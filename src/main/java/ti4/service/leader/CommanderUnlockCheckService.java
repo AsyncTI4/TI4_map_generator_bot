@@ -18,6 +18,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -299,13 +300,8 @@ public class CommanderUnlockCheckService {
             }
             case "ta" -> shouldBeUnlocked = (TaAbilityHandler.getControlledPlanetCountWithAnyDesign(player, game) >= 4);
             case "netrunners" ->
-                shouldBeUnlocked = player.getTechs().stream()
-                                .filter(tech -> game.getRealPlayersExcludingThis(player).stream()
-                                                .filter(otherPlayer -> otherPlayer.hasTech(tech))
-                                                .count()
-                                        >= 2)
-                                .count()
-                        >= 2;
+                shouldBeUnlocked = TechnologyType.mainFour.stream()
+                        .anyMatch(type -> ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 3);
             case "crystellum" ->
                 shouldBeUnlocked =
                         (CrystellumLeadersHandler.getCrystellumCommanderCapacitySystemCount(game, player) >= 3);

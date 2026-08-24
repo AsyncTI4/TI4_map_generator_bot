@@ -178,6 +178,7 @@
     "title": "Systems Specialist",
     "abilityWindow": "When a player spends resources to research a technology:",
     "abilityText": "You may exhaust this card to reduce the cost by 1 for each other player who owns that technology.",
+    "notes": "This is best used when the receiving player is actually paying for their tech, it will update once they press a button during payment after the agent has been applied.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -189,7 +190,8 @@
     "title": "Tech Junkie",
     "abilityWindow": "When you perform the secondary ability of the \"Technology\" strategy card:",
     "abilityText": "You may choose to not spend a command token. If you do spend a command token, you may exhaust a planet with a technology specialty to research a technology of the same color as the exhausted planet without spending resources.",
-    "unlockCondition": "Own 2 technologies that are owned by at least 2 other players.",
+    "notes": "When this is unlocked, make sure to not press \"Spend a strategy token\". Press \"Get a Technology\" instead. Then, it will offer your options for following.",
+    "unlockCondition": "Own 3 technologies in the same color.",
     "source": "beans"
   },
   {

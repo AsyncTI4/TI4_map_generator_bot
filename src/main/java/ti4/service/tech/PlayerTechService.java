@@ -112,7 +112,8 @@ public class PlayerTechService {
         if ("tharcanumpmy".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
-        CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -933,7 +934,8 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum", "netrunners");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1

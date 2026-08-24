@@ -210,8 +210,7 @@ public class NetrunnersAbilitiesHandler {
                         .anyMatch(tech -> tech != null && tech.getFaction().isEmpty()))
                 .map(player -> Buttons.green(
                         netrunner.factionButtonChecker() + "proxyNetworkPlayer_" + player.getFaction(),
-                        "Copy a Technology from " + player.getColorDisplayName(),
-                        FactionEmojis.netrunners))
+                        "Copy a Technology from " + player.getColorDisplayName()))
                 .toList();
         if (buttons.isEmpty()) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -238,8 +237,7 @@ public class NetrunnersAbilitiesHandler {
                 .map(tech -> Buttons.green(
                         netrunner.factionButtonChecker() + "proxyNetworkTech_" + source.getFaction() + "_"
                                 + tech.getAlias(),
-                        tech.getName(),
-                        FactionEmojis.netrunners))
+                        tech.getName()))
                 .toList();
         if (buttons.isEmpty()) {
             ButtonHelper.deleteMessage(event);

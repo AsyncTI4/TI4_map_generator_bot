@@ -109,8 +109,7 @@ public class NetrunnersLeadersHandler {
                 })
                 .map(planet -> Buttons.green(
                         player.factionButtonChecker() + "netrunnersCommanderPlanet_" + planet,
-                        "Exhaust " + planet,
-                        FactionEmojis.netrunners))
+                        "Exhaust " + Helper.getPlanetRepresentation(planet, game)))
                 .toList();
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -167,7 +166,7 @@ public class NetrunnersLeadersHandler {
     }
 
     public static Button getAgentDiscountButton(Game game, Player player, String techId, String payType) {
-        int discount = getAgentDiscount(game, player, techId);
+        int discount = getAgentDiscount(game, player, player, techId);
         if (discount < 1) return null;
         return Buttons.gray(
                 player.factionButtonChecker() + "netrunnersAgentDiscount_" + player.getFaction() + "|" + techId + "|"
@@ -178,7 +177,9 @@ public class NetrunnersLeadersHandler {
 
     public static Button getAgentCardsInfoButton(Player player) {
         return Buttons.gray(
-                player.factionButtonChecker() + "netrunnersAgentInfo", "Netrunners Agent", FactionEmojis.netrunners);
+                player.factionButtonChecker() + "netrunnersAgentInfo",
+                "Use Netrunners Agent",
+                FactionEmojis.netrunners);
     }
 
     @ButtonHandler("netrunnersAgentInfo")
@@ -207,8 +208,7 @@ public class NetrunnersLeadersHandler {
                 .filter(techId -> Mapper.getTech(techId) != null)
                 .map(techId -> Buttons.green(
                         player.factionButtonChecker() + "netrunnersAgentDiscount_" + target.getFaction() + "|" + techId,
-                        Mapper.getTech(techId).getName(),
-                        FactionEmojis.netrunners))
+                        Mapper.getTech(techId).getName()))
                 .toList();
         ButtonHelper.deleteMessage(event);
         if (buttons.isEmpty()) {
@@ -240,8 +240,7 @@ public class NetrunnersLeadersHandler {
                 .map(candidate -> Buttons.green(
                         netrunner.factionButtonChecker() + "netrunnersAgentDiscount_" + researcher.getFaction() + "|"
                                 + candidate,
-                        Mapper.getTech(candidate).getName(),
-                        FactionEmojis.netrunners))
+                        Mapper.getTech(candidate).getName()))
                 .toList();
         String message = netrunner.getRepresentationUnfogged()
                 + ", please choose the technology " + researcher.getRepresentation(false, true)
@@ -250,7 +249,7 @@ public class NetrunnersLeadersHandler {
                 netrunner.factionButtonChecker() + "netrunnersAgentDiscount_" + researcher.getFaction() + "|";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), techButtons, message, buttonPrefix, buttonID)) return;
-        int discount = getAgentDiscount(game, netrunner, techId);
+        int discount = getAgentDiscount(game, netrunner, researcher, techId);
         if (!researcher.hasTech(techId) || discount < 1) return;
         ExhaustLeaderService.exhaustLeader(
                 game, netrunner, netrunner.getLeader("netrunnersagent").orElseThrow());
@@ -270,12 +269,13 @@ public class NetrunnersLeadersHandler {
                         + ". The discount has been added to their spend summary.");
     }
 
-    private static int getAgentDiscount(Game game, Player netrunner, String techId) {
+    private static int getAgentDiscount(Game game, Player netrunner, Player researcher, String techId) {
         if (game == null
                 || netrunner == null
+                || researcher == null
                 || Mapper.getTech(techId) == null
                 || !netrunner.hasUnexhaustedLeader("netrunnersagent")) return 0;
-        return (int) game.getRealPlayersExcludingThis(netrunner).stream()
+        return (int) game.getRealPlayersExcludingThis(researcher).stream()
                 .filter(player -> player.hasTech(techId))
                 .count();
     }
@@ -290,8 +290,7 @@ public class NetrunnersLeadersHandler {
                         game.getRealPlayersExcludingThis(player).stream().anyMatch(other -> other.hasTech(tech)))
                 .map(tech -> Buttons.green(
                         player.factionButtonChecker() + "netrunnersHeroTech_" + tech,
-                        Mapper.getTech(tech).getName(),
-                        FactionEmojis.netrunners))
+                        Mapper.getTech(tech).getName()))
                 .toList();
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -315,8 +314,7 @@ public class NetrunnersLeadersHandler {
                         game.getRealPlayersExcludingThis(player).stream().anyMatch(other -> other.hasTech(tech)))
                 .map(tech -> Buttons.green(
                         player.factionButtonChecker() + "netrunnersHeroTech_" + tech,
-                        Mapper.getTech(tech).getName(),
-                        FactionEmojis.netrunners))
+                        Mapper.getTech(tech).getName()))
                 .toList();
         String message = player.getRepresentationUnfogged()
                 + ", please choose the shared technology to return with _Power Surge - Network Overload_.";
@@ -344,16 +342,10 @@ public class NetrunnersLeadersHandler {
             return;
         }
         List<Button> buttons = game.getRealPlayersExcludingThis(player).stream()
-                .filter(other ->
-                        player.getDebtTokenCount(other.getColor(), NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL) > 0)
-                .filter(other -> other.getTechs().stream()
-                        .map(Mapper::getTech)
-                        .anyMatch(tech ->
-                                tech != null && tech.getFaction().isEmpty() && !player.hasTech(tech.getAlias())))
+                .filter(other -> isEligibleHeroTokenSource(player, other))
                 .map(other -> Buttons.green(
                         player.factionButtonChecker() + "netrunnersHeroSource_" + other.getFaction(),
-                        "Return " + other.getColorDisplayName() + " Token",
-                        FactionEmojis.netrunners))
+                        "Return " + other.getColorDisplayName() + " Token"))
                 .toList();
         if (buttons.isEmpty()) {
             finishHero(game, player, null);
@@ -366,6 +358,14 @@ public class NetrunnersLeadersHandler {
                 player.getRepresentationUnfogged()
                         + ", you may return a control token to gain 1 command token and a non-faction technology that player has.",
                 buttons);
+    }
+
+    private static boolean isEligibleHeroTokenSource(Player player, Player source) {
+        return player.getDebtTokenCount(source.getColor(), NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL) > 0
+                && source.getTechs().stream()
+                        .map(Mapper::getTech)
+                        .anyMatch(tech ->
+                                tech != null && tech.getFaction().isEmpty() && !player.hasTech(tech.getAlias()));
     }
 
     @ButtonHandler("netrunnersHeroDone")
@@ -388,15 +388,23 @@ public class NetrunnersLeadersHandler {
                 .map(tech -> Buttons.green(
                         player.factionButtonChecker() + "netrunnersHeroGain_" + source.getFaction() + "_"
                                 + tech.getAlias(),
-                        tech.getName(),
-                        FactionEmojis.netrunners))
+                        tech.getName()))
                 .toList();
+        boolean hasAnotherSource = game.getRealPlayersExcludingThis(player).stream()
+                .anyMatch(other -> other != source && isEligibleHeroTokenSource(player, other));
         if (buttons.isEmpty()) {
-            ButtonHelper.deleteMessage(event);
-            offerHeroTokenSourceSelection(game, player);
+            if (hasAnotherSource) {
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+            } else {
+                ButtonHelper.deleteMessage(event);
+            }
             return;
         }
-        ButtonHelper.deleteMessage(event);
+        if (hasAnotherSource) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+        } else {
+            ButtonHelper.deleteMessage(event);
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", choose the technology to gain:",
@@ -429,6 +437,5 @@ public class NetrunnersLeadersHandler {
                 player.getRepresentationUnfogged()
                         + ", choose where to gain 1 command token via _Power Surge - Network Overload_.",
                 ButtonHelper.getGainCCButtons(player));
-        offerHeroTokenSourceSelection(game, player);
     }
 }
