@@ -14,9 +14,6 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
@@ -180,7 +177,6 @@ public class DestroyUnitService {
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
-        CrystellumAbilityHandler.offerFragmentationForBatchIfRelevant(event, game, units, combat);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
@@ -301,9 +297,6 @@ public class DestroyUnitService {
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
                 }
-                if (player != null && player.hasUnit("crystellum_flagship")) {
-                    CrystellumUnitHandler.resolveCrystFlagDestroy(event, player, game, unit);
-                }
             }
             default -> Consumers.nop();
         }
@@ -403,9 +396,6 @@ public class DestroyUnitService {
                                 + " available to you  (on the game board or in your reinforcements)."
                                 + "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");
             }
-        }
-        if (player != null && CrystellumPromissoryHandler.canUseFracture(game, player, unit, combat, killers)) {
-            CrystellumPromissoryHandler.sendFractureButtons(event, game, player, unit);
         }
         if (player != null) {
             String unitTypeString =

@@ -31,8 +31,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMora
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
@@ -354,10 +352,6 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
         AeternaTechHandler.resetThanatocyteLatticeForCombat(game, player1, tile, unitHolderName);
         AeternaTechHandler.resetThanatocyteLatticeForCombat(game, player2, tile, unitHolderName);
-        if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
-            CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
-            CrystellumAbilityHandler.resetRefractionForCombat(game, player2, tile);
-        }
         if (firstCombatThread) {
             if (player1.hasLeader("aeternacommander") && !player1.hasLeaderUnlocked("aeternacommander")) {
                 MessageHelper.sendMessageToChannelWithButton(
@@ -1432,13 +1426,6 @@ public class StartCombatService {
         if ((p1.hasAbility("facsimile") && p1 != game.getActivePlayer())
                 || p2.hasAbility("facsimile") && p2 != game.getActivePlayer() && !game.isFowMode()) {
             buttons.add(Buttons.gray("startFacsimile_" + tile.getPosition(), "Facsimile", FactionEmojis.mortheus));
-        }
-
-        // Facet
-        if (CrystellumLeadersHandler.canUseCrystellumHero(p1)) {
-            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p1, tile));
-        } else if (CrystellumLeadersHandler.canUseCrystellumHero(p2)) {
-            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p2, tile));
         }
 
         // mercenaries
