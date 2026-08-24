@@ -791,7 +791,12 @@ public class PlayerAreaGenerator {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .mapToInt(UnitHolder::getTotalGalvanizedCount)
                     .sum();
-            if (totGalvanized > maxGalvanizeTokens) {
+            boolean hasNonBastionGalvanizeSource = game.getRealPlayers().stream()
+                    .anyMatch(p -> p.hasTech("thardentiar")
+                            || p.hasTech("thponthousr")
+                            || p.ownsPromissoryNote("thpnponthous")
+                            || p.hasUnlockedBreakthrough("kryxosbt"));
+            if (!game.isFrankenGame() && !hasNonBastionGalvanizeSource && totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
                         + ", there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

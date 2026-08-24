@@ -1240,6 +1240,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? LunariumAbilityHandler.getFactionSheetCCs(game, this)
                 : game.getMaxSOCountPerPlayer();
         int bonus = 0;
+        if (game.isErwansGambitMode() && "mentak".equalsIgnoreCase(getFaction())) bonus = game.getRound() + 1;
         if (hasRelic("obsidian")) bonus++;
         if (hasRelic("absol_obsidian")) bonus++;
         if (hasAbility("information_brokers")) bonus++;
@@ -1503,9 +1504,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 }
 
                 for (String trait : planet.getPlanetTypes()) {
-                    if (Constants.CULTURAL.equals(trait)
-                            || Constants.HAZARDOUS.equals(trait)
-                            || Constants.INDUSTRIAL.equals(trait)) {
+                    if (!planet.isHomePlanet(game)
+                            && (Constants.CULTURAL.equals(trait)
+                                    || Constants.HAZARDOUS.equals(trait)
+                                    || Constants.INDUSTRIAL.equals(trait))) {
                         controlledTraits.add(trait);
                     }
                 }
@@ -2664,8 +2666,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addPlanet("fabricatestation");
             refreshPlanet("fabricatestation");
         }
-
-        ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, this, techID);
 
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);

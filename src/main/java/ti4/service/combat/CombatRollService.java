@@ -587,26 +587,6 @@ public class CombatRollService {
             message += "\n_Mass Hypnosis_ redirected " + massHypnosisHits + " hit" + (massHypnosisHits == 1 ? "" : "s")
                     + " to its owner's ships.";
         }
-        int renegadeCount = opponent.hasUnit("ponthous_destroyer2")
-                ? tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, opponent)
-                : 0;
-        if (rollType == CombatRollType.AFB && h > 0 && opponent != player && renegadeCount > 0) {
-            int canceledHits = Math.min(h, renegadeCount);
-            h -= canceledHits;
-            message = message.replaceFirst(
-                    "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
-            if (payload.total() != null) {
-                CombatRollPayload.RollTotal total = payload.total();
-                payload = new CombatRollPayload(
-                        payload.header(),
-                        payload.notes(),
-                        payload.modifiers(),
-                        payload.unitRolls(),
-                        new CombatRollPayload.RollTotal(total.diceRolled(), h, total.misses(), total.maximumHits()));
-            }
-            message += "\n_Renegade II_ canceled " + canceledHits + " ANTI-FIGHTER BARRAGE hit"
-                    + (canceledHits == 1 ? "" : "s") + " automatically.";
-        }
         XytherisAbilityHandler.beginStingOfTheHiveRoll(game, player, tile, rollType, h);
         int round;
         String combatName =
@@ -883,7 +863,7 @@ public class CombatRollService {
                 if (!stingOfTheHiveButtons.isEmpty()) {
                     buttons.addAll(stingOfTheHiveButtons);
                     msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
-                            + " to decide whether to place or move a mine before assigning hits.";
+                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
@@ -974,7 +954,7 @@ public class CombatRollService {
                     + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
             if (!stingOfTheHiveButtons.isEmpty()) {
                 msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
-                        + " to decide whether to place or move a mine before assigning hits.";
+                        + " to decide whether to cancel hits and place mine tokens before assigning hits.";
             }
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
@@ -986,7 +966,7 @@ public class CombatRollService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation()
-                                + ", you may use **Sting of the Hive** to place or move a mine instead of 1 SPACE CANNON DEFENCE hit.\n-# "
+                                + ", you may use **Sting of the Hive** to cancel any number of these SPACE CANNON DEFENCE hits and place that many mine tokens.\n-# "
                                 + opponent.getRepresentationNoPing()
                                 + " should wait to assign hits until you have decided:",
                         stingOfTheHiveButtons);
@@ -1043,7 +1023,7 @@ public class CombatRollService {
                                         + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".";
                                 if (!stingOfTheHiveButtons.isEmpty()) {
                                     assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
-                                            + " to decide whether to place or move a mine before assigning hits.";
+                                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
@@ -1067,7 +1047,7 @@ public class CombatRollService {
                                                 + (h == 1 ? "" : "s") + " for the dummy player.";
                                 if (!stingOfTheHiveButtons.isEmpty()) {
                                     assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
-                                            + " to decide whether to place or move a mine before assigning hits.";
+                                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),

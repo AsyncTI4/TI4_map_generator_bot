@@ -89,7 +89,9 @@ class GamePhaseButtonHandler {
     @ButtonHandler("startOfGameObjReveal")
     public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game) {
         for (Player p : game.getRealPlayers()) {
-            if (p.getSecrets().size() > 1 && !game.isExtraSecretMode()) {
+            if (p.getSecrets().size() > 1
+                    && !game.isExtraSecretMode()
+                    && (!game.isErwansGambitMode() || !"mentak".equalsIgnoreCase(p.getFaction()))) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Please ensure everyone has discarded secret objectives before hitting this button. ");

@@ -28,8 +28,10 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
@@ -260,7 +262,7 @@ public class TacticalActionService {
 
     private FinishMovementContext executeCoreFinishMovement(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
         if (player.hasLeader("ironhero")) {
             IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
@@ -286,6 +288,21 @@ public class TacticalActionService {
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
+        }
+        if (game.isErwansGambitMode()) {
+            if (tile == player.getHomeSystemTile()
+                    && game.getStoredValue("unclaimedRelicLocations").contains(player.getFaction())) {
+                Die d1 = new Die(10);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " rolled " + d1.getResult() + " for their defense roll.");
+                if (d1.isSuccess()) {
+                    game.setStoredValue(
+                            "unclaimedRelicLocations",
+                            game.getStoredValue("unclaimedRelicLocations").replace(player.getFaction(), ""));
+                    RelicHelper.drawRelicAndNotify(player, event, game);
+                }
+            }
         }
 
         return new FinishMovementContext(updatedTile, unitsWereMoved, hasGfsInRange, playersWithPds2);

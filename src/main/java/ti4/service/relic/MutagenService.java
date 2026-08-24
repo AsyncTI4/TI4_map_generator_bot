@@ -82,9 +82,11 @@ public class MutagenService {
         if (volatileMutagenics) {
             player.removeRelic("volatile_mutagenics");
             player.removeExhaustedRelic("volatile_mutagenics");
-            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
-            OblivionUnitHandler.doOblivionMechCheck(game, player);
         }
+
+        // Purging either kind of Mutagen is a single "purge 1 or more components" event.
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
 
         game.setStoredValue(OPTIONS_KEY + player.getFaction(), String.join(",", options));
         game.setStoredValue(REMAINING_KEY + player.getFaction(), volatileMutagenics ? "2" : "1");
@@ -195,9 +197,7 @@ public class MutagenService {
                 .filter(Mapper::isValidTech)
                 .filter(techID -> {
                     TechnologyModel tech = Mapper.getTech(techID);
-                    return tech.isFactionTech()
-                            && !tech.isUnitUpgrade()
-                            && game.getRealPlayers().stream().noneMatch(otherPlayer -> otherPlayer.hasTech(techID));
+                    return tech.isFactionTech() && !tech.isUnitUpgrade() && isFactionTechAvailable(game, techID);
                 })
                 .distinct()
                 .toList();
@@ -246,13 +246,16 @@ public class MutagenService {
         }
         String id = choiceParts[1];
         return switch (choiceParts[0]) {
-            case "tech" ->
-                Mapper.isValidTech(id)
-                        && !player.hasTech(id)
-                        && game.getRealPlayers().stream().noneMatch(otherPlayer -> otherPlayer.hasTech(id));
+            case "tech" -> Mapper.isValidTech(id) && !player.hasTech(id) && isFactionTechAvailable(game, id);
             case "agent", "commander" -> Mapper.isValidLeader(id) && Helper.getPlayerFromLeader(game, id) == null;
             default -> false;
         };
+    }
+
+    private static boolean isFactionTechAvailable(Game game, String techID) {
+        return game.getRealPlayers().stream()
+                .noneMatch(otherPlayer -> otherPlayer.hasTech(techID)
+                        || otherPlayer.getFactionTechs().contains(techID));
     }
 
     private static List<Button> getMutagenOptionButtons(Player player, List<String> options) {

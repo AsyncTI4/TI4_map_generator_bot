@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obli
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -16,12 +17,10 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
-import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
@@ -263,7 +262,7 @@ public class OblivionLeadersHandler {
 
         List<Button> buttons = getCommanderUnits(game, player).stream()
                 .map(unit -> Buttons.green(
-                        player.factionButtonChecker() + COMMANDER_UNIT + position + "|" + unit.getAsyncId(),
+                        player.factionButtonChecker() + COMMANDER_UNIT + position + "|" + unit.getId(),
                         "Produce 1 " + unit.getUnitType().humanReadableName(),
                         unit.getUnitEmoji()))
                 .toList();
@@ -272,12 +271,13 @@ public class OblivionLeadersHandler {
             return;
         }
 
+        String message = player.getRepresentation()
+                + ", please choose the unit to produce using Deyra the Voidborn, the Oblivion commander.";
+        String buttonPrefix = player.factionButtonChecker() + COMMANDER_UNIT + position + "|";
+
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation()
-                        + ", please choose the unit to produce using Deyra the Voidborn, the Oblivion commander.",
-                buttons);
+                event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
     }
 
     @ButtonHandler(COMMANDER_UNIT)
@@ -285,9 +285,28 @@ public class OblivionLeadersHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(COMMANDER_UNIT.length()).split("\\|", 3);
         Tile tile = payload.length >= 2 && game != null ? game.getTileByPosition(payload[0]) : null;
+        List<Button> commanderUnits = payload.length >= 1 && game != null && player != null
+                ? getCommanderUnits(game, player).stream()
+                        .map(model -> Buttons.green(
+                                player.factionButtonChecker() + COMMANDER_UNIT + payload[0] + "|" + model.getId(),
+                                "Produce 1 " + model.getUnitType().humanReadableName(),
+                                model.getUnitEmoji()))
+                        .toList()
+                : List.of();
+        String message = player == null
+                ? ""
+                : player.getRepresentation()
+                        + ", please choose the unit to produce using Deyra the Voidborn, the Oblivion commander.";
+        String buttonPrefix = player == null || payload.length < 1
+                ? ""
+                : player.factionButtonChecker() + COMMANDER_UNIT + payload[0] + "|";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), commanderUnits, message, buttonPrefix, buttonID)) {
+            return;
+        }
         UnitModel unit = payload.length >= 2
                 ? getCommanderUnits(game, player).stream()
-                        .filter(model -> model.getAsyncId().equals(payload[1]))
+                        .filter(model -> model.getId().equals(payload[1]))
                         .findFirst()
                         .orElse(null)
                 : null;
@@ -354,13 +373,11 @@ public class OblivionLeadersHandler {
         if (game == null || player == null) {
             return List.of();
         }
-        return player.getUnitModels().stream()
+        return Mapper.getUnits().values().stream()
                 .filter(unit -> unit.getCost() > 0 && unit.getCost() <= 4)
                 .filter(unit -> !unit.getIsStructure())
-                .filter(unit -> {
-                    UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
-                    return unitKey != null && ButtonHelperFactionSpecific.remainingUnitsOfType(game, unitKey) > 0;
-                })
+                .filter(unit -> unit.getUnitType() != null && unit.getName() != null)
+                .sorted(Comparator.comparing(UnitModel::getName))
                 .toList();
     }
 

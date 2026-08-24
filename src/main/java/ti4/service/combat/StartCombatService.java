@@ -130,6 +130,9 @@ public class StartCombatService {
     }
 
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
+        if (game.getStoredValue("safeHarborUsed").isEmpty()) {
+            return;
+        }
         spaceCombatCheck(game, tile, event);
         tile.getUnitHolders().values().stream()
                 .filter(unitHolder -> !Constants.SPACE.equals(unitHolder.getName()))
@@ -826,7 +829,7 @@ public class StartCombatService {
     public static void sendSpaceCannonButtonsToThread(
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition());
         if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
@@ -886,6 +889,8 @@ public class StartCombatService {
         combatPlayers.add(p2);
         List<Button> buttons = new ArrayList<>();
 
+        Player mentakOpponent = null;
+        boolean mentakFound = false;
         for (Player player : combatPlayers) {
             Player otherPlayer = p1;
             if (otherPlayer == player) {
@@ -969,6 +974,15 @@ public class StartCombatService {
                         msg
                                 + ", a reminder that if you keep alive at least 3 non-fighter ships in the active system until the end of combat, you could score _Demonstrate Your Power_.",
                         buttons2);
+            }
+            if (game.isErwansGambitMode()
+                    && "space".equalsIgnoreCase(type)
+                    && "mentak".equalsIgnoreCase(player.getFaction())
+                    && capitalShips >= 2) {
+                mentakFound = true;
+            }
+            if (!"mentak".equalsIgnoreCase(player.getFaction())) {
+                mentakOpponent = player;
             }
 
             if ((player.hasAbility("primacy")
@@ -1240,6 +1254,13 @@ public class StartCombatService {
                         buttons);
             }
         }
+        if (mentakFound) {
+            Button steal = Buttons.gray(
+                    mentakOpponent.factionButtonChecker() + "toggleGalvanize_" + tile.getPosition(), "Claim a bounty");
+            String message = mentakOpponent.getRepresentation()
+                    + ", a reminder that if you win this combat you can claim a bounty with this button. (bounty is represented via a galvanize token)";
+            MessageHelper.sendMessageToChannelWithButton(mentakOpponent.getCardsInfoThread(), message, steal);
+        }
     }
 
     private static void sendAFBButtonsToThread(
@@ -1317,7 +1338,7 @@ public class StartCombatService {
         spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
 
         // Add Graviton Laser System button if applicable
-        for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+        for (Player playerWithPds : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
             if (playerWithPds.hasTechReady("gls")) { // Graviton Laser Systems
                 spaceCannonButtons.add(
                         Buttons.gray("exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
@@ -1471,7 +1492,8 @@ public class StartCombatService {
         if (game.isFowMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
             return 0;
         }
-        if (!ButtonHelper.tileHasPDS2Cover(player1, game, tile.getPosition()).isEmpty()) {
+        if (!ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition())
+                .isEmpty()) {
             return 1;
         }
         return 0;

@@ -221,11 +221,13 @@ public final class ButtonHelperTacticalAction {
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
-                    && !player.getExhaustedRelics().contains("emphidia")) {
+                    && !player.getExhaustedRelics().contains("emphidia")
+                    && !ButtonHelper.getButtonsToExploreAllPlanets(player, game).isEmpty()) {
                 String message = player.getRepresentation()
                         + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
                 List<Button> systemButtons2 = new ArrayList<>();
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+                systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
             if (game.isWarfareAction()
@@ -284,6 +286,7 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -532,6 +535,39 @@ public final class ButtonHelperTacticalAction {
         }
     }
 
+    @ButtonHandler("useSafeHarbor")
+    public static void useSafeHarbor(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentationNoPing() + " is using their safe harbor ability");
+
+        for (Player p : game.getRealPlayersExcludingThis(player)) {
+            if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                if ("letnev".equalsIgnoreCase(p.getFaction())) {
+                    continue;
+                }
+                game.setStoredValue("safeHarborUsed", "yes");
+                if ("saar".equalsIgnoreCase(p.getFaction())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing() + " does not need to pay Saar due to their brotherhood.");
+                    continue;
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), player.getRepresentation() + " spent 2tg for the purpose.");
+                player.setTg(player.getTg() - 2);
+                if ("jolnar".equalsIgnoreCase(p.getFaction())) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            p.getCorrectChannel(),
+                            p.getRepresentation()
+                                    + " you can use this button to research a tech that Mentak owns for 2tg.",
+                            Buttons.GET_A_TECH);
+                }
+            }
+        }
+    }
+
     @ButtonHandler("tacticalAction")
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
         if (!player.isActivePlayer() && game.isFowMode()) {
@@ -740,6 +776,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
         NetrunnersAbilitiesHandler.offerBlackout(game, player, tile);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
@@ -807,21 +844,35 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
 
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, pos);
         if (!game.isFowMode() && !playersWithPds2.isEmpty() && !game.isL1Hero()) {
+            Tile pdsTile = game.getTileByPosition(pos);
+            Map<String, PdsCoverage> pdsCoverage =
+                    pdsTile == null ? null : PdsCoverageHelper.calculatePdsCoverage(game, pdsTile);
             List<String> mentions = new ArrayList<>();
+            int totalDice = 0;
             for (Player playerWithPds : playersWithPds2) {
                 if (playerWithPds == player) {
                     continue;
                 }
-                mentions.add(playerWithPds.getRepresentationNoPing());
+                PdsCoverage coverage = pdsCoverage == null ? null : pdsCoverage.get(playerWithPds.getFaction());
+                if (coverage == null) {
+                    mentions.add(playerWithPds.getRepresentationNoPing());
+                    continue;
+                }
+                totalDice += coverage.getCount();
+                mentions.add(playerWithPds.getRepresentationNoPing() + " (" + coverage.getCount()
+                        + (coverage.getCount() == 1 ? " die)" : " dice)"));
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')
                         .append(player.getRepresentationUnfogged())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
-                        .append(String.join(", ", mentions))
-                        .append(".");
+                        .append(String.join(", ", mentions));
+                if (mentions.size() > 1 && totalDice > 0) {
+                    message.append(", for a total of ").append(totalDice).append(totalDice == 1 ? " die" : " dice");
+                }
+                message.append(".");
             }
         }
 
@@ -991,6 +1042,13 @@ public final class ButtonHelperTacticalAction {
                             flaah.getRepresentation() + " use buttons to resolve a build for Flaah Hyphae.",
                             buttons);
                 }
+            }
+            if (player.hasAbility("safe_harbor") && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(player.factionButtonChecker() + "useSafeHarbor_" + pos, "Use Safe Harbor"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
+                String msg = player.getRepresentation() + ", you may use the button to use your safe harbor ability.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
 
             Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();

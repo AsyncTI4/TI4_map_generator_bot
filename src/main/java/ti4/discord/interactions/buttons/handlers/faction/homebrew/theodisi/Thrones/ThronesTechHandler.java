@@ -33,11 +33,13 @@ public class ThronesTechHandler {
     private static final String MOVE_SS_TRANSPORT = "moveSpecterStepTransport_";
     private static final String DONE_SS_TRANSPORT = "doneSpecterStepTransport_";
     private static final String SS_TRANSPORT_PAGE = "specterStepTransportPage_";
+    private static final String SS_DESTINATION_PAGE = "specterStepDestinationPage_";
     // Rift-Touched Bastion
     private static final String RTB = "ththronesr";
     private static final String USE_RTB = "useRiftTouchedBastion";
     private static final String SELECT_RTB_SYSTEM = "selectRiftTouchedBastionSystem_";
     private static final String RTB_RIFT = "riftTouchedBastionRift_";
+    private static final String RTB_ACTIVE_PLAYER = "riftTouchedBastionActivePlayer_";
 
     // Specter Step
     public static List<Button> getSpecterStepButtons(Player player) {
@@ -88,45 +90,15 @@ public class ThronesTechHandler {
     }
 
     @ButtonHandler(SELECT_SS_SHIP)
-    public static void selectSpecterAdjacentSystem(
+    public static void selectSpecterStepDestination(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null || !player.hasTechReady(SS)) {
             return;
         }
 
         String asyncId = buttonID.substring(SELECT_SS_SHIP.length());
-        UnitModel selectedShip = player.getUnitFromAsyncID(asyncId);
-        if (selectedShip == null || !selectedShip.getIsShip()) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
-        if (activeTile == null
-                || activeTile.getSpaceUnitHolder().getUnitsByStateForPlayer(player).keySet().stream()
-                        .noneMatch(unitKey -> asyncId.equals(unitKey.asyncID()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> adjacentSystems = new ArrayList<>();
-        for (String position :
-                FoWHelper.getAdjacentTilesAndNotThisTile(game, activeTile.getPosition(), player, false)) {
-            Tile tile = game.getTileByPosition(position);
-            if (tile == null
-                    || !FoWHelper.playerHasUnitsInSystem(player, tile)
-                    || game.getRealPlayersNDummies().stream()
-                            .anyMatch(otherPlayer -> otherPlayer != player
-                                    && FoWHelper.playerHasActualShipsInSystem(otherPlayer, tile))) {
-                continue;
-            }
-
-            adjacentSystems.add(Buttons.green(
-                    player.factionButtonChecker() + MOVE_SS_SHIP + asyncId + "|" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player)));
-        }
-
-        if (adjacentSystems.isEmpty()) {
+        List<Button> destinationButtons = getSpecterStepDestinationButtons(game, player, asyncId);
+        if (destinationButtons.isEmpty()) {
             ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -134,11 +106,38 @@ public class ThronesTechHandler {
             return;
         }
 
+        String message = player.getRepresentation() + ", please choose the system to which to move the ship.";
+        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        String pagePrefix = player.factionButtonChecker() + SS_DESTINATION_PAGE + asyncId + "_";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), destinationButtons, extraButtons, message, pagePrefix, buttonID)) {
+            return;
+        }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
+                message,
+                NewStuffHelper.buttonPagination(destinationButtons, extraButtons, pagePrefix, 25, 0, false));
+    }
+
+    @ButtonHandler(SS_DESTINATION_PAGE)
+    public static void changeSpecterStepDestinationPage(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String payload = buttonID.substring(SS_DESTINATION_PAGE.length());
+        int pageMarker = payload.lastIndexOf("_page");
+        if (game == null || player == null || !player.hasTechReady(SS) || pageMarker < 1) {
+            return;
+        }
+        String asyncId = payload.substring(0, pageMarker);
+        List<Button> destinationButtons = getSpecterStepDestinationButtons(game, player, asyncId);
+        NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                destinationButtons,
+                List.of(Buttons.red("deleteButtons", "Decline")),
                 player.getRepresentation() + ", please choose the system to which to move the ship.",
-                adjacentSystems);
+                player.factionButtonChecker() + SS_DESTINATION_PAGE + asyncId + "_",
+                buttonID);
     }
 
     @ButtonHandler(MOVE_SS_SHIP)
@@ -161,9 +160,6 @@ public class ThronesTechHandler {
         Tile destination = game.getTileByPosition(parts[1]);
         if (source == null
                 || destination == null
-                || !FoWHelper.getAdjacentTilesAndNotThisTile(game, source.getPosition(), player, false)
-                        .contains(destination.getPosition())
-                || !FoWHelper.playerHasUnitsInSystem(player, destination)
                 || game.getRealPlayersNDummies().stream()
                         .anyMatch(otherPlayer -> otherPlayer != player
                                 && FoWHelper.playerHasActualShipsInSystem(otherPlayer, destination))) {
@@ -317,6 +313,28 @@ public class ThronesTechHandler {
         return buttons;
     }
 
+    private static List<Button> getSpecterStepDestinationButtons(Game game, Player player, String asyncId) {
+        Tile source = game.getTileByPosition(game.getActiveSystem());
+        UnitKey shipKey = source == null
+                ? null
+                : source.getSpaceUnitHolder().getUnitsByStateForPlayer(player).keySet().stream()
+                        .filter(unitKey -> asyncId.equals(unitKey.asyncID()))
+                        .findFirst()
+                        .orElse(null);
+        UnitModel ship = shipKey == null ? null : player.getUnitFromUnitKey(shipKey);
+        if (ship == null || !ship.getIsShip()) return List.of();
+
+        return game.getTileMap().values().stream()
+                .filter(tile -> tile != source)
+                .filter(tile -> game.getRealPlayersNDummies().stream()
+                        .noneMatch(otherPlayer ->
+                                otherPlayer != player && FoWHelper.playerHasActualShipsInSystem(otherPlayer, tile)))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker() + MOVE_SS_SHIP + asyncId + "|" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)))
+                .toList();
+    }
+
     private static Button getSpecterStepTransportDoneButton(Player player, Tile source, Tile destination) {
         return Buttons.red(
                 player.factionButtonChecker() + DONE_SS_TRANSPORT + source.getPosition() + "|"
@@ -326,15 +344,23 @@ public class ThronesTechHandler {
 
     // Rift-Touched Bastion
     public static void offerRiftTouchedBastion(Game game, Tile activatedTile) {
+        Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) return;
         for (Player player : game.getRealPlayers()) {
-            if (!player.hasTechReady(RTB) || !FoWHelper.playerHasUnitsInSystem(player, activatedTile)) {
+            if (!player.hasTechReady(RTB)
+                    || (player != activePlayer && !FoWHelper.playerHasUnitsInSystem(player, activatedTile))
+                    || getRiftTouchedBastionSystemButtons(game, player, activePlayer)
+                            .isEmpty()) {
                 continue;
             }
+            game.setStoredValue(RTB_ACTIVE_PLAYER + player.getFaction(), activePlayer.getFaction());
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", you may exhaust _Rift-Touched Bastion_ to treat a system containing your units as a gravity rift for this tactical action.",
+                            + ", you may exhaust _Rift-Touched Bastion_ to treat a system containing "
+                            + activePlayer.getRepresentationNoPing()
+                            + "'s units as a gravity rift for this tactical action.",
                     List.of(
                             Buttons.green(
                                     player.factionButtonChecker() + USE_RTB,
@@ -346,19 +372,23 @@ public class ThronesTechHandler {
 
     @ButtonHandler(USE_RTB)
     public static void offerRiftTouchedBastionSystems(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.hasTechReady(RTB)) {
+        Player activePlayer = game.getActivePlayer();
+        if (!player.hasTechReady(RTB)
+                || activePlayer == null
+                || !activePlayer.getFaction().equals(game.getStoredValue(RTB_ACTIVE_PLAYER + player.getFaction()))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        List<Button> buttons = getRiftTouchedBastionSystemButtons(game, player);
+        List<Button> buttons = getRiftTouchedBastionSystemButtons(game, player, activePlayer);
         if (buttons.isEmpty()) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         String message = player.getRepresentation()
-                + ", choose a system containing your units to treat as a gravity rift for this tactical action.";
+                + ", choose a system containing " + activePlayer.getRepresentationNoPing()
+                + "'s units to treat as a gravity rift for this tactical action.";
 
         String prefix = player.factionButtonChecker() + SELECT_RTB_SYSTEM;
         MessageHelper.sendMessageToChannelWithButtons(
@@ -369,14 +399,18 @@ public class ThronesTechHandler {
     @ButtonHandler(SELECT_RTB_SYSTEM)
     public static void resolveRiftTouchedBastion(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasTechReady(RTB)) {
+        Player activePlayer = game.getActivePlayer();
+        if (!player.hasTechReady(RTB)
+                || activePlayer == null
+                || !activePlayer.getFaction().equals(game.getStoredValue(RTB_ACTIVE_PLAYER + player.getFaction()))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        List<Button> buttons = getRiftTouchedBastionSystemButtons(game, player);
+        List<Button> buttons = getRiftTouchedBastionSystemButtons(game, player, activePlayer);
         String message = player.getRepresentationNoPing()
-                + ", choose a system containing your units to treat as a gravity rift for this tactical action.";
+                + ", choose a system containing " + activePlayer.getRepresentationNoPing()
+                + "'s units to treat as a gravity rift for this tactical action.";
         String prefix = player.factionButtonChecker() + SELECT_RTB_SYSTEM;
 
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -386,12 +420,13 @@ public class ThronesTechHandler {
 
         String position = buttonID.substring(SELECT_RTB_SYSTEM.length());
         Tile tile = game.getTileByPosition(position);
-        if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+        if (tile == null || !FoWHelper.playerHasUnitsInSystem(activePlayer, tile)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         player.exhaustTech(RTB);
+        game.removeStoredValue(RTB_ACTIVE_PLAYER + player.getFaction());
 
         if (!tile.isGravityRift()) {
             tile.addToken("token_gravityrift.png", Constants.SPACE);
@@ -408,9 +443,9 @@ public class ThronesTechHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Button> getRiftTouchedBastionSystemButtons(Game game, Player player) {
+    private static List<Button> getRiftTouchedBastionSystemButtons(Game game, Player player, Player activePlayer) {
         return game.getTileMap().values().stream()
-                .filter(tile -> FoWHelper.playerHasUnitsInSystem(player, tile))
+                .filter(tile -> FoWHelper.playerHasUnitsInSystem(activePlayer, tile))
                 .map(tile -> Buttons.green(
                         player.factionButtonChecker() + SELECT_RTB_SYSTEM + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player),
@@ -429,5 +464,9 @@ public class ThronesTechHandler {
                     }
                     game.removeStoredValue(key);
                 });
+        game.getStoredValueMap().keySet().stream()
+                .filter(key -> key.startsWith(RTB_ACTIVE_PLAYER))
+                .toList()
+                .forEach(game::removeStoredValue);
     }
 }

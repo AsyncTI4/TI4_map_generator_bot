@@ -197,6 +197,7 @@ public class AddPlanetService {
                     }
                     if (player_.hasTech("pa")
                             && !player_.getExhaustedPlanets().contains(planet)
+                            && "action".equalsIgnoreCase(game.getPhaseOfGame())
                             && ButtonHelper.checkForTechSkips(game, planet)
                             && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
                         player_.exhaustPlanet(planet);
