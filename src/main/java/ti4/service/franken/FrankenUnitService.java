@@ -16,17 +16,13 @@ public class FrankenUnitService {
 
     public static void addUnits(
             GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean dupes) {
-        if (player.getGame().isVeiledHeartMode()) {
-            for (String unit : unitIDs) {
-                VeiledHeartService.addVeiledCard(player, unit);
-            }
-            String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
-            MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-            return;
-        }
-
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
+            if (VeiledHeartService.canBeVeiled(player.getGame(), unitID)) {
+                VeiledHeartService.addVeiledCard(player, unitID);
+                sb.append("> ").append(" veiled unit (reveal using the button in the `#cards-info` thread)");
+                continue;
+            }
             UnitModel unitModel = Mapper.getUnit(unitID);
             if (player.getGame().isTwilightsFallMode()
                     && ("fs".equalsIgnoreCase(unitModel.getAsyncId()) || "mf".equalsIgnoreCase(unitModel.getAsyncId()))
@@ -67,7 +63,7 @@ public class FrankenUnitService {
     public static void removeUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed units:\n");
         for (String unitID : unitIDs) {
-            if (player.getGame().isVeiledHeartMode()) {
+            if (player.getGame().isVeiledHeartMode() && VeiledHeartService.hasVeiledCard(player, unitID)) {
                 VeiledHeartService.removeVeiledCard(player, unitID);
                 sb.append("> veiled ").append(unitID);
             } else {

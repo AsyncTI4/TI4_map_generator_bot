@@ -122,6 +122,25 @@ public class VeiledHeartService {
         }
     }
 
+    public static boolean canBeVeiled(Game game, String card) {
+        if (!game.isVeiledHeartMode()) {
+            return false;
+        }
+        Optional<VeiledCardType> optional_type = VeiledCardType.fromCard(card);
+        if (optional_type.isEmpty()) {
+            return false;
+        }
+        VeiledCardType type = optional_type.get();
+        String deckId =
+                switch (type) {
+                    case ABILITY -> game.getAbilitySpliceDeckID();
+                    case UNIT -> game.getUnitSpliceDeckID();
+                    case GENOME -> game.getGenomeSpliceDeckID();
+                    case PARADIGM -> game.getParadigmSpliceDeckID();
+                };
+        return Mapper.getDeck(deckId).getNewDeck().contains(card);
+    }
+
     private static String toTitleCase(String s) {
         return StringUtils.capitalize(s.toLowerCase());
     }
@@ -187,7 +206,7 @@ public class VeiledHeartService {
         return veiledCardsByType;
     }
 
-    private static boolean hasVeiledCard(Player player, String card) {
+    public static boolean hasVeiledCard(Player player, String card) {
         return getVeiledCards(player).anyMatch(card::equals);
     }
 
