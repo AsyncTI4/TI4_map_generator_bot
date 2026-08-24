@@ -132,19 +132,18 @@
         "requirements": "Y",
         "faction": "netrunners",
         "source": "beans",
-        "text": "At the start of the status phase, gain 1 trade good for every 2 other player's control tokens on your faction sheet."
+        "text": "At the start of the status phase, gain 1 trade good for every control token on your faction sheet."
     },
     {
-        "alias": "benetrunnerssd",
-        "name": "Siphon II",
+        "alias": "benetrunnersbo",
+        "name": "Blackout",
         "types": [
-            "UNITUPGRADE"
+            "WARFARE"
         ],
-        "requirements": "YY",
+        "requirements": "RR",
         "faction": "netrunners",
-        "baseUpgrade": "sd2",
         "source": "beans",
-        "text": "This unit's PRODUCTION value is equal to 4 more than this planet's resource value. When using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 2 other player's control tokens on your faction sheet. Up to 3 fighters in this system do not count against capacity."
+        "text": "When another player activates a system that contains your units, you may choose 1 non-unit upgrade technology owned by that player. That technology has no effect until the end of their turn."
     },
     {
         "alias": "benataudo",

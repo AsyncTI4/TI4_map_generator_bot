@@ -307,7 +307,7 @@
     "id": "netrunners_flagship",
     "baseType": "flagship",
     "asyncId": "fs",
-    "name": "E.M.P",
+    "name": "Trojan",
     "source": "beans",
     "faction": "netrunners",
     "moveValue": 1,
@@ -319,7 +319,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "SPACE CANNON cannot be used against your units in this system. Space Docks being blockaded by this unit lose their PRODUCTION ability."
+    "ability": "After this unit moves, before SPACE CANNON OFFENSE, choose 1 unit ability other than SUSTAIN DAMAGE. All units in this unit's system lose that ability until the end of this action."
   },
   {
     "id": "netrunners_mech",
@@ -334,36 +334,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you place a structure, you may spend 1 resource to place a mech with that structure."
-  },
-  {
-    "id": "netrunners_spacedock",
-    "baseType": "spacedock",
-    "asyncId": "sd",
-    "name": "Siphon I",
-    "upgradesToUnitId": "netrunners_spacedock2",
-    "source": "beans",
-    "faction": "netrunners",
-    "productionValue": "+2",
-    "basicProduction": "res",
-    "capacityValue": 3,
-    "isStructure": true,
-    "ability": "This unit's PRODUCTION value is equal to 2 more than this planet's resource value. \n\nWhen using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 4 other player's control tokens on your faction sheet. \n\nUp to 3 fighters in this system do not count against capacity."
-  },
-  {
-    "id": "netrunners_spacedock2",
-    "baseType": "spacedock",
-    "asyncId": "sd",
-    "name": "Siphon II",
-    "upgradesFromUnitId": "netrunners_spacedock",
-    "requiredTechId": "benetrunnerssd",
-    "source": "beans",
-    "faction": "netrunners",
-    "productionValue": "+4",
-    "basicProduction": "res",
-    "capacityValue": 3,
-    "isStructure": true,
-    "ability": "This unit's PRODUCTION value is equal to 4 more than this planet's resource value. \n\nWhen using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 2 other player's control tokens on your faction sheet. \n\nUp to 3 fighters in this system do not count against capacity."
+    "ability": "DEPLOY: When you gain a technology, you may place a mech from your reinforcements on a planet you control."
   },
   {
     "id": "natau_flagship",

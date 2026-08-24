@@ -58,7 +58,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRid
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
@@ -2669,6 +2668,10 @@ public class ButtonHelper {
     }
 
     public static int checkNumberNonFighterShips(Player player, Tile tile) {
+        return checkNumberNonFighterShips(player, tile, true);
+    }
+
+    public static int checkNumberNonFighterShips(Player player, Tile tile, boolean includeMechs) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnitKeys()) {
@@ -2680,10 +2683,10 @@ public class ButtonHelper {
             UnitModel removedUnit = unitModels.getFirst();
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
                 count += space.getUnitCount(unit);
-            } else if ("mech".equalsIgnoreCase(removedUnit.getBaseType())
+            } else if (includeMechs
+                    && "mech".equalsIgnoreCase(removedUnit.getBaseType())
                     && player.hasUnit("naaz_mech_space")
-                    && !player.hasUnit("naaz_voltron")
-                    && "action".equalsIgnoreCase(player.getGame().getPhaseOfGame())) {
+                    && !player.hasUnit("naaz_voltron")) {
                 count += space.getUnitCount(unit);
             }
         }
@@ -6179,6 +6182,41 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(channel, message);
             }
         }
+        if (game.isErwansGambitMode()) {
+            if (tile.isMecatol(game)
+                    && game.isCustodiansScored()
+                    && game.getStoredValue("unclaimedRelicLocations").contains("mr")) {
+                Die d1 = new Die(10);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " rolled " + d1.getResult() + " for their retrieval roll.");
+                if (d1.isSuccess()) {
+                    game.setStoredValue(
+                            "unclaimedRelicLocations",
+                            game.getStoredValue("unclaimedRelicLocations").replace("mr", ""));
+                    RelicHelper.drawRelicAndNotify(player, event, game);
+                }
+            }
+            if (tile.isHomeSystem() && "mentak".equalsIgnoreCase(player.getFaction())) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (tile == p2.getHomeSystemTile()
+                            && game.getStoredValue("unclaimedRelicLocations").contains(p2.getFaction())) {
+                        Die d1 = new Die(5);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " rolled " + d1.getResult()
+                                        + " for their retrieval roll.");
+                        if (d1.isSuccess()) {
+                            game.setStoredValue(
+                                    "unclaimedRelicLocations",
+                                    game.getStoredValue("unclaimedRelicLocations")
+                                            .replace(p2.getFaction(), ""));
+                            RelicHelper.drawRelicAndNotify(player, event, game);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static List<Tile> getTilesWithShipsInTheSystem(Player player, Game game) {
@@ -8054,11 +8092,6 @@ public class ButtonHelper {
             } else {
                 playersWithPds2.add(hiveEchoPlayer);
             }
-        }
-        if (game.getRealPlayers().stream()
-                .anyMatch(player -> game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander"))) {
-            playersWithPds2.addAll(NetrunnersLeadersHandler.getCommanderSpaceCannonPlayers(
-                    targetPlayer, game, tilePos, playersWithPds2));
         }
         return playersWithPds2;
     }

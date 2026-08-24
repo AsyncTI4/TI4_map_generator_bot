@@ -157,6 +157,7 @@ public class GameProperties {
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;
     private @ExportableField boolean liberationC4Mode;
+    private @ExportableField boolean erwansGambitMode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;

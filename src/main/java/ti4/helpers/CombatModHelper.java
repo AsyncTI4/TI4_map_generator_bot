@@ -223,7 +223,7 @@ public class CombatModHelper {
             if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
                 for (String fs : ValefarZService.getFlagshipAbilitys(game, player)) {
                     UnitModel fsUnit = Mapper.getUnit(fs);
-                    if (fsUnit == unit) continue;
+                    if (fsUnit == null || fsUnit == unit) continue;
                     Optional<CombatModifierModel> relevantMod2 = combatModifiers.values().stream()
                             .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, fsUnit.getAlias()))
                             .findFirst();
@@ -578,6 +578,9 @@ public class CombatModHelper {
                             }
                         }
                     }
+                }
+                if (game.isErwansGambitMode() && !"letnev".equalsIgnoreCase(player.getFaction())) {
+                    meetsCondition = false;
                 }
             }
             case "opponent_has_sftt" -> {

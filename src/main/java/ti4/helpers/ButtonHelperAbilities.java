@@ -68,6 +68,62 @@ public final class ButtonHelperAbilities {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
+    @ButtonHandler("drawHeistObj_")
+    public static void drawHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Integer type = Integer.parseInt(buttonID.split("_")[1]);
+        game.drawSecretObjective(player.getUserID(), type);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has drawn a Heist Objective worth " + type + " VP.");
+    }
+
+    @ButtonHandler("revealHeistObj")
+    public static void revealHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        for (String so : player.getSecretsUnscored().keySet()) {
+            buttons.add(Buttons.green(
+                    "changePoToSo_" + so, Mapper.getSecretObjective(so).getName()));
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "Choose which objective you wish to reveal.", buttons);
+    }
+
+    @ButtonHandler("changePoToSo_")
+    public static void changePoToSo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String so = buttonID.split("_")[1];
+        game.addToSoToPoList(so);
+        player.removeSecret(player.getSecrets().get(so));
+        Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(so), 1);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has revealed a Heist Objective.",
+                Mapper.getSecretObjective(so).getRepresentationEmbed());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("removeHeistObj")
+    public static void removeHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        for (String so : game.getSoToPoList()) {
+            buttons.add(Buttons.green(
+                    "removePoToSo_" + so, Mapper.getSecretObjective(so).getName()));
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "Choose which objective you wish to remove.", buttons);
+    }
+
+    @ButtonHandler("removePoToSo_")
+    public static void removePoToSo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String so = buttonID.split("_")[1];
+        game.getSoToPoList().remove(so);
+        game.removeCustomPO(Mapper.getSecretObjectivesJustNames().get(so));
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has removed a Heist Objective.",
+                Mapper.getSecretObjective(so).getRepresentationEmbed());
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("mirvedaFS_")
     public static void mirvedaFS(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];

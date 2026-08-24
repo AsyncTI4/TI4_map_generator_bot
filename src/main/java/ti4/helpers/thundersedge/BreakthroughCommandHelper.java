@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
@@ -288,6 +289,9 @@ public final class BreakthroughCommandHelper {
             }
             if ("oblivionbt".equalsIgnoreCase(bt.getID())) {
                 OblivionBreakthroughHandler.startCallOfTheVoid(game, player);
+            }
+            if ("netrunnersbt".equalsIgnoreCase(bt.getID())) {
+                NetrunnersBreakthroughHandler.offerDataBreachPlacement(game, player);
             }
             if (FractureService.canFractureEnterPlay(game)) serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);

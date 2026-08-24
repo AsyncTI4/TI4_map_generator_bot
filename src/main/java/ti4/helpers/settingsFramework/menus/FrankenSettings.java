@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.franken.ban.BanService;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
@@ -59,6 +60,7 @@ public class FrankenSettings extends SettingsMenu {
     private final ListSetting<FactionModel> bannedFactions;
     private final ListSetting<FrankenBanList> banLists;
     private final FrankenHomebrewSettings homebrewSettings;
+    private final FrankenDrazFactionPrioritySettings factionPrioritySettings;
 
     private final FrankenDeckSettings deckSettings;
 
@@ -118,6 +120,7 @@ public class FrankenSettings extends SettingsMenu {
         }
 
         homebrewSettings = new FrankenHomebrewSettings(game, json, this);
+        factionPrioritySettings = new FrankenDrazFactionPrioritySettings(json, this);
         deckSettings = new FrankenDeckSettings(game, json, this);
         draftLimitSettings = new FrankenDraftLimitSettings(game, json, this);
 
@@ -142,7 +145,11 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected List<SettingsMenu> categories() {
-        return List.of(homebrewSettings, deckSettings, draftLimitSettings);
+        List<SettingsMenu> categories = new ArrayList<>(List.of(homebrewSettings, deckSettings, draftLimitSettings));
+        if (isFrankendrazMode()) {
+            categories.add(factionPrioritySettings);
+        }
+        return categories;
     }
 
     @Override
@@ -189,6 +196,7 @@ public class FrankenSettings extends SettingsMenu {
         deckSettings.resetSettings();
         draftLimitSettings.resetSettings();
         if (isFrankendrazMode()) {
+            factionPrioritySettings.resetSettings();
             banAllDsFactions.setVal(true);
             banAllBrFactions.setVal(true);
             homebrewSettings.getDiscoStars().setVal(true);
@@ -205,6 +213,7 @@ public class FrankenSettings extends SettingsMenu {
         applyHomebrewSettings();
         deckSettings.applyDecks(game, event);
         applyBanSettings();
+        applyPriorityFactionSettings();
         return FrankenDraftStartService.startFrankenDraft(event, game, force.isVal(), selectedDraftMode());
     }
 
@@ -221,6 +230,45 @@ public class FrankenSettings extends SettingsMenu {
         }
     }
 
+    private void applyPriorityFactionSettings() {
+        game.removeStoredValue(FrankenDrazDraft.PRIORITY_FACTIONS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.DISCORDANT_STARS_FACTION_LIMITS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.BLUE_REVERIE_FACTION_LIMITS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.LOST_LEGACIES_FACTION_LIMITS_KEY);
+        if (isFrankendrazMode()
+                && !factionPrioritySettings.getPrioritizedFactions().getKeys().isEmpty()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.PRIORITY_FACTIONS_KEY,
+                    String.join(
+                            Constants.FIN_SEPARATOR,
+                            factionPrioritySettings.getPrioritizedFactions().getKeys()));
+        }
+        if (isFrankendrazMode() && isEffectiveDiscordantStarsEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.DISCORDANT_STARS_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getDiscordantStarsFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings
+                                    .getDiscordantStarsFactionLimits()
+                                    .getValHigh());
+        }
+        if (isFrankendrazMode() && isEffectiveBlueReverieEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.BLUE_REVERIE_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getBlueReverieFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings
+                                    .getBlueReverieFactionLimits()
+                                    .getValHigh());
+        }
+        if (isFrankendrazMode() && isLostLegaciesEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.LOST_LEGACIES_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getLostLegaciesFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings
+                                    .getLostLegaciesFactionLimits()
+                                    .getValHigh());
+        }
+    }
+
     private void applySourceFactionBans(BanService banService, ComponentSource source, boolean enabled) {
         if (!enabled) return;
         Mapper.getFactionsValues().stream()
@@ -231,11 +279,7 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
-        bannedFactions.setAllValues(legalFactionOptions(
-                game.isThundersEdge(),
-                isEffectiveDiscordantStarsEnabled(),
-                isEffectiveBlueReverieEnabled(),
-                isLostLegaciesEnabled()));
+        bannedFactions.setAllValues(getLegalFactionOptions());
     }
 
     void applyHomebrewSettings() {
@@ -408,6 +452,14 @@ public class FrankenSettings extends SettingsMenu {
         return Mapper.getFactionsValues().stream()
                 .filter(faction -> isLegalFrankenFaction(faction, teEnabled, dsEnabled, brEnabled, lostLegaciesEnabled))
                 .collect(Collectors.toMap(FactionModel::getAlias, faction -> faction));
+    }
+
+    Map<String, FactionModel> getLegalFactionOptions() {
+        return legalFactionOptions(
+                game.isThundersEdge(),
+                isEffectiveDiscordantStarsEnabled(),
+                isEffectiveBlueReverieEnabled(),
+                isLostLegaciesEnabled());
     }
 
     private static boolean isLegalFrankenFaction(
