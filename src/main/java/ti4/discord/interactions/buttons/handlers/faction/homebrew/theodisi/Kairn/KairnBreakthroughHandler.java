@@ -244,6 +244,7 @@ public class KairnBreakthroughHandler {
                     ExploreModel fragment = Mapper.getExplore(fragmentId);
                     return fragment != null
                             && isRelicFragment(fragment)
+                            && !fragmentId.startsWith("supermassive")
                             && trait.equalsIgnoreCase(fragment.getType())
                             && !game.getExploreDeck(trait).contains(fragmentId)
                             && !game.getExploreDiscard(trait).contains(fragmentId)

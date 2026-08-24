@@ -218,6 +218,7 @@ public final class ButtonHelperModifyUnits {
                             .append(" sustained\n");
                     hits -= min;
                     tile.addUnitDamage("space", unitKey, min);
+                    CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                 }
             }
         }
@@ -367,6 +368,7 @@ public final class ButtonHelperModifyUnits {
                     }
                     hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
+                    CommanderUnlockCheckService.checkPlayer(player, "ponthous");
 
                     for (int x = 0; x < min; x++) {
                         ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
@@ -665,6 +667,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         sustainedShip = true;
                         if ("ashen_dreadnought2".equals(unitModel.getId()) && !spaceCannonOffence) {
                             ashenAshfallSustains += min;
@@ -739,6 +742,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         if (unitModel.getIsShip()) {
                             sustainedShip = true;
                         }
@@ -892,6 +896,7 @@ public final class ButtonHelperModifyUnits {
 
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
+                        CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         sustainedShip = true;
                         handleLetnevCommanderCheck(player, game, event, min);
                         msg.append("> Sustained ")
