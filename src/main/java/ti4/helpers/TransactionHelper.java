@@ -36,6 +36,7 @@ import ti4.image.TransactionGenerator;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -126,7 +127,8 @@ public class TransactionHelper {
                             item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                     int amountToTransact = 1;
                     boolean isGeneralized =
-                            List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                            List.of("PNs", "ACs", "SOs", "VeiledAbilities").contains(thingToTransact)
+                                    && furtherDetail.contains("generic");
                     if (isGeneralized) {
                         amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                         furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
@@ -192,6 +194,8 @@ public class TransactionHelper {
                             ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, furtherDetail, game);
                             CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
                         }
+                        case "TfAbilities" -> {}
+                        case "VeiledAbilities" -> {}
                         case "dmz" ->
                             ButtonHelper.resolveDMZTrade(
                                     sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
@@ -259,7 +263,8 @@ public class TransactionHelper {
                         item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
                 boolean isGeneralized =
-                        List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                        List.of("PNs", "ACs", "SOs", "VeiledAbilities").contains(thingToTransact)
+                                && furtherDetail.contains("generic");
                 if ("frags".equalsIgnoreCase(thingToTransact) || isGeneralized) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
@@ -387,12 +392,30 @@ public class TransactionHelper {
                     }
                     case "Frags" ->
                         trans.repeat(ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
-                    case "Technology" ->
+                    case "Technology", "TfAbilities" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" ->
                         trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "Relics" ->
                         trans.append(Mapper.getRelic(furtherDetail).getName()).append(ExploreEmojis.Relic);
+                    case "VeiledAbilities" -> {
+                        if ("generic".equals(furtherDetail)) {
+                            trans.append(amountToTransact)
+                                    .append(" Veiled Abilit")
+                                    .append(amountToTransact == 1 ? "y" : "ies")
+                                    .append(" to be specified by player");
+                        } else {
+                            if (!VeiledHeartService.hasVeiledCard(player, furtherDetail)) {
+                                continue;
+                            }
+                            trans.append("Veiled Ability");
+                            if (!hidePrivateCardText) {
+                                trans.append(" _")
+                                        .append(Mapper.getTech(furtherDetail).getRepresentation(false))
+                                        .append("_");
+                            }
+                        }
+                    }
                     case "action" ->
                         trans.append("An in-game ").append(furtherDetail).append(" action");
                     case "details" -> {
@@ -931,7 +954,7 @@ public class TransactionHelper {
                     message += player.getRepresentation(false, false);
                     message += " Click the number of unscored secret objectives you wish to request.";
                     message +=
-                            " Since unscored secret objectives are private info, you will have to discuss with other other player to explain which unscored secret objectives you wish to transact;";
+                            " Since unscored secret objectives are private info, you will have to discuss with the other player to explain which unscored secret objectives you wish to transact;";
                     message += " these buttons will just make sure that the player is offered buttons to send them.";
 
                     int limit = p2.getSecretsUnscored().size();
@@ -981,6 +1004,39 @@ public class TransactionHelper {
                 for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
+                }
+            }
+            case "TfAbilities" -> {
+                message += " Please choose the ability you wish to " + requestOrOffer + ".";
+                for (String ability : p1.getTfAbilities()) {
+                    stuffToTransButtons.add(Buttons.gray(
+                            "offerToTransact_TfAbilities_" + p1.getFaction() + "_" + p2.getFaction() + "_" + ability,
+                            Mapper.getTech(ability).getName()));
+                }
+            }
+            case "VeiledAbilities" -> {
+                if (requesting) {
+                    message += " Click the number of veiled abilities you wish to request.";
+                    message +=
+                            " Since veiled abilities are private info, you will have to discuss with the other player to explain which veiled abilities you wish to transact;";
+                    message += " these buttons will just make sure that the player is offered buttons to send them.";
+
+                    int limit = VeiledHeartService.countVeiledCards(VeiledHeartService.VeiledCardType.ABILITY, p2);
+                    String prefix =
+                            "offerToTransact_VeiledAbilities_" + p1.getFaction() + "_" + p2.getFaction() + "_generic";
+                    for (int i = 1; i <= limit; i++) {
+                        stuffToTransButtons.add(
+                                Buttons.gray(prefix + i, i == 1 ? "1 Veiled Ability" : i + " Veiled Abilities"));
+                    }
+                } else {
+                    message += " Please choose the veiled ability you wish to " + requestOrOffer + ".";
+                    VeiledHeartService.getVeiledCards(VeiledHeartService.VeiledCardType.ABILITY, p1)
+                            .forEach(ability -> {
+                                stuffToTransButtons.add(Buttons.gray(
+                                        "offerToTransact_VeiledAbilities_" + p1.getFaction() + "_" + p2.getFaction()
+                                                + "_" + ability,
+                                        Mapper.getTech(ability).getName()));
+                            });
                 }
             }
             case "Details" -> {
@@ -2021,6 +2077,19 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_Relics_" + p1.getFaction() + "_" + p2.getFaction(), "Relics"));
         }
+        if (graft) {
+            String buttonLabel = "Abilities";
+            if (game.isVeiledHeartMode()
+                    && VeiledHeartService.countVeiledCards(VeiledHeartService.VeiledCardType.ABILITY, p1) > 0) {
+                stuffToTransButtons.add(Buttons.gray(
+                        "newTransact_VeiledAbilities_" + p1.getFaction() + "_" + p2.getFaction(), "Veiled Abilities"));
+                buttonLabel = "Revealed Abilities";
+            }
+            if (!p1.getTfAbilities().isEmpty()) {
+                stuffToTransButtons.add(Buttons.gray(
+                        "newTransact_TfAbilities_" + p1.getFaction() + "_" + p2.getFaction(), buttonLabel));
+            }
+        }
         if (p1 == player) {
             stuffToTransButtons.add(Buttons.blue(
                     "newTransact_Details_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Specify Deal"));
@@ -2204,9 +2273,10 @@ public class TransactionHelper {
             String prevBlackMarketFaction = buttonID.substring(buttonID.indexOf("_BMD_") + 5);
             Player bmdPlayer = game.getPlayerFromColorOrFaction(prevBlackMarketFaction);
             if (bmdPlayer != null) {
-                String msg = "The previous offer you made using _Black Market Dealing_ was rejected, rescinded, ";
+                String cardName = game.isTwilightKart() ? "Graft" : "Black Market Dealing";
+                String msg = "The previous offer you made using _" + cardName + "_ was rejected, rescinded, ";
                 msg += "or is being counter offered. Therefore, the next transaction offer you make will be ";
-                msg += "allowed to use _Black Market Dealing_ again.";
+                msg += "allowed to use _" + cardName + "_ again.";
                 MessageHelper.sendMessageToChannel(bmdPlayer.getCardsInfoThread(), msg);
                 bmdPlayer.setStoredValue("bmd", "y");
             }

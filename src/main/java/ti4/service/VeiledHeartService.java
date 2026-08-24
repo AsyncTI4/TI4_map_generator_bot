@@ -150,7 +150,7 @@ public class VeiledHeartService {
         return Arrays.stream(getStoredValue(player).split("_")).filter(card -> card.length() > 1);
     }
 
-    private static Stream<String> getVeiledCards(VeiledCardType type, Player player) {
+    public static Stream<String> getVeiledCards(VeiledCardType type, Player player) {
         return getVeiledCards(player).filter(type::matches);
     }
 
@@ -187,7 +187,7 @@ public class VeiledHeartService {
         return veiledCardsByType;
     }
 
-    private static boolean hasVeiledCard(Player player, String card) {
+    public static boolean hasVeiledCard(Player player, String card) {
         return getVeiledCards(player).anyMatch(card::equals);
     }
 
