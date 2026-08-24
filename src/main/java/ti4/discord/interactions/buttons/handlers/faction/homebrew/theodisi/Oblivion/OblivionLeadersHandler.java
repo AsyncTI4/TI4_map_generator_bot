@@ -3,7 +3,10 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obli
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -374,9 +377,17 @@ public class OblivionLeadersHandler {
             return List.of();
         }
         return Mapper.getUnits().values().stream()
+                .filter(unit -> unit.getFaction().isEmpty())
+                .filter(unit -> unit.getUpgradesFromUnitId().isEmpty())
                 .filter(unit -> unit.getCost() > 0 && unit.getCost() <= 4)
                 .filter(unit -> !unit.getIsStructure())
                 .filter(unit -> unit.getUnitType() != null && unit.getName() != null)
+                .sorted(Comparator.comparing((UnitModel unit) -> !unit.getId().equalsIgnoreCase(unit.getBaseType()))
+                        .thenComparing(UnitModel::getId))
+                .collect(Collectors.toMap(
+                        UnitModel::getUnitType, Function.identity(), (first, ignored) -> first, LinkedHashMap::new))
+                .values()
+                .stream()
                 .sorted(Comparator.comparing(UnitModel::getName))
                 .toList();
     }

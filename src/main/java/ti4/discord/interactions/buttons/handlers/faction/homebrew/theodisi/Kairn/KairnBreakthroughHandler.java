@@ -2,9 +2,11 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kair
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -99,20 +101,23 @@ public class KairnBreakthroughHandler {
 
     @ButtonHandler(EXPLORE_PLANET)
     public static void explorePlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(EXPLORE_PLANET.length()).split("\\|", 2);
-        if (payload.length != 2) {
+        String[] payload = buttonID.substring(EXPLORE_PLANET.length()).split("\\|", 3);
+        if (payload.length < 2) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        String trait = payload[0];
-        String planetName = payload[1];
+        String requiredTrait = payload[0];
+        String selectedTrait = payload.length == 3 ? payload[1] : null;
+        String planetName = payload.length == 3 ? payload[2] : payload[1];
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         Tile tile = game.getTileFromPlanet(planetName);
+        Set<String> planetTraits = planet == null ? Set.of() : planet.getPlanetTypes();
         if (planet == null
                 || tile == null
                 || !player.getPlanetsAllianceMode().contains(planetName)
-                || !planet.getPlanetTypes().contains(trait)) {
+                || !planetTraits.contains(requiredTrait)
+                || (selectedTrait != null && !planetTraits.contains(selectedTrait))) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Could not resolve _Relic Trading Hub_ because that planet is unavailable.");
@@ -120,9 +125,22 @@ public class KairnBreakthroughHandler {
             return;
         }
 
+        if (selectedTrait == null && planet.getPlanetTypes().size() > 1) {
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", please choose the trait under which to explore "
+                            + Helper.getPlanetRepresentation(planetName, game)
+                            + " for _Relic Trading Hub_.",
+                    getExploreTraitButtons(player, requiredTrait, planetName, planet));
+            return;
+        }
+
+        String trait = selectedTrait == null ? requiredTrait : selectedTrait;
         ButtonHelper.deleteMessage(event);
         ExploreService.explorePlanet(event, tile, planetName, trait.toUpperCase(), player, false, game, 1, false);
-        sendFragmentGainButtons(game, player, trait);
+        sendFragmentGainButtons(game, player, requiredTrait);
     }
 
     @ButtonHandler(GAIN_FRAGMENT)
@@ -170,6 +188,15 @@ public class KairnBreakthroughHandler {
             }
         }
         return buttons;
+    }
+
+    private static List<Button> getExploreTraitButtons(
+            Player player, String requiredTrait, String planetName, Planet planet) {
+        return planet.getPlanetTypes().stream()
+                .map(trait -> Buttons.green(
+                        player.factionButtonChecker() + EXPLORE_PLANET + requiredTrait + "|" + trait + "|" + planetName,
+                        "Explore as " + StringUtils.capitalize(trait)))
+                .toList();
     }
 
     private static void sendFragmentGainButtons(Game game, Player player, String purgedTrait) {
