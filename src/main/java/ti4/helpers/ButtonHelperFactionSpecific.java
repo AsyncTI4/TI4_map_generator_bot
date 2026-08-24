@@ -3430,10 +3430,10 @@ public final class ButtonHelperFactionSpecific {
         }
     }
 
-    public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static List<Button> getUnitButtonsForVortex(Player player, Game game) {
         List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Couldn't find any Dimensional Tears.");
             return Collections.emptyList();
         }
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.getFirst().getPosition(), player, false);

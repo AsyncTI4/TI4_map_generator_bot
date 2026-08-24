@@ -19,6 +19,9 @@ import ti4.message.MessageHelper;
 public class OblivionUnitHandler {
 
     public static void doOblivionMechCheck(Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
         OblivionLeadersHandler.offerCommanderProduction(game, player);
         if (!player.hasUnit("oblivion_mech")) {
             return;

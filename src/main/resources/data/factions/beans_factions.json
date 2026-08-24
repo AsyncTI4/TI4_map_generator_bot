@@ -237,7 +237,7 @@
         "commodities": 3,
         "factionTech": [
             "benetrunnersdm",
-            "benetrunnerssd"
+            "benetrunnersbo"
         ],
         "startingTech": [
             "aida"
@@ -268,7 +268,7 @@
             "infantry",
             "netrunners_mech",
             "pds",
-            "netrunners_spacedock"
+            "spacedock"
         ],
         "complexity": "High",
         "source": "beans"

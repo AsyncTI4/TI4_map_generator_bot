@@ -640,6 +640,7 @@ class GameLoadService {
                 case Constants.WHISPERS_DISABLED -> game.setWhispersDisabled(parseBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(parseBooleanOrDefault(info, false));
                 case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(parseBooleanOrDefault(info, false));
+                case Constants.ERWANS_GAMBIT_MODE -> game.setErwansGambitMode(parseBooleanOrDefault(info, false));
                 case Constants.VOTC_MODE -> game.setVotcMode(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_FULL_COMPONENT_TEXT ->
                     game.setShowFullComponentTextEmbeds(parseBooleanOrDefault(info, false));

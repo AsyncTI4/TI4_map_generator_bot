@@ -95,6 +95,7 @@ import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
@@ -963,6 +964,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
 
         gameModes.put("Liberation", isLiberationC4Mode());
+        gameModes.put("Erwan's Gambit", isErwansGambitMode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
 
@@ -3010,11 +3012,37 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public String drawSecretObjective(String userID) {
+        return drawSecretObjective(userID, 1);
+    }
+
+    public String drawSecretObjective(String userID, int type) {
         if (getSecretObjectives().isEmpty()) {
             return null;
         }
         String id = getSecretObjectives().getFirst();
         Player player = getPlayer(userID);
+
+        if (isErwansGambitMode() && "mentak".equalsIgnoreCase(player.getFaction())) {
+            List<SecretObjectiveModel> heistObbies =
+                    new ArrayList<>(Mapper.getSecretObjectives().values());
+            Collections.shuffle(heistObbies);
+            for (SecretObjectiveModel so : heistObbies) {
+                if (player.getSecrets().containsKey(so.getAlias())
+                        || getSoToPoList().contains(so.getAlias())) {
+                    continue;
+                }
+                if (so.getSource() != ComponentSource.erwans_gambit) {
+                    continue;
+                }
+                if (so.getPoints() != type) {
+                    continue;
+                }
+                id = so.getAlias();
+                player.setSecret(id);
+                checkSOLimit(player);
+                return id;
+            }
+        }
         if (player != null) {
             removeSOFromGame(id);
             player.setSecret(id);
@@ -3326,6 +3354,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            if (Mapper.getSecretObjective(soID).getSource() == ComponentSource.erwans_gambit) {
+                return true;
+            }
             getSecretObjectives().add(soID);
             Collections.shuffle(getSecretObjectives());
             return true;

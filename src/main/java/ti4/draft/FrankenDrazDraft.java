@@ -29,6 +29,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
+import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -37,9 +38,14 @@ import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyService;
 
 public class FrankenDrazDraft extends FrankenDraft {
     public static final String UNLIMITED_KEPT_COMPONENTS_KEY = "frankenDrazUnlimitedKeptComponents";
+    public static final String PRIORITY_FACTIONS_KEY = "frankenDrazPriorityFactions";
+    public static final String DISCORDANT_STARS_FACTION_LIMITS_KEY = "frankenDrazDiscordantStarsFactionLimits";
+    public static final String BLUE_REVERIE_FACTION_LIMITS_KEY = "frankenDrazBlueReverieFactionLimits";
+    public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
     private static final int DEFAULT_FACTION_LIMIT = 6;
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
@@ -117,7 +123,32 @@ public class FrankenDrazDraft extends FrankenDraft {
     public List<DraftBag> generateBags(Game game) {
         Map<DraftCategory, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
-        allDraftableItems.put(DraftCategory.FACTION, FactionDraftItem.buildAllDraftableItems(allDraftableFactions));
+        List<DraftItem> factionItems = FactionDraftItem.buildAllDraftableItems(allDraftableFactions);
+        int factionPoolSize = game.getRealPlayers().size() * getFactionDraftLimit();
+        Map<ComponentSource, int[]> sourceLimits = new HashMap<>();
+        for (Map.Entry<ComponentSource, String> entry : Map.of(
+                        ComponentSource.ds, DISCORDANT_STARS_FACTION_LIMITS_KEY,
+                        ComponentSource.blue_reverie, BLUE_REVERIE_FACTION_LIMITS_KEY,
+                        ComponentSource.theodisi, LOST_LEGACIES_FACTION_LIMITS_KEY)
+                .entrySet()) {
+            String[] limits = game.getStoredValue(entry.getValue()).split("\\|", 2);
+            if (limits.length == 2) {
+                sourceLimits.put(entry.getKey(), new int[] {Integer.parseInt(limits[0]), Integer.parseInt(limits[1])});
+            }
+        }
+        List<String> factionAliases =
+                factionItems.stream().map(DraftItem::getItemId).toList();
+        List<String> priorityFactions =
+                List.of(PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue(PRIORITY_FACTIONS_KEY)));
+        List<FactionModel> selectedFactions = MiltyService.createFactionDraft(
+                        factionPoolSize, new ArrayList<>(factionAliases), priorityFactions, sourceLimits)
+                .stream()
+                .map(Mapper::getFaction)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        List<DraftItem> selectedFactionItems = FactionDraftItem.buildAllItems(selectedFactions);
+        Collections.shuffle(selectedFactionItems);
+        allDraftableItems.put(DraftCategory.FACTION, selectedFactionItems);
         allDraftableItems.put(DraftCategory.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();

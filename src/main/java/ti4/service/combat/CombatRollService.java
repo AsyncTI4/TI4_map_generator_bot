@@ -40,9 +40,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
@@ -456,10 +453,6 @@ public class CombatRollService {
                 opponent = player;
             }
         }
-        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
-                && NetrunnersUnitsHandler.resolveEmpSpaceCannonBlock(event, game, player, tile, rollType)) {
-            return 0;
-        }
         Map<UnitModel, Integer> opponentUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
@@ -533,10 +526,6 @@ public class CombatRollService {
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
         RevenantLeadersHandler.addRevXytherisAgentModifier(tempMods, game, player, rollType);
-        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
-            tempMods.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
-                    game, player, tile, combatOnHolder, rollType));
-        }
         if (player.hasTech("beironats")) {
             extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
                     game, player, opponent, tile, combatOnHolder, rollType));
@@ -2961,11 +2950,6 @@ public class CombatRollService {
         }
         XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.SpaceCannonOffence)
                 .ifPresent(unit -> output.putIfAbsent(unit, 1));
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander")) {
-            NetrunnersLeadersHandler.getCommanderSpaceCannonUnits(game, player, tile)
-                    .forEach((model, count) ->
-                            output.merge(new ImmutablePair<>(model, spaceHolder), count, Integer::sum));
-        }
         UnitModel sigilCannon = ArcanumTechHandler.getSigilOfTransmutationSpaceCannon(game, player, tile);
         if (sigilCannon != null) {
             output.put(new ImmutablePair<>(sigilCannon, spaceHolder), 1);

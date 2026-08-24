@@ -16,7 +16,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTi
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
@@ -180,9 +180,6 @@ public class StartTurnService {
         game.setPhaseOfGame("action");
         AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
-        if (NetrunnersPromissoryHandler.shouldOfferSharedNetworkAccessButtons(player, game)) {
-            NetrunnersPromissoryHandler.offerSharedNetworkAccessButtons(player, game);
-        }
         SabotageService.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = game.isFowMode();
 
@@ -498,6 +495,12 @@ public class StartTurnService {
         if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
             startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
         }
+        if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
+            Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);
+            if (proxyNetworkButton != null) {
+                startButtons.add(proxyNetworkButton);
+            }
+        }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
         }
@@ -791,6 +794,20 @@ public class StartTurnService {
                         factionChecker + "exhaustTech_batyriy",
                         "Exhaust Temporal Displacement",
                         TechEmojis.CyberneticTech));
+            }
+            if (player.hasTech("dsolrar")
+                    && !player.getExhaustedTechs().contains("dsolrar")
+                    && !game.isTwilightsFallMode()) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "exhaustTech_dsolrar",
+                        "Exhaust False Flag Operations",
+                        FactionEmojis.olradin));
+            }
+            if (player.hasTech("tf-dsolrar") && !player.getExhaustedTechs().contains("tf-dsolrar")) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "exhaustTech_tf-dsolrar",
+                        "Exhaust False Flag Operations",
+                        FactionEmojis.olradin));
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
                 startButtons.add(Buttons.gray(

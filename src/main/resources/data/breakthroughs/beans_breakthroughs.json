@@ -64,11 +64,8 @@
         "name": "Data Breach",
         "shortName": "Data\nBreach",
         "faction": "netrunners",
-        "synergy": [
-            "CYBERNETIC",
-            "BIOTIC"
-        ],
-        "text": "When researching a technology owned by a player whose control token is on your faction sheet: \n\nFor every 2 of that player's control token on your faction sheet, you may ignore 1 of that technologies prerequisites.",
+        "synergy": ["NONE"],
+        "text": "When you unlock this breakthrough, place one of your control tokens on another player's breakthrough. Your breakthrough has synergy in the colors on the breakthrough your control token is on. When you would place another player's control token on your faction sheet using your Neural Instruments ability, you may instead move your control token onto that player's breakthrough.",
         "source": "beans"
     },
     {

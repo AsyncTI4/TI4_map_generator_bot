@@ -277,7 +277,7 @@ public class PlayHeroService {
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
             case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
-            case "netrunnershero" -> NetrunnersLeadersHandler.startRevolution(game, player);
+            case "netrunnershero" -> NetrunnersLeadersHandler.offerHeroTechSelection(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");

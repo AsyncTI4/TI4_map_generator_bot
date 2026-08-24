@@ -96,7 +96,7 @@
         "id": "neural_instruments",
         "name": "Neural Instruments",
         "faction": "netrunners",
-        "window": "When any other player researches or gains a technology, or exhausts a technology for its effect:",
+        "window": "When any other player gains a technology, or exhausts a technology for its effect:",
         "windowEffect": "Place 1 of that player's control tokens on your faction sheet. You may not have more than 1 of each player's control token on your faction sheet at a time.",
         "source": "beans"
     },
@@ -105,7 +105,7 @@
         "name": "Proxy Network",
         "faction": "netrunners",
         "window": "At the start of your turn:",
-        "windowEffect": "You may remove 1 player's control token from your faction sheet to copy the effect of 1 of that player's non-faction technologies until the end of your turn.",
+        "windowEffect": "You may remove 1 player's control token from your faction sheet and select 1 of that player's non-faction technologies. Treat that technology as if you own it until the end of your turn.",
         "source": "beans"
     },
     {
@@ -113,7 +113,7 @@
         "name": "Reverse Engineering",
         "faction": "netrunners",
         "window": "Once per round, at the end of your turn:",
-        "windowEffect": "You may spend a token from your strategy pool to to gain a copied technology.",
+        "windowEffect": "You may spend a token from your strategy pool to gain the technology you selected at the start of this turn using your Proxy Network ability.",
         "source": "beans"
     },
     {

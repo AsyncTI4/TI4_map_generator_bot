@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -64,6 +65,7 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (NetrunnersAbilitiesHandler.offerReverseEngineering(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
                         .isEmpty()) {
@@ -108,6 +110,7 @@ public class EndTurnService {
         TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
+        game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
         game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
         String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
@@ -118,6 +121,14 @@ public class EndTurnService {
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
                             + " lost temporary access to their _Field Test_ technology at the end of their turn.");
+        }
+        String proxyTech = game.getStoredValue("netrunnersProxyTech" + player.getFaction());
+        if (!proxyTech.isEmpty()) {
+            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " lost temporary access to their **Proxy Network** copied technology.");
         }
         game.setActiveSystem("");
     }

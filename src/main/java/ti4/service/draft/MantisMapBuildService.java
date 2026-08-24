@@ -242,22 +242,27 @@ public class MantisMapBuildService {
             return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your tile to place.";
         }
 
-        // Check if the buttons are stale; ensure they pertain to the latest positions needing tiles
-        var groupedPositions = getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
-        List<String> positionsToPlace = getNextPositionGroup(mapBuildContext.game(), groupedPositions);
-        Integer templatePlayerNum =
-                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), positionsToPlace.getFirst());
-        if (templatePlayerNum == null) {
-            return "Error: Could not determine player number for tile position " + positionsToPlace.getFirst() + ".";
-        }
-        Player nextPlayerToPlace =
-                mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
-        if (nextPlayerToPlace == null) {
-            return "Error: Could not find player for tile position " + positionsToPlace.getFirst() + ".";
-        }
-        if (!nextPlayerToPlace.getUserID().equals(playerWithTileId)) {
-            return DraftButtonService.USER_MISTAKE_PREFIX
-                    + "It's not your turn. Are your buttons stale? Consider refreshing the draft info.";
+        if (tilePosition != null) {
+            // Check if the buttons are stale; ensure they pertain to the latest positions needing tiles
+            var groupedPositions = getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
+            List<String> positionsToPlace = getNextPositionGroup(mapBuildContext.game(), groupedPositions);
+            Integer templatePlayerNum =
+                    getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), positionsToPlace.getFirst());
+            if (templatePlayerNum == null) {
+                return "Error: Could not determine player number for tile position " + positionsToPlace.getFirst()
+                        + ".";
+            }
+            Player nextPlayerToPlace = mapBuildContext
+                    .getPlayerForPosition()
+                    .apply(templatePlayerNum)
+                    .orElse(null);
+            if (nextPlayerToPlace == null) {
+                return "Error: Could not find player for tile position " + positionsToPlace.getFirst() + ".";
+            }
+            if (!nextPlayerToPlace.getUserID().equals(playerWithTileId)) {
+                return DraftButtonService.USER_MISTAKE_PREFIX
+                        + "It's not your turn. Are your buttons stale? Consider refreshing the draft info.";
+            }
         }
 
         return null;

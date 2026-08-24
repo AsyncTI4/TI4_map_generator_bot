@@ -2832,8 +2832,7 @@ public final class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + ", you exhausted " + planetRep + ".",
                 p2,
                 p2.getRepresentationUnfogged() + ", your planet " + planetRep + " was exhausted.",
-                player.getRepresentationUnfogged() + ", you exhausted " + planetRep + " belonging to "
-                        + p2.getRepresentationUnfogged() + ".");
+                player.getRepresentationUnfogged() + ", you exhausted " + planetRep + ".");
         ButtonHelper.deleteMessage(event);
     }
 

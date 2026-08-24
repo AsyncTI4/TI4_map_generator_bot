@@ -524,6 +524,20 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 synergies.addAll(getBreakthroughModel(bt).getSynergy());
             }
         }
+        if (isBreakthroughUnlocked("netrunnersbt")) {
+            String dataBreach = game.getStoredValue("netrunnersDataBreach" + getFaction());
+            String[] parts = dataBreach.split("~", 2);
+            if (parts.length == 2) {
+                Player target = game.getPlayerFromColorOrFaction(parts[0]);
+                BreakthroughModel copiedBreakthrough = Mapper.getBreakthrough(parts[1]);
+                if (target != null
+                        && target.hasBreakthrough(parts[1])
+                        && copiedBreakthrough != null
+                        && copiedBreakthrough.getSynergy() != null) {
+                    synergies.addAll(copiedBreakthrough.getSynergy());
+                }
+            }
+        }
         if (hasRelic("quantumcore")) {
             synergies.addAll(List.of(
                     TechnologyType.BIOTIC,
@@ -1226,6 +1240,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? LunariumAbilityHandler.getFactionSheetCCs(game, this)
                 : game.getMaxSOCountPerPlayer();
         int bonus = 0;
+        if (game.isErwansGambitMode() && "mentak".equalsIgnoreCase(getFaction())) bonus = game.getRound() + 1;
         if (hasRelic("obsidian")) bonus++;
         if (hasRelic("absol_obsidian")) bonus++;
         if (hasAbility("information_brokers")) bonus++;
@@ -2358,6 +2373,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public boolean hasTech(String techID) {
+        if (techID == null) return false;
         if ("det".equals(techID) || "amd".equals(techID)) {
             if (getTechs().contains("absol_" + techID)) {
                 return true;
@@ -2650,8 +2666,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addPlanet("fabricatestation");
             refreshPlanet("fabricatestation");
         }
-
-        ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, this, techID);
 
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
