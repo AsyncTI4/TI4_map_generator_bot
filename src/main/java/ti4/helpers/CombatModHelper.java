@@ -579,6 +579,9 @@ public class CombatModHelper {
                         }
                     }
                 }
+                if (game.isErwansGambitMode() && !"letnev".equalsIgnoreCase(player.getFaction())) {
+                    meetsCondition = false;
+                }
             }
             case "opponent_has_sftt" -> {
                 if (player.hasUnlockedBreakthrough("winnubt") && getOpponentSfttCount(opponent) > 0) {

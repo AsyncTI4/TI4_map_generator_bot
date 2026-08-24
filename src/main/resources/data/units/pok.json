@@ -416,7 +416,7 @@
         "id": "l1z1x_mech",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Anihilator",
+        "name": "Annihilator",
         "source": "pok",
         "faction": "l1z1x",
         "capacityUsed": 1,
@@ -427,7 +427,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship.",
+        "ability": "While not participating in ground combat, this unit can use its BOMBARDMENT ability on planets in its system as if it were a ship.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/annihilator.jpg?raw=true"
     },
     {
@@ -1066,7 +1066,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After this unit uses it's SUSTAIN DAMAGE ability during ground combat, it produces 1 hit against your opponent's ground forces on this planet.",
+        "ability": "After this unit uses its SUSTAIN DAMAGE ability during ground combat, it produces 1 hit against your opponent's ground forces on this planet.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/valkyrie_exoskeleton.jpg?raw=true"
     },
     {

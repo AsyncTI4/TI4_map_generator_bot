@@ -87,6 +87,12 @@ public class SecretObjectiveInfoService {
             Button discardB = Buttons.blue("get_so_discard_buttons", "Discard A Secret Objective");
             buttons.add(discardB);
         }
+        if (player.hasAbility("safe_harbor")) {
+            buttons.add(Buttons.green("drawHeistObj_1", "Draw 1 VP Heist Objective"));
+            buttons.add(Buttons.green("drawHeistObj_2", "Draw 2 VP Heist Objective"));
+            buttons.add(Buttons.gray("revealHeistObj", "Reveal Heist Objective"));
+            buttons.add(Buttons.red("removeHeistObj", "Remove Revealed Heist Objective"));
+        }
 
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);

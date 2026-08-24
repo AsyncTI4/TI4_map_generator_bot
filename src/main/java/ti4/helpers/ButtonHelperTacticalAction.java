@@ -223,11 +223,13 @@ public final class ButtonHelperTacticalAction {
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
-                    && !player.getExhaustedRelics().contains("emphidia")) {
+                    && !player.getExhaustedRelics().contains("emphidia")
+                    && !ButtonHelper.getButtonsToExploreAllPlanets(player, game).isEmpty()) {
                 String message = player.getRepresentation()
                         + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
                 List<Button> systemButtons2 = new ArrayList<>();
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+                systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
             if (game.isWarfareAction()
@@ -286,6 +288,7 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -538,6 +541,39 @@ public final class ButtonHelperTacticalAction {
             }
         } else {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
+        }
+    }
+
+    @ButtonHandler("useSafeHarbor")
+    public static void useSafeHarbor(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentationNoPing() + " is using their safe harbor ability");
+
+        for (Player p : game.getRealPlayersExcludingThis(player)) {
+            if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                if ("letnev".equalsIgnoreCase(p.getFaction())) {
+                    continue;
+                }
+                game.setStoredValue("safeHarborUsed", "yes");
+                if ("saar".equalsIgnoreCase(p.getFaction())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing() + " does not need to pay Saar due to their brotherhood.");
+                    continue;
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), player.getRepresentation() + " spent 2tg for the purpose.");
+                player.setTg(player.getTg() - 2);
+                if ("jolnar".equalsIgnoreCase(p.getFaction())) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            p.getCorrectChannel(),
+                            p.getRepresentation()
+                                    + " you can use this button to research a tech that Mentak owns for 2tg.",
+                            Buttons.GET_A_TECH);
+                }
+            }
         }
     }
 
@@ -1014,6 +1050,13 @@ public final class ButtonHelperTacticalAction {
                             flaah.getRepresentation() + " use buttons to resolve a build for Flaah Hyphae.",
                             buttons);
                 }
+            }
+            if (player.hasAbility("safe_harbor") && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(player.factionButtonChecker() + "useSafeHarbor_" + pos, "Use Safe Harbor"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
+                String msg = player.getRepresentation() + ", you may use the button to use your safe harbor ability.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
 
             Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();
