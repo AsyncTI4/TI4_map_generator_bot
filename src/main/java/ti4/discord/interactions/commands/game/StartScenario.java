@@ -136,7 +136,11 @@ public class StartScenario extends GameStateSubcommand {
 
         for (Player p : game.getRealPlayers()) {
             List<Button> buttons = new ArrayList<>();
-            for (int x = 0; x < Helper.getPlayerResourcesAvailable(player, game) + 1; x++) {
+            int amount = Helper.getPlayerResourcesAvailable(p, game) + 1 + p.getTg();
+            if (p.hasTech("mc")) {
+                amount += p.getTg();
+            }
+            for (int x = 0; x < amount; x++) {
                 buttons.add(Buttons.green("bidResource_" + x, "" + x));
             }
             MessageHelper.sendMessageToChannel(
