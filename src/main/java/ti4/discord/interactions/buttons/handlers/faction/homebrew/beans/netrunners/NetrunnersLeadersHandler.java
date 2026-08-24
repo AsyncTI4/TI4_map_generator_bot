@@ -54,12 +54,10 @@ public class NetrunnersLeadersHandler {
                 List.of(
                         Buttons.green(
                                 player.factionButtonChecker() + "netrunnersCommanderTechnologySecondary_skip",
-                                "Research Without Spending a Token",
-                                FactionEmojis.netrunners),
+                                "Research Without Spending a Token"),
                         Buttons.gray(
                                 player.factionButtonChecker() + "netrunnersCommanderTechnologySecondary_spend",
-                                "Spend a Token Normally",
-                                FactionEmojis.netrunners)));
+                                "Spend a Token Normally")));
     }
 
     @ButtonHandler("netrunnersCommanderTechnologySecondary_")
@@ -426,6 +424,7 @@ public class NetrunnersLeadersHandler {
             return;
         player.clearDebt(source, 1, NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL);
         player.addTech(techId);
+        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
