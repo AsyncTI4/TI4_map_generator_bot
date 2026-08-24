@@ -89,7 +89,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "After this unit is destroyed, you may return a number of captured fighters from your faction sheet up to the cost of this unit to place 2 ships in this system with a combined cost of no more than the amount of fighters returned."
+    "ability": "After this unit is destroyed, you may return a number of captured fighters from your faction sheet up to the cost of this unit to place up to 2 ships in this system with a combined cost of no more than the amount of fighters returned."
   },
   {
     "id": "crystellum_mech",

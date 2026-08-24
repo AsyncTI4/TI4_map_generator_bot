@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
@@ -1515,6 +1516,11 @@ public class StartCombatService {
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
+
+        if (isGroundCombat) {
+            CrystellumUnitHandler.addRefractumDeployButton(buttons, p1);
+            CrystellumUnitHandler.addRefractumDeployButton(buttons, p2);
+        }
 
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

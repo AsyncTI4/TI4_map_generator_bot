@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
@@ -299,6 +300,9 @@ public class DestroyUnitService {
                 }
             }
             case Flagship -> {
+                if (player != null && player.hasUnit("crystellum_flagship")) {
+                    CrystellumUnitHandler.offerFractalRebuild(game, player, unit.tile());
+                }
                 if (player != null && player.hasUnit("ta_flagship")) {
                     TaUnitHandler.clearWorldshaperOnFlagshipDestroy(player, unit);
                 }
