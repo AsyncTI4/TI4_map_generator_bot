@@ -374,6 +374,8 @@ public class OblivionLeadersHandler {
             return List.of();
         }
         return Mapper.getUnits().values().stream()
+                .filter(unit -> unit.getFaction().isEmpty())
+                .filter(unit -> unit.getUpgradesFromUnitId().isEmpty())
                 .filter(unit -> unit.getCost() > 0 && unit.getCost() <= 4)
                 .filter(unit -> !unit.getIsStructure())
                 .filter(unit -> unit.getUnitType() != null && unit.getName() != null)
