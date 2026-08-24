@@ -122,7 +122,7 @@ public class StartScenario extends GameStateSubcommand {
             game.setStoredValue("auctionObject", "relic_" + game.getAllRelics().getFirst());
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getMainGameChannel(),
-                    "Hacan has begun an action on this relic:",
+                    "Hacan has begun an auction on this relic:",
                     relic.getRepresentationEmbed());
         } else {
             String tech = drawRandomFactionTech(game);
@@ -130,7 +130,7 @@ public class StartScenario extends GameStateSubcommand {
             TechnologyModel relic = Mapper.getTech(drawRandomFactionTech(game));
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getMainGameChannel(),
-                    "Hacan has begun an action on this technology:",
+                    "Hacan has begun an auction on this technology:",
                     relic.getRepresentationEmbed());
         }
 

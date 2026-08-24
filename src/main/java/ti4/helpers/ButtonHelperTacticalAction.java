@@ -57,7 +57,6 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -507,22 +506,6 @@ public final class ButtonHelperTacticalAction {
             OblivionAbilityHandler.offerReflectionPlacement(event, game, player, tile);
             MyrrTechHandler.offerSegmentedStructuring(event, game, player, tile);
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
-        }
-
-        if (game.isErwansGambitMode()) {
-            if (tile == player.getHomeSystemTile()
-                    && game.getStoredValue("unclaimedRelicLocations").contains(player.getFaction())) {
-                Die d1 = new Die(10);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + " rolled " + d1.getResult() + " for their defense roll.");
-                if (d1.isSuccess()) {
-                    game.setStoredValue(
-                            "unclaimedRelicLocations",
-                            game.getStoredValue("unclaimedRelicLocations").replace(player.getFaction(), ""));
-                    RelicHelper.drawRelicAndNotify(player, event, game);
-                }
-            }
         }
     }
 
