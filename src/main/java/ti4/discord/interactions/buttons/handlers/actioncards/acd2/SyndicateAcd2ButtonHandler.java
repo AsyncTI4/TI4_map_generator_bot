@@ -99,9 +99,11 @@ class SyndicateAcd2ButtonHandler {
         ButtonHelper.checkACLimit(game, target);
 
         String targetDisplay = FoWHelper.factionEmojiOrAnon(game, target, "another player");
+        String cardDisplay = Mapper.getActionCard(cardId).getNameRepresentation(game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " gave an action card to " + targetDisplay + " via _Syndicate_.");
+                player.getRepresentationUnfogged() + " gave " + cardDisplay + " to " + targetDisplay
+                        + " via _Syndicate_.");
 
         game.setStoredValue(SYNDICATE_CARDS_KEY, String.join(",", revealedCards));
         game.setStoredValue(SYNDICATE_PLAYERS_KEY, String.join(",", remainingPlayers));
