@@ -267,18 +267,22 @@ public class ActionCardStatsService {
                         .append('\n'));
     }
 
-    private static void accumulateActionCardPlayToWinCorrelation(
+    static void accumulateActionCardPlayToWinCorrelation(
             Game game, Player winner, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
         for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
-            if (StringUtils.isBlank(actionCardPlay.getPlayerId())) {
+            boolean canceled = actionCardPlay.isCanceled();
+            // A canceled play never reaches win attribution below, so it still counts even when we
+            // don't know who played it - the legacy-save migration reconstructs cancels as plays
+            // with no player, and dropping those hid most of the cancels this section reports.
+            if (!canceled && StringUtils.isBlank(actionCardPlay.getPlayerId())) {
                 continue;
             }
 
             PlayToWinCorrelationCount count = playToWinCorrelationCounts.computeIfAbsent(
                     actionCardPlay.getActionCard(), _ -> new PlayToWinCorrelationCount());
             count.incrementPlaysIncludingCanceled();
-            if (actionCardPlay.isCanceled()) {
+            if (canceled) {
                 continue;
             }
             count.incrementTotal();
@@ -288,7 +292,7 @@ public class ActionCardStatsService {
         }
     }
 
-    private static void appendPlayToWinCorrelationStats(
+    static void appendPlayToWinCorrelationStats(
             StringBuilder message,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, Integer> expectedDrawsPerCard) {
