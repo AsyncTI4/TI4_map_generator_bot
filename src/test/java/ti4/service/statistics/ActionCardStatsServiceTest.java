@@ -1,6 +1,7 @@
 package ti4.service.statistics;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +71,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         game.getGameStats().recordAcPlay(GameStats.OVERRULE, winner);
 
         Map<String, PlayToWinCorrelationCount> counts = new HashMap<>();
-        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(game, winner, counts);
+        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(game, winner, counts, new HashMap<>());
 
         PlayToWinCorrelationCount overrule = counts.get(GameStats.OVERRULE);
         assertThat(overrule.getPlaysIncludingCanceled()).isEqualTo(2);
@@ -87,7 +88,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         game.getGameStats().recordAcPlay(GameStats.OVERRULE, null);
 
         Map<String, PlayToWinCorrelationCount> counts = new HashMap<>();
-        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(game, winner, counts);
+        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(game, winner, counts, new HashMap<>());
 
         // An uncancelled play still feeds the win rate, so one with no player stays out entirely.
         assertThat(counts).isEmpty();
@@ -108,6 +109,25 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         assertThat(withRecoveredCancel)
                 .isEqualTo("- Overrule: 1 wins, 2 plays (50.0% win rate), 1 uncancelled plays (100.0% win rate),"
                         + " 10.0 Impact Score (wins vs ~draws), 12.0 Impact Score Ω (+0.2 win per cancel)\n");
+    }
+
+    @Test
+    void shouldTallyUnattributedPlaysPerCardForTheDeveloperDebug() {
+        Game game = new Game();
+        Player winner = new Player("winner", "", game);
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, null);
+        game.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, null);
+        game.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, winner);
+        game.getGameStats().recordAcPlay("Flank Speed", winner);
+
+        Map<String, Integer> unattributedPlayCounts = new HashMap<>();
+        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(
+                game, winner, new HashMap<>(), unattributedPlayCounts);
+
+        // Only the two plays with no recorded player are tallied, and cards with none stay out.
+        assertThat(unattributedPlayCounts).containsExactly(entry(GameStats.OVERRULE, 2));
     }
 
     private static String renderOverrule(PlayToWinCorrelationCount count) {

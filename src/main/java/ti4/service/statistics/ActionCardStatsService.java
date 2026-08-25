@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -43,6 +45,7 @@ public class ActionCardStatsService {
         Map<String, Integer> cancelCounts = new HashMap<>();
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
+        Map<String, Integer> unattributedPlayCounts = new HashMap<>();
         Set<String> includedGameNames = new HashSet<>();
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
@@ -55,14 +58,25 @@ public class ActionCardStatsService {
                         .and(game -> deckCardIds.containsAll(
                                 game.getDiscardActionCards().keySet())),
                 game -> accumulateActionCardStats(
-                        game, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames),
+                        game,
+                        cancelCounts,
+                        actionCardsPlayedCounts,
+                        playToWinCorrelationCounts,
+                        unattributedPlayCounts,
+                        includedGameNames),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
                 event.getChannel(),
                 "Action Card Play Statistics",
                 buildMessage(
-                        acDeck, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames));
+                        acDeck,
+                        cancelCounts,
+                        actionCardsPlayedCounts,
+                        playToWinCorrelationCounts,
+                        unattributedPlayCounts,
+                        includedGameNames,
+                        CommandHelper.hasRole(event, JdaService.developerRoles)));
     }
 
     private static void accumulateActionCardStats(
@@ -70,6 +84,7 @@ public class ActionCardStatsService {
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Map<String, Integer> unattributedPlayCounts,
             Set<String> includedGameNames) {
         includedGameNames.add(game.getName());
 
@@ -87,7 +102,7 @@ public class ActionCardStatsService {
         if (winner == null) {
             return;
         }
-        accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts);
+        accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts, unattributedPlayCounts);
     }
 
     private static void incrementActionCardPlayCount(
@@ -137,7 +152,9 @@ public class ActionCardStatsService {
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            Set<String> includedGameNames) {
+            Map<String, Integer> unattributedPlayCounts,
+            Set<String> includedGameNames,
+            boolean includeDeveloperDebug) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
         Map<String, Integer> playedExpectedDraws = computeExpectedDraws(actionCardsPlayedCounts, copiesPerName);
         Map<String, Integer> playsIncludingCanceled = playToWinCorrelationCounts.entrySet().stream()
@@ -164,7 +181,33 @@ public class ActionCardStatsService {
             appendTrackingStartNote(message);
             appendOverruleStats(message, OverruleStatsService.get().getCountPerStrategyCard(includedGameNames));
         }
+        if (includeDeveloperDebug) {
+            appendUnattributedPlayDebug(message, unattributedPlayCounts);
+        }
         return message.toString();
+    }
+
+    // Plays we could not tie to a player, almost all of them cancels the legacy-save migration
+    // reconstructed. Canceled ones still count toward plays and Impact Score Ω; uncancelled ones
+    // are dropped, since they would otherwise feed a win rate with no winner to compare against.
+    private static void appendUnattributedPlayDebug(
+            StringBuilder message, Map<String, Integer> unattributedPlayCounts) {
+        message.append("\n**Unattributed plays (developer debug)**\n");
+        message.append("_Play-to-win correlation plays with no recorded player, per card._\n");
+        if (unattributedPlayCounts.isEmpty()) {
+            message.append("Every tracked play has a player.\n");
+            return;
+        }
+
+        unattributedPlayCounts.entrySet().stream()
+                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+                        .reversed()
+                        .thenComparing(Map.Entry::getKey))
+                .forEach(entry -> message.append("- ")
+                        .append(entry.getKey())
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append('\n'));
     }
 
     private static void appendTrackingStartNote(StringBuilder message) {
@@ -268,10 +311,16 @@ public class ActionCardStatsService {
     }
 
     static void accumulateActionCardPlayToWinCorrelation(
-            Game game, Player winner, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+            Game game,
+            Player winner,
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Map<String, Integer> unattributedPlayCounts) {
         String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
         for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
             boolean canceled = actionCardPlay.isCanceled();
+            if (StringUtils.isBlank(actionCardPlay.getPlayerId())) {
+                unattributedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
+            }
             // A canceled play never reaches win attribution below, so it still counts even when we
             // don't know who played it - the legacy-save migration reconstructs cancels as plays
             // with no player, and dropping those hid most of the cancels this section reports.
