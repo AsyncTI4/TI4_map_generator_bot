@@ -31,7 +31,7 @@ import ti4.spring.service.statistics.overrule.OverruleStatsService;
 public class ActionCardStatsService {
     private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
     private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
-    private static final double CANCEL_WIN_EQUIVALENT = 0.1;
+    private static final double CANCEL_WIN_EQUIVALENT = 0.2;
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
@@ -157,7 +157,7 @@ public class ActionCardStatsService {
         appendTrackingStartNote(message);
         appendExpectedDrawsNote(message, computeMaxPlaysPerCopyCount(playsIncludingCanceled, copiesPerName));
         message.append(
-                "_The Impact Score compares wins to expected draws. Impact Score Ω raises that score by 1/10th of a win for each cancel of the card._\n");
+                "_The Impact Score compares wins to expected draws. Impact Score Ω raises that score by 1/5th of a win for each cancel of the card._\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts, winCorrelationExpectedDraws);
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             message.append("\n**Overrule targets**\n");
@@ -344,7 +344,7 @@ public class ActionCardStatsService {
                         .append(firstEntry ? " Impact Score (wins vs ~draws)" : " Impact Score")
                         .append(", ")
                         .append(String.format("%.1f", getOmegaImpactScore(count, expectedDraws)))
-                        .append(firstEntry ? " Impact Score Ω (+0.1 win per cancel)" : " Impact Score Ω");
+                        .append(firstEntry ? " Impact Score Ω (+0.2 win per cancel)" : " Impact Score Ω");
             }
             message.append('\n');
         }
