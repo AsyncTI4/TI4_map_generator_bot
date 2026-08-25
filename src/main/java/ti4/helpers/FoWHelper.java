@@ -212,12 +212,10 @@ public final class FoWHelper {
 
     /** Dispatch a {@link Buttons} factory by {@code style} ("gray" default, "green", "red", "blue"). */
     private static Button styledButton(String style, String buttonId, String label, String emoji) {
-        return switch (style == null ? "gray" : style) {
-            case "green" -> Buttons.green(buttonId, label, emoji);
-            case "red" -> Buttons.red(buttonId, label, emoji);
-            case "blue" -> Buttons.blue(buttonId, label, emoji);
-            default -> Buttons.gray(buttonId, label, emoji);
-        };
+        if ("green".equals(style)) return Buttons.green(buttonId, label, emoji);
+        if ("red".equals(style)) return Buttons.red(buttonId, label, emoji);
+        if ("blue".equals(style)) return Buttons.blue(buttonId, label, emoji);
+        return Buttons.gray(buttonId, label, emoji);
     }
 
     /**

@@ -62,8 +62,7 @@ public class PrototypeDeploymentLLButtonHandler {
         TechnologyModel tech = Mapper.getTech(techId);
         UnitModel unit = tech == null || !player.hasTech(techId) || !tech.isUnitUpgrade()
                 ? null
-                : player.getUnitFromUnitKey(
-                        Mapper.getUnitKey(tech.getBaseUpgrade().orElse(techId), player.getColorID()));
+                : Mapper.getUnitModelByTechUpgrade(techId);
         if (unit == null || "warsun".equalsIgnoreCase(unit.getBaseType())) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That unit upgrade is no longer eligible.");
             return;
@@ -89,8 +88,7 @@ public class PrototypeDeploymentLLButtonHandler {
         TechnologyModel tech = Mapper.getTech(techId);
         UnitModel unit = tech == null || !player.hasTech(techId) || !tech.isUnitUpgrade()
                 ? null
-                : player.getUnitFromUnitKey(
-                        Mapper.getUnitKey(tech.getBaseUpgrade().orElse(techId), player.getColorID()));
+                : Mapper.getUnitModelByTechUpgrade(techId);
         if (unit == null || "warsun".equalsIgnoreCase(unit.getBaseType())) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That unit upgrade is no longer eligible.");
             return;
@@ -111,8 +109,7 @@ public class PrototypeDeploymentLLButtonHandler {
         for (String techId : player.getTechs()) {
             TechnologyModel tech = Mapper.getTech(techId);
             if (tech == null || !tech.isUnitUpgrade()) continue;
-            UnitModel unit = player.getUnitFromUnitKey(
-                    Mapper.getUnitKey(tech.getBaseUpgrade().orElse(techId), player.getColorID()));
+            UnitModel unit = Mapper.getUnitModelByTechUpgrade(techId);
             if (unit == null || "warsun".equalsIgnoreCase(unit.getBaseType())) continue;
             buttons.add(Buttons.gray(
                     player.factionButtonChecker() + SELECT + techId, "Deploy " + unit.getName(), unit.getUnitEmoji()));

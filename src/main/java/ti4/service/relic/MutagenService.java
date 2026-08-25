@@ -245,11 +245,13 @@ public class MutagenService {
             return false;
         }
         String id = choiceParts[1];
-        return switch (choiceParts[0]) {
-            case "tech" -> Mapper.isValidTech(id) && !player.hasTech(id) && isFactionTechAvailable(game, id);
-            case "agent", "commander" -> Mapper.isValidLeader(id) && Helper.getPlayerFromLeader(game, id) == null;
-            default -> false;
-        };
+        if ("tech".equals(choiceParts[0])) {
+            return Mapper.isValidTech(id) && !player.hasTech(id) && isFactionTechAvailable(game, id);
+        }
+        if ("agent".equals(choiceParts[0]) || "commander".equals(choiceParts[0])) {
+            return Mapper.isValidLeader(id) && Helper.getPlayerFromLeader(game, id) == null;
+        }
+        return false;
     }
 
     private static boolean isFactionTechAvailable(Game game, String techID) {
