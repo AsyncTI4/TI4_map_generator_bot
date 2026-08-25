@@ -15,7 +15,9 @@ import ti4.testUtils.BaseTi4Test;
 class ActionCardStatsServiceTest extends BaseTi4Test {
 
     @Test
-    void shouldUseTheClassMaxPlaysAsExpectedDraws() {
+    void shouldScaleTheLeadingFourOfDownForOneOfs() {
+        // Sabotage leads on plays per copy (25 vs Direct Hit's 15 and Rise of a Messiah's 20), so a
+        // single copy is estimated at 25 draws: 100 for the 4-ofs, a quarter of that for the 1-of.
         Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
                 Map.of("Sabotage", 100, "Direct Hit", 60, "Rise of a Messiah", 20),
                 Map.of("Sabotage", 4, "Direct Hit", 4, "Rise of a Messiah", 1));
@@ -23,11 +25,21 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         assertThat(expectedDraws)
                 .containsEntry("Sabotage", 100)
                 .containsEntry("Direct Hit", 100)
-                .containsEntry("Rise of a Messiah", 20);
+                .containsEntry("Rise of a Messiah", 25);
     }
 
     @Test
-    void shouldGiveEveryClassMemberTheFullClassMax() {
+    void shouldScaleTheLeadingOneOfUpForFourOfs() {
+        // Rise of a Messiah is played 30 times off one copy, beating Sabotage's 25 per copy, so it
+        // sets the per-copy estimate and the 4-ofs get four times as many expected draws.
+        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+                Map.of("Sabotage", 100, "Rise of a Messiah", 30), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
+
+        assertThat(expectedDraws).containsEntry("Sabotage", 120).containsEntry("Rise of a Messiah", 30);
+    }
+
+    @Test
+    void shouldGiveEveryCardOfTheSameCopyCountTheSameExpectedDraws() {
         Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
                 Map.of("Sabotage", 20, "Overrule", 30), Map.of("Sabotage", 4, "Overrule", 4));
 
@@ -43,20 +55,28 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldSkipClassesWithNoPlays() {
+    void shouldDeriveOneOfDrawsFromTheFourOfsWhenNoOneOfWasPlayed() {
         Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
                 Map.of("Sabotage", 10), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
 
-        // The 1-of class has zero plays, so no expected draws can be derived for it.
-        assertThat(expectedDraws).containsOnlyKeys("Sabotage");
+        // 2.5 draws per copy, rounded for the single copy the 1-of has.
+        assertThat(expectedDraws).containsEntry("Sabotage", 10).containsEntry("Rise of a Messiah", 3);
     }
 
     @Test
-    void shouldIncludeUnplayedCardsWhoseClassHasPlays() {
+    void shouldSkipEveryCardWhenNothingWasPlayed() {
+        Map<String, Integer> expectedDraws =
+                ActionCardStatsService.computeExpectedDraws(Map.of(), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
+
+        assertThat(expectedDraws).isEmpty();
+    }
+
+    @Test
+    void shouldIncludeUnplayedCardsWhoseCopyCountHasPlays() {
         Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
                 Map.of("Sabotage", 10), Map.of("Sabotage", 4, "Direct Hit", 4));
 
-        // Direct Hit was never played, but its class max still approximates its draws.
+        // Direct Hit was never played, but the per-copy estimate still approximates its draws.
         assertThat(expectedDraws).containsEntry("Direct Hit", 10);
     }
 

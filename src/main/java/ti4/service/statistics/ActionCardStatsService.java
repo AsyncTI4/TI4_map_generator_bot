@@ -122,29 +122,43 @@ public class ActionCardStatsService {
         return copiesPerName;
     }
 
-    // Cards with the same number of copies in the deck have about the same draw rate, so the most
-    // played card of a copy class approximates one play per draw; its play count stands in for how
-    // many times each card of that class was drawn. The deck composition only classifies cards.
+    // The most played card approximates one play per draw, so it stands in for how often it was
+    // drawn. Every card of the same copy count shares that estimate; cards with a different copy
+    // count are drawn proportionally more or less often, so the estimate scales with the copies.
     static Map<String, Integer> computeExpectedDraws(
             Map<String, Integer> playCounts, Map<String, Integer> copiesPerName) {
-        Map<Integer, Integer> maxPlaysPerCopyCount = computeMaxPlaysPerCopyCount(playCounts, copiesPerName);
+        Map<Integer, Integer> expectedDrawsPerCopyCount = computeExpectedDrawsPerCopyCount(playCounts, copiesPerName);
 
         Map<String, Integer> expectedDraws = new HashMap<>();
         copiesPerName.forEach((name, copies) -> {
-            int classMax = maxPlaysPerCopyCount.getOrDefault(copies, 0);
-            if (classMax > 0) {
-                expectedDraws.put(name, classMax);
+            int draws = expectedDrawsPerCopyCount.getOrDefault(copies, 0);
+            if (draws > 0) {
+                expectedDraws.put(name, draws);
             }
         });
         return expectedDraws;
     }
 
-    private static Map<Integer, Integer> computeMaxPlaysPerCopyCount(
+    private static Map<Integer, Integer> computeExpectedDrawsPerCopyCount(
             Map<String, Integer> playCounts, Map<String, Integer> copiesPerName) {
-        Map<Integer, Integer> maxPlaysPerCopyCount = new HashMap<>();
-        copiesPerName.forEach(
-                (name, copies) -> maxPlaysPerCopyCount.merge(copies, playCounts.getOrDefault(name, 0), Integer::max));
-        return maxPlaysPerCopyCount;
+        double drawsPerCopy = computeDrawsPerCopy(playCounts, copiesPerName);
+        return copiesPerName.values().stream().distinct().collect(Collectors.toMap(copies -> copies, copies ->
+                (int) Math.round(drawsPerCopy * copies)));
+    }
+
+    // Plays per copy in the deck puts every card on equal footing, so a 4-of leading the deck sets
+    // the same per-copy estimate a 1-of would. Scaling that back up by a card's own copy count is
+    // what turns one leader's play count into an expected draw count for the whole deck.
+    private static double computeDrawsPerCopy(Map<String, Integer> playCounts, Map<String, Integer> copiesPerName) {
+        double drawsPerCopy = 0;
+        for (Map.Entry<String, Integer> entry : copiesPerName.entrySet()) {
+            int copies = entry.getValue();
+            if (copies > 0) {
+                double playsPerCopy = playCounts.getOrDefault(entry.getKey(), 0) / (double) copies;
+                drawsPerCopy = Math.max(drawsPerCopy, playsPerCopy);
+            }
+        }
+        return drawsPerCopy;
     }
 
     private static String buildMessage(
@@ -168,11 +182,11 @@ public class ActionCardStatsService {
                 .append(acDeck.getName())
                 .append("'._\n");
         message.append("\n**Action card plays, expected draws, and Sabotage/Cancels**\n");
-        appendExpectedDrawsNote(message, computeMaxPlaysPerCopyCount(actionCardsPlayedCounts, copiesPerName));
+        appendExpectedDrawsNote(message, computeExpectedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
         appendActionCardPlayAndCancelStats(message, actionCardsPlayedCounts, cancelCounts, playedExpectedDraws);
         message.append("\n**Action card play-to-win correlation**\n");
         appendTrackingStartNote(message);
-        appendExpectedDrawsNote(message, computeMaxPlaysPerCopyCount(playsIncludingCanceled, copiesPerName));
+        appendExpectedDrawsNote(message, computeExpectedDrawsPerCopyCount(playsIncludingCanceled, copiesPerName));
         message.append(
                 "_The Impact Score compares wins to expected draws. Impact Score Ω raises that score by 1/5th of a win for each cancel of the card._\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts, winCorrelationExpectedDraws);
