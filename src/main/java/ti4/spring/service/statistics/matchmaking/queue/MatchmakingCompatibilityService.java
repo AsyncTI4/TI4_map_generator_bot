@@ -9,7 +9,7 @@ import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 @UtilityClass
 class MatchmakingCompatibilityService {
 
-    private static final long ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT = 12;
+    private static final long ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT = 10;
 
     private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 3;
     private static final double SKILL_DIFFERENCE_WIDENING_PER_WINDOW = 1;
