@@ -68,6 +68,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case FACTION -> getFactionDraftLimit();
             case BLUETILE -> 3;
@@ -84,6 +85,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         int limit =
                 switch (category) {
                     case ABILITY -> 4;
@@ -522,7 +524,7 @@ public class FrankenDrazDraft extends FrankenDraft {
                 || hand.getCategoryCount(DraftCategory.BREAKTHROUGH) > 0;
     }
 
-    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         Map<String, FactionModel> factions = new LinkedHashMap<>();
         for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);

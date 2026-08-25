@@ -40,8 +40,21 @@ public class FrankenDraft extends BagDraft {
         super(owner);
     }
 
+    /**
+     * FoW games don't pre-draft map tiles, and table/speaker order is handled separately by the FoW setup
+     * wizard - blue tile, red tile, and draft order limits are always 0 in Fog of War, for every Franken
+     * draft variant.
+     */
+    protected boolean isFowExcludedCategory(DraftCategory category) {
+        return getOwner().isFowMode()
+                && (category == DraftCategory.BLUETILE
+                        || category == DraftCategory.REDTILE
+                        || category == DraftCategory.DRAFTORDER);
+    }
+
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case ABILITY, BLUETILE -> 3;
             case TECH, REDTILE, STARTINGFLEET -> 2;
@@ -55,6 +68,7 @@ public class FrankenDraft extends BagDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case ABILITY, BLUETILE -> 3;
             case TECH, REDTILE -> 2;
@@ -95,7 +109,7 @@ public class FrankenDraft extends BagDraft {
         "obsidian"
     };
 
-    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions(game);
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {

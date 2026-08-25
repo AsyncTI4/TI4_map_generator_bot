@@ -733,6 +733,10 @@ public final class StatusHelper {
                     int remaining = game.changeCommsOnPlanet(1, planet.getName());
 
                     String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
+                    // TODO FOG LEAK: unconditionally reveals this planet's identity/location to
+                    // game.getMainGameChannel()
+                    // even in FoW games, regardless of what any player has actually explored. Should route through a
+                    // fog-aware channel helper (e.g. GMService/FoWHelper) when game.isFowMode().
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
                     if (remaining % 3 == 0) {
                         String msg2 = "The Monument to the Ages on the planet of "
