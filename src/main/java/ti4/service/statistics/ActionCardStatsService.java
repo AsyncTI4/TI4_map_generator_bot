@@ -31,6 +31,7 @@ import ti4.spring.service.statistics.overrule.OverruleStatsService;
 public class ActionCardStatsService {
     private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
     private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
+    private static final double CANCEL_WIN_EQUIVALENT = 0.1;
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
@@ -155,7 +156,8 @@ public class ActionCardStatsService {
         message.append("\n**Action card play-to-win correlation**\n");
         appendTrackingStartNote(message);
         appendExpectedDrawsNote(message, computeMaxPlaysPerCopyCount(playsIncludingCanceled, copiesPerName));
-        message.append("_The Impact Score compares wins to expected draws._\n");
+        message.append(
+                "_The Impact Score compares wins to expected draws. Impact Score Ω raises that score by 1/10th of a win for each cancel of the card._\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts, winCorrelationExpectedDraws);
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             message.append("\n**Overrule targets**\n");
@@ -326,15 +328,23 @@ public class ActionCardStatsService {
                     .append(": ")
                     .append(count.getWins())
                     .append(" wins, ")
-                    .append(count.getTotal())
+                    .append(count.getPlaysIncludingCanceled())
                     .append(" plays (")
+                    .append(String.format("%.1f%%", count.getWinRateIncludingCanceled() * 100))
+                    .append(firstEntry ? " win rate), " : "), ")
+                    .append(count.getTotal())
+                    .append(" uncancelled plays (")
                     .append(String.format("%.1f%%", count.getWinRate() * 100))
                     .append(firstEntry ? " win rate)" : ")");
-            Double impactScore = getImpactScore(count.getWins(), expectedDrawsPerCard.get(entry.getKey()));
+            Integer expectedDraws = expectedDrawsPerCard.get(entry.getKey());
+            Double impactScore = getImpactScore(count.getWins(), expectedDraws);
             if (impactScore != null) {
                 message.append(", ")
                         .append(String.format("%.1f", impactScore))
-                        .append(firstEntry ? " Impact Score (wins vs ~draws)" : " Impact Score");
+                        .append(firstEntry ? " Impact Score (wins vs ~draws)" : " Impact Score")
+                        .append(", ")
+                        .append(String.format("%.1f", getOmegaImpactScore(count, expectedDraws)))
+                        .append(firstEntry ? " Impact Score Ω (+0.1 win per cancel)" : " Impact Score Ω");
             }
             message.append('\n');
         }
@@ -342,6 +352,10 @@ public class ActionCardStatsService {
 
     private static Double getImpactScore(int wins, Integer expectedDraws) {
         return expectedDraws == null || expectedDraws <= 0 ? null : wins / (double) expectedDraws * 100;
+    }
+
+    private static double getOmegaImpactScore(PlayToWinCorrelationCount count, int expectedDraws) {
+        return (count.getWins() + CANCEL_WIN_EQUIVALENT * count.getCanceled()) / (double) expectedDraws * 100;
     }
 
     @Getter
@@ -362,8 +376,16 @@ public class ActionCardStatsService {
             wins++;
         }
 
+        int getCanceled() {
+            return playsIncludingCanceled - total;
+        }
+
         double getWinRate() {
             return total == 0 ? 0 : (double) wins / total;
+        }
+
+        double getWinRateIncludingCanceled() {
+            return playsIncludingCanceled == 0 ? 0 : (double) wins / playsIncludingCanceled;
         }
     }
 }
