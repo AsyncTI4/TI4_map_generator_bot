@@ -74,17 +74,28 @@ public class SabotageAutoReactCron {
     }
 
     private static boolean playerShouldRandomlyReact(Player player, Game game) {
-        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
-            return false;
-        }
-
-        boolean canSabotage = SabotageService.canSabotage(player, game);
-        if (canSabotage) {
+        if (!isEligibleForAutoPass(player, game)) {
             return false;
         }
 
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;
         int rollResult = ThreadLocalRandom.current().nextInt(1, rollMax + 1);
         return rollResult == rollMax;
+    }
+
+    static boolean isEligibleForAutoPass(Player player, Game game) {
+        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
+            return false;
+        }
+
+        // The auto-pass only ever fires for players who cannot sabotage, so every one of them leaks
+        // information. That leak is worst for the player who is currently up to act: everyone can see
+        // they are at the keyboard, so a bot pass on their behalf is a clean tell that they hold no
+        // sabotage. Make them react manually instead - they can be auto-passed once their turn ends.
+        if (player.isActivePlayer()) {
+            return false;
+        }
+
+        return !SabotageService.canSabotage(player, game);
     }
 }
