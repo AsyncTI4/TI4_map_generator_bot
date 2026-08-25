@@ -15,7 +15,7 @@ class MatchmakingCompatibilityServiceTest {
             Set.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
 
     // Typical evening-hours profiles per region, expressed in UTC (12 contiguous hot hours each,
-    // the minimum the "similar active hours" restriction is willing to enable).
+    // comfortably above the 10-hour minimum the "similar active hours" restriction requires).
     // EU (Central, UTC+1): 13:00–01:00 local -> 12–23 UTC
     private static final Set<Integer> EU_HOURS = Set.of(12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
     // USA (Eastern, UTC-5): 17:00–05:00 local -> 22,23,0..9 UTC
@@ -100,16 +100,16 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void similarActiveHoursRequiresTwelveSharedHours() {
+    void similarActiveHoursRequiresTenSharedHours() {
         PlayerMatchmakingData picky = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)
-                .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+                .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
                 .build();
         PlayerMatchmakingData fewShared = player("b")
-                .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23)
+                .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 20, 21, 22, 23)
                 .build();
         PlayerMatchmakingData manyShared =
-                player("c").activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).build();
+                player("c").activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared))
                 .isTrue();
@@ -119,10 +119,9 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void playerWithTooFewActiveHoursCanNeverMatch() {
-        // Fewer than 12 hot hours means the 12-shared-hour requirement can never be satisfied.
-        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(player("a")
-                        .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                        .build()))
+        // Fewer than 10 hot hours means the 10-shared-hour requirement can never be satisfied.
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
+                        player("a").activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8).build()))
                 .isFalse();
     }
 
@@ -153,12 +152,14 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void euAndSeaPlayersAreNotMatched() {
+    void euAndSeaPlayersAreMatched() {
+        // EU and SEA share exactly 10 hot hours (12:00-21:00 UTC), which clears the lowered
+        // 10-shared-hour bar.
         PlayerMatchmakingData eu = regional("eu", EU_HOURS);
         PlayerMatchmakingData sea = regional("sea", SEA_HOURS);
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, sea)).isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, eu)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, sea)).isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, eu)).isFalse();
     }
 
     @Test
@@ -180,12 +181,14 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void apacAndSeaPlayersAreNotMatched() {
+    void apacAndSeaPlayersAreMatched() {
+        // APAC and SEA are only one timezone apart; their 12h evening windows already share 10
+        // hours, clearing the lowered 10-shared-hour bar.
         PlayerMatchmakingData apac = regional("apac", APAC_HOURS);
         PlayerMatchmakingData sea = regional("sea", SEA_HOURS);
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, sea)).isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, apac)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, sea)).isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, apac)).isFalse();
     }
 
     @Test
@@ -221,12 +224,14 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void euAndUsaAwakeSixteenHoursAreNotMatched() {
+    void euAndUsaAwakeSixteenHoursAreMatched() {
+        // With full 16h awake windows, EU and USA now share 10 hours (11:00-20:00 UTC), which
+        // clears the lowered 10-shared-hour bar.
         PlayerMatchmakingData eu = regional("eu", EU_16H_HOURS);
         PlayerMatchmakingData usa = regional("usa", USA_16H_HOURS);
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, usa)).isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, eu)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, usa)).isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, eu)).isFalse();
     }
 
     @Test
