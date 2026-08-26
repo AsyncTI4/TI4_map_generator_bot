@@ -1,8 +1,12 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -24,6 +28,7 @@ import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
@@ -100,7 +105,12 @@ public class AgendaRiderHelper {
 
         String cleanedChoice = choice;
         if (agendaDetails.toLowerCase().contains("planet")) {
-            cleanedChoice = Helper.getPlanetRepresentation(choice, game);
+            // getPlanetRepresentation appends live resources/influence and a [DMZ] marker, which is current
+            // map state the readers of this announcement may not be entitled to. The agenda summary uses the
+            // static planet name for exactly this reason, so match it.
+            cleanedChoice = game.isFowMode()
+                    ? AgendaHelper.getAgendaOutcomeName(game, choice, true)
+                    : Helper.getPlanetRepresentation(choice, game);
         }
         String voteMessage = "chose to put a " + rider + " on \"" + StringUtils.capitalize(cleanedChoice) + "\".";
         voteMessage = !game.isFowMode()
@@ -122,7 +132,13 @@ public class AgendaRiderHelper {
 
         MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
         String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary + "\n \n");
+        // In fog the summary names the outcome, so pushing it to the main channel would broadcast a planet
+        // that most players have no business knowing about. Voters get the summary in their own channel as
+        // the turn passes to them (see AgendaHelper.resolvingAnAgendaVote), and everything becomes public at
+        // resolution time anyway.
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary + "\n \n");
+        }
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -131,16 +147,57 @@ public class AgendaRiderHelper {
                         + ", don't forget you now have to decide on whether you will play any more \"after\"s.");
     }
 
-    private static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
+    /**
+     * @param planetSource whose planets to list. In fog this is ignored in favour of the planets
+     *                     {@code viewer} could know about - listing one player's holdings is the leak.
+     * @param viewer       the player who will see these buttons.
+     */
+    private static List<Button> getPlanetOutcomeButtons(
+            Player planetSource, Player viewer, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
-        for (String planet : new ArrayList<>(player.getPlanets())) {
-            String label = Helper.getPlanetRepresentation(planet, game);
+        Collection<String> planets;
+        if (game.isFowMode() && viewer != null) {
+            // Rider ids are "<prefix>rider_planet;<planet>_<rider>", so the planet is not the trailing
+            // segment and the Blind Target modal (which appends "_<target>") cannot express them. Riders are
+            // therefore limited to planets the predictor knows about, which is still far tighter than the
+            // previous behaviour of listing a chosen player's entire holdings.
+            planets = new ArrayList<>(PlanetTargetService.knownPlanetIds(
+                    game, viewer, new HashSet<>(game.getCurrentAgendaVotes().keySet())));
+        } else if (planetSource == null) {
+            return planetOutcomeButtons;
+        } else {
+            planets = new ArrayList<>(planetSource.getPlanets());
+        }
+        // Same labelling rule as the fog candidate lists, computed once. The fog set here includes planets
+        // the viewer merely remembers and outcomes they have never seen, so live resources/influence and the
+        // [DMZ] marker would report state changed since they last looked.
+        var fogSafeLabel = PlanetTargetService.fogSafeLabeller(game, viewer);
+        for (String planet : planets) {
+            if (game.getTileFromPlanet(planet) == null) continue;
+            String label = fogSafeLabel.apply(planet);
             Button button = rider == null
                     ? Buttons.gray(prefix + "_" + planet, label)
                     : Buttons.gray(prefix + "rider_planet;" + planet + "_" + rider, label);
             planetOutcomeButtons.add(button);
         }
+        planetOutcomeButtons.sort((a, b) -> a.getLabel().compareToIgnoreCase(b.getLabel()));
         return planetOutcomeButtons;
+    }
+
+    /**
+     * {@link #getPlanetOutcomeButtons}, paginated past Discord's 25-button cap in fog. Not routed through
+     * {@link PlanetTargetService#targetButtons} - this flow's ids are shaped
+     * {@code prefix + "rider_planet;" + planet + "_" + rider}, not the {@code prefix + "_" + planetId} shape
+     * that service hardcodes, so it gets its own small local wrapper instead, the same way the agenda vote
+     * list's pagination worked before it was generalized into that service.
+     */
+    static List<Button> paginatedPlanetOutcomeButtons(
+            Player planetSource, Player viewer, Game game, String prefix, String rider, String navPrefix, int page) {
+        List<Button> all = getPlanetOutcomeButtons(planetSource, viewer, game, prefix, rider);
+        if (!game.isFowMode()) {
+            return all;
+        }
+        return NewStuffHelper.buttonPagination(all, null, navPrefix, 25, page, false);
     }
 
     public static List<Button> getAgendaButtons(String riderName, Game game, String prefix) {
@@ -177,13 +234,31 @@ public class AgendaRiderHelper {
     @ButtonHandler("planetRider_")
     public static void planetRider(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         buttonID = buttonID.replace("planetRider_", "");
+        // A page-nav press re-enters this same handler (see paginatedPlanetOutcomeButtons's navPrefix) with
+        // a trailing "pageN". Stripping it first, before the color/rider split below, means a fresh press
+        // and a page-N press reduce to the identical "color_rider" string either way.
+        int page = 0;
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
+        if (pageMatch.find()) {
+            page = Integer.parseInt(pageMatch.group("page"));
+            buttonID = buttonID.substring(0, pageMatch.start());
+        }
         String factionOrColor = buttonID.substring(0, buttonID.indexOf('_'));
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Chose to Rider for one of " + factionOrColor + "'s planets. Please choose which one.";
 
         String rider = buttonID.replace(factionOrColor + "_", "");
-        List<Button> outcomeActionRow =
-                getPlanetOutcomeButtons(planetOwner, game, player.factionButtonChecker(), rider);
+        // Reuses the presser's own gate, matching the real target buttons built one line below - only the
+        // player who opened this list can page through it.
+        String navPrefix = player.factionButtonChecker() + "planetRider_" + factionOrColor + "_" + rider;
+        List<Button> outcomeActionRow = paginatedPlanetOutcomeButtons(
+                planetOwner, player, game, player.factionButtonChecker(), rider, navPrefix, page);
+        if (game.isFowMode()) {
+            voteMessage = "Chose to Rider for a planet. Please choose which one.";
+        }
+        if (page > 0) {
+            voteMessage += " (page " + (page + 1) + ")";
+        }
 
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
@@ -365,7 +440,10 @@ public class AgendaRiderHelper {
             } else {
                 if (rider != null) {
                     if (planetRes != null) {
-                        button = Buttons.blue(planetRes + "_" + player.getColor() + "_" + rider, player.getColor());
+                        // Keep the prefix: it carries the FFCC_<faction>_ ownership check, and dropping it
+                        // let any player press another player's rider-target button.
+                        button = Buttons.blue(
+                                prefix + planetRes + "_" + player.getColor() + "_" + rider, player.getColor());
                     } else {
                         button = Buttons.blue(
                                 prefix + "rider_player;" + player.getColor() + "_" + rider, player.getColor());

@@ -652,15 +652,32 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji()
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
-                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                    if (p2.getSoScored() < player.getSoScored()) {
-                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, game);
+                if (game.isFowMode()) {
+                    // One prompt, not one per opponent: the fog list is built from what this player knows
+                    // rather than from any particular opponent's holdings, so a per-opponent loop would post
+                    // identical panels and name who is behind on secret objectives into the bargain.
+                    boolean anyBehind = game.getRealPlayersExcludingThis(player).stream()
+                            .anyMatch(p2 -> p2.getSoScored() < player.getSoScored());
+                    if (anyBehind) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
-                                player.getRepresentationUnfogged() + " you have scored more secret objectives than "
-                                        + p2.getRepresentation()
-                                        + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
-                                shrineButtons);
+                                player.getRepresentationUnfogged()
+                                        + ", you have scored more secret objectives than at least one other player,"
+                                        + " and so here are buttons to look at a shrine. You can decline to gain 2 CC"
+                                        + " instead, using the CC buttons above.",
+                                ButtonHelperHeroes.getShrineButtons(null, player, game));
+                    }
+                } else {
+                    for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                        if (p2.getSoScored() < player.getSoScored()) {
+                            List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, player, game);
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCorrectChannel(),
+                                    player.getRepresentationUnfogged() + " you have scored more secret objectives than "
+                                            + p2.getRepresentation()
+                                            + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
+                                    shrineButtons);
+                        }
                     }
                 }
             }
