@@ -15,6 +15,13 @@ public final class MidasTurbineButton implements MoveAbilityButton {
     }
 
     public List<Button> build(MoveContext ctx) {
+
+        if (ctx.game.isTwilightsFallMode()) {
+            return List.of(Buttons.green(
+                    ctx.player.factionButtonChecker() + "exhaustTech_tf-dsvadeb",
+                    "Exhaust Midas Turbine",
+                    FactionEmojis.vaden));
+        }
         return List.of(Buttons.green(
                 ctx.player.factionButtonChecker() + "exhaustTech_dsvadeb",
                 "Exhaust Midas Turbine",

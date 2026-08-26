@@ -18,6 +18,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -27,10 +28,19 @@ import ti4.model.SourceModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
 
 @UtilityClass
 public class TEOptionService {
+
+    /**
+     * These homebrew-toggle confirmations were hardcoded to the public main channel regardless of where the
+     * GM clicked from - in a FoW game that leaks setup chatter to every player, so route to the GM room instead.
+     */
+    private static MessageChannel homebrewChannel(Game game) {
+        return game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+    }
 
     @ButtonHandler("startTFGame")
     public static void startTFGame(Game game, ButtonInteractionEvent event) {
@@ -47,9 +57,23 @@ public class TEOptionService {
             The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
-        buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
-        buttons.add(
-                Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        // Milty/Nucleus draft slices, tiles and speaker order - in FoW the GM hand-builds the map and sets
+        // seat/speaker order via `/fow setup` instead, and tile/draft-order categories are already forced to
+        // 0 for FoW (FrankenDraft.isFowExcludedCategory), so those two drafts have nothing left to draft.
+        if (!game.isFowMode()) {
+            buttons.add(
+                    Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
+            buttons.add(Buttons.gray(
+                    "startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        } else {
+            // The splice is normally phase 2 after a milty/nucleus draft. In FoW the wizard already does what
+            // those drafts would (map, factions, positions, seat/speaker order), so the splice on its own is
+            // the RAW-style option here - players still draft their abilities/units/genomes.
+            buttons.add(Buttons.gray("startTFDraft_splice", "Inaugural Splice Only (abilities/units/genomes)"));
+            msg += "\n\n-# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker "
+                    + "order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the "
+                    + "RAW-style flow once the wizard has assigned factions and positions.";
+        }
         buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
@@ -57,6 +81,18 @@ public class TEOptionService {
     @ButtonHandler("startTFDraft")
     public static void startTFDraft(ButtonInteractionEvent event, Game game) {
         game.setupTwilightsFallMode(event);
+        if (event.getButton().getCustomId().endsWith("_splice")) {
+            // force=false so any player the GM already set up through the wizard keeps their faction, colour
+            // and (crucially) their assigned home position - setUpFrankenFactions with force=true re-parks
+            // everyone at the temporary off-map 50x anchors, which would undo the wizard's placements.
+            FrankenDraftBagService.setUpFrankenFactions(game, event, false);
+            FrankenDraftBagService.clearPlayerHands(game);
+            // Same entry point the automatic post-milty splice uses; it deliberately skips seat-order
+            // assignment in FoW, since the wizard owns that.
+            ButtonHelperTwilightsFall.startInauguralSplice(game);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
         game.setBagDraft(new TwilightsFallFrankenDraft(game));
@@ -68,7 +104,7 @@ public class TEOptionService {
     private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
         String msg = "Use the buttons to enable or disable various homebrew options:";
         List<ContainerChildComponent> sections = getTFHomebrewInfo(game);
-        MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+        MessageV2Builder builder = new MessageV2Builder(homebrewChannel(game));
         builder.append(msg);
         builder.append(Container.of(sections));
         builder.append(Buttons.DONE_DELETE_BUTTONS);
@@ -109,7 +145,7 @@ public class TEOptionService {
                     buttons.add(Buttons.green("twilightDSSetup_pruned", "Just 4 units of each type"));
                     buttons.add(Buttons.blue("deleteButtons", "All the Units"));
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(),
+                            homebrewChannel(game),
                             "Some people find there's too many units and would prefer to prune the deck to just 4 random units of each type (normal deck has 31 units, TK + normal is 60 units, pruned is 43 units)",
                             buttons);
                 }
@@ -121,7 +157,7 @@ public class TEOptionService {
                     buttons.add(Buttons.green("twilightDSSetup_justds", "Just DS Abilities"));
                     buttons.add(Buttons.blue("twilightDSSetup_mixture", "Mixture of Normal and DS abilities"));
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(),
+                            homebrewChannel(game),
                             "Do you want to use just DS abilities or a mixture of Normal and DS abilities?",
                             buttons);
                 }
@@ -136,7 +172,7 @@ public class TEOptionService {
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "justds" -> {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Chose to just use DS abilities");
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), "Chose to just use DS abilities");
                 List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
                 game.removeStoredValue("bannedTechs");
                 for (String tech : allCards) {
@@ -145,7 +181,7 @@ public class TEOptionService {
             }
             case "mixture" -> {
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "Chose to just use a mixture of DS and normal abilities");
+                        homebrewChannel(game), "Chose to just use a mixture of DS and normal abilities");
                 List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
                 game.removeStoredValue("bannedTechs");
                 for (TechnologyModel tech : Mapper.getTechs().values()) {
@@ -159,11 +195,10 @@ public class TEOptionService {
                     BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
                     msg += Mapper.getTech(allCards.get(x)).getName() + "\n";
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg);
             }
             case "pruned" -> {
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "Chose to just use a pruned deck of units.");
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), "Chose to just use a pruned deck of units.");
                 List<String> allCards = Mapper.getDeck("twilight_kart_units").getNewShuffledDeck();
                 game.removeStoredValue("bannedUnits");
                 String msg = "The following units have been banned:\n";
@@ -178,7 +213,7 @@ public class TEOptionService {
                         msg += un.getName() + "\n";
                     }
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg);
             }
         }
         ButtonHelper.deleteMessage(event);

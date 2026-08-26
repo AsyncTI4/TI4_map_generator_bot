@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -31,6 +33,7 @@ import ti4.spring.service.statistics.overrule.OverruleStatsService;
 public class ActionCardStatsService {
     private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
     private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
+    private static final double CANCEL_WIN_EQUIVALENT = 0.2;
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
@@ -42,6 +45,7 @@ public class ActionCardStatsService {
         Map<String, Integer> cancelCounts = new HashMap<>();
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
+        Map<String, Integer> unattributedPlayCounts = new HashMap<>();
         Set<String> includedGameNames = new HashSet<>();
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
@@ -54,14 +58,25 @@ public class ActionCardStatsService {
                         .and(game -> deckCardIds.containsAll(
                                 game.getDiscardActionCards().keySet())),
                 game -> accumulateActionCardStats(
-                        game, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames),
+                        game,
+                        cancelCounts,
+                        actionCardsPlayedCounts,
+                        playToWinCorrelationCounts,
+                        unattributedPlayCounts,
+                        includedGameNames),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
                 event.getChannel(),
                 "Action Card Play Statistics",
                 buildMessage(
-                        acDeck, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames));
+                        acDeck,
+                        cancelCounts,
+                        actionCardsPlayedCounts,
+                        playToWinCorrelationCounts,
+                        unattributedPlayCounts,
+                        includedGameNames,
+                        CommandHelper.hasRole(event, JdaService.developerRoles)));
     }
 
     private static void accumulateActionCardStats(
@@ -69,6 +84,7 @@ public class ActionCardStatsService {
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Map<String, Integer> unattributedPlayCounts,
             Set<String> includedGameNames) {
         includedGameNames.add(game.getName());
 
@@ -86,7 +102,7 @@ public class ActionCardStatsService {
         if (winner == null) {
             return;
         }
-        accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts);
+        accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts, unattributedPlayCounts);
     }
 
     private static void incrementActionCardPlayCount(
@@ -106,29 +122,43 @@ public class ActionCardStatsService {
         return copiesPerName;
     }
 
-    // Cards with the same number of copies in the deck have about the same draw rate, so the most
-    // played card of a copy class approximates one play per draw; its play count stands in for how
-    // many times each card of that class was drawn. The deck composition only classifies cards.
+    // The most played card approximates one play per draw, so it stands in for how often it was
+    // drawn. Every card of the same copy count shares that estimate; cards with a different copy
+    // count are drawn proportionally more or less often, so the estimate scales with the copies.
     static Map<String, Integer> computeExpectedDraws(
             Map<String, Integer> playCounts, Map<String, Integer> copiesPerName) {
-        Map<Integer, Integer> maxPlaysPerCopyCount = computeMaxPlaysPerCopyCount(playCounts, copiesPerName);
+        Map<Integer, Integer> expectedDrawsPerCopyCount = computeExpectedDrawsPerCopyCount(playCounts, copiesPerName);
 
         Map<String, Integer> expectedDraws = new HashMap<>();
         copiesPerName.forEach((name, copies) -> {
-            int classMax = maxPlaysPerCopyCount.getOrDefault(copies, 0);
-            if (classMax > 0) {
-                expectedDraws.put(name, classMax);
+            int draws = expectedDrawsPerCopyCount.getOrDefault(copies, 0);
+            if (draws > 0) {
+                expectedDraws.put(name, draws);
             }
         });
         return expectedDraws;
     }
 
-    private static Map<Integer, Integer> computeMaxPlaysPerCopyCount(
+    private static Map<Integer, Integer> computeExpectedDrawsPerCopyCount(
             Map<String, Integer> playCounts, Map<String, Integer> copiesPerName) {
-        Map<Integer, Integer> maxPlaysPerCopyCount = new HashMap<>();
-        copiesPerName.forEach(
-                (name, copies) -> maxPlaysPerCopyCount.merge(copies, playCounts.getOrDefault(name, 0), Integer::max));
-        return maxPlaysPerCopyCount;
+        double drawsPerCopy = computeDrawsPerCopy(playCounts, copiesPerName);
+        return copiesPerName.values().stream().distinct().collect(Collectors.toMap(copies -> copies, copies ->
+                (int) Math.round(drawsPerCopy * copies)));
+    }
+
+    // Plays per copy in the deck puts every card on equal footing, so a 4-of leading the deck sets
+    // the same per-copy estimate a 1-of would. Scaling that back up by a card's own copy count is
+    // what turns one leader's play count into an expected draw count for the whole deck.
+    private static double computeDrawsPerCopy(Map<String, Integer> playCounts, Map<String, Integer> copiesPerName) {
+        double drawsPerCopy = 0;
+        for (Map.Entry<String, Integer> entry : copiesPerName.entrySet()) {
+            int copies = entry.getValue();
+            if (copies > 0) {
+                double playsPerCopy = playCounts.getOrDefault(entry.getKey(), 0) / (double) copies;
+                drawsPerCopy = Math.max(drawsPerCopy, playsPerCopy);
+            }
+        }
+        return drawsPerCopy;
     }
 
     private static String buildMessage(
@@ -136,7 +166,9 @@ public class ActionCardStatsService {
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            Set<String> includedGameNames) {
+            Map<String, Integer> unattributedPlayCounts,
+            Set<String> includedGameNames,
+            boolean includeDeveloperDebug) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
         Map<String, Integer> playedExpectedDraws = computeExpectedDraws(actionCardsPlayedCounts, copiesPerName);
         Map<String, Integer> playsIncludingCanceled = playToWinCorrelationCounts.entrySet().stream()
@@ -150,19 +182,46 @@ public class ActionCardStatsService {
                 .append(acDeck.getName())
                 .append("'._\n");
         message.append("\n**Action card plays, expected draws, and Sabotage/Cancels**\n");
-        appendExpectedDrawsNote(message, computeMaxPlaysPerCopyCount(actionCardsPlayedCounts, copiesPerName));
+        appendExpectedDrawsNote(message, computeExpectedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
         appendActionCardPlayAndCancelStats(message, actionCardsPlayedCounts, cancelCounts, playedExpectedDraws);
         message.append("\n**Action card play-to-win correlation**\n");
         appendTrackingStartNote(message);
-        appendExpectedDrawsNote(message, computeMaxPlaysPerCopyCount(playsIncludingCanceled, copiesPerName));
-        message.append("_The Impact Score compares wins to expected draws._\n");
+        appendExpectedDrawsNote(message, computeExpectedDrawsPerCopyCount(playsIncludingCanceled, copiesPerName));
+        message.append(
+                "_The Impact Score compares wins to expected draws. Impact Score Ω raises that score by 1/5th of a win for each cancel of the card._\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts, winCorrelationExpectedDraws);
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             message.append("\n**Overrule targets**\n");
             appendTrackingStartNote(message);
             appendOverruleStats(message, OverruleStatsService.get().getCountPerStrategyCard(includedGameNames));
         }
+        if (includeDeveloperDebug) {
+            appendUnattributedPlayDebug(message, unattributedPlayCounts);
+        }
         return message.toString();
+    }
+
+    // Plays we could not tie to a player, almost all of them cancels the legacy-save migration
+    // reconstructed. Canceled ones still count toward plays and Impact Score Ω; uncancelled ones
+    // are dropped, since they would otherwise feed a win rate with no winner to compare against.
+    private static void appendUnattributedPlayDebug(
+            StringBuilder message, Map<String, Integer> unattributedPlayCounts) {
+        message.append("\n**Unattributed plays (developer debug)**\n");
+        message.append("_Play-to-win correlation plays with no recorded player, per card._\n");
+        if (unattributedPlayCounts.isEmpty()) {
+            message.append("Every tracked play has a player.\n");
+            return;
+        }
+
+        unattributedPlayCounts.entrySet().stream()
+                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+                        .reversed()
+                        .thenComparing(Map.Entry::getKey))
+                .forEach(entry -> message.append("- ")
+                        .append(entry.getKey())
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append('\n'));
     }
 
     private static void appendTrackingStartNote(StringBuilder message) {
@@ -265,18 +324,28 @@ public class ActionCardStatsService {
                         .append('\n'));
     }
 
-    private static void accumulateActionCardPlayToWinCorrelation(
-            Game game, Player winner, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+    static void accumulateActionCardPlayToWinCorrelation(
+            Game game,
+            Player winner,
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Map<String, Integer> unattributedPlayCounts) {
         String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
         for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
+            boolean canceled = actionCardPlay.isCanceled();
             if (StringUtils.isBlank(actionCardPlay.getPlayerId())) {
+                unattributedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
+            }
+            // A canceled play never reaches win attribution below, so it still counts even when we
+            // don't know who played it - the legacy-save migration reconstructs cancels as plays
+            // with no player, and dropping those hid most of the cancels this section reports.
+            if (!canceled && StringUtils.isBlank(actionCardPlay.getPlayerId())) {
                 continue;
             }
 
             PlayToWinCorrelationCount count = playToWinCorrelationCounts.computeIfAbsent(
                     actionCardPlay.getActionCard(), _ -> new PlayToWinCorrelationCount());
             count.incrementPlaysIncludingCanceled();
-            if (actionCardPlay.isCanceled()) {
+            if (canceled) {
                 continue;
             }
             count.incrementTotal();
@@ -286,7 +355,7 @@ public class ActionCardStatsService {
         }
     }
 
-    private static void appendPlayToWinCorrelationStats(
+    static void appendPlayToWinCorrelationStats(
             StringBuilder message,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, Integer> expectedDrawsPerCard) {
@@ -326,15 +395,23 @@ public class ActionCardStatsService {
                     .append(": ")
                     .append(count.getWins())
                     .append(" wins, ")
-                    .append(count.getTotal())
+                    .append(count.getPlaysIncludingCanceled())
                     .append(" plays (")
+                    .append(String.format("%.1f%%", count.getWinRateIncludingCanceled() * 100))
+                    .append(firstEntry ? " win rate), " : "), ")
+                    .append(count.getTotal())
+                    .append(" uncancelled plays (")
                     .append(String.format("%.1f%%", count.getWinRate() * 100))
                     .append(firstEntry ? " win rate)" : ")");
-            Double impactScore = getImpactScore(count.getWins(), expectedDrawsPerCard.get(entry.getKey()));
+            Integer expectedDraws = expectedDrawsPerCard.get(entry.getKey());
+            Double impactScore = getImpactScore(count.getWins(), expectedDraws);
             if (impactScore != null) {
                 message.append(", ")
                         .append(String.format("%.1f", impactScore))
-                        .append(firstEntry ? " Impact Score (wins vs ~draws)" : " Impact Score");
+                        .append(firstEntry ? " Impact Score (wins vs ~draws)" : " Impact Score")
+                        .append(", ")
+                        .append(String.format("%.1f", getOmegaImpactScore(count, expectedDraws)))
+                        .append(firstEntry ? " Impact Score Ω (+0.2 win per cancel)" : " Impact Score Ω");
             }
             message.append('\n');
         }
@@ -342,6 +419,10 @@ public class ActionCardStatsService {
 
     private static Double getImpactScore(int wins, Integer expectedDraws) {
         return expectedDraws == null || expectedDraws <= 0 ? null : wins / (double) expectedDraws * 100;
+    }
+
+    private static double getOmegaImpactScore(PlayToWinCorrelationCount count, int expectedDraws) {
+        return (count.getWins() + CANCEL_WIN_EQUIVALENT * count.getCanceled()) / (double) expectedDraws * 100;
     }
 
     @Getter
@@ -362,8 +443,16 @@ public class ActionCardStatsService {
             wins++;
         }
 
+        int getCanceled() {
+            return playsIncludingCanceled - total;
+        }
+
         double getWinRate() {
             return total == 0 ? 0 : (double) wins / total;
+        }
+
+        double getWinRateIncludingCanceled() {
+            return playsIncludingCanceled == 0 ? 0 : (double) wins / playsIncludingCanceled;
         }
     }
 }

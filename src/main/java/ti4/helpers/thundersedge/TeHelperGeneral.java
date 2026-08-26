@@ -96,7 +96,7 @@ public class TeHelperGeneral {
             return;
         }
 
-        for (Planet station : tile.getSpaceStations()) {
+        for (Planet station : tile.getSpaceStations(game)) {
             Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
             if (newOwner == prevOwner) {
                 continue;

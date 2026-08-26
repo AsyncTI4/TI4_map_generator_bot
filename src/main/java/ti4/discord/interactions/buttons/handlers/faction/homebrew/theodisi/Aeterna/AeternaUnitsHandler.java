@@ -237,7 +237,9 @@ public class AeternaUnitsHandler {
     @ButtonHandler(GRAVEYARD_PRODUCE)
     public static void resolveGraveyardProduction(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        resolveGraveyardIAction(event, game, player, buttonID, GRAVEYARD_PRODUCE, true);
+        if (!resolveGraveyardIAction(event, game, player, buttonID, GRAVEYARD_PRODUCE, true)) {
+            return;
+        }
     }
 
     @ButtonHandler(GRAVEYARD_II)
@@ -262,7 +264,7 @@ public class AeternaUnitsHandler {
     @ButtonHandler(GRAVEYARD_DECLINE)
     public static void declineGraveyard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(GRAVEYARD_DECLINE.length()).split("\\|", 4);
-        if (game == null || player == null || payload.length != 4 || !payload[3].equals(getCurrentActionKey(game))) {
+        if (game == null || player == null || payload.length != 4) {
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -303,7 +305,6 @@ public class AeternaUnitsHandler {
         if (dockHolder == null
                 || dockHolder.getUnitCount(UnitType.Spacedock, player) < 1
                 || unitType == null
-                || !payload[3].equals(getCurrentActionKey(game))
                 || payload[3].equals(game.getStoredValue(GRAVEYARD_USED_ACTION + dockKey))
                 || (produce && !canProduceFromGraveyard(game, player, dockTile, dockHolder, unitType))) {
             return false;

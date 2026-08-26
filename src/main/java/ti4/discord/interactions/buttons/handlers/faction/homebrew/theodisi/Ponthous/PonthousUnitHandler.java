@@ -20,6 +20,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.service.unit.UnitModelValueInjectionService;
@@ -64,6 +65,7 @@ public class PonthousUnitHandler {
         }
 
         space.addDamagedUnit(flagship, 1);
+        CommanderUnlockCheckService.checkPlayer(player, "ponthous");
         game.setStoredValue(getOldGlorySustainKey(player, tile), Integer.toString(fightersToGrantSustain));
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannel(

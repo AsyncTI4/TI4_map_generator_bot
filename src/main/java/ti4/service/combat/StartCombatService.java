@@ -130,7 +130,7 @@ public class StartCombatService {
     }
 
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
-        if (game.getStoredValue("safeHarborUsed").isEmpty()) {
+        if (game.isErwansGambitMode() && !game.getStoredValue("safeHarborUsed").isEmpty()) {
             return;
         }
         spaceCombatCheck(game, tile, event);

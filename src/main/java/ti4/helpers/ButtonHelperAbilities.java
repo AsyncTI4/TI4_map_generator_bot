@@ -2461,6 +2461,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
+
         return buttons;
     }
 
