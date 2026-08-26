@@ -426,10 +426,15 @@ public class LostLegaciesRelicHandler {
         }
 
         player.addExhaustedRelic("cosmicboon");
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", you may use these buttons to explore 2 planets you control.",
-                ButtonHelper.getButtonsToExploreAllPlanets(player, game));
+                player.getRepresentation() + ", choose the first planet to explore with _Cosmic Boon_.",
+                buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", choose the second planet to explore with _Cosmic Boon_.",
+                buttons);
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
