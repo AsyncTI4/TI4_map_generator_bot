@@ -115,10 +115,8 @@
     "faction": "crystellum",
     "capacityUsed": 1,
     "cost": 0.5,
-    "combatHitsOn": 7,
+    "combatHitsOn": 8,
     "combatDieCount": 1,
-    "afbHitsOn": 8,
-    "afbDieCount": 1,
     "moveValue": 3,
     "isShip": true,
     "ability": "This unit may move without being transported. Fighters in excess of  your capacity count against your fleet limit. When this unit is destroyed, it captures itself. At the start of your turn, you may place up to 2 fighters from your reinforcements in any system that contains a planet you control."

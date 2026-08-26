@@ -52,7 +52,7 @@
     "title": "Lightkeeper",
     "abilityWindow": "When you produce fighters:",
     "abilityText": "You may place them in any system that contains your command tokens and no other players ships.",
-    "unlockCondition": "Have 8 captured fighters on your faction sheet.",
+    "unlockCondition": "Have 12 fighters on the game board.",
     "source": "beans"
   },
   {

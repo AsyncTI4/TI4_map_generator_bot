@@ -2284,7 +2284,17 @@ public final class ButtonHelperModifyUnits {
         }
 
         CommanderUnlockCheckService.checkPlayer(
-                player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
+                player,
+                "mentak",
+                "l1z1x",
+                "tnelis",
+                "cymiae",
+                "kyro",
+                "ghemina",
+                "argent",
+                "naaz",
+                "arborec",
+                "crystellum");
     }
 
     @ButtonHandler("cloakedFleets_")

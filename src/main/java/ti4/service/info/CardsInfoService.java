@@ -10,6 +10,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
@@ -214,6 +215,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("naazagent")) {
             buttons.add(
                     Buttons.gray("getAgentSelection_naazagent", "Use NRA Agent on Someone Else", FactionEmojis.Naaz));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            CrystellumLeadersHandler.addCrystellumAgentCardsInfoButton(buttons, player);
         }
         if (player.hasUnexhaustedLeader("empyreanagent")) {
             buttons.add(Buttons.gray(

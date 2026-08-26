@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
@@ -4867,6 +4868,9 @@ public class ButtonHelper {
                     player.factionButtonChecker() + "exhaustAgent_freesystemsagent_" + player.getFaction(),
                     "Use Free Systems Agent",
                     FactionEmojis.freesystems));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
         }
 
         // OTHER stuff

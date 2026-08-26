@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePr
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
@@ -2957,6 +2958,10 @@ public final class Helper {
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "crystellumcommander")) {
+                unitButtons.addAll(
+                        CrystellumLeadersHandler.getCrystellumCommanderFighterButtons(player, tile, game, placePrefix));
+            }
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));

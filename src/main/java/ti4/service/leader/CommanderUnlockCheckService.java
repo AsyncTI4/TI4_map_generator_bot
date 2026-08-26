@@ -285,6 +285,8 @@ public class CommanderUnlockCheckService {
 
             // BEANS
             case "ashen" -> shouldBeUnlocked = true;
+            case "crystellum" ->
+                shouldBeUnlocked = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) >= 12;
             case "dream" -> {
                 int eligibleSystems = 0;
                 for (Tile tile : game.getTileMap().values()) {

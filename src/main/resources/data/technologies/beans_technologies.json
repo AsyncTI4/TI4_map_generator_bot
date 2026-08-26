@@ -31,7 +31,7 @@
         "requirements": "BB",
         "faction": "crystellum",
         "source": "beans",
-        "text": "During movement, you may destroy 1 of your non-fighter ships on the board to give a number of ships equal to half the cost of the destroyed ship +1 move until the end of this tactical action."
+        "text": "During movement, you may exhaust this card and destroy 1 of your non-fighter ships on the board to give a number of ships equal to the cost of the destroyed ship +1 move until the end of this tactical action."
     },
     {
         "alias": "becrysta",
@@ -39,10 +39,10 @@
         "types": [
             "CYBERNETIC"
         ],
-        "requirements": "YY",
+        "requirements": "Y",
         "faction": "crystellum",
         "source": "beans",
-        "text": "At the start of your turn, you may exhaust this card and remove 1 of your non-fighter ships from the board with a cost of no more than 4 to capture that many fighters from the supply."
+        "text": "At the start of your turn, you may exhaust this card and destroy 1 of your non-fighter ships from the board with a cost of no more than 3 to capture that many fighters from the supply."
     },
     {
         "alias": "beasheninf",

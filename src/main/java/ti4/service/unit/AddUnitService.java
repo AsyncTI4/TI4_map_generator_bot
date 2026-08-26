@@ -221,7 +221,7 @@ public class AddUnitService {
         }
 
         CommanderUnlockCheckService.checkPlayer(
-                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones");
+                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones", "crystellum");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {
