@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyA
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
@@ -448,6 +449,7 @@ class DeleteButtonsButtonHandler {
                 MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player, myrrProductionContext[1]);
             }
             game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
+            ArcanumBreakthroughHandler.clearPowerWordWishProductionContext(game, player, buttonID);
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
             if (player.hasAbility("amalgamation")) {
