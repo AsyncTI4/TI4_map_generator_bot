@@ -17,11 +17,11 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Retrofitti
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -273,6 +273,7 @@ public final class ButtonHelperTacticalAction {
         }
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        CrystellumTechHandler.clearResonanceDrive(game);
         ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
@@ -774,7 +775,6 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
-        NetrunnersAbilitiesHandler.offerBlackout(game, player, tile);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);

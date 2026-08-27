@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
@@ -393,6 +394,9 @@ public class TacticalActionService {
         MoveContext pubCtx = new MoveContext(player, game, event);
         for (MoveAbilityButton ability : MoveAbilityButtons.ABILITIES) {
             if (ability.enabled(pubCtx)) buttons.addAll(ability.build(pubCtx));
+        }
+        if (player.hasTechReady("becrystrd")) {
+            CrystellumTechHandler.addResonanceDriveButton(buttons, player);
         }
 
         // Finish movement controls

@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTimeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
@@ -504,6 +505,9 @@ public class StartTurnService {
         }
         if (!doneActionThisTurn && player.hasUnit("crystellum_fighter3")) {
             startButtons.add(CrystellumUnitHandler.addShardSwarmStartTurnButton(player));
+        }
+        if (!doneActionThisTurn && player.hasTechReady("becrysta")) {
+            CrystellumTechHandler.addAtomizationButton(startButtons, game, player);
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));

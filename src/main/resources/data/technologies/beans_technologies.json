@@ -124,15 +124,15 @@
         "text": "At the start of the status phase, gain 1 trade good for every control token on your faction sheet."
     },
     {
-        "alias": "benetrunnersbo",
-        "name": "Blackout",
+        "alias": "benetrunnersmo",
+        "name": "Mimetic Override",
         "types": [
             "WARFARE"
         ],
-        "requirements": "RR",
+        "requirements": "RRR",
         "faction": "netrunners",
         "source": "beans",
-        "text": "When another player activates a system that contains your units, you may choose 1 non-unit upgrade technology owned by that player. That technology has no effect until the end of their turn."
+        "text": "During combat, your opponent treats any technologies they own that you also own as having no ability text."
     },
     {
         "alias": "benataudo",
