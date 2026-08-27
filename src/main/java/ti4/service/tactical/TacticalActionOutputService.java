@@ -341,9 +341,6 @@ public class TacticalActionOutputService {
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (player.hasTech("becrystrd")) {
-                output.append(" (has _Resonance Drive_ for +1 to each ship at capacity. This is not automated.");
-            }
             if (unit.unitType() == UnitType.Destroyer) {
                 if (player.ownsUnit("ponthous_destroyer2")) {
                     output.append("**REMINDER**: Renegade II can only transport ground forces.");

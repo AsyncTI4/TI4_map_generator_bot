@@ -131,7 +131,7 @@ public class CrystellumTechHandler {
                     event.getMessageChannel(),
                     player.getRepresentationNoPing() + ", please choose a non-fighter ship to " + action + ".",
                     buttons);
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     private static boolean destroySelectedShip(

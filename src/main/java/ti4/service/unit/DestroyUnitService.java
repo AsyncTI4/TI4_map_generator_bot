@@ -15,7 +15,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -202,10 +201,6 @@ public class DestroyUnitService {
         if (player != null && player.hasAbility("fragmentation")) {
             CrystellumAbilityHandler.resolveFragmentation(event, game, player, unit);
         }
-        if (player != null && player.hasPlayablePromissoryInHand("bepncryst")) {
-            CrystellumPromissoryHandler.resolveFracture(event, game, player, unit, combat);
-        }
-
         if (combat && player != null) {
             if (player.hasUnit("ashen_dreadnought") || player.hasUnit("ashen_dreadnought2")) {
                 AshenUnitHandler.offerAshfallEngineOnDestroy(event, game, player, unit);
@@ -304,8 +299,9 @@ public class DestroyUnitService {
                 }
             }
             case Flagship -> {
-                if (player != null && player.hasUnit("crystellum_flagship")) {
-                    CrystellumUnitHandler.offerFractalRebuild(game, player, unit.tile());
+                UnitModel destroyedFlagship = player == null ? null : player.getUnitFromUnitKey(unit.unitKey());
+                if (destroyedFlagship != null && "crystellum_flagship".equals(destroyedFlagship.getId())) {
+                    CrystellumUnitHandler.offerFractalRebuild(event, game, player, unit.tile());
                 }
                 if (player != null && player.hasUnit("ta_flagship")) {
                     TaUnitHandler.clearWorldshaperOnFlagshipDestroy(player, unit);

@@ -1521,8 +1521,8 @@ public class StartCombatService {
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
 
         if (isGroundCombat) {
-            CrystellumUnitHandler.addRefractumDeployButton(buttons, p1);
-            CrystellumUnitHandler.addRefractumDeployButton(buttons, p2);
+            CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
+            CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
         }
 
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {

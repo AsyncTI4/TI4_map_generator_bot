@@ -76,8 +76,8 @@ public class NetrunnersAbilitiesHandler {
         if (!technologies.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    player.getRepresentationNoPing() + "'s _Mimetic Override_ means "
-                            + opponent.getRepresentationNoPing() + " treats " + technologies
+                    player.getRepresentation() + "'s _Mimetic Override_ means "
+                            + opponent.getRepresentation() + " treats " + technologies
                             + " as having no ability text for this combat.\n-# This effect is player-enforced.");
         }
     }
