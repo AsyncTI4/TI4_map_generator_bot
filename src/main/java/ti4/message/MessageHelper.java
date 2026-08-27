@@ -922,6 +922,43 @@ public class MessageHelper {
     }
 
     /**
+     * Packs blocks into as few messages as possible without ever splitting one across two of them.
+     * A block is whatever the caller does not want broken up - a heading with its notes, or a list
+     * item with the bullets nested under it, which Discord renders as a list of their own if they
+     * arrive in a message without the line they hang off.
+     * <p>
+     * A block longer than maxLength on its own cannot be kept whole, and is split by
+     * {@link #splitLargeText(String, int)} as a last resort.
+     *
+     * @param blocks text blocks to pack, in the order they should appear
+     * @param maxLength maximum length of each returned message, any positive integer
+     */
+    public static List<String> packBlocksIntoMessages(List<String> blocks, int maxLength) {
+        List<String> messages = new ArrayList<>();
+        if (blocks == null || blocks.isEmpty()) return messages;
+        StringBuilder message = new StringBuilder();
+        for (String block : blocks) {
+            if (block == null || block.isEmpty()) continue;
+            if (message.length() + block.length() > maxLength && message.length() > 0) {
+                messages.add(message.toString());
+                message.setLength(0);
+            }
+            if (block.length() > maxLength) {
+                // splitLargeText can trail an empty part, and Discord rejects an empty message.
+                for (String part : splitLargeText(block, maxLength)) {
+                    if (!part.isEmpty()) messages.add(part);
+                }
+                continue;
+            }
+            message.append(block);
+        }
+        if (message.length() > 0) {
+            messages.add(message.toString());
+        }
+        return messages;
+    }
+
+    /**
      * @message Message to send - can be large or null/empty
      * @embeds List of MessageEmbed - will truncate after the first 5
      * @buttons List of Button - can be large or null/empty
@@ -1106,6 +1143,37 @@ public class MessageHelper {
                     .queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
             sendMessageToChannel(channel, messageToSend);
+        }
+    }
+
+    /**
+     * Sends blocks to a thread, packed into as few messages as possible without splitting a block
+     * across two of them. Use this over the String overload whenever the text has units - such as
+     * a bullet and the bullets nested under it - that have to arrive in the same message.
+     */
+    public static void sendMessageToThread(MessageChannelUnion channel, String threadName, List<String> blocks) {
+        if (channel == null || threadName == null || threadName.isEmpty()) return;
+        List<String> messages = packBlocksIntoMessages(blocks, 2000);
+        if (messages.isEmpty()) return;
+        if (channel instanceof TextChannel) {
+            channel.asTextChannel()
+                    .createThreadChannel(threadName)
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                    .queueAfter(
+                            500,
+                            TimeUnit.MILLISECONDS,
+                            t -> messages.forEach(message -> sendMessageToChannel(t, message)));
+        } else if (channel instanceof ThreadChannel) {
+            messages.forEach(message -> sendMessageToChannel(channel, message));
+        }
+    }
+
+    public static void sendMessageToThread(MessageChannel channel, String threadName, List<String> blocks) {
+        if (channel instanceof MessageChannelUnion union) {
+            sendMessageToThread(union, threadName, blocks);
+        } else {
+            sendMessageToChannel(channel, "Something went wrong trying to send this to a thread! Sorry!");
+            packBlocksIntoMessages(blocks, 2000).forEach(message -> sendMessageToChannel(channel, message));
         }
     }
 
