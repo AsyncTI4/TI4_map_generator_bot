@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
@@ -131,6 +132,10 @@ class RelicPurgeFragments extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(
                     event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
+        fragmentsToPurge.stream()
+                .filter(fragmentId -> fragmentId.startsWith("supermassive"))
+                .forEach(fragmentId -> ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(
+                        game, activePlayer, event, fragmentId));
 
         boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (drawRelic) {

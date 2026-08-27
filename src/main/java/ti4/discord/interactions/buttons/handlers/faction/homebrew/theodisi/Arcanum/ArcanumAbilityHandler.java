@@ -11,6 +11,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
@@ -175,6 +176,9 @@ public class ArcanumAbilityHandler {
         player.removeFragment(fragmentId);
         game.purgeExplore(fragmentId);
         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        if (fragmentId.startsWith("supermassive")) {
+            ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);
+        }
         game.setStoredValue(
                 RITUAL_FRAGS_PURGED + player.getFaction(),
                 selected.isEmpty() ? fragmentId : selected + "|" + fragmentId);

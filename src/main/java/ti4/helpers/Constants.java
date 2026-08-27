@@ -1037,6 +1037,7 @@ public final class Constants {
     public static final String SEND_FRAGMENT = "send_fragment";
     public static final String USE = "use";
     public static final String PURGE_FRAGMENTS = "purge_fragments";
+    public static final String SHOW_PURGED_FRAGMENTS = "show_purged_fragments";
     public static final String FRAGMENTS = "fragments";
     public static final String LIST_FRAGMENTS = "list_fragments";
     public static final String RELIC = "relic";

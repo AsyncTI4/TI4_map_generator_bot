@@ -139,6 +139,9 @@ public class SecretObjectiveHelper {
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        if (fragId.startsWith("supermassive")) {
+                            ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
+                        }
                         switch (fragId) {
                             case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
                                 message2.append(" " + ExploreEmojis.CFrag);

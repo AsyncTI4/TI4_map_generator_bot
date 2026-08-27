@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
@@ -66,7 +67,7 @@ public class ButtonHelperExplore {
             return;
         }
         resolvePurgedFragments(game, player, event, List.of(fragmentId));
-        offerSupermassiveFragmentGain(game, player, event, fragmentId);
+        offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);
     }
 
     @ButtonHandler(GAIN_SUPERMASSIVE_FRAGMENT)
@@ -150,7 +151,7 @@ public class ButtonHelperExplore {
     }
 
     private static void offerSupermassiveFragmentGain(
-            Game game, Player player, ButtonInteractionEvent event, String supermassiveFragment) {
+            Game game, Player player, GenericInteractionCreateEvent event, String supermassiveFragment) {
         ExploreModel supermassiveModel = Mapper.getExplore(supermassiveFragment);
         if (supermassiveModel == null) {
             return;
@@ -204,6 +205,10 @@ public class ButtonHelperExplore {
                                 "Gain " + fragment.getName());
                 })
                 .toList();
+    }
+
+    public static List<String> getPurgedFragments(Game game) {
+        return getPurgedFragments(game, null, null);
     }
 
     private static List<String> getPurgedFragments(Game game, String trait, String excludedFragment) {
@@ -318,6 +323,13 @@ public class ButtonHelperExplore {
             player.setAtsCount(player.getAtsCount() + 1);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+        }
+    }
+
+    public static void offerSupermassiveFragmentGainIfApplicable(
+            Game game, Player player, GenericInteractionCreateEvent event, String fragmentId) {
+        if (fragmentId != null && fragmentId.startsWith("supermassive")) {
+            offerSupermassiveFragmentGain(game, player, event, fragmentId);
         }
     }
 
