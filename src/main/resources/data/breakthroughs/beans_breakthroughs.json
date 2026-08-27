@@ -49,14 +49,14 @@
     },
     {
         "alias": "tabt",
-        "name": "Adaptive Economy",
-        "shortName": "Adaptive\nEconomy",
+        "name": "Safe Havens",
+        "shortName": "Safe\nHavens",
         "faction": "ta",
         "synergy": [
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At the end of your turn, you may exhaust this card or spend 1 token from your strategy pool to remove 1 design from a non-home planet and attach it to a different non-home planet in an adjacent system that does not have a design attached to it. Then, place 2 infantry from your reinforcements on that planet and ready it.",
+        "text": "Once per action, when you exhaust a planet that has an attachment, you may place 1 infantry from your reinforcements on that planet. During invasion on a planet you control, if that planet has an attachment, you may force your ground forces into coexistence on that planet.",
         "source": "beans"
     },
     {
