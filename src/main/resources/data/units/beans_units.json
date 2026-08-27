@@ -89,7 +89,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "After this unit is destroyed, place fighters in its system up to its capacity value."
+    "ability": "After this unit is destroyed, you may return a number of captured fighters from your faction sheet up to the capacity value of this unit to place 1 ship in this system with a cost of no more than the amount of fighters returned."
   },
   {
     "id": "crystellum_mech",
@@ -104,7 +104,22 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "After another player produces 1 or more hits against you during ground combat, you may choose to assign 1 of those hits to 1 of your fighters in the active system instead."
+    "ability": "DEPLOY: At the start of ground combat, you may return 2 captured fighters to place 1 mech from your reinforcements on that planet."
+  },
+  {
+    "id": "crystellum_fighter3",
+    "baseType": "fighter",
+    "asyncId": "ff",
+    "name": "Shard Swarm",
+    "source": "beans",
+    "faction": "crystellum",
+    "capacityUsed": 1,
+    "cost": 0.5,
+    "combatHitsOn": 8,
+    "combatDieCount": 1,
+    "moveValue": 3,
+    "isShip": true,
+    "ability": "This unit may move without being transported. Fighters in excess of  your capacity count against your fleet limit. When this unit is destroyed, it captures itself. At the start of your turn, you may place up to 2 fighters from your reinforcements in any system that contains a planet you control."
   },
   {
     "id": "ashen_flagship",

@@ -32,9 +32,10 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
@@ -354,10 +355,6 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
         AeternaTechHandler.resetThanatocyteLatticeForCombat(game, player1, tile, unitHolderName);
         AeternaTechHandler.resetThanatocyteLatticeForCombat(game, player2, tile, unitHolderName);
-        if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
-            CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
-            CrystellumAbilityHandler.resetRefractionForCombat(game, player2, tile);
-        }
         if (firstCombatThread) {
             if (player1.hasLeader("aeternacommander") && !player1.hasLeaderUnlocked("aeternacommander")) {
                 MessageHelper.sendMessageToChannelWithButton(
@@ -530,6 +527,8 @@ public class StartCombatService {
 
         // General Space Combat
         sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
+        NetrunnersAbilitiesHandler.announceMimeticOverride(player1, player2, threadChannel);
+        NetrunnersAbilitiesHandler.announceMimeticOverride(player2, player1, threadChannel);
         if (!game.isFowMode()) {
             if (player1.getPlayableActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
@@ -1434,13 +1433,6 @@ public class StartCombatService {
             buttons.add(Buttons.gray("startFacsimile_" + tile.getPosition(), "Facsimile", FactionEmojis.mortheus));
         }
 
-        // Facet
-        if (CrystellumLeadersHandler.canUseCrystellumHero(p1)) {
-            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p1, tile));
-        } else if (CrystellumLeadersHandler.canUseCrystellumHero(p2)) {
-            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p2, tile));
-        }
-
         // mercenaries
         Player florzen = Helper.getPlayerFromAbility(game, "mercenaries");
         if (florzen != null && FoWHelper.playerHasFightersInAdjacentSystems(florzen, tile, game)) {
@@ -1478,6 +1470,14 @@ public class StartCombatService {
                 && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
+        }
+
+        // Pieces of a Whole
+        if (p1.hasAbility("pieces_of_a_whole")) {
+            CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p1, tile);
+        }
+        if (p2.hasAbility("pieces_of_a_whole")) {
+            CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p2, tile);
         }
 
         return buttons;
@@ -1519,6 +1519,11 @@ public class StartCombatService {
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
+
+        if (isGroundCombat) {
+            CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
+            CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
+        }
 
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

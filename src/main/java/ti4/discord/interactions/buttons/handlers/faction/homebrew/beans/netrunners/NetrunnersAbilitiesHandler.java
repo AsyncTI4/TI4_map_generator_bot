@@ -3,13 +3,13 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunn
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -64,49 +64,22 @@ public class NetrunnersAbilitiesHandler {
         }
     }
 
-    public static void offerBlackout(Game game, Player activator, ti4.game.Tile tile) {
-        if (game == null || activator == null || tile == null) {
-            return;
+    public static void announceMimeticOverride(Player player, Player opponent, MessageChannel channel) {
+        if (player == null || opponent == null || channel == null || !player.hasTech("benetrunnersmo")) return;
+        String technologies = player.getTechs().stream()
+                .filter(opponent::hasTech)
+                .map(Mapper::getTech)
+                .filter(java.util.Objects::nonNull)
+                .map(tech -> "_" + tech.getName() + "_")
+                .sorted()
+                .collect(java.util.stream.Collectors.joining(", "));
+        if (!technologies.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    player.getRepresentation() + "'s _Mimetic Override_ means "
+                            + opponent.getRepresentation() + " treats " + technologies
+                            + " as having no ability text for this combat.\n-# This effect is player-enforced.");
         }
-        for (Player netrunner : game.getRealPlayersExcludingThis(activator)) {
-            if (!netrunner.hasTech("benetrunnersbo") || !FoWHelper.playerHasUnitsInSystem(netrunner, tile)) continue;
-            List<Button> buttons = activator.getTechs().stream()
-                    .map(Mapper::getTech)
-                    .filter(java.util.Objects::nonNull)
-                    .filter(tech -> activator.hasTech(tech.getAlias()))
-                    .filter(tech -> !tech.isUnitUpgrade())
-                    .map(tech -> Buttons.gray(
-                            netrunner.factionButtonChecker() + "netrunnersBlackout_" + activator.getFaction() + "_"
-                                    + tech.getAlias(),
-                            tech.getName()))
-                    .toList();
-            if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        netrunner.getCorrectChannel(),
-                        netrunner.getRepresentationUnfogged()
-                                + ", please choose a technology that cannot be used until the end of that player's turn due to **Blackout**.",
-                        buttons);
-            }
-        }
-    }
-
-    @ButtonHandler("netrunnersBlackout_")
-    public static void resolveBlackout(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace("netrunnersBlackout_", "").split("_", 2);
-        if (parts.length != 2) return;
-        Player target = game.getPlayerFromColorOrFaction(parts[0]);
-        if (target == null
-                || !netrunner.hasTech("benetrunnersbo")
-                || !target.hasTech(parts[1])
-                || Mapper.getTech(parts[1]) == null
-                || Mapper.getTech(parts[1]).isUnitUpgrade()) return;
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                netrunner.getRepresentation() + ", " + target.getRepresentation() + ", **"
-                        + Mapper.getTech(parts[1]).getName() + "** cannot be used until the end of "
-                        + target.getRepresentation(false, true) + "'s turn due to **Blackout**."
-                        + "\n-# This effect is player-enforced.");
     }
 
     @ButtonHandler("netrunnersDataBreachMove_")

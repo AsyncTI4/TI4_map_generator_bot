@@ -40,7 +40,7 @@
     "name": "Shardwright Veyla",
     "title": "Fleet Control",
     "abilityWindow": "At the end of a player's turn:",
-    "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in the active system up to the number of non-fighter ships in that system. If that player was another player, gain trade goods equal to the amount of fighters placed.",
+    "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in the active system up to the number of non-fighter ships in that system. If that player was another player, capture that many fighters from the supply.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -48,11 +48,11 @@
     "id": "crystellumcommander",
     "faction": "crystellum",
     "type": "commander",
-    "name": "Highbearer Lumina",
+    "name": "High Architect Lumina",
     "title": "Lightkeeper",
-    "abilityWindow": "When you activate a system that contains another player's ships:",
-    "abilityText": "For each ship being moved, you may choose to add +1 to that ships printed capacity value until the end of this tactical action.",
-    "unlockCondition": "Have ships with a printed capacity value in 3 non-home systems.",
+    "abilityWindow": "When you produce fighters:",
+    "abilityText": "You may place them in any system that contains your command tokens and no other players ships.",
+    "unlockCondition": "Have 12 fighters on the game board.",
     "source": "beans"
   },
   {
@@ -62,8 +62,8 @@
     "name": "Facet",
     "title": "Hive Mind Nexus",
     "abilityName": "Mirror - Infinite Reflections",
-    "abilityWindow": "At the start of a space combat:",
-    "abilityText": "Place non-fighter ships in the active system from your reinforcements equal to the amount and type of each of your opponent's non-fighter ships participating in this combat. During this combat, your ships in the active system do not count against your fleet limit. At the end of combat, purge this card.",
+    "abilityWindow": "ACTION:",
+    "abilityText": "You may return any number of captured fighters from your faction sheet to place any number of units in any systems that contain at least 1 of your ships with a total cost of no more than twice the amount of fighters returned. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },

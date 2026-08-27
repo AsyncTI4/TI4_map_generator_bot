@@ -13,6 +13,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
@@ -230,6 +231,8 @@ public class TacticalActionOutputService {
         summary.append(String.join("\n", lines));
         String powerWordWishMoveNote = ArcanumBreakthroughHandler.getPowerWordWishMoveNote(game, player, tile);
         if (!powerWordWishMoveNote.isEmpty()) summary.append('\n').append(powerWordWishMoveNote);
+        String resonanceDriveMoveNote = CrystellumTechHandler.getResonanceDriveMoveNote(game, player);
+        if (!resonanceDriveMoveNote.isEmpty()) summary.append('\n').append(resonanceDriveMoveNote);
         String extraSummary = buildShortSummary(game, Set.of(tile.getPosition()));
         if (extraSummary != null && inclSummary) summary.append('\n').append(extraSummary);
         return summary.toString();
@@ -337,9 +340,6 @@ public class TacticalActionOutputService {
             }
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
-            }
-            if (player.hasTech("becrystrd")) {
-                output.append(" (has _Resonance Drive_ for +1 to each ship at capacity. This is not automated.");
             }
             if (unit.unitType() == UnitType.Destroyer) {
                 if (player.ownsUnit("ponthous_destroyer2")) {

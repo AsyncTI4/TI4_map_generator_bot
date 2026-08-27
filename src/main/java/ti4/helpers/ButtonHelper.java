@@ -56,7 +56,6 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
@@ -4147,9 +4146,6 @@ public class ButtonHelper {
                 * 2;
         // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
 
-        if (CrystellumLeadersHandler.hasFacetBypass(game, player, tile)) {
-            fleetCap += 1000;
-        }
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
             fleetCap += 1000;
         }
@@ -4881,6 +4877,9 @@ public class ButtonHelper {
                     player.factionButtonChecker() + "exhaustAgent_freesystemsagent_" + player.getFaction(),
                     "Use Free Systems Agent",
                     FactionEmojis.freesystems));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
         }
 
         // OTHER stuff
@@ -6982,8 +6981,7 @@ public class ButtonHelper {
                 || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
                         && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
                 || (player.hasRelic("metalivoidshielding")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                || CrystellumBreakthroughHandler.canUseDefensiveArchitectureSustain(game, player, tile, unitModel);
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
     }
 
     @ButtonHandler("startThalnos_")

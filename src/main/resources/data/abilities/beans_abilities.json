@@ -27,7 +27,7 @@
         "name": "Fragmentation",
         "faction": "crystellum",
         "window": "After one of your non-fighter ships is destroyed:",
-        "windowEffect": "You may capture 1 fighter from the supply.",
+        "windowEffect": "Capture 1 fighter from the supply.",
         "source": "beans"
     },
     {
@@ -35,7 +35,7 @@
         "name": "Pieces of a Whole",
         "faction": "crystellum",
         "window": "At the start of space combat:",
-        "windowEffect": "You mayu return up to 2 captured fighters from your faction sheet to place that many fighters from your reinforcements in the active system.",
+        "windowEffect": "You may return up to 2 captured fighters from your faction sheet to place that many fighters from your reinforcements in the active system.",
         "source": "beans"
     },
     {

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
@@ -270,6 +271,10 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
                     owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        }
+
+        if ("bepncryst".equalsIgnoreCase(id)) {
+            CrystellumPromissoryHandler.resolveFracture(game, player, event);
         }
 
         if (id.contains("dspnveld")) {
