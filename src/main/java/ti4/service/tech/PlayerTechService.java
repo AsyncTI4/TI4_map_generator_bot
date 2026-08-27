@@ -669,9 +669,6 @@ public class PlayerTechService {
                         event.getMessageChannel(), "Please choose a planet to explore.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
-            case "betaqr" -> { // Quantum Restructuring
-                TaFactionTechHandler.resolveQuantumRestructuring(event, game, player);
-            }
             case "betaro" -> { // Resource Optimization
                 TaFactionTechHandler.resolveResOp(event, game, player);
             }

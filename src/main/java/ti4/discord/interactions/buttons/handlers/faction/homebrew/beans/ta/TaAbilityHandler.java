@@ -13,7 +13,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -25,10 +24,9 @@ import ti4.service.leader.CommanderUnlockCheckService;
 public class TaAbilityHandler {
 
     private static final String PLANETARY_RECONFIGURATION = "planetary_reconfiguration";
-    private static final String EFFICIENT_GOVERNANCE = "efficient_governance";
     private static final String ATTACH_DESIGN_PREFIX = "taAttachDesign_";
     private static final List<String> ATTACHABLE_DESIGNS =
-            List.of("designunify", "designtranspose", "designprestige", "designabundance");
+            List.of("designtranspose", "designprestige", "designabundance");
 
     public static void sendPlanetaryReconfigurationStatus(Player player, Game game) {
         if (player == null
@@ -243,28 +241,6 @@ public class TaAbilityHandler {
             return design;
         }
         return attachment.getName().replace(" (Design)", "");
-    }
-
-    public static void resolveEfficientGovernance(Game game, String winner) {
-        if (game == null || winner == null || winner.isBlank()) {
-            return;
-        }
-
-        for (Player player : AgendaHelper.getWinningVoters(winner, game)) {
-            if (!player.hasAbility(EFFICIENT_GOVERNANCE)) {
-                continue;
-            }
-
-            List<Button> buttons = new ArrayList<>(Helper.getPlanetRefreshButtons(player, game));
-            buttons.add(Buttons.red("deleteButtons", "Done Readying"));
-            if (buttons != null) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " You may ready up to 2 planets due to your _Efficient Governance_ ability.",
-                        buttons);
-            }
-        }
     }
 
     public static void resolveGrandDesign(Player player, Game game, String planetName) {
