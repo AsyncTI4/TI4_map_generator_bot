@@ -40,6 +40,8 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
@@ -769,15 +771,22 @@ public class ButtonHelperCommanders {
             return;
         }
         List<Button> buttons = new ArrayList<>();
-        for (String planet : target.getPlanetsAllianceMode()) {
-            if (game.getUnitHolderFromPlanet(planet) != null
-                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
-                    && !ButtonHelper.getPlanetExplorationButtons(
-                                    game, game.getUnitHolderFromPlanet(planet), player, false, true)
-                            .isEmpty()) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
+        if (game.isFowMode()) {
+            // Ground forces and explorability are both hidden state, so neither can narrow the fog list -
+            // which planets are explorable would also disclose their traits and attachments.
+            buttons = PlanetTargetService.targetButtons(
+                    game, player, PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3"), buttons);
+        } else {
+            for (String planet : target.getPlanetsAllianceMode()) {
+                if (game.getUnitHolderFromPlanet(planet) != null
+                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
+                        && !ButtonHelper.getPlanetExplorationButtons(
+                                        game, game.getUnitHolderFromPlanet(planet), player, false, true)
+                                .isEmpty()) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Cancel"));

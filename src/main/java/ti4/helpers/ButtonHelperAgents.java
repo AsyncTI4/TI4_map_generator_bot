@@ -52,6 +52,8 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -1166,13 +1168,22 @@ public final class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(channel, exhaustText);
 
                 List<Button> buttons = new ArrayList<>();
-                for (String planet : p2.getPlanets()) {
-                    if (game.getUnitHolderFromPlanet(planet) != null
-                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
-                            && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                        buttons.add(Buttons.gray(
-                                player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                                Helper.getPlanetRepresentation(planet, game)));
+                if (game.isFowMode()) {
+                    buttons = PlanetTargetService.targetButtons(
+                            game,
+                            player,
+                            PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
+                                    .where(p -> !p.isHomePlanet(game)),
+                            buttons);
+                } else {
+                    for (String planet : p2.getPlanets()) {
+                        if (game.getUnitHolderFromPlanet(planet) != null
+                                && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                                && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
+                            buttons.add(Buttons.gray(
+                                    player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                    Helper.getPlanetRepresentation(planet, game)));
+                        }
                     }
                 }
                 String msg = player.getRepresentation()
