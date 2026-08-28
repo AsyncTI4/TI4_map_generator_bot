@@ -121,6 +121,17 @@ public class TaLeadersHandler {
         }
         String cardID = game.drawExplore(parts[1]);
         ExploreModel explore = Mapper.getExplore(cardID);
+        String revealedCard = explore == null ? "an unknown card" : "_" + explore.getName() + "_";
+        if (explore == null) {
+            MessageHelper.sendMessageToChannel(
+                    target.getCorrectChannel(),
+                    target.getRepresentationUnfogged() + " revealed " + revealedCard + " with Len, the Ta agent.");
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    target.getCorrectChannel(),
+                    target.getRepresentationUnfogged() + " revealed " + revealedCard + " with Len, the Ta agent.",
+                    List.of(explore.getRepresentationEmbed()));
+        }
         if (explore != null && explore.getAttachmentId().isPresent()) {
             String attachment = explore.getAttachmentId().get();
             String attachmentPath = Mapper.getAttachmentImagePath(attachment);
@@ -144,7 +155,7 @@ public class TaLeadersHandler {
             target.gainTG(2);
             MessageHelper.sendMessageToChannel(
                     target.getCorrectChannel(),
-                    target.getRepresentationUnfogged() + " discarded the revealed card and gained 2 " + MiscEmojis.tg
+                    target.getRepresentationUnfogged() + " discarded it and gained 2 " + MiscEmojis.tg
                             + " with Len, the Ta agent.");
         }
         ButtonHelper.deleteMessage(event);
@@ -164,7 +175,7 @@ public class TaLeadersHandler {
         int commoditiesGained = player.getCommodities() - commoditiesBefore;
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Gained "
+                player.getRepresentationUnfogged() + " gained "
                         + commoditiesGained
                         + " "
                         + MiscEmojis.comm
@@ -172,12 +183,13 @@ public class TaLeadersHandler {
                         + Helper.getPlanetRepresentationPlusEmoji(planetName)
                         + " due to Zul, the Ta commander.");
         if (TaAbilityHandler.planetHasAnyAttachment(tile, planetName) && commoditiesGained > 0) {
-            List<Button> buttons = List.of(Buttons.green(
+            List<Button> buttons = new ArrayList<>(List.of(Buttons.green(
                     player.factionButtonChecker() + COMMANDER_CONVERT_PREFIX + tile.getPosition() + "|" + planetName,
                     "Convert Commodity to Trade Good",
-                    MiscEmojis.comm));
+                    MiscEmojis.comm)));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
 
-            MessageHelper.sendMessageToChannel(
+            MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + ", because "

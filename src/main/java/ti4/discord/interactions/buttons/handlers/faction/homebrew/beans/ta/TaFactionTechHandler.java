@@ -13,6 +13,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.planet.PlanetService;
@@ -78,6 +79,7 @@ public class TaFactionTechHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " placed 1 PDS on " + Helper.getPlanetRepresentation(parts[1], game)
                         + " with _Quantum Restructuring_.");
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
     }
 
     public static void resolveResOp(GenericInteractionCreateEvent event, Game game, Player player) {

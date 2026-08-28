@@ -155,13 +155,14 @@ public class TaAbilityHandler {
         ExploreModel secondExplore = Mapper.getExplore(secondCard);
         if (firstExplore == null || secondExplore == null) {
             game.discardExplore(firstCard);
-            if (secondExplore != null) game.discardExplore(secondCard);
+            game.discardExplore(secondCard);
             return true;
         }
-        MessageHelper.sendMessageToChannelWithButtons(
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
                         + ", please choose the exploration card to resolve with **Perfect Architecture**.",
+                List.of(firstExplore.getRepresentationEmbed(), secondExplore.getRepresentationEmbed()),
                 List.of(
                         Buttons.green(
                                 player.factionButtonChecker() + PERFECT_ARCHITECTURE_RESOLVE + firstCard + "|"

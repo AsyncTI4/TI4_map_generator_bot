@@ -44,7 +44,8 @@ public class TaBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you may place 1 infantry on "
-                        + Helper.getPlanetRepresentation(planetName, game) + " with **Safe Havens**.",
+                        + Helper.getPlanetRepresentation(planetName, game)
+                        + " with **Safe Havens**. This ability can be used only once per action.",
                 buttons);
     }
 
