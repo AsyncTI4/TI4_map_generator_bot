@@ -95,6 +95,10 @@ public final class Constants {
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
+    public static final String TWILIGHT_DS = "twilight_ds";
+    public static final String TWILIGHT_KART = "twilight_kart";
+    public static final String TK_DESTROYER_CUP = "tk_destroyer_cup";
+    public static final String TK_NOVA_CUP = "tk_nova_cup";
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
@@ -1669,8 +1673,6 @@ public final class Constants {
     public static final String ALL = "ALL";
     public static final String COEXIST = "coexist";
 
-    public static final String TWILIGHT_KART = "twilight_kart";
-    public static final String TWILIGHT_DS = "twilight_ds";
     public static final String ABILITY_DECK_ID = "ability_deck_id";
     public static final String GENOME_DECK_ID = "genome_deck_id";
     public static final String PARADIGM_DECK_ID = "paradigm_deck_id";
