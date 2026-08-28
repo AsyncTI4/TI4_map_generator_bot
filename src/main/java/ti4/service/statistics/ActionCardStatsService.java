@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.TreeSet;
@@ -64,7 +65,7 @@ public class ActionCardStatsService {
     // Bounds on the pseudo-plays estimated below, guarding against a degenerate dataset asking for
     // either no shrinkage at all or so much that every card collapses onto the deck average.
     private static final double MIN_PSEUDO_PLAYS = 5;
-    private static final double MAX_PSEUDO_PLAYS = 500;
+    private static final double MAX_PSEUDO_PLAYS = 200;
 
     // Cards thinner than this are left out of the spread estimate: their rates are mostly noise,
     // and a rate off one or two plays would swamp the correction meant to remove that noise.
@@ -289,15 +290,6 @@ public class ActionCardStatsService {
                         + "._\n";
         blocks.add(header);
 
-        StringBuilder playAndCancelStats = new StringBuilder();
-        Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);
-        playAndCancelStats.append("\n**Plays vs estimated draws, and cancel rates**\n");
-        appendEstimatedDrawsNote(
-                playAndCancelStats, computeEstimatedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
-        appendActionCardPlayAndCancelStats(
-                playAndCancelStats, actionCardsPlayedCounts, cancelCounts, playedEstimatedDraws);
-        blocks.add(playAndCancelStats.toString());
-
         StringBuilder impactScoreNotes = new StringBuilder();
         impactScoreNotes.append("\n**Impact Score**\n");
         impactScoreNotes
@@ -326,6 +318,17 @@ public class ActionCardStatsService {
         }
 
         playerStats.appendTo(blocks);
+
+        StringBuilder playAndCancelStats = new StringBuilder();
+        Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);
+        playAndCancelStats.append("\n**Plays vs estimated draws, and cancel rates**\n");
+        appendRecoveredDataNote(playAndCancelStats);
+        appendEstimatedDrawsNote(
+                playAndCancelStats, computeEstimatedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
+        appendActionCardPlayAndCancelStats(
+                playAndCancelStats, actionCardsPlayedCounts, cancelCounts, playedEstimatedDraws);
+        blocks.add(playAndCancelStats.toString());
+
         if (options.developerDebug()) {
             StringBuilder developerDebug = new StringBuilder();
             appendUnattributedPlayDebug(developerDebug, unattributedPlays);
@@ -416,6 +419,11 @@ public class ActionCardStatsService {
         message.append("_We started tracking these on ")
                 .append(PLAYER_TRACKING_START_DATE)
                 .append("._\n");
+    }
+
+    private static void appendRecoveredDataNote(StringBuilder message) {
+        message.append(
+                "_Recovered from older games rather than recorded as they were played, so read these as rough. A play here is any card that reached the discard pile, whether it was played or discarded to hand limit, and cancels in the oldest games were reconstructed after the fact. Every section above is built only on plays recorded as they happened._\n");
     }
 
     private static void appendEstimatedDrawsNote(StringBuilder message, Map<Integer, Integer> maxPlaysPerCopyCount) {
@@ -576,11 +584,15 @@ public class ActionCardStatsService {
         Map<String, Integer> cancelRateRanks = rankDescending(
                 cardNames, name -> playToWinCorrelationCounts.get(name).getCancelRate());
 
+        boolean averageLeads =
+                appendAverageOfAllCards(blocks, playToWinCorrelationCounts, estimatedDrawsPerCard, weights);
+
         for (int i = 0; i < sortedEntries.size(); i++) {
             Map.Entry<String, PlayToWinCorrelationCount> entry = sortedEntries.get(i);
             // The list is sorted by Impact Score, so only the rates need a rank spelled out. The
-            // leading card names each rate in full and every card below it abbreviates.
-            boolean firstEntry = i == 0;
+            // leading row names each rate in full and every row below it abbreviates - which is the
+            // average row when there is one, since it sits above every card.
+            boolean firstEntry = !averageLeads && i == 0;
             String winRateLabel = firstEntry ? "uncancelled play win rate" : "win";
             String playRateLabel = firstEntry ? "plays vs estimated draw rate" : "play";
             String cancelRateLabel = firstEntry ? "cancel rate" : "cancel";
@@ -622,14 +634,56 @@ public class ActionCardStatsService {
         }
     }
 
+    private static boolean appendAverageOfAllCards(
+            List<String> blocks,
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Map<String, Integer> estimatedDrawsPerCard,
+            ImpactWeights weights) {
+        List<PlayToWinCorrelationCount> scorable = playToWinCorrelationCounts.entrySet().stream()
+                .filter(entry -> getPlayRate(entry.getValue(), estimatedDrawsPerCard.get(entry.getKey())) != null)
+                .map(Map.Entry::getValue)
+                .toList();
+        if (scorable.isEmpty()) {
+            return false;
+        }
+
+        double winRate = scorable.stream()
+                .mapToDouble(PlayToWinCorrelationCount::getWinRate)
+                .average()
+                .orElse(0);
+        double playRate = playToWinCorrelationCounts.entrySet().stream()
+                .map(entry -> getPlayRate(entry.getValue(), estimatedDrawsPerCard.get(entry.getKey())))
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0);
+        double cancelRate = scorable.stream()
+                .mapToDouble(PlayToWinCorrelationCount::getCancelRate)
+                .average()
+                .orElse(0);
+
+        ImpactRates rates = computeImpactRates(playToWinCorrelationCounts, estimatedDrawsPerCard);
+        double impactScore = weights.score(
+                anchor(winRate, rates.bestWinRate()),
+                anchor(playRate, rates.bestPlayRate()),
+                anchor(cancelRate, rates.bestCancelRate()));
+
+        StringBuilder message = new StringBuilder();
+        message.append("- **Average across all cards:**\n");
+        message.append("  - ").append(String.format("%.1f", impactScore)).append(" Impact Score\n");
+        appendRate(message, winRate, "uncancelled play win rate", null);
+        appendRate(message, playRate, "plays vs estimated draw rate", null);
+        appendRate(message, cancelRate, "cancel rate", null);
+        blocks.add(message.toString());
+        return true;
+    }
+
     private static void appendRate(StringBuilder message, double rate, String label, Integer rank) {
-        message.append("  - ")
-                .append(formatRate(rate))
-                .append(' ')
-                .append(label)
-                .append(" (#")
-                .append(rank)
-                .append(")\n");
+        message.append("  - ").append(formatRate(rate)).append(' ').append(label);
+        if (rank != null) {
+            message.append(" (#").append(rank).append(')');
+        }
+        message.append('\n');
     }
 
     // Discord shows these counts down to the single play, so "1 cancels" is on screen often
@@ -670,11 +724,9 @@ public class ActionCardStatsService {
     // A card's impact is how well it wins, how much of the deck's draws it accounts for, and how
     // badly opponents want it gone - weighted in that order. Each rate is measured against the
     // deck's best, so a card that leads all three scores 100.
-    static Map<String, Double> computeImpactScores(
+    private static ImpactRates computeImpactRates(
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            Map<String, Integer> estimatedDrawsPerCard,
-            Set<String> unsabotageableCards,
-            ImpactWeights weights) {
+            Map<String, Integer> estimatedDrawsPerCard) {
         // Win rates and cancel rates spread very differently - most cards win at roughly the deck
         // average while cancels pile onto a handful of cards - so each gets its own shrinkage.
         ShrinkageModel winRateModel = buildShrinkageModel(
@@ -698,22 +750,38 @@ public class ActionCardStatsService {
             cancelRates.put(cardName, cancelRateModel.shrink(count.getCanceled(), count.getPlaysIncludingCanceled()));
         });
 
-        double bestWinRate = getMax(winRates);
-        double bestPlayRate = getMax(playRates);
-        double bestCancelRate = getMax(cancelRates);
+        return new ImpactRates(
+                winRates, playRates, cancelRates, getMax(winRates), getMax(playRates), getMax(cancelRates));
+    }
 
+    static Map<String, Double> computeImpactScores(
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Map<String, Integer> estimatedDrawsPerCard,
+            Set<String> unsabotageableCards,
+            ImpactWeights weights) {
+        ImpactRates rates = computeImpactRates(playToWinCorrelationCounts, estimatedDrawsPerCard);
         Map<String, Double> impactScores = new HashMap<>();
-        winRates.forEach((cardName, winRate) -> {
-            double win = anchor(winRate, bestWinRate);
-            double play = anchor(playRates.get(cardName), bestPlayRate);
+        rates.winRates().forEach((cardName, winRate) -> {
+            double win = anchor(winRate, rates.bestWinRate());
+            double play = anchor(rates.playRates().get(cardName), rates.bestPlayRate());
             if (unsabotageableCards.contains(cardName)) {
                 weights.scoreWithoutCancels(win, play).ifPresent(score -> impactScores.put(cardName, score));
                 return;
             }
-            impactScores.put(cardName, weights.score(win, play, anchor(cancelRates.get(cardName), bestCancelRate)));
+            impactScores.put(
+                    cardName,
+                    weights.score(win, play, anchor(rates.cancelRates().get(cardName), rates.bestCancelRate())));
         });
         return impactScores;
     }
+
+    private record ImpactRates(
+            Map<String, Double> winRates,
+            Map<String, Double> playRates,
+            Map<String, Double> cancelRates,
+            double bestWinRate,
+            double bestPlayRate,
+            double bestCancelRate) {}
 
     private record ReportOptions(
             ImpactWeights weights, boolean factionControl, boolean fullDetails, boolean developerDebug) {}

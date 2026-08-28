@@ -171,18 +171,57 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
                 Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
 
+        // The average row leads, so it is the one that names each rate in full and carries no rank,
+        // having nothing to be ranked against. Every card below it abbreviates.
         assertThat(rendered).isEqualTo("""
+                        - **Average across all cards:**
+                          - 75.9 Impact Score
+                          - 31.1% uncancelled play win rate
+                          - 75.0% plays vs estimated draw rate
+                          - 17.5% cancel rate
                         - **Overrule:**
                           - 100.0 Impact Score
-                          - 40.0% uncancelled play win rate (#1)
-                          - 100.0% plays vs estimated draw rate (#1)
-                          - 25.0% cancel rate (#1)
+                          - 40.0% win (#1)
+                          - 100.0% play (#1)
+                          - 25.0% cancel (#1)
                         - **Lie in Wait:**
                           - 53.9\\* Impact Score
                           - 22.2% win (#2)
                           - 50.0% play (#2)
                           - 10.0% cancel (#2)
                         """);
+    }
+
+    @Test
+    void shouldAverageEachRateOverTheCardsRatherThanOverThePlays() {
+        // Overrule is played twice as often as Lie in Wait, and must not count twice as much for
+        // it: one card, one vote. Win rates of 40% and 22.2% average to 31.1%, not to the 33.3%
+        // that pooling 80 wins over 240 uncancelled plays would give.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
+
+        assertThat(rendered).contains("- 31.1% uncancelled play win rate\n");
+        assertThat(rendered).contains("- 75.0% plays vs estimated draw rate\n");
+        assertThat(rendered).contains("- 17.5% cancel rate\n");
+    }
+
+    @Test
+    void shouldKeepRawCountsOffTheAverageRowEvenUnderFullDetails() {
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1),
+                true);
+
+        // Every figure on that row is a mean over cards, while a count is a total over plays. The
+        // two do not divide back into each other, so printing them together would only imply they do.
+        assertThat(rendered.substring(0, rendered.indexOf("- **Overrule:**")))
+                .contains("- 17.5% cancel rate\n")
+                .doesNotContain(" wins, ");
+        // The cards below it still carry theirs.
+        assertThat(rendered).contains("  - 60 wins, 200 plays, 50 cancels\n");
     }
 
     @Test
@@ -221,11 +260,9 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         // Lie in Wait wins and is canceled far more often per play, which outweighs Overrule being
         // played twice as much - so it leads the list and carries the labels.
         assertThat(rendered).contains("- 87.5\\* Impact Score").contains("- 64.0 Impact Score");
-        assertThat(rendered).contains("- 80.0% uncancelled play win rate (#1)").contains("- 40.0% win (#2)");
-        assertThat(rendered)
-                .contains("- 50.0% plays vs estimated draw rate (#2)")
-                .contains("- 100.0% play (#1)");
-        assertThat(rendered).contains("- 50.0% cancel rate (#1)").contains("- 25.0% cancel (#2)");
+        assertThat(rendered).contains("- 80.0% win (#1)").contains("- 40.0% win (#2)");
+        assertThat(rendered).contains("- 50.0% play (#2)").contains("- 100.0% play (#1)");
+        assertThat(rendered).contains("- 50.0% cancel (#1)").contains("- 25.0% cancel (#2)");
     }
 
     @Test
@@ -237,9 +274,9 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
 
         // Both convert half their plays, so both are #1 on win rate while the play rates differ.
         assertThat(rendered)
-                .contains("- 50.0% uncancelled play win rate (#1)")
                 .contains("- 50.0% win (#1)")
-                .contains("- 100.0% plays vs estimated draw rate (#1)")
+                .contains("- 50.0% win (#1)")
+                .contains("- 100.0% play (#1)")
                 .contains("- 50.0% play (#2)");
     }
 
@@ -345,7 +382,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Set.of(GameStats.SABOTAGE),
                 false);
 
-        assertThat(rendered).contains("cancel rate (#1)");
+        assertThat(rendered).contains("- 1.0% cancel (#1)");
     }
 
     @Test
@@ -372,8 +409,8 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 1, "Always Saboed", 1));
 
         // With a quarter of the score riding on cancels, a card nobody is willing to let resolve
-        // leads the deck on that alone - so it takes the first entry's spelled-out labels with it.
-        assertThat(rendered).contains("- 0.0% uncancelled play win rate (#2)").contains("- 77.5\\* Impact Score");
+        // leads the deck on that alone.
+        assertThat(rendered).contains("- 0.0% win (#2)").contains("- 77.5\\* Impact Score");
         assertThat(rendered.indexOf("Always Saboed")).isLessThan(rendered.indexOf(GameStats.OVERRULE));
     }
 

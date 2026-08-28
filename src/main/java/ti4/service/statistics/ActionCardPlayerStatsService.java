@@ -28,7 +28,7 @@ import ti4.model.FactionModel;
 class ActionCardPlayerStatsService {
 
     // Rows are pooled three counts wide. A row per exact count splits the sample thin enough that
-    // neighbouring rows swing on a few players each, which hides the trend running through them.
+    // neighboring rows swing on a few players each, which hides the trend running through them.
     private static final int BAND_SIZE = 3;
 
     // The last band is open-ended: past here the sample thins out fast, and how far past hardly
