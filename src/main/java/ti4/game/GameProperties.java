@@ -180,9 +180,13 @@ public class GameProperties {
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
-    private @ExportableField boolean twilightKart;
     private @ExportableField boolean loreMode;
     private @ExportableField boolean twilightDS;
+    // Twilight Kart Modes
+    // TODO: remove twilightKart when no more games exist that have it set exist
+    private @ExportableField boolean twilightKart; // Deprecated.
+    private @ExportableField boolean tkDestroyerCup;
+    private @ExportableField boolean tkNovaCup;
 
     // Discord Snowflakes
     private @ExportableField String guildID;
