@@ -247,8 +247,7 @@
         ],
         "abilities": [
             "neural_instruments",
-            "proxy_network",
-            "reverse_engineering"
+            "proxy_network"
         ],
         "leaders": [
             "netrunnersagent",

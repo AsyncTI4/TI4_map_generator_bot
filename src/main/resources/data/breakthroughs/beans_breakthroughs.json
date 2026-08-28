@@ -65,7 +65,7 @@
         "shortName": "Data\nBreach",
         "faction": "netrunners",
         "synergy": ["NONE"],
-        "text": "When you unlock this breakthrough, place one of your control tokens on another player's breakthrough. Your breakthrough has synergy in the colors on the breakthrough your control token is on. When you would place another player's control token on your faction sheet using your Neural Instruments ability, you may instead move your control token onto that player's breakthrough.",
+        "text": "When you unlock this breakthrough, place one of your control tokens on another player's breakthrough. Your breakthrough has synergy in the colors on the breakthrough your control token is on. At the end of your turn you may exhaust this card and spend a token from your strategy pool to gain the technology affected by your Proxy Network ability.",
         "source": "beans"
     },
     {
