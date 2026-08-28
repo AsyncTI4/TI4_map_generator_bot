@@ -306,8 +306,8 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         Map<String, Double> scores =
                 ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE), WEIGHTS);
 
-        assertThat(scores.get(GameStats.SABOTAGE)).isCloseTo(100.0, within(1e-9));
-        assertThat(scores.get(GameStats.OVERRULE)).isCloseTo(75.0, within(1e-9));
+        assertThat(scores.get(GameStats.SABOTAGE)).isCloseTo(100.0, within(1.0e-9));
+        assertThat(scores.get(GameStats.OVERRULE)).isCloseTo(75.0, within(1.0e-9));
     }
 
     @Test
@@ -394,7 +394,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 200, "Lucky Shot", 200),
                 Map.of(GameStats.OVERRULE, 1, "Lucky Shot", 1));
 
-        assertThat(rendered).contains("- 74.2 Impact Score").contains("- 50.2\\* Impact Score");
+        assertThat(rendered).contains("- 73.4 Impact Score").contains("- 50.2\\* Impact Score");
         // The real card leads despite conceding the win-rate anchor to the lucky one.
         assertThat(rendered.indexOf(GameStats.OVERRULE)).isLessThan(rendered.indexOf("Lucky Shot"));
     }
@@ -447,16 +447,16 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         // Identical rates are no evidence that cards differ at all, and two cards 10 points apart on
         // 12 plays each is a gap luck fully explains. Both lean entirely on the deck average.
         assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.25, 100), rateSample(0.25, 100))))
-                .isEqualTo(500);
+                .isEqualTo(200);
         assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.30, 12), rateSample(0.20, 12))))
-                .isEqualTo(500);
+                .isEqualTo(200);
     }
 
     @Test
     void shouldShrinkHardestWhenThereIsNothingToCompare() {
         assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.30, 100))))
-                .isEqualTo(500);
-        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of())).isEqualTo(500);
+                .isEqualTo(200);
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of())).isEqualTo(200);
     }
 
     private static double[] rateSample(double rate, int denominator) {
