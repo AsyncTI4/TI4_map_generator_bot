@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.GameStats;
@@ -253,6 +254,53 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldSplitTheCancelWeightBetweenWinsAndPlaysForACardNoSabotageCanCancel() {
+        // Identical records, and neither card is ever canceled. Overrule still concedes the cancel
+        // weight, because it could have been sabotaged and no card earned that category. Sabotage
+        // never could be, so its tenth is shared out over the two figures that do apply to it.
+        Map<String, PlayToWinCorrelationCount> counts = Map.of(
+                GameStats.SABOTAGE, playToWinCount(100, 100, 50),
+                GameStats.OVERRULE, playToWinCount(100, 100, 50));
+        Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 100, GameStats.OVERRULE, 100);
+
+        Map<String, Double> scores =
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE));
+
+        assertThat(scores.get(GameStats.SABOTAGE)).isCloseTo(100.0, within(1e-9));
+        assertThat(scores.get(GameStats.OVERRULE)).isCloseTo(90.0, within(1e-9));
+    }
+
+    @Test
+    void shouldNotLetARareWatcherCancelDragDownACardNoSabotageCanCancel() {
+        // The one cancel Sabotage suffered came from something like a Watcher. Scoring it on the
+        // cancel category would read that rarity as "nobody wanted this gone" and mark it down.
+        Map<String, PlayToWinCorrelationCount> counts = Map.of(
+                GameStats.SABOTAGE, playToWinCount(200, 199, 100),
+                GameStats.OVERRULE, playToWinCount(200, 100, 100));
+        Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 200, GameStats.OVERRULE, 200);
+
+        double carvedOut = ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE))
+                .get(GameStats.SABOTAGE);
+        double scoredOnCancels = ActionCardStatsService.computeImpactScores(counts, draws, Set.of())
+                .get(GameStats.SABOTAGE);
+
+        assertThat(carvedOut).isGreaterThan(scoredOnCancels);
+    }
+
+    @Test
+    void shouldStillShowTheCancelRateOfACardNoSabotageCanCancel() {
+        // The figure is worth seeing even though it is not worth scoring.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.SABOTAGE, playToWinCount(100, 99, 50)),
+                Map.of(GameStats.SABOTAGE, 100),
+                Map.of(GameStats.SABOTAGE, 4),
+                Set.of(GameStats.SABOTAGE),
+                false);
+
+        assertThat(rendered).contains("cancel rate (#1)");
+    }
+
+    @Test
     void shouldNotLetATinySampleRunAwayWithTheScore() {
         // Two wins from two plays is a 100% win rate and nothing else. Shrinkage drags it back to
         // near the deck average, and the play rate it never earned keeps it below the real card.
@@ -339,9 +387,18 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
             Map<String, Integer> estimatedDraws,
             Map<String, Integer> copiesPerName,
             boolean includeFullDetails) {
+        return renderCorrelation(counts, estimatedDraws, copiesPerName, Set.of(), includeFullDetails);
+    }
+
+    private static String renderCorrelation(
+            Map<String, PlayToWinCorrelationCount> counts,
+            Map<String, Integer> estimatedDraws,
+            Map<String, Integer> copiesPerName,
+            Set<String> uncancelableCards,
+            boolean includeFullDetails) {
         List<String> blocks = new ArrayList<>();
         ActionCardStatsService.appendPlayToWinCorrelationStats(
-                blocks, counts, estimatedDraws, copiesPerName, includeFullDetails);
+                blocks, counts, estimatedDraws, copiesPerName, uncancelableCards, includeFullDetails);
         return String.join("", blocks);
     }
 

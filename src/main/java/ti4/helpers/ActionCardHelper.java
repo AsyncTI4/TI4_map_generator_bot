@@ -2292,6 +2292,10 @@ public class ActionCardHelper {
         return !actionCard.getText().contains("cannot be canceled");
     }
 
+    public static boolean cannotBeSabotaged(ActionCardModel actionCard) {
+        return isSabotageOrShatter(actionCard.getAlias()) || !isActionCardCancelable(actionCard);
+    }
+
     public static void serveManipulateInvestmentButtons(Game game, Player player) {
         List<Button> scButtons = new ArrayList<>();
         for (int sc : game.getSCList()) {

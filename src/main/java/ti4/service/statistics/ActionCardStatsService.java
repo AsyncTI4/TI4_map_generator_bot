@@ -30,6 +30,7 @@ import ti4.game.GameStats.ActionCardPlay;
 import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.helpers.ActionCardHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -40,6 +41,11 @@ import ti4.spring.service.statistics.overrule.OverruleStatsService;
 public class ActionCardStatsService {
     public static final String FULL_DETAILS_OPTION = "full_details";
 
+    // Worth moving forward once we have the volume to spare. Games from the first weeks after this
+    // date still carry player-less Overrule placeholders, because legacy code recorded an Overrule
+    // play only once its strategy card was chosen - one canceled before that has no play of its own
+    // and the placeholder is its only trace. Those age out as older games leave the sample, so once
+    // the orphans are gone, a later cutoff buys cleaner data at no real cost.
     private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
     private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
 
@@ -158,6 +164,17 @@ public class ActionCardStatsService {
         actionCardsPlayedCounts.merge(name, 1, Integer::sum);
     }
 
+    private static Set<String> getUnsabotageableNames(DeckModel acDeck) {
+        Set<String> unsabotageableNames = new HashSet<>();
+        for (String cardId : acDeck.getCardIDs()) {
+            ActionCardModel actionCardModel = Mapper.getActionCard(cardId);
+            if (actionCardModel != null && ActionCardHelper.cannotBeSabotaged(actionCardModel)) {
+                unsabotageableNames.add(actionCardModel.getName());
+            }
+        }
+        return unsabotageableNames;
+    }
+
     private static Map<String, Integer> getCopiesPerName(DeckModel acDeck) {
         Map<String, Integer> copiesPerName = new HashMap<>();
         for (String cardId : acDeck.getCardIDs()) {
@@ -245,9 +262,16 @@ public class ActionCardStatsService {
                 impactScoreNotes, computeEstimatedDrawsPerCopyCount(playsIncludingCanceled, copiesPerName));
         impactScoreNotes.append(
                 "_The Impact Score blends win rate (0.6), play rate (0.3) and cancel rate (0.1), each measured against the deck's best. Thin samples are pulled toward the deck average, and a \\* marks a card still too thin to trust. A rank (#) is the card's place against every other card for that figure._\n");
+        impactScoreNotes.append(
+                "_A card no Sabotage can cancel is scored on win rate (0.67) and play rate (0.33) alone._\n");
         blocks.add(impactScoreNotes.toString());
         appendPlayToWinCorrelationStats(
-                blocks, playToWinCorrelationCounts, winCorrelationEstimatedDraws, copiesPerName, includeFullDetails);
+                blocks,
+                playToWinCorrelationCounts,
+                winCorrelationEstimatedDraws,
+                copiesPerName,
+                getUnsabotageableNames(acDeck),
+                includeFullDetails);
 
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             StringBuilder overruleTargets = new StringBuilder();
@@ -420,9 +444,7 @@ public class ActionCardStatsService {
                         .computeIfAbsent(actionCardPlay.getActionCard(), _ -> new UnattributedPlays())
                         .record(game.getName(), creationDate);
             }
-            // A canceled play never reaches win attribution below, so it still counts even when we
-            // don't know who played it - the legacy-save migration reconstructs cancels as plays
-            // with no player, and dropping those hid most of the cancels this section reports.
+
             if (!canceled && StringUtils.isBlank(actionCardPlay.getPlayerId())) {
                 continue;
             }
@@ -447,13 +469,15 @@ public class ActionCardStatsService {
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, Integer> estimatedDrawsPerCard,
             Map<String, Integer> copiesPerName,
+            Set<String> unsabotageableCards,
             boolean includeFullDetails) {
         if (playToWinCorrelationCounts.isEmpty()) {
             blocks.add("No eligible action card play data matched the selected filters.\n");
             return;
         }
 
-        Map<String, Double> impactScores = computeImpactScores(playToWinCorrelationCounts, estimatedDrawsPerCard);
+        Map<String, Double> impactScores =
+                computeImpactScores(playToWinCorrelationCounts, estimatedDrawsPerCard, unsabotageableCards);
         List<Map.Entry<String, PlayToWinCorrelationCount>> sortedEntries =
                 playToWinCorrelationCounts.entrySet().stream()
                         .sorted(Comparator.<Map.Entry<String, PlayToWinCorrelationCount>>comparingInt(
@@ -569,7 +593,8 @@ public class ActionCardStatsService {
     // deck's best, so a card that leads all three scores 100.
     static Map<String, Double> computeImpactScores(
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            Map<String, Integer> estimatedDrawsPerCard) {
+            Map<String, Integer> estimatedDrawsPerCard,
+            Set<String> unsabotageableCards) {
         // Win rates and cancel rates spread very differently - most cards win at roughly the deck
         // average while cancels pile onto a handful of cards - so each gets its own shrinkage.
         ShrinkageModel winRateModel = buildShrinkageModel(
@@ -598,12 +623,23 @@ public class ActionCardStatsService {
         double bestCancelRate = getMax(cancelRates);
 
         Map<String, Double> impactScores = new HashMap<>();
-        winRates.forEach((cardName, winRate) -> impactScores.put(
-                cardName,
-                (IMPACT_WIN_RATE_WEIGHT * anchor(winRate, bestWinRate)
-                                + IMPACT_PLAY_RATE_WEIGHT * anchor(playRates.get(cardName), bestPlayRate)
-                                + IMPACT_CANCEL_RATE_WEIGHT * anchor(cancelRates.get(cardName), bestCancelRate))
-                        * 100));
+        winRates.forEach((cardName, winRate) -> {
+            double win = anchor(winRate, bestWinRate);
+            double play = anchor(playRates.get(cardName), bestPlayRate);
+            if (unsabotageableCards.contains(cardName)) {
+                double scale = 1 / (IMPACT_WIN_RATE_WEIGHT + IMPACT_PLAY_RATE_WEIGHT);
+                impactScores.put(
+                        cardName,
+                        (IMPACT_WIN_RATE_WEIGHT * scale * win + IMPACT_PLAY_RATE_WEIGHT * scale * play) * 100);
+                return;
+            }
+            impactScores.put(
+                    cardName,
+                    (IMPACT_WIN_RATE_WEIGHT * win
+                                    + IMPACT_PLAY_RATE_WEIGHT * play
+                                    + IMPACT_CANCEL_RATE_WEIGHT * anchor(cancelRates.get(cardName), bestCancelRate))
+                            * 100);
+        });
         return impactScores;
     }
 
