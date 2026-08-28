@@ -1,5 +1,9 @@
 package ti4.helpers;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,6 +19,10 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 public final class CommandCounterHelper {
+
+    // Weak event keys keep this deduplication limited to the originating interaction.
+    private static final Map<GenericInteractionCreateEvent, Set<String>> VERYDITH_PROMPTS_BY_EVENT =
+            new WeakHashMap<>();
 
     public static void addCC(GenericInteractionCreateEvent event, Game game, String color, Tile tile) {
         addCC(event, game.getPlayerFromColorOrFaction(color), tile);
@@ -64,6 +72,16 @@ public final class CommandCounterHelper {
                 continue;
             }
 
+            String promptKey = game.getName() + "|" + verydithPlayer.getFaction() + "|" + tile.getPosition();
+            if (event != null) {
+                synchronized (VERYDITH_PROMPTS_BY_EVENT) {
+                    if (!VERYDITH_PROMPTS_BY_EVENT
+                            .computeIfAbsent(event, ignored -> new HashSet<>())
+                            .add(promptKey)) {
+                        continue;
+                    }
+                }
+            }
             VerydithBreakthroughHandler.offerUnyieldingAccord(event, verydithPlayer, tile);
         }
         if (player.hasLeader("ardentiacommander")) {
