@@ -719,7 +719,7 @@ public class ActionCardStatsService {
         double score(double win, double play, double cancel) {
             return (winRate * win + playRate * play + cancelRate * cancel) / total() * 100;
         }
-        
+
         OptionalDouble scoreWithoutCancels(double win, double play) {
             double sabotageProofTotal = winRate + playRate;
             return sabotageProofTotal <= 0
