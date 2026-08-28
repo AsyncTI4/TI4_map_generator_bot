@@ -11,6 +11,17 @@
         ]
     },
     {
+        "source": "tk_nova_cup",
+        "name": "Twilight Kart: Nova Cup",
+        "canal": "community",
+        "credits": "Disasper, OnTheWind, and andcat. With special thanks to SqueamishEmu, El Blasto, JayCyrZak, QuantumOctopus, Wekker, RoundtreeBard",
+        "description": "8 Alternate Mahact Kings, 13 Reworked Genomes, and 1 Reworked Action Card. For use with Twilight's Fall. Can be combined with Twilight Kart: Destroyer Cup or used standalone.",
+        "data": [
+          "[Google Sheet](https://docs.google.com/spreadsheets/d/1k2S4_cm96fKZ-qHHZXAxFekM6uoqAC8Ysf0oxHh4R8c/edit?usp=sharing)",
+          "[Assets Folder](???)"
+        ]
+    },
+    {
         "source": "twilight_ds",
         "name": "Twilight Discordant Stars",
         "canal": "community",
