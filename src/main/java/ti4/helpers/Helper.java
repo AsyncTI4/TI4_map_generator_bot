@@ -50,8 +50,10 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePr
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
@@ -1959,7 +1961,7 @@ public final class Helper {
                         .append(".");
             }
         }
-        if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+        if (ArcanumBreakthroughHandler.hasPowerWordWishProductionDiscount(game, player)) {
             msg.append("\n-1 from Power Word: Wish");
         }
         if (remoteWorkforceBuild) {
@@ -2524,7 +2526,7 @@ public final class Helper {
         }
         totalUnits += numInf + numFF;
         if (wantCost) {
-            if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+            if (ArcanumBreakthroughHandler.hasPowerWordWishProductionDiscount(game, player)) {
                 cost = Math.max(0, cost - 1);
             }
             if (player.hasPlanet("skarnath")
@@ -2609,6 +2611,7 @@ public final class Helper {
         player.resetProducedUnits();
         boolean asn = warfareNOtherstuff.contains("asn");
         warfareNOtherstuff = warfareNOtherstuff.replace("asn", "");
+        ArcanumBreakthroughHandler.setPowerWordWishProductionContext(game, player, warfareNOtherstuff);
         int resourcelimit = 100;
         String planetInteg = "";
         if (warfareNOtherstuff.contains("integrated")) {
@@ -2955,6 +2958,10 @@ public final class Helper {
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "crystellumcommander")) {
+                unitButtons.addAll(
+                        CrystellumLeadersHandler.getCrystellumCommanderFighterButtons(player, tile, game, placePrefix));
+            }
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));

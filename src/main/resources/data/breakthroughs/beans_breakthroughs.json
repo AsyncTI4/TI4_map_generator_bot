@@ -13,14 +13,14 @@
     },
     {
         "alias": "crystellumbt",
-        "name": "Defensive Architecture",
-        "shortName": "Defensive\nArchitecture",
+        "name": "Will of the Many",
+        "shortName": "Will of\nthe Many",
         "faction": "crystellum",
         "synergy": [
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "At the start of the first round of space combat: \n\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of that combat.",
+        "text": "If you have the Fighter II unit upgrade technology, flip this card and place it on top of Fighter II.",
         "source": "beans"
     },
     {

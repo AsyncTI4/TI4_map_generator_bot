@@ -377,7 +377,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Player getPlayerThatControlsPlanet(String planet) {
-        for (Player p : getRealPlayers()) {
+        return getPlayerThatControlsPlanet(planet, false);
+    }
+
+    /**
+     * @param includeDummies also consider dummy players, which control planets in some setups (e.g. the
+     *                       Unstable Planet target list is built from real players and dummies).
+     */
+    public Player getPlayerThatControlsPlanet(String planet, boolean includeDummies) {
+        for (Player p : (includeDummies ? getRealPlayersNDummies() : getRealPlayers())) {
             if (p.getPlanets().contains(planet)) {
                 return p;
             }

@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -33,8 +34,8 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.async.ReserveGameNumberService;
+import ti4.service.fow.setup.FowSetupWizardService;
 import ti4.service.game.CreateGameService;
-import ti4.service.game.HomebrewService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -212,7 +213,17 @@ public class CreateFoWGameService {
         sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
-        HomebrewService.offerGameHomebrewButtons(gmChannel);
+        MessageHelper.sendMessageToChannelWithButton(
+                gmChannel,
+                "## FoW Setup Wizard\nFor new and old GMs - set up nearly all Fog related things in a "
+                        + "non-obligatory pipeline. Set homebrew, scenarios, deal factions, set player "
+                        + "positions, all in one flow!\n\n### Steps\n"
+                        + FowSetupWizardService.stepOverview(),
+                Buttons.blue("fowSetupOpenWizard", "FoW Setup Wizard"));
+        // The standalone homebrew prompt is redundant now: the wizard's Game Options step covers 11 of the
+        // 14 homebrew options as categorised toggles, and its Game Type step still exposes the full flat
+        // list (including Red Tape / Ignis Aurora / Omega Phase) via the "Supported Homebrew" button.
+        // HomebrewService.offerGameHomebrewButtons(gmChannel);
         GMService.logActivity(
                 newGame,
                 "This thread will log player slash commands and other activities.\n"

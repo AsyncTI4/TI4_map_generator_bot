@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -34,13 +34,13 @@ public class DeckConfigImportService {
      * exclusion is reported and skipped rather than aborting the whole import. The caller's command
      * carries {@code saveGame = true}, so the mutated game is persisted after this returns.
      */
-    public static void importDeckConfig(SlashCommandInteractionEvent event, Game game, String json) {
+    public static void importDeckConfig(GenericInteractionCreateEvent event, Game game, String json) {
         DeckConfigIO config;
         try {
             config = JsonMapperManager.basic().readValue(json, DeckConfigIO.class);
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Failed to parse deck config JSON: " + e.getMessage());
+                    event.getMessageChannel(), "Failed to parse deck config JSON: " + e.getMessage());
             return;
         }
 
@@ -61,7 +61,7 @@ public class DeckConfigImportService {
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to import deck config " + Constants.solaxPing(), e);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
+                    event.getMessageChannel(),
                     "Failed to import deck config: " + e.getMessage() + "\n-# Solax has been pinged");
             return;
         }
@@ -71,11 +71,11 @@ public class DeckConfigImportService {
         if (!problems.isEmpty()) {
             summary.append("\nWarnings / skipped:\n").append(problems);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), summary.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), summary.toString());
     }
 
     private static void applySlots(
-            SlashCommandInteractionEvent event,
+            GenericInteractionCreateEvent event,
             Game game,
             DeckConfigIO config,
             StringBuilder applied,
@@ -99,7 +99,8 @@ public class DeckConfigImportService {
                 continue;
             }
 
-            boolean success = SetDeckService.setDeck(event, game, slotKey, deck);
+            // The import command carries no reset_deck option, so this mirrors its prior always-false behavior.
+            boolean success = SetDeckService.setDeck(event, game, slotKey, deck, false);
             if (success) {
                 applied.append("- ").append(slotKey).append(" → ").append(alias).append('\n');
             } else {

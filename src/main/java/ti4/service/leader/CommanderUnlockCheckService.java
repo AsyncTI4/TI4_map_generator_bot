@@ -3,7 +3,6 @@ package ti4.service.leader;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
@@ -286,6 +285,8 @@ public class CommanderUnlockCheckService {
 
             // BEANS
             case "ashen" -> shouldBeUnlocked = true;
+            case "crystellum" ->
+                shouldBeUnlocked = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) >= 12;
             case "dream" -> {
                 int eligibleSystems = 0;
                 for (Tile tile : game.getTileMap().values()) {
@@ -302,9 +303,6 @@ public class CommanderUnlockCheckService {
             case "netrunners" ->
                 shouldBeUnlocked = TechnologyType.mainFour.stream()
                         .anyMatch(type -> ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 3);
-            case "crystellum" ->
-                shouldBeUnlocked =
-                        (CrystellumLeadersHandler.getCrystellumCommanderCapacitySystemCount(game, player) >= 3);
             case "natau" -> {
                 int qualifyingSystems = 0;
                 for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {

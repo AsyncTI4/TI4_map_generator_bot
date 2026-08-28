@@ -13,16 +13,14 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
-import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -35,7 +33,6 @@ public class AeternaUnitsHandler {
     private static final String GRAVEYARD_PRODUCE = "aeternaGraveyardProduce_";
     private static final String GRAVEYARD_II = "aeternaGraveyardII_";
     private static final String GRAVEYARD_DECLINE = "aeternaGraveyardDecline_";
-    private static final String GRAVEYARD_PRODUCE_LOCATION = "aeternaGraveyardProduceLocation_";
     private static final String SHOW_CRYPT_CAPACITY = "showCryptCapacity";
     private static final String CRYPT_TOKEN_COUNT = "aeternaCryptControlTokens_";
     private static final String CRYPT_USED_ACTION = "aeternaCryptUsedAction_";
@@ -196,27 +193,27 @@ public class AeternaUnitsHandler {
                         if (graveyardII) {
                             buttons.add(Buttons.green(
                                     player.factionButtonChecker() + GRAVEYARD_II + payload,
-                                    "Gain 1 Commodity and Produce 1 " + unitType.humanReadableName(),
+                                    "Gain 1 Commodity and Produce 1 Unit",
                                     FactionEmojis.aeterna));
                         } else {
                             buttons.add(Buttons.blue(
                                     player.factionButtonChecker() + GRAVEYARD_COMM + payload,
                                     "Gain 1 Commodity",
                                     FactionEmojis.aeterna));
-                            if (canProduceFromGraveyard(game, player, dockTile, dockHolder, unitType)) {
-                                buttons.add(Buttons.green(
-                                        player.factionButtonChecker() + GRAVEYARD_PRODUCE + payload,
-                                        "Produce 1 " + unitType.humanReadableName(),
-                                        FactionEmojis.aeterna));
-                            }
+                            buttons.add(Buttons.green(
+                                    player.factionButtonChecker() + GRAVEYARD_PRODUCE + payload,
+                                    "Produce 1 Unit",
+                                    FactionEmojis.aeterna));
                         }
                         buttons.add(
                                 Buttons.red(player.factionButtonChecker() + GRAVEYARD_DECLINE + payload, "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
-                                player.getRepresentationNoPing() + ", use _Graveyard " + (graveyardII ? "II" : "I")
-                                        + "_ at " + getGraveyardLocation(game, player, dockTile, dockHolder)
-                                        + " for the destroyed " + unitType.humanReadableName() + ".",
+                                player.getRepresentationNoPing() + ", you may resolve _Graveyard "
+                                        + (graveyardII ? "II" : "I") + "_ at "
+                                        + getGraveyardLocation(game, player, dockTile, dockHolder)
+                                        + " for the destroyed "
+                                        + unitType.humanReadableName() + ".",
                                 buttons);
                     }
                 }
@@ -251,13 +248,12 @@ public class AeternaUnitsHandler {
 
         Tile dockTile = game.getTileByPosition(payload[0]);
         UnitHolder dockHolder = dockTile.getUnitHolders().get(payload[1]);
-        UnitType unitType = Units.findUnitType(payload[2]);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " activated _Graveyard II_ at "
                         + getGraveyardLocation(game, player, dockTile, dockHolder) + ".");
         ButtonHelperStats.gainComms(event, game, player, 1, false);
-        produceFromGraveyard(event, game, player, dockTile, dockHolder, unitType);
+        sendGraveyardProductionButtons(event, game, player, dockTile, dockHolder);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -279,9 +275,8 @@ public class AeternaUnitsHandler {
 
         Tile dockTile = game.getTileByPosition(payload[0]);
         UnitHolder dockHolder = dockTile.getUnitHolders().get(payload[1]);
-        UnitType unitType = Units.findUnitType(payload[2]);
         if (produce) {
-            produceFromGraveyard(event, game, player, dockTile, dockHolder, unitType);
+            sendGraveyardProductionButtons(event, game, player, dockTile, dockHolder);
             ButtonHelper.deleteMessage(event);
         }
         return true;
@@ -305,8 +300,7 @@ public class AeternaUnitsHandler {
         if (dockHolder == null
                 || dockHolder.getUnitCount(UnitType.Spacedock, player) < 1
                 || unitType == null
-                || payload[3].equals(game.getStoredValue(GRAVEYARD_USED_ACTION + dockKey))
-                || (produce && !canProduceFromGraveyard(game, player, dockTile, dockHolder, unitType))) {
+                || payload[3].equals(game.getStoredValue(GRAVEYARD_USED_ACTION + dockKey))) {
             return false;
         }
 
@@ -314,122 +308,22 @@ public class AeternaUnitsHandler {
         return true;
     }
 
-    private static boolean canProduceFromGraveyard(
-            Game game, Player player, Tile dockTile, UnitHolder dockHolder, UnitType unitType) {
-        UnitModel unit = getProducedUnit(player, unitType);
-        if (unit == null
-                || player.getUnitCap(unit.getAsyncId())
-                        <= ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, unit.getAsyncId())) {
-            return false;
-        }
-        return unit.getIsShip()
-                || (!Constants.SPACE.equals(dockHolder.getName())
-                        && player.getPlanets().contains(dockHolder.getName()));
-    }
-
-    private static void produceFromGraveyard(
-            net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent event,
-            Game game,
-            Player player,
-            Tile dockTile,
-            UnitHolder dockHolder,
-            UnitType unitType) {
-        if (!canProduceFromGraveyard(game, player, dockTile, dockHolder, unitType)) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + " could not produce a " + unitType.humanReadableName()
-                            + " with _Graveyard_ because none are available.");
-            return;
-        }
-
-        UnitModel unit = getProducedUnit(player, unitType);
-        if (unit.getIsGroundForce()) {
-            String payload = dockTile.getPosition() + "|" + dockHolder.getName() + "|" + unitType;
-            List<Button> buttons = List.of(
-                    Buttons.green(
-                            player.factionButtonChecker() + GRAVEYARD_PRODUCE_LOCATION + payload + "|"
-                                    + Constants.SPACE,
-                            "Produce 1 " + unit.getName() + " in Space",
-                            FactionEmojis.aeterna),
-                    Buttons.green(
-                            player.factionButtonChecker() + GRAVEYARD_PRODUCE_LOCATION + payload + "|"
-                                    + dockHolder.getName(),
-                            "Produce 1 " + unit.getName() + " on " + dockHolder.getName(),
-                            FactionEmojis.aeterna));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + ", please choose where _Graveyard_ at "
-                            + getGraveyardLocation(game, player, dockTile, dockHolder) + " produces the "
-                            + unit.getName() + ".",
-                    buttons);
-            return;
-        }
-
-        String location = unit.getIsShip() ? Constants.SPACE : dockHolder.getName();
-        AddUnitService.addUnits(event, dockTile, game, player.getColor(), "1 " + unit.getAsyncId() + " " + location);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " produced 1 " + unit.getName() + " with _Graveyard_ at "
-                        + getGraveyardLocation(game, player, dockTile, dockHolder) + ".");
-        sendGraveyardPaymentPrompt(game, player, unit, dockTile, dockHolder);
-    }
-
-    @ButtonHandler(GRAVEYARD_PRODUCE_LOCATION)
-    public static void resolveGraveyardProductionLocation(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload =
-                buttonID.substring(GRAVEYARD_PRODUCE_LOCATION.length()).split("\\|", 4);
-        if (game == null || player == null || payload.length != 4) {
-            return;
-        }
-
-        Tile dockTile = game.getTileByPosition(payload[0]);
-        UnitHolder dockHolder =
-                dockTile == null ? null : dockTile.getUnitHolders().get(payload[1]);
-        UnitType unitType = Units.findUnitType(payload[2]);
-        UnitModel unit = unitType == null ? null : getProducedUnit(player, unitType);
-        if (dockHolder == null
-                || dockHolder.getUnitCount(UnitType.Spacedock, player) < 1
-                || unit == null
-                || !unit.getIsGroundForce()
-                || !canProduceFromGraveyard(game, player, dockTile, dockHolder, unitType)
-                || (!Constants.SPACE.equals(payload[3]) && !dockHolder.getName().equals(payload[3]))) {
-            return;
-        }
-
-        AddUnitService.addUnits(event, dockTile, game, player.getColor(), "1 " + unit.getAsyncId() + " " + payload[3]);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " produced 1 " + unit.getName() + " with _Graveyard_ at "
-                        + getGraveyardLocation(game, player, dockTile, dockHolder) + ".");
-        sendGraveyardPaymentPrompt(game, player, unit, dockTile, dockHolder);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void sendGraveyardPaymentPrompt(
-            Game game, Player player, UnitModel unit, Tile dockTile, UnitHolder dockHolder) {
-        int cost = (int) Math.ceil(unit.getCost());
-        game.setStoredValue("producedUnitCostFor" + player.getFaction(), Integer.toString(cost));
-        player.setTotalExpenses(player.getTotalExpenses() + cost);
-
-        List<Button> paymentButtons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
-        paymentButtons.add(Buttons.red("deleteButtons_graveyard", "Done Exhausting Planets"));
+    private static void sendGraveyardProductionButtons(
+            ButtonInteractionEvent event, Game game, Player player, Tile dockTile, UnitHolder dockHolder) {
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, dockTile, "graveyard", "place");
+        buttons.removeIf(button -> button.getLabel() != null
+                && (button.getLabel().startsWith("Produce 2 Fighter")
+                        || button.getLabel().startsWith("Produce 2 Infantry")));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", please choose planets to exhaust to pay " + cost
-                        + " for the " + unit.getName() + " produced by _Graveyard_ at "
-                        + getGraveyardLocation(game, player, dockTile, dockHolder) + ".",
-                paymentButtons);
+                player.getRepresentationNoPing() + ", please choose a unit to produce with _Graveyard_ at "
+                        + getGraveyardLocation(game, player, dockTile, dockHolder) + ".\n-# You must enforce the "
+                        + " destroyed-unit type.",
+                buttons);
     }
 
     private static String getGraveyardLocation(Game game, Player player, Tile dockTile, UnitHolder dockHolder) {
         return dockHolder.getRepresentation(game) + " in " + dockTile.getRepresentationForButtons(game, player);
-    }
-
-    private static UnitModel getProducedUnit(Player player, UnitType unitType) {
-        return player.getUnitsByAsyncID(unitType.getValue()).stream()
-                .findFirst()
-                .orElse(null);
     }
 
     public static void addCryptControlTokenForDestroyedFighters(Game game, List<RemovedUnit> units) {

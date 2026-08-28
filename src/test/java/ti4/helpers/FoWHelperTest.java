@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -99,6 +100,58 @@ class FoWHelperTest extends BaseTi4Test {
         assertThat(button.getLabel()).isEqualTo(player.getColorIfCanSeeStats(viewer));
         // Per-viewer button drops the icon entirely so it can't leak color to someone who can't see it.
         assertThat(button.getEmoji()).isNull();
+    }
+
+    // ---- fog memory: "have I ever seen this system" -----------------------------------------
+
+    @Test
+    void hasEverSeenTile_falseBeforeSeeing_trueAfter() {
+        game.setFowMode(true);
+        Tile tile = new Tile("18", "000");
+        game.setTile(tile);
+
+        assertThat(FoWHelper.hasEverSeenTile(player, "000")).isFalse();
+        player.updateFogTile(tile, null);
+        assertThat(FoWHelper.hasEverSeenTile(player, "000")).isTrue();
+    }
+
+    @Test
+    void hasEverSeenTile_survivesTheTileBeingFlipped() {
+        // The memory records position -> tileID, but FlipTileService rewrites tile IDs in place (82a -> 82b
+        // and similar). Matching on the remembered tileID would turn a system the player genuinely scouted
+        // into a false negative, so the check is deliberately position-only.
+        game.setFowMode(true);
+        Tile before = new Tile("82a", "305");
+        game.setTile(before);
+        player.updateFogTile(before, null);
+
+        game.setTile(new Tile("82b", "305"));
+
+        assertThat(FoWHelper.hasEverSeenTile(player, "305")).isTrue();
+    }
+
+    @Test
+    void knowledgePredicates_outsideFogEverythingIsKnown() {
+        game.setFowMode(false);
+        Tile tile = new Tile("18", "000");
+        game.setTile(tile);
+
+        assertThat(FoWHelper.knowsTile(game, player, "000")).isTrue();
+        // Never seen, not visible, and nobody owns it - outside fog it is known regardless.
+        assertThat(FoWHelper.knowsTile(game, player, "999")).isTrue();
+        assertThat(FoWHelper.knowsPlanetExists(game, player, "mr")).isTrue();
+        assertThat(FoWHelper.getKnownTilePositions(game, player)).contains("000");
+    }
+
+    @Test
+    void getKnownTilePositions_inFogUnionsVisibleAndRemembered() {
+        game.setFowMode(true);
+        Tile remembered = new Tile("25", "304");
+        game.setTile(remembered);
+        assertThat(FoWHelper.getKnownTilePositions(game, player)).doesNotContain("304");
+
+        player.updateFogTile(remembered, null);
+        assertThat(FoWHelper.getKnownTilePositions(game, player)).contains("304");
     }
 
     // ---- canSeeStatsOfPlayer: per-PN-type stat-reveal toggles --------------------------------

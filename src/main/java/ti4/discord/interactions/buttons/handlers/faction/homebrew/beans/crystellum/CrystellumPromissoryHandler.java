@@ -11,107 +11,66 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.transaction.SendPromissoryService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
 public class CrystellumPromissoryHandler {
-    private static final String PN_ID = "bepncryst";
-    private static final String USE_FRACTURE = "crystellumUseFracture_";
+    private static final String RESOLVE_FRACTURE = "resolveCrystellumFracture_";
 
-    public static boolean canUseFracture(
-            Game game, Player player, RemovedUnit unit, boolean combat, List<Player> killers) {
-        if (game == null || player == null || unit == null || unit.uh() == null || unit.tile() == null) {
-            return false;
-        }
-        if (!combat || unit.getTotalRemoved() <= 0) {
-            return false;
-        }
-        UnitModel model = player.getUnitFromUnitKey(unit.unitKey());
-        if (model == null || !model.getIsShip() || model.getUnitType() == UnitType.Fighter) {
-            return false;
-        }
-        if (!unit.tile().getPosition().equals(game.getActiveSystem())) {
-            return false;
-        }
-        if (!player.getPromissoryNotes().containsKey(PN_ID)) {
-            return false;
-        }
-        if (player.getPromissoryNotesOwned().contains(PN_ID)) {
-            return false;
-        }
-        Player owner = game.getPNOwner(PN_ID);
-        if (owner == null || owner == player) {
-            return false;
-        }
-        if (owner.equals(game.getActivePlayer())) {
-            return false;
-        }
-        for (UnitKey key : unit.uh().getUnitKeys()) {
-            if (owner.unitBelongsToPlayer(key)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static void sendFractureButtons(
-            GenericInteractionCreateEvent event, Game game, Player player, RemovedUnit unit) {
-        if (event == null || game == null || player == null || unit == null) {
-            return;
-        }
-
-        String tilePos = unit.tile().getPosition();
-        String useId = player.factionButtonChecker() + USE_FRACTURE + tilePos;
-        List<Button> buttons = List.of(Buttons.green(useId, "Use Fracture"), Buttons.red("deleteButtons", "Decline"));
-
-        String message = player.getRepresentationUnfogged()
-                + ", you may use _Fracture_ to place 1 fighter in "
-                + unit.tile().getRepresentation() + ".";
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        }
-    }
-
-    @ButtonHandler(USE_FRACTURE)
-    public static void resolveUseFracture(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String tilePos = buttonID.replace(USE_FRACTURE, "");
-        Tile tile = game.getTileByPosition(tilePos);
+    public static void resolveFracture(Game game, Player player, GenericInteractionCreateEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find tile to place fighter in.");
-            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + ", there is no active system for _Fracture_.");
             return;
         }
 
-        if (!player.getPromissoryNotes().containsKey(PN_ID)) {
-            ButtonHelper.deleteMessage(event);
+        List<Button> buttons = player.getUnitModels().stream()
+                .filter(UnitModel::getIsShip)
+                .filter(unit -> !"fighter".equalsIgnoreCase(unit.getBaseType()))
+                .map(UnitModel::getAsyncId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .map(asyncId -> player.getPriorityUnitByAsyncID(asyncId, tile.getSpaceUnitHolder()))
+                .filter(java.util.Objects::nonNull)
+                .sorted(java.util.Comparator.comparing(UnitModel::getName))
+                .map(unit -> Buttons.green(
+                        player.factionButtonChecker() + RESOLVE_FRACTURE + tile.getPosition() + "|" + unit.getAsyncId(),
+                        "Destroyed " + unit.getName() + " (Cost " + (int) Math.ceil(unit.getCost()) + ")",
+                        unit.getUnitEmoji()))
+                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + ", you have no non-fighter ships to select for _Fracture_.");
             return;
         }
-        Player receiver = game.getPNOwner(PN_ID);
-        if (player.getPromissoryNotesOwned().contains(PN_ID) || receiver == null || receiver == player) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", choose the non-fighter ship destroyed for _Fracture_.",
+                buttons);
+    }
 
-        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 fighter");
-        SendPromissoryService.sendPromissoryToPlayer(event, game, player, receiver, PN_ID);
+    @ButtonHandler(RESOLVE_FRACTURE)
+    public static void resolveFractureShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring(RESOLVE_FRACTURE.length()).split("\\|", 2);
+        Tile tile = payload.length == 2 ? game.getTileByPosition(payload[0]) : null;
+        UnitModel unit = tile == null || payload.length != 2
+                ? null
+                : player.getPriorityUnitByAsyncID(payload[1], tile.getSpaceUnitHolder());
+        if (unit == null || !unit.getIsShip() || "fighter".equalsIgnoreCase(unit.getBaseType())) return;
 
+        int fighters = (int) Math.ceil(unit.getCost());
+        AddUnitService.addUnits(event, tile, game, player.getColor(), fighters + " fighter " + Constants.SPACE);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " used _Fracture_ to place 1 fighter in " + tile.getRepresentation()
-                        + " and returned the promissory note to " + receiver.getRepresentationNoPing() + ".");
+                player.getRepresentationNoPing() + " resolved _Fracture_, placed " + fighters + " fighter"
+                        + (fighters == 1 ? "" : "s") + " in " + tile.getRepresentationForButtons(game, player)
+                        + ".");
         ButtonHelper.deleteMessage(event);
     }
 }

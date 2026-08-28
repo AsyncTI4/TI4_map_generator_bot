@@ -658,7 +658,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public boolean hasFF2Tech() {
         UnitModel ff = getUnitByType(UnitType.Fighter);
-        return ff.getIsUpgrade() || ownsUnit("florzen_fighter");
+        return ff.getIsUpgrade() || ownsUnit("florzen_fighter") || ownsUnit("crystellum_fighter3");
     }
 
     public boolean hasUpgradedUnit(String baseUpgradeID) {
@@ -2698,6 +2698,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("ff2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mirvedabt")) {
             removeOwnedUnitByID("fighter2");
             addOwnedUnitByID("mirveda_fighter3");
+        }
+        if ("ff2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("crystellumbt")) {
+            removeOwnedUnitByID("fighter2");
+            addOwnedUnitByID("crystellum_fighter3");
         }
         if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
             addOwnedUnitByID("tribune3");

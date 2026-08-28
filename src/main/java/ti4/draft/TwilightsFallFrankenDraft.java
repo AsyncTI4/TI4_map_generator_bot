@@ -10,6 +10,7 @@ public class TwilightsFallFrankenDraft extends FrankenDraft {
 
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case TECH, BLUETILE -> 3;
             case REDTILE, STARTINGFLEET, HOMESYSTEM, AGENT, UNIT -> 2;
@@ -20,6 +21,7 @@ public class TwilightsFallFrankenDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case BLUETILE -> 3;
             case REDTILE, TECH -> 2;

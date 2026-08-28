@@ -15,7 +15,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -50,6 +49,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
@@ -180,7 +180,6 @@ public class DestroyUnitService {
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
-        CrystellumAbilityHandler.offerFragmentationForBatchIfRelevant(event, game, units, combat);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
@@ -199,6 +198,9 @@ public class DestroyUnitService {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
+        if (player != null && player.hasAbility("fragmentation")) {
+            CrystellumAbilityHandler.resolveFragmentation(event, game, player, unit);
+        }
         if (combat && player != null) {
             if (player.hasUnit("ashen_dreadnought") || player.hasUnit("ashen_dreadnought2")) {
                 AshenUnitHandler.offerAshfallEngineOnDestroy(event, game, player, unit);
@@ -231,6 +233,20 @@ public class DestroyUnitService {
             case Infantry -> {
                 capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
                 AshenUnitHandler.resolveFlagshipBombardmentInfantryDeath(event, game, player, unit);
+            }
+            case Fighter -> {
+                if (player != null && player.hasUnit("crystellum_fighter3")) {
+                    AddUnitService.addUnits(
+                            event, player.getNomboxTile(), game, player.getColor(), totalAmount + " fighter");
+
+                    String fighterText = totalAmount <= 10
+                            ? UnitEmojis.fighter.toString().repeat(totalAmount)
+                            : UnitEmojis.fighter + "×" + totalAmount;
+
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " captured " + fighterText + " with SHARD SWARM.");
+                }
             }
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
@@ -283,6 +299,10 @@ public class DestroyUnitService {
                 }
             }
             case Flagship -> {
+                UnitModel destroyedFlagship = player == null ? null : player.getUnitFromUnitKey(unit.unitKey());
+                if (destroyedFlagship != null && "crystellum_flagship".equals(destroyedFlagship.getId())) {
+                    CrystellumUnitHandler.offerFractalRebuild(event, game, player, unit.tile());
+                }
                 if (player != null && player.hasUnit("ta_flagship")) {
                     TaUnitHandler.clearWorldshaperOnFlagshipDestroy(player, unit);
                 }
@@ -300,9 +320,6 @@ public class DestroyUnitService {
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
-                }
-                if (player != null && player.hasUnit("crystellum_flagship")) {
-                    CrystellumUnitHandler.resolveCrystFlagDestroy(event, player, game, unit);
                 }
             }
             default -> Consumers.nop();
@@ -403,9 +420,6 @@ public class DestroyUnitService {
                                 + " available to you  (on the game board or in your reinforcements)."
                                 + "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");
             }
-        }
-        if (player != null && CrystellumPromissoryHandler.canUseFracture(game, player, unit, combat, killers)) {
-            CrystellumPromissoryHandler.sendFractureButtons(event, game, player, unit);
         }
         if (player != null) {
             String unitTypeString =

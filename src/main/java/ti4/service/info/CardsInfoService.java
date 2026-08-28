@@ -10,7 +10,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
@@ -146,12 +145,6 @@ public class CardsInfoService {
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             buttons.add(DreamLeadersHandler.getDreamAgentCardsInfoButton(player));
         }
-        if (player.hasUnexhaustedLeader("crystellumagent")) {
-            buttons.add(CrystellumLeadersHandler.getCrystellumAgentButton(player));
-        }
-        if (player.hasTech("becrystmb") && player.isActivePlayer()) {
-            buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
-        }
         if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
             buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));
         }
@@ -222,6 +215,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("naazagent")) {
             buttons.add(
                     Buttons.gray("getAgentSelection_naazagent", "Use NRA Agent on Someone Else", FactionEmojis.Naaz));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            CrystellumLeadersHandler.addCrystellumAgentCardsInfoButton(buttons, player);
         }
         if (player.hasUnexhaustedLeader("empyreanagent")) {
             buttons.add(Buttons.gray(

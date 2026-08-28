@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
@@ -276,6 +277,7 @@ public class PlayHeroService {
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
+            case "crystellumhero" -> CrystellumLeadersHandler.startCrystellumHero(event, game, player);
             case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
             case "netrunnershero" -> NetrunnersLeadersHandler.offerHeroTechSelection(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
@@ -652,15 +654,32 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji()
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
-                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                    if (p2.getSoScored() < player.getSoScored()) {
-                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, game);
+                if (game.isFowMode()) {
+                    // One prompt, not one per opponent: the fog list is built from what this player knows
+                    // rather than from any particular opponent's holdings, so a per-opponent loop would post
+                    // identical panels and name who is behind on secret objectives into the bargain.
+                    boolean anyBehind = game.getRealPlayersExcludingThis(player).stream()
+                            .anyMatch(p2 -> p2.getSoScored() < player.getSoScored());
+                    if (anyBehind) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
-                                player.getRepresentationUnfogged() + " you have scored more secret objectives than "
-                                        + p2.getRepresentation()
-                                        + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
-                                shrineButtons);
+                                player.getRepresentationUnfogged()
+                                        + ", you have scored more secret objectives than at least one other player,"
+                                        + " and so here are buttons to look at a shrine. You can decline to gain 2 CC"
+                                        + " instead, using the CC buttons above.",
+                                ButtonHelperHeroes.getShrineButtons(null, player, game));
+                    }
+                } else {
+                    for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                        if (p2.getSoScored() < player.getSoScored()) {
+                            List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, player, game);
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCorrectChannel(),
+                                    player.getRepresentationUnfogged() + " you have scored more secret objectives than "
+                                            + p2.getRepresentation()
+                                            + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
+                                    shrineButtons);
+                        }
                     }
                 }
             }

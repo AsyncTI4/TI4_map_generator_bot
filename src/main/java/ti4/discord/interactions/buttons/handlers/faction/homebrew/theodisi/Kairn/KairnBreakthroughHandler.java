@@ -15,6 +15,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
@@ -86,6 +87,9 @@ public class KairnBreakthroughHandler {
         String trait = fragment.getType().toLowerCase();
         player.removeFragment(fragmentId);
         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        if (fragmentId.startsWith("supermassive")) {
+            ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);
+        }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);

@@ -17,12 +17,11 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Retrofitti
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -270,11 +269,11 @@ public final class ButtonHelperTacticalAction {
             if (player.hasAbility("dream_nexus")) {
                 DreamUnitsHandler.offerLiturgyButtons(event, game, player);
             }
-            CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
         }
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        CrystellumTechHandler.clearResonanceDrive(game);
         ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
@@ -449,7 +448,6 @@ public final class ButtonHelperTacticalAction {
                     "lunarium",
                     "zephyrion",
                     "vyserix",
-                    "crystellum",
                     "myrr",
                     "oblivion",
                     "thrones");
@@ -777,7 +775,6 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
-        NetrunnersAbilitiesHandler.offerBlackout(game, player, tile);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
@@ -1147,9 +1144,6 @@ public final class ButtonHelperTacticalAction {
                 systemButtons);
 
         // Resolve other abilities
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "crystellumcommander")) {
-            CrystellumLeadersHandler.giveCommanderReminder(player, game);
-        }
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(game, tile, player);
             if (!buttons.isEmpty()) {

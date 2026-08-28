@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -31,6 +32,7 @@ public class ArcanumBreakthroughHandler {
     private static final String USE_POWER_WORD_WISH = "usePowerWordWish";
     private static final String WISH_SELECT = "powerWordWishSelect_";
     private static final String WISH_UNIT = "powerWordWishUnit_";
+    private static final String PRODUCTION_DISCOUNT_KEY = "powerWordWishProduction_";
     private static final String MOVE = "move";
     private static final String COMBAT = "combat";
     private static final String CAPACITY = "capacity";
@@ -97,6 +99,39 @@ public class ArcanumBreakthroughHandler {
     }
 
     // Effects
+    public static void setPowerWordWishProductionContext(Game game, Player player, String productionContext) {
+        if (game == null || player == null) {
+            return;
+        }
+        if (productionContext == null) {
+            clearPowerWordWishProductionContext(game, player, null);
+            return;
+        }
+
+        boolean usesProductionAbility = MyrrBreakthroughHandler.usedUnitProduction(productionContext);
+        game.setStoredValue(
+                PRODUCTION_DISCOUNT_KEY + player.getFaction(),
+                player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK) && usesProductionAbility ? productionContext : "");
+    }
+
+    public static boolean hasPowerWordWishProductionDiscount(Game game, Player player) {
+        return game != null
+                && player != null
+                && player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK)
+                && MyrrBreakthroughHandler.usedUnitProduction(
+                        game.getStoredValue(PRODUCTION_DISCOUNT_KEY + player.getFaction()));
+    }
+
+    public static void clearPowerWordWishProductionContext(Game game, Player player, String productionContext) {
+        if (game != null
+                && player != null
+                && (productionContext == null
+                        || productionContext.equals(
+                                game.getStoredValue(PRODUCTION_DISCOUNT_KEY + player.getFaction())))) {
+            game.removeStoredValue(PRODUCTION_DISCOUNT_KEY + player.getFaction());
+        }
+    }
+
     public static void offerPowerWordWish(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null) return;
 

@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -79,6 +80,9 @@ public class AncientMapsLLButtonHandler {
         player.removeFragment(fragmentId);
         game.purgeExplore(fragmentId);
         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+        if (fragmentId.startsWith("supermassive")) {
+            ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);
+        }
         game.setStoredValue(key, selected.isEmpty() ? fragmentId : selected + "|" + fragmentId);
 
         ExploreModel fragment = Mapper.getExplore(fragmentId);
