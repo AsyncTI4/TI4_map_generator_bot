@@ -656,14 +656,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setParadigmSpliceDeckID("tf_paradigm");
         setUnitSpliceDeckID("tf_units");
 
-        // Overrides for TK mode
+        // Overrides for TK modes
+        if (isTkNovaCup()) {
+            acDeck = "action_cards_tk_nova";
+        }
         // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
         if (isTwilightKart() || isTkDestroyerCup()) {
             agendaDeck = "agendas_twilight_kart";
-            acDeck = "action_cards_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
+            acDeck = isTkNovaCup() ? "action_cards_tk_destroyer_and_nova" : "action_cards_twilight_kart";
         }
-        // TODO: TK_NOVA_CUP: set genomes, ACs, etc.
+        // TODO: TK_NOVA_CUP: set genomes, etc.
 
         // Set other normal decks
         validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));

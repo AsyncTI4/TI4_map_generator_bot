@@ -200,5 +200,13 @@
         "window": "After another player moves ships into a system that contains your ships",
         "text": "You may move 1 of your ships into the active system from any system, including systems that contain your command tokens.",
         "source": "tk_destroyer_cup"
+    },
+    {
+      "alias": "tk-nova-starflare",
+      "name": "Starflare",
+      "phase": "Action",
+      "window": "After a player moves 1 or more ships into or out of an anomaly",
+      "text": "Roll 1 die for each of those ships. On a 1-3 destroy that unit.",
+      "source": "tk_nova_cup"
     }
 ]
