@@ -76,6 +76,26 @@ public final class Constants {
     public static final String bortId = "154000388121559040";
     public static final String dicecordId = "572698679618568193";
 
+    // Game Modes
+    public static final String BASE_GAME_MODE = "base_game_mode";
+    public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
+    public static final String TWILIGHTS_FALL_MODE = "twilights_fall_mode";
+    public static final String COMMUNITY_MODE = "community_mode";
+    public static final String ALLIANCE_MODE = "alliance_mode";
+    public static final String FOW_OPTIONS = "fow_options";
+    public static final String FOW_MODE = "fow_mode";
+    public static final String LIGHT_FOG_MODE = "light_fog_mode";
+    public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
+    public static final String RED_TAPE_MODE = "red_tape_mode";
+    public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
+    public static final String SPIN_MODE = "spin_mode";
+    public static final String ABSOL_MODE = "absol_mode";
+    public static final String PROMISES_PROMISES = "promises_promises";
+    public static final String FLAGSHIPPING = "flagshipping";
+    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
+    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
+    public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
+
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
@@ -126,9 +146,6 @@ public final class Constants {
     public static final String ALLOW_GAME_CREATION = "allow_game_creation";
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String LAST_IMAGE_FILE_NAME = "last_image_file_name";
-    public static final String COMMUNITY_MODE = "community_mode";
-    public static final String ALLIANCE_MODE = "alliance_mode";
-    public static final String FOW_MODE = "fow_mode";
     public static final String AVERNUS = "avernus";
     public static final String BROKENPLANET1 = "brokenplanet1";
     public static final String BROKENPLANET2 = "brokenplanet2";
@@ -136,28 +153,13 @@ public final class Constants {
     public static final String BROKENPLANET4 = "brokenplanet4";
     public static final String BROKENPLANET5 = "brokenplanet5";
     public static final String BROKENPLANET6 = "brokenplanet6";
-    public static final String FOW_OPTIONS = "fow_options";
-    public static final String BASE_GAME_MODE = "base_game_mode";
-    public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
-    public static final String TWILIGHTS_FALL_MODE = "twilights_fall_mode";
-    public static final String LIGHT_FOG_MODE = "light_fog_mode";
-    public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
-    public static final String RED_TAPE_MODE = "red_tape_mode";
-    public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
-    public static final String SPIN_MODE = "spin_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
     public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
     public static final String PENDING_MOVEMENT_STATE = "pending_movement_state";
-    public static final String ABSOL_MODE = "absol_mode";
-    public static final String PROMISES_PROMISES = "promises_promises";
-    public static final String FLAGSHIPPING = "flagshipping";
     public static final String JUST_UNITS = "just_units";
-    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
-    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
-    public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
-    public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String THUNDERSEDGE = "thundersedge";
+    public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String NOTEPAD = "notepad";
