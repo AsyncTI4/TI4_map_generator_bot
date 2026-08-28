@@ -198,23 +198,9 @@ class ActionCardPlayerStatsService {
         return factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : faction;
     }
 
-    double getAverageCardsPlayed(String faction) {
+    private double getAverageCardsPlayed(String faction) {
         int games = gamesPerFaction.getOrDefault(faction, 0);
         return games == 0 ? 0 : cardsPlayedPerFaction.getOrDefault(faction, 0) / (double) games;
-    }
-
-    int getGames(String faction) {
-        return gamesPerFaction.getOrDefault(faction, 0);
-    }
-
-    int getPlayers(int cardsPlayed) {
-        WinRateCount count = playersByCardsPlayed.get(cardsPlayed);
-        return count == null ? 0 : count.getPlayers();
-    }
-
-    int getWins(int cardsPlayed) {
-        WinRateCount count = playersByCardsPlayed.get(cardsPlayed);
-        return count == null ? 0 : count.getWins();
     }
 
     @Getter

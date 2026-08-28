@@ -1,7 +1,6 @@
 package ti4.service.statistics;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +22,11 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        // The quiet player is what the 3-5 band is measured against, so they have to be counted.
-        assertThat(stats.getPlayers(0)).isEqualTo(1);
-        assertThat(stats.getWins(0)).isZero();
-        assertThat(stats.getPlayers(3)).isEqualTo(1);
-        assertThat(stats.getWins(3)).isEqualTo(1);
+        // The quiet player is what the 3-5 band is measured against, so they have to be counted -
+        // if they were dropped, the 3-5 band would read 100% of all players rather than half.
+        String rendered = render(stats);
+        assertThat(rendered).contains("- 0-2 cards: 0% win rate (0/1 players; 50% of all players)\n");
+        assertThat(rendered).contains("- 3-5 cards: 100% (1/1; 50%)\n");
     }
 
     @Test
@@ -44,9 +43,9 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
 
         // The canceled Overrule never resolved, but it left the loser's hand all the same - which
         // is what carries them over into the 3-5 band instead of the 0-2 one.
-        assertThat(stats.getPlayers(3)).isEqualTo(1);
-        assertThat(stats.getWins(3)).isZero();
-        assertThat(stats.getPlayers(0)).isEqualTo(1);
+        String rendered = render(stats);
+        assertThat(rendered).contains("- 3-5 cards: 0% (0/1; 50%)\n");
+        assertThat(rendered).doesNotContain("- 0-2 cards: 0%");
     }
 
     @Test
@@ -60,8 +59,8 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        assertThat(stats.getPlayers(0)).isEqualTo(2);
-        assertThat(stats.getWins(0)).isEqualTo(1);
+        // Both played one card, so they share a band - and only one of them won it.
+        assertThat(render(stats)).contains("- 0-2 cards: 50% win rate (1/2 players; 100% of all players)\n");
     }
 
     @Test
@@ -90,8 +89,9 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         stats.accumulate(game, winner);
 
         // A seventh player counted here would never win, and would drag every rate down with them.
-        assertThat(render(stats)).contains("- 0-2 cards: 100% win rate (1/1 players; 100% of all players)\n");
-        assertThat(stats.getPlayers(3)).isZero();
+        assertThat(render(stats))
+                .contains("- 0-2 cards: 100% win rate (1/1 players; 100% of all players)\n")
+                .doesNotContain("- 3-5 cards:");
     }
 
     @Test
@@ -106,8 +106,6 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         stats.accumulate(game, winner);
 
         // The last band is open-ended, so 15 and 40 share it however far apart they are.
-        assertThat(stats.getPlayers(15)).isEqualTo(2);
-        assertThat(stats.getWins(15)).isEqualTo(1);
         assertThat(render(stats)).contains("- 15+ cards: 50% win rate (1/2 players; 100% of all players)\n");
     }
 
@@ -197,10 +195,10 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         recordPlays(secondGame, xxcha, 4);
         stats.accumulate(secondGame, xxcha);
 
-        assertThat(stats.getGames("sol")).isEqualTo(2);
-        assertThat(stats.getAverageCardsPlayed("sol")).isEqualTo(5.5, within(1e-9));
-        assertThat(stats.getGames("xxcha")).isEqualTo(1);
-        assertThat(stats.getAverageCardsPlayed("xxcha")).isEqualTo(4.0, within(1e-9));
+        // Sol played 8 then 3 across two games; Xxcha 4 across its one.
+        String rendered = render(stats);
+        assertThat(rendered).contains("- ` 5.50 from 2 games`");
+        assertThat(rendered).contains("- ` 4.00 from 1 game`");
     }
 
     @Test

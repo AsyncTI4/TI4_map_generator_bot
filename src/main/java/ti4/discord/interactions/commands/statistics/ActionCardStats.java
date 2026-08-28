@@ -15,6 +15,10 @@ class ActionCardStats extends Subcommand {
                 OptionType.BOOLEAN,
                 ActionCardStatsService.FULL_DETAILS_OPTION,
                 "'true' to add the raw win, play and cancel counts behind each Impact Score"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                ActionCardStatsService.FACTION_CONTROL_OPTION,
+                "'true' to drop every game featuring Yssaril or Ral Nel, who both play off action cards"));
         // Read as proportions, so 2/1/1 weighs the same as the 0.5/0.25/0.25 default. Pass one and
         // the other two keep their defaults, which is rarely what you want - pass all three.
         addOptions(

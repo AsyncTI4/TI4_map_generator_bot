@@ -14,6 +14,7 @@ import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -53,8 +54,12 @@ public class ActionCardStatsService {
     public static final String WIN_WEIGHT_OPTION = "win_weight";
     public static final String PLAY_WEIGHT_OPTION = "play_weight";
     public static final String CANCEL_WEIGHT_OPTION = "cancel_weight";
+    public static final String FACTION_CONTROL_OPTION = "faction_control";
 
     private static final ImpactWeights DEFAULT_IMPACT_WEIGHTS = new ImpactWeights(0.5, 0.25, 0.25);
+
+    private static final Set<String> ACTION_CARD_DISTORTING_FACTIONS = Set.of("yssaril", "ralnel");
+    private static final String FACTION_CONTROL_NAMES = "Yssaril or Ral Nel";
 
     // Bounds on the pseudo-plays estimated below, guarding against a degenerate dataset asking for
     // either no shrinkage at all or so much that every card collapses onto the deck average.
@@ -70,25 +75,30 @@ public class ActionCardStatsService {
     private static final int STABLE_UNCANCELLED_PLAYS_PER_COPY = 100;
 
     public static void queueReply(SlashCommandInteractionEvent event) {
-        ImpactWeights weights = parseImpactWeights(event);
+        ReportOptions options = parseReportOptions(event);
         // Checked here rather than on the pipeline thread, so a bad weight comes straight back
         // instead of opening a thread and reporting into it a minute later.
-        if (weights.total() <= 0 || weights.hasNegative()) {
+        if (options.weights().total() <= 0 || options.weights().hasNegative()) {
             MessageHelper.sendMessageToEventChannel(
                     event, "Impact Score weights cannot be negative, and at least one of them has to be above zero.");
             return;
         }
-        StatisticsPipeline.queue(event, () -> showActionCardStats(event, weights));
+        StatisticsPipeline.queue(event, () -> showActionCardStats(event, options));
     }
 
-    private static ImpactWeights parseImpactWeights(SlashCommandInteractionEvent event) {
-        return new ImpactWeights(
+    private static ReportOptions parseReportOptions(SlashCommandInteractionEvent event) {
+        ImpactWeights weights = new ImpactWeights(
                 event.getOption(WIN_WEIGHT_OPTION, DEFAULT_IMPACT_WEIGHTS.winRate(), OptionMapping::getAsDouble),
                 event.getOption(PLAY_WEIGHT_OPTION, DEFAULT_IMPACT_WEIGHTS.playRate(), OptionMapping::getAsDouble),
                 event.getOption(CANCEL_WEIGHT_OPTION, DEFAULT_IMPACT_WEIGHTS.cancelRate(), OptionMapping::getAsDouble));
+        return new ReportOptions(
+                weights,
+                event.getOption(FACTION_CONTROL_OPTION, false, OptionMapping::getAsBoolean),
+                event.getOption(FULL_DETAILS_OPTION, false, OptionMapping::getAsBoolean),
+                CommandHelper.hasRole(event, JdaService.developerRoles));
     }
 
-    private static void showActionCardStats(SlashCommandInteractionEvent event, ImpactWeights weights) {
+    private static void showActionCardStats(SlashCommandInteractionEvent event, ReportOptions options) {
         DeckModel acDeck = Mapper.getDeck(DEFAULT_AC_DECK_ID);
 
         Map<String, Integer> cancelCounts = new HashMap<>();
@@ -102,11 +112,17 @@ public class ActionCardStatsService {
         // changed decks mid-game), which would pollute the stats with off-deck cards.
         Set<String> deckCardIds = new HashSet<>(acDeck.getCardIDs());
 
+        Predicate<Game> gameFilter = GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
+                .and(game -> DEFAULT_AC_DECK_ID.equals(game.getAcDeckID()))
+                .and(game ->
+                        deckCardIds.containsAll(game.getDiscardActionCards().keySet()));
+        if (options.factionControl()) {
+            gameFilter = gameFilter.and(
+                    game -> !GameStatisticsFilterer.hasAnyFaction(game, ACTION_CARD_DISTORTING_FACTIONS));
+        }
+
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
-                        .and(game -> DEFAULT_AC_DECK_ID.equals(game.getAcDeckID()))
-                        .and(game -> deckCardIds.containsAll(
-                                game.getDiscardActionCards().keySet())),
+                gameFilter,
                 game -> accumulateActionCardStats(
                         game,
                         cancelCounts,
@@ -128,9 +144,7 @@ public class ActionCardStatsService {
                         unattributedPlays,
                         includedGameNames,
                         playerStats,
-                        weights,
-                        event.getOption(FULL_DETAILS_OPTION, false, OptionMapping::getAsBoolean),
-                        CommandHelper.hasRole(event, JdaService.developerRoles)));
+                        options));
     }
 
     private static void accumulateActionCardStats(
@@ -258,9 +272,7 @@ public class ActionCardStatsService {
             Map<String, UnattributedPlays> unattributedPlays,
             Set<String> includedGameNames,
             ActionCardPlayerStatsService playerStats,
-            ImpactWeights weights,
-            boolean includeFullDetails,
-            boolean includeDeveloperDebug) {
+            ReportOptions options) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
         Map<String, Integer> playsIncludingCanceled = playToWinCorrelationCounts.entrySet().stream()
                 .collect(Collectors.toMap(
@@ -272,7 +284,9 @@ public class ActionCardStatsService {
         String header =
                 "\n_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with winners, using deck '"
                         + acDeck.getName()
-                        + "'._\n";
+                        + "'"
+                        + (options.factionControl() ? ", excluding any game with " + FACTION_CONTROL_NAMES : "")
+                        + "._\n";
         blocks.add(header);
 
         StringBuilder playAndCancelStats = new StringBuilder();
@@ -292,7 +306,7 @@ public class ActionCardStatsService {
                 .append(", when we started tracking who played each card._\n");
         appendEstimatedDrawsNote(
                 impactScoreNotes, computeEstimatedDrawsPerCopyCount(playsIncludingCanceled, copiesPerName));
-        appendImpactWeightNotes(impactScoreNotes, weights);
+        appendImpactWeightNotes(impactScoreNotes, options.weights());
         blocks.add(impactScoreNotes.toString());
         appendPlayToWinCorrelationStats(
                 blocks,
@@ -300,8 +314,8 @@ public class ActionCardStatsService {
                 winCorrelationEstimatedDraws,
                 copiesPerName,
                 getUnsabotageableNames(acDeck),
-                weights,
-                includeFullDetails);
+                options.weights(),
+                options.fullDetails());
 
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             StringBuilder overruleTargets = new StringBuilder();
@@ -312,7 +326,7 @@ public class ActionCardStatsService {
         }
 
         playerStats.appendTo(blocks);
-        if (includeDeveloperDebug) {
+        if (options.developerDebug()) {
             StringBuilder developerDebug = new StringBuilder();
             appendUnattributedPlayDebug(developerDebug, unattributedPlays);
             blocks.add(developerDebug.toString());
@@ -368,7 +382,7 @@ public class ActionCardStatsService {
 
     // The weights are reported as the proportions they are actually applied as, so a caller who
     // passed 2/1/1 reads back the same note as one who passed 0.5/0.25/0.25.
-    static void appendImpactWeightNotes(StringBuilder message, ImpactWeights weights) {
+    private static void appendImpactWeightNotes(StringBuilder message, ImpactWeights weights) {
         message.append("_The Impact Score blends win rate (")
                 .append(formatWeight(weights.winRate() / weights.total()))
                 .append("), play rate (")
@@ -700,6 +714,9 @@ public class ActionCardStatsService {
         });
         return impactScores;
     }
+
+    private record ReportOptions(
+            ImpactWeights weights, boolean factionControl, boolean fullDetails, boolean developerDebug) {}
 
     /**
      * How much each figure is worth to the Impact Score. Taken as proportions rather than as
