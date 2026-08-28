@@ -19,6 +19,7 @@ import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -28,11 +29,13 @@ import ti4.model.SourceModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
 
 @UtilityClass
 public class TEOptionService {
+    private static final String TOGGLE_TF_HOMEBREW_PREFIX = "toggleTfHomebrew_";
 
     /**
      * These homebrew-toggle confirmations were hardcoded to the public main channel regardless of where the
@@ -113,32 +116,35 @@ public class TEOptionService {
         // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
     }
 
-    public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
-        String idPre = "toggleTFHomebrew_";
-        List<ContainerChildComponent> sections = new ArrayList<>();
-
-        SourceModel tk = Mapper.getSource("twilight_kart");
-        String tkId = idPre + "twilightkart";
-        Button button = Buttons.rgToggle(game.isTwilightKart(), tkId, "Twilight Kart", SourceEmojis.TwilightKart);
-        sections.add(Section.of(button, tk.getRepresentationTextDisplays()));
-
-        SourceModel teds = Mapper.getSource("twilight_ds");
-        String tedsID = idPre + "twilightds";
-        Button button2 =
-                Buttons.rgToggle(game.isTwilightDS(), tedsID, "Discordant Stars", SourceEmojis.DiscordantStars);
-        sections.add(Section.of(button2, teds.getRepresentationTextDisplays()));
-        // sections.add(Separator.create(true, Spacing.LARGE));
-
-        return sections;
+    private static ContainerChildComponent getSingleTfHomebrewInfo(
+            boolean isDisable, String sourceId, String buttonLabel, TI4Emoji sourceEmoji) {
+        SourceModel source = Mapper.getSource(sourceId);
+        String buttonId = TOGGLE_TF_HOMEBREW_PREFIX + sourceId;
+        Button button = Buttons.rgToggle(isDisable, buttonId, buttonLabel, sourceEmoji);
+        return Section.of(button, source.getRepresentationTextDisplays());
     }
 
-    @ButtonHandler("toggleTFHomebrew")
-    private static void toggleTFHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
-        String homebrew = buttonID.split("_")[1];
+    private static ContainerChildComponent getSingleTfHomebrewInfo(
+            boolean isDisable, String sourceId, String buttonLabel) {
+        return getSingleTfHomebrewInfo(isDisable, sourceId, buttonLabel, SourceEmojis.TwilightKart);
+    }
+
+    public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
+        return List.of(
+                getSingleTfHomebrewInfo(
+                        game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
+                getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
+                getSingleTfHomebrewInfo(
+                        game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars));
+    }
+
+    @ButtonHandler(TOGGLE_TF_HOMEBREW_PREFIX)
+    private static void toggleTfHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
+        String homebrew = buttonID.replace(TOGGLE_TF_HOMEBREW_PREFIX, "");
         switch (homebrew) {
-            case "twilightkart" -> {
-                game.setTwilightKart(!game.isTwilightKart());
-                if (game.isTwilightKart()) {
+            case Constants.TK_DESTROYER_CUP -> {
+                game.setTkDestroyerCup(!game.isTkDestroyerCup());
+                if (game.isTkDestroyerCup()) {
                     game.setupTwilightsFallMode(event);
                     List<Button> buttons = new ArrayList<>();
                     game.removeStoredValue("bannedUnits");
@@ -146,11 +152,17 @@ public class TEOptionService {
                     buttons.add(Buttons.blue("deleteButtons", "All the Units"));
                     MessageHelper.sendMessageToChannel(
                             homebrewChannel(game),
-                            "Some people find there's too many units and would prefer to prune the deck to just 4 random units of each type (normal deck has 31 units, TK + normal is 60 units, pruned is 43 units)",
+                            "Some people find there's too many units and would prefer to prune the deck to just 4 random units of each type (normal deck has 31 units, TK (Destroyer Cup) + normal is 60 units, pruned is 43 units)",
                             buttons);
                 }
             }
-            case "twilightds" -> {
+            case Constants.TK_NOVA_CUP -> {
+                game.setTkNovaCup(!game.isTkNovaCup());
+                if (game.isTkNovaCup()) {
+                    game.setupTwilightsFallMode(event);
+                }
+            }
+            case Constants.TWILIGHT_DS -> {
                 game.setTwilightDS(!game.isTwilightDS());
                 if (game.isTwilightDS()) {
                     List<Button> buttons = new ArrayList<>();
