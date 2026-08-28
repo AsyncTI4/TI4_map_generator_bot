@@ -35,7 +35,7 @@ public class Source {
         uncharted_space,
         monuments,
         blue_reverie,
-        twilight_kart,
+        tk_destroyer_cup,
         twilight_ds,
         pally,
 
@@ -162,7 +162,7 @@ public class Source {
 
         public boolean isTwilightFallish() {
             return switch (this) {
-                case twilights_fall, twilight_kart, twilight_ds -> true;
+                case twilights_fall, tk_destroyer_cup, twilight_ds -> true;
                 default -> false;
             };
         }
@@ -200,7 +200,7 @@ public class Source {
                         case lazax -> FactionEmojis.Lazax;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
-                        case twilight_kart -> SourceEmojis.TwilightKart;
+                        case tk_destroyer_cup -> SourceEmojis.TwilightKart;
                         case twilight_ds -> SourceEmojis.DiscordantStars;
                         default -> null;
                     };
