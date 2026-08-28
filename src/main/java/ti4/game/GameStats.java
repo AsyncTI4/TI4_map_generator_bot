@@ -155,7 +155,7 @@ public class GameStats {
         return indices.size();
     }
 
-    private static String getTrackedPlayerId(Player player) {
+    public static String getTrackedPlayerId(Player player) {
         if (player == null) {
             return null;
         }

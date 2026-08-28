@@ -46,7 +46,7 @@ public class ActionCardStatsService {
     // play only once its strategy card was chosen - one canceled before that has no play of its own
     // and the placeholder is its only trace. Those age out as older games leave the sample, so once
     // the orphans are gone, a later cutoff buys cleaner data at no real cost.
-    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
+    static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
     private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
 
     private static final double IMPACT_WIN_RATE_WEIGHT = 0.6;
@@ -78,6 +78,7 @@ public class ActionCardStatsService {
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
         Map<String, UnattributedPlays> unattributedPlays = new HashMap<>();
         Set<String> includedGameNames = new HashSet<>();
+        ActionCardPlayerStatsService playerStats = new ActionCardPlayerStatsService();
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
         // changed decks mid-game), which would pollute the stats with off-deck cards.
@@ -94,7 +95,8 @@ public class ActionCardStatsService {
                         actionCardsPlayedCounts,
                         playToWinCorrelationCounts,
                         unattributedPlays,
-                        includedGameNames),
+                        includedGameNames,
+                        playerStats),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
@@ -107,6 +109,7 @@ public class ActionCardStatsService {
                         playToWinCorrelationCounts,
                         unattributedPlays,
                         includedGameNames,
+                        playerStats,
                         event.getOption(FULL_DETAILS_OPTION, false, OptionMapping::getAsBoolean),
                         CommandHelper.hasRole(event, JdaService.developerRoles)));
     }
@@ -117,7 +120,8 @@ public class ActionCardStatsService {
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, UnattributedPlays> unattributedPlays,
-            Set<String> includedGameNames) {
+            Set<String> includedGameNames,
+            ActionCardPlayerStatsService playerStats) {
         includedGameNames.add(game.getName());
 
         game.getDiscardActionCards()
@@ -135,6 +139,9 @@ public class ActionCardStatsService {
             return;
         }
         accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts, unattributedPlays);
+        // Same gate, same reason: with no player on a play there is nobody to count the cards
+        // against, so a game from before tracking would report six players who played nothing.
+        playerStats.accumulate(game, winner);
     }
 
     // Older games recorded plays with no player at all, so they can only contribute cancels - never
@@ -231,6 +238,7 @@ public class ActionCardStatsService {
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, UnattributedPlays> unattributedPlays,
             Set<String> includedGameNames,
+            ActionCardPlayerStatsService playerStats,
             boolean includeFullDetails,
             boolean includeDeveloperDebug) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
@@ -241,16 +249,22 @@ public class ActionCardStatsService {
                 computeEstimatedDraws(playsIncludingCanceled, copiesPerName);
 
         List<String> blocks = new ArrayList<>();
-        StringBuilder message = new StringBuilder();
-        message.append(
-                        "\n_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with winners, using deck '")
-                .append(acDeck.getName())
-                .append("'._\n");
+      String header =
+          "\n_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with winners, using deck '" +
+              acDeck.getName() +
+              "'._\n";
+        blocks.add(header);
+
+        playerStats.appendTo(blocks);
+
+        StringBuilder playAndCancelStats = new StringBuilder();
         Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);
-        message.append("\n**Plays vs estimated draws, and cancel rates**\n");
-        appendEstimatedDrawsNote(message, computeEstimatedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
-        appendActionCardPlayAndCancelStats(message, actionCardsPlayedCounts, cancelCounts, playedEstimatedDraws);
-        blocks.add(message.toString());
+        playAndCancelStats.append("\n**Plays vs estimated draws, and cancel rates**\n");
+        appendEstimatedDrawsNote(
+                playAndCancelStats, computeEstimatedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
+        appendActionCardPlayAndCancelStats(
+                playAndCancelStats, actionCardsPlayedCounts, cancelCounts, playedEstimatedDraws);
+        blocks.add(playAndCancelStats.toString());
 
         StringBuilder impactScoreNotes = new StringBuilder();
         impactScoreNotes.append("\n**Impact Score**\n");
@@ -405,7 +419,7 @@ public class ActionCardStatsService {
         return playCount == 0 ? 0 : (double) cancelCount / playCount;
     }
 
-    private static String formatPercent(double rate) {
+    static String formatPercent(double rate) {
         return BigDecimal.valueOf(rate * 100)
                         .setScale(2, RoundingMode.HALF_UP)
                         .stripTrailingZeros()
@@ -435,7 +449,7 @@ public class ActionCardStatsService {
             Player winner,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, UnattributedPlays> unattributedPlays) {
-        String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
+        String winningPlayerId = GameStats.getTrackedPlayerId(winner);
         LocalDate creationDate = getCreationDate(game);
         for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
             boolean canceled = actionCardPlay.isCanceled();
@@ -555,7 +569,7 @@ public class ActionCardStatsService {
 
     // Discord shows these counts down to the single play, so "1 cancels" is on screen often
     // enough to be worth a plural that agrees with the number in front of it.
-    private static void appendCount(StringBuilder message, int count, String singular) {
+    static void appendCount(StringBuilder message, int count, String singular) {
         message.append(count).append(" ").append(singular);
         if (count != 1) {
             message.append("s");
