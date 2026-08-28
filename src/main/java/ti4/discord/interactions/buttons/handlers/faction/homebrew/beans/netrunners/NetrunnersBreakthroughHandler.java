@@ -87,7 +87,10 @@ public class NetrunnersBreakthroughHandler {
     }
 
     public static boolean offerDataBreachTechnology(Game game, Player player) {
-        if (game == null || player == null || !player.hasReadyBreakthrough(DATA_BREACH) || player.getStrategicCC() < 1) {
+        if (game == null
+                || player == null
+                || !player.hasReadyBreakthrough(DATA_BREACH)
+                || player.getStrategicCC() < 1) {
             return false;
         }
         String techId = game.getStoredValue(NetrunnersAbilitiesHandler.PROXY_TECH + player.getFaction());
@@ -96,19 +99,22 @@ public class NetrunnersBreakthroughHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you may exhaust _Data Breach_ and spend 1 command token from your strategy pool to permanently gain "
+                player.getRepresentationUnfogged()
+                        + ", you may exhaust _Data Breach_ and spend 1 command token from your strategy pool to permanently gain "
                         + Mapper.getTech(techId).getNameRepresentation() + ".",
                 List.of(
                         Buttons.green(
-                                player.factionButtonChecker() + "netrunnersDataBreachGainTech",
-                                "Use Data Breach"),
+                                player.factionButtonChecker() + "netrunnersDataBreachGainTech", "Use Data Breach"),
                         Buttons.red(player.factionButtonChecker() + "netrunnersDataBreachDeclineTech", "Decline")));
         return true;
     }
 
     @ButtonHandler("netrunnersDataBreachGainTech")
     public static void resolveDataBreachTechnology(Game game, Player player, ButtonInteractionEvent event) {
-        if (game == null || player == null || !player.hasReadyBreakthrough(DATA_BREACH) || player.getStrategicCC() < 1) {
+        if (game == null
+                || player == null
+                || !player.hasReadyBreakthrough(DATA_BREACH)
+                || player.getStrategicCC() < 1) {
             return;
         }
         String techId = game.getStoredValue(NetrunnersAbilitiesHandler.PROXY_TECH + player.getFaction());
@@ -121,7 +127,8 @@ public class NetrunnersBreakthroughHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " spent 1 command token from their strategy pool and permanently gained "
+                player.getRepresentationNoPing()
+                        + " spent 1 command token from their strategy pool and permanently gained "
                         + Mapper.getTech(techId).getNameRepresentation() + " with _Data Breach_.");
         EndTurnService.endTurnAndUpdateMap(event, game, player);
     }

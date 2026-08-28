@@ -359,7 +359,9 @@ public class AddPlanetService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
-
+        if (!alreadyOwned && player.hasLeader("tacommander")) {
+            CommanderUnlockCheckService.checkPlayer(player, "ta");
+        }
         if (game.isMinorFactionsMode()
                 && tile != null
                 && unitHolder.getTokenList().contains("attachment_threetraits.png")

@@ -293,6 +293,7 @@ public class PlayerTechService {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "betaqr" -> TaFactionTechHandler.resolveQuantumRestructuring(event, game, player);
             case "thobliviong" -> {
                 OblivionTechHandler.offerACPlayFromDiscardButtons(event, player, game);
                 deleteTheOneButtonIfButtonEvent(event);

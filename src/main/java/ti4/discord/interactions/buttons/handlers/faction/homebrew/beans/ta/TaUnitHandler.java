@@ -42,22 +42,27 @@ public class TaUnitHandler {
                 || game == null
                 || tile == null
                 || !player.hasUnit(MECH_ID)
+                || planetName == null
                 || planetName.isBlank()
                 || ButtonHelper.isLawInPlay(game, "articles_war")
                 || (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) >= 4)
                 || !player.getPlanetsAllianceMode().contains(planetName)) {
             return;
         }
+        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        if (planet == null || !TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+            return;
+        }
 
         String message = player.getRepresentationUnfogged()
-                + ", you attached a design to "
+                + ", an attachment was added to "
                 + Helper.getPlanetRepresentation(planetName, game)
                 + ". You may spend 1 resource to place a mech on that planet.";
 
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + DEPLOY_MECH_PREFIX + tile.getPosition() + "|" + planetName,
-                        "Pay 1r to Deploy Mech",
+                        "Pay 1 Resource to Deploy Mech",
                         FactionEmojis.ta),
                 Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -77,12 +82,15 @@ public class TaUnitHandler {
         String tilePosition = parts[0];
         String planetName = parts[1];
         Tile tile = game.getTileByPosition(tilePosition);
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
 
         if (tilePosition == null
                 || planetName == null
                 || tile == null
+                || planet == null
                 || !player.hasUnit(MECH_ID)
                 || !player.getPlanetsAllianceMode().contains(planetName)
+                || !TaAbilityHandler.planetHasAnyAttachment(tile, planetName)
                 || ButtonHelper.isLawInPlay(game, "articles_war")
                 || (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) >= 4)) {
             return;
@@ -92,15 +100,16 @@ public class TaUnitHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " deployed 1 mech on "
+                player.getRepresentationUnfogged() + " placed a Valuator (Ta mech) on "
                         + Helper.getPlanetRepresentation(planetName, game)
-                        + " with **Valuator**.");
+                        + " using its DEPLOY ability.");
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " please pay 1 resource for **Valuator**.",
+                player.getRepresentationUnfogged()
+                        + " please pay 1 resource for a Valuator (Ta mech)'s DEPLOY ability.",
                 buttons);
     }
 
@@ -212,7 +221,7 @@ public class TaUnitHandler {
                     player.getRepresentationUnfogged()
                             + ", choose a friendly planet in "
                             + tile.getRepresentationForButtons(game, player)
-                            + " for **Worldshaper**'s positive attachment.",
+                            + " for the Worldshaper (the Ta flagship)'s positive attachment.",
                     buttons);
         }
 
@@ -229,7 +238,7 @@ public class TaUnitHandler {
                     player.getRepresentationUnfogged()
                             + ", choose a planet controlled by another player in "
                             + tile.getRepresentationForButtons(game, player)
-                            + " for **Worldshaper**'s negative attachment.",
+                            + " for the Worldshaper (the Ta flagship)'s negative attachment.",
                     buttons);
         }
     }
@@ -288,7 +297,8 @@ public class TaUnitHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                Helper.getPlanetRepresentation(planetName, game) + " gets the positive **Worldshaper** attachment.");
+                Helper.getPlanetRepresentation(planetName, game)
+                        + " gets the Worldshaper (the Ta flagship)'s positive attachment.");
     }
 
     @ButtonHandler(SELECT_NEGATIVE_PREFIX)
@@ -321,6 +331,7 @@ public class TaUnitHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                Helper.getPlanetRepresentation(planetName, game) + " gets the negative **Worldshaper** attachment.");
+                Helper.getPlanetRepresentation(planetName, game)
+                        + " gets the Worldshaper (the Ta flagship)'s negative attachment.");
     }
 }

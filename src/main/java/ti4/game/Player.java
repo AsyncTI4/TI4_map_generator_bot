@@ -50,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
@@ -2839,6 +2840,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (getPlanets().contains(planet) && !getExhaustedPlanets().contains(planet)) {
             getExhaustedPlanets().add(planet);
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
+            TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null

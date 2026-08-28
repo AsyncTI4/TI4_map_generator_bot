@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -626,6 +627,7 @@ public final class ButtonHelperTacticalAction {
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamLeadersHandler.clearDreamAgentAnomaly(game);
+        TaBreakthroughHandler.clearSafeHavens(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);

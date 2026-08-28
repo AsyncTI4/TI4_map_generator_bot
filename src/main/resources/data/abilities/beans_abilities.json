@@ -89,7 +89,7 @@
         "name": "Pefect Architecture",
         "faction": "ta",
         "window": "When you explore a planet that has an attachment or one of your structures:",
-        "windowEffect": "You may draw 2 cards. Choose 1 to resolve and discard the rest.",
+        "windowEffect": "Draw 2 cards. Choose 1 to resolve and discard the rest.",
         "source": "beans"
     },
     {

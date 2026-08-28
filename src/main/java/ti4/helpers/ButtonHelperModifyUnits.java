@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
@@ -1424,6 +1425,8 @@ public final class ButtonHelperModifyUnits {
                         || player.hasAbility("researchteam")
                         || player.hasAbility("raider_coves")
                         || player.hasUnit("tf-ambassador")
+                        || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
+                        || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player2, unitHolder.getName())
                         || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
@@ -1437,7 +1440,8 @@ public final class ButtonHelperModifyUnits {
                             || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                             || player.hasAbility("researchteam")
                             || player.hasAbility("raider_coves")
-                            || player.hasUnit("tf-ambassador")) {
+                            || player.hasUnit("tf-ambassador")
+                            || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())) {
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -1448,7 +1452,9 @@ public final class ButtonHelperModifyUnits {
                     if (player2.getPlanets().contains(unitHolder.getName())
                             && (player2.hasAbility("researchteam")
                                     || (player2.hasUnit("firmament_mech")
-                                            && unitHolder.getUnitCount(UnitType.Mech, player2) > 0))) {
+                                            && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
+                                    || TaBreakthroughHandler.canUseSafeHavensCoexistence(
+                                            game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 player2.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),

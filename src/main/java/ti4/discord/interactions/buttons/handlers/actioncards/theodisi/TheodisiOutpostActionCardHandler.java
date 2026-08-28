@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -76,6 +77,7 @@ public class TheodisiOutpostActionCardHandler {
             return;
         }
         planet.addToken(attachment);
+        TaUnitHandler.offerTaMechDeploy(event, player, game, game.getTileFromPlanet(planetName), planetName);
         game.getDiscardACStatus().put(outpost, ACStatus.purged);
 
         MessageHelper.sendMessageToChannel(

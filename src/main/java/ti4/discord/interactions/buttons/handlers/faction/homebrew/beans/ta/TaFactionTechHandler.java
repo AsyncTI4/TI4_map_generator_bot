@@ -11,18 +11,74 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.planet.PlanetService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class TaFactionTechHandler {
 
+    private static final String YELLOW_TECH = "betaqr";
+    private static final String QR_PLACE_PDS = "taQRPlacePds_";
     private static final String GREEN_TECH = "betaro";
     private static final String RO_PLANET_READY = "taROPlanetReady_";
     private static final String RO_PLANET_EXHAUST = "taROPlanetExhaust_";
     private static final String RO_DECLINE = "taRODecline";
+
+    public static void resolveQuantumRestructuring(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (event == null || game == null || player == null || !player.hasTech(YELLOW_TECH)) {
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (String planetName : player.getPlanets()) {
+            Tile tile = game.getTileFromPlanet(planetName);
+            Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+            if (planet != null && TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + QR_PLACE_PDS + tile.getPosition() + "|" + planetName,
+                        "Place PDS on " + Helper.getPlanetRepresentation(planetName, game)));
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + " has no controlled planet with an attachment for _Quantum Restructuring_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the planet on which to place 1 PDS with _Quantum Restructuring_.",
+                buttons);
+    }
+
+    @ButtonHandler(QR_PLACE_PDS)
+    private static void resolveQuantumRestructuringPlacement(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.substring(QR_PLACE_PDS.length()).split("\\|", 2);
+        if (game == null || player == null || parts.length != 2 || !player.hasTech(YELLOW_TECH)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        Tile tile = game.getTileByPosition(parts[0]);
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(parts[1]);
+        if (planet == null
+                || !player.getPlanets().contains(parts[1])
+                || !TaAbilityHandler.planetHasAnyAttachment(tile, parts[1])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 pds " + parts[1]);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " placed 1 PDS on " + Helper.getPlanetRepresentation(parts[1], game)
+                        + " with _Quantum Restructuring_.");
+    }
 
     public static void resolveResOp(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null || !player.hasTech(GREEN_TECH)) {
