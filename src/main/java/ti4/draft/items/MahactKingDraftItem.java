@@ -137,6 +137,7 @@ public class MahactKingDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems() {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : Mapper.getFactions().values()) {
+            // TODO: TK_NOVA_CUP: allow nova cup kings in draft
             if (faction.getSource() == ComponentSource.twilights_fall) {
                 allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
             }

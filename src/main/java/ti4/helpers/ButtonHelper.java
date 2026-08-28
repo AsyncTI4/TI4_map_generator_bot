@@ -7410,6 +7410,7 @@ public class ButtonHelper {
                 }
                 if (factionsComplete.contains(factionId)) continue;
                 if (!game.isTwilightsFallMode() && faction.getSource() == ComponentSource.twilights_fall) continue;
+                // TODO: TK_NOVA_CUP: allow nova cup kings in setup
                 if (game.isTwilightsFallMode() && faction.getSource() != ComponentSource.twilights_fall) continue;
                 buttons.add(Buttons.green(
                         "setupStep2_" + userId + "_" + factionId, name, FactionEmojis.getFactionIcon(factionId)));

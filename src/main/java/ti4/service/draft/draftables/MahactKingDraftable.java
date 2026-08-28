@@ -284,6 +284,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
         initialize(
                 kingSettings.getNumFactions().getVal(),
+                // TODO: TK_NOVA_CUP: allow nova cup kings in setup
                 List.of(ComponentSource.twilights_fall),
                 kingSettings.getPriFactions().getKeys().stream().toList(),
                 kingSettings.getBanFactions().getKeys().stream().toList());

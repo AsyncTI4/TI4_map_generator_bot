@@ -75,6 +75,7 @@ public class MahactKingDraftableSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
+        // TODO: TK_NOVA_CUP: include nova cup kings
         List<ComponentSource> sources = List.of(ComponentSource.twilights_fall);
         Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(model -> sources.contains(model.getSource()))

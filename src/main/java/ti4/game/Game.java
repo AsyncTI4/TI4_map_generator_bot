@@ -663,6 +663,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             acDeck = "action_cards_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
         }
+        // TODO: TK_NOVA_CUP: set genomes, ACs, etc.
 
         // Set other normal decks
         validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
