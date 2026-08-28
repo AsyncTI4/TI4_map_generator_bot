@@ -1,6 +1,6 @@
 [
     {
-        "alias": "agendas_tk_destroyer_cup",
+        "alias": "agendas_twilight_kart",
         "name": "Twilight Kart: Destroyer Cup Edicts",
         "type": "agenda",
         "description": "All Edicts for the Homebrew; Twilight Kart: Destroyer Cup",
@@ -24,7 +24,7 @@
         "source": "tk_destroyer_cup"
     },
     {
-        "alias": "action_cards_tk_destroyer_cup",
+        "alias": "action_cards_twilight_kart",
         "name": "Twilight Kart: Destroyer Cup Action Cards",
         "type": "action_card",
         "description": "All action cards for the Homebrew; Twilight Kart: Destroyer Cup",
@@ -108,7 +108,7 @@
         "source": "tk_destroyer_cup"
     },
     {
-        "alias": "units_tk_destroyer_cup",
+        "alias": "twilight_kart_units",
         "name": "Twilight Kart: Destroyer Cup Unit Upgrades",
         "type": "OTHER",
         "description": "All unit upgrades available in the Homebrew; Twilight Kart: Destroyer Cup",
