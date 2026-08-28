@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -91,7 +92,8 @@ public class GameStatisticsFilterer {
         return getGamesFilter(event, true);
     }
 
-    // 6-player, 10-victory-point, non-fog, non-Galactic-Event, non-Scenario games with winners.
+    // 6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with
+    // winners. Homebrew covers fog, and scenario covers Alliance.
     public static Predicate<Game> getStandardCompetitiveGamesFilter() {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(6, game);
         return playerCountPredicate
@@ -183,6 +185,13 @@ public class GameStatisticsFilterer {
         }
         return game.getWinners().stream()
                 .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
+    }
+
+    public static boolean hasAnyFaction(Game game, Set<String> factionAliases) {
+        return game.getFactions().stream()
+                .filter(faction -> faction != null && !faction.isBlank())
+                .map(faction -> faction.toLowerCase(Locale.ROOT))
+                .anyMatch(factionAliases::contains);
     }
 
     private static boolean filterOnFaction(String factionFilter, Game game) {

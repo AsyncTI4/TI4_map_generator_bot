@@ -1,28 +1,38 @@
 package ti4.service.statistics;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.within;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
+import ti4.game.helper.GameHelper;
+import ti4.service.statistics.ActionCardStatsService.ImpactWeights;
 import ti4.service.statistics.ActionCardStatsService.PlayToWinCorrelationCount;
+import ti4.service.statistics.ActionCardStatsService.UnattributedPlays;
 import ti4.testUtils.BaseTi4Test;
 
 class ActionCardStatsServiceTest extends BaseTi4Test {
+
+    private static final ImpactWeights WEIGHTS = new ImpactWeights(0.5, 0.25, 0.25);
 
     @Test
     void shouldScaleTheLeadingFourOfDownForOneOfs() {
         // Sabotage leads on plays per copy (25 vs Direct Hit's 15 and Rise of a Messiah's 20), so a
         // single copy is estimated at 25 draws: 100 for the 4-ofs, a quarter of that for the 1-of.
-        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+        Map<String, Integer> estimatedDraws = ActionCardStatsService.computeEstimatedDraws(
                 Map.of("Sabotage", 100, "Direct Hit", 60, "Rise of a Messiah", 20),
                 Map.of("Sabotage", 4, "Direct Hit", 4, "Rise of a Messiah", 1));
 
-        assertThat(expectedDraws)
+        assertThat(estimatedDraws)
                 .containsEntry("Sabotage", 100)
                 .containsEntry("Direct Hit", 100)
                 .containsEntry("Rise of a Messiah", 25);
@@ -31,58 +41,59 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     @Test
     void shouldScaleTheLeadingOneOfUpForFourOfs() {
         // Rise of a Messiah is played 30 times off one copy, beating Sabotage's 25 per copy, so it
-        // sets the per-copy estimate and the 4-ofs get four times as many expected draws.
-        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+        // sets the per-copy estimate and the 4-ofs get four times as many estimated draws.
+        Map<String, Integer> estimatedDraws = ActionCardStatsService.computeEstimatedDraws(
                 Map.of("Sabotage", 100, "Rise of a Messiah", 30), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
 
-        assertThat(expectedDraws).containsEntry("Sabotage", 120).containsEntry("Rise of a Messiah", 30);
+        assertThat(estimatedDraws).containsEntry("Sabotage", 120).containsEntry("Rise of a Messiah", 30);
     }
 
     @Test
-    void shouldGiveEveryCardOfTheSameCopyCountTheSameExpectedDraws() {
-        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+    void shouldGiveEveryCardOfTheSameCopyCountTheSameEstimatedDraws() {
+        Map<String, Integer> estimatedDraws = ActionCardStatsService.computeEstimatedDraws(
                 Map.of("Sabotage", 20, "Overrule", 30), Map.of("Sabotage", 4, "Overrule", 4));
 
-        assertThat(expectedDraws).containsEntry("Sabotage", 30).containsEntry("Overrule", 30);
+        assertThat(estimatedDraws).containsEntry("Sabotage", 30).containsEntry("Overrule", 30);
     }
 
     @Test
     void shouldSkipCardsNotInTheDeck() {
-        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+        Map<String, Integer> estimatedDraws = ActionCardStatsService.computeEstimatedDraws(
                 Map.of("Sabotage", 10, "Mystery Card", 5), Map.of("Sabotage", 4));
 
-        assertThat(expectedDraws).containsOnlyKeys("Sabotage");
+        assertThat(estimatedDraws).containsOnlyKeys("Sabotage");
     }
 
     @Test
     void shouldDeriveOneOfDrawsFromTheFourOfsWhenNoOneOfWasPlayed() {
-        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+        Map<String, Integer> estimatedDraws = ActionCardStatsService.computeEstimatedDraws(
                 Map.of("Sabotage", 10), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
 
         // 2.5 draws per copy, rounded for the single copy the 1-of has.
-        assertThat(expectedDraws).containsEntry("Sabotage", 10).containsEntry("Rise of a Messiah", 3);
+        assertThat(estimatedDraws).containsEntry("Sabotage", 10).containsEntry("Rise of a Messiah", 3);
     }
 
     @Test
     void shouldSkipEveryCardWhenNothingWasPlayed() {
-        Map<String, Integer> expectedDraws =
-                ActionCardStatsService.computeExpectedDraws(Map.of(), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
+        Map<String, Integer> estimatedDraws =
+                ActionCardStatsService.computeEstimatedDraws(Map.of(), Map.of("Sabotage", 4, "Rise of a Messiah", 1));
 
-        assertThat(expectedDraws).isEmpty();
+        assertThat(estimatedDraws).isEmpty();
     }
 
     @Test
     void shouldIncludeUnplayedCardsWhoseCopyCountHasPlays() {
-        Map<String, Integer> expectedDraws = ActionCardStatsService.computeExpectedDraws(
+        Map<String, Integer> estimatedDraws = ActionCardStatsService.computeEstimatedDraws(
                 Map.of("Sabotage", 10), Map.of("Sabotage", 4, "Direct Hit", 4));
 
         // Direct Hit was never played, but the per-copy estimate still approximates its draws.
-        assertThat(expectedDraws).containsEntry("Direct Hit", 10);
+        assertThat(estimatedDraws).containsEntry("Direct Hit", 10);
     }
 
     @Test
     void shouldCountCancelsThatTheMigrationCouldNotAttributeToAPlayer() {
         Game game = new Game();
+        game.setName("pbd1000");
         Player winner = new Player("winner", "", game);
         // The legacy-save migration reconstructs a cancel it cannot attribute as a canceled play
         // with no player - the shape that used to be dropped before it was counted.
@@ -102,8 +113,46 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldCountEveryCopyOfAMultiCopyCardPlayedInOneGame() {
+        Game game = new Game();
+        Player winner = new Player("winner", "", game);
+        Player loser = new Player("loser", "", game);
+        // Flank Speed has four copies in the deck, so the same game can see it played more than
+        // once - each copy is its own play, and the winner's copies are each their own win.
+        game.getGameStats().recordAcPlay("Flank Speed", winner);
+        game.getGameStats().recordAcPlay("Flank Speed", winner);
+        game.getGameStats().recordAcPlay("Flank Speed", loser);
+
+        Map<String, PlayToWinCorrelationCount> counts = new HashMap<>();
+        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(game, winner, counts, new HashMap<>());
+
+        PlayToWinCorrelationCount flankSpeed = counts.get("Flank Speed");
+        assertThat(flankSpeed.getPlaysIncludingCanceled()).isEqualTo(3);
+        assertThat(flankSpeed.getTotal()).isEqualTo(3);
+        assertThat(flankSpeed.getWins()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldNotCountACanceledPlayAsAWin() {
+        Game game = new Game();
+        Player winner = new Player("winner", "", game);
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, winner);
+        game.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
+
+        Map<String, PlayToWinCorrelationCount> counts = new HashMap<>();
+        ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(game, winner, counts, new HashMap<>());
+
+        PlayToWinCorrelationCount overrule = counts.get(GameStats.OVERRULE);
+        // The winner played it and won, but the cancel meant it never got to affect the game.
+        assertThat(overrule.getPlaysIncludingCanceled()).isEqualTo(1);
+        assertThat(overrule.getTotal()).isZero();
+        assertThat(overrule.getWins()).isZero();
+    }
+
+    @Test
     void shouldStillIgnoreUncancelledPlaysWithNoPlayer() {
         Game game = new Game();
+        game.setName("pbd1000");
         Player winner = new Player("winner", "", game);
         game.getGameStats().recordAcPlay(GameStats.OVERRULE, null);
 
@@ -115,25 +164,389 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldLiftOnlyThePlayCountsAndOmegaWhenARecoveredCancelIsCounted() {
-        // The same card either side of the fix: identical wins and uncancelled plays, but the
-        // second run also counts one migration-recovered cancel. Expected draws are pinned here to
-        // isolate the change; in the real report they are derived from the play counts, so they
-        // move too.
-        String withoutRecoveredCancel = renderOverrule(playToWinCount(1, 1, 1));
-        String withRecoveredCancel = renderOverrule(playToWinCount(2, 1, 1));
+    void shouldLabelTheRatesOnTheLeadingCardOnly() {
+        // Overrule tops all three rates and Lie in Wait trails all three, so with only two cards
+        // between them they take the ends of every spread: the full 100 and a flat zero.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
 
-        assertThat(withoutRecoveredCancel)
-                .isEqualTo("- Overrule: 1 wins, 1 plays (100.0% win rate), 1 uncancelled plays (100.0% win rate),"
-                        + " 10.0 Impact Score (wins vs ~draws), 10.0 Impact Score Ω (+0.2 win per cancel)\n");
-        assertThat(withRecoveredCancel)
-                .isEqualTo("- Overrule: 1 wins, 2 plays (50.0% win rate), 1 uncancelled plays (100.0% win rate),"
-                        + " 10.0 Impact Score (wins vs ~draws), 12.0 Impact Score Ω (+0.2 win per cancel)\n");
+        // The average row leads, so it is the one that names each rate in full and carries no rank,
+        // having nothing to be ranked against. Every card below it abbreviates.
+        assertThat(rendered).isEqualTo("""
+                        - **Average across all cards:**
+                          - 47.7 Impact Score
+                          - 31.1% uncancelled play win rate
+                          - 75.0% plays vs estimated draw rate
+                          - 17.5% cancel rate
+                        - **Overrule:**
+                          - 100.0 Impact Score
+                          - 40.0% win (#1)
+                          - 100.0% play (#1)
+                          - 25.0% cancel (#1)
+                        - **Lie in Wait:**
+                          - 0.0\\* Impact Score
+                          - 22.2% win (#2)
+                          - 50.0% play (#2)
+                          - 10.0% cancel (#2)
+                        """);
+    }
+
+    @Test
+    void shouldAverageEachRateOverTheCardsRatherThanOverThePlays() {
+        // Overrule is played twice as often as Lie in Wait, and must not count twice as much for
+        // it: one card, one vote. Win rates of 40% and 22.2% average to 31.1%, not to the 33.3%
+        // that pooling 80 wins over 240 uncancelled plays would give.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
+
+        assertThat(rendered).contains("- 31.1% uncancelled play win rate\n");
+        assertThat(rendered).contains("- 75.0% plays vs estimated draw rate\n");
+        assertThat(rendered).contains("- 17.5% cancel rate\n");
+    }
+
+    @Test
+    void shouldKeepRawCountsOffTheAverageRowEvenUnderFullDetails() {
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1),
+                true);
+
+        // Every figure on that row is a mean over cards, while a count is a total over plays. The
+        // two do not divide back into each other, so printing them together would only imply they do.
+        assertThat(rendered.substring(0, rendered.indexOf("- **Overrule:**")))
+                .contains("- 17.5% cancel rate\n")
+                .doesNotContain(" wins, ");
+        // The cards below it still carry theirs.
+        assertThat(rendered).contains("  - 60 wins, 200 plays, 50 cancels\n");
+    }
+
+    @Test
+    void shouldOnlyShowTheRawCountsWhenFullDetailsIsAskedFor() {
+        Map<String, PlayToWinCorrelationCount> counts =
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20));
+        Map<String, Integer> estimatedDraws = Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200);
+        Map<String, Integer> copies = Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1);
+
+        assertThat(renderCorrelation(counts, estimatedDraws, copies)).doesNotContain(" wins, ");
+        assertThat(renderCorrelation(counts, estimatedDraws, copies, true))
+                .contains("  - 60 wins, 200 plays, 50 cancels\n")
+                .contains("  - 20 wins, 100 plays, 10 cancels\n");
+    }
+
+    @Test
+    void shouldMatchThePluralToTheCountInFrontOfIt() {
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(2, 1, 1)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1),
+                true);
+
+        assertThat(rendered).contains("  - 1 win, 2 plays, 1 cancel\n");
+    }
+
+    @Test
+    void shouldRankEachFigureSeparately() {
+        // Every figure orders the two cards differently, so none of the ranks may be shared between
+        // figures - a card leading one of them must still be ranked on its own merits in the others.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 50, 40)),
+                Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
+
+        // Lie in Wait wins and is canceled far more often per play, which outweighs Overrule being
+        // played twice as much - so it leads the list and carries the labels.
+        assertThat(rendered).contains("- 75.0\\* Impact Score").contains("- 25.0 Impact Score");
+        assertThat(rendered).contains("- 80.0% win (#1)").contains("- 40.0% win (#2)");
+        assertThat(rendered).contains("- 50.0% play (#2)").contains("- 100.0% play (#1)");
+        assertThat(rendered).contains("- 50.0% cancel (#1)").contains("- 25.0% cancel (#2)");
+    }
+
+    @Test
+    void shouldShareARankBetweenCardsTiedOnAFigure() {
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(100, 100, 50), "Lie in Wait", playToWinCount(50, 50, 25)),
+                Map.of(GameStats.OVERRULE, 100, "Lie in Wait", 100),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
+
+        // Both convert half their plays, so both are #1 on win rate while the play rates differ.
+        assertThat(rendered)
+                .contains("- 50.0% win (#1)")
+                .contains("- 50.0% win (#1)")
+                .contains("- 100.0% play (#1)")
+                .contains("- 50.0% play (#2)");
+    }
+
+    @Test
+    void shouldWeightTheRatesTwoOneOne() {
+        // Neither card is ever canceled, so the cancel component pays nothing to anybody and the
+        // best score on offer is the other two weights. Lie in Wait matches Overrule's win rate, so
+        // both take the whole win weight; it is played half as often, and with only the two of them
+        // that puts it at the bottom of the play spread rather than halfway up it.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(100, 100, 50), "Lie in Wait", playToWinCount(50, 50, 25)),
+                Map.of(GameStats.OVERRULE, 100, "Lie in Wait", 100),
+                Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
+
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 50.0\\* Impact Score");
+    }
+
+    @Test
+    void shouldSplitTheCancelWeightBetweenWinsAndPlaysForACardNoSabotageCanCancel() {
+        // Identical records, and neither card is ever canceled. Overrule still concedes the cancel
+        // weight, because it could have been sabotaged and no card earned that category. Sabotage
+        // never could be, so its tenth is shared out over the two figures that do apply to it.
+        Map<String, PlayToWinCorrelationCount> counts = Map.of(
+                GameStats.SABOTAGE, playToWinCount(100, 100, 50),
+                GameStats.OVERRULE, playToWinCount(100, 100, 50));
+        Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 100, GameStats.OVERRULE, 100);
+
+        Map<String, Double> scores =
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE), WEIGHTS);
+
+        assertThat(scores.get(GameStats.SABOTAGE)).isCloseTo(100.0, within(1.0e-9));
+        assertThat(scores.get(GameStats.OVERRULE)).isCloseTo(75.0, within(1.0e-9));
+    }
+
+    @Test
+    void shouldReadTheWeightsAsProportionsRatherThanAbsolutes() {
+        Map<String, PlayToWinCorrelationCount> counts =
+                Map.of(GameStats.OVERRULE, playToWinCount(100, 100, 50), "Lie in Wait", playToWinCount(50, 50, 25));
+        Map<String, Integer> draws = Map.of(GameStats.OVERRULE, 100, "Lie in Wait", 100);
+
+        // 2/1/1 is the same weighting as 0.5/0.25/0.25 written differently, so a caller should not
+        // have to normalise by hand to get a score they can compare against another run.
+        assertThat(ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), new ImpactWeights(2, 1, 1)))
+                .isEqualTo(ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), WEIGHTS));
+    }
+
+    @Test
+    void shouldLetTheWeightsDecideWhichCardLeads() {
+        // Overrule is played twice as often; Lie in Wait is canceled far more per play. Which of
+        // them leads is entirely a question of what the caller says matters.
+        Map<String, PlayToWinCorrelationCount> counts =
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 200, 40), "Lie in Wait", playToWinCount(100, 50, 20));
+        Map<String, Integer> draws = Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200);
+
+        Map<String, Double> onPlays =
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), new ImpactWeights(0, 1, 0));
+        Map<String, Double> onCancels =
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), new ImpactWeights(0, 0, 1));
+
+        assertThat(onPlays.get(GameStats.OVERRULE)).isGreaterThan(onPlays.get("Lie in Wait"));
+        assertThat(onCancels.get("Lie in Wait")).isGreaterThan(onCancels.get(GameStats.OVERRULE));
+    }
+
+    @Test
+    void shouldLeaveACardNoSabotageCanCancelUnscoredWhenCancelsCarryTheWholeScore() {
+        Map<String, PlayToWinCorrelationCount> counts = Map.of(
+                GameStats.SABOTAGE, playToWinCount(100, 100, 50),
+                GameStats.OVERRULE, playToWinCount(100, 50, 25));
+        Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 100, GameStats.OVERRULE, 100);
+
+        Map<String, Double> scores = ActionCardStatsService.computeImpactScores(
+                counts, draws, Set.of(GameStats.SABOTAGE), new ImpactWeights(0, 0, 1));
+
+        // The only figure being scored is the one Sabotage is exempt from, so there is nothing left
+        // to judge it on - and a flat zero would read as a verdict rather than as the absence of one.
+        assertThat(scores).containsOnlyKeys(GameStats.OVERRULE);
+    }
+
+    @Test
+    void shouldNotLetARareWatcherCancelDragDownACardNoSabotageCanCancel() {
+        // The one cancel Sabotage suffered came from something like a Watcher. Scoring it on the
+        // cancel category would read that rarity as "nobody wanted this gone" and mark it down.
+        Map<String, PlayToWinCorrelationCount> counts = Map.of(
+                GameStats.SABOTAGE, playToWinCount(200, 199, 100),
+                GameStats.OVERRULE, playToWinCount(200, 100, 100));
+        Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 200, GameStats.OVERRULE, 200);
+
+        double carvedOut = ActionCardStatsService.computeImpactScores(
+                        counts, draws, Set.of(GameStats.SABOTAGE), WEIGHTS)
+                .get(GameStats.SABOTAGE);
+        double scoredOnCancels = ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), WEIGHTS)
+                .get(GameStats.SABOTAGE);
+
+        assertThat(carvedOut).isGreaterThan(scoredOnCancels);
+    }
+
+    @Test
+    void shouldStillShowTheCancelRateOfACardNoSabotageCanCancel() {
+        // The figure is worth seeing even though it is not worth scoring.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.SABOTAGE, playToWinCount(100, 99, 50)),
+                Map.of(GameStats.SABOTAGE, 100),
+                Map.of(GameStats.SABOTAGE, 4),
+                Set.of(GameStats.SABOTAGE),
+                false);
+
+        assertThat(rendered).contains("- 1.0% cancel (#1)");
+    }
+
+    @Test
+    void shouldNotLetATinySampleRunAwayWithTheScore() {
+        // Two wins from two plays is a 100% win rate and nothing else. Shrinkage drags it back to
+        // near the deck average, and the play rate it never earned keeps it below the real cards.
+        //
+        // The field has to look like a real deck for this to mean anything. How hard to shrink is
+        // measured from how far apart the cards sit, so a two-card deck with the two of them 20
+        // points apart is told the differences are real and barely shrinks at all - and then the
+        // lucky card keeps a win rate it did nothing to earn. A deck clustered near its own average
+        // is what tells the estimator the spread is mostly luck.
+        Map<String, PlayToWinCorrelationCount> counts = new HashMap<>(Map.of(
+                GameStats.OVERRULE,
+                playToWinCount(200, 200, 60),
+                "Lucky Shot",
+                playToWinCount(2, 2, 2),
+                "Spy",
+                playToWinCount(200, 180, 36),
+                "Uprising",
+                playToWinCount(200, 175, 35),
+                "Parley",
+                playToWinCount(200, 170, 35),
+                "Rally",
+                playToWinCount(200, 185, 37),
+                "Plague",
+                playToWinCount(200, 190, 38)));
+        Map<String, Integer> draws = new HashMap<>();
+        Map<String, Integer> copies = new HashMap<>();
+        counts.keySet().forEach(name -> {
+            draws.put(name, 200);
+            copies.put(name, 1);
+        });
+
+        String rendered = renderCorrelation(counts, draws, copies);
+
+        // The lucky card's 100% is shrunk back to 22.8%, leaving it last rather than first.
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 30.6\\* Impact Score");
+        assertThat(rendered.indexOf(GameStats.OVERRULE)).isLessThan(rendered.indexOf("Lucky Shot"));
+    }
+
+    @Test
+    void shouldScoreACardThatWasAlwaysCanceledAtTheDeckAverage() {
+        // Every play canceled means no win rate can be measured at all. The deck average is the
+        // honest stand-in - scoring it a flat zero would punish the card for being feared.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(100, 100, 40), "Always Saboed", playToWinCount(10, 0, 0)),
+                Map.of(GameStats.OVERRULE, 100, "Always Saboed", 100),
+                Map.of(GameStats.OVERRULE, 1, "Always Saboed", 1));
+
+        // Neither card can be separated on win rate - the one that never resolved is standing on
+        // the deck average, and the deck average is the other one's rate - so each takes the whole
+        // win weight, and they split the two figures that do separate them: Overrule leads on
+        // plays, the feared card leads on cancels, and they land level.
+        assertThat(rendered).contains("- 0.0% win (#2)");
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 75.0\\* Impact Score");
+    }
+
+    @Test
+    void shouldScaleTheInstabilityMarkerWithCopiesInTheDeck() {
+        // Identical records, so identical scores - but a 4-of should have been seen four times as
+        // often, which makes the same sample thin for it and sound for the 1-of.
+        String rendered = renderCorrelation(
+                Map.of(GameStats.OVERRULE, playToWinCount(180, 150, 60), "Flank Speed", playToWinCount(180, 150, 60)),
+                Map.of(GameStats.OVERRULE, 180, "Flank Speed", 180),
+                Map.of(GameStats.OVERRULE, 1, "Flank Speed", 4));
+
+        assertThat(rendered).contains("- 100.0 Impact Score").contains("- 100.0\\* Impact Score");
+    }
+
+    @Test
+    void shouldShrinkLessWhenCardRatesReallyDoDiffer() {
+        // Two cards 10 points apart on 100 plays each. Luck alone explains only a sliver of that
+        // gap, so the rest is treated as real and a card needs 59 plays to half-outweigh the deck.
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.30, 100), rateSample(0.20, 100))))
+                .isEqualTo(59, within(0.001));
+    }
+
+    @Test
+    void shouldBarelyShrinkWildlySpreadRates() {
+        // An 80% card beside a 20% card is far more spread than luck could produce, so each card's
+        // own record is trusted almost outright - the floor keeps a little shrinkage in place.
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.80, 100), rateSample(0.20, 100))))
+                .isEqualTo(5);
+    }
+
+    @Test
+    void shouldShrinkHardestWhenTheSpreadIsNoWiderThanLuck() {
+        // Identical rates are no evidence that cards differ at all, and two cards 10 points apart on
+        // 12 plays each is a gap luck fully explains. Both lean entirely on the deck average.
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.25, 100), rateSample(0.25, 100))))
+                .isEqualTo(200);
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.30, 12), rateSample(0.20, 12))))
+                .isEqualTo(200);
+    }
+
+    @Test
+    void shouldShrinkHardestWhenThereIsNothingToCompare() {
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of(rateSample(0.30, 100))))
+                .isEqualTo(200);
+        assertThat(ActionCardStatsService.estimatePseudoPlays(List.of())).isEqualTo(200);
+    }
+
+    private static double[] rateSample(double rate, int denominator) {
+        return new double[] {rate, denominator};
+    }
+
+    private static String renderCorrelation(
+            Map<String, PlayToWinCorrelationCount> counts,
+            Map<String, Integer> estimatedDraws,
+            Map<String, Integer> copiesPerName) {
+        return renderCorrelation(counts, estimatedDraws, copiesPerName, false);
+    }
+
+    private static String renderCorrelation(
+            Map<String, PlayToWinCorrelationCount> counts,
+            Map<String, Integer> estimatedDraws,
+            Map<String, Integer> copiesPerName,
+            boolean includeFullDetails) {
+        return renderCorrelation(counts, estimatedDraws, copiesPerName, Set.of(), includeFullDetails);
+    }
+
+    private static String renderCorrelation(
+            Map<String, PlayToWinCorrelationCount> counts,
+            Map<String, Integer> estimatedDraws,
+            Map<String, Integer> copiesPerName,
+            Set<String> uncancelableCards,
+            boolean includeFullDetails) {
+        List<String> blocks = new ArrayList<>();
+        ActionCardStatsService.appendPlayToWinCorrelationStats(
+                blocks, counts, estimatedDraws, copiesPerName, uncancelableCards, WEIGHTS, includeFullDetails);
+        return String.join("", blocks);
+    }
+
+    @Test
+    void shouldOnlyCorrelateGamesStartedAfterPlayerTrackingBegan() {
+        assertThat(ActionCardStatsService.startedAfterPlayerTracking(gameCreatedOn("2026.05.24")))
+                .isTrue();
+        // The cutoff date itself is not after the cutoff, so it stays out along with everything
+        // older - those games record plays with no player and would contribute cancels with no wins.
+        assertThat(ActionCardStatsService.startedAfterPlayerTracking(gameCreatedOn("2026.05.23")))
+                .isFalse();
+        assertThat(ActionCardStatsService.startedAfterPlayerTracking(gameCreatedOn("2024.01.01")))
+                .isFalse();
+    }
+
+    @Test
+    void shouldLeaveOutGamesWithAnUnreadableCreationDate() {
+        assertThat(ActionCardStatsService.startedAfterPlayerTracking(gameCreatedOn("not a date")))
+                .isFalse();
+    }
+
+    private static Game gameCreatedOn(String creationDate) {
+        Game game = new Game();
+        game.setCreationDate(creationDate);
+        return game;
     }
 
     @Test
     void shouldTallyUnattributedPlaysPerCardForTheDeveloperDebug() {
-        Game game = new Game();
+        Game game = gameCreatedOn("2026.06.01");
+        game.setName("pbd1000");
         Player winner = new Player("winner", "", game);
         game.getGameStats().recordAcPlay(GameStats.OVERRULE, null);
         game.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
@@ -142,18 +555,64 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         game.getGameStats().recordAcPlay(GameStats.OVERRULE, winner);
         game.getGameStats().recordAcPlay("Flank Speed", winner);
 
-        Map<String, Integer> unattributedPlayCounts = new HashMap<>();
+        Map<String, UnattributedPlays> unattributedPlays = new HashMap<>();
         ActionCardStatsService.accumulateActionCardPlayToWinCorrelation(
-                game, winner, new HashMap<>(), unattributedPlayCounts);
+                game, winner, new HashMap<>(), unattributedPlays);
 
         // Only the two plays with no recorded player are tallied, and cards with none stay out.
-        assertThat(unattributedPlayCounts).containsExactly(entry(GameStats.OVERRULE, 2));
+        assertThat(unattributedPlays).containsOnlyKeys(GameStats.OVERRULE);
+        UnattributedPlays overrule = unattributedPlays.get(GameStats.OVERRULE);
+        assertThat(overrule.getCount()).isEqualTo(2);
+        // Both plays came from the one game, so it is named once and dates the whole span.
+        assertThat(overrule.getGameNames()).containsExactly("pbd1000");
+        assertThat(overrule.getFirstCreationDate()).isEqualTo(LocalDate.of(2026, 6, 1));
+        assertThat(overrule.getLastCreationDate()).isEqualTo(LocalDate.of(2026, 6, 1));
     }
 
-    private static String renderOverrule(PlayToWinCorrelationCount count) {
+    @Test
+    void shouldSpanTheCreationDatesOfEveryGameACardWasUnattributedIn() {
+        UnattributedPlays plays = new UnattributedPlays();
+        plays.record("pbd2", LocalDate.of(2026, 7, 1));
+        plays.record("pbd1", LocalDate.of(2026, 6, 1));
+        plays.record("pbd3", LocalDate.of(2026, 8, 1));
+
+        assertThat(plays.getFirstCreationDate()).isEqualTo(LocalDate.of(2026, 6, 1));
+        assertThat(plays.getLastCreationDate()).isEqualTo(LocalDate.of(2026, 8, 1));
+    }
+
+    @Test
+    void shouldNameTheGamesBehindEveryUnattributedCardExceptOverrule() {
+        String rendered = renderUnattributedPlayDebug(Map.of(
+                GameStats.OVERRULE,
+                unattributedPlays(Map.of("pbd1", "2026.06.01", "pbd2", "2026.08.01")),
+                "Repeal Law",
+                unattributedPlays(Map.of("pbd3", "2026.07.01", "pbd4", "2026.07.02"))));
+
+        // Overrule is in too many games to name, so it reports the window they were created in.
+        assertThat(rendered)
+                .contains("- Overrule: 2 (games created 2026-06-01 through 2026-08-01, 2 games)\n")
+                .contains("- Repeal Law: 2 (pbd3, pbd4)\n");
+    }
+
+    @Test
+    void shouldStillCountOverruleWhenNoneOfItsGamesCouldBeDated() {
+        String rendered = renderUnattributedPlayDebug(
+                Map.of(GameStats.OVERRULE, unattributedPlays(Collections.singletonMap("pbd1", null))));
+
+        assertThat(rendered).contains("- Overrule: 1\n");
+    }
+
+    private static UnattributedPlays unattributedPlays(Map<String, String> creationDatePerGameName) {
+        UnattributedPlays plays = new UnattributedPlays();
+        creationDatePerGameName.forEach((gameName, creationDate) -> plays.record(
+                gameName,
+                creationDate == null ? null : LocalDate.parse(creationDate, GameHelper.CREATION_DATE_FORMATTER)));
+        return plays;
+    }
+
+    private static String renderUnattributedPlayDebug(Map<String, UnattributedPlays> unattributedPlays) {
         StringBuilder message = new StringBuilder();
-        ActionCardStatsService.appendPlayToWinCorrelationStats(
-                message, Map.of(GameStats.OVERRULE, count), Map.of(GameStats.OVERRULE, 10));
+        ActionCardStatsService.appendUnattributedPlayDebug(message, unattributedPlays);
         return message.toString();
     }
 
