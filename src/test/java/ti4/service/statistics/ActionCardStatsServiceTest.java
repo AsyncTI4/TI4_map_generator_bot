@@ -15,11 +15,14 @@ import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.game.helper.GameHelper;
+import ti4.service.statistics.ActionCardStatsService.ImpactWeights;
 import ti4.service.statistics.ActionCardStatsService.PlayToWinCorrelationCount;
 import ti4.service.statistics.ActionCardStatsService.UnattributedPlays;
 import ti4.testUtils.BaseTi4Test;
 
 class ActionCardStatsServiceTest extends BaseTi4Test {
+
+    private static final ImpactWeights WEIGHTS = new ImpactWeights(0.5, 0.25, 0.25);
 
     @Test
     void shouldScaleTheLeadingFourOfDownForOneOfs() {
@@ -175,7 +178,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                           - 100.0% plays vs estimated draw rate (#1)
                           - 25.0% cancel rate (#1)
                         - **Lie in Wait:**
-                          - 55.7\\* Impact Score
+                          - 53.9\\* Impact Score
                           - 22.2% win (#2)
                           - 50.0% play (#2)
                           - 10.0% cancel (#2)
@@ -217,7 +220,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
 
         // Lie in Wait wins and is canceled far more often per play, which outweighs Overrule being
         // played twice as much - so it leads the list and carries the labels.
-        assertThat(rendered).contains("- 85.0\\* Impact Score").contains("- 66.5 Impact Score");
+        assertThat(rendered).contains("- 87.5\\* Impact Score").contains("- 64.0 Impact Score");
         assertThat(rendered).contains("- 80.0% uncancelled play win rate (#1)").contains("- 40.0% win (#2)");
         assertThat(rendered)
                 .contains("- 50.0% plays vs estimated draw rate (#2)")
@@ -241,7 +244,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldWeightTheRatesSixThreeOne() {
+    void shouldWeightTheRatesTwoOneOne() {
         // Neither card is ever canceled, so the cancel component pays nothing to anybody and the
         // best score on offer is the other two weights. Lie in Wait matches Overrule's win rate but
         // is played half as often, so it keeps the win weight and half the play weight.
@@ -250,7 +253,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 100, "Lie in Wait", 100),
                 Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
 
-        assertThat(rendered).contains("- 90.0 Impact Score").contains("- 75.0\\* Impact Score");
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 62.5\\* Impact Score");
     }
 
     @Test
@@ -264,10 +267,54 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 100, GameStats.OVERRULE, 100);
 
         Map<String, Double> scores =
-                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE));
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE), WEIGHTS);
 
         assertThat(scores.get(GameStats.SABOTAGE)).isCloseTo(100.0, within(1e-9));
-        assertThat(scores.get(GameStats.OVERRULE)).isCloseTo(90.0, within(1e-9));
+        assertThat(scores.get(GameStats.OVERRULE)).isCloseTo(75.0, within(1e-9));
+    }
+
+    @Test
+    void shouldReadTheWeightsAsProportionsRatherThanAbsolutes() {
+        Map<String, PlayToWinCorrelationCount> counts =
+                Map.of(GameStats.OVERRULE, playToWinCount(100, 100, 50), "Lie in Wait", playToWinCount(50, 50, 25));
+        Map<String, Integer> draws = Map.of(GameStats.OVERRULE, 100, "Lie in Wait", 100);
+
+        // 2/1/1 is the same weighting as 0.5/0.25/0.25 written differently, so a caller should not
+        // have to normalise by hand to get a score they can compare against another run.
+        assertThat(ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), new ImpactWeights(2, 1, 1)))
+                .isEqualTo(ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), WEIGHTS));
+    }
+
+    @Test
+    void shouldLetTheWeightsDecideWhichCardLeads() {
+        // Overrule is played twice as often; Lie in Wait is canceled far more per play. Which of
+        // them leads is entirely a question of what the caller says matters.
+        Map<String, PlayToWinCorrelationCount> counts =
+                Map.of(GameStats.OVERRULE, playToWinCount(200, 200, 40), "Lie in Wait", playToWinCount(100, 50, 20));
+        Map<String, Integer> draws = Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200);
+
+        Map<String, Double> onPlays =
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), new ImpactWeights(0, 1, 0));
+        Map<String, Double> onCancels =
+                ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), new ImpactWeights(0, 0, 1));
+
+        assertThat(onPlays.get(GameStats.OVERRULE)).isGreaterThan(onPlays.get("Lie in Wait"));
+        assertThat(onCancels.get("Lie in Wait")).isGreaterThan(onCancels.get(GameStats.OVERRULE));
+    }
+
+    @Test
+    void shouldLeaveACardNoSabotageCanCancelUnscoredWhenCancelsCarryTheWholeScore() {
+        Map<String, PlayToWinCorrelationCount> counts = Map.of(
+                GameStats.SABOTAGE, playToWinCount(100, 100, 50),
+                GameStats.OVERRULE, playToWinCount(100, 50, 25));
+        Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 100, GameStats.OVERRULE, 100);
+
+        Map<String, Double> scores = ActionCardStatsService.computeImpactScores(
+                counts, draws, Set.of(GameStats.SABOTAGE), new ImpactWeights(0, 0, 1));
+
+        // The only figure being scored is the one Sabotage is exempt from, so there is nothing left
+        // to judge it on - and a flat zero would read as a verdict rather than as the absence of one.
+        assertThat(scores).containsOnlyKeys(GameStats.OVERRULE);
     }
 
     @Test
@@ -279,9 +326,10 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 GameStats.OVERRULE, playToWinCount(200, 100, 100));
         Map<String, Integer> draws = Map.of(GameStats.SABOTAGE, 200, GameStats.OVERRULE, 200);
 
-        double carvedOut = ActionCardStatsService.computeImpactScores(counts, draws, Set.of(GameStats.SABOTAGE))
+        double carvedOut = ActionCardStatsService.computeImpactScores(
+                        counts, draws, Set.of(GameStats.SABOTAGE), WEIGHTS)
                 .get(GameStats.SABOTAGE);
-        double scoredOnCancels = ActionCardStatsService.computeImpactScores(counts, draws, Set.of())
+        double scoredOnCancels = ActionCardStatsService.computeImpactScores(counts, draws, Set.of(), WEIGHTS)
                 .get(GameStats.SABOTAGE);
 
         assertThat(carvedOut).isGreaterThan(scoredOnCancels);
@@ -309,7 +357,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 200, "Lucky Shot", 200),
                 Map.of(GameStats.OVERRULE, 1, "Lucky Shot", 1));
 
-        assertThat(rendered).contains("- 89.1 Impact Score").contains("- 60.3\\* Impact Score");
+        assertThat(rendered).contains("- 74.2 Impact Score").contains("- 50.2\\* Impact Score");
         // The real card leads despite conceding the win-rate anchor to the lucky one.
         assertThat(rendered.indexOf(GameStats.OVERRULE)).isLessThan(rendered.indexOf("Lucky Shot"));
     }
@@ -323,7 +371,10 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 100, "Always Saboed", 100),
                 Map.of(GameStats.OVERRULE, 1, "Always Saboed", 1));
 
-        assertThat(rendered).contains("- 0.0% win (#2)").contains("- 73.0\\* Impact Score");
+        // With a quarter of the score riding on cancels, a card nobody is willing to let resolve
+        // leads the deck on that alone - so it takes the first entry's spelled-out labels with it.
+        assertThat(rendered).contains("- 0.0% uncancelled play win rate (#2)").contains("- 77.5\\* Impact Score");
+        assertThat(rendered.indexOf("Always Saboed")).isLessThan(rendered.indexOf(GameStats.OVERRULE));
     }
 
     @Test
@@ -398,7 +449,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
             boolean includeFullDetails) {
         List<String> blocks = new ArrayList<>();
         ActionCardStatsService.appendPlayToWinCorrelationStats(
-                blocks, counts, estimatedDraws, copiesPerName, uncancelableCards, includeFullDetails);
+                blocks, counts, estimatedDraws, copiesPerName, uncancelableCards, WEIGHTS, includeFullDetails);
         return String.join("", blocks);
     }
 

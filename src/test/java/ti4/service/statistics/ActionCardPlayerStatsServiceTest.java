@@ -18,16 +18,16 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         addPlayer(game, "quiet");
-        game.getGameStats().recordAcPlay("Flank Speed", winner);
+        recordPlays(game, winner, 3);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        // The quiet player is what the 1-card row is measured against, so they have to be counted.
+        // The quiet player is what the 3-5 band is measured against, so they have to be counted.
         assertThat(stats.getPlayers(0)).isEqualTo(1);
         assertThat(stats.getWins(0)).isZero();
-        assertThat(stats.getPlayers(1)).isEqualTo(1);
-        assertThat(stats.getWins(1)).isEqualTo(1);
+        assertThat(stats.getPlayers(3)).isEqualTo(1);
+        assertThat(stats.getWins(3)).isEqualTo(1);
     }
 
     @Test
@@ -37,14 +37,16 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         Player loser = addPlayer(game, "loser");
         game.getGameStats().recordAcPlay(GameStats.OVERRULE, loser);
         game.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
-        game.getGameStats().recordAcPlay("Flank Speed", loser);
+        recordPlays(game, loser, 2);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        // The canceled Overrule never resolved, but it left the loser's hand all the same.
-        assertThat(stats.getPlayers(2)).isEqualTo(1);
-        assertThat(stats.getWins(2)).isZero();
+        // The canceled Overrule never resolved, but it left the loser's hand all the same - which
+        // is what carries them over into the 3-5 band instead of the 0-2 one.
+        assertThat(stats.getPlayers(3)).isEqualTo(1);
+        assertThat(stats.getWins(3)).isZero();
+        assertThat(stats.getPlayers(0)).isEqualTo(1);
     }
 
     @Test
@@ -58,8 +60,8 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        assertThat(stats.getPlayers(1)).isEqualTo(2);
-        assertThat(stats.getWins(1)).isEqualTo(1);
+        assertThat(stats.getPlayers(0)).isEqualTo(2);
+        assertThat(stats.getWins(0)).isEqualTo(1);
     }
 
     @Test
@@ -72,9 +74,9 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        // The one player at the table is credited with nothing, and no phantom player appears.
-        assertThat(stats.getPlayers(0)).isEqualTo(1);
-        assertThat(stats.getPlayers(1)).isZero();
+        // The one player at the table is credited with nothing, and the whole sample is still just
+        // them - a phantom carrying the orphaned play would show up as a second player here.
+        assertThat(render(stats)).contains("- 0-2 cards: 100% win rate (1/1 players; 100% of all players)\n");
     }
 
     @Test
@@ -82,49 +84,50 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player stranger = new Player("stranger", "", game);
-        game.getGameStats().recordAcPlay("Flank Speed", stranger);
+        recordPlays(game, stranger, 5);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
         // A seventh player counted here would never win, and would drag every rate down with them.
-        assertThat(stats.getPlayers(0)).isEqualTo(1);
-        assertThat(stats.getPlayers(1)).isZero();
+        assertThat(render(stats)).contains("- 0-2 cards: 100% win rate (1/1 players; 100% of all players)\n");
+        assertThat(stats.getPlayers(3)).isZero();
     }
 
     @Test
-    void shouldCollectEveryPlayerAtOrAboveTheCapIntoOneRow() {
+    void shouldCollectEveryPlayerAtOrAboveTheLastBandIntoOneRow() {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player loser = addPlayer(game, "loser");
-        recordPlays(game, winner, 20);
+        recordPlays(game, winner, 15);
         recordPlays(game, loser, 40);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        assertThat(stats.getPlayers(20)).isEqualTo(2);
-        assertThat(stats.getWins(20)).isEqualTo(1);
-        assertThat(render(stats)).contains("- 20+ cards: 50% win rate (1/2 players; 100% of all players)\n");
+        // The last band is open-ended, so 15 and 40 share it however far apart they are.
+        assertThat(stats.getPlayers(15)).isEqualTo(2);
+        assertThat(stats.getWins(15)).isEqualTo(1);
+        assertThat(render(stats)).contains("- 15+ cards: 50% win rate (1/2 players; 100% of all players)\n");
     }
 
     @Test
-    void shouldGiveEveryCountUnderTheCapItsOwnRow() {
+    void shouldPoolCountsIntoBandsThreeWide() {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player loser = addPlayer(game, "loser");
-        recordPlays(game, winner, 19);
-        recordPlays(game, loser, 1);
+        recordPlays(game, winner, 13);
+        recordPlays(game, loser, 2);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
         String rendered = render(stats);
-        assertThat(rendered).contains("- 1 card: 0% win rate (0/1 players; 50% of all players)\n");
-        // One short of the cap still gets a row of its own rather than joining the 20+ pile.
-        assertThat(rendered).contains("- 19 cards: 100% (1/1; 50%)\n");
-        // Nobody played 2 through 18, so those rows are left out rather than divided by zero.
-        assertThat(rendered).doesNotContain("- 2 cards:").doesNotContain("- 18 cards:");
+        // 2 falls in the band starting at 0, and 13 in the one starting at 12.
+        assertThat(rendered).contains("- 0-2 cards: 0% win rate (0/1 players; 50% of all players)\n");
+        assertThat(rendered).contains("- 12-14 cards: 100% (1/1; 50%)\n");
+        // Nobody played 3 through 11, so those bands are left out rather than divided by zero.
+        assertThat(rendered).doesNotContain("- 3-5 cards:").doesNotContain("- 9-11 cards:");
     }
 
     @Test
@@ -132,15 +135,15 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player loser = addPlayer(game, "loser");
-        recordPlays(game, winner, 3);
+        recordPlays(game, winner, 6);
         recordPlays(game, loser, 1);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
         String rendered = render(stats);
-        assertThat(rendered).contains("- 1 card: 0% win rate (0/1 players; 50% of all players)\n");
-        assertThat(rendered).contains("- 3 cards: 100% (1/1; 50%)\n");
+        assertThat(rendered).contains("- 0-2 cards: 0% win rate (0/1 players; 50% of all players)\n");
+        assertThat(rendered).contains("- 6-8 cards: 100% (1/1; 50%)\n");
     }
 
     @Test
@@ -163,7 +166,7 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldAverageCardsOverThePlayersAboveTheCapAtTheirRealCounts() {
+    void shouldAverageCardsOverThePlayersAboveTheLastBandAtTheirRealCounts() {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player loser = addPlayer(game, "loser");
@@ -173,8 +176,8 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        // Both sit in the 20+ row, which cannot be summed back into a total - the average has to
-        // come from the counts themselves or it would read 20.00.
+        // Both sit in the 15+ row, which cannot be summed back into a total - the average has to
+        // come from the counts themselves or it would read 15.00.
         assertThat(render(stats)).contains("The average number of action cards played is 30.00.\n");
     }
 

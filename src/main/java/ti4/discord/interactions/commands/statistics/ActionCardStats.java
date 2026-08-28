@@ -15,6 +15,21 @@ class ActionCardStats extends Subcommand {
                 OptionType.BOOLEAN,
                 ActionCardStatsService.FULL_DETAILS_OPTION,
                 "'true' to add the raw win, play and cancel counts behind each Impact Score"));
+        // Read as proportions, so 2/1/1 weighs the same as the 0.5/0.25/0.25 default. Pass one and
+        // the other two keep their defaults, which is rarely what you want - pass all three.
+        addOptions(
+                impactWeightOption(ActionCardStatsService.WIN_WEIGHT_OPTION, "win rate", "0.5"),
+                impactWeightOption(ActionCardStatsService.PLAY_WEIGHT_OPTION, "play rate", "0.25"),
+                impactWeightOption(ActionCardStatsService.CANCEL_WEIGHT_OPTION, "cancel rate", "0.25"));
+    }
+
+    private static OptionData impactWeightOption(String name, String figure, String defaultWeight) {
+        return new OptionData(
+                        OptionType.NUMBER,
+                        name,
+                        "Impact Score weight for " + figure + ", relative to the other two (default " + defaultWeight
+                                + ")")
+                .setMinValue(0);
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -49,9 +50,11 @@ public class ActionCardStatsService {
     static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
     private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
 
-    private static final double IMPACT_WIN_RATE_WEIGHT = 0.6;
-    private static final double IMPACT_PLAY_RATE_WEIGHT = 0.3;
-    private static final double IMPACT_CANCEL_RATE_WEIGHT = 0.1;
+    public static final String WIN_WEIGHT_OPTION = "win_weight";
+    public static final String PLAY_WEIGHT_OPTION = "play_weight";
+    public static final String CANCEL_WEIGHT_OPTION = "cancel_weight";
+
+    private static final ImpactWeights DEFAULT_IMPACT_WEIGHTS = new ImpactWeights(0.5, 0.25, 0.25);
 
     // Bounds on the pseudo-plays estimated below, guarding against a degenerate dataset asking for
     // either no shrinkage at all or so much that every card collapses onto the deck average.
@@ -67,10 +70,25 @@ public class ActionCardStatsService {
     private static final int STABLE_UNCANCELLED_PLAYS_PER_COPY = 100;
 
     public static void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> showActionCardStats(event));
+        ImpactWeights weights = parseImpactWeights(event);
+        // Checked here rather than on the pipeline thread, so a bad weight comes straight back
+        // instead of opening a thread and reporting into it a minute later.
+        if (weights.total() <= 0 || weights.hasNegative()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Impact Score weights cannot be negative, and at least one of them has to be above zero.");
+            return;
+        }
+        StatisticsPipeline.queue(event, () -> showActionCardStats(event, weights));
     }
 
-    private static void showActionCardStats(SlashCommandInteractionEvent event) {
+    private static ImpactWeights parseImpactWeights(SlashCommandInteractionEvent event) {
+        return new ImpactWeights(
+                event.getOption(WIN_WEIGHT_OPTION, DEFAULT_IMPACT_WEIGHTS.winRate(), OptionMapping::getAsDouble),
+                event.getOption(PLAY_WEIGHT_OPTION, DEFAULT_IMPACT_WEIGHTS.playRate(), OptionMapping::getAsDouble),
+                event.getOption(CANCEL_WEIGHT_OPTION, DEFAULT_IMPACT_WEIGHTS.cancelRate(), OptionMapping::getAsDouble));
+    }
+
+    private static void showActionCardStats(SlashCommandInteractionEvent event, ImpactWeights weights) {
         DeckModel acDeck = Mapper.getDeck(DEFAULT_AC_DECK_ID);
 
         Map<String, Integer> cancelCounts = new HashMap<>();
@@ -110,6 +128,7 @@ public class ActionCardStatsService {
                         unattributedPlays,
                         includedGameNames,
                         playerStats,
+                        weights,
                         event.getOption(FULL_DETAILS_OPTION, false, OptionMapping::getAsBoolean),
                         CommandHelper.hasRole(event, JdaService.developerRoles)));
     }
@@ -239,6 +258,7 @@ public class ActionCardStatsService {
             Map<String, UnattributedPlays> unattributedPlays,
             Set<String> includedGameNames,
             ActionCardPlayerStatsService playerStats,
+            ImpactWeights weights,
             boolean includeFullDetails,
             boolean includeDeveloperDebug) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
@@ -272,10 +292,7 @@ public class ActionCardStatsService {
                 .append(", when we started tracking who played each card._\n");
         appendEstimatedDrawsNote(
                 impactScoreNotes, computeEstimatedDrawsPerCopyCount(playsIncludingCanceled, copiesPerName));
-        impactScoreNotes.append(
-                "_The Impact Score blends win rate (0.6), play rate (0.3) and cancel rate (0.1), each measured against the deck's best. Thin samples are pulled toward the deck average, and a \\* marks a card still too thin to trust. A rank (#) is the card's place against every other card for that figure._\n");
-        impactScoreNotes.append(
-                "_A card no Sabotage can cancel is scored on win rate (0.67) and play rate (0.33) alone._\n");
+        appendImpactWeightNotes(impactScoreNotes, weights);
         blocks.add(impactScoreNotes.toString());
         appendPlayToWinCorrelationStats(
                 blocks,
@@ -283,6 +300,7 @@ public class ActionCardStatsService {
                 winCorrelationEstimatedDraws,
                 copiesPerName,
                 getUnsabotageableNames(acDeck),
+                weights,
                 includeFullDetails);
 
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
@@ -346,6 +364,38 @@ public class ActionCardStatsService {
                 .append(", ")
                 .append(plays.getGameNames().size())
                 .append(" games)");
+    }
+
+    // The weights are reported as the proportions they are actually applied as, so a caller who
+    // passed 2/1/1 reads back the same note as one who passed 0.5/0.25/0.25.
+    static void appendImpactWeightNotes(StringBuilder message, ImpactWeights weights) {
+        message.append("_The Impact Score blends win rate (")
+                .append(formatWeight(weights.winRate() / weights.total()))
+                .append("), play rate (")
+                .append(formatWeight(weights.playRate() / weights.total()))
+                .append(") and cancel rate (")
+                .append(formatWeight(weights.cancelRate() / weights.total()))
+                .append(
+                        "), each measured against the deck's best. Thin samples are pulled toward the deck average, and a \\* marks a card still too thin to trust. A rank (#) is the card's place against every other card for that figure._\n");
+
+        double sabotageProofTotal = weights.winRate() + weights.playRate();
+        if (sabotageProofTotal <= 0) {
+            // Cancels carry the whole score, so a card that cannot be canceled has nothing left to
+            // be scored on and is left out of the section entirely rather than described here.
+            return;
+        }
+        message.append("_A card no Sabotage can cancel is scored on win rate (")
+                .append(formatWeight(weights.winRate() / sabotageProofTotal))
+                .append(") and play rate (")
+                .append(formatWeight(weights.playRate() / sabotageProofTotal))
+                .append(") alone._\n");
+    }
+
+    private static String formatWeight(double weight) {
+        return BigDecimal.valueOf(weight)
+                .setScale(2, RoundingMode.HALF_UP)
+                .stripTrailingZeros()
+                .toPlainString();
     }
 
     private static void appendTrackingStartNote(StringBuilder message) {
@@ -484,6 +534,7 @@ public class ActionCardStatsService {
             Map<String, Integer> estimatedDrawsPerCard,
             Map<String, Integer> copiesPerName,
             Set<String> unsabotageableCards,
+            ImpactWeights weights,
             boolean includeFullDetails) {
         if (playToWinCorrelationCounts.isEmpty()) {
             blocks.add("No eligible action card play data matched the selected filters.\n");
@@ -491,7 +542,7 @@ public class ActionCardStatsService {
         }
 
         Map<String, Double> impactScores =
-                computeImpactScores(playToWinCorrelationCounts, estimatedDrawsPerCard, unsabotageableCards);
+                computeImpactScores(playToWinCorrelationCounts, estimatedDrawsPerCard, unsabotageableCards, weights);
         List<Map.Entry<String, PlayToWinCorrelationCount>> sortedEntries =
                 playToWinCorrelationCounts.entrySet().stream()
                         .sorted(Comparator.<Map.Entry<String, PlayToWinCorrelationCount>>comparingInt(
@@ -608,7 +659,8 @@ public class ActionCardStatsService {
     static Map<String, Double> computeImpactScores(
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, Integer> estimatedDrawsPerCard,
-            Set<String> unsabotageableCards) {
+            Set<String> unsabotageableCards,
+            ImpactWeights weights) {
         // Win rates and cancel rates spread very differently - most cards win at roughly the deck
         // average while cancels pile onto a handful of cards - so each gets its own shrinkage.
         ShrinkageModel winRateModel = buildShrinkageModel(
@@ -641,20 +693,39 @@ public class ActionCardStatsService {
             double win = anchor(winRate, bestWinRate);
             double play = anchor(playRates.get(cardName), bestPlayRate);
             if (unsabotageableCards.contains(cardName)) {
-                double scale = 1 / (IMPACT_WIN_RATE_WEIGHT + IMPACT_PLAY_RATE_WEIGHT);
-                impactScores.put(
-                        cardName,
-                        (IMPACT_WIN_RATE_WEIGHT * scale * win + IMPACT_PLAY_RATE_WEIGHT * scale * play) * 100);
+                weights.scoreWithoutCancels(win, play).ifPresent(score -> impactScores.put(cardName, score));
                 return;
             }
-            impactScores.put(
-                    cardName,
-                    (IMPACT_WIN_RATE_WEIGHT * win
-                                    + IMPACT_PLAY_RATE_WEIGHT * play
-                                    + IMPACT_CANCEL_RATE_WEIGHT * anchor(cancelRates.get(cardName), bestCancelRate))
-                            * 100);
+            impactScores.put(cardName, weights.score(win, play, anchor(cancelRates.get(cardName), bestCancelRate)));
         });
         return impactScores;
+    }
+
+    /**
+     * How much each figure is worth to the Impact Score. Taken as proportions rather than as
+     * absolutes, so 2/1/1 and 0.5/0.25/0.25 score identically and a card leading every figure
+     * lands on 100 whatever numbers the caller passed in.
+     */
+    record ImpactWeights(double winRate, double playRate, double cancelRate) {
+
+        double total() {
+            return winRate + playRate + cancelRate;
+        }
+
+        boolean hasNegative() {
+            return winRate < 0 || playRate < 0 || cancelRate < 0;
+        }
+
+        double score(double win, double play, double cancel) {
+            return (winRate * win + playRate * play + cancelRate * cancel) / total() * 100;
+        }
+        
+        OptionalDouble scoreWithoutCancels(double win, double play) {
+            double sabotageProofTotal = winRate + playRate;
+            return sabotageProofTotal <= 0
+                    ? OptionalDouble.empty()
+                    : OptionalDouble.of((winRate * win + playRate * play) / sabotageProofTotal * 100);
+        }
     }
 
     // How far a card's own record should move it off the deck average. Both halves are measured

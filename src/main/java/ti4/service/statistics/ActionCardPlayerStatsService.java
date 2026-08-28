@@ -27,9 +27,13 @@ import ti4.model.FactionModel;
  */
 class ActionCardPlayerStatsService {
 
-    // Everything at or above this collects into one row. Getting through more than twenty cards is
-    // rare enough that an exact row for each would be a column of rates off a handful of players.
-    private static final int MAX_EXACT_CARDS_PLAYED = 20;
+    // Rows are pooled three counts wide. A row per exact count splits the sample thin enough that
+    // neighbouring rows swing on a few players each, which hides the trend running through them.
+    private static final int BAND_SIZE = 3;
+
+    // The last band is open-ended: past here the sample thins out fast, and how far past hardly
+    // matters next to the fact that the player got through most of a hand.
+    private static final int LAST_BAND_START = 15;
 
     private final NavigableMap<Integer, WinRateCount> playersByCardsPlayed = new TreeMap<>();
     private final Map<String, Integer> gamesPerFaction = new HashMap<>();
@@ -65,10 +69,10 @@ class ActionCardPlayerStatsService {
         String winningPlayerId = GameStats.getTrackedPlayerId(winner);
         playersById.forEach((playerId, player) -> {
             int cardsPlayed = cardsPlayedPerPlayer.get(playerId);
-            // Seeded at zero above, so a player who played nothing lands in the 0 row rather than
-            // dropping out of the denominator the rows below it are measured against.
+            // Seeded at zero above, so a player who played nothing lands in the first band rather
+            // than dropping out of the denominator the rows below it are measured against.
             playersByCardsPlayed
-                    .computeIfAbsent(Math.min(cardsPlayed, MAX_EXACT_CARDS_PLAYED), _ -> new WinRateCount())
+                    .computeIfAbsent(bandOf(cardsPlayed), _ -> new WinRateCount())
                     .record(playerId.equals(winningPlayerId));
             totalCardsPlayed += cardsPlayed;
             recordFaction(player.getFaction(), cardsPlayed);
@@ -102,7 +106,7 @@ class ActionCardPlayerStatsService {
 
         int totalPlayers = totalOf(WinRateCount::getPlayers);
 
-        heading.append(" A card canceled by a Sabotage still counts - it was spent either way._\n")
+        heading.append(", counting those canceled._\n")
                 .append("- The average win rate is ")
                 .append(ActionCardStatsService.formatPercent(totalOf(WinRateCount::getWins) / (double) totalPlayers))
                 .append(". The average number of action cards played is ")
@@ -135,12 +139,17 @@ class ActionCardPlayerStatsService {
         });
     }
 
-    private static void appendCardsPlayed(StringBuilder row, int cardsPlayed) {
-        if (cardsPlayed >= MAX_EXACT_CARDS_PLAYED) {
-            row.append(cardsPlayed).append("+ cards");
+    // The band a count falls in, named by where it starts, so the rows sort in the order they read.
+    private static int bandOf(int cardsPlayed) {
+        return cardsPlayed >= LAST_BAND_START ? LAST_BAND_START : cardsPlayed / BAND_SIZE * BAND_SIZE;
+    }
+
+    private static void appendCardsPlayed(StringBuilder row, int band) {
+        if (band >= LAST_BAND_START) {
+            row.append(band).append("+ cards");
             return;
         }
-        ActionCardStatsService.appendCount(row, cardsPlayed, "card");
+        row.append(band).append('-').append(band + BAND_SIZE - 1).append(" cards");
     }
 
     private int totalOf(ToIntFunction<WinRateCount> figure) {
