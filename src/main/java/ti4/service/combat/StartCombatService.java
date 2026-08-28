@@ -1113,7 +1113,9 @@ public class StartCombatService {
                     & tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) > 0;
             if ("space".equalsIgnoreCase(type) && salvage) {
                 buttons = new ArrayList<>();
-                String label = game.isTwilightKart() ? "Salvage Barge" : "Salvage Operations";
+                // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+                String label =
+                        game.isTwilightKart() || game.isTkDestroyerCup() ? "Salvage Barge" : "Salvage Operations";
                 buttons.add(Buttons.gray("salvageOps_" + tile.getPosition(), label, FactionEmojis.Mentak));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),

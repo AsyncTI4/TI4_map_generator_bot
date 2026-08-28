@@ -732,10 +732,9 @@ public final class ButtonHelperActionCards {
 
     public static List<Button> getCourageousOptions(Player player, Game game, boolean nekro, String type) {
         String factionChecker = player.factionButtonChecker();
-        nekro |= game.isTwilightKart() && game.isTwilightsFallMode();
         List<Button> buttons = new ArrayList<>();
 
-        List<String> allowedUnits = Stream.of(
+        List<String> allowedUnits = new ArrayList<>(Stream.of(
                         UnitType.Destroyer,
                         UnitType.Cruiser,
                         UnitType.Carrier,
@@ -744,22 +743,15 @@ public final class ButtonHelperActionCards {
                         UnitType.Warsun,
                         UnitType.Fighter)
                 .map(UnitType::getValue)
-                .toList();
-
-        if (nekro) {
-            allowedUnits = Stream.of(
-                            UnitType.Destroyer,
-                            UnitType.Cruiser,
-                            UnitType.Carrier,
-                            UnitType.Dreadnought,
-                            UnitType.Flagship,
-                            UnitType.Warsun,
-                            UnitType.Fighter,
-                            UnitType.Mech,
-                            UnitType.Infantry)
-                    .map(UnitType::getValue)
-                    .toList();
+                .toList());
+        // tkDestroyerCup's Avenge AC can target ground forces
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        boolean avengeAcUsed = game.isTwilightsFallMode() && (game.isTwilightKart() || game.isTkDestroyerCup());
+        if (nekro || avengeAcUsed) {
+            allowedUnits.add(UnitType.Mech.getValue());
+            allowedUnits.add(UnitType.Infantry.getValue());
         }
+
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
             if (ownedUnit != null) {

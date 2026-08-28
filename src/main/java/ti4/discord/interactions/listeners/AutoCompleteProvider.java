@@ -483,10 +483,12 @@ class AutoCompleteProvider {
                         "ordinian",
                         "te",
                         "tf",
-                        "twilightkart",
                         "twilightds",
                         "tedemo",
-                        "noswap");
+                        "noswap",
+                        Constants.TWILIGHT_KART,
+                        Constants.TK_DESTROYER_CUP,
+                        Constants.TK_NOVA_CUP);
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }

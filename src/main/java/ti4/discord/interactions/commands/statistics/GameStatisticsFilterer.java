@@ -246,8 +246,11 @@ public class GameStatisticsFilterer {
             case "tf" -> game.isTwilightsFallMode();
             case "tedemo" -> game.isThundersEdgeDemo();
             case "noswap" -> game.isNoSwapMode();
-            case "twilightkart" -> game.isTwilightKart();
             case "twilightds" -> game.isTwilightDS();
+            // isTwilightKart is Deprecated. Once removed, replace with isTkDestroyerCup || isTkNovaCup
+            case Constants.TWILIGHT_KART -> game.isTwilightKart();
+            case Constants.TK_DESTROYER_CUP -> game.isTkDestroyerCup();
+            case Constants.TK_NOVA_CUP -> game.isTkNovaCup();
             default -> false;
         };
     }

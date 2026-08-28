@@ -8763,7 +8763,8 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planet);
             String message;
             String action = " Diplo ";
-            if (game.isTwilightKart()) {
+            // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+            if (game.isTwilightKart() || game.isTkDestroyerCup()) {
                 action = " make _Sanctuary_ in ";
             }
             if (tile != null) {

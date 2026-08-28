@@ -643,7 +643,10 @@ class GameSaveService {
         writeStrLine(writer, Constants.GENOME_DECK_ID, game.getGenomeSpliceDeckID());
         writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
         writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
+        // isTwilightKart is Deprecated. Once removed, remove this line
         writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
+        writeBoolLine(writer, Constants.TK_DESTROYER_CUP, game.isTkDestroyerCup());
+        writeBoolLine(writer, Constants.TK_NOVA_CUP, game.isTkNovaCup());
         writeBoolLine(writer, Constants.TWILIGHT_DS, game.isTwilightDS());
 
         writer.write(Constants.BAG_DRAFT + " "

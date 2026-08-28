@@ -657,7 +657,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setUnitSpliceDeckID("tf_units");
 
         // Overrides for TK mode
-        if (isTwilightKart()) {
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (isTwilightKart() || isTkDestroyerCup()) {
             agendaDeck = "agendas_twilight_kart";
             acDeck = "action_cards_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");

@@ -571,7 +571,10 @@ class GameLoadService {
                 case Constants.BASE_GAME_MODE -> game.setBaseGameMode(parseBooleanOrDefault(info, false));
                 case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(parseBooleanOrDefault(info, false));
                 case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(parseBooleanOrDefault(info, false));
+                // setTwilightKart is Deprecated. Once removed, remove this case
                 case Constants.TWILIGHT_KART -> game.setTwilightKart(parseBooleanOrDefault(info, false));
+                case Constants.TK_DESTROYER_CUP -> game.setTkDestroyerCup(parseBooleanOrDefault(info, false));
+                case Constants.TK_NOVA_CUP -> game.setTkNovaCup(parseBooleanOrDefault(info, false));
                 case Constants.TWILIGHT_DS -> game.setTwilightDS(parseBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(parseBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(parseBooleanOrDefault(info, false));
