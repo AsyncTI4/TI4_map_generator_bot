@@ -249,13 +249,11 @@ public class ActionCardStatsService {
                 computeEstimatedDraws(playsIncludingCanceled, copiesPerName);
 
         List<String> blocks = new ArrayList<>();
-      String header =
-          "\n_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with winners, using deck '" +
-              acDeck.getName() +
-              "'._\n";
+        String header =
+                "\n_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with winners, using deck '"
+                        + acDeck.getName()
+                        + "'._\n";
         blocks.add(header);
-
-        playerStats.appendTo(blocks);
 
         StringBuilder playAndCancelStats = new StringBuilder();
         Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);
@@ -294,6 +292,8 @@ public class ActionCardStatsService {
             appendOverruleStats(overruleTargets, OverruleStatsService.get().getCountPerStrategyCard(includedGameNames));
             blocks.add(overruleTargets.toString());
         }
+
+        playerStats.appendTo(blocks);
         if (includeDeveloperDebug) {
             StringBuilder developerDebug = new StringBuilder();
             appendUnattributedPlayDebug(developerDebug, unattributedPlays);

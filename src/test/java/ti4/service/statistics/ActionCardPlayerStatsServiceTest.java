@@ -97,15 +97,15 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player loser = addPlayer(game, "loser");
-        recordPlays(game, winner, 15);
+        recordPlays(game, winner, 20);
         recordPlays(game, loser, 40);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        assertThat(stats.getPlayers(15)).isEqualTo(2);
-        assertThat(stats.getWins(15)).isEqualTo(1);
-        assertThat(render(stats)).contains("- 15+ cards: 50% win rate (1/2 players; 100% of all players)\n");
+        assertThat(stats.getPlayers(20)).isEqualTo(2);
+        assertThat(stats.getWins(20)).isEqualTo(1);
+        assertThat(render(stats)).contains("- 20+ cards: 50% win rate (1/2 players; 100% of all players)\n");
     }
 
     @Test
@@ -113,7 +113,7 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
         Player loser = addPlayer(game, "loser");
-        recordPlays(game, winner, 14);
+        recordPlays(game, winner, 19);
         recordPlays(game, loser, 1);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
@@ -121,9 +121,10 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
 
         String rendered = render(stats);
         assertThat(rendered).contains("- 1 card: 0% win rate (0/1 players; 50% of all players)\n");
-        assertThat(rendered).contains("- 14 cards: 100% (1/1; 50%)\n");
-        // Nobody played 2 through 13, so those rows are left out rather than divided by zero.
-        assertThat(rendered).doesNotContain("- 2 cards:").doesNotContain("- 13 cards:");
+        // One short of the cap still gets a row of its own rather than joining the 20+ pile.
+        assertThat(rendered).contains("- 19 cards: 100% (1/1; 50%)\n");
+        // Nobody played 2 through 18, so those rows are left out rather than divided by zero.
+        assertThat(rendered).doesNotContain("- 2 cards:").doesNotContain("- 18 cards:");
     }
 
     @Test
@@ -146,15 +147,35 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
     void shouldMeasureTheBaselineFromTheSampleRatherThanAssumingIt() {
         Game game = new Game();
         Player winner = addPlayer(game, "winner");
-        addPlayer(game, "loser1");
+        Player loser1 = addPlayer(game, "loser1");
         addPlayer(game, "loser2");
         addPlayer(game, "loser3");
+        recordPlays(game, winner, 5);
+        recordPlays(game, loser1, 3);
 
         ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
         stats.accumulate(game, winner);
 
-        // One winner in four here, so the note has to say 25% and not the 16.7% of a full table.
-        assertThat(render(stats)).contains("A player won 25% of the time across this sample");
+        // One winner in four here, so it has to say 25% and not the 16.67% of a full table, and
+        // eight cards over the four players who could have played them.
+        assertThat(render(stats))
+                .contains("- The average win rate is 25%. The average number of action cards played is 2.00.\n");
+    }
+
+    @Test
+    void shouldAverageCardsOverThePlayersAboveTheCapAtTheirRealCounts() {
+        Game game = new Game();
+        Player winner = addPlayer(game, "winner");
+        Player loser = addPlayer(game, "loser");
+        recordPlays(game, winner, 40);
+        recordPlays(game, loser, 20);
+
+        ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
+        stats.accumulate(game, winner);
+
+        // Both sit in the 20+ row, which cannot be summed back into a total - the average has to
+        // come from the counts themselves or it would read 20.00.
+        assertThat(render(stats)).contains("The average number of action cards played is 30.00.\n");
     }
 
     @Test

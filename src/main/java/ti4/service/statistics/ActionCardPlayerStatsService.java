@@ -27,13 +27,17 @@ import ti4.model.FactionModel;
  */
 class ActionCardPlayerStatsService {
 
-    // Everything at or above this collects into one row. Playing twenty-odd cards in a game is
+    // Everything at or above this collects into one row. Getting through more than twenty cards is
     // rare enough that an exact row for each would be a column of rates off a handful of players.
-    private static final int MAX_EXACT_CARDS_PLAYED = 15;
+    private static final int MAX_EXACT_CARDS_PLAYED = 20;
 
     private final NavigableMap<Integer, WinRateCount> playersByCardsPlayed = new TreeMap<>();
     private final Map<String, Integer> gamesPerFaction = new HashMap<>();
     private final Map<String, Integer> cardsPlayedPerFaction = new HashMap<>();
+
+    // Kept apart from the rows above, which collapse everything at the cap into one key and so
+    // cannot be summed back into a true total.
+    private int totalCardsPlayed;
 
     void accumulate(Game game, Player winner) {
         // The 6-player filter counts this same list, so it is the one that gives six players a game.
@@ -66,6 +70,7 @@ class ActionCardPlayerStatsService {
             playersByCardsPlayed
                     .computeIfAbsent(Math.min(cardsPlayed, MAX_EXACT_CARDS_PLAYED), _ -> new WinRateCount())
                     .record(playerId.equals(winningPlayerId));
+            totalCardsPlayed += cardsPlayed;
             recordFaction(player.getFaction(), cardsPlayed);
         });
     }
@@ -96,14 +101,13 @@ class ActionCardPlayerStatsService {
         }
 
         int totalPlayers = totalOf(WinRateCount::getPlayers);
-        // Measured rather than assumed. One winner among six should put this at 16.7%, so anything
-        // else on screen is the denominator itself telling us it has gone wrong.
-        heading.append(" A player won ")
+
+        heading.append(" A card canceled by a Sabotage still counts - it was spent either way._\n")
+                .append("- The average win rate is ")
                 .append(ActionCardStatsService.formatPercent(totalOf(WinRateCount::getWins) / (double) totalPlayers))
-                .append(" of the time across this sample, which is the rate to read these against.")
-                // Sabotage goes unemphasised: the note is italicised as a whole, and the usual
-                // _Sabotage_ would close those italics early and leave the rest of it upright.
-                .append(" A card canceled by a Sabotage still counts - it was spent either way._\n");
+                .append(". The average number of action cards played is ")
+                .append(String.format("%.2f", totalCardsPlayed / (double) totalPlayers))
+                .append(".\n");
         blocks.add(heading.toString());
 
         boolean[] labelsPending = {true};
