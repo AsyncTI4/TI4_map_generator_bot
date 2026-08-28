@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -392,8 +393,8 @@ public class ActionCardStatsService {
                 .append(formatWeight(weights.playRate() / weights.total()))
                 .append(") and cancel rate (")
                 .append(formatWeight(weights.cancelRate() / weights.total()))
-                .append(
-                        "), each measured against the deck's best. Thin samples are pulled toward the deck average, and a \\* marks a card still too thin to trust. A rank (#) is the card's place against every other card for that figure._\n");
+                .append("). Thin samples are pulled toward the deck average, and a \\* marks a card still too thin to"
+                        + " trust. A rank (#) is the card's place against every other card for that figure._\n");
 
         double sabotageProofTotal = weights.winRate() + weights.playRate();
         if (sabotageProofTotal <= 0) {
@@ -664,9 +665,9 @@ public class ActionCardStatsService {
 
         ImpactRates rates = computeImpactRates(playToWinCorrelationCounts, estimatedDrawsPerCard);
         double impactScore = weights.score(
-                anchor(winRate, rates.bestWinRate()),
-                anchor(playRate, rates.bestPlayRate()),
-                anchor(cancelRate, rates.bestCancelRate()));
+                rates.winSpread().anchor(winRate),
+                rates.playSpread().anchor(playRate),
+                rates.cancelSpread().anchor(cancelRate));
 
         StringBuilder message = new StringBuilder();
         message.append("- **Average across all cards:**\n");
@@ -722,8 +723,9 @@ public class ActionCardStatsService {
     }
 
     // A card's impact is how well it wins, how much of the deck's draws it accounts for, and how
-    // badly opponents want it gone - weighted in that order. Each rate is measured against the
-    // deck's best, so a card that leads all three scores 100.
+    // badly opponents want it gone - weighted in that order. Each rate is measured across the
+    // deck's full spread on that figure, so a card that leads all three scores 100 and one that
+    // trails all three scores 0.
     private static ImpactRates computeImpactRates(
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, Integer> estimatedDrawsPerCard) {
@@ -751,7 +753,7 @@ public class ActionCardStatsService {
         });
 
         return new ImpactRates(
-                winRates, playRates, cancelRates, getMax(winRates), getMax(playRates), getMax(cancelRates));
+                winRates, playRates, cancelRates, Spread.of(winRates), Spread.of(playRates), Spread.of(cancelRates));
     }
 
     static Map<String, Double> computeImpactScores(
@@ -762,15 +764,18 @@ public class ActionCardStatsService {
         ImpactRates rates = computeImpactRates(playToWinCorrelationCounts, estimatedDrawsPerCard);
         Map<String, Double> impactScores = new HashMap<>();
         rates.winRates().forEach((cardName, winRate) -> {
-            double win = anchor(winRate, rates.bestWinRate());
-            double play = anchor(rates.playRates().get(cardName), rates.bestPlayRate());
+            double win = rates.winSpread().anchor(winRate);
+            double play = rates.playSpread().anchor(rates.playRates().get(cardName));
             if (unsabotageableCards.contains(cardName)) {
                 weights.scoreWithoutCancels(win, play).ifPresent(score -> impactScores.put(cardName, score));
                 return;
             }
             impactScores.put(
                     cardName,
-                    weights.score(win, play, anchor(rates.cancelRates().get(cardName), rates.bestCancelRate())));
+                    weights.score(
+                            win,
+                            play,
+                            rates.cancelSpread().anchor(rates.cancelRates().get(cardName))));
         });
         return impactScores;
     }
@@ -779,9 +784,22 @@ public class ActionCardStatsService {
             Map<String, Double> winRates,
             Map<String, Double> playRates,
             Map<String, Double> cancelRates,
-            double bestWinRate,
-            double bestPlayRate,
-            double bestCancelRate) {}
+            Spread winSpread,
+            Spread playSpread,
+            Spread cancelSpread) {}
+
+    private record Spread(double worst, double best) {
+
+        static Spread of(Map<String, Double> rates) {
+            DoubleSummaryStatistics stats =
+                    rates.values().stream().mapToDouble(Double::doubleValue).summaryStatistics();
+            return new Spread(stats.getMin(), stats.getMax());
+        }
+
+        double anchor(double rate) {
+            return best - worst <= 0 ? (best > 0 ? 1 : 0) : Math.clamp((rate - worst) / (best - worst), 0, 1);
+        }
+    }
 
     private record ReportOptions(
             ImpactWeights weights, boolean factionControl, boolean fullDetails, boolean developerDebug) {}
@@ -877,14 +895,6 @@ public class ActionCardStatsService {
             return MAX_PSEUDO_PLAYS;
         }
         return Math.clamp(binomialVariance / spread - 1, MIN_PSEUDO_PLAYS, MAX_PSEUDO_PLAYS);
-    }
-
-    private static double getMax(Map<String, Double> rates) {
-        return rates.values().stream().mapToDouble(Double::doubleValue).max().orElse(0);
-    }
-
-    private static double anchor(double rate, double best) {
-        return best <= 0 ? 0 : Math.min(rate / best, 1);
     }
 
     private static boolean isUnstable(PlayToWinCorrelationCount count, int copies) {

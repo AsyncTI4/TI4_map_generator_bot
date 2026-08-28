@@ -165,7 +165,8 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
 
     @Test
     void shouldLabelTheRatesOnTheLeadingCardOnly() {
-        // Overrule tops all three rates, so it anchors each of them and scores the full 100.
+        // Overrule tops all three rates and Lie in Wait trails all three, so with only two cards
+        // between them they take the ends of every spread: the full 100 and a flat zero.
         String rendered = renderCorrelation(
                 Map.of(GameStats.OVERRULE, playToWinCount(200, 150, 60), "Lie in Wait", playToWinCount(100, 90, 20)),
                 Map.of(GameStats.OVERRULE, 200, "Lie in Wait", 200),
@@ -175,7 +176,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         // having nothing to be ranked against. Every card below it abbreviates.
         assertThat(rendered).isEqualTo("""
                         - **Average across all cards:**
-                          - 75.9 Impact Score
+                          - 47.7 Impact Score
                           - 31.1% uncancelled play win rate
                           - 75.0% plays vs estimated draw rate
                           - 17.5% cancel rate
@@ -185,7 +186,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                           - 100.0% play (#1)
                           - 25.0% cancel (#1)
                         - **Lie in Wait:**
-                          - 53.9\\* Impact Score
+                          - 0.0\\* Impact Score
                           - 22.2% win (#2)
                           - 50.0% play (#2)
                           - 10.0% cancel (#2)
@@ -259,7 +260,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
 
         // Lie in Wait wins and is canceled far more often per play, which outweighs Overrule being
         // played twice as much - so it leads the list and carries the labels.
-        assertThat(rendered).contains("- 87.5\\* Impact Score").contains("- 64.0 Impact Score");
+        assertThat(rendered).contains("- 75.0\\* Impact Score").contains("- 25.0 Impact Score");
         assertThat(rendered).contains("- 80.0% win (#1)").contains("- 40.0% win (#2)");
         assertThat(rendered).contains("- 50.0% play (#2)").contains("- 100.0% play (#1)");
         assertThat(rendered).contains("- 50.0% cancel (#1)").contains("- 25.0% cancel (#2)");
@@ -283,14 +284,15 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     @Test
     void shouldWeightTheRatesTwoOneOne() {
         // Neither card is ever canceled, so the cancel component pays nothing to anybody and the
-        // best score on offer is the other two weights. Lie in Wait matches Overrule's win rate but
-        // is played half as often, so it keeps the win weight and half the play weight.
+        // best score on offer is the other two weights. Lie in Wait matches Overrule's win rate, so
+        // both take the whole win weight; it is played half as often, and with only the two of them
+        // that puts it at the bottom of the play spread rather than halfway up it.
         String rendered = renderCorrelation(
                 Map.of(GameStats.OVERRULE, playToWinCount(100, 100, 50), "Lie in Wait", playToWinCount(50, 50, 25)),
                 Map.of(GameStats.OVERRULE, 100, "Lie in Wait", 100),
                 Map.of(GameStats.OVERRULE, 1, "Lie in Wait", 1));
 
-        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 62.5\\* Impact Score");
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 50.0\\* Impact Score");
     }
 
     @Test
@@ -388,14 +390,39 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     @Test
     void shouldNotLetATinySampleRunAwayWithTheScore() {
         // Two wins from two plays is a 100% win rate and nothing else. Shrinkage drags it back to
-        // near the deck average, and the play rate it never earned keeps it below the real card.
-        String rendered = renderCorrelation(
-                Map.of(GameStats.OVERRULE, playToWinCount(200, 200, 60), "Lucky Shot", playToWinCount(2, 2, 2)),
-                Map.of(GameStats.OVERRULE, 200, "Lucky Shot", 200),
-                Map.of(GameStats.OVERRULE, 1, "Lucky Shot", 1));
+        // near the deck average, and the play rate it never earned keeps it below the real cards.
+        //
+        // The field has to look like a real deck for this to mean anything. How hard to shrink is
+        // measured from how far apart the cards sit, so a two-card deck with the two of them 20
+        // points apart is told the differences are real and barely shrinks at all - and then the
+        // lucky card keeps a win rate it did nothing to earn. A deck clustered near its own average
+        // is what tells the estimator the spread is mostly luck.
+        Map<String, PlayToWinCorrelationCount> counts = new HashMap<>(Map.of(
+                GameStats.OVERRULE,
+                playToWinCount(200, 200, 60),
+                "Lucky Shot",
+                playToWinCount(2, 2, 2),
+                "Spy",
+                playToWinCount(200, 180, 36),
+                "Uprising",
+                playToWinCount(200, 175, 35),
+                "Parley",
+                playToWinCount(200, 170, 35),
+                "Rally",
+                playToWinCount(200, 185, 37),
+                "Plague",
+                playToWinCount(200, 190, 38)));
+        Map<String, Integer> draws = new HashMap<>();
+        Map<String, Integer> copies = new HashMap<>();
+        counts.keySet().forEach(name -> {
+            draws.put(name, 200);
+            copies.put(name, 1);
+        });
 
-        assertThat(rendered).contains("- 73.4 Impact Score").contains("- 50.2\\* Impact Score");
-        // The real card leads despite conceding the win-rate anchor to the lucky one.
+        String rendered = renderCorrelation(counts, draws, copies);
+
+        // The lucky card's 100% is shrunk back to 22.8%, leaving it last rather than first.
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 30.6\\* Impact Score");
         assertThat(rendered.indexOf(GameStats.OVERRULE)).isLessThan(rendered.indexOf("Lucky Shot"));
     }
 
@@ -408,10 +435,12 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
                 Map.of(GameStats.OVERRULE, 100, "Always Saboed", 100),
                 Map.of(GameStats.OVERRULE, 1, "Always Saboed", 1));
 
-        // With a quarter of the score riding on cancels, a card nobody is willing to let resolve
-        // leads the deck on that alone.
-        assertThat(rendered).contains("- 0.0% win (#2)").contains("- 77.5\\* Impact Score");
-        assertThat(rendered.indexOf("Always Saboed")).isLessThan(rendered.indexOf(GameStats.OVERRULE));
+        // Neither card can be separated on win rate - the one that never resolved is standing on
+        // the deck average, and the deck average is the other one's rate - so each takes the whole
+        // win weight, and they split the two figures that do separate them: Overrule leads on
+        // plays, the feared card leads on cancels, and they land level.
+        assertThat(rendered).contains("- 0.0% win (#2)");
+        assertThat(rendered).contains("- 75.0 Impact Score").contains("- 75.0\\* Impact Score");
     }
 
     @Test
