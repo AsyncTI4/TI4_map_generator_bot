@@ -1188,6 +1188,21 @@ public class StartPhaseService {
                             + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
             game.setStoredValue("postedSurvey", "yes");
         }
+
+        if (game.getRound() == 1
+                && !game.isFowMode()
+                && game.getActionCards().contains("overrule")
+                && game.getStoredValue("offeredOverrulePurge").isEmpty()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("purgeOverrule", "Purge Overrule"));
+            buttons.add(Buttons.gray("deleteButtons", "Keep Overrule"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getTableTalkChannel(),
+                    "This game's action card deck contains _Overrule_ (_perform the primary ability of a readied or unchosen strategy card_)."
+                            + " Some groups prefer to play without it. If the table agrees to remove it, you can use these buttons to purge it from the deck.",
+                    buttons);
+            game.setStoredValue("offeredOverrulePurge", "yes");
+        }
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {

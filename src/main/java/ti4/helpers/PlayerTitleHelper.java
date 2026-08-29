@@ -149,6 +149,29 @@ public class PlayerTitleHelper {
         }
     }
 
+    @ButtonHandler("purgeOverrule")
+    public static void purgeOverrule(ButtonInteractionEvent event, String buttonID, Game game) {
+        ButtonHelper.deleteMessage(event);
+        if (buttonID.contains("confirmed")) {
+            boolean removed = game.getActionCards().removeIf("overrule"::equals);
+            game.setStoredValue("removeOverrule", "true");
+
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    removed
+                            ? "Purged _Overrule_ from the action card deck."
+                            : "_Overrule_ was not in the action card deck, but it will be kept out if the deck is changed.");
+        } else {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("purgeOverruleconfirmed", "Purge Overrule"));
+            buttons.add(Buttons.gray("deleteButtons", "Oops Mistake"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    "Please confirm that you are pressing this button to purge _Overrule_ from the game.",
+                    buttons);
+        }
+    }
+
     @ButtonHandler("noSupportSwaps")
     public static void noSupportSwaps(ButtonInteractionEvent event, String buttonID, Game game) {
         game.setNoSwapMode(true);
