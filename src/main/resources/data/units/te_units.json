@@ -346,6 +346,7 @@
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Corsair",
+        "upgradesFromUnitId": "cruiser2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/te/faction/mentak_cruiser3.jpg?raw=true",
         "source": "thunders_edge",
         "faction": "mentak",
