@@ -3596,6 +3596,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
+        if ("true".equals(getStoredValue("removeOverrule"))) {
+            getActionCards().removeIf("overrule"::equals);
+        }
         return true;
     }
 
