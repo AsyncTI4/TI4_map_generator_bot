@@ -149,7 +149,6 @@ public class TeHelperActionCards {
                     "Could not find that player. Please resolve _Extreme Duress_ manually.");
             return;
         }
-        // If it was also pre-assigned, clear it so it does not fire a second time at the start of a turn.
         game.removeStoredValue("ExtremeDuress");
         sendExtremeDuressResolutionButtons(target, player);
         MessageHelper.sendMessageToChannel(
@@ -158,7 +157,6 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    /** Ask {@code target} to either concede to {@code duressPlayer}'s _Extreme Duress_ or take their strategic action. */
     public static void sendExtremeDuressResolutionButtons(Player target, Player duressPlayer) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(
