@@ -43,6 +43,7 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
@@ -281,17 +282,7 @@ public class StartTurnService {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.getPlayableActionCards().contains("extremeduress")) {
                     game.removeStoredValue("ExtremeDuress");
-                    ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
-                    List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red(
-                            player.factionButtonChecker() + "concedeToED_" + p2.getFaction(),
-                            "Lose Action Cards, Give Trade Goods, And Show Secrets"));
-                    buttons2.add(
-                            Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation() + ", please resolve _Extreme Duress_.",
-                            buttons2);
+                    TeHelperActionCards.autoResolveExtremeDuress(event, game, player, p2);
                 }
             }
         }
