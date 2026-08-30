@@ -1500,9 +1500,10 @@ public final class ButtonHelperModifyUnits {
                                 + " you may use this button to return fighters to space after combat concludes. This only needs to be done once.",
                         b2s);
             }
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
             if (game.isMonumentToTheAgesMode()
-                    && game.getPlayerFromColorOrFaction("neutral") != null
-                    && unitHolder.getUnitCount(UnitType.Spacedock, game.getPlayerFromColorOrFaction("neutral")) > 0
+                    && neutral != null
+                    && unitHolder.getUnitCount(UnitType.Spacedock, neutral) > 0
                     && !player.getPlanets().contains(unitHolder.getName())) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("takeMonument_" + unitHolder.getName(), "Take Control Of Monument"));
