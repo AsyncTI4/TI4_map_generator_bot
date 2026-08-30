@@ -718,7 +718,9 @@ public class ActionCardHelper {
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
-            if (activePlayer != null && (activePlayer.hasTech("tp") || activePlayer.hasTech("tf-crafty"))) {
+            if (activePlayer != null
+                    && activePlayer != player
+                    && (activePlayer.hasTech("tp") || activePlayer.hasTech("tf-crafty"))) {
                 return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }

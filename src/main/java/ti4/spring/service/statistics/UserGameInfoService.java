@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.game.Game;
@@ -16,6 +17,7 @@ import ti4.game.Player;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.PlayerEntity;
@@ -167,6 +169,12 @@ public class UserGameInfoService {
         if (managedPlayer == null) return false;
         int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
         int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
+        var userSettings = UserSettingsManager.get(managedPlayer.getId());
+        String trackRecord = userSettings.getTrackRecord();
+        int droppedGames = 0;
+        droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+        droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
+        completedGames += droppedGames;
         return ongoingAmount > completedGames + 2;
     }
 

@@ -390,6 +390,9 @@ public class PlayerTechService {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
                 }
+                if (game.isTwilightDS()) {
+                    player.exhaustTech("tf-dskortg");
+                }
             }
             case "td", "absol_td" -> // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(game, player);

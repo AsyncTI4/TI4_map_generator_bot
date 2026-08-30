@@ -201,6 +201,9 @@ public class AgendaRiderHelper {
     }
 
     public static List<Button> getAgendaButtons(String riderName, Game game, String prefix) {
+        if (game.getCurrentAgendaInfo() == null || !game.getCurrentAgendaInfo().contains("_")) {
+            return new ArrayList<Button>();
+        }
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
         String lower = agendaDetails.toLowerCase();
 

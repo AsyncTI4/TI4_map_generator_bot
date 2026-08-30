@@ -165,16 +165,13 @@ public class EmelparService {
 
     @ButtonHandler("emelparReady_relic_")
     private static void readyRelic(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "emelparReady_relic_" + RegexHelper.relicRegex(game);
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            String relicID = matcher.group("relic");
-            RelicModel model = Mapper.getRelic(relicID);
-            player2.removeExhaustedRelic(relicID);
-            String readyMsg = ExploreEmojis.Relic + " " + model.getName();
-            postSummary(event, player, readyMsg);
-        });
+        String relicID = buttonID.replace("emelparReady_relic_", "");
+        RelicModel model = Mapper.getRelic(relicID);
+        player2.removeExhaustedRelic(relicID);
+        String readyMsg = ExploreEmojis.Relic + " " + model.getName();
+        postSummary(event, player, readyMsg);
     }
 
     @ButtonHandler("emelparReady_tech_")
