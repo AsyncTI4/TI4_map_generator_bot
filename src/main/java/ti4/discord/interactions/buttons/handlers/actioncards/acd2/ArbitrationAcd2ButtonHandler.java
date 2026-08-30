@@ -23,165 +23,217 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 class ArbitrationAcd2ButtonHandler {
 
+    static final String UNOWNED_PLANETS_KEY = "unownedPlanets";
+    private static final String NEUTRAL_FACTION = "neutral";
+    private static final String COULD_NOT_RESOLVE = "Could not resolve _Arbitration_.";
+
     @ButtonHandler("resolveArbitration")
     public static void resolveArbitration(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getArbitrationOwnerButtons(game, player);
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = getInfantryPlayerButtons(game, player);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible planets for _Arbitration_.");
-            ButtonHelper.deleteMessage(event);
+                    player.getRepresentation()
+                            + ", there is nowhere to place an infantry into coexistence for _Arbitration_.");
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose which player's planets to inspect for _Arbitration_.",
+                player.getRepresentation() + ", choose whose reinforcements the _Arbitration_ infantry comes from.",
                 buttons);
+    }
+
+    @ButtonHandler("arbitrationInfantry_")
+    public static void resolveArbitrationInfantry(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
+        String payload = buttonID.replace("arbitrationInfantry_", "");
+        Player infantryPlayer = getPlayerFromFactionPrefix(game, payload);
+        if (!isEligibleInfantryPlayer(player, infantryPlayer)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), COULD_NOT_RESOLVE);
+            return;
+        }
+
+        List<Button> buttons = getPlanetOwnerButtons(game, player, infantryPlayer);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", there is nowhere to place "
+                            + infantryPlayer.getRepresentationNoPing() + "'s infantry for _Arbitration_.");
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose whose planets to place "
+                        + infantryPlayer.getRepresentationNoPing() + "'s infantry among for _Arbitration_.",
+                buttons);
     }
 
     @ButtonHandler("arbitrationOwner_")
     public static void resolveArbitrationOwner(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String owner = buttonID.replace("arbitrationOwner_", "");
-        List<Button> buttons = getArbitrationPlanetButtons(game, player, owner);
+        ButtonHelper.deleteMessage(event);
+        String payload = buttonID.replace("arbitrationOwner_", "");
+        Player infantryPlayer = getPlayerFromFactionPrefix(game, payload);
+        String ownerKey = getSuffixAfterFactionPrefix(payload);
+        if (!isEligibleInfantryPlayer(player, infantryPlayer) || ownerKey == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), COULD_NOT_RESOLVE);
+            return;
+        }
+
+        List<Button> buttons = getPlanetButtons(game, player, infantryPlayer, ownerKey);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " has no eligible planets for _Arbitration_ in that category.");
-            ButtonHelper.deleteMessage(event);
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose a non-home planet with ground forces for _Arbitration_.",
+                player.getRepresentation() + ", choose the planet " + infantryPlayer.getRepresentationNoPing()
+                        + " will place 1 infantry into coexistence on for _Arbitration_.",
                 buttons);
-        ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("arbitrationPlanet_")
-    public static void resolveArbitrationPlanet(
+    @ButtonHandler("arbitrationPlace_")
+    public static void resolveArbitrationPlace(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String[] buttonParts = buttonID.split("_", 3);
-        if (buttonParts.length < 3) {
-            return;
-        }
-        String planet = buttonParts[2];
-        List<Button> buttons = getArbitrationTargetButtons(game, player, planet);
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible target players for _Arbitration_ on "
-                            + Helper.getPlanetRepresentation(planet, game) + ".");
-            ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteMessage(event);
+        String payload = buttonID.replace("arbitrationPlace_", "");
+        Player infantryPlayer = getPlayerFromFactionPrefix(game, payload);
+        String planetName = getSuffixAfterFactionPrefix(payload);
+        Planet planet = planetName == null ? null : game.getUnitHolderFromPlanet(planetName);
+        Tile tile = planetName == null ? null : game.getTileFromPlanet(planetName);
+        if (!isEligibleInfantryPlayer(player, infantryPlayer)
+                || planet == null
+                || tile == null
+                || !isCoexistenceTarget(game, planet, infantryPlayer)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), COULD_NOT_RESOLVE);
             return;
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", choose who will place 1 infantry into coexistence on "
-                        + Helper.getPlanetRepresentation(planet, game) + ".",
-                buttons);
-        ButtonHelper.deleteMessage(event);
+        placeInfantryIntoCoexistence(game, event, tile, infantryPlayer, planetName);
+
+        String message = player.getRepresentation() + " used _Arbitration_ to place 1 "
+                + infantryPlayer.getRepresentationNoPing() + " infantry into coexistence on "
+                + Helper.getPlanetRepresentation(planetName, game) + ".";
+        announceToPlayerAndAffected(player, message, infantryPlayer, game.getPlanetOwner(planetName));
     }
 
-    @ButtonHandler("arbitrationTarget_")
-    public static void resolveArbitrationTarget(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String arbitrationTarget = buttonID.replace("arbitrationTarget_", "");
-        int lastSeparator = arbitrationTarget.lastIndexOf('_');
-        if (lastSeparator < 0) {
-            return;
-        }
-
-        String planet = arbitrationTarget.substring(0, lastSeparator);
-        String faction = arbitrationTarget.substring(lastSeparator + 1);
-        Player target = game.getPlayerFromColorOrFaction(faction);
-        Tile tile = game.getTileFromPlanet(planet);
-        if (target == null || tile == null || target == player || target.hasPlanet(planet)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Arbitration_.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
+    private static void placeInfantryIntoCoexistence(
+            Game game, ButtonInteractionEvent event, Tile tile, Player infantryPlayer, String planetName) {
         game.setStoredValue("coexistFlag", "yes");
-        AddUnitService.addUnits(event, tile, game, target.getColor(), "inf " + planet);
+        AddUnitService.addUnits(event, tile, game, infantryPlayer.getColor(), "inf " + planetName);
         game.removeStoredValue("coexistFlag");
         ButtonHelperAbilities.oceanBoundCheck(game);
-
-        String planetRepresentation = Helper.getPlanetRepresentation(planet, game);
-        String message = player.getRepresentation() + " chose " + target.getRepresentationNoPing()
-                + " to place 1 infantry into coexistence on " + planetRepresentation + " using _Arbitration_.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        if (!Objects.equals(player.getCorrectChannel(), target.getCorrectChannel())) {
-            MessageHelper.sendMessageToChannel(target.getCorrectChannel(), message);
-        }
-        ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Button> getArbitrationOwnerButtons(Game game, Player player) {
+    private static void announceToPlayerAndAffected(Player player, String message, Player... affectedPlayers) {
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        for (Player affected : affectedPlayers) {
+            if (affected != null
+                    && affected != player
+                    && !Objects.equals(player.getCorrectChannel(), affected.getCorrectChannel())) {
+                MessageHelper.sendMessageToChannel(affected.getCorrectChannel(), message);
+            }
+        }
+    }
+
+    static List<Button> getInfantryPlayerButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player infantryPlayer : game.getRealPlayers()) {
+            if (!isEligibleInfantryPlayer(player, infantryPlayer)
+                    || getPlanetOwnerButtons(game, player, infantryPlayer).isEmpty()) {
+                continue;
+            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "arbitrationInfantry_" + infantryPlayer.getFaction(),
+                    "gray",
+                    infantryPlayer));
+        }
+        return buttons;
+    }
+
+    static List<Button> getPlanetOwnerButtons(Game game, Player player, Player infantryPlayer) {
         List<Button> buttons = new ArrayList<>();
         for (Player owner : game.getRealPlayers()) {
-            if (owner == player
-                    || getArbitrationPlanetButtons(game, player, owner.getFaction())
+            if (owner == infantryPlayer
+                    || getPlanetButtons(game, player, infantryPlayer, owner.getFaction())
                             .isEmpty()) {
                 continue;
             }
             buttons.add(FoWHelper.fogSafeTargetButton(
-                    player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(), "gray", owner));
+                    getOwnerButtonId(player, infantryPlayer, owner.getFaction()), "gray", owner));
         }
 
-        if (!getArbitrationPlanetButtons(game, player, "neutralUnits").isEmpty()) {
-            buttons.add(Buttons.gray(player.factionButtonChecker() + "arbitrationOwner_neutralUnits", "Neutral Units"));
+        if (!getPlanetButtons(game, player, infantryPlayer, UNOWNED_PLANETS_KEY).isEmpty()) {
+            buttons.add(Buttons.gray(getOwnerButtonId(player, infantryPlayer, UNOWNED_PLANETS_KEY), "Unowned Planets"));
         }
         return buttons;
     }
 
-    private static List<Button> getArbitrationPlanetButtons(Game game, Player player, String owner) {
-        List<String> planets = new ArrayList<>();
+    static List<Button> getPlanetButtons(Game game, Player player, Player infantryPlayer, String ownerKey) {
+        List<String> planetNames = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.isHomeSystem(game)) {
-                continue;
-            }
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (!isArbitrationPlanetInCategory(game, planet, owner)
-                        || getArbitrationTargetButtons(game, player, planet.getName())
-                                .isEmpty()) {
-                    continue;
+                if (matchesOwnerCategory(game, planet, ownerKey) && isCoexistenceTarget(game, planet, infantryPlayer)) {
+                    planetNames.add(planet.getName());
                 }
-                planets.add(planet.getName());
             }
         }
 
-        Collections.sort(planets);
-        return planets.stream()
-                .map(planet -> Buttons.green(
-                        player.factionButtonChecker() + "arbitrationPlanet_" + owner + "_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)))
+        Collections.sort(planetNames);
+        return planetNames.stream()
+                .map(planetName -> Buttons.green(
+                        player.factionButtonChecker() + "arbitrationPlace_" + infantryPlayer.getFaction() + "_"
+                                + planetName,
+                        Helper.getPlanetRepresentation(planetName, game)))
                 .toList();
     }
 
-    private static boolean isArbitrationPlanetInCategory(Game game, Planet planet, String owner) {
-        if ("neutralUnits".equals(owner)) {
-            return planet.hasGroundForces(game.getNeutral());
-        }
-        Player planetOwner = game.getPlanetOwner(planet.getName());
-        return planetOwner != null && owner.equals(planetOwner.getFaction()) && planet.hasGroundForces(game);
+    private static String getOwnerButtonId(Player player, Player infantryPlayer, String ownerKey) {
+        return player.factionButtonChecker() + "arbitrationOwner_" + infantryPlayer.getFaction() + "_" + ownerKey;
     }
 
-    private static List<Button> getArbitrationTargetButtons(Game game, Player player, String planet) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player target : game.getRealPlayers()) {
-            if (target == player || target.hasPlanet(planet)) {
-                continue;
-            }
-            buttons.add(FoWHelper.fogSafeTargetButton(
-                    player.factionButtonChecker() + "arbitrationTarget_" + planet + "_" + target.getFaction(),
-                    "gray",
-                    target));
+    private static boolean matchesOwnerCategory(Game game, Planet planet, String ownerKey) {
+        Player controller = game.getPlanetOwner(planet.getName());
+        if (UNOWNED_PLANETS_KEY.equals(ownerKey)) {
+            return controller == null;
         }
-        return buttons;
+        return controller != null && ownerKey.equals(controller.getFaction());
+    }
+
+    static boolean isCoexistenceTarget(Game game, Planet planet, Player infantryPlayer) {
+        return !planet.isHomePlanet(game)
+                && game.getPlanetOwner(planet.getName()) != infantryPlayer
+                && hasCoexistencePartner(game, planet, infantryPlayer);
+    }
+
+    static boolean hasCoexistencePartner(Game game, Planet planet, Player infantryPlayer) {
+        return neutralHasGroundForces(game, planet)
+                || game.getRealPlayers().stream()
+                        .anyMatch(other -> other != infantryPlayer && planet.hasGroundForces(other));
+    }
+
+    private static boolean neutralHasGroundForces(Game game, Planet planet) {
+        Player neutral = game.getPlayerFromColorOrFaction(NEUTRAL_FACTION);
+        return neutral != null && planet.hasGroundForces(neutral);
+    }
+
+    private static boolean isEligibleInfantryPlayer(Player player, Player infantryPlayer) {
+        return infantryPlayer != null && infantryPlayer != player;
+    }
+
+    private static Player getPlayerFromFactionPrefix(Game game, String payload) {
+        return game.getPlayerFromColorOrFaction(payload.split("_", 2)[0]);
+    }
+
+    private static String getSuffixAfterFactionPrefix(String payload) {
+        String[] parts = payload.split("_", 2);
+        return parts.length < 2 ? null : parts[1];
     }
 }
