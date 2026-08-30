@@ -60,7 +60,8 @@ public class TeHelperActionCards {
                 buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
-            case "crisis", "extremeduress" -> nop(); // preset
+            case "crisis" -> nop(); // preset
+            case "extremeduress" -> buttons.add(Buttons.green(ffcc + "extremeDuressStart", resolve));
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
             case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
@@ -111,6 +112,61 @@ public class TeHelperActionCards {
         String message = "Choose the player who you are trying to have an exchange with.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("extremeDuressStart")
+    private static void extremeDuressStart(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (!p2.hasUnplayedSCs()) {
+                continue;
+            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "extremeDuressTarget_" + p2.getColor(), "gray", p2));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", no other player has a readied strategy card, so there is no legal target for _Extreme Duress_ right now.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the player who will experience _Extreme Duress_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("extremeDuressTarget_")
+    private static void extremeDuressTarget(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String color = buttonID.split("_")[1];
+        Player target = game.getPlayerFromColorOrFaction(color);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find that player. Please resolve _Extreme Duress_ manually.");
+            return;
+        }
+        // If it was also pre-assigned, clear it so it does not fire a second time at the start of a turn.
+        game.removeStoredValue("ExtremeDuress");
+        sendExtremeDuressResolutionButtons(target, player);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " played _Extreme Duress_ on " + target.getRepresentationNoPing() + ".");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    /** Ask {@code target} to either concede to {@code duressPlayer}'s _Extreme Duress_ or take their strategic action. */
+    public static void sendExtremeDuressResolutionButtons(Player target, Player duressPlayer) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(
+                target.factionButtonChecker() + "concedeToED_" + duressPlayer.getFaction(),
+                "Lose Action Cards, Give Trade Goods, And Show Secrets"));
+        buttons.add(Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(), target.getRepresentation() + ", please resolve _Extreme Duress_.", buttons);
     }
 
     @ButtonHandler("concedeToED")
