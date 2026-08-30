@@ -226,8 +226,8 @@ public class CreateGameButtonHandler {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
             int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            var userSettings = UserSettingsManager.get(member.getId());
             if (managedPlayer != null) {
-                var userSettings = UserSettingsManager.get(managedPlayer.getId());
                 String trackRecord = userSettings.getTrackRecord();
                 int droppedGames = 0;
                 droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
