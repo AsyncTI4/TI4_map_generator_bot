@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -48,6 +49,8 @@ import ti4.service.unit.RemoveUnitService;
 @UtilityClass
 public class TeHelperActionCards {
 
+    public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
+
     public static void nop() {}
 
     public static boolean resolveTeActionCard(ActionCardModel card, Player player, String introMsg) {
@@ -61,7 +64,11 @@ public class TeHelperActionCards {
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
             case "crisis" -> nop(); // preset
-            case "extremeduress" -> buttons.add(Buttons.green(ffcc + "extremeDuressStart", resolve));
+            case "extremeduress" -> {
+                if (!isAutoResolvingExtremeDuress(player.getGame())) {
+                    buttons.add(Buttons.green(ffcc + "extremeDuressStart", resolve));
+                }
+            }
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
             case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
@@ -155,6 +162,21 @@ public class TeHelperActionCards {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " played _Extreme Duress_ on " + target.getRepresentationNoPing() + ".");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void autoResolveExtremeDuress(
+            GenericInteractionCreateEvent event, Game game, Player target, Player duressPlayer) {
+        game.setStoredValue(EXTREME_DURESS_AUTO_RESOLVING, "true");
+        try {
+            ActionCardHelper.playAC(event, game, duressPlayer, "extremeduress", game.getMainGameChannel());
+        } finally {
+            game.removeStoredValue(EXTREME_DURESS_AUTO_RESOLVING);
+        }
+        sendExtremeDuressResolutionButtons(target, duressPlayer);
+    }
+
+    private static boolean isAutoResolvingExtremeDuress(Game game) {
+        return !game.getStoredValue(EXTREME_DURESS_AUTO_RESOLVING).isEmpty();
     }
 
     public static void sendExtremeDuressResolutionButtons(Player target, Player duressPlayer) {

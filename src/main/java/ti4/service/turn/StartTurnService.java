@@ -282,8 +282,7 @@ public class StartTurnService {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.getPlayableActionCards().contains("extremeduress")) {
                     game.removeStoredValue("ExtremeDuress");
-                    ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
-                    TeHelperActionCards.sendExtremeDuressResolutionButtons(player, p2);
+                    TeHelperActionCards.autoResolveExtremeDuress(event, game, player, p2);
                 }
             }
         }
