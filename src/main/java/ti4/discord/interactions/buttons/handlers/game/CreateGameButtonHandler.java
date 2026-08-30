@@ -226,6 +226,12 @@ public class CreateGameButtonHandler {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
             int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            var userSettings = UserSettingsManager.get(managedPlayer.getId());
+            String trackRecord = userSettings.getTrackRecord();
+            int droppedGames = 0;
+            droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+            droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
+            completedGames += droppedGames;
             if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
                 memberList
                         .append("⚠️ (Above or equal game limit: ")
@@ -247,7 +253,6 @@ public class CreateGameButtonHandler {
                 }
                 memberList.append(" fastest 6 player game length(s) in days) ");
             }
-            var userSettings = UserSettingsManager.get(member.getId());
             String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
                 if (activityList.isEmpty()) {
@@ -498,7 +503,7 @@ public class CreateGameButtonHandler {
             String trackRecord = userSettings.getTrackRecord();
             int droppedGames = 0;
             droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
-            droppedGames -= StringUtils.countMatches(trackRecord, "dropped");
+            droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
             limitIncrease += droppedGames;
             if (ongoingAmount > completedGames + 2 + limitIncrease && ongoingAmount != 0) {
                 MessageHelper.sendMessageToChannel(

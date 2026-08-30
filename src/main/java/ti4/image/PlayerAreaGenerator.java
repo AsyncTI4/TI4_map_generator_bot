@@ -1788,7 +1788,7 @@ public class PlayerAreaGenerator {
 
             if (reinforcementsPosition != null) {
                 int unitCap = player.getUnitCap(unitID);
-                if (unitCap == 0) {
+                if (unitCap == 0 && !"fs".equals(unitID)) {
                     unitCap = reinforcementsPosition.getPositionCount(unitID);
                 }
 

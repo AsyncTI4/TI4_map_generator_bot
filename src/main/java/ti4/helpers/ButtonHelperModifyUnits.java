@@ -1501,6 +1501,7 @@ public final class ButtonHelperModifyUnits {
                         b2s);
             }
             if (game.isMonumentToTheAgesMode()
+                    && game.getPlayerFromColorOrFaction("neutral") != null
                     && unitHolder.getUnitCount(UnitType.Spacedock, game.getPlayerFromColorOrFaction("neutral")) > 0
                     && !player.getPlanets().contains(unitHolder.getName())) {
                 List<Button> b2s = new ArrayList<>();

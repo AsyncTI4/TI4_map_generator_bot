@@ -1488,6 +1488,9 @@ class AutoCompleteProvider {
                         List<Command.Choice> options = Mapper.getTechs().values().stream()
                                 .filter(entry -> entry.getFaction().isPresent())
                                 .filter(entry -> entry.search(enteredValue))
+                                .filter(model -> model.getSource() != ComponentSource.miltymod
+                                        && model.getSource() != ComponentSource.project_pi
+                                        && model.getSource() != ComponentSource.asteroid)
                                 .limit(25)
                                 .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
                                 .collect(Collectors.toList());

@@ -2120,6 +2120,7 @@ public class TransactionHelper {
                     Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Offer More"));
             stuffToTransButtons.add(Buttons.gray("sendOffer_" + p1.getFaction(), "Send the Offer"));
         }
+        stuffToTransButtons.add(Buttons.red("deleteButtons", "Delete This Transaction"));
 
         return stuffToTransButtons;
     }
