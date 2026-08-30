@@ -169,12 +169,14 @@ public class UserGameInfoService {
         if (managedPlayer == null) return false;
         int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
         int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-        var userSettings = UserSettingsManager.get(managedPlayer.getId());
-        String trackRecord = userSettings.getTrackRecord();
-        int droppedGames = 0;
-        droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
-        droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
-        completedGames += droppedGames;
+        if (managedPlayer != null) {
+            var userSettings = UserSettingsManager.get(managedPlayer.getId());
+            String trackRecord = userSettings.getTrackRecord();
+            int droppedGames = 0;
+            droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+            droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
+            completedGames += droppedGames;
+        }
         return ongoingAmount > completedGames + 2;
     }
 
