@@ -22,15 +22,19 @@ import net.dv8tion.jda.api.requests.restaction.pagination.ThreadChannelPaginatio
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.JdaService;
+import ti4.testUtils.BaseTi4Test;
 
-class PlayerTest {
+class PlayerTest extends BaseTi4Test {
 
     private final PrintStream originalSystemOut = System.out;
 
     @AfterEach
     void afterEach() {
-        JdaService.jda = null;
-        JdaService.testingMode = false;
+        // Restore to BaseTi4Test's shared values rather than null/false - this suite runs all test
+        // classes in one JVM fork, so leaving JdaService in a per-test-only state here would leak
+        // into whichever test class runs next.
+        JdaService.jda = mockJda;
+        JdaService.testingMode = true;
         System.setOut(originalSystemOut);
     }
 

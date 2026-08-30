@@ -36,6 +36,9 @@
     - E.g. war sun "Other players' units in this system lose PLANETARY SHIELD."
     - E.g. space dock "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
 - For technologies and unit abilities, split unrelated abilities by a single newline
+# Accessibility
+- Don't rely on red/green color alone to convey meaning (e.g. success/failure, allowed/disallowed);
+  - Pair color-coded state with text or an emoji so it doesn't depend on color vision;
 # Vocabulary
 - Short faction names should be what appears on their promissory notes/unit upgrades;
   - In particular, "N'orr", "Creuss", "Vuil'raith", "Ul";

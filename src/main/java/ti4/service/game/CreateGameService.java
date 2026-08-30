@@ -51,6 +51,7 @@ import ti4.message.MessageHelper;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -231,6 +232,8 @@ public class CreateGameService {
             player.getCardsInfoThread();
         }
 
+        applyColorAccessibilityDefaults(newGame);
+
         // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " + role.getName()
                 + "\n> " + chatChannel.getAsMention()
@@ -265,6 +268,40 @@ public class CreateGameService {
         }
 
         return newGame;
+    }
+
+    // Applies game-wide accommodations when a participant has opted into color-accessibility cues,
+    // and privately confirms this to that player only (their color preference is not announced
+    // to the rest of the table). The hexBorderStyle change is intentionally applied game-wide
+    // rather than gated behind a separate host opt-in: it's a low-severity cosmetic default (not a
+    // per-player identity change) that the host can freely revert via the existing game
+    // customization options (see CustomizationOptions/GameOptionButtonHandler).
+    private static void applyColorAccessibilityDefaults(Game game) {
+        if (!GameColorsService.hasColorAccessibilityPlayer(game)) {
+            return;
+        }
+        game.setHexBorderStyle("dash");
+        // The initial GameManager.save in createNewGame already ran before this point, so persist
+        // this mutation explicitly - otherwise it only survives in memory until some unrelated
+        // later action happens to save the game.
+        GameManager.save(game, "Applied color-accessibility defaults");
+        // Not game.getRealPlayers() - no one has picked a faction/color yet at creation time, so
+        // isRealPlayer() would filter out every player here.
+        for (Player player : game.getPlayers().values()) {
+            if (player.isNpc() || player.isDummy()) {
+                continue;
+            }
+            String colorVisionPref = player.getUserSettings().getColorVisionPref();
+            if (UserSettings.COLOR_VISION_RED_GREEN.equals(colorVisionPref)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        "Color accessibility cues are enabled for you in this game: your color will be auto-assigned to avoid common red/green confusion pairs where possible. Async staff kindly request you also consider `/player change_unit_decal` to give your units a pattern that's distinct per-player, independent of color - useful as a backup, since the automatic checks only cover that common form. Tile-control borders will also render dashed for extra visibility, though the border is still colored per-player, not patterned per-player, so it won't by itself tell two players' borders apart.");
+            } else if (UserSettings.COLOR_VISION_OTHER.equals(colorVisionPref)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        "Color accessibility cues are enabled for you in this game. Our automatic checks only cover common red/green confusion, so they can't guard against your specific form of color vision deficiency. Async staff kindly request you consider `/player change_unit_decal`, giving your units a pattern that's distinct per-player, independent of color. Tile-control borders will also render dashed for extra visibility, though the border is still colored per-player, not patterned per-player, so it won't by itself tell two players' borders apart.");
+            }
+        }
     }
 
     public static void presentSetupToPlayers(Game game) {
