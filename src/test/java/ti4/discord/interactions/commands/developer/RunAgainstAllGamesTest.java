@@ -21,6 +21,59 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
                 .isEqualTo("keleresa");
     }
 
+    /**
+     * Keleres predates the re-skinned Keleres planets, so the games this command exists for hold the
+     * base faction's planet ids. The player's faction is already known to be Keleres, so these name
+     * a flavour just as well as the k-suffixed ones.
+     */
+    @Test
+    void shouldNameTheFlavourFromTheBaseFactionsPlanetIds() {
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("mollprimus", "wellon")))
+                .isEqualTo("keleresm");
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("archonren", "archontau")))
+                .isEqualTo("keleresx");
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("valk", "avar", "ylir")))
+                .isEqualTo("keleresa");
+    }
+
+    @Test
+    void shouldNameTheFlavourFromTheTileThePlayerIsAnchoredTo() {
+        Game mentakHome = gameWithTiles("02");
+        assertThat(RunAgainstAllGames.factionFromTheirOwnHomeTile(mentakHome, anchoredAt(mentakHome, "101")))
+                .isEqualTo("keleresm");
+
+        Game xxchaHome = gameWithTiles("14");
+        assertThat(RunAgainstAllGames.factionFromTheirOwnHomeTile(xxchaHome, anchoredAt(xxchaHome, "101")))
+                .isEqualTo("keleresx");
+
+        Game argentHome = gameWithTiles("58");
+        assertThat(RunAgainstAllGames.factionFromTheirOwnHomeTile(argentHome, anchoredAt(argentHome, "101")))
+                .isEqualTo("keleresa");
+    }
+
+    /**
+     * A board-wide sweep must not read the base home systems, since 02, 14 and 58 belong to Mentak,
+     * Xxcha and Argent whenever those factions are the ones playing them.
+     */
+    @Test
+    void shouldNotSweepTheBoardForBaseFactionHomeSystems() {
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("02", "19")))
+                .isNull();
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("14", "58")))
+                .isNull();
+    }
+
+    @Test
+    void shouldNotGuessFromAnAnchorPointingAtNothingKeleres() {
+        Game game = gameWithTiles("19");
+        assertThat(RunAgainstAllGames.factionFromTheirOwnHomeTile(game, anchoredAt(game, "101")))
+                .isNull();
+        assertThat(RunAgainstAllGames.factionFromTheirOwnHomeTile(game, anchoredAt(game, "999")))
+                .isNull();
+        assertThat(RunAgainstAllGames.factionFromTheirOwnHomeTile(game, anchoredAt(game, null)))
+                .isNull();
+    }
+
     @Test
     void shouldNotGuessFromPlanetsThatNameNoFlavourOrMoreThanOne() {
         assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("wellon", "vefutii")))
@@ -65,6 +118,14 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
         player.setFaction("keleres");
         player.setColor("red");
         player.getPlanets().addAll(List.of(planets));
+        return player;
+    }
+
+    private static Player anchoredAt(Game game, String position) {
+        Player player = game.addPlayer("user-" + position, "user");
+        player.setFaction("keleres");
+        player.setColor("red");
+        player.setPlayerStatsAnchorPosition(position);
         return player;
     }
 
