@@ -449,7 +449,7 @@ public class PlanetWinRateStatisticsService {
     private static void appendHomePlanetsLostSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Home planets lost\n"
                 + "_Players who ended the game without every planet of their own home system. Coexisting on one"
-                + " counts as holding it, so keeping a home system means holding or coexisting on all of it._\n");
+                + " counts as holding it._\n");
 
         blocks.add(renderCombinedHomePlanetsLostLine(stats.overall));
         wellSampledFactions(stats)
