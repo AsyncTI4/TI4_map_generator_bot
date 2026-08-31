@@ -36,6 +36,13 @@ class RunAgainstAllGames extends Subcommand {
     private static final String LEGACY_KELERES_FACTION = "keleres";
 
     /**
+     * What a player nothing in their game can place becomes. The handful this catches are all
+     * unfinished or fog games that no statistic reads, so the flavour is a label rather than a
+     * finding - each one is listed in the report so the guess stays visible.
+     */
+    private static final String DEFAULT_KELERES_FACTION = "keleresm";
+
+    /**
      * The Keleres-only home systems. Nobody else sits on these, so one of them anywhere on a board
      * names the flavour even when the player it belonged to cannot be placed any other way.
      */
@@ -93,7 +100,7 @@ class RunAgainstAllGames extends Subcommand {
                         + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
         List<String> retypedGames = new ArrayList<>();
-        List<String> undeterminedGames = new ArrayList<>();
+        List<String> defaultedPlayers = new ArrayList<>();
         int[] retypedPlayers = {0};
         int[] restoredPositions = {0};
 
@@ -121,8 +128,8 @@ class RunAgainstAllGames extends Subcommand {
                             faction = orphanedBaseFaction;
                         }
                         if (faction == null) {
-                            undeterminedGames.add(describeUndetermined(game, player));
-                            continue;
+                            faction = DEFAULT_KELERES_FACTION;
+                            defaultedPlayers.add(describeUndetermined(game, player));
                         }
                         String homePosition = homeSystemPositionFor(game, faction);
                         if (homePosition != null) {
@@ -148,7 +155,7 @@ class RunAgainstAllGames extends Subcommand {
                 },
                 dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
-        report(event, dryRun, retypedGames, undeterminedGames, retypedPlayers[0], restoredPositions[0]);
+        report(event, dryRun, retypedGames, defaultedPlayers, retypedPlayers[0], restoredPositions[0]);
     }
 
     /**
@@ -269,7 +276,7 @@ class RunAgainstAllGames extends Subcommand {
             SlashCommandInteractionEvent event,
             boolean dryRun,
             List<String> retypedGames,
-            List<String> undeterminedGames,
+            List<String> defaultedPlayers,
             int retypedPlayers,
             int restoredPositions) {
         StringBuilder message = new StringBuilder();
@@ -282,19 +289,23 @@ class RunAgainstAllGames extends Subcommand {
                 .append(" games, ")
                 .append(restoredPositions)
                 .append(" of them with a home system position to restore.\n");
-        if (undeterminedGames.isEmpty()) {
-            message.append("Every legacy Keleres player was placed.");
+        if (defaultedPlayers.isEmpty()) {
+            message.append("Every legacy Keleres player was placed from their own game.");
         } else {
-            message.append("**Could not be determined (")
-                    .append(undeterminedGames.size())
+            message.append("**Nothing in the game said which flavour, so ")
+                    .append(DEFAULT_KELERES_FACTION)
+                    .append(" was used (")
+                    .append(defaultedPlayers.size())
                     .append("):**\n- ")
-                    .append(String.join("\n- ", undeterminedGames));
+                    .append(String.join("\n- ", defaultedPlayers));
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
 
         BotLogger.info((dryRun ? "[DRY RUN] Would retype " : "Retyped ") + retypedPlayers
                 + " legacy Keleres player(s) across " + retypedGames.size() + " games: "
                 + String.join(", ", retypedGames)
-                + (undeterminedGames.isEmpty() ? "" : " | Undetermined: " + String.join(", ", undeterminedGames)));
+                + (defaultedPlayers.isEmpty()
+                        ? ""
+                        : " | Defaulted to " + DEFAULT_KELERES_FACTION + ": " + String.join(", ", defaultedPlayers)));
     }
 }
