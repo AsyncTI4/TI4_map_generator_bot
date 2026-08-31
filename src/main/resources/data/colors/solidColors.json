@@ -174,7 +174,7 @@
         "aliases": ["pch"],
         "textColor": "black",
         "primaryColor": { "red": 232, "green": 184, "blue": 167 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["PINK"]
     },
     {
         "alias": "eth",
@@ -230,6 +230,6 @@
         "aliases": ["beg", "beige"],
         "textColor": "black",
         "primaryColor": { "red": 189, "green": 197, "blue": 133 },
-        "colorCategories": ["YELLOW"]
+        "colorCategories": ["BROWN"]
     }
 ]

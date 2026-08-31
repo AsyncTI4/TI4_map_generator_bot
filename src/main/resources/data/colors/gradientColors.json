@@ -24,7 +24,7 @@
         "textColor": "white",
         "primaryColor": { "red": 240, "green": 6, "blue": 6 },
         "secondaryColor": { "red": 245, "green": 245, "blue": 6 },
-        "colorCategories": ["RED"]
+        "colorCategories": ["ORANGE"]
     },
     {
         "alias": "gcr",
@@ -60,7 +60,7 @@
         "textColor": "black",
         "primaryColor": { "red": 255, "green": 100, "blue": 1 },
         "secondaryColor": { "red": 190, "green": 190, "blue": 1 },
-        "colorCategories": ["YELLOW"]
+        "colorCategories": ["ORANGE"]
     },
     {
         "alias": "bld",
@@ -78,7 +78,7 @@
         "textColor": "white",
         "primaryColor": { "red": 229, "green": 134, "blue": 0 },
         "secondaryColor": { "red": 79, "green": 40, "blue": 0 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "nvy",
