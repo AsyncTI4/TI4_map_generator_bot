@@ -265,6 +265,28 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldCountSilverFlamesOnEveryHomePlanetsLostLine() {
+        // pbd15718's shape: Crimson is silver flamed, so Ahk Creuxx is off the board entirely.
+        String report = render(repeatGame(MINIMUM_SAMPLE, game -> {
+            game.setStoredValue("silverFlamed", "crimson");
+            addPlayer(game, "crimson", false);
+            addPlayer(game, "sol", true, "jord", "wellon");
+        }));
+
+        assertThat(report).contains(" 25 Silver Flames (0% win rate).\n");
+        assertThat(report).contains("- **All factions**: 25/50 (50%) of players lost a home planet.");
+    }
+
+    @Test
+    void shouldLeaveTheSilverFlameSentenceOffWhenThereAreNone() {
+        Game game = newGame("1");
+        addPlayer(game, "letnev", false, "arcprime");
+        addPlayer(game, "sol", true, "jord", "wrenterra");
+
+        assertThat(render(List.of(game))).doesNotContain("Silver Flames");
+    }
+
+    @Test
     void shouldListTheGamesAFactionLostItsHomePlanetsIn() {
         Game game = newGame("1");
         game.setTile(new Tile("10", "101"));

@@ -165,7 +165,12 @@ public class PlanetWinRateStatisticsService {
             }
 
             SeatOutcome outcome = new SeatOutcome(
-                    isWinner, nonHomePlanets, coexistedOn.size(), lostAHomePlanet, coexistedThroughALoss);
+                    isWinner,
+                    nonHomePlanets,
+                    coexistedOn.size(),
+                    lostAHomePlanet,
+                    coexistedThroughALoss,
+                    wasSilverFlamed(game, faction));
             stats.overall.record(outcome);
             for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
                 stats.byFaction
@@ -224,10 +229,20 @@ public class PlanetWinRateStatisticsService {
                     .append(holder)
                     .append(')');
         }
-        if (game.getStoredValue("silverFlamed").contains(seat.player().getFaction())) {
+        if (wasSilverFlamed(game, seat.player().getFaction())) {
             sb.append(" [silverFlamed]");
         }
         return sb.append('\n').toString();
+    }
+
+    /**
+     * The Silver Flame purges a home system outright - SilverFlameService strips its planets from
+     * everyone, removes the tile and drops a silver flame tile in its place, so nobody took it. It
+     * stores the one faction it happened to under a single key, so this is an equality test rather
+     * than a lookup in a list.
+     */
+    private static boolean wasSilverFlamed(Game game, String faction) {
+        return game.getStoredValue("silverFlamed").equalsIgnoreCase(faction);
     }
 
     private static boolean isOcean(String planetId) {
@@ -302,7 +317,8 @@ public class PlanetWinRateStatisticsService {
             int nonHomePlanets,
             int coexistedPlanets,
             boolean lostHome,
-            boolean coexistedThroughALoss) {}
+            boolean coexistedThroughALoss,
+            boolean silverFlamed) {}
 
     private static List<String> buildReport(PlanetWinRateStats stats) {
         List<String> blocks = new ArrayList<>();
@@ -531,6 +547,7 @@ public class PlanetWinRateStatisticsService {
         }
         // No coexistence line here: it belongs to the one faction that can do it, not to a total
         // that every other faction is counted into.
+        appendSilverFlames(sb, group);
         return sb.append('\n').toString();
     }
 
@@ -549,7 +566,19 @@ public class PlanetWinRateStatisticsService {
         if (showCoexistence) {
             appendCoexistedThrough(sb, group);
         }
+        appendSilverFlames(sb, group);
         return sb.append('\n').toString();
+    }
+
+    private static void appendSilverFlames(StringBuilder sb, PlanetHoldingStats group) {
+        if (group.silverFlamed.getPlayers() == 0) {
+            return;
+        }
+        sb.append(". ")
+                .append(group.silverFlamed.getPlayers())
+                .append(" Silver Flames (")
+                .append(ActionCardStatsService.formatPercent(group.silverFlamed.getWinRate()))
+                .append(" win rate).");
     }
 
     private static void appendCoexistedThrough(StringBuilder sb, PlanetHoldingStats group) {
@@ -643,6 +672,8 @@ public class PlanetWinRateStatisticsService {
 
         final WinRateCount heldEveryHomePlanet = new WinRateCount();
 
+        final WinRateCount silverFlamed = new WinRateCount();
+
         final NavigableMap<Integer, WinRateCount> playersByCoexistBand = new TreeMap<>();
 
         int players;
@@ -668,6 +699,9 @@ public class PlanetWinRateStatisticsService {
                     .computeIfAbsent(coexistBandStartFor(outcome.coexistedPlanets()), _ -> new WinRateCount())
                     .record(outcome.isWinner());
             (outcome.lostHome() ? lostAHomePlanet : heldEveryHomePlanet).record(outcome.isWinner());
+            if (outcome.silverFlamed()) {
+                silverFlamed.record(outcome.isWinner());
+            }
         }
 
         double averageCoexistedPlanets() {
