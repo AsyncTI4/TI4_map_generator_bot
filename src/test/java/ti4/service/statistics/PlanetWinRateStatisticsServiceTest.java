@@ -255,13 +255,18 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
     @Test
     void shouldDropTheCoexistenceSectionEntirelyForPokOnly() {
-        Game game = prophecyOfKingsGame("1");
+        Game pokOnlyGame = withCoexistingTitans(prophecyOfKingsGame("1"));
+        Game bothExpansions = withCoexistingTitans(pokAndThundersEdgeGame("2"));
+
+        assertThat(render(List.of(pokOnlyGame), true)).doesNotContain("### Win rate by planets coexisted on");
+        assertThat(render(List.of(bothExpansions), false)).contains("### Win rate by planets coexisted on");
+    }
+
+    private static Game withCoexistingTitans(Game game) {
         game.setTile(new Tile("19", "101"));
         Player titans = addPlayer(game, "titans", false, "elysium");
         putInfantryOn(game, "wellon", titans);
-
-        assertThat(render(List.of(game), true)).doesNotContain("### Win rate by planets coexisted on");
-        assertThat(render(List.of(game), false)).contains("### Win rate by planets coexisted on");
+        return game;
     }
 
     @Test
@@ -284,39 +289,6 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         addPlayer(game, "sol", true, "jord", "wrenterra");
 
         assertThat(render(List.of(game))).doesNotContain("Silver Flames");
-    }
-
-    @Test
-    void shouldListTheGamesAFactionLostItsHomePlanetsIn() {
-        Game game = newGame("1");
-        game.setTile(new Tile("10", "101"));
-        addPlayer(game, "letnev", false, "arcprime");
-        addPlayer(game, "sol", true, "jord", "wrenterra");
-
-        String report = String.join("", PlanetWinRateStatisticsService.buildReport(List.of(game), false, "letnev"));
-
-        assertThat(report).contains("### Home planet losses for `letnev`\n");
-        assertThat(report).contains("- `planet-stats-1` Wren Terra (sol)\n");
-    }
-
-    @Test
-    void shouldSayAFactionNeverLostAHomePlanetWhenItDidNot() {
-        Game game = newGame("1");
-        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
-        addPlayer(game, "sol", true, "jord");
-
-        String report = String.join("", PlanetWinRateStatisticsService.buildReport(List.of(game), false, "letnev"));
-
-        assertThat(report).contains("- They never lost a home planet.\n");
-    }
-
-    @Test
-    void shouldLeaveTheHomeLossDebugSectionOutWhenNoFactionIsAskedFor() {
-        Game game = newGame("1");
-        addPlayer(game, "letnev", false, "arcprime");
-        addPlayer(game, "sol", true, "jord", "wrenterra");
-
-        assertThat(render(List.of(game))).doesNotContain("### Home planet losses for");
     }
 
     @Test
@@ -410,42 +382,43 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldTakeBothThundersEdgeAndProphecyOfKingsByDefault() {
-        Game thundersEdge = pokAndThundersEdgeGame("1");
+    void shouldTakeOnlyGamesCarryingBothExpansionsByDefault() {
+        Game bothExpansions = pokAndThundersEdgeGame("1");
         Game prophecyOfKings = prophecyOfKingsGame("2");
 
-        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(thundersEdge, false))
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(bothExpansions, false))
                 .isTrue();
         assertThat(PlanetWinRateStatisticsService.isEligibleGameType(prophecyOfKings, false))
-                .isTrue();
-
-        String report = render(List.of(thundersEdge, prophecyOfKings));
-        assertThat(report).contains("_Thunder's Edge and Prophecy of Kings games.");
-        assertThat(report).contains("Games analyzed: 2 | Players analyzed: 4\n");
-    }
-
-    @Test
-    void shouldDropThundersEdgeGamesWhenPokOnly() {
-        Game thundersEdge = pokAndThundersEdgeGame("1");
-        Game prophecyOfKings = prophecyOfKingsGame("2");
-
-        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(thundersEdge, true))
                 .isFalse();
-        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(prophecyOfKings, true))
-                .isTrue();
 
-        String report = render(List.of(thundersEdge, prophecyOfKings), true);
-        assertThat(report).contains("_Prophecy of Kings games, no Thunder's Edge.");
+        String report = render(List.of(bothExpansions, prophecyOfKings));
+        assertThat(report).contains("_Games with both Prophecy of Kings and Thunder's Edge.");
         assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
     }
 
     @Test
-    void shouldDropGamesThatAreNeitherThundersEdgeNorProphecyOfKings() {
+    void shouldTakeOnlyGamesWithoutThundersEdgeWhenPokOnly() {
+        Game bothExpansions = pokAndThundersEdgeGame("1");
+        Game prophecyOfKings = prophecyOfKingsGame("2");
+
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(bothExpansions, true))
+                .isFalse();
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(prophecyOfKings, true))
+                .isTrue();
+
+        String report = render(List.of(bothExpansions, prophecyOfKings), true);
+        assertThat(report).contains("_Prophecy of Kings games without Thunder's Edge.");
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+    }
+
+    @Test
+    void shouldDropGamesWithoutProphecyOfKingsEitherWay() {
         Game baseGame = pokAndThundersEdgeGame("1");
-        baseGame.setThundersEdge(false);
         baseGame.setProphecyOfKings(false);
 
         assertThat(PlanetWinRateStatisticsService.isEligibleGameType(baseGame, false))
+                .isFalse();
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(baseGame, true))
                 .isFalse();
         assertThat(render(List.of(baseGame))).contains("No games matched.\n");
     }

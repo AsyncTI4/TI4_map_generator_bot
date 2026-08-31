@@ -14,12 +14,7 @@ class PlanetWinRates extends Subcommand {
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 PlanetWinRateStatisticsService.POK_ONLY_OPTION,
-                "'true' for Prophecy of Kings games only, dropping Thunder's Edge (default: both)"));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        PlanetWinRateStatisticsService.HOME_LOSS_FACTION_OPTION,
-                        "List every game this faction ended without a home planet, and who holds it")
-                .setAutoComplete(true));
+                "'true' for Prophecy of Kings games without Thunder's Edge (default: games with both)"));
     }
 
     @Override
