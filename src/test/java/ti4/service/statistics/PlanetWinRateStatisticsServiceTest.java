@@ -114,35 +114,99 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldCountCoexistingOnAHomePlanetAsHoldingIt() {
+    void shouldCountDeepwroughtCoexistingOnItsHomePlanetAsHoldingIt() {
         Game game = newGame("1");
-        game.setTile(new Tile("01", "101"));
-        Player sol = addPlayer(game, "sol", true, "wellon");
-        Player letnev = addPlayer(game, "letnev", false, "arcprime", "wrenterra", "jord");
-        // Sol lost Jord to Letnev but still has infantry standing on it.
-        putInfantryOn(game, "jord", sol);
+        game.setTile(new Tile("95", "101"));
+        Player deepwrought = addPlayer(game, "deepwrought", false);
+        addPlayer(game, "sol", true, "jord", "ikatena");
+        // Sol took Ikatena, but the Deepwrought are still standing on it.
+        putInfantryOn(game, "ikatena", deepwrought);
 
         String report = render(List.of(game));
 
         assertThat(report)
                 .contains("- **All factions**: 0/2 (0%) of players lost a home planet."
                         + " Coexisted through 1/1 (100%) of home system losses.\n");
-        assertThat(letnev.getPlanets()).contains("jord");
+    }
+
+    /** Every other faction has to actually control its home planets to keep them. */
+    @Test
+    void shouldNotLetAnyOtherFactionCoexistThroughAHomePlanetLoss() {
+        Game game = newGame("1");
+        game.setTile(new Tile("01", "101"));
+        Player letnev = addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+        addPlayer(game, "sol", true, "jord");
+        // Letnev is standing on Jord, which does nothing for Sol or for Letnev's own home.
+        putInfantryOn(game, "jord", letnev);
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("- **All factions**: 0/2 (0%) of players lost a home planet\n");
+        assertThat(report).doesNotContain("Coexisted through");
     }
 
     @Test
-    void shouldStillCountALossWhenCoexistingOnOnlyOneOfTwoHomePlanets() {
+    void shouldStillCountALossWhenDeepwroughtIsNotStandingOnItsHome() {
         Game game = newGame("1");
-        game.setTile(new Tile("10", "101"));
-        Player letnev = addPlayer(game, "letnev", false);
-        Player sol = addPlayer(game, "sol", true, "jord", "arcprime", "wrenterra");
-        // Letnev holds neither home planet and is only standing on one of them.
-        putInfantryOn(game, "arcprime", letnev);
+        game.setTile(new Tile("95", "101"));
+        addPlayer(game, "deepwrought", false);
+        addPlayer(game, "sol", true, "jord", "ikatena");
 
         String report = render(List.of(game));
 
         assertThat(report).contains("- **All factions**: 1/2 (50%) of players lost a home planet.");
         assertThat(report).doesNotContain("Coexisted through");
+    }
+
+    @Test
+    void shouldBandTheCoexistedPlanetCountAndAverageIt() {
+        Game game = newGame("1");
+        game.setTile(new Tile("19", "101"));
+        game.setTile(new Tile("20", "102"));
+        Player sol = addPlayer(game, "sol", true, "jord");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon", "vefutii", "abyz");
+        // Sol controls neither Wellon nor Vefut II but is standing on both.
+        putInfantryOn(game, "wellon", sol);
+        putInfantryOn(game, "vefutii", sol);
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("### Win rate by planets coexisted on\n");
+        assertThat(report)
+                .contains("- **All factions**: 1.00 planets coexisted on on average, 50% win rate from 2 players");
+        assertThat(report).contains("  - 0 planets: 0% (0/1; 50%)\n");
+        assertThat(report).contains("  - 2 planets: 100% (1/1; 50%)\n");
+    }
+
+    @Test
+    void shouldCollectEveryCoexistenceAtOrAboveFiveIntoOneBand() {
+        Game game = newGame("1");
+        // Wellon on 19, Vefut II on 20, Abyz on 38, Arinam and Meer both on 37.
+        game.setTile(new Tile("19", "101"));
+        game.setTile(new Tile("20", "102"));
+        game.setTile(new Tile("38", "103"));
+        game.setTile(new Tile("37", "104"));
+        Player sol = addPlayer(game, "sol", true, "jord");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon", "vefutii", "abyz", "arinam", "meer");
+        for (String planet : List.of("wellon", "vefutii", "abyz", "arinam", "meer")) {
+            putInfantryOn(game, planet, sol);
+        }
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("  - 5+ planets: 100% (1/1; 50%)\n");
+        assertThat(report).contains("2.50 planets coexisted on on average");
+    }
+
+    @Test
+    void shouldSayOnePlanetInTheSingularForTheCoexistBands() {
+        Game game = newGame("1");
+        game.setTile(new Tile("19", "101"));
+        Player sol = addPlayer(game, "sol", true, "jord");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon");
+        putInfantryOn(game, "wellon", sol);
+
+        assertThat(render(List.of(game))).contains("  - 1 planet: 100% (1/1; 50%)\n");
     }
 
     @Test

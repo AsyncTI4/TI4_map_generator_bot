@@ -23,6 +23,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.AliasHandler;
@@ -36,8 +37,15 @@ public class PlanetWinRateStatisticsService {
 
     public static final String POK_ONLY_OPTION = "pok_only";
 
+    /**
+     * The Deepwrought Scholarate is the one faction that holds ground alongside whoever controls a
+     * planet, so it is the only one whose coexistence can carry it through losing a home planet.
+     */
+    private static final String COEXISTING_FACTION = "deepwrought";
+
     private static final int BAND_SIZE = 2;
     private static final int OPEN_ENDED_BAND_START = 11;
+    private static final int COEXIST_OPEN_ENDED_BAND_START = 5;
     private static final int MINIMUM_FACTION_PLAYERS = 25;
     private static final int SKIPPED_FACTIONS_LISTED = 10;
 
@@ -56,6 +64,12 @@ public class PlanetWinRateStatisticsService {
     private static final Comparator<Entry<String, PlanetHoldingStats>> BY_AVERAGE_NON_HOME_PLANETS_DESC =
             Comparator.comparingDouble((Entry<String, PlanetHoldingStats> entry) ->
                             entry.getValue().averageNonHomePlanets())
+                    .reversed()
+                    .thenComparing(Entry::getKey);
+
+    private static final Comparator<Entry<String, PlanetHoldingStats>> BY_AVERAGE_COEXISTED_PLANETS_DESC =
+            Comparator.comparingDouble((Entry<String, PlanetHoldingStats> entry) ->
+                            entry.getValue().averageCoexistedPlanets())
                     .reversed()
                     .thenComparing(Entry::getKey);
 
@@ -127,16 +141,20 @@ public class PlanetWinRateStatisticsService {
                     .filter(planet -> !homePlanets.contains(planet))
                     .filter(planet -> !isTradeStation(planet))
                     .count();
-            Set<String> coexistedOn = coexistedHomePlanets(game, seat.player(), homePlanets, controlledPlanets);
+            Set<String> coexistedOn = coexistedPlanets(game, seat.player(), controlledPlanets);
+            Set<String> coexistedHomePlanets = COEXISTING_FACTION.equalsIgnoreCase(faction) ? coexistedOn : Set.of();
             boolean lostAHomePlanet = homePlanets.stream()
-                    .anyMatch(planet -> !controlledPlanets.contains(planet) && !coexistedOn.contains(planet));
-            boolean coexistedThroughALoss = !lostAHomePlanet && !coexistedOn.isEmpty();
+                    .anyMatch(planet -> !controlledPlanets.contains(planet) && !coexistedHomePlanets.contains(planet));
+            boolean coexistedThroughALoss =
+                    !lostAHomePlanet && homePlanets.stream().anyMatch(coexistedHomePlanets::contains);
 
-            stats.overall.record(isWinner, nonHomePlanets, lostAHomePlanet, coexistedThroughALoss);
+            SeatOutcome outcome = new SeatOutcome(
+                    isWinner, nonHomePlanets, coexistedOn.size(), lostAHomePlanet, coexistedThroughALoss);
+            stats.overall.record(outcome);
             for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
                 stats.byFaction
                         .computeIfAbsent(factionKey, _ -> new PlanetHoldingStats())
-                        .record(isWinner, nonHomePlanets, lostAHomePlanet, coexistedThroughALoss);
+                        .record(outcome);
             }
 
             controlledPlanets.stream()
@@ -148,20 +166,20 @@ public class PlanetWinRateStatisticsService {
     }
 
     /**
-     * Home planets the player no longer controls but still has ground forces or structures on. The
-     * same reading of coexistence {@link Player#getPlanetsForScoring} takes, scoped to the planets
-     * this section is asking about.
+     * Planets the player does not control but still has ground forces or structures on - the same
+     * reading of coexistence {@link Player#getPlanetsForScoring} takes.
      */
-    private static Set<String> coexistedHomePlanets(
-            Game game, Player player, Set<String> homePlanets, Set<String> controlledPlanets) {
+    private static Set<String> coexistedPlanets(Game game, Player player, Set<String> controlledPlanets) {
         Set<String> coexistedOn = new HashSet<>();
-        for (String homePlanet : homePlanets) {
-            if (controlledPlanets.contains(homePlanet)) {
-                continue;
-            }
-            if (game.getUnitHolderFromPlanet(homePlanet) instanceof Planet planet
-                    && (planet.hasGroundForces(player) || planet.hasStructures(player))) {
-                coexistedOn.add(homePlanet);
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                String planetId = planet.getName();
+                if (controlledPlanets.contains(planetId) || isOcean(planetId)) {
+                    continue;
+                }
+                if (planet.hasGroundForces(player) || planet.hasStructures(player)) {
+                    coexistedOn.add(planetId);
+                }
             }
         }
         return coexistedOn;
@@ -234,6 +252,13 @@ public class PlanetWinRateStatisticsService {
 
     private record PlayerHome(Player player, Set<String> homePlanets) {}
 
+    private record SeatOutcome(
+            boolean isWinner,
+            int nonHomePlanets,
+            int coexistedPlanets,
+            boolean lostHome,
+            boolean coexistedThroughALoss) {}
+
     private static List<String> buildReport(PlanetWinRateStats stats) {
         List<String> blocks = new ArrayList<>();
 
@@ -265,6 +290,7 @@ public class PlanetWinRateStatisticsService {
         appendSkippedPlayersSection(blocks, stats);
 
         appendNonHomePlanetsSection(blocks, stats);
+        appendCoexistedPlanetsSection(blocks, stats);
         appendHomePlanetsLostSection(blocks, stats);
         appendPerPlanetSection(blocks, stats);
 
@@ -302,7 +328,7 @@ public class PlanetWinRateStatisticsService {
     private static void appendNonHomePlanetsSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Win rate by non-home planets controlled\n"
                 + "_Planets held at the end of the game outside the player's own home system."
-                + " Trade stations are not counted._\n"
+                + " Trade stations are not counted, and neither is coexisting on a planet without controlling it._\n"
                 + "_Each row reads: win rate (wins/players; share of that group's players who got that far)._\n");
 
         blocks.add(renderBandedGroup("**All factions**", stats.overall));
@@ -360,10 +386,61 @@ public class PlanetWinRateStatisticsService {
         sb.append(bandStart).append('-').append(bandStart + BAND_SIZE - 1).append(" planets");
     }
 
+    private static int coexistBandStartFor(int planets) {
+        return Math.min(planets, COEXIST_OPEN_ENDED_BAND_START);
+    }
+
+    private static void appendCoexistBandLabel(StringBuilder sb, int bandStart) {
+        sb.append(bandStart)
+                .append(
+                        bandStart >= COEXIST_OPEN_ENDED_BAND_START
+                                ? "+ planets"
+                                : bandStart == 1 ? " planet" : " planets");
+    }
+
+    private static void appendCoexistedPlanetsSection(List<String> blocks, PlanetWinRateStats stats) {
+        blocks.add("\n### Win rate by planets coexisted on\n"
+                + "_Planets a player had ground forces or structures on at the end of the game without controlling"
+                + " them._\n"
+                + "_Each row reads: win rate (wins/players; share of that group's players who got that far)._\n");
+
+        blocks.add(renderCoexistGroup("**All factions**", stats.overall));
+        wellSampledFactions(stats)
+                .sorted(BY_AVERAGE_COEXISTED_PLANETS_DESC)
+                .forEach(entry -> blocks.add(renderCoexistGroup(factionLabel(entry.getKey()), entry.getValue())));
+    }
+
+    private static String renderCoexistGroup(String label, PlanetHoldingStats group) {
+        StringBuilder sb = new StringBuilder("- ");
+        sb.append(label)
+                .append(": ")
+                .append(String.format("%.2f", group.averageCoexistedPlanets()))
+                .append(" planets coexisted on on average, ")
+                .append(ActionCardStatsService.formatPercent(group.winRate()))
+                .append(" win rate from ");
+        ActionCardStatsService.appendCount(sb, group.players, "player");
+        sb.append('\n');
+
+        group.playersByCoexistBand.forEach((bandStart, count) -> {
+            sb.append("  - ");
+            appendCoexistBandLabel(sb, bandStart);
+            sb.append(": ")
+                    .append(ActionCardStatsService.formatPercent(count.getWinRate()))
+                    .append(" (")
+                    .append(count.getWins())
+                    .append('/')
+                    .append(count.getPlayers())
+                    .append("; ")
+                    .append(ActionCardStatsService.formatPercent(count.getPlayers() / (double) group.players))
+                    .append(")\n");
+        });
+        return sb.toString();
+    }
+
     private static void appendHomePlanetsLostSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Home planets lost\n"
                 + "_Players who did not control every planet of their own home system at the end of the game."
-                + " Coexisting on one counts as holding it._\n");
+                + " For the Deepwrought Scholarate, coexisting on one counts as holding it._\n");
 
         blocks.add(renderCombinedHomePlanetsLostLine(stats.overall));
         wellSampledFactions(stats)
@@ -487,24 +564,35 @@ public class PlanetWinRateStatisticsService {
 
         final WinRateCount heldEveryHomePlanet = new WinRateCount();
 
+        final NavigableMap<Integer, WinRateCount> playersByCoexistBand = new TreeMap<>();
+
         int players;
         int wins;
         int nonHomePlanetsAtTheirRealCounts;
+        int coexistedPlanetsAtTheirRealCounts;
         int coexistedThroughLosses;
 
-        void record(boolean isWinner, int nonHomePlanets, boolean lostHome, boolean coexistedThroughALoss) {
+        void record(SeatOutcome outcome) {
             players++;
-            if (isWinner) {
+            if (outcome.isWinner()) {
                 wins++;
             }
-            nonHomePlanetsAtTheirRealCounts += nonHomePlanets;
-            if (coexistedThroughALoss) {
+            nonHomePlanetsAtTheirRealCounts += outcome.nonHomePlanets();
+            coexistedPlanetsAtTheirRealCounts += outcome.coexistedPlanets();
+            if (outcome.coexistedThroughALoss()) {
                 coexistedThroughLosses++;
             }
             playersByBand
-                    .computeIfAbsent(bandStartFor(nonHomePlanets), _ -> new WinRateCount())
-                    .record(isWinner);
-            (lostHome ? lostAHomePlanet : heldEveryHomePlanet).record(isWinner);
+                    .computeIfAbsent(bandStartFor(outcome.nonHomePlanets()), _ -> new WinRateCount())
+                    .record(outcome.isWinner());
+            playersByCoexistBand
+                    .computeIfAbsent(coexistBandStartFor(outcome.coexistedPlanets()), _ -> new WinRateCount())
+                    .record(outcome.isWinner());
+            (outcome.lostHome() ? lostAHomePlanet : heldEveryHomePlanet).record(outcome.isWinner());
+        }
+
+        double averageCoexistedPlanets() {
+            return players == 0 ? 0 : (double) coexistedPlanetsAtTheirRealCounts / players;
         }
 
         /** Losses of control, before coexistence hands some of them back. */
