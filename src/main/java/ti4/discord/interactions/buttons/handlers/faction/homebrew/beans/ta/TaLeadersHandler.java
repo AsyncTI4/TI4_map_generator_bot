@@ -307,7 +307,6 @@ public class TaLeadersHandler {
 
         if (!player.getPlanets().contains(planetName)
                 || player.getHomeSystemTile() == null
-                || !tile.getPosition().equals(player.getHomeSystemTile().getPosition())
                 || TaAbilityHandler.planetHasGrandDesignAttached(tile, planetName)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
