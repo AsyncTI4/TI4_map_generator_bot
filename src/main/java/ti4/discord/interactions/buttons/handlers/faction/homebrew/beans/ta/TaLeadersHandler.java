@@ -29,65 +29,65 @@ public class TaLeadersHandler {
     private static final String AGENT_CHOOSE_TRAIT_PREFIX = "taAgentChooseTrait_";
     private static final String AGENT_RESOLVE_TRAIT_PREFIX = "taAgentResolveTrait_";
 
-    public static void resolveTaAgentTarget(Game game, Player target) {
-        if (game == null || target == null) {
+    public static void resolveTaAgentTarget(Game game, Player player) {
+        if (game == null || player == null) {
             return;
         }
 
         List<Button> buttons = new ArrayList<>();
-        for (String planetName : target.getPlanets()) {
+        for (String planetName : player.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planetName);
             Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
             if (planet != null && !planet.getPlanetTypes().isEmpty()) {
                 buttons.add(Buttons.green(
-                        target.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX + planetName,
+                        player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX + planetName,
                         Helper.getPlanetRepresentation(planetName, game)));
             }
         }
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    target.getCorrectChannel(),
-                    target.getRepresentationUnfogged() + " has no explorable planets for Len, the Ta agent.");
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " has no explorable planets for Len, the Ta agent.");
             return;
         }
-        String message = target.getRepresentationUnfogged() + ", choose a planet for Len, the Ta agent.";
+        String message = player.getRepresentationUnfogged() + ", choose a planet for Len, the Ta agent.";
         MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
+                player.getCorrectChannel(),
                 message,
-                NewStuffHelper.buttonPagination(buttons, target.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX, 0));
+                NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX, 0));
     }
 
     @ButtonHandler(AGENT_CHOOSE_TRAIT_PREFIX)
-    public static void chooseTaAgentTrait(Game game, Player target, ButtonInteractionEvent event, String buttonID) {
-        if (game == null || target == null) {
+    public static void chooseTaAgentTrait(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (game == null || player == null) {
             return;
         }
         List<Button> planetButtons = new ArrayList<>();
-        for (String controlledPlanet : target.getPlanets()) {
+        for (String controlledPlanet : player.getPlanets()) {
             Tile controlledTile = game.getTileFromPlanet(controlledPlanet);
             Planet controlledPlanetHolder =
                     controlledTile == null ? null : controlledTile.getUnitHolderFromPlanet(controlledPlanet);
             if (controlledPlanetHolder != null
                     && !controlledPlanetHolder.getPlanetTypes().isEmpty()) {
                 planetButtons.add(Buttons.green(
-                        target.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX + controlledPlanet,
+                        player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX + controlledPlanet,
                         Helper.getPlanetRepresentation(controlledPlanet, game)));
             }
         }
-        String message = target.getRepresentationUnfogged() + ", choose a planet for Len, the Ta agent.";
+        String message = player.getRepresentationUnfogged() + ", choose a planet for Len, the Ta agent.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
-                target.getCorrectChannel(),
+                player.getCorrectChannel(),
                 planetButtons,
                 message,
-                target.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX,
+                player.factionButtonChecker() + AGENT_CHOOSE_TRAIT_PREFIX,
                 buttonID)) {
             return;
         }
         String planetName = buttonID.substring(AGENT_CHOOSE_TRAIT_PREFIX.length());
         Tile tile = game.getTileFromPlanet(planetName);
         Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
-        if (planet == null || !target.getPlanets().contains(planetName)) {
+        if (planet == null || !player.getPlanets().contains(planetName)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -95,13 +95,13 @@ public class TaLeadersHandler {
         List<Button> buttons = new ArrayList<>();
         for (String trait : planet.getPlanetTypes()) {
             buttons.add(Buttons.green(
-                    target.factionButtonChecker() + AGENT_RESOLVE_TRAIT_PREFIX + planetName + "|" + trait,
+                    player.factionButtonChecker() + AGENT_RESOLVE_TRAIT_PREFIX + planetName + "|" + trait,
                     StringUtils.capitalize(trait)));
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentationUnfogged() + ", choose the matching exploration deck for Len, the Ta agent.",
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose the matching exploration deck for Len, the Ta agent.",
                 buttons);
     }
 
