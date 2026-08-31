@@ -158,10 +158,68 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
         assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isNull();
     }
 
-    private static void seat(Game game, String faction) {
+    /**
+     * pbd189c: the Keleres home tile is not on the map at all any more, and Saar is holding Archon
+     * Ren and Archon Tau. With no Xxcha at the table those planets can only have come from Keleres.
+     */
+    @Test
+    void shouldNameTheFlavourFromHomePlanetsAConquerorIsHolding() {
+        Game game = gameWithTiles("19", "20");
+        seat(game, "keleres");
+        seat(game, "saar", "archonren", "archontau", "lodor");
+        seat(game, "cabal");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isEqualTo("keleresx");
+    }
+
+    /**
+     * pbd108: Argent is at the table and holding both its own home and Moll Primus, so only the
+     * borrowed home whose faction is absent is left to name the Keleres seat.
+     */
+    @Test
+    void shouldIgnoreHomePlanetsThatBelongToAFactionActuallyPlaying() {
+        Game game = gameWithTiles("19");
+        seat(game, "keleres");
+        seat(game, "argent", "valk", "avar", "ylir", "mollprimus");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isEqualTo("keleresm");
+    }
+
+    /** pbd353: two borrowed homes are orphaned at once, so there is nothing to pick between them. */
+    @Test
+    void shouldNotGuessBetweenTwoOrphanedHomesHeldByConquerors() {
+        Game game = gameWithTiles("19");
+        seat(game, "keleres");
+        seat(game, "sardakk", "archonren");
+        seat(game, "winnu", "mollprimus");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isNull();
+    }
+
+    @Test
+    void shouldFindTheHomeSystemPositionByItsPlanetsWhateverTheTileIdIs() {
+        // These games carry the Keleres home as 02, 14 or 58 as often as the re-skinned tiles.
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(gameWithTiles("19", "14"), "keleresx"))
+                .isEqualTo("102");
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(gameWithTiles("58"), "keleresa"))
+                .isEqualTo("101");
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(gameWithTiles("94new"), "keleresm"))
+                .isEqualTo("101");
+    }
+
+    @Test
+    void shouldFindNoHomeSystemPositionWhenTheTileIsGoneFromTheBoard() {
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(gameWithTiles("19", "20"), "keleresx"))
+                .isNull();
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(gameWithTiles("14"), "keleresm"))
+                .isNull();
+    }
+
+    private static void seat(Game game, String faction, String... planets) {
         Player player = game.addPlayer(faction + "-user", faction);
         player.setFaction(faction);
         player.setColor(COLORS.get(game.getPlayers().size() - 1));
+        player.getPlanets().addAll(List.of(planets));
     }
 
     private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "orange");

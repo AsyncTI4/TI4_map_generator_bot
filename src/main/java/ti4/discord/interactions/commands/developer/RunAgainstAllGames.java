@@ -18,6 +18,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
@@ -57,12 +58,11 @@ class RunAgainstAllGames extends Subcommand {
             Map.entry("2", "keleresm"));
 
     /**
-     * The base faction each of those home systems belongs to when it is not Keleres sitting on it.
-     * Keleres never shares a table with the faction whose home it wears, so one of these tiles on a
-     * board with its own faction absent can only be the Keleres player's.
+     * The faction each flavour borrows its home system from. Keleres never shares a table with that
+     * faction, so a home system of theirs in a game without them can only be the Keleres player's.
      */
-    private static final Map<String, String> BASE_FACTION_BY_HOME_TILE = Map.ofEntries(
-            Map.entry("14", "xxcha"), Map.entry("58", "argent"), Map.entry("02", "mentak"), Map.entry("2", "mentak"));
+    private static final Map<String, String> BORROWED_FROM =
+            Map.of("keleresx", "xxcha", "keleresa", "argent", "keleresm", "mentak");
 
     private static final Map<String, String> KELERES_FACTION_BY_HOME_PLANET = Map.ofEntries(
             Map.entry("archonrenk", "keleresx"),
@@ -95,6 +95,7 @@ class RunAgainstAllGames extends Subcommand {
         List<String> retypedGames = new ArrayList<>();
         List<String> undeterminedGames = new ArrayList<>();
         int[] retypedPlayers = {0};
+        int[] restoredPositions = {0};
 
         ConsumeGameUtility.consumeAllGames(
                 game -> {
@@ -123,10 +124,17 @@ class RunAgainstAllGames extends Subcommand {
                             undeterminedGames.add(describeUndetermined(game, player));
                             continue;
                         }
+                        String homePosition = homeSystemPositionFor(game, faction);
+                        if (homePosition != null) {
+                            restoredPositions[0]++;
+                        }
                         if (!dryRun) {
                             player.setFaction(faction);
+                            if (homePosition != null) {
+                                player.setHomeSystemPosition(homePosition);
+                            }
                         }
-                        retyped.add(faction);
+                        retyped.add(faction + (homePosition == null ? "" : "@" + homePosition));
                     }
 
                     if (retyped.isEmpty()) {
@@ -140,7 +148,7 @@ class RunAgainstAllGames extends Subcommand {
                 },
                 dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
-        report(event, dryRun, retypedGames, undeterminedGames, retypedPlayers[0]);
+        report(event, dryRun, retypedGames, undeterminedGames, retypedPlayers[0], restoredPositions[0]);
     }
 
     /**
@@ -184,8 +192,10 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     /**
-     * The last resort, for a player who lost their home system and has no position left to name it:
-     * a base home system on the board whose own faction is not at the table has to be theirs.
+     * The last resort, for a player who lost their home system and has no position left to name it.
+     * A borrowed home system in a game its own faction is not playing can only be the Keleres seat,
+     * whether it is still a tile on the board or only survives as planets in a conqueror's hands -
+     * the oldest games no longer carry the tile at all.
      */
     static String factionFromAnOrphanedBaseHome(Game game) {
         Set<String> factionsAtTheTable = game.getPlayers().values().stream()
@@ -194,12 +204,13 @@ class RunAgainstAllGames extends Subcommand {
                 .map(faction -> faction.toLowerCase(Locale.ROOT))
                 .collect(Collectors.toSet());
 
-        Set<String> candidates = game.getTileMap().values().stream()
-                .map(Tile::getTileID)
-                .filter(BASE_FACTION_BY_HOME_TILE::containsKey)
-                .filter(tileId -> !isAtTheTable(factionsAtTheTable, BASE_FACTION_BY_HOME_TILE.get(tileId)))
-                .map(KELERES_FACTION_BY_OWN_TILE::get)
+        Set<String> candidates = Stream.concat(
+                        game.getTileMap().values().stream().map(Tile::getTileID).map(KELERES_FACTION_BY_OWN_TILE::get),
+                        game.getPlayers().values().stream()
+                                .flatMap(player -> player.getPlanets().stream())
+                                .map(KELERES_FACTION_BY_HOME_PLANET::get))
                 .filter(Objects::nonNull)
+                .filter(keleresFaction -> !isAtTheTable(factionsAtTheTable, BORROWED_FROM.get(keleresFaction)))
                 .collect(Collectors.toSet());
         return candidates.size() == 1 ? candidates.iterator().next() : null;
     }
@@ -207,6 +218,23 @@ class RunAgainstAllGames extends Subcommand {
     private static boolean isAtTheTable(Set<String> factionsAtTheTable, String baseFaction) {
         return factionsAtTheTable.stream()
                 .anyMatch(faction -> faction.equals(baseFaction) || faction.endsWith("_" + baseFaction));
+    }
+
+    /**
+     * Where the flavour's home system is sitting, found by its planets rather than its tile id -
+     * these games carry it as 02, 14 or 58 as often as the re-skinned 93new or 94new. Null when the
+     * board no longer holds the tile at all, which is half of them.
+     */
+    static String homeSystemPositionFor(Game game, String keleresFaction) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> tile.getPlanetUnitHolders().stream()
+                        .map(UnitHolder::getName)
+                        .map(KELERES_FACTION_BY_HOME_PLANET::get)
+                        .anyMatch(keleresFaction::equals))
+                .map(Tile::getPosition)
+                .filter(StringUtils::isNotBlank)
+                .findFirst()
+                .orElse(null);
     }
 
     /** Enough of the player to work out from a dry run why nothing placed them. */
@@ -217,10 +245,15 @@ class RunAgainstAllGames extends Subcommand {
         }
         Tile tile = position == null ? null : game.getTileByPosition(position);
         List<String> planets = player.getPlanets().stream().limit(8).toList();
+        String factions = game.getPlayers().values().stream()
+                .map(Player::getFaction)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(","));
         return game.getName() + " (" + player.getUserName() + ") pos=" + (position == null ? "-" : position)
                 + " tile=" + (tile == null ? "-" : tile.getTileID())
                 + " tiles=" + game.getTileMap().size()
-                + " planets=" + (planets.isEmpty() ? "-" : String.join(",", planets));
+                + " planets=" + (planets.isEmpty() ? "-" : String.join(",", planets))
+                + " factions=" + factions;
     }
 
     private static void report(
@@ -228,7 +261,8 @@ class RunAgainstAllGames extends Subcommand {
             boolean dryRun,
             List<String> retypedGames,
             List<String> undeterminedGames,
-            int retypedPlayers) {
+            int retypedPlayers,
+            int restoredPositions) {
         StringBuilder message = new StringBuilder();
         message.append(dryRun ? "Would retype " : "Retyped ")
                 .append(retypedPlayers)
@@ -236,7 +270,9 @@ class RunAgainstAllGames extends Subcommand {
                 .append(retypedGames.size())
                 .append(" game(s), out of ")
                 .append(GameManager.getGameCount())
-                .append(" games.\n");
+                .append(" games, ")
+                .append(restoredPositions)
+                .append(" of them with a home system position to restore.\n");
         if (undeterminedGames.isEmpty()) {
             message.append("Every legacy Keleres player was placed.");
         } else {
