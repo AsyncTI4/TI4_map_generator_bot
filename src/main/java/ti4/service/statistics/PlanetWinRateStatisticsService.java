@@ -31,8 +31,8 @@ import ti4.model.PlanetModel;
 @UtilityClass
 public class PlanetWinRateStatisticsService {
 
-    private static final int BAND_SIZE = 3;
-    private static final int OPEN_ENDED_BAND_START = 18;
+    private static final int BAND_SIZE = 2;
+    private static final int OPEN_ENDED_BAND_START = 12;
     private static final int MINIMUM_FACTION_PLAYERS = 25;
     private static final int MINIMUM_PLANET_HOLDINGS = 25;
 
@@ -99,10 +99,13 @@ public class PlanetWinRateStatisticsService {
         for (PlayerHome seat : seats) {
             String faction = seat.player().getFaction();
             Set<String> homePlanets = seat.homePlanets();
-            Set<String> controlledPlanets = new HashSet<>(seat.player().getPlanets());
+            Set<String> controlledPlanets = seat.player().getPlanets().stream()
+                    .filter(planet -> !isOcean(planet))
+                    .collect(Collectors.toCollection(HashSet::new));
             boolean isWinner = faction.equals(winner.getFaction());
             int nonHomePlanets = (int) controlledPlanets.stream()
                     .filter(planet -> !homePlanets.contains(planet))
+                    .filter(planet -> !isTradeStation(planet))
                     .count();
             boolean lostAHomePlanet = !controlledPlanets.containsAll(homePlanets);
 
@@ -119,6 +122,16 @@ public class PlanetWinRateStatisticsService {
                             .computeIfAbsent(planet, _ -> new WinRateCount())
                             .record(isWinner));
         }
+    }
+
+    private static boolean isOcean(String planetId) {
+        PlanetModel planetModel = Mapper.getPlanet(planetId);
+        return planetModel != null && planetModel.isFake();
+    }
+
+    private static boolean isTradeStation(String planetId) {
+        PlanetModel planetModel = Mapper.getPlanet(planetId);
+        return planetModel != null && planetModel.isSpaceStation();
     }
 
     private static Set<String> getHomePlanets(Player player) {
@@ -138,7 +151,7 @@ public class PlanetWinRateStatisticsService {
         List<String> blocks = new ArrayList<>();
 
         StringBuilder header = new StringBuilder("## __**Planet Win Rates**__\n");
-        header.append("_Planets each player controlled at the end of the game._\n");
+        header.append("_Planets each player controlled at the end of the game. Oceans are never counted._\n");
         header.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with"
                 + " winners._\n");
         if (stats.overall.players == 0) {
@@ -173,7 +186,8 @@ public class PlanetWinRateStatisticsService {
 
     private static void appendNonHomePlanetsSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Win rate by non-home planets controlled\n"
-                + "_Planets held at the end of the game outside the player's own home system._\n"
+                + "_Planets held at the end of the game outside the player's own home system."
+                + " Trade stations are not counted._\n"
                 + "_Each row reads: win rate (wins/players; share of that group's players who got that far)._\n");
 
         blocks.add(renderBandedGroup("**All factions**", stats.overall));
@@ -225,41 +239,53 @@ public class PlanetWinRateStatisticsService {
         blocks.add("\n### Home planets lost\n"
                 + "_Players who did not control every planet of their own home system at the end of the game._\n");
 
-        blocks.add(renderHomePlanetsLostLine("**All factions**", stats.overall));
+        blocks.add(renderCombinedHomePlanetsLostLine(stats.overall));
         wellSampledFactions(stats)
                 .sorted(BY_HOME_LOSS_RATE_DESC)
-                .forEach(
-                        entry -> blocks.add(renderHomePlanetsLostLine(factionLabel(entry.getKey()), entry.getValue())));
+                .forEach(entry ->
+                        blocks.add(renderFactionHomePlanetsLostLine(factionLabel(entry.getKey()), entry.getValue())));
     }
 
-    private static String renderHomePlanetsLostLine(String label, PlanetHoldingStats group) {
-        StringBuilder sb = new StringBuilder("- ");
-        sb.append(label).append(": ");
-        WinRateCount lost = group.lostAHomePlanet;
-        WinRateCount held = group.heldEveryHomePlanet;
-        if (lost.getPlayers() == 0) {
-            return sb.append("never lost a home planet, across ")
-                    .append(group.players)
-                    .append(" players\n")
-                    .toString();
+    private static String renderCombinedHomePlanetsLostLine(PlanetHoldingStats group) {
+        StringBuilder sb = appendHomePlanetsLostCount(new StringBuilder("- **All factions**: "), group);
+        if (group.lostAHomePlanet.getPlayers() == 0) {
+            return sb.append(" of players lost a home planet\n").toString();
         }
-        sb.append(lost.getPlayers())
+        return sb.append(" of players lost a home planet. ")
+                .append(ActionCardStatsService.formatPercent(group.lostAHomePlanet.getWinRate()))
+                .append(" win rate when they did, ")
+                .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
+                .append(" when they did not\n")
+                .toString();
+    }
+
+    private static String renderFactionHomePlanetsLostLine(String label, PlanetHoldingStats group) {
+        StringBuilder sb =
+                appendHomePlanetsLostCount(new StringBuilder("- ").append(label).append(": "), group);
+        if (group.lostAHomePlanet.getPlayers() == 0) {
+            return sb.append(" homes lost\n").toString();
+        }
+        return sb.append(" homes lost. ")
+                .append(ActionCardStatsService.formatPercent(group.lostAHomePlanet.getWinRate()))
+                .append(" win rate, ")
+                .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
+                .append(" otherwise\n")
+                .toString();
+    }
+
+    private static StringBuilder appendHomePlanetsLostCount(StringBuilder sb, PlanetHoldingStats group) {
+        return sb.append(group.lostAHomePlanet.getPlayers())
                 .append('/')
                 .append(group.players)
                 .append(" (")
                 .append(ActionCardStatsService.formatPercent(group.homeLossRate()))
-                .append(") lost one - ")
-                .append(ActionCardStatsService.formatPercent(lost.getWinRate()))
-                .append(" win rate when they did, ")
-                .append(ActionCardStatsService.formatPercent(held.getWinRate()))
-                .append(" when they did not\n");
-        return sb.toString();
+                .append(')');
     }
 
     private static void appendPerPlanetSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Win rate by planet controlled\n"
                 + "_A player's win rate when they held the planet at the end of the game. Home planets are left"
-                + " out, since they sit with whoever started on them nearly every game._\n"
+                + " out._\n"
                 + "_Only planets held at least " + MINIMUM_PLANET_HOLDINGS + " times are shown._\n");
 
         List<Entry<String, WinRateCount>> ranked = stats.byPlanet.entrySet().stream()

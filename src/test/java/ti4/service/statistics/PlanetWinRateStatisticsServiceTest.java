@@ -27,11 +27,12 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
         assertThat(report)
                 .contains("- **All factions**: 1.00 non-home planets on average, 50% win rate from 2 players");
-        assertThat(report).contains("  - 0-2 planets: 50% (1/2; 100%)\n");
+        assertThat(report).contains("  - 0-1 planets: 0% (0/1; 50%)\n");
+        assertThat(report).contains("  - 2-3 planets: 100% (1/1; 50%)\n");
     }
 
     @Test
-    void shouldPoolCountsIntoBandsThreeWideAndCapTheLastOne() {
+    void shouldPoolCountsIntoBandsTwoWideAndCapTheLastOne() {
         Game game = newGame("1");
         addPlayer(game, "sol", true, "jord");
         takePlanets(game.getPlayerFromColorOrFaction("sol"), 4);
@@ -40,9 +41,35 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
         String report = render(List.of(game));
 
-        assertThat(report).contains("  - 3-5 planets: 100% (1/1; 50%)\n");
-        assertThat(report).contains("  - 18+ planets: 0% (0/1; 50%)\n");
+        assertThat(report).contains("  - 4-5 planets: 100% (1/1; 50%)\n");
+        assertThat(report).contains("  - 12+ planets: 0% (0/1; 50%)\n");
         assertThat(report).contains("12.00 non-home planets on average");
+    }
+
+    @Test
+    void shouldNeverCountOceans() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon", "ocean3", "ocean4", "ocean5");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("- **All factions**: 0.50 non-home planets on average");
+        assertThat(report)
+                .doesNotContain("Deep Abyss")
+                .doesNotContain("Brine Pool")
+                .doesNotContain("Ice Shelf");
+    }
+
+    @Test
+    void shouldLeaveTradeStationsOutOfTheNonHomePlanetCountButStillRankThem() {
+        String report = render(repeatGame(MINIMUM_SAMPLE, game -> {
+            addPlayer(game, "sol", true, "jord", "wellon", "thewatchtower");
+            addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+        }));
+
+        assertThat(report).contains("- **All factions**: 0.50 non-home planets on average");
+        assertThat(report).contains("* `100%` (25/25) The Watchtower\n");
     }
 
     @Test
@@ -55,8 +82,19 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
         assertThat(report).contains("### Home planets lost\n");
         assertThat(report)
-                .contains("- **All factions**: 1/2 (50%) lost one - 0% win rate when they did, 100% when they did"
-                        + " not\n");
+                .contains("- **All factions**: 1/2 (50%) of players lost a home planet. 0% win rate when they did,"
+                        + " 100% when they did not\n");
+    }
+
+    @Test
+    void shouldRenderFactionHomePlanetsLostInItsOwnShorterForm() {
+        String report = render(repeatGame(MINIMUM_SAMPLE, game -> {
+            addPlayer(game, "sol", true, "jord");
+            addPlayer(game, "letnev", false, "arcprime");
+        }));
+
+        assertThat(report).contains("- **All factions**: 25/50 (50%) of players lost a home planet.");
+        assertThat(report).contains("(100%) homes lost. 0% win rate, 0% otherwise\n");
     }
 
     @Test
@@ -65,7 +103,7 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         addPlayer(game, "sol", true, "jord", "wellon");
         addPlayer(game, "letnev", false, "arcprime", "wrenterra");
 
-        assertThat(render(List.of(game))).contains("- **All factions**: never lost a home planet, across 2 players\n");
+        assertThat(render(List.of(game))).contains("- **All factions**: 0/2 (0%) of players lost a home planet\n");
     }
 
     @Test
@@ -91,7 +129,7 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         assertThat(report).doesNotContain("Arc Prime");
         assertThat(report).contains("* `100%` (25/25) Wellon\n");
         assertThat(report).contains("- **All factions**: 1.00 non-home planets on average");
-        assertThat(report).contains("- **All factions**: 25/50 (50%) lost one");
+        assertThat(report).contains("- **All factions**: 25/50 (50%) of players lost a home planet.");
     }
 
     @Test
