@@ -2,6 +2,7 @@ package ti4.discord.interactions.commands.developer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -55,6 +56,14 @@ class RunAgainstAllGames extends Subcommand {
             Map.entry("02", "keleresm"),
             Map.entry("2", "keleresm"));
 
+    /**
+     * The base faction each of those home systems belongs to when it is not Keleres sitting on it.
+     * Keleres never shares a table with the faction whose home it wears, so one of these tiles on a
+     * board with its own faction absent can only be the Keleres player's.
+     */
+    private static final Map<String, String> BASE_FACTION_BY_HOME_TILE = Map.ofEntries(
+            Map.entry("14", "xxcha"), Map.entry("58", "argent"), Map.entry("02", "mentak"), Map.entry("2", "mentak"));
+
     private static final Map<String, String> KELERES_FACTION_BY_HOME_PLANET = Map.ofEntries(
             Map.entry("archonrenk", "keleresx"),
             Map.entry("archontauk", "keleresx"),
@@ -97,6 +106,7 @@ class RunAgainstAllGames extends Subcommand {
                     }
 
                     String boardFaction = factionFromTheOnlyKeleresHomeOnTheBoard(game);
+                    String orphanedBaseFaction = factionFromAnOrphanedBaseHome(game);
                     List<String> retyped = new ArrayList<>();
                     for (Player player : legacyPlayers) {
                         String faction = factionFromTheirHomePlanets(player);
@@ -105,6 +115,9 @@ class RunAgainstAllGames extends Subcommand {
                         }
                         if (faction == null) {
                             faction = boardFaction;
+                        }
+                        if (faction == null) {
+                            faction = orphanedBaseFaction;
                         }
                         if (faction == null) {
                             undeterminedGames.add(describeUndetermined(game, player));
@@ -168,6 +181,32 @@ class RunAgainstAllGames extends Subcommand {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * The last resort, for a player who lost their home system and has no position left to name it:
+     * a base home system on the board whose own faction is not at the table has to be theirs.
+     */
+    static String factionFromAnOrphanedBaseHome(Game game) {
+        Set<String> factionsAtTheTable = game.getPlayers().values().stream()
+                .map(Player::getFaction)
+                .filter(StringUtils::isNotBlank)
+                .map(faction -> faction.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+
+        Set<String> candidates = game.getTileMap().values().stream()
+                .map(Tile::getTileID)
+                .filter(BASE_FACTION_BY_HOME_TILE::containsKey)
+                .filter(tileId -> !isAtTheTable(factionsAtTheTable, BASE_FACTION_BY_HOME_TILE.get(tileId)))
+                .map(KELERES_FACTION_BY_OWN_TILE::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        return candidates.size() == 1 ? candidates.iterator().next() : null;
+    }
+
+    private static boolean isAtTheTable(Set<String> factionsAtTheTable, String baseFaction) {
+        return factionsAtTheTable.stream()
+                .anyMatch(faction -> faction.equals(baseFaction) || faction.endsWith("_" + baseFaction));
     }
 
     /** Enough of the player to work out from a dry run why nothing placed them. */

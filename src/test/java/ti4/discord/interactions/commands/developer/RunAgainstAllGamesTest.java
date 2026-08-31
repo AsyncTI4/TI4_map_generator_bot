@@ -121,6 +121,51 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
         return player;
     }
 
+    @Test
+    void shouldNameTheFlavourFromABaseHomeSystemWhoseOwnFactionIsNotPlaying() {
+        // The Xxcha home is on the board and no Xxcha is at the table, so it is the Keleres seat.
+        Game game = gameWithTiles("14", "19", "20");
+        seat(game, "keleres");
+        seat(game, "sol");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isEqualTo("keleresx");
+    }
+
+    @Test
+    void shouldNotClaimABaseHomeSystemItsOwnFactionIsPlaying() {
+        Game game = gameWithTiles("14", "19");
+        seat(game, "keleres");
+        seat(game, "xxcha");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isNull();
+    }
+
+    @Test
+    void shouldNotClaimABaseHomeSystemItsOwnVariantFactionIsPlaying() {
+        Game game = gameWithTiles("02", "19");
+        seat(game, "keleres");
+        seat(game, "pi_mentak");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isNull();
+    }
+
+    @Test
+    void shouldNotGuessBetweenTwoOrphanedBaseHomeSystems() {
+        Game game = gameWithTiles("14", "58");
+        seat(game, "keleres");
+        seat(game, "sol");
+
+        assertThat(RunAgainstAllGames.factionFromAnOrphanedBaseHome(game)).isNull();
+    }
+
+    private static void seat(Game game, String faction) {
+        Player player = game.addPlayer(faction + "-user", faction);
+        player.setFaction(faction);
+        player.setColor(COLORS.get(game.getPlayers().size() - 1));
+    }
+
+    private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "orange");
+
     private static Player anchoredAt(Game game, String position) {
         Player player = game.addPlayer("user-" + position, "user");
         player.setFaction("keleres");
