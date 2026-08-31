@@ -328,7 +328,7 @@ public class PlanetWinRateStatisticsService {
     private static void appendNonHomePlanetsSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Win rate by non-home planets controlled\n"
                 + "_Planets held at the end of the game outside the player's own home system."
-                + " Trade stations are not counted, and neither is coexisting on a planet without controlling it._\n"
+                + " Trade stations and coexisting do not count._\n"
                 + "_Each row reads: win rate (wins/players; share of that group's players who got that far)._\n");
 
         blocks.add(renderBandedGroup("**All factions**", stats.overall));
@@ -459,7 +459,8 @@ public class PlanetWinRateStatisticsService {
                     .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
                     .append(" when they did not");
         }
-        appendCoexistedThrough(sb, group);
+        // No coexistence line here: it belongs to the one faction that can do it, not to a total
+        // that every other faction is counted into.
         return sb.append('\n').toString();
     }
 

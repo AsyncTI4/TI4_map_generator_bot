@@ -124,9 +124,21 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
         String report = render(List.of(game));
 
-        assertThat(report)
-                .contains("- **All factions**: 0/2 (0%) of players lost a home planet."
-                        + " Coexisted through 1/1 (100%) of home system losses.\n");
+        assertThat(report).contains("- **All factions**: 0/2 (0%) of players lost a home planet\n");
+    }
+
+    /** The combined row is every faction summed, so a rescue only one of them can earn stays off it. */
+    @Test
+    void shouldKeepTheCoexistedThroughLineOffTheCombinedRow() {
+        String report = render(repeatGame(MINIMUM_SAMPLE, game -> {
+            game.setTile(new Tile("95", "101"));
+            Player deepwrought = addPlayer(game, "deepwrought", false);
+            addPlayer(game, "sol", true, "jord", "ikatena");
+            putInfantryOn(game, "ikatena", deepwrought);
+        }));
+
+        assertThat(report).contains("- **All factions**: 0/50 (0%) of players lost a home planet\n");
+        assertThat(report).contains("homes lost. Coexisted through 25/25 (100%) of home system losses.\n");
     }
 
     /** Every other faction has to actually control its home planets to keep them. */
