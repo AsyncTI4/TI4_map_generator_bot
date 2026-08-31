@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -17,18 +18,31 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
+import ti4.helpers.settingsFramework.menus.SliceDraftableSettings;
+import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
+import ti4.model.MapTemplateModel;
 import ti4.model.RelicModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.service.draft.DraftManager;
+import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
+import ti4.service.draft.NucleusSpecs;
+import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
+import ti4.service.draft.SliceGenerationPipeline;
+import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
@@ -57,6 +71,9 @@ public class StartScenario extends GameStateSubcommand {
         }
         if (scenario.contains("erwan's gambit")) {
             startErwansGambit(game, event);
+        }
+        if (scenario.contains("muaat mania")) {
+            startMuaatMania(game, event);
         }
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
@@ -365,6 +382,117 @@ public class StartScenario extends GameStateSubcommand {
             return model.getAlias();
         }
         return null;
+    }
+
+    private static void startMuaatMania(Game game, GenericInteractionCreateEvent event) {
+        if (game.getPlayers().size() != 6) {
+            MessageHelper.sendMessageToEventChannel(event, "Muaat mania needs exactly 6 players.");
+        }
+        game.setMuaatManiaMode(true);
+        game.removeRelicFromGame("shard");
+        game.setVp(20);
+
+        DraftSystemSettings draftSystemSettings = new DraftSystemSettings(game, null);
+        draftSystemSettings.setupNucleusPreset();
+        game.setDraftSystemSettings(draftSystemSettings);
+        DraftSystemSettings draftSystemSettings2 = game.initializeDraftSystemSettings();
+        draftSystemSettings2.parseInput(event, "jmfA_draft_startSetup");
+        DraftManager draftManager = game.getDraftManager();
+        draftManager.resetForNewDraft();
+        draftManager.setPlayers(draftSystemSettings.getPlayerUserIds().stream().toList());
+        SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
+        // SliceDraftableSettings
+        SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
+        NucleusSliceDraftableSettings nucleusSettings = sliceSettings.getNucleusSettings();
+        MapTemplateModel mapTemplate = sliceSettings.getMapTemplate().getValue();
+        mapTemplate = Mapper.getMapTemplate("6pStandardNucleus");
+
+        // Check if presets are provided - if so, use them directly instead of generating
+        Map<String, String> presetMapTiles = nucleusSettings.getParsedMapTiles();
+
+        NucleusSpecs specs = new NucleusSpecs(
+                sliceSettings.getNumSlices().getVal(),
+                nucleusSettings.getNucleusWormholes().getValLow(), // min nucleus wormholes
+                nucleusSettings.getNucleusWormholes().getValHigh(), // max nucleus wormholes
+                nucleusSettings.getNucleusLegendaries().getValLow(), // min nucleus legendaries
+                nucleusSettings.getNucleusLegendaries().getValHigh(), // max nucleus legendaries
+                nucleusSettings.getTotalWormholes().getValLow(), // min map wormholes
+                nucleusSettings.getTotalWormholes().getValHigh(), // max map wormholes
+                nucleusSettings.getTotalLegendaries().getValLow(), // min map legendaries
+                nucleusSettings.getTotalLegendaries().getValHigh(), // max map legendaries
+                nucleusSettings.getSliceValue().getValLow(), // min slice value
+                nucleusSettings.getSliceValue().getValHigh(), // max slice value
+                nucleusSettings.getNucleusValue().getValLow(), // min nucleus value
+                nucleusSettings.getNucleusValue().getValHigh(), // max nucleus value
+                nucleusSettings.getSlicePlanetCount().getValLow(), // min slice planets
+                nucleusSettings.getSlicePlanetCount().getValHigh(), // max slice planets
+                nucleusSettings.getMinimumSliceRes().getVal(), // min slice resources
+                nucleusSettings.getMinimumSliceInf().getVal(), // min slice influence
+                nucleusSettings.getMaxNucleusQualityDifference().getVal(), // max nucleus quality difference
+                nucleusSettings.getMinimumRedTiles().getVal() // expected red tiles
+                );
+
+        game.clearTileMap();
+        // Very important...the distance tool needs hyperlane tiles placed to calculate adjacencies
+        PartialMapService.placeFromTemplate(mapTemplate, game);
+        // Nucleus generation expects the map template to be set on the game
+        game.setMapTemplateID(mapTemplate.getAlias());
+
+        String specError = NucleusSpecs.validateSpecsForGame(specs, game);
+        SliceGenerationPipeline.queue(event, game, specs, (NucleusOutcome outcome) -> {
+            List<Player> players = new ArrayList<>(game.getPlayers().values());
+            Collections.shuffle(players);
+            int num = 199;
+            new SliceDraftable().initialize(outcome.slices());
+            game.getDraftManager().tryStartDraft();
+            for (int x = 301; x < 319; x++) {
+                Tile tile = game.getTileByPosition("" + x);
+                if (tile != null) {
+                    game.removeTile("" + x);
+                }
+            }
+            for (Player player : players) {
+                num += 2;
+                String faction = getRandomUnusedFaction(game);
+                PlayerSetupState setupState = new PlayerSetupState(faction, "" + num, 201 == num);
+                PlayerSetupService.setupPlayer(setupState, player, game, event);
+            }
+            DrawSecretService.dealSOToAll(event, 2, game);
+
+            GameManager.save(game, "Nucleus generation");
+        });
+
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Muaat Mania has been set up");
+    }
+
+    private static String getRandomUnusedFaction(Game game) {
+        List<String> commanders = new ArrayList<>();
+        List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
+                .filter(f -> f.getSource() != ComponentSource.twilights_fall
+                        && (f.getSource().isOfficial()
+                                || (game.isDiscordantStarsMode()
+                                        && f.getSource().isDs())
+                                || (game.isBlueReverieMode() && f.getSource().isBr())))
+                .toList();
+        for (FactionModel faction : allFactions) {
+            String commanderName = faction.getAlias();
+            if (commanderName.contains("keleres")
+                    || commanderName.contains("muaat")
+                    || commanderName.contains("crimson")) {
+                continue;
+            }
+            if (game.getFactions().contains(faction.getAlias())
+                    || ("obsidian".equalsIgnoreCase(faction.getAlias())
+                            && game.getFactions().contains("firmament"))
+                    || ("firmament".equalsIgnoreCase(faction.getAlias())
+                            && game.getFactions().contains("obsidian"))
+                    || commanders.contains(commanderName)) {
+                continue;
+            }
+            commanders.add(commanderName);
+        }
+        Collections.shuffle(commanders);
+        return commanders.getFirst();
     }
 
     private static void startErwansGambit(Game game, GenericInteractionCreateEvent event) {

@@ -483,7 +483,7 @@ public final class ButtonHelperModifyUnits {
         }
         if (!doesPlayerHaveGfOnPlanet(unitHolder, player)) {
             Player opponent = game.getActivePlayer();
-            if (opponent == player || !FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
+            if (opponent == null || opponent == player || !FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
                 for (Player p : game.getRealPlayersNNeutral()) {
                     if (p != player && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
                         opponent = p;
@@ -491,7 +491,7 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if (opponent != player && FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
+            if (opponent != null && opponent != player && FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
                 if (opponent.hasTech("dxa")) {
                     String msg3 = opponent.getRepresentation()
                             + " you may have an opportunity to use _Dacxive Animators_ on "

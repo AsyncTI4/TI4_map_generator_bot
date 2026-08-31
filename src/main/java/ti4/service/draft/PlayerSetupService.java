@@ -563,7 +563,7 @@ public class PlayerSetupService {
         if ("d11".equalsIgnoreCase(hsTile)) {
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
-        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
+        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports")) || game.isMuaatManiaMode()) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
         }
@@ -600,6 +600,12 @@ public class PlayerSetupService {
             if (game.isRapidMobilizationMode() || game.isCosmicConvergenceMode()) {
                 FractureService.spawnFracture(event, game);
                 FractureService.spawnIngressTokens(event, game, player, "nah");
+            }
+        }
+        if (game.isMuaatManiaMode()) {
+            player.addOwnedUnitByID("mm_warsun");
+            if (player.getHomeSystemTile() != null) {
+                AddUnitService.addUnits(event, tile, game, color, "ws");
             }
         }
     }

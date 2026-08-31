@@ -559,6 +559,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.COSMIC_CONVERGENCE_MODE + " " + game.isCosmicConvergenceMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MUAAT_MANIA_MODE + " " + game.isMuaatManiaMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NO_FRACTURE + " " + game.isNoFractureMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CALL_OF_THE_VOID_MODE + " " + game.isCallOfTheVoidMode());

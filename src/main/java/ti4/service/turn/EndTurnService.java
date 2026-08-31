@@ -32,6 +32,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
@@ -204,6 +205,23 @@ public class EndTurnService {
                 Leader hero =
                         ralnel == null ? null : ralnel.getLeader("ralnelhero").orElse(null);
                 if (hero != null) PlayHeroService.playHero(event, game, ralnel, hero);
+            }
+        }
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed) && game.isMuaatManiaMode()) {
+            for (Player player : game.getRealPlayers()) {
+                if (player.getPlanets().contains("styx")) {
+                    if (game.getStoredValue("styxHolderMM").contains(player.getFaction())) {
+                        Integer poIndex = game.addCustomPO("Styx Win", 20);
+                        game.scorePublicObjective(player.getUserID(), poIndex);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " won by holding styx for a round.");
+                        Helper.checkEndGame(game, mainPlayer);
+                        return;
+                    } else {
+                        game.setStoredValue("styxHolderMM", player.getFaction());
+                    }
+                }
             }
         }
 
