@@ -154,6 +154,25 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldLeaveOutTwilightsFallGames() {
+        Game twilightsFall = newGame("1");
+        twilightsFall.setTwilightsFallMode(true);
+        addPlayer(twilightsFall, "sol", true, "jord", "wellon");
+        addPlayer(twilightsFall, "letnev", false, "arcprime", "wrenterra");
+
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(twilightsFall))
+                .isFalse();
+        assertThat(render(List.of(twilightsFall))).contains("No games matched.\n");
+
+        Game normal = newGame("2");
+        addPlayer(normal, "sol", true, "jord", "wellon");
+        addPlayer(normal, "letnev", false, "arcprime", "wrenterra");
+
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(normal)).isTrue();
+        assertThat(render(List.of(twilightsFall, normal))).contains("Games analyzed: 1 | Players analyzed: 2\n");
+    }
+
+    @Test
     void shouldBreakDownSkippedPlayersByFactionWithAGameToLookAt() {
         Game game = newGame("1");
         addPlayer(game, "sol", true, "jord", "wellon");

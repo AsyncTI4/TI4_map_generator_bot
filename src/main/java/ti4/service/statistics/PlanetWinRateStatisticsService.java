@@ -61,7 +61,8 @@ public class PlanetWinRateStatisticsService {
     private static void showPlanetWinRates(SlashCommandInteractionEvent event) {
         PlanetWinRateStats stats = new PlanetWinRateStats();
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getStandardCompetitiveGamesFilter(),
+                GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
+                        .and(PlanetWinRateStatisticsService::isEligibleGameType),
                 game -> accumulateGame(game, stats),
                 ExecutionLockType.READ);
 
@@ -74,9 +75,13 @@ public class PlanetWinRateStatisticsService {
         return buildReport(stats);
     }
 
+    static boolean isEligibleGameType(Game game) {
+        return !game.isTwilightsFallMode();
+    }
+
     private static void accumulateGame(Game game, PlanetWinRateStats stats) {
         Player winner = game.getWinner().orElse(null);
-        if (winner == null) {
+        if (winner == null || !isEligibleGameType(game)) {
             return;
         }
         stats.games++;
@@ -154,8 +159,8 @@ public class PlanetWinRateStatisticsService {
 
         StringBuilder header = new StringBuilder("## __**Planet Win Rates**__\n");
         header.append("_Planets each player controlled at the end of the game. Oceans are never counted._\n");
-        header.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with"
-                + " winners._\n");
+        header.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario,"
+                + " non-Twilight's-Fall games with winners._\n");
         if (stats.overall.players == 0) {
             header.append('\n')
                     .append(
