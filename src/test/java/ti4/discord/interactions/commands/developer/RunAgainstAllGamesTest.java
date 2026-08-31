@@ -2,39 +2,78 @@ package ti4.discord.interactions.commands.developer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.testUtils.BaseTi4Test;
 
 class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
-    void shouldOnlyCleanUpGamesThatRecordAPlayerOnEveryPlay() {
-        assertThat(RunAgainstAllGames.startedAfterPlayerTracking(gameCreatedOn("2026.05.24")))
-                .isTrue();
+    void shouldNameTheFlavourAPlayerStillSittingOnTheirHomeworldWas() {
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("mollprimusk", "wellon")))
+                .isEqualTo("keleresm");
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("archonrenk", "archontauk")))
+                .isEqualTo("keleresx");
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("valkk", "ylirk", "avark")))
+                .isEqualTo("keleresa");
     }
 
     @Test
-    void shouldSkipGamesFromBeforePlayerTrackingBegan() {
-        // Every play in these games is player-less, so a player-less cancel is not evidence of
-        // anything and the cleanup has no way to tell a fabricated one from a real one.
-        assertThat(RunAgainstAllGames.startedAfterPlayerTracking(gameCreatedOn("2026.05.23")))
-                .isFalse();
-        assertThat(RunAgainstAllGames.startedAfterPlayerTracking(gameCreatedOn("2026.01.01")))
-                .isFalse();
+    void shouldNotGuessFromPlanetsThatNameNoFlavourOrMoreThanOne() {
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("wellon", "vefutii")))
+                .isNull();
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding()))
+                .isNull();
+        // Conquering another Keleres home would make the planets disagree - the board decides then.
+        assertThat(RunAgainstAllGames.factionFromTheirHomePlanets(playerHolding("valkk", "mollprimusk")))
+                .isNull();
     }
 
     @Test
-    void shouldSkipGamesItCannotDate() {
-        assertThat(RunAgainstAllGames.startedAfterPlayerTracking(gameCreatedOn("not a date")))
-                .isFalse();
-        assertThat(RunAgainstAllGames.startedAfterPlayerTracking(gameCreatedOn("")))
-                .isFalse();
+    void shouldNameTheFlavourFromTheHomeSystemLeftOnTheBoard() {
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("93new", "19", "20")))
+                .isEqualTo("keleresa");
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("92new")))
+                .isEqualTo("keleresx");
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("94new")))
+                .isEqualTo("keleresm");
     }
 
-    private static Game gameCreatedOn(String creationDate) {
+    @Test
+    void shouldNotGuessFromABoardWithNoKeleresHomeOrMoreThanOne() {
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("19", "20")))
+                .isNull();
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles()))
+                .isNull();
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("92new", "94new")))
+                .isNull();
+    }
+
+    /** The plain Xxcha, Argent and Mentak homes are different systems, and must not be read as Keleres. */
+    @Test
+    void shouldNotReadThePlainHomeSystemsAsKeleres() {
+        assertThat(RunAgainstAllGames.factionFromTheOnlyKeleresHomeOnTheBoard(gameWithTiles("92", "93", "94")))
+                .isNull();
+    }
+
+    private static Player playerHolding(String... planets) {
         Game game = new Game();
-        game.setCreationDate(creationDate);
+        Player player = game.addPlayer("user", "user");
+        player.setFaction("keleres");
+        player.setColor("red");
+        player.getPlanets().addAll(List.of(planets));
+        return player;
+    }
+
+    private static Game gameWithTiles(String... tileIds) {
+        Game game = new Game();
+        int position = 101;
+        for (String tileId : tileIds) {
+            game.setTile(new Tile(tileId, Integer.toString(position++)));
+        }
         return game;
     }
 }
