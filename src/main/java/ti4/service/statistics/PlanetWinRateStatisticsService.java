@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
@@ -31,6 +32,8 @@ import ti4.model.PlanetModel;
 
 @UtilityClass
 public class PlanetWinRateStatisticsService {
+
+    public static final String POK_ONLY_OPTION = "pok_only";
 
     private static final int BAND_SIZE = 2;
     private static final int OPEN_ENDED_BAND_START = 12;
@@ -56,33 +59,41 @@ public class PlanetWinRateStatisticsService {
                     .thenComparing(Entry::getKey);
 
     public static void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> showPlanetWinRates(event));
+        boolean pokOnly = event.getOption(POK_ONLY_OPTION, false, OptionMapping::getAsBoolean);
+        StatisticsPipeline.queue(event, () -> showPlanetWinRates(event, pokOnly));
     }
 
-    private static void showPlanetWinRates(SlashCommandInteractionEvent event) {
-        PlanetWinRateStats stats = new PlanetWinRateStats();
+    private static void showPlanetWinRates(SlashCommandInteractionEvent event, boolean pokOnly) {
+        PlanetWinRateStats stats = new PlanetWinRateStats(pokOnly);
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
-                        .and(PlanetWinRateStatisticsService::isEligibleGameType),
+                        .and(game -> isEligibleGameType(game, pokOnly)),
                 game -> accumulateGame(game, stats),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Planet win rates", buildReport(stats));
     }
 
-    static List<String> buildReport(List<Game> games) {
-        PlanetWinRateStats stats = new PlanetWinRateStats();
+    static List<String> buildReport(List<Game> games, boolean pokOnly) {
+        PlanetWinRateStats stats = new PlanetWinRateStats(pokOnly);
         games.forEach(game -> accumulateGame(game, stats));
         return buildReport(stats);
     }
 
-    static boolean isEligibleGameType(Game game) {
-        return !game.isTwilightsFallMode();
+    static boolean isEligibleGameType(Game game, boolean pokOnly) {
+        if (game.isTwilightsFallMode()) {
+            return false;
+        }
+        return pokOnly ? game.isProphecyOfKings() && !game.isThundersEdge() : sampledGameType(game);
+    }
+
+    private static boolean sampledGameType(Game game) {
+        return game.isThundersEdge() || game.isProphecyOfKings();
     }
 
     private static void accumulateGame(Game game, PlanetWinRateStats stats) {
         Player winner = game.getWinner().orElse(null);
-        if (winner == null || !isEligibleGameType(game)) {
+        if (winner == null || !isEligibleGameType(game, stats.pokOnly)) {
             return;
         }
         stats.games++;
@@ -176,8 +187,12 @@ public class PlanetWinRateStatisticsService {
 
         StringBuilder header = new StringBuilder("## __**Planet Win Rates**__\n");
         header.append("_Planets each player controlled at the end of the game. Oceans are never counted._\n");
-        header.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario,"
-                + " non-Twilight's-Fall games with winners._\n");
+        header.append(
+                        stats.pokOnly
+                                ? "_Prophecy of Kings games, no Thunder's Edge."
+                                : "_Thunder's Edge and Prophecy" + " of Kings games.")
+                .append(" 6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario,"
+                        + " non-Twilight's-Fall, with winners._\n");
         if (stats.overall.players == 0) {
             header.append('\n')
                     .append(
@@ -367,6 +382,12 @@ public class PlanetWinRateStatisticsService {
     }
 
     private static class PlanetWinRateStats {
+        private PlanetWinRateStats(boolean pokOnly) {
+            this.pokOnly = pokOnly;
+        }
+
+        final boolean pokOnly;
+
         final PlanetHoldingStats overall = new PlanetHoldingStats();
 
         final Map<String, PlanetHoldingStats> byFaction = new HashMap<>();

@@ -161,7 +161,9 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         addPlayer(twilightsFall, "sol", true, "jord", "wellon");
         addPlayer(twilightsFall, "letnev", false, "arcprime", "wrenterra");
 
-        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(twilightsFall))
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(twilightsFall, false))
+                .isFalse();
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(twilightsFall, true))
                 .isFalse();
         assertThat(render(List.of(twilightsFall))).contains("No games matched.\n");
 
@@ -169,8 +171,65 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         addPlayer(normal, "sol", true, "jord", "wellon");
         addPlayer(normal, "letnev", false, "arcprime", "wrenterra");
 
-        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(normal)).isTrue();
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(normal, false))
+                .isTrue();
         assertThat(render(List.of(twilightsFall, normal))).contains("Games analyzed: 1 | Players analyzed: 2\n");
+    }
+
+    @Test
+    void shouldTakeBothThundersEdgeAndProphecyOfKingsByDefault() {
+        Game thundersEdge = pokAndThundersEdgeGame("1");
+        Game prophecyOfKings = prophecyOfKingsGame("2");
+
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(thundersEdge, false))
+                .isTrue();
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(prophecyOfKings, false))
+                .isTrue();
+
+        String report = render(List.of(thundersEdge, prophecyOfKings));
+        assertThat(report).contains("_Thunder's Edge and Prophecy of Kings games.");
+        assertThat(report).contains("Games analyzed: 2 | Players analyzed: 4\n");
+    }
+
+    @Test
+    void shouldDropThundersEdgeGamesWhenPokOnly() {
+        Game thundersEdge = pokAndThundersEdgeGame("1");
+        Game prophecyOfKings = prophecyOfKingsGame("2");
+
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(thundersEdge, true))
+                .isFalse();
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(prophecyOfKings, true))
+                .isTrue();
+
+        String report = render(List.of(thundersEdge, prophecyOfKings), true);
+        assertThat(report).contains("_Prophecy of Kings games, no Thunder's Edge.");
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+    }
+
+    @Test
+    void shouldDropGamesThatAreNeitherThundersEdgeNorProphecyOfKings() {
+        Game baseGame = pokAndThundersEdgeGame("1");
+        baseGame.setThundersEdge(false);
+        baseGame.setProphecyOfKings(false);
+
+        assertThat(PlanetWinRateStatisticsService.isEligibleGameType(baseGame, false))
+                .isFalse();
+        assertThat(render(List.of(baseGame))).contains("No games matched.\n");
+    }
+
+    private static Game pokAndThundersEdgeGame(String suffix) {
+        Game game = newGame(suffix);
+        game.setThundersEdge(true);
+        game.setProphecyOfKings(true);
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+        return game;
+    }
+
+    private static Game prophecyOfKingsGame(String suffix) {
+        Game game = pokAndThundersEdgeGame(suffix);
+        game.setThundersEdge(false);
+        return game;
     }
 
     @Test
@@ -267,7 +326,11 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     private static String render(List<Game> games) {
-        return String.join("", PlanetWinRateStatisticsService.buildReport(games));
+        return render(games, false);
+    }
+
+    private static String render(List<Game> games, boolean pokOnly) {
+        return String.join("", PlanetWinRateStatisticsService.buildReport(games, pokOnly));
     }
 
     private static Game newGame(String suffix) {
