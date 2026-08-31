@@ -107,7 +107,7 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldRankPlanetsByWinRateOnceTheyClearTheSampleThreshold() {
+    void shouldRankPlanetsByWinRateHighestFirst() {
         String report = render(repeatGame(MINIMUM_SAMPLE, game -> {
             addPlayer(game, "sol", true, "jord", "wellon");
             addPlayer(game, "letnev", false, "arcprime", "wrenterra", "vefutii");
@@ -133,15 +133,49 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldSuppressPlanetsBelowTheSampleThreshold() {
-        String report = render(repeatGame(MINIMUM_SAMPLE - 1, game -> {
-            addPlayer(game, "sol", true, "jord", "wellon");
-            addPlayer(game, "letnev", false, "arcprime", "wrenterra");
-        }));
+    void shouldRankAPlanetHeldOnlyOnce() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        assertThat(render(List.of(game))).contains("* `100%` (1/1) Wellon\n");
+    }
+
+    @Test
+    void shouldSayNoPlanetsWereHeldWhenEveryoneOnlyHasTheirHome() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(game));
 
         assertThat(report).contains("### Win rate by planet controlled\n");
-        assertThat(report).contains("- No planet was held that often.\n");
-        assertThat(report).doesNotContain("Wellon");
+        assertThat(report).contains("- No planets were held.\n");
+    }
+
+    @Test
+    void shouldBreakDownSkippedPlayersByFactionWithAGameToLookAt() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "bluetf", false);
+        addPlayer(game, "redtf", false);
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 1\n");
+        assertThat(report).contains("### Skipped players\n");
+        assertThat(report).contains("2 player(s) had no home planets on file for their faction");
+        assertThat(report).contains("- `bluetf` - 1 player(s), e.g. game `planet-stats-1`\n");
+        assertThat(report).contains("- `redtf` - 1 player(s), e.g. game `planet-stats-1`\n");
+    }
+
+    @Test
+    void shouldLeaveOutTheSkippedSectionWhenEveryHomeWasIdentified() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        assertThat(render(List.of(game))).doesNotContain("### Skipped players");
     }
 
     @Test

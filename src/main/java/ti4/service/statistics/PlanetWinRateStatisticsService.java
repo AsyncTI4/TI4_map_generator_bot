@@ -34,7 +34,7 @@ public class PlanetWinRateStatisticsService {
     private static final int BAND_SIZE = 2;
     private static final int OPEN_ENDED_BAND_START = 12;
     private static final int MINIMUM_FACTION_PLAYERS = 25;
-    private static final int MINIMUM_PLANET_HOLDINGS = 25;
+    private static final int SKIPPED_FACTIONS_LISTED = 10;
 
     private static final Comparator<Entry<String, WinRateCount>> BY_WIN_RATE_DESC = Comparator.comparingDouble(
                     (Entry<String, WinRateCount> entry) -> entry.getValue().getWinRate())
@@ -90,6 +90,8 @@ public class PlanetWinRateStatisticsService {
             Set<String> homePlanets = getHomePlanets(player);
             if (homePlanets.isEmpty()) {
                 stats.playersWithoutAKnownHome++;
+                stats.skippedPlayersByFaction.merge(player.getFaction(), 1, Integer::sum);
+                stats.skippedGameNames.putIfAbsent(player.getFaction(), game.getName());
                 continue;
             }
             seats.add(new PlayerHome(player, homePlanets));
@@ -170,18 +172,42 @@ public class PlanetWinRateStatisticsService {
                 .append(" | Players analyzed: ")
                 .append(stats.overall.players)
                 .append('\n');
-        if (stats.playersWithoutAKnownHome > 0) {
-            header.append("_Skipped ")
-                    .append(stats.playersWithoutAKnownHome)
-                    .append(" player(s) whose home planets could not be identified._\n");
-        }
         blocks.add(header.toString());
+        appendSkippedPlayersSection(blocks, stats);
 
         appendNonHomePlanetsSection(blocks, stats);
         appendHomePlanetsLostSection(blocks, stats);
         appendPerPlanetSection(blocks, stats);
 
         return blocks;
+    }
+
+    private static void appendSkippedPlayersSection(List<String> blocks, PlanetWinRateStats stats) {
+        if (stats.playersWithoutAKnownHome == 0) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder("\n### Skipped players\n");
+        sb.append("_")
+                .append(stats.playersWithoutAKnownHome)
+                .append(" player(s) had no home planets on file for their faction, so they are in none of the numbers"
+                        + " above or below. Each row names a game to look at._\n");
+
+        List<Entry<String, Integer>> byFaction = stats.skippedPlayersByFaction.entrySet().stream()
+                .sorted(Entry.<String, Integer>comparingByValue().reversed().thenComparing(Entry::getKey))
+                .toList();
+        byFaction.stream().limit(SKIPPED_FACTIONS_LISTED).forEach(entry -> sb.append("- `")
+                .append(entry.getKey())
+                .append("` - ")
+                .append(entry.getValue())
+                .append(" player(s), e.g. game `")
+                .append(stats.skippedGameNames.get(entry.getKey()))
+                .append("`\n"));
+        if (byFaction.size() > SKIPPED_FACTIONS_LISTED) {
+            sb.append("- and ")
+                    .append(byFaction.size() - SKIPPED_FACTIONS_LISTED)
+                    .append(" more faction(s)\n");
+        }
+        blocks.add(sb.toString());
     }
 
     private static void appendNonHomePlanetsSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -285,15 +311,12 @@ public class PlanetWinRateStatisticsService {
     private static void appendPerPlanetSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Win rate by planet controlled\n"
                 + "_A player's win rate when they held the planet at the end of the game. Home planets are left"
-                + " out._\n"
-                + "_Only planets held at least " + MINIMUM_PLANET_HOLDINGS + " times are shown._\n");
+                + " out._\n");
 
-        List<Entry<String, WinRateCount>> ranked = stats.byPlanet.entrySet().stream()
-                .filter(entry -> entry.getValue().getPlayers() >= MINIMUM_PLANET_HOLDINGS)
-                .sorted(BY_WIN_RATE_DESC)
-                .toList();
+        List<Entry<String, WinRateCount>> ranked =
+                stats.byPlanet.entrySet().stream().sorted(BY_WIN_RATE_DESC).toList();
         if (ranked.isEmpty()) {
-            blocks.add("- No planet was held that often.\n");
+            blocks.add("- No planets were held.\n");
             return;
         }
         ranked.forEach(entry -> blocks.add(renderPlanetLine(entry)));
@@ -327,6 +350,10 @@ public class PlanetWinRateStatisticsService {
         final Map<String, PlanetHoldingStats> byFaction = new HashMap<>();
 
         final Map<String, WinRateCount> byPlanet = new HashMap<>();
+
+        final Map<String, Integer> skippedPlayersByFaction = new HashMap<>();
+
+        final Map<String, String> skippedGameNames = new HashMap<>();
 
         int games;
         int playersWithoutAKnownHome;
