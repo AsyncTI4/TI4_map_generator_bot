@@ -38,8 +38,8 @@ public class PlanetWinRateStatisticsService {
     public static final String POK_ONLY_OPTION = "pok_only";
 
     /**
-     * The Deepwrought Scholarate is the one faction that holds ground alongside whoever controls a
-     * planet, so it is the only one whose coexistence can carry it through losing a home planet.
+     * Coexistence carries any faction through a home planet loss, but only the Deepwrought
+     * Scholarate does it often enough for the count to be worth a line of its own.
      */
     private static final String COEXISTING_FACTION = "deepwrought";
 
@@ -145,11 +145,11 @@ public class PlanetWinRateStatisticsService {
                     .filter(planet -> !isTradeStation(planet))
                     .count();
             Set<String> coexistedOn = coexistedPlanets(game, seat.player(), controlledPlanets);
-            Set<String> coexistedHomePlanets = COEXISTING_FACTION.equalsIgnoreCase(faction) ? coexistedOn : Set.of();
+            // A home system is kept only by holding or coexisting on every planet in it.
             boolean lostAHomePlanet = homePlanets.stream()
-                    .anyMatch(planet -> !controlledPlanets.contains(planet) && !coexistedHomePlanets.contains(planet));
+                    .anyMatch(planet -> !controlledPlanets.contains(planet) && !coexistedOn.contains(planet));
             boolean coexistedThroughALoss =
-                    !lostAHomePlanet && homePlanets.stream().anyMatch(coexistedHomePlanets::contains);
+                    !lostAHomePlanet && homePlanets.stream().anyMatch(coexistedOn::contains);
 
             SeatOutcome outcome = new SeatOutcome(
                     isWinner, nonHomePlanets, coexistedOn.size(), lostAHomePlanet, coexistedThroughALoss);
@@ -293,7 +293,9 @@ public class PlanetWinRateStatisticsService {
         appendSkippedPlayersSection(blocks, stats);
 
         appendNonHomePlanetsSection(blocks, stats);
-        appendCoexistedPlanetsSection(blocks, stats);
+        if (!stats.pokOnly) {
+            appendCoexistedPlanetsSection(blocks, stats);
+        }
         appendHomePlanetsLostSection(blocks, stats);
         appendPerPlanetSection(blocks, stats);
 
@@ -446,14 +448,16 @@ public class PlanetWinRateStatisticsService {
 
     private static void appendHomePlanetsLostSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Home planets lost\n"
-                + "_Players who did not control every planet of their own home system at the end of the game."
-                + " For the Deepwrought Scholarate, coexisting on one counts as holding it._\n");
+                + "_Players who ended the game without every planet of their own home system. Coexisting on one"
+                + " counts as holding it, so keeping a home system means holding or coexisting on all of it._\n");
 
         blocks.add(renderCombinedHomePlanetsLostLine(stats.overall));
         wellSampledFactions(stats)
                 .sorted(BY_HOME_LOSS_RATE_DESC)
-                .forEach(entry ->
-                        blocks.add(renderFactionHomePlanetsLostLine(factionLabel(entry.getKey()), entry.getValue())));
+                .forEach(entry -> blocks.add(renderFactionHomePlanetsLostLine(
+                        factionLabel(entry.getKey()),
+                        entry.getValue(),
+                        COEXISTING_FACTION.equalsIgnoreCase(entry.getKey()))));
     }
 
     private static String renderCombinedHomePlanetsLostLine(PlanetHoldingStats group) {
@@ -471,7 +475,8 @@ public class PlanetWinRateStatisticsService {
         return sb.append('\n').toString();
     }
 
-    private static String renderFactionHomePlanetsLostLine(String label, PlanetHoldingStats group) {
+    private static String renderFactionHomePlanetsLostLine(
+            String label, PlanetHoldingStats group, boolean showCoexistence) {
         StringBuilder sb =
                 appendHomePlanetsLostCount(new StringBuilder("- ").append(label).append(": "), group);
         sb.append(" homes lost");
@@ -482,7 +487,9 @@ public class PlanetWinRateStatisticsService {
                     .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
                     .append(" otherwise");
         }
-        appendCoexistedThrough(sb, group);
+        if (showCoexistence) {
+            appendCoexistedThrough(sb, group);
+        }
         return sb.append('\n').toString();
     }
 

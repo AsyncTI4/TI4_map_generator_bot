@@ -141,20 +141,33 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         assertThat(report).contains("homes lost. Coexisted through 25/25 (100%) of home system losses.\n");
     }
 
-    /** Every other faction has to actually control its home planets to keep them. */
+    /** Coexistence keeps any faction's home, not just the Deepwrought - only the note is theirs. */
     @Test
-    void shouldNotLetAnyOtherFactionCoexistThroughAHomePlanetLoss() {
+    void shouldCountAnyFactionsCoexistenceAsHoldingItsHome() {
         Game game = newGame("1");
-        game.setTile(new Tile("01", "101"));
-        Player letnev = addPlayer(game, "letnev", false, "arcprime", "wrenterra");
-        addPlayer(game, "sol", true, "jord");
-        // Letnev is standing on Jord, which does nothing for Sol or for Letnev's own home.
-        putInfantryOn(game, "jord", letnev);
+        game.setTile(new Tile("10", "101"));
+        Player letnev = addPlayer(game, "letnev", false);
+        addPlayer(game, "sol", true, "jord", "arcprime", "wrenterra");
+        // Sol took both Letnev home planets, and Letnev is standing on both.
+        putInfantryOn(game, "arcprime", letnev);
+        putInfantryOn(game, "wrenterra", letnev);
 
         String report = render(List.of(game));
 
         assertThat(report).contains("- **All factions**: 0/2 (0%) of players lost a home planet\n");
         assertThat(report).doesNotContain("Coexisted through");
+    }
+
+    /** Half a home system is still a lost home system. */
+    @Test
+    void shouldCountALossWhenOnlySomeOfTheHomeSystemIsHeldOrCoexistedOn() {
+        Game game = newGame("1");
+        game.setTile(new Tile("10", "101"));
+        Player letnev = addPlayer(game, "letnev", false);
+        addPlayer(game, "sol", true, "jord", "arcprime", "wrenterra");
+        putInfantryOn(game, "arcprime", letnev);
+
+        assertThat(render(List.of(game))).contains("- **All factions**: 1/2 (50%) of players lost a home planet.");
     }
 
     @Test
@@ -238,6 +251,17 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         putInfantryOn(game, "wellon", titans);
 
         assertThat(render(List.of(game))).contains("  - 1 planet: 100% (1/1; 100%)\n");
+    }
+
+    @Test
+    void shouldDropTheCoexistenceSectionEntirelyForPokOnly() {
+        Game game = prophecyOfKingsGame("1");
+        game.setTile(new Tile("19", "101"));
+        Player titans = addPlayer(game, "titans", false, "elysium");
+        putInfantryOn(game, "wellon", titans);
+
+        assertThat(render(List.of(game), true)).doesNotContain("### Win rate by planets coexisted on");
+        assertThat(render(List.of(game), false)).contains("### Win rate by planets coexisted on");
     }
 
     @Test
