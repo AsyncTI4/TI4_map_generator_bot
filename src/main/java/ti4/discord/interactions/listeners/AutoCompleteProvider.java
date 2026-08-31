@@ -183,16 +183,15 @@ class AutoCompleteProvider {
                 Map<String, String> values = new HashMap<>() {
                     {
                         put("RED", "Reds");
-                        put("GRAY", "Grays");
-                        // put("GRAY", "Greys");// TODO duplicate keys
-                        // put("GRAY", "Blacks");
                         put("ORANGE", "Oranges");
-                        // put("ORANGE", "Browns");
+                        put("BROWN", "Browns");
                         put("YELLOW", "Yellows");
                         put("GREEN", "Greens");
                         put("BLUE", "Blues");
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
+                        put("WHITE", "Whites");
+                        put("BLACK", "Blacks");
                         put("MULTI", "Multi-Colours");
                         put(Constants.ALL, "ALL COLOURS");
                     }
