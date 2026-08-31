@@ -39,7 +39,7 @@ class ColorModelTest extends BaseTi4Test {
     }
 
     private static final Set<String> VALID_CATEGORIES =
-            Set.of("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK");
+            Set.of("RED", "ORANGE", "BROWN", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "WHITE", "BLACK");
 
     private static void checkColorCategories(ColorModel color) {
         for (String category : color.getColorCategories()) {

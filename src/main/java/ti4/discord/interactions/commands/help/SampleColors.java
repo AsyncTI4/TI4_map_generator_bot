@@ -62,7 +62,8 @@ class SampleColors extends Subcommand {
         if (input == null
                 || Constants.ALL.equals(input.getAsString())
                 || input.getAsString().isEmpty()) {
-            hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", MULTI);
+            hues = Arrays.asList(
+                    "RED", "ORANGE", "BROWN", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "WHITE", "BLACK", MULTI);
             fewer = 1;
         } else {
             SPACING = 12;

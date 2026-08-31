@@ -96,7 +96,7 @@
         "textColor": "white",
         "primaryColor": { "red": 140, "green": 60, "blue": 55 },
         "secondaryColor": { "red": 60, "green": 30, "blue": 25 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "eme",
@@ -150,7 +150,7 @@
         "textColor": "black",
         "primaryColor": { "red": 255, "green": 0, "blue": 0 },
         "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["BLACK"]
     },
     {
         "alias": "sbt",
@@ -168,7 +168,7 @@
         "textColor": "black",
         "primaryColor": { "red": 255, "green": 0, "blue": 0 },
         "secondaryColor": { "red": 0, "green": 255, "blue": 0 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["WHITE"]
     },
     {
         "alias": "wsp",
@@ -186,7 +186,7 @@
         "textColor": "white",
         "primaryColor": { "red": 255, "green": 255, "blue": 255 },
         "secondaryColor": { "red": 0, "green": 0, "blue": 0 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["BLACK", "WHITE"]
     },
     {
         "alias": "pld",
@@ -213,7 +213,7 @@
         "textColor": "white",
         "primaryColor": { "red": 74, "green": 27, "blue": 36 },
         "secondaryColor": { "red": 135, "green": 0, "blue": 4 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "nm",
@@ -231,7 +231,7 @@
         "textColor": "black",
         "primaryColor": { "red": 242, "green": 242, "blue": 242 },
         "secondaryColor": { "red": 255, "green": 210, "blue": 112 },
-        "colorCategories": ["GRAY", "YELLOW"]
+        "colorCategories": ["WHITE", "YELLOW"]
     },
     {
         "alias": "abr",
@@ -240,7 +240,7 @@
         "textColor": "black",
         "primaryColor": { "red": 206, "green": 206, "blue": 206 },
         "secondaryColor": { "red": 50, "green": 50, "blue": 50 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["WHITE"]
     },
     {
         "alias": "ryl",
@@ -258,7 +258,7 @@
         "textColor": "black",
         "primaryColor": { "red": 243, "green": 229, "blue": 171 },
         "secondaryColor": { "red": 150, "green": 80, "blue": 42 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "psy",
@@ -276,7 +276,7 @@
         "textColor": "white",
         "primaryColor": { "red": 90, "green": 150, "blue": 100 },
         "secondaryColor": { "red": 172, "green": 160, "blue": 116 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "blt",

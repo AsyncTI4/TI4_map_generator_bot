@@ -6,7 +6,7 @@
         "aliases": ["lgy", "lightgrey", "white", "W"],
         "textColor": "black",
         "primaryColor": { "red": 206, "green": 206, "blue": 206 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["WHITE"]
     },
     {
         "alias": "red",
@@ -70,7 +70,7 @@
         "aliases": ["black", "blk"],
         "textColor": "white",
         "primaryColor": { "red": 50, "green": 50, "blue": 50 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["BLACK"]
     },
     {
         "alias": "ptr",
@@ -94,7 +94,7 @@
         "aliases": ["bwn"],
         "textColor": "white",
         "primaryColor": { "red": 150, "green": 80, "blue": 42 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "gry",
@@ -102,7 +102,7 @@
         "aliases": ["gray", "grey", "gry"],
         "textColor": "white",
         "primaryColor": { "red": 110, "green": 122, "blue": 150 },
-        "colorCategories": ["GRAY"]
+        "colorCategories": ["BLACK"]
     },
     {
         "alias": "tan",
@@ -110,7 +110,7 @@
         "aliases": ["tan"],
         "textColor": "black",
         "primaryColor": { "red": 172, "green": 160, "blue": 116 },
-        "colorCategories": ["ORANGE"]
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "frs",
