@@ -207,6 +207,26 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
                 .isEqualTo("101");
     }
 
+    /**
+     * Xxcha's own home has the same planets as the Keleres-Xxcha home, so with Xxcha at the table
+     * that tile is theirs and must not be handed to Keleres.
+     */
+    @Test
+    void shouldNotClaimASharedHomeSystemItsOwnFactionIsPlaying() {
+        Game game = gameWithTiles("14");
+        seat(game, "keleres");
+        seat(game, "xxcha");
+
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(game, "keleresx")).isNull();
+
+        Game keleresOnlyTile = gameWithTiles("92new");
+        seat(keleresOnlyTile, "keleres");
+        seat(keleresOnlyTile, "xxcha");
+
+        assertThat(RunAgainstAllGames.homeSystemPositionFor(keleresOnlyTile, "keleresx"))
+                .isEqualTo("101");
+    }
+
     @Test
     void shouldFindNoHomeSystemPositionWhenTheTileIsGoneFromTheBoard() {
         assertThat(RunAgainstAllGames.homeSystemPositionFor(gameWithTiles("19", "20"), "keleresx"))

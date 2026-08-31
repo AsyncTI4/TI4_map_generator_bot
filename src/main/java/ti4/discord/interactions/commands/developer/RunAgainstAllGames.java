@@ -198,11 +198,7 @@ class RunAgainstAllGames extends Subcommand {
      * the oldest games no longer carry the tile at all.
      */
     static String factionFromAnOrphanedBaseHome(Game game) {
-        Set<String> factionsAtTheTable = game.getPlayers().values().stream()
-                .map(Player::getFaction)
-                .filter(StringUtils::isNotBlank)
-                .map(faction -> faction.toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
+        Set<String> factionsAtTheTable = factionsAtTheTable(game);
 
         Set<String> candidates = Stream.concat(
                         game.getTileMap().values().stream().map(Tile::getTileID).map(KELERES_FACTION_BY_OWN_TILE::get),
@@ -213,6 +209,14 @@ class RunAgainstAllGames extends Subcommand {
                 .filter(keleresFaction -> !isAtTheTable(factionsAtTheTable, BORROWED_FROM.get(keleresFaction)))
                 .collect(Collectors.toSet());
         return candidates.size() == 1 ? candidates.iterator().next() : null;
+    }
+
+    private static Set<String> factionsAtTheTable(Game game) {
+        return game.getPlayers().values().stream()
+                .map(Player::getFaction)
+                .filter(StringUtils::isNotBlank)
+                .map(faction -> faction.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
     }
 
     private static boolean isAtTheTable(Set<String> factionsAtTheTable, String baseFaction) {
@@ -226,11 +230,16 @@ class RunAgainstAllGames extends Subcommand {
      * board no longer holds the tile at all, which is half of them.
      */
     static String homeSystemPositionFor(Game game, String keleresFaction) {
+        // With the borrowed faction at the table, a shared home system is theirs and not Keleres's -
+        // only the Keleres-only tiles can be claimed then.
+        boolean sharedHomesAreSpokenFor = isAtTheTable(factionsAtTheTable(game), BORROWED_FROM.get(keleresFaction));
         return game.getTileMap().values().stream()
                 .filter(tile -> tile.getPlanetUnitHolders().stream()
                         .map(UnitHolder::getName)
                         .map(KELERES_FACTION_BY_HOME_PLANET::get)
                         .anyMatch(keleresFaction::equals))
+                .filter(tile ->
+                        !sharedHomesAreSpokenFor || KELERES_FACTION_BY_KELERES_TILE.containsKey(tile.getTileID()))
                 .map(Tile::getPosition)
                 .filter(StringUtils::isNotBlank)
                 .findFirst()
