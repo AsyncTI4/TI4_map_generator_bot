@@ -3434,7 +3434,10 @@ public class ButtonHelper {
             }
         }
         StringBuilder stringBuilder = new StringBuilder();
-        removeUser(event, game, p2, stringBuilder);
+        if (!p2.isDummy()) {
+            removeUser(event, game, p2, stringBuilder);
+        }
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("buyoutPlanet_")
