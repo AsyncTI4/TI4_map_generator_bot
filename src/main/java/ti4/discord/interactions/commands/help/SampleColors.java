@@ -30,10 +30,17 @@ import ti4.service.image.FileUploadService;
 
 class SampleColors extends Subcommand {
 
+    private static final String MULTI = "MULTI";
+
     SampleColors() {
         super(Constants.SAMPLE_COLORS, "Show a sample image of dreadnoughts in various player colors.");
         addOptions(new OptionData(OptionType.STRING, Constants.HUE, "General hue of colors to show (default: all)")
                 .setAutoComplete(true));
+    }
+
+    private static boolean isInCategory(ColorModel color, String category) {
+        if (MULTI.equals(category)) return color.isMulti();
+        return !color.isMulti() && color.getColorCategories().contains(category);
     }
 
     @Override
@@ -55,9 +62,8 @@ class SampleColors extends Subcommand {
         if (input == null
                 || Constants.ALL.equals(input.getAsString())
                 || input.getAsString().isEmpty()) {
-            hues = Arrays.asList(
-                    "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2", "MULTI3");
-            fewer = 3;
+            hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", MULTI);
+            fewer = 1;
         } else {
             SPACING = 12;
             DREADWIDTH = 77 + 2 * SPACING;
@@ -66,11 +72,9 @@ class SampleColors extends Subcommand {
             LINEHEIGHT = 20;
             bigFont = Storage.getFont16();
             smallFont = Storage.getFont12();
-            if ("MULTI".equals(input.getAsString())) {
-                hues = Arrays.asList("MULTI1", "MULTI2", "MULTI3");
-                fewer = 3;
-            } else {
-                hues.add(input.getAsString());
+            hues.add(input.getAsString());
+            if (MULTI.equals(input.getAsString())) {
+                fewer = 1;
             }
             stroke = new BasicStroke(3.0f);
         }
@@ -79,7 +83,7 @@ class SampleColors extends Subcommand {
         for (String h : hues) {
             int count = 0;
             for (ColorModel c : Mapper.getColors()) {
-                if (c.getHue().equals(h)) {
+                if (isInCategory(c, h)) {
                     count++;
                 }
             }
@@ -106,9 +110,9 @@ class SampleColors extends Subcommand {
 
         for (String h : hues) {
             x = left;
-            boolean multi = h.contains("MULTI");
+            boolean multi = MULTI.equals(h);
             for (ColorModel c : Mapper.getColors()) {
-                if (!c.getHue().equals(h)) {
+                if (!isInCategory(c, h)) {
                     continue;
                 }
                 String alias = c.getAlias();

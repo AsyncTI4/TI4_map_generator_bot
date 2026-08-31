@@ -34,7 +34,48 @@ class ColorModelTest extends BaseTi4Test {
             checkEmojisConfig(color);
             checkUnitImages(color);
             checkTokenImages(color);
+            checkColorCategories(color);
         }
+    }
+
+    private static final Set<String> VALID_CATEGORIES =
+            Set.of("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK");
+
+    private static void checkColorCategories(ColorModel color) {
+        for (String category : color.getColorCategories()) {
+            assertTrue(
+                    VALID_CATEGORIES.contains(category),
+                    color.getName() + " has an unknown colorCategory: " + category);
+        }
+    }
+
+    @Test
+    void testPinkishColorsAvoidEachOther() {
+        ColorModel pink = Mapper.getColor("pink");
+        ColorModel psychedelic = Mapper.getColor("psychedelic");
+        ColorModel sunset = Mapper.getColor("sunset");
+
+        assertTrue(overlaps(pink, psychedelic), "pink and psychedelic should be considered overlapping");
+        assertTrue(overlaps(pink, sunset), "pink and sunset should be considered overlapping");
+        assertTrue(overlaps(psychedelic, sunset), "psychedelic and sunset should be considered overlapping");
+    }
+
+    @Test
+    void testDisjointCategoriesDoNotOverlap() {
+        ColorModel psychedelic = Mapper.getColor("psychedelic");
+        ColorModel harlequin = Mapper.getColor("harlequin");
+
+        assertFalse(overlaps(psychedelic, harlequin), "disjoint categories should not count as overlapping");
+    }
+
+    @Test
+    void testMultiIsDerivedFromCategoryCount() {
+        assertTrue(Mapper.getColor("sunset").isMulti(), "sunset has three categories");
+        assertFalse(Mapper.getColor("red").isMulti(), "red has one category");
+    }
+
+    private static boolean overlaps(ColorModel c1, ColorModel c2) {
+        return c1.getColorCategories().stream().anyMatch(c2.getColorCategories()::contains);
     }
 
     private static boolean isDefault(String emoji) {
