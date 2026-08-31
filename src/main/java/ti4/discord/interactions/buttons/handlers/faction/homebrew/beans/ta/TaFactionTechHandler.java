@@ -23,184 +23,62 @@ import ti4.service.unit.AddUnitService;
 public class TaFactionTechHandler {
 
     private static final String YELLOW_TECH = "betaqr";
+    private static final String QR_PLACE_PDS = "taQRPlacePds_";
     private static final String GREEN_TECH = "betaro";
-    private static final String QR_CHOOSE_PLANET = "taQRPlanet_";
-    private static final String QR_CHOOSE_STRUCTURE = "taQRStructure_";
-    private static final String QR_DECLINE = "taQRDecline";
     private static final String RO_PLANET_READY = "taROPlanetReady_";
     private static final String RO_PLANET_EXHAUST = "taROPlanetExhaust_";
     private static final String RO_DECLINE = "taRODecline";
 
     public static void resolveQuantumRestructuring(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (player == null || game == null || !player.hasTech(YELLOW_TECH)) {
-            return;
-        }
-
-        List<String> designPlanets = new ArrayList<>();
-        for (String planetName : player.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planetName);
-            if (tile == null) {
-                continue;
-            }
-
-            if (TaAbilityHandler.planetHasAnyDesignAttached(tile, planetName)) {
-                designPlanets.add(planetName);
-            }
-        }
-
-        if (designPlanets.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "There are no eligible planets with a design on them");
-            ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (String planetName : designPlanets) {
-            Tile tile = game.getTileFromPlanet(planetName);
-            Planet planet = tile.getUnitHolderFromPlanet(planetName);
-            if (tile == null || planet == null) {
-                continue;
-            }
-
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + QR_CHOOSE_PLANET + tile.getPosition() + "|" + planetName,
-                    Helper.getPlanetRepresentation(planetName, game)));
-        }
-        buttons.add(Buttons.red(player.factionButtonChecker() + QR_DECLINE, "Decline"));
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", choose a planet you control with a design for _Quantum Restructuring_.",
-                buttons);
-    }
-
-    @ButtonHandler(QR_CHOOSE_PLANET)
-    public static void resolveQrPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null || !buttonID.startsWith(QR_CHOOSE_PLANET)) {
-            return;
-        }
-
-        String payload = buttonID.substring(QR_CHOOSE_PLANET.length());
-        String[] parts = payload.split("\\|", 2);
-        if (parts.length != 2) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        String tilePosition = parts[0];
-        String planetName = parts[1];
-
-        Tile tile = game.getTileByPosition(tilePosition);
-        if (tile == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
-        if (planet == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        if (!player.hasTech(YELLOW_TECH)
-                || !player.getPlanetsAllianceMode().contains(planetName)
-                || !TaAbilityHandler.planetHasAnyDesignAttached(tile, planetName)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + QR_CHOOSE_STRUCTURE + tilePosition + "|" + planetName + "|pds",
-                "Place 1 PDS"));
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + QR_CHOOSE_STRUCTURE + tilePosition + "|" + planetName + "|spacedock",
-                "Place 1 Spacedock"));
-        buttons.add(Buttons.red(player.factionButtonChecker() + QR_DECLINE, "Decline"));
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", choose which structure to place on "
-                        + Helper.getPlanetRepresentation(planetName, game),
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(QR_CHOOSE_STRUCTURE)
-    public static void resolveQrStructure(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null || !buttonID.startsWith(QR_CHOOSE_STRUCTURE)) {
-            return;
-        }
-
-        String payload = buttonID.substring(QR_CHOOSE_STRUCTURE.length());
-        String[] parts = payload.split("\\|", 3);
-        if (parts.length != 3) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String tilePosition = parts[0];
-        String planetName = parts[1];
-        String structureType = parts[2];
-
-        Tile tile = game.getTileByPosition(tilePosition);
-        if (tile == null
-                || !player.hasTech(YELLOW_TECH)
-                || !player.getPlanetsAllianceMode().contains(planetName)
-                || !TaAbilityHandler.planetHasAnyDesignAttached(tile, planetName)
-                || (!"pds".equals(structureType) && (!"spacedock".equals(structureType)))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        int pdsRemaining =
-                player.getUnitCap("pd") - ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
-
-        int sdRemaining =
-                player.getUnitCap("sd") - ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
-
-        if ("pds".equals(structureType) && pdsRemaining < 1) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", you have no PDS remaining in your reinforcements.");
-            ButtonHelper.deleteMessage(event);
-            ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-            return;
-        }
-
-        if ("spacedock".equals(structureType) && sdRemaining < 1) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", you have no more Space Docks in your reinforcements.");
-            ButtonHelper.deleteMessage(event);
-            ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-            return;
-        }
-
-        String unitString = "pds".equals(structureType) ? "1 pds " + planetName : "1 spacedock " + planetName;
-        AddUnitService.addUnits(event, tile, game, player.getColor(), unitString);
-
-        ButtonHelper.deleteMessage(event);
-
-        String structureName = "pds".equalsIgnoreCase(structureType) ? "PDS" : "space dock";
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + " placed 1 " + structureName + " on "
-                        + Helper.getPlanetRepresentation(planetName, game)
-                        + " using _Quantum Restructuring_.");
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-    }
-
-    @ButtonHandler(QR_DECLINE)
-    public static void resolveQrDecline(ButtonInteractionEvent event, Game game, Player player) {
         if (event == null || game == null || player == null || !player.hasTech(YELLOW_TECH)) {
             return;
         }
+        List<Button> buttons = new ArrayList<>();
+        for (String planetName : player.getPlanets()) {
+            Tile tile = game.getTileFromPlanet(planetName);
+            Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+            if (planet != null && TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + QR_PLACE_PDS + tile.getPosition() + "|" + planetName,
+                        "Place PDS on " + Helper.getPlanetRepresentation(planetName, game)));
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + " has no controlled planet with an attachment for _Quantum Restructuring_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the planet on which to place 1 PDS with _Quantum Restructuring_.",
+                buttons);
+    }
 
+    @ButtonHandler(QR_PLACE_PDS)
+    private static void resolveQuantumRestructuringPlacement(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.substring(QR_PLACE_PDS.length()).split("\\|", 2);
+        if (game == null || player == null || parts.length != 2 || !player.hasTech(YELLOW_TECH)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        Tile tile = game.getTileByPosition(parts[0]);
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(parts[1]);
+        if (planet == null
+                || !player.getPlanets().contains(parts[1])
+                || !TaAbilityHandler.planetHasAnyAttachment(tile, parts[1])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 pds " + parts[1]);
         ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " placed 1 PDS on " + Helper.getPlanetRepresentation(parts[1], game)
+                        + " with _Quantum Restructuring_.");
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
     }
 

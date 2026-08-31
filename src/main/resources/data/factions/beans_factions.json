@@ -198,13 +198,13 @@
             "sdn",
             "pa"
         ],
-        "startingTechAmount": 1,
+        "startingTechAmount": 2,
         "homePlanets": [
             "ta"
         ],
         "abilities": [
             "planetary_reconfiguration",
-            "efficient_governance"
+            "perfect_architecture"
         ],
         "leaders": [
             "taagent",
@@ -247,8 +247,7 @@
         ],
         "abilities": [
             "neural_instruments",
-            "proxy_network",
-            "reverse_engineering"
+            "proxy_network"
         ],
         "leaders": [
             "netrunnersagent",

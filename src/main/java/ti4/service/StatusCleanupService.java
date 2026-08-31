@@ -94,7 +94,6 @@ public class StatusCleanupService {
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
 
-            NetrunnersAbilitiesHandler.clearReverseEngineering(game, player);
             NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
             NetrunnersFactionTechsHandler.clearDataMining(game, player);
             player.setPassed(false);

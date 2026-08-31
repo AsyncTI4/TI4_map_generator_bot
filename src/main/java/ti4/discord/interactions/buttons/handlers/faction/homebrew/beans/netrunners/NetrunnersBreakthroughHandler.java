@@ -11,13 +11,17 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.turn.EndTurnService;
 
 @UtilityClass
 public class NetrunnersBreakthroughHandler {
+    private static final String DATA_BREACH = "netrunnersbt";
+
     public static BreakthroughModel getCopiedDataBreachBreakthrough(Game game, Player player) {
         if (game == null || player == null || !player.hasUnlockedBreakthrough("netrunnersbt")) {
             return null;
@@ -76,10 +80,74 @@ public class NetrunnersBreakthroughHandler {
         List<Button> buttons = getDataBreachPlacementButtons(game, player);
         if (buttons.isEmpty()) return;
         String message =
-                player.getRepresentationUnfogged() + ", please choose the breakthrough for your **Data Breach** token.";
+                player.getRepresentationUnfogged() + ", please choose the breakthrough for your _Data Breach_ token.";
         String buttonPrefix = player.factionButtonChecker() + "netrunnersDataBreach_";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+    }
+
+    public static boolean offerDataBreachTechnology(Game game, Player player) {
+        if (game == null
+                || player == null
+                || !player.hasReadyBreakthrough(DATA_BREACH)
+                || player.getStrategicCC() < 1) {
+            return false;
+        }
+        String techId = game.getStoredValue(NetrunnersAbilitiesHandler.PROXY_TECH + player.getFaction());
+        if (techId.isEmpty() || !player.hasTech(techId) || Mapper.getTech(techId) == null) {
+            return false;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", you may exhaust _Data Breach_ and spend 1 command token from your strategy pool to permanently gain "
+                        + Mapper.getTech(techId).getNameRepresentation() + ".",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + "netrunnersDataBreachGainTech", "Use Data Breach"),
+                        Buttons.red(player.factionButtonChecker() + "netrunnersDataBreachDeclineTech", "Decline")));
+        return true;
+    }
+
+    @ButtonHandler("netrunnersDataBreachGainTech")
+    public static void resolveDataBreachTechnology(Game game, Player player, ButtonInteractionEvent event) {
+        if (game == null
+                || player == null
+                || !player.hasReadyBreakthrough(DATA_BREACH)
+                || player.getStrategicCC() < 1) {
+            return;
+        }
+        String techId = game.getStoredValue(NetrunnersAbilitiesHandler.PROXY_TECH + player.getFaction());
+        if (techId.isEmpty() || !player.hasTech(techId) || Mapper.getTech(techId) == null) {
+            return;
+        }
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        BreakthroughCommandHelper.exhaustBreakthrough(player, DATA_BREACH);
+        game.removeStoredValue(NetrunnersAbilitiesHandler.PROXY_TECH + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + " spent 1 command token from their strategy pool and permanently gained "
+                        + Mapper.getTech(techId).getNameRepresentation() + " with _Data Breach_.");
+        EndTurnService.endTurnAndUpdateMap(event, game, player);
+    }
+
+    @ButtonHandler("netrunnersDataBreachDeclineTech")
+    public static void declineDataBreachTechnology(Game game, Player player, ButtonInteractionEvent event) {
+        if (game == null || player == null || !player.hasUnlockedBreakthrough(DATA_BREACH)) {
+            return;
+        }
+        String techId = game.getStoredValue(NetrunnersAbilitiesHandler.PROXY_TECH + player.getFaction());
+        NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
+        ButtonHelper.deleteMessage(event);
+        if (!techId.isEmpty() && Mapper.getTech(techId) != null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " declined to use _Data Breach_ and lost temporary access to "
+                            + Mapper.getTech(techId).getNameRepresentation() + ".");
+        }
+        EndTurnService.endTurnAndUpdateMap(event, game, player);
     }
 
     private static List<Button> getDataBreachPlacementButtons(Game game, Player player) {
@@ -107,7 +175,7 @@ public class NetrunnersBreakthroughHandler {
         }
         List<Button> buttons = getDataBreachPlacementButtons(game, player);
         String message =
-                player.getRepresentationUnfogged() + ", please choose the breakthrough for your **Data Breach** token.";
+                player.getRepresentationUnfogged() + ", please choose the breakthrough for your _Data Breach_ token.";
         String buttonPrefix = player.factionButtonChecker() + "netrunnersDataBreach_";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) return;
@@ -119,7 +187,7 @@ public class NetrunnersBreakthroughHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " placed their Data Breach token on "
+                player.getRepresentation() + " placed their _Data Breach_ token on "
                         + Mapper.getBreakthrough(parts[1]).getNameRepresentation() + ".");
     }
 }

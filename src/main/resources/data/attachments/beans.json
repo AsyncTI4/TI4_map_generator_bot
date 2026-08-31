@@ -23,13 +23,6 @@
         "source": "beans"
     },
     {
-        "id": "designunify",
-        "name": "Unify (Design)",
-        "imagePath": "attachment_designunify.png",
-        "isFakeAttachment": true,
-        "source": "beans"
-    },
-    {
         "id": "designgrand",
         "name": "Grand Design",
         "imagePath": "attachment_designgrand.png",

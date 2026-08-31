@@ -33,7 +33,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
@@ -214,13 +213,11 @@ public final class AgendaHelper {
                 && !buttonID.contains("predictive")
                 && !buttonID.contains("everything")) {
             PlanetExhaust.doAction(player, planetName, game, false);
-            TaLeadersHandler.clearLenPredeclareForPlanet(game, player, planetName);
         }
         if (buttonID.contains("everything")) {
             for (String planet : player.getPlanets()) {
                 player.exhaustPlanet(planet);
             }
-            TaLeadersHandler.clearAllLenPredeclaresForPlayer(game, player);
         }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (!buttonID.contains("argent")
@@ -1766,7 +1763,6 @@ public final class AgendaHelper {
                 voteAmount++;
             }
         }
-        voteAmount += TaLeadersHandler.getLenPredeclaredVoteBonus(game, player, planet);
         return voteAmount;
     }
 
@@ -1791,8 +1787,7 @@ public final class AgendaHelper {
             if (voteAmount != 0) {
                 Button button = Buttons.gray(
                         "exhaustForVotes_planet_" + planet,
-                        planetNameProper + " (" + voteAmount + ")"
-                                + TaLeadersHandler.getLenVoteLabelSuffix(game, player, planet),
+                        planetNameProper + " (" + voteAmount + ")",
                         PlanetEmojis.getPlanetEmoji(planet));
                 planetButtons.add(button);
             }

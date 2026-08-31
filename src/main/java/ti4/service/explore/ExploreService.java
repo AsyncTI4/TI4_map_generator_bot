@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
@@ -433,6 +434,11 @@ public class ExploreService {
         }
         Planet exploredPlanet = planetName == null ? null : game.getUnitHolderFromPlanet(planetName);
         boolean isPlanetExplore = !Constants.FRONTIER.equals(drawColor) && exploredPlanet != null;
+        if (isPlanetExplore
+                && TaAbilityHandler.offerPerfectArchitecture(
+                        event, player, game, tile, planetName, cardID, drawColor)) {
+            return;
+        }
         if (isPlanetExplore) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green(
@@ -649,6 +655,7 @@ public class ExploreService {
 
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
                     tile.addToken(attachmentFilename, planetID);
+                    TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetID);
                     message = new StringBuilder("Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".");
                     if (Constants.DMZ.equals(attachment)) {
@@ -1488,7 +1495,6 @@ public class ExploreService {
         if (player.getPlanets().contains(planetID) && player.hasAbility("planetary_reconfiguration")) {
             TaAbilityHandler.offerPlanetaryReconfigurationButtons(player, game, tile, planetID);
         }
-
         if (player.hasAbility("awaken")
                 && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
                 && player.getPlanetsAllianceMode().contains(planetID)

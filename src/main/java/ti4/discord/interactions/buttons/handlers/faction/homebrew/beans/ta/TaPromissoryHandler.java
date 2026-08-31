@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class TaPromissoryHandler {
@@ -29,9 +30,7 @@ public class TaPromissoryHandler {
 
         for (String planetName : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
-            if (planet == null
-                    || planet.isHomePlanet()
-                    || planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN)) {
+            if (planet == null || planet.isHomePlanet() || planet.getTokenList().contains(ASE_ATTACHMENT_TOKEN)) {
                 continue;
             }
             return true;
@@ -51,9 +50,7 @@ public class TaPromissoryHandler {
         List<String> legalPlanets = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
-            if (planet == null
-                    || planet.isHomePlanet()
-                    || planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN)) {
+            if (planet == null || planet.isHomePlanet() || planet.getTokenList().contains(ASE_ATTACHMENT_TOKEN)) {
                 continue;
             }
 
@@ -124,12 +121,13 @@ public class TaPromissoryHandler {
 
         if (!player.getPlanets().contains(planetName)
                 || planet.isHomePlanet()
-                || planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN)) {
+                || planet.getTokenList().contains(ASE_ATTACHMENT_TOKEN)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         planet.addToken(ASE_ATTACHMENT_TOKEN);
+        CommanderUnlockCheckService.checkPlayer(player, "ta");
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannel(
@@ -140,6 +138,6 @@ public class TaPromissoryHandler {
     }
 
     public static boolean planetHasAdvancedStructuralEngineering(Planet planet) {
-        return planet != null && planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN);
+        return planet != null && planet.getTokenList().contains(ASE_ATTACHMENT_TOKEN);
     }
 }
