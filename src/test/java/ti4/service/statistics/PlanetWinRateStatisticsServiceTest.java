@@ -273,7 +273,7 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
             addPlayer(game, "sol", true, "jord", "wellon");
         }));
 
-        assertThat(report).contains(" 25 Silver Flames (0% win rate).\n");
+        assertThat(report).contains(" 25 Silver Flames.\n");
         assertThat(report).contains("- **All factions**: 25/50 (50%) of players lost a home planet.");
     }
 

@@ -574,11 +574,7 @@ public class PlanetWinRateStatisticsService {
         if (group.silverFlamed.getPlayers() == 0) {
             return;
         }
-        sb.append(". ")
-                .append(group.silverFlamed.getPlayers())
-                .append(" Silver Flames (")
-                .append(ActionCardStatsService.formatPercent(group.silverFlamed.getWinRate()))
-                .append(" win rate).");
+        sb.append(". ").append(group.silverFlamed.getPlayers()).append(" Silver Flames.");
     }
 
     private static void appendCoexistedThrough(StringBuilder sb, PlanetHoldingStats group) {
