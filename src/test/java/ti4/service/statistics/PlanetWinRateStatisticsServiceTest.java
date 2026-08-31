@@ -265,15 +265,51 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldStillSkipAPlayerWithNoFactionFileAndNoHomeSystemOnTheBoard() {
+    void shouldFindALegacyKeleresHomeWithoutAPositionToGoOn() {
+        // pbd298-era games store a bare "keleres" and no home system position, so the only thing
+        // naming their home is the Keleres tile sitting on the board.
+        Game game = newGame("1");
+        game.setTile(new Tile("93new", "101"));
+        addPlayer(game, "keleres", true, "valkk", "ylirk", "avark", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(game));
+
+        assertThat(report).doesNotContain("### Skipped players");
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+        assertThat(report).contains("- **All factions**: 0.50 non-home planets on average");
+        assertThat(report).contains("* `100%` (1/1) Wellon\n");
+    }
+
+    @Test
+    void shouldStillSkipAPlayerWhoseFactionHasNoHomeworldAnywhereOnTheBoard() {
         Game game = newGame("1");
         addPlayer(game, "sol", true, "jord", "wellon");
-        addPlayer(game, "keleres", false, "archonrenk");
+        addPlayer(game, "keleres", false, "wellon");
 
         String report = render(List.of(game));
 
         assertThat(report).contains("### Skipped players\n");
         assertThat(report).contains("- `keleres` - 1 player(s), e.g. game `planet-stats-1`\n");
+    }
+
+    @Test
+    void shouldKeepEveryFactionHomeworldOutOfThePerPlanetRanking() {
+        // Nobody at this table is Letnev or Arborec, so their homeworlds are not covered by any
+        // seated player's home planets - the planet data is what has to keep them out.
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "arcprime", "wrenterra", "nestphar", "wellon");
+        addPlayer(game, "jolnar", false, "jol", "nar");
+
+        String report = render(List.of(game));
+
+        assertThat(report)
+                .doesNotContain("Arc Prime")
+                .doesNotContain("Wren Terra")
+                .doesNotContain("Nestphar");
+        assertThat(report).contains("* `100%` (1/1) Wellon\n");
+        // They are still ground taken outside Sol's own home system.
+        assertThat(report).contains("- **All factions**: 2.00 non-home planets on average");
     }
 
     @Test

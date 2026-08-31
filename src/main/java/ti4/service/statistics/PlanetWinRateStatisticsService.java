@@ -136,7 +136,7 @@ public class PlanetWinRateStatisticsService {
             }
 
             controlledPlanets.stream()
-                    .filter(planet -> !everyHomePlanetOnTheBoard.contains(planet))
+                    .filter(planet -> !everyHomePlanetOnTheBoard.contains(planet) && !isFactionHomeworld(planet))
                     .forEach(planet -> stats.byPlanet
                             .computeIfAbsent(planet, _ -> new WinRateCount())
                             .record(isWinner));
@@ -151,6 +151,11 @@ public class PlanetWinRateStatisticsService {
     private static boolean isTradeStation(String planetId) {
         PlanetModel planetModel = Mapper.getPlanet(planetId);
         return planetModel != null && planetModel.isSpaceStation();
+    }
+
+    private static boolean isFactionHomeworld(String planetId) {
+        PlanetModel planetModel = Mapper.getPlanet(planetId);
+        return planetModel != null && StringUtils.isNotBlank(planetModel.getFactionHomeworld());
     }
 
     private static Set<String> getHomePlanets(Game game, Player player) {
@@ -168,7 +173,7 @@ public class PlanetWinRateStatisticsService {
     }
 
     private static Set<String> getHomePlanetsFromTheBoard(Game game, Player player) {
-        return Stream.of(player.getHomeSystemPosition(), player.getPlayerStatsAnchorPosition())
+        Set<String> atTheirPosition = Stream.of(player.getHomeSystemPosition(), player.getPlayerStatsAnchorPosition())
                 .filter(position -> StringUtils.isNotBlank(position) && !"null".equalsIgnoreCase(position))
                 .map(game::getTileByPosition)
                 .filter(tile -> tile != null && tile.isHomeSystem())
@@ -178,6 +183,29 @@ public class PlanetWinRateStatisticsService {
                 .filter(homePlanets -> !homePlanets.isEmpty())
                 .findFirst()
                 .orElse(Set.of());
+        return atTheirPosition.isEmpty() ? homeworldsBelongingTo(game, player.getFaction()) : atTheirPosition;
+    }
+
+    private static Set<String> homeworldsBelongingTo(Game game, String faction) {
+        return game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                .map(UnitHolder::getName)
+                .filter(planetId -> isHomeworldOf(planetId, faction))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Older games stored Keleres as a bare "keleres", which no faction file answers to, while its
+     * homeworlds are marked for keleresa, keleresm and keleresx. Only one of those is ever on a
+     * board, so the alias the planet names starting with the one the player carries picks it out.
+     */
+    private static boolean isHomeworldOf(String planetId, String faction) {
+        PlanetModel planetModel = Mapper.getPlanet(planetId);
+        if (planetModel == null || StringUtils.isBlank(planetModel.getFactionHomeworld())) {
+            return false;
+        }
+        String homeworldFaction = planetModel.getFactionHomeworld().toLowerCase(Locale.ROOT);
+        return homeworldFaction.startsWith(faction.toLowerCase(Locale.ROOT));
     }
 
     private record PlayerHome(Player player, Set<String> homePlanets) {}
