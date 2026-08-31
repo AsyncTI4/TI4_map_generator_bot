@@ -29,17 +29,17 @@ import ti4.spring.service.statistics.matchmaking.SkillTier;
 public class GameStatisticsFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
-    private static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
+    public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
     static final String FOG_FILTER = "is_fog";
     static final String HOMEBREW_FILTER = "has_homebrew";
-    private static final String HAS_WINNER_FILTER = "has_winner";
+    public static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
     private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
-    private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
+    public static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
     private static final String STARTED_AFTER_FILTER = "started_after";
     private static final String SKILL_TIER_FILTER = "skill_tier";
 
@@ -74,6 +74,13 @@ public class GameStatisticsFilterer {
                 OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
         filters.add(skillTierFilterOption());
         return filters;
+    }
+
+    public static List<OptionData> gameStatsFiltersExcept(String... omittedFilters) {
+        Set<String> omitted = Set.of(omittedFilters);
+        return gameStatsFilters().stream()
+                .filter(filter -> !omitted.contains(filter.getName()))
+                .toList();
     }
 
     private static OptionData skillTierFilterOption() {
