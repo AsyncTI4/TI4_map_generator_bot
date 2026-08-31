@@ -31,6 +31,8 @@ class SearchWinningPath extends Subcommand {
 
     private record Criterion(String description, Predicate<WinningPathBreakdown> matches) {}
 
+    private static final int MAX_GAMES_LISTED = 100;
+
     private static final List<PathComponent> COMPONENTS = List.of(
             new PathComponent(
                     "stage_1s",
@@ -98,23 +100,32 @@ class SearchWinningPath extends Subcommand {
         }
 
         var foundGames = new HashSet<String>();
-        StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ")
-                .append(describe(searchedPath))
-                .append('\n');
+        StringBuilder listedGames = new StringBuilder();
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
                         .map(winner -> hasWinningPath(game, winner, searchedPath))
                         .orElse(false)),
                 game -> {
-                    foundGames.add(game.getName());
-                    sb.append(formatGame(game)).append('\n');
+                    if (foundGames.add(game.getName()) && foundGames.size() <= MAX_GAMES_LISTED) {
+                        listedGames.append(formatGame(game)).append('\n');
+                    }
                 },
                 ExecutionLockType.READ);
 
+        StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ")
+                .append(describe(searchedPath))
+                .append('\n');
         if (foundGames.isEmpty()) {
             sb.append("No games match the selected path.");
+        } else if (foundGames.size() > MAX_GAMES_LISTED) {
+            sb.append("_Showing the first ")
+                    .append(MAX_GAMES_LISTED)
+                    .append(" of ")
+                    .append(foundGames.size())
+                    .append(" matching games._\n");
         }
+        sb.append(listedGames);
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Winning Path Games", sb.toString());
     }
