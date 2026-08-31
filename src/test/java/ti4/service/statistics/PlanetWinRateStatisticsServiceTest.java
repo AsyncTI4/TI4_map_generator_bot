@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
@@ -109,6 +111,38 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
         assertThat(report).contains("- **All factions**: 25/50 (50%) of players lost a home planet.");
         assertThat(report).contains("(100%) homes lost. 0% win rate, 0% otherwise\n");
+    }
+
+    @Test
+    void shouldCountCoexistingOnAHomePlanetAsHoldingIt() {
+        Game game = newGame("1");
+        game.setTile(new Tile("01", "101"));
+        Player sol = addPlayer(game, "sol", true, "wellon");
+        Player letnev = addPlayer(game, "letnev", false, "arcprime", "wrenterra", "jord");
+        // Sol lost Jord to Letnev but still has infantry standing on it.
+        putInfantryOn(game, "jord", sol);
+
+        String report = render(List.of(game));
+
+        assertThat(report)
+                .contains("- **All factions**: 0/2 (0%) of players lost a home planet."
+                        + " Coexisted through 1/1 (100%) of home system losses.\n");
+        assertThat(letnev.getPlanets()).contains("jord");
+    }
+
+    @Test
+    void shouldStillCountALossWhenCoexistingOnOnlyOneOfTwoHomePlanets() {
+        Game game = newGame("1");
+        game.setTile(new Tile("10", "101"));
+        Player letnev = addPlayer(game, "letnev", false);
+        Player sol = addPlayer(game, "sol", true, "jord", "arcprime", "wrenterra");
+        // Letnev holds neither home planet and is only standing on one of them.
+        putInfantryOn(game, "arcprime", letnev);
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("- **All factions**: 1/2 (50%) of players lost a home planet.");
+        assertThat(report).doesNotContain("Coexisted through");
     }
 
     @Test
@@ -400,6 +434,12 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         }
         player.getPlanets().addAll(List.of(planets));
         return player;
+    }
+
+    private static void putInfantryOn(Game game, String planet, Player player) {
+        // Coexistence is read through the player's own unit models, so they have to own infantry.
+        player.addOwnedUnitByID("infantry");
+        game.getUnitHolderFromPlanet(planet).addUnit(Units.getUnitKey(UnitType.Infantry, player.getColorID()), 1);
     }
 
     private static void takePlanets(Player player, int count) {

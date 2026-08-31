@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
@@ -126,13 +127,16 @@ public class PlanetWinRateStatisticsService {
                     .filter(planet -> !homePlanets.contains(planet))
                     .filter(planet -> !isTradeStation(planet))
                     .count();
-            boolean lostAHomePlanet = !controlledPlanets.containsAll(homePlanets);
+            Set<String> coexistedOn = coexistedHomePlanets(game, seat.player(), homePlanets, controlledPlanets);
+            boolean lostAHomePlanet = homePlanets.stream()
+                    .anyMatch(planet -> !controlledPlanets.contains(planet) && !coexistedOn.contains(planet));
+            boolean coexistedThroughALoss = !lostAHomePlanet && !coexistedOn.isEmpty();
 
-            stats.overall.record(isWinner, nonHomePlanets, lostAHomePlanet);
+            stats.overall.record(isWinner, nonHomePlanets, lostAHomePlanet, coexistedThroughALoss);
             for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
                 stats.byFaction
                         .computeIfAbsent(factionKey, _ -> new PlanetHoldingStats())
-                        .record(isWinner, nonHomePlanets, lostAHomePlanet);
+                        .record(isWinner, nonHomePlanets, lostAHomePlanet, coexistedThroughALoss);
             }
 
             controlledPlanets.stream()
@@ -141,6 +145,26 @@ public class PlanetWinRateStatisticsService {
                             .computeIfAbsent(planet, _ -> new WinRateCount())
                             .record(isWinner));
         }
+    }
+
+    /**
+     * Home planets the player no longer controls but still has ground forces or structures on. The
+     * same reading of coexistence {@link Player#getPlanetsForScoring} takes, scoped to the planets
+     * this section is asking about.
+     */
+    private static Set<String> coexistedHomePlanets(
+            Game game, Player player, Set<String> homePlanets, Set<String> controlledPlanets) {
+        Set<String> coexistedOn = new HashSet<>();
+        for (String homePlanet : homePlanets) {
+            if (controlledPlanets.contains(homePlanet)) {
+                continue;
+            }
+            if (game.getUnitHolderFromPlanet(homePlanet) instanceof Planet planet
+                    && (planet.hasGroundForces(player) || planet.hasStructures(player))) {
+                coexistedOn.add(homePlanet);
+            }
+        }
+        return coexistedOn;
     }
 
     private static boolean isOcean(String planetId) {
@@ -338,7 +362,8 @@ public class PlanetWinRateStatisticsService {
 
     private static void appendHomePlanetsLostSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Home planets lost\n"
-                + "_Players who did not control every planet of their own home system at the end of the game._\n");
+                + "_Players who did not control every planet of their own home system at the end of the game."
+                + " Coexisting on one counts as holding it._\n");
 
         blocks.add(renderCombinedHomePlanetsLostLine(stats.overall));
         wellSampledFactions(stats)
@@ -349,29 +374,44 @@ public class PlanetWinRateStatisticsService {
 
     private static String renderCombinedHomePlanetsLostLine(PlanetHoldingStats group) {
         StringBuilder sb = appendHomePlanetsLostCount(new StringBuilder("- **All factions**: "), group);
-        if (group.lostAHomePlanet.getPlayers() == 0) {
-            return sb.append(" of players lost a home planet\n").toString();
+        sb.append(" of players lost a home planet");
+        if (group.lostAHomePlanet.getPlayers() > 0) {
+            sb.append(". ")
+                    .append(ActionCardStatsService.formatPercent(group.lostAHomePlanet.getWinRate()))
+                    .append(" win rate when they did, ")
+                    .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
+                    .append(" when they did not");
         }
-        return sb.append(" of players lost a home planet. ")
-                .append(ActionCardStatsService.formatPercent(group.lostAHomePlanet.getWinRate()))
-                .append(" win rate when they did, ")
-                .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
-                .append(" when they did not\n")
-                .toString();
+        appendCoexistedThrough(sb, group);
+        return sb.append('\n').toString();
     }
 
     private static String renderFactionHomePlanetsLostLine(String label, PlanetHoldingStats group) {
         StringBuilder sb =
                 appendHomePlanetsLostCount(new StringBuilder("- ").append(label).append(": "), group);
-        if (group.lostAHomePlanet.getPlayers() == 0) {
-            return sb.append(" homes lost\n").toString();
+        sb.append(" homes lost");
+        if (group.lostAHomePlanet.getPlayers() > 0) {
+            sb.append(". ")
+                    .append(ActionCardStatsService.formatPercent(group.lostAHomePlanet.getWinRate()))
+                    .append(" win rate, ")
+                    .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
+                    .append(" otherwise");
         }
-        return sb.append(" homes lost. ")
-                .append(ActionCardStatsService.formatPercent(group.lostAHomePlanet.getWinRate()))
-                .append(" win rate, ")
-                .append(ActionCardStatsService.formatPercent(group.heldEveryHomePlanet.getWinRate()))
-                .append(" otherwise\n")
-                .toString();
+        appendCoexistedThrough(sb, group);
+        return sb.append('\n').toString();
+    }
+
+    private static void appendCoexistedThrough(StringBuilder sb, PlanetHoldingStats group) {
+        if (group.coexistedThroughLosses == 0) {
+            return;
+        }
+        sb.append(". Coexisted through ")
+                .append(group.coexistedThroughLosses)
+                .append('/')
+                .append(group.homeControlLosses())
+                .append(" (")
+                .append(ActionCardStatsService.formatPercent(group.coexistedThroughRate()))
+                .append(") of home system losses.");
     }
 
     private static StringBuilder appendHomePlanetsLostCount(StringBuilder sb, PlanetHoldingStats group) {
@@ -450,17 +490,31 @@ public class PlanetWinRateStatisticsService {
         int players;
         int wins;
         int nonHomePlanetsAtTheirRealCounts;
+        int coexistedThroughLosses;
 
-        void record(boolean isWinner, int nonHomePlanets, boolean lostHome) {
+        void record(boolean isWinner, int nonHomePlanets, boolean lostHome, boolean coexistedThroughALoss) {
             players++;
             if (isWinner) {
                 wins++;
             }
             nonHomePlanetsAtTheirRealCounts += nonHomePlanets;
+            if (coexistedThroughALoss) {
+                coexistedThroughLosses++;
+            }
             playersByBand
                     .computeIfAbsent(bandStartFor(nonHomePlanets), _ -> new WinRateCount())
                     .record(isWinner);
             (lostHome ? lostAHomePlanet : heldEveryHomePlanet).record(isWinner);
+        }
+
+        /** Losses of control, before coexistence hands some of them back. */
+        int homeControlLosses() {
+            return lostAHomePlanet.getPlayers() + coexistedThroughLosses;
+        }
+
+        double coexistedThroughRate() {
+            int losses = homeControlLosses();
+            return losses == 0 ? 0 : (double) coexistedThroughLosses / losses;
         }
 
         double winRate() {
