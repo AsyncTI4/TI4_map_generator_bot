@@ -36,7 +36,7 @@ public class PlanetWinRateStatisticsService {
     public static final String POK_ONLY_OPTION = "pok_only";
 
     private static final int BAND_SIZE = 2;
-    private static final int OPEN_ENDED_BAND_START = 12;
+    private static final int OPEN_ENDED_BAND_START = 11;
     private static final int MINIMUM_FACTION_PLAYERS = 25;
     private static final int SKIPPED_FACTIONS_LISTED = 10;
 
@@ -287,10 +287,20 @@ public class PlanetWinRateStatisticsService {
     }
 
     private static int bandStartFor(int planets) {
-        return planets >= OPEN_ENDED_BAND_START ? OPEN_ENDED_BAND_START : planets / BAND_SIZE * BAND_SIZE;
+        if (planets == 0) {
+            return 0;
+        }
+        if (planets >= OPEN_ENDED_BAND_START) {
+            return OPEN_ENDED_BAND_START;
+        }
+        return (planets - 1) / BAND_SIZE * BAND_SIZE + 1;
     }
 
     private static void appendBandLabel(StringBuilder sb, int bandStart) {
+        if (bandStart == 0) {
+            sb.append("0 planets");
+            return;
+        }
         if (bandStart >= OPEN_ENDED_BAND_START) {
             sb.append(bandStart).append("+ planets");
             return;

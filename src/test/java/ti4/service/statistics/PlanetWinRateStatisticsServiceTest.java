@@ -28,12 +28,25 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
         assertThat(report)
                 .contains("- **All factions**: 1.00 non-home planets on average, 50% win rate from 2 players");
-        assertThat(report).contains("  - 0-1 planets: 0% (0/1; 50%)\n");
-        assertThat(report).contains("  - 2-3 planets: 100% (1/1; 50%)\n");
+        assertThat(report).contains("  - 0 planets: 0% (0/1; 50%)\n");
+        assertThat(report).contains("  - 1-2 planets: 100% (1/1; 50%)\n");
     }
 
     @Test
-    void shouldPoolCountsIntoBandsTwoWideAndCapTheLastOne() {
+    void shouldGiveZeroPlanetsABandOfItsOwnAheadOfOneAndTwo() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon");
+        addPlayer(game, "jolnar", false, "jol", "nar", "vefutii", "quann");
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("  - 0 planets: 100% (1/1; 33.33%)\n");
+        assertThat(report).contains("  - 1-2 planets: 0% (0/2; 66.67%)\n");
+    }
+
+    @Test
+    void shouldPoolCountsIntoOddStartingBandsTwoWideAndCapTheLastOne() {
         Game game = newGame("1");
         addPlayer(game, "sol", true, "jord");
         takePlanets(game.getPlayerFromColorOrFaction("sol"), 4);
@@ -42,8 +55,8 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
         String report = render(List.of(game));
 
-        assertThat(report).contains("  - 4-5 planets: 100% (1/1; 50%)\n");
-        assertThat(report).contains("  - 12+ planets: 0% (0/1; 50%)\n");
+        assertThat(report).contains("  - 3-4 planets: 100% (1/1; 50%)\n");
+        assertThat(report).contains("  - 11+ planets: 0% (0/1; 50%)\n");
         assertThat(report).contains("12.00 non-home planets on average");
     }
 
