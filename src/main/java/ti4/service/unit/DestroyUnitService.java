@@ -297,6 +297,19 @@ public class DestroyUnitService {
                 if (player != null && player.hasUnit("xan_flagship")) {
                     XanUnitHandler.offerFlagshipReplace(event, game, player);
                 }
+                if (player != null && game.isMuaatManiaMode()) {
+                    String msg = player.getRepresentation()
+                            + " it appears you have been defeated. Instruct your killer (if any) to use the attached buttons to buyout any of your planets that they want (and claim the boon) before pressing the button to finish your elimination";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("claimMMBoon", "Claim Boon"));
+                    for (String planet : player.getPlanets()) {
+                        buttons.add(Buttons.blue(
+                                "buyoutPlanet_" + planet + "_" + player.getFaction(),
+                                "Buy " + Helper.getPlanetRepresentation(planet, game)));
+                    }
+                    buttons.add(Buttons.red("finishMMElimination_" + player.getFaction(), "Finish Elimination"));
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                }
             }
             case Flagship -> {
                 UnitModel destroyedFlagship = player == null ? null : player.getUnitFromUnitKey(unit.unitKey());

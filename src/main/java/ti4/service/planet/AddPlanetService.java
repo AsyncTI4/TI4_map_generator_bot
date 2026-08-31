@@ -687,7 +687,7 @@ public class AddPlanetService {
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
-        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
+        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet) && !game.isMuaatManiaMode()) {
             String marrow = "A Song Like Marrow";
             Integer id = game.getRevealedPublicObjectives().getOrDefault(marrow, null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);

@@ -456,7 +456,11 @@ class AutoCompleteProvider {
             }
             case Constants.SCENARIO -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)", "erwan's gambit (homebrew)");
+                var tokens = List.of(
+                        "ordinian (codex 1)",
+                        "liberation (codex 4)",
+                        "erwan's gambit (homebrew)",
+                        "muaat mania (homebrew)");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }

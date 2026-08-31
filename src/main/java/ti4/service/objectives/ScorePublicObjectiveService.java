@@ -146,6 +146,9 @@ public class ScorePublicObjectiveService {
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
+        if (game.isMuaatManiaMode()) {
+            ButtonHelper.offerMMBoon(player, game);
+        }
         if (player.hasTech("tf-yinascendant") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");

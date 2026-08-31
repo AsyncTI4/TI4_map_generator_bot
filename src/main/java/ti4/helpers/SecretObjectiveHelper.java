@@ -231,7 +231,9 @@ public class SecretObjectiveHelper {
                             + " if another player satisfied the requirements of the SO you just scored, you can use this button to draw an SO via your plausible deniability ability.",
                     buttons);
         }
-
+        if (game.isMuaatManiaMode()) {
+            ButtonHelper.offerMMBoon(player, game);
+        }
         if (player.hasTech("tf-yinascendant")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

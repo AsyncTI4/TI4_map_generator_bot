@@ -759,6 +759,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return true;
         }
 
+        Game game = player.getGame();
+        if (game.getRealPlayers().size() == 1
+                && player.isRealPlayer()
+                && game.getRealAndEliminatedPlayers().size() > 1) {
+            return true;
+        }
+
         Player ally = getRealPlayersNDummies().stream()
                 .filter(p -> p != player && p.getAllianceMembers().contains(player.getFaction()))
                 .findFirst()
@@ -957,6 +964,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Cosmic Convergence", isCosmicConvergenceMode());
+        gameModes.put("Muaat Mania", isMuaatManiaMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());

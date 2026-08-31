@@ -2368,8 +2368,7 @@ public final class Helper {
         if (game.isTwilightsFallMode()) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-
+                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                         Tile t2 = game.getTileByPosition(tilePos);
                         for (UnitHolder uH : t2.getUnitHolders().values()) {
                             if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -3789,6 +3788,11 @@ public final class Helper {
                                 + "Press **End Game** only after done giving titles.",
                         titleButton);
             }
+            return true;
+        }
+        if (game.getRealPlayers().size() == 1
+                && player.isRealPlayer()
+                && game.getRealAndEliminatedPlayers().size() > 1) {
             return true;
         }
         return false;

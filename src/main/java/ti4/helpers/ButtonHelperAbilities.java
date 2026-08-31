@@ -590,7 +590,9 @@ public final class ButtonHelperAbilities {
 
     public static List<Button> getGraceButtons(Game game, Player edyn, int scPlayed) {
         List<Button> scButtons = new ArrayList<>();
-        scButtons.add(Buttons.gray("spendAStratCC", "Spend a Strategy Token"));
+        if (!game.isMuaatManiaMode()) {
+            scButtons.add(Buttons.gray("spendAStratCC", "Spend a Strategy Token"));
+        }
         if (scPlayed > 1
                 && (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1))) {
             scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
