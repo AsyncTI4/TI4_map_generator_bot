@@ -43,6 +43,9 @@ public class PlanetWinRateStatisticsService {
      */
     private static final String COEXISTING_FACTION = "deepwrought";
 
+    /** The factions that coexist by design, and so the only ones the coexistence section reports. */
+    private static final List<String> COEXISTING_FACTIONS = List.of(COEXISTING_FACTION, "titans");
+
     private static final int BAND_SIZE = 2;
     private static final int OPEN_ENDED_BAND_START = 11;
     private static final int COEXIST_OPEN_ENDED_BAND_START = 5;
@@ -400,14 +403,18 @@ public class PlanetWinRateStatisticsService {
 
     private static void appendCoexistedPlanetsSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("\n### Win rate by planets coexisted on\n"
-                + "_Planets a player had ground forces or structures on at the end of the game without controlling"
-                + " them._\n"
                 + "_Each row reads: win rate (wins/players; share of that group's players who got that far)._\n");
 
-        blocks.add(renderCoexistGroup("**All factions**", stats.overall));
-        wellSampledFactions(stats)
+        List<Entry<String, PlanetHoldingStats>> reported = COEXISTING_FACTIONS.stream()
+                .filter(stats.byFaction::containsKey)
+                .map(faction -> Map.entry(faction, stats.byFaction.get(faction)))
                 .sorted(BY_AVERAGE_COEXISTED_PLANETS_DESC)
-                .forEach(entry -> blocks.add(renderCoexistGroup(factionLabel(entry.getKey()), entry.getValue())));
+                .toList();
+        if (reported.isEmpty()) {
+            blocks.add("- Neither faction appeared in the sample.\n");
+            return;
+        }
+        reported.forEach(entry -> blocks.add(renderCoexistGroup(factionLabel(entry.getKey()), entry.getValue())));
     }
 
     private static String renderCoexistGroup(String label, PlanetHoldingStats group) {

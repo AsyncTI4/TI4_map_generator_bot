@@ -175,19 +175,38 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         Game game = newGame("1");
         game.setTile(new Tile("19", "101"));
         game.setTile(new Tile("20", "102"));
-        Player sol = addPlayer(game, "sol", true, "jord");
-        addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon", "vefutii", "abyz");
-        // Sol controls neither Wellon nor Vefut II but is standing on both.
-        putInfantryOn(game, "wellon", sol);
-        putInfantryOn(game, "vefutii", sol);
+        Player titans = addPlayer(game, "titans", true, "elysium");
+        addPlayer(game, "deepwrought", false, "ikatena");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon", "vefutii");
+        // The Titans control neither Wellon nor Vefut II but are standing on both.
+        putInfantryOn(game, "wellon", titans);
+        putInfantryOn(game, "vefutii", titans);
 
         String report = render(List.of(game));
 
         assertThat(report).contains("### Win rate by planets coexisted on\n");
-        assertThat(report)
-                .contains("- **All factions**: 1.00 planets coexisted on on average, 50% win rate from 2 players");
-        assertThat(report).contains("  - 0 planets: 0% (0/1; 50%)\n");
-        assertThat(report).contains("  - 2 planets: 100% (1/1; 50%)\n");
+        assertThat(report).contains("2.00 planets coexisted on on average, 100% win rate from 1 player");
+        assertThat(report).contains("  - 2 planets: 100% (1/1; 100%)\n");
+        assertThat(report).contains("0.00 planets coexisted on on average, 0% win rate from 1 player");
+    }
+
+    @Test
+    void shouldReportOnlyTheFactionsThatCoexistByDesign() {
+        Game game = newGame("1");
+        game.setTile(new Tile("19", "101"));
+        Player letnev = addPlayer(game, "letnev", true, "arcprime", "wrenterra");
+        addPlayer(game, "titans", false, "elysium");
+        addPlayer(game, "sol", false, "jord", "wellon");
+        // Letnev is coexisting, but only the Deepwrought and the Titans earn a row here.
+        putInfantryOn(game, "wellon", letnev);
+
+        List<String> coexistRows = render(List.of(game))
+                .lines()
+                .filter(line -> line.contains("planets coexisted on on average"))
+                .toList();
+
+        assertThat(coexistRows).hasSize(1);
+        assertThat(coexistRows.getFirst()).contains("Titans").doesNotContain("**All factions**");
     }
 
     @Test
@@ -198,27 +217,39 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         game.setTile(new Tile("20", "102"));
         game.setTile(new Tile("38", "103"));
         game.setTile(new Tile("37", "104"));
-        Player sol = addPlayer(game, "sol", true, "jord");
+        Player titans = addPlayer(game, "titans", true, "elysium");
         addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon", "vefutii", "abyz", "arinam", "meer");
         for (String planet : List.of("wellon", "vefutii", "abyz", "arinam", "meer")) {
-            putInfantryOn(game, planet, sol);
+            putInfantryOn(game, planet, titans);
         }
 
         String report = render(List.of(game));
 
-        assertThat(report).contains("  - 5+ planets: 100% (1/1; 50%)\n");
-        assertThat(report).contains("2.50 planets coexisted on on average");
+        assertThat(report).contains("  - 5+ planets: 100% (1/1; 100%)\n");
+        assertThat(report).contains("5.00 planets coexisted on on average");
     }
 
     @Test
     void shouldSayOnePlanetInTheSingularForTheCoexistBands() {
         Game game = newGame("1");
         game.setTile(new Tile("19", "101"));
-        Player sol = addPlayer(game, "sol", true, "jord");
+        Player titans = addPlayer(game, "titans", true, "elysium");
         addPlayer(game, "letnev", false, "arcprime", "wrenterra", "wellon");
-        putInfantryOn(game, "wellon", sol);
+        putInfantryOn(game, "wellon", titans);
 
-        assertThat(render(List.of(game))).contains("  - 1 planet: 100% (1/1; 50%)\n");
+        assertThat(render(List.of(game))).contains("  - 1 planet: 100% (1/1; 100%)\n");
+    }
+
+    @Test
+    void shouldSayNeitherFactionAppearedWhenTheSampleHasNoCoexistingFaction() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("### Win rate by planets coexisted on\n");
+        assertThat(report).contains("- Neither faction appeared in the sample.\n");
     }
 
     @Test
