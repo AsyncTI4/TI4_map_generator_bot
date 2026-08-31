@@ -36,6 +36,9 @@ import ti4.model.PlanetModel;
 public class PlanetWinRateStatisticsService {
 
     public static final String POK_ONLY_OPTION = "pok_only";
+    public static final String HOME_LOSS_FACTION_OPTION = "home_loss_faction";
+
+    private static final int HOME_LOSS_GAMES_LISTED = 40;
 
     /**
      * Coexistence carries any faction through a home planet loss, but only the Deepwrought
@@ -78,11 +81,13 @@ public class PlanetWinRateStatisticsService {
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         boolean pokOnly = event.getOption(POK_ONLY_OPTION, false, OptionMapping::getAsBoolean);
-        StatisticsPipeline.queue(event, () -> showPlanetWinRates(event, pokOnly));
+        String homeLossFaction = event.getOption(HOME_LOSS_FACTION_OPTION, null, OptionMapping::getAsString);
+        StatisticsPipeline.queue(event, () -> showPlanetWinRates(event, pokOnly, homeLossFaction));
     }
 
-    private static void showPlanetWinRates(SlashCommandInteractionEvent event, boolean pokOnly) {
-        PlanetWinRateStats stats = new PlanetWinRateStats(pokOnly);
+    private static void showPlanetWinRates(
+            SlashCommandInteractionEvent event, boolean pokOnly, String homeLossFaction) {
+        PlanetWinRateStats stats = new PlanetWinRateStats(pokOnly, homeLossFaction);
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
                         .and(game -> isEligibleGameType(game, pokOnly)),
@@ -93,7 +98,11 @@ public class PlanetWinRateStatisticsService {
     }
 
     static List<String> buildReport(List<Game> games, boolean pokOnly) {
-        PlanetWinRateStats stats = new PlanetWinRateStats(pokOnly);
+        return buildReport(games, pokOnly, null);
+    }
+
+    static List<String> buildReport(List<Game> games, boolean pokOnly, String homeLossFaction) {
+        PlanetWinRateStats stats = new PlanetWinRateStats(pokOnly, homeLossFaction);
         games.forEach(game -> accumulateGame(game, stats));
         return buildReport(stats);
     }
@@ -151,6 +160,10 @@ public class PlanetWinRateStatisticsService {
             boolean coexistedThroughALoss =
                     !lostAHomePlanet && homePlanets.stream().anyMatch(coexistedOn::contains);
 
+            if (lostAHomePlanet && faction.equalsIgnoreCase(stats.homeLossFaction)) {
+                stats.homeLossGames.add(describeHomeLoss(game, seat, controlledPlanets, coexistedOn));
+            }
+
             SeatOutcome outcome = new SeatOutcome(
                     isWinner, nonHomePlanets, coexistedOn.size(), lostAHomePlanet, coexistedThroughALoss);
             stats.overall.record(outcome);
@@ -186,6 +199,35 @@ public class PlanetWinRateStatisticsService {
             }
         }
         return coexistedOn;
+    }
+
+    /**
+     * One line per home planet loss for the faction being debugged: which planets went, who has them
+     * now, and whether the home system is still on the board at all.
+     */
+    private static String describeHomeLoss(
+            Game game, PlayerHome seat, Set<String> controlledPlanets, Set<String> coexistedOn) {
+        StringBuilder sb = new StringBuilder("- `").append(game.getName()).append("`");
+        for (String homePlanet : seat.homePlanets().stream().sorted().toList()) {
+            if (controlledPlanets.contains(homePlanet) || coexistedOn.contains(homePlanet)) {
+                continue;
+            }
+            UnitHolder unitHolder = game.getUnitHolderFromPlanet(homePlanet);
+            String holder = game.getRealAndEliminatedPlayers().stream()
+                    .filter(player -> player.getPlanets().contains(homePlanet))
+                    .map(Player::getFaction)
+                    .findFirst()
+                    .orElse(unitHolder == null ? "not on the board" : "nobody");
+            sb.append(' ')
+                    .append(planetName(homePlanet))
+                    .append(" (")
+                    .append(holder)
+                    .append(')');
+        }
+        if (game.getStoredValue("silverFlamed").contains(seat.player().getFaction())) {
+            sb.append(" [silverFlamed]");
+        }
+        return sb.append('\n').toString();
     }
 
     private static boolean isOcean(String planetId) {
@@ -298,8 +340,25 @@ public class PlanetWinRateStatisticsService {
         }
         appendHomePlanetsLostSection(blocks, stats);
         appendPerPlanetSection(blocks, stats);
+        appendHomeLossDebugSection(blocks, stats);
 
         return blocks;
+    }
+
+    private static void appendHomeLossDebugSection(List<String> blocks, PlanetWinRateStats stats) {
+        if (StringUtils.isBlank(stats.homeLossFaction)) {
+            return;
+        }
+        blocks.add("\n### Home planet losses for `" + stats.homeLossFaction + "`\n"
+                + "_Each line names the game, the home planets they ended without, and who holds each one._\n");
+        if (stats.homeLossGames.isEmpty()) {
+            blocks.add("- They never lost a home planet.\n");
+            return;
+        }
+        stats.homeLossGames.stream().limit(HOME_LOSS_GAMES_LISTED).forEach(blocks::add);
+        if (stats.homeLossGames.size() > HOME_LOSS_GAMES_LISTED) {
+            blocks.add("- and " + (stats.homeLossGames.size() - HOME_LOSS_GAMES_LISTED) + " more\n");
+        }
     }
 
     private static void appendSkippedPlayersSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -552,11 +611,16 @@ public class PlanetWinRateStatisticsService {
     }
 
     private static class PlanetWinRateStats {
-        private PlanetWinRateStats(boolean pokOnly) {
+        private PlanetWinRateStats(boolean pokOnly, String homeLossFaction) {
             this.pokOnly = pokOnly;
+            this.homeLossFaction = homeLossFaction;
         }
 
         final boolean pokOnly;
+
+        final String homeLossFaction;
+
+        final List<String> homeLossGames = new ArrayList<>();
 
         final PlanetHoldingStats overall = new PlanetHoldingStats();
 

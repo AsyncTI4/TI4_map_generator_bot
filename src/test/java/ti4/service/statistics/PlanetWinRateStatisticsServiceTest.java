@@ -265,6 +265,39 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldListTheGamesAFactionLostItsHomePlanetsIn() {
+        Game game = newGame("1");
+        game.setTile(new Tile("10", "101"));
+        addPlayer(game, "letnev", false, "arcprime");
+        addPlayer(game, "sol", true, "jord", "wrenterra");
+
+        String report = String.join("", PlanetWinRateStatisticsService.buildReport(List.of(game), false, "letnev"));
+
+        assertThat(report).contains("### Home planet losses for `letnev`\n");
+        assertThat(report).contains("- `planet-stats-1` Wren Terra (sol)\n");
+    }
+
+    @Test
+    void shouldSayAFactionNeverLostAHomePlanetWhenItDidNot() {
+        Game game = newGame("1");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+        addPlayer(game, "sol", true, "jord");
+
+        String report = String.join("", PlanetWinRateStatisticsService.buildReport(List.of(game), false, "letnev"));
+
+        assertThat(report).contains("- They never lost a home planet.\n");
+    }
+
+    @Test
+    void shouldLeaveTheHomeLossDebugSectionOutWhenNoFactionIsAskedFor() {
+        Game game = newGame("1");
+        addPlayer(game, "letnev", false, "arcprime");
+        addPlayer(game, "sol", true, "jord", "wrenterra");
+
+        assertThat(render(List.of(game))).doesNotContain("### Home planet losses for");
+    }
+
+    @Test
     void shouldSayNeitherFactionAppearedWhenTheSampleHasNoCoexistingFaction() {
         Game game = newGame("1");
         addPlayer(game, "sol", true, "jord", "wellon");
