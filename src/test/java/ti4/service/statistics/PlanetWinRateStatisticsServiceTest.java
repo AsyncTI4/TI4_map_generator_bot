@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.testUtils.BaseTi4Test;
 
 class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
@@ -170,6 +171,37 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
 
         assertThat(PlanetWinRateStatisticsService.isEligibleGameType(normal)).isTrue();
         assertThat(render(List.of(twilightsFall, normal))).contains("Games analyzed: 1 | Players analyzed: 2\n");
+    }
+
+    @Test
+    void shouldReadHomePlanetsOffTheBoardWhenTheFactionFileHasNone() {
+        // Older games stored Keleres as a bare "keleres", which has no faction model behind it.
+        Game game = newGame("1");
+        game.setTile(new Tile("92new", "101"));
+        Player keleres = addPlayer(game, "keleres", true, "archonrenk", "archontauk", "wellon");
+        keleres.setPlayerStatsAnchorPosition("101");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(game));
+
+        assertThat(report).doesNotContain("### Skipped players");
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+        // Archon Ren and Archon Tau are home, so Wellon is the one planet taken outside it.
+        assertThat(report).contains("- **All factions**: 0.50 non-home planets on average");
+        assertThat(report).contains("* `100%` (1/1) Wellon\n");
+        assertThat(report).doesNotContain("Archon Ren").doesNotContain("Archon Tau");
+    }
+
+    @Test
+    void shouldStillSkipAPlayerWithNoFactionFileAndNoHomeSystemOnTheBoard() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "keleres", false, "archonrenk");
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("### Skipped players\n");
+        assertThat(report).contains("- `keleres` - 1 player(s), e.g. game `planet-stats-1`\n");
     }
 
     @Test

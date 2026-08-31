@@ -21,6 +21,7 @@ import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.AliasHandler;
 import ti4.image.Mapper;
@@ -92,7 +93,7 @@ public class PlanetWinRateStatisticsService {
             if (StringUtils.isBlank(player.getFaction())) {
                 continue;
             }
-            Set<String> homePlanets = getHomePlanets(player);
+            Set<String> homePlanets = getHomePlanets(game, player);
             if (homePlanets.isEmpty()) {
                 stats.playersWithoutAKnownHome++;
                 stats.skippedPlayersByFaction.merge(player.getFaction(), 1, Integer::sum);
@@ -141,15 +142,31 @@ public class PlanetWinRateStatisticsService {
         return planetModel != null && planetModel.isSpaceStation();
     }
 
-    private static Set<String> getHomePlanets(Player player) {
+    private static Set<String> getHomePlanets(Game game, Player player) {
         FactionModel factionModel = player.getFactionModel();
-        if (factionModel == null) {
-            return Set.of();
+        if (factionModel != null) {
+            Set<String> homePlanets = factionModel.getHomePlanets().stream()
+                    .filter(StringUtils::isNotBlank)
+                    .map(planet -> AliasHandler.resolvePlanet(planet.toLowerCase(Locale.ROOT)))
+                    .collect(Collectors.toSet());
+            if (!homePlanets.isEmpty()) {
+                return homePlanets;
+            }
         }
-        return factionModel.getHomePlanets().stream()
-                .filter(StringUtils::isNotBlank)
-                .map(planet -> AliasHandler.resolvePlanet(planet.toLowerCase(Locale.ROOT)))
-                .collect(Collectors.toSet());
+        return getHomePlanetsFromTheBoard(game, player);
+    }
+
+    private static Set<String> getHomePlanetsFromTheBoard(Game game, Player player) {
+        return Stream.of(player.getHomeSystemPosition(), player.getPlayerStatsAnchorPosition())
+                .filter(position -> StringUtils.isNotBlank(position) && !"null".equalsIgnoreCase(position))
+                .map(game::getTileByPosition)
+                .filter(tile -> tile != null && tile.isHomeSystem())
+                .map(tile -> tile.getPlanetUnitHolders().stream()
+                        .map(UnitHolder::getName)
+                        .collect(Collectors.toSet()))
+                .filter(homePlanets -> !homePlanets.isEmpty())
+                .findFirst()
+                .orElse(Set.of());
     }
 
     private record PlayerHome(Player player, Set<String> homePlanets) {}
@@ -194,8 +211,8 @@ public class PlanetWinRateStatisticsService {
         StringBuilder sb = new StringBuilder("\n### Skipped players\n");
         sb.append("_")
                 .append(stats.playersWithoutAKnownHome)
-                .append(" player(s) had no home planets on file for their faction, so they are in none of the numbers"
-                        + " above or below. Each row names a game to look at._\n");
+                .append(" player(s) had no home planets on file for their faction and no home system on the board, so"
+                        + " they are in none of the numbers above or below. Each row names a game to look at._\n");
 
         List<Entry<String, Integer>> byFaction = stats.skippedPlayersByFaction.entrySet().stream()
                 .sorted(Entry.<String, Integer>comparingByValue().reversed().thenComparing(Entry::getKey))
