@@ -273,6 +273,19 @@ public class AddPlanetService {
                             }
                         }
                     }
+                    if (player.hasRelic("taraniscrest")) {
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                player_.dummyPlayerSpoof() + "exchangeProgramPart3_" + planet,
+                                "Place Enemy into Coexistence"));
+                        buttons.add(Buttons.red("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " you can place a " + player_.getFactionEmoji()
+                                        + " infantry into coexistence on "
+                                        + Mapper.getPlanet(planet).getName() + " due to the Taranis Crest relic.",
+                                buttons);
+                    }
                     if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
                                 + " lost control of "
