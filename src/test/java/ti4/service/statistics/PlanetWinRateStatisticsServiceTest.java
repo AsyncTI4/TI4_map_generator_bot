@@ -407,8 +407,56 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
                 .isTrue();
 
         String report = render(List.of(bothExpansions, prophecyOfKings), true);
-        assertThat(report).contains("_Prophecy of Kings games without Thunder's Edge.");
+        assertThat(report).contains("_Prophecy of Kings games with no Thunder's Edge planets on the table.");
         assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+    }
+
+    @Test
+    void shouldDropPokOnlyGamesHoldingAPlanetFromALaterExpansion() {
+        Game game = prophecyOfKingsGame("1");
+        addPlayer(game, "hacan", false, "tempesta");
+
+        assertThat(PlanetWinRateStatisticsService.hasOnlyProphecyOfKingsPlanets(game))
+                .isFalse();
+        assertThat(render(List.of(game), true)).contains("No games matched.\n");
+    }
+
+    @Test
+    void shouldDropPokOnlyGamesWithALaterExpansionTileStillOnTheBoard() {
+        Game game = prophecyOfKingsGame("1");
+        game.setTile(new Tile("18", "000"));
+        assertThat(PlanetWinRateStatisticsService.hasOnlyProphecyOfKingsPlanets(game))
+                .isTrue();
+
+        game.setTile(new Tile("112", "000"));
+
+        assertThat(PlanetWinRateStatisticsService.hasOnlyProphecyOfKingsPlanets(game))
+                .isFalse();
+    }
+
+    @Test
+    void shouldReportHowManyPokOnlyGamesCarriedALaterExpansionsPlanets() {
+        Game clean = prophecyOfKingsGame("1");
+        Game withThundersEdge = prophecyOfKingsGame("2");
+        addPlayer(withThundersEdge, "hacan", false, "tempesta");
+
+        String report = render(List.of(clean, withThundersEdge), true);
+
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+        assertThat(report)
+                .contains("Dropped 1 game(s) that were not flagged as Thunder's Edge but had planets from it in"
+                        + " play.\n");
+    }
+
+    @Test
+    void shouldLeaveLaterExpansionPlanetsAloneOutsidePokOnly() {
+        Game game = pokAndThundersEdgeGame("1");
+        addPlayer(game, "hacan", false, "tempesta");
+
+        String report = render(List.of(game), false);
+
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 3\n");
+        assertThat(report).doesNotContain("Dropped");
     }
 
     @Test

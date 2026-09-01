@@ -105,9 +105,33 @@ public class PlanetWinRateStatisticsService {
         return pokOnly ? !game.isThundersEdge() : game.isThundersEdge();
     }
 
+    /**
+     * Some games sit on a Thunder's Edge board without carrying the flag, so a run that means to be
+     * free of Thunder's Edge has to look at what is actually on the table rather than trust the mode.
+     */
+    static boolean hasOnlyProphecyOfKingsPlanets(Game game) {
+        return everyPlanetInPlay(game)
+                .map(Mapper::getPlanet)
+                .allMatch(planet -> planet != null
+                        && planet.getSource() != null
+                        && planet.getSource().isPok());
+    }
+
+    private static Stream<String> everyPlanetInPlay(Game game) {
+        return Stream.concat(
+                game.getTileMap().values().stream()
+                        .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                        .map(UnitHolder::getName),
+                game.getRealAndEliminatedPlayers().stream().flatMap(player -> player.getPlanets().stream()));
+    }
+
     private static void accumulateGame(Game game, PlanetWinRateStats stats) {
         Player winner = game.getWinner().orElse(null);
         if (winner == null || !isEligibleGameType(game, stats.pokOnly)) {
+            return;
+        }
+        if (stats.pokOnly && !hasOnlyProphecyOfKingsPlanets(game)) {
+            stats.gamesWithLaterPlanets++;
             return;
         }
         stats.games++;
@@ -281,7 +305,7 @@ public class PlanetWinRateStatisticsService {
         header.append("_Planets each player controlled at the end of the game. Oceans are never counted._\n");
         header.append(
                         stats.pokOnly
-                                ? "_Prophecy of Kings games without Thunder's Edge."
+                                ? "_Prophecy of Kings games with no Thunder's Edge planets on the table."
                                 : "_Games with both Prophecy of Kings and Thunder's Edge.")
                 .append(" 6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario,"
                         + " non-Twilight's-Fall, with winners._\n");
@@ -293,6 +317,7 @@ public class PlanetWinRateStatisticsService {
                                     : "None of the " + stats.games
                                             + " matching games had a player whose home planets could be identified.")
                     .append('\n');
+            appendGamesDroppedForLaterPlanets(header, stats);
             blocks.add(header.toString());
             return blocks;
         }
@@ -301,6 +326,7 @@ public class PlanetWinRateStatisticsService {
                 .append(" | Players analyzed: ")
                 .append(stats.overall.players)
                 .append('\n');
+        appendGamesDroppedForLaterPlanets(header, stats);
         blocks.add(header.toString());
         appendSkippedPlayersSection(blocks, stats);
 
@@ -312,6 +338,15 @@ public class PlanetWinRateStatisticsService {
         appendPerPlanetSection(blocks, stats);
 
         return blocks;
+    }
+
+    private static void appendGamesDroppedForLaterPlanets(StringBuilder header, PlanetWinRateStats stats) {
+        if (stats.gamesWithLaterPlanets == 0) {
+            return;
+        }
+        header.append("Dropped ")
+                .append(stats.gamesWithLaterPlanets)
+                .append(" game(s) that were not flagged as Thunder's Edge but had planets from it in play.\n");
     }
 
     private static void appendSkippedPlayersSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -590,6 +625,7 @@ public class PlanetWinRateStatisticsService {
         final Map<String, String> skippedGameNames = new HashMap<>();
 
         int games;
+        int gamesWithLaterPlanets;
         int playersWithoutAKnownHome;
     }
 
