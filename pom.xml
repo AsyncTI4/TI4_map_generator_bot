@@ -26,7 +26,7 @@
     <rollbar.version>2.3.1</rollbar.version>
     <spotless.version>3.9.0</spotless.version>
     <spotless.skip>false</spotless.skip>
-    <spotbugs.version>4.10.3</spotbugs.version>
+    <spotbugs.version>4.10.4</spotbugs.version>
     <spotbugs-maven-plugin.version>4.10.3.0</spotbugs-maven-plugin.version>
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <sb-contrib.version>7.7.4</sb-contrib.version>
