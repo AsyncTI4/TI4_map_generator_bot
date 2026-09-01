@@ -478,6 +478,7 @@ public class StartScenario extends GameStateSubcommand {
             String commanderName = faction.getAlias();
             if (commanderName.contains("keleres")
                     || commanderName.contains("muaat")
+                    || commanderName.contains("cabal")
                     || commanderName.contains("crimson")) {
                 continue;
             }
