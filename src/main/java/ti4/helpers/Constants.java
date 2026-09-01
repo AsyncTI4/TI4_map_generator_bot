@@ -513,6 +513,7 @@ public final class Constants {
     public static final String EXPEDITION_WIN_RATES = "expedition_win_rates";
     public static final String TWILIGHTS_FALL_SPLICE_WIN_RATES = "tf_splice_win_rates";
     public static final String SLICE_TILE_WIN_RATES = "slice_tile_win_rates";
+    public static final String PLANET_WIN_RATES = "planet_win_rates";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
