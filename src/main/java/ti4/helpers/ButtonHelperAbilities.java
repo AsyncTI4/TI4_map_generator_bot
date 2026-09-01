@@ -116,7 +116,7 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("removePoToSo_")
     public static void removePoToSo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String so = buttonID.split("_")[1];
+        String so = buttonID.replace("removePoToSo_", "");
         game.getSoToPoList().remove(so);
         game.removeCustomPO(Mapper.getSecretObjectivesJustNames().get(so));
         MessageHelper.sendMessageToChannelWithEmbed(

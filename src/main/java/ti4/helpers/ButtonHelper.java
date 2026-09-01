@@ -4593,9 +4593,9 @@ public class ButtonHelper {
                     + player.getEffectiveFleetCC()
                     + " command tokens in your fleet pool,"
                     + (fleetCap / 2 - player.getEffectiveFleetCC() > 0
-                            ? "plus the ability to hold"
+                            ? " plus the ability to hold "
                                     + (fleetCap / 2 - player.getEffectiveFleetCC())
-                                    + "additional ships, for a total of " + (fleetCap / 2)
+                                    + " additional ships, for a total of " + (fleetCap / 2)
                             : "")
                     + " and you currently are filling "
                     + (numFighter2sFleet + numOfCapitalShips + 1) / 2
