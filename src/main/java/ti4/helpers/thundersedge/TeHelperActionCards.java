@@ -331,7 +331,7 @@ public class TeHelperActionCards {
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         boolean somebodyToCoexistWith = game.getRealPlayers().stream()
                 .anyMatch(other ->
-                        other != player && other.getColor() != null && unitHolder.getUnitCount(other.getColor()) > 0);
+                        other != player && other.getColor() != null && unitHolder.getUnitCount(other.getColorID()) > 0);
         if (!somebodyToCoexistWith) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
