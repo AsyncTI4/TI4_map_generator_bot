@@ -92,7 +92,7 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("changePoToSo_")
     public static void changePoToSo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String so = buttonID.split("_")[1];
+        String so = buttonID.replace("changePoToSo_", "");
         game.addToSoToPoList(so);
         player.removeSecret(player.getSecrets().get(so));
         Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(so), 1);
