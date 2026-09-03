@@ -105,6 +105,9 @@ class RunAgainstAllGames extends Subcommand {
                         return;
                     }
                     int migrated = migrateLegacyTargets(game, dryRun);
+                    if (migrated == 0) {
+                        return;
+                    }
                     migratedTargets[0] += migrated;
                     changedGames.add(game.getName() + " ");
                     if (!dryRun) {
