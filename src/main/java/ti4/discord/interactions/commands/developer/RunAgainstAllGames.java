@@ -140,7 +140,7 @@ class RunAgainstAllGames extends Subcommand {
     @SuppressWarnings("deprecation")
     private static int migrateLegacyTargets(Game game, boolean dryRun) {
         if (dryRun) {
-            if (!game.getAcDeckID().equalsIgnoreCase("action_cards_te")) {
+            if (!"action_cards_te".equalsIgnoreCase(game.getAcDeckID())) {
                 return 0;
             }
             // Counting instead of converting - a dry run must not touch the game.
