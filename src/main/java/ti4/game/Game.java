@@ -3562,6 +3562,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void resetActionCardDeck(DeckModel deck) {
         setAcDeckID(deck.getAlias());
         setActionCards(deck.getNewShuffledDeck());
+        removeOverruleIfPurged();
         getDiscardActionCards().clear();
         getDiscardACStatus().clear();
         getPlayedActionCards().clear();
@@ -3604,10 +3605,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
+        removeOverruleIfPurged();
+        return true;
+    }
+
+    public void removeOverruleIfPurged() {
         if ("true".equals(getStoredValue("removeOverrule"))) {
             getActionCards().removeIf("overrule"::equals);
         }
-        return true;
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {
