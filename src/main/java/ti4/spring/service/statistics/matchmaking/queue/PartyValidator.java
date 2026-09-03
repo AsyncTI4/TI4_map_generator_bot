@@ -16,6 +16,19 @@ import ti4.spring.service.statistics.UserGameInfoService;
 @UtilityClass
 public class PartyValidator {
 
+    public static List<String> getValidPaces(List<String> userIds) {
+        UserGameInfoService userGameInfoService = UserGameInfoService.get();
+        List<String> paces = new ArrayList<>(MatchmakingOptions.PACE_RESTRICTION_OPTIONS);
+        for (String userId : userIds.stream().distinct().toList()) {
+            MatchmakingOptions.PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT.forEach((pace, days) -> {
+                if (!userGameInfoService.hasCompletedGameInDays(userId, days)) {
+                    paces.remove(pace);
+                }
+            });
+        }
+        return paces;
+    }
+
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
 

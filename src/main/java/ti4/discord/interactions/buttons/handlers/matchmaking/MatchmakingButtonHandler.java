@@ -19,6 +19,9 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -240,7 +243,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
-                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                PartyValidator.getValidPaces(List.of(userId)),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
@@ -274,6 +277,8 @@ class MatchmakingButtonHandler {
     private static Modal buildSearchModal(ButtonInteractionEvent event) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
+        List<String> gameMemberIds =
+                memberIds(signedUpMembersOrPresser(event.getMessage(), event.getGuild(), event.getMember()));
 
         StringSelectMenu expansions = buildSingleSelect(
                 EXPANSIONS_ID,
@@ -282,7 +287,7 @@ class MatchmakingButtonHandler {
                 DEFAULT_EXPANSION_OPTIONS);
         StringSelectMenu playerCounts = buildSingleSelect(
                 PLAYER_COUNTS_ID,
-                PLAYER_COUNT_OPTIONS,
+                groupPlayerCountOptions(gameMemberIds.size()),
                 userSettings.getMatchmakingPlayerCounts(),
                 DEFAULT_PLAYER_COUNT_OPTIONS);
         StringSelectMenu victoryPoints = buildSingleSelect(
@@ -292,7 +297,7 @@ class MatchmakingButtonHandler {
                 DEFAULT_VICTORY_POINT_OPTIONS);
         StringSelectMenu paces = buildSingleSelect(
                 PACE_RESTRICTIONS_ID,
-                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                groupPaceOptions(gameMemberIds),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS);
         Modal.Builder modal = Modal.create(SEARCH_FOR_PLAYERS_MODAL_ID, "Search for Players")
@@ -301,7 +306,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces));
 
-        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        List<String> restrictionOptions = groupRestrictionOptions(gameMemberIds);
         if (!restrictionOptions.isEmpty()) {
             CheckboxGroup restrictions = buildCheckboxGroup(
                     RESTRICTIONS_ID,
@@ -317,6 +322,8 @@ class MatchmakingButtonHandler {
     private static Modal buildTiglSearchModal(ButtonInteractionEvent event) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
+        List<Member> gameMembers = signedUpMembersOrPresser(event.getMessage(), event.getGuild(), event.getMember());
+        List<String> gameMemberIds = memberIds(gameMembers);
 
         StringSelectMenu victoryPoints = buildSingleSelect(
                 VICTORY_POINTS_ID,
@@ -325,11 +332,11 @@ class MatchmakingButtonHandler {
                 DEFAULT_VICTORY_POINT_OPTIONS);
         StringSelectMenu paces = buildSingleSelect(
                 PACE_RESTRICTIONS_ID,
-                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                groupPaceOptions(gameMemberIds),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS);
         List<String> rankOptions = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(
-                event.getUser(), MatchmakingOptions.TIGL_RANK_OPTIONS);
+                memberUsers(gameMembers), MatchmakingOptions.TIGL_RANK_OPTIONS);
         if (rankOptions.isEmpty()) {
             rankOptions = List.of(MatchmakingOptions.UNRANKED_OPTION);
         }
@@ -340,7 +347,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Pace", paces))
                 .addComponents(Label.of("Rank", ranks));
 
-        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        List<String> restrictionOptions = groupRestrictionOptions(gameMemberIds);
         if (!restrictionOptions.isEmpty()) {
             CheckboxGroup restrictions = buildCheckboxGroup(
                     RESTRICTIONS_ID,
@@ -478,6 +485,7 @@ class MatchmakingButtonHandler {
         if (isMakingNewGamesOrTiglGamesThread) {
             MatchmakingQueueSearchService.get()
                     .register(event.getChannelId(), event.getMessage().getId(), criteria);
+            MessageHelper.sendMessageToChannel(event.getChannel(), describeQueuedGame(criteria));
         }
         int added = CreateGameButtonHandler.addPlayersFromQueueSearch(event, criteria);
         String continuation = isMakingNewGamesOrTiglGamesThread
@@ -491,6 +499,30 @@ class MatchmakingButtonHandler {
                 event,
                 "Added " + added + " matching " + pluralize(added, "player") + " from the queue to this game."
                         + continuation);
+    }
+
+    private static String describeQueuedGame(PlayerSearchCriteria criteria) {
+        StringBuilder message = new StringBuilder("This game has joined the ")
+                .append(criteria.tigl() ? "TIGL " : "")
+                .append("matchmaking queue, looking for:\n")
+                .append("- **Player count:** ")
+                .append(describeOptions(criteria.playerCounts()))
+                .append("\n- **Victory point goal:** ")
+                .append(describeOptions(criteria.victoryPointGoals()))
+                .append("\n- **Expansion:** ")
+                .append(describeOptions(criteria.expansions()))
+                .append("\n- **Pace:** ")
+                .append(describeOptions(criteria.paces()));
+        if (criteria.tigl()) {
+            message.append("\n- **Rank:** ").append(describeOptions(criteria.tiglRanks()));
+        }
+        message.append("\n- **Restrictions:** ").append(describeOptions(criteria.restrictions()));
+        return message.append("\nThe matchmaker will keep adding matching players until the game is launched.")
+                .toString();
+    }
+
+    private static String describeOptions(List<String> options) {
+        return options == null || options.isEmpty() ? "None" : String.join(", ", options);
     }
 
     private static boolean isMakingNewGamesOrTiglGamesThread(ModalInteractionEvent event) {
@@ -515,7 +547,9 @@ class MatchmakingButtonHandler {
 
     private static PlayerSearchCriteria buildTiglSearchCriteria(ModalInteractionEvent event) {
         List<String> requestedRanks = getSelectedValues(event, TIGL_RANKS_ID);
-        List<String> allowedRanks = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(event.getUser(), requestedRanks);
+        List<Member> gameMembers = signedUpMembersOrPresser(event.getMessage(), event.getGuild(), event.getMember());
+        List<String> allowedRanks =
+                TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(memberUsers(gameMembers), requestedRanks);
         return new PlayerSearchCriteria(
                 List.of("6"),
                 getSelectedValues(event, VICTORY_POINTS_ID),
@@ -624,6 +658,24 @@ class MatchmakingButtonHandler {
         return false;
     }
 
+    private static List<Member> signedUpMembersOrPresser(Message message, Guild guild, Member presser) {
+        List<Member> signedUp = CreateGameButtonHandler.fetchMembersFromMessage(message, guild).stream()
+                .distinct()
+                .toList();
+        if (!signedUp.isEmpty()) {
+            return signedUp;
+        }
+        return presser == null ? List.of() : List.of(presser);
+    }
+
+    private static List<String> memberIds(List<Member> members) {
+        return members.stream().map(Member::getId).toList();
+    }
+
+    private static List<User> memberUsers(List<Member> members) {
+        return members.stream().map(Member::getUser).toList();
+    }
+
     private static List<String> groupPlayerCountOptions(int groupSize) {
         List<String> options = PLAYER_COUNT_OPTIONS.stream()
                 .filter(option -> Integer.parseInt(option) >= groupSize)
@@ -632,32 +684,12 @@ class MatchmakingButtonHandler {
     }
 
     private static List<String> groupPaceOptions(List<String> groupMemberIds) {
-        List<String> shared = null;
-        for (String id : groupMemberIds) {
-            List<String> eligible = filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(id);
-            if (shared == null) {
-                shared = new ArrayList<>(eligible);
-            } else {
-                shared.retainAll(eligible);
-            }
-        }
-        return shared == null || shared.isEmpty() ? List.of(SLOWER_PACE_OPTION) : shared;
+        List<String> shared = PartyValidator.getValidPaces(groupMemberIds);
+        return shared.isEmpty() ? List.of(SLOWER_PACE_OPTION) : shared;
     }
 
     private static List<String> groupRestrictionOptions(List<String> groupMemberIds) {
         return new ArrayList<>(PartyValidator.getValidRestrictions(groupMemberIds, RESTRICTION_OPTIONS));
-    }
-
-    private static List<String> filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(String userId) {
-        UserGameInfoService userGameInfoService = UserGameInfoService.get();
-        List<String> restrictions = new ArrayList<>(PACE_RESTRICTION_OPTIONS);
-        MatchmakingOptions.PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT.forEach(
-                (paceRestriction, gameCompletedInDaysRequirement) -> {
-                    if (!userGameInfoService.hasCompletedGameInDays(userId, gameCompletedInDaysRequirement)) {
-                        restrictions.remove(paceRestriction);
-                    }
-                });
-        return restrictions;
     }
 
     private static CheckboxGroup buildCheckboxGroup(

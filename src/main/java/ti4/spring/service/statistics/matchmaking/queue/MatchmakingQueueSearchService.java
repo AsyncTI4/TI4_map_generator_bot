@@ -3,8 +3,12 @@ package ti4.spring.service.statistics.matchmaking.queue;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
+import ti4.helpers.TIGLHelper;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 
@@ -46,6 +51,50 @@ public class MatchmakingQueueSearchService {
     public void remove(String threadId) {
         if (DatabasePersistenceGate.isDisabled()) return;
         repository.deleteByThreadId(threadId);
+    }
+
+    public Optional<String> findJoinBlocker(String threadId, String joiningUserId, List<String> existingMemberIds) {
+        if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
+        return repository
+                .findByThreadId(threadId)
+                .flatMap(search ->
+                        QueuedGameJoinValidator.findJoinBlocker(toCriteria(search), joiningUserId, existingMemberIds));
+    }
+
+    @Transactional
+    public void updateForRoster(String threadId, List<String> memberIds) {
+        if (DatabasePersistenceGate.isDisabled()) return;
+        Optional<MatchmakingQueueSearch> found = repository.findByThreadId(threadId);
+        if (found.isEmpty()) return;
+
+        MatchmakingQueueSearch search = found.get();
+        List<String> queuedCounts = split(search.getPlayerCounts());
+        List<String> reachableCounts = queuedCounts.stream()
+                .filter(count -> Integer.parseInt(count) >= memberIds.size())
+                .toList();
+        if (reachableCounts.isEmpty() && !queuedCounts.isEmpty()) {
+            repository.delete(search);
+            return;
+        }
+        search.setPlayerCounts(join(reachableCounts));
+        if (search.isTigl()) {
+            List<String> ranks = narrowTiglRanks(split(search.getTiglRanks()), memberIds);
+            if (!ranks.isEmpty()) {
+                search.setTiglRanks(join(ranks));
+            }
+        }
+        repository.save(search);
+    }
+
+    private static List<String> narrowTiglRanks(List<String> ranks, List<String> memberIds) {
+        Guild guild = JdaService.guildPrimary;
+        if (guild == null) return ranks;
+        List<User> users = memberIds.stream()
+                .map(guild::getMemberById)
+                .filter(Objects::nonNull)
+                .map(Member::getUser)
+                .toList();
+        return TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(users, ranks);
     }
 
     public void search() {

@@ -257,7 +257,19 @@ public final class TIGLHelper {
     }
 
     public static List<String> filterStandardTiglRankOptionsAtOrBelow(User user, List<String> options) {
-        int maxIndex = getUsersHighestTIGLRank(user, false).getIndex();
+        return filterStandardTiglRankOptionsAtOrBelow(
+                getUsersHighestTIGLRank(user, false).getIndex(), options);
+    }
+
+    public static List<String> filterStandardTiglRankOptionsAtOrBelow(List<User> users, List<String> options) {
+        if (users.isEmpty()) {
+            return List.of();
+        }
+        return filterStandardTiglRankOptionsAtOrBelow(
+                getLowestCommonRankBetweenPlayers(users, false).getIndex(), options);
+    }
+
+    private static List<String> filterStandardTiglRankOptionsAtOrBelow(int maxIndex, List<String> options) {
         return options.stream()
                 .filter(opt -> {
                     TIGLRank rank = TIGLRank.fromString(opt);
