@@ -49,6 +49,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -776,6 +777,14 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        if (game.isMonumentsMode()) {
+            for (Player monumentOwner : game.getRealPlayers()) {
+                if (monumentOwner.hasUnit("creuss_monument")
+                        && ButtonHelper.doesPlayerHaveUnitHere("creuss_monument", monumentOwner, tile)) {
+                    MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
+                }
+            }
+        }
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
