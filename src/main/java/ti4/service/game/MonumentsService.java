@@ -1,14 +1,23 @@
 package ti4.service.game;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
@@ -69,6 +78,42 @@ public class MonumentsService {
                 .filter(unit -> !player.ownsUnit(unit.getId()))
                 .findFirst()
                 .ifPresent(unit -> player.addOwnedUnitByID(unit.getId()));
+    }
+
+    public static List<Button> getPlanetsInOrAdjacentToPlayerMonumentButtons(
+            Game game, Player player, String buttonPrefix) {
+        if (!game.isMonumentsMode()) {
+            return List.of();
+        }
+
+        LinkedHashSet<String> systemPositions = new LinkedHashSet<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().values().stream()
+                    .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0)) {
+                systemPositions.add(tile.getPosition());
+                systemPositions.addAll(
+                        FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
+            }
+        }
+
+        LinkedHashSet<String> planetNames = new LinkedHashSet<>();
+        for (String position : systemPositions) {
+            Tile tile = game.getTileByPosition(position);
+            if (tile == null) {
+                continue;
+            }
+            for (UnitHolder holder : tile.getPlanetUnitHolders()) {
+                planetNames.add(holder.getName());
+            }
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (String planetName : planetNames) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + buttonPrefix + planetName,
+                    Helper.getPlanetRepresentation(planetName, game)));
+        }
+        return buttons;
     }
 
     @ButtonHandler("scoreToppleAMonument")
