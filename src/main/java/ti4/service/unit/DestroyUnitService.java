@@ -48,6 +48,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -198,6 +199,24 @@ public class DestroyUnitService {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
+        if (game.isMonumentsMode()
+                && unit.unitKey().unitType() == UnitType.Monument
+                && game.getActiveSystem() != null) {
+            for (Player secretHolder : game.getRealPlayers()) {
+                if (secretHolder == player || !secretHolder.getSecretsUnscored().containsKey("tam")) {
+                    continue;
+                }
+                Button scoreButton = Buttons.green(
+                        secretHolder.factionButtonChecker() + "scoreToppleAMonument",
+                        "Score Topple a Monument",
+                        CardEmojis.SecretObjective);
+                MessageHelper.sendMessageToChannelWithButton(
+                        secretHolder.getCardsInfoThread(),
+                        secretHolder.getRepresentation() + ", a monument was destroyed during a tactical action. "
+                                + "If you destroyed another player's monument, you can score _Topple a Monument_.",
+                        scoreButton);
+            }
+        }
         if (player != null && player.hasAbility("fragmentation")) {
             CrystellumAbilityHandler.resolveFragmentation(event, game, player, unit);
         }

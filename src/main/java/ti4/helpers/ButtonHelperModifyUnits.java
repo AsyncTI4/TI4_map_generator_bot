@@ -51,6 +51,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
@@ -1959,6 +1960,41 @@ public final class ButtonHelperModifyUnits {
         String successMessage;
         String playerRep = player.getRepresentationNoPing();
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        if ("monument".equalsIgnoreCase(unitLong)) {
+            if (!game.isMonumentsMode()) {
+                MessageHelper.sendEphemeralMessageToEventChannel(event, "Monuments+ is not enabled for this game.");
+                return;
+            }
+            UnitModel monument = player.getUnitByBaseType("monument");
+            List<String> planetTypes = planet == null ? new ArrayList<>() : new ArrayList<>(planet.getPlanetTypes());
+            if (tile != null && tile.isSupernova()) {
+                planetTypes.add("SUPERNOVA");
+            }
+            if (tile != null && tile.equals(player.getHomeSystemTile())) {
+                planetTypes.add("HOME_PLANET");
+            }
+            if (planet != null && !planet.getTechSpecialities().isEmpty()) {
+                planetTypes.add("TECH_SPECIALTY");
+            }
+            if (planet != null && planet.isLegendary()) {
+                planetTypes.add("LEGENDARY");
+            }
+            if (tile != null && tile.isMecatol(game)) {
+                planetTypes.add("MECATOL_REX");
+            }
+            if (planet != null
+                    && planet.getPlanetModel() != null
+                    && planet.getPlanetModel().getPlanetTypes().stream()
+                            .anyMatch(type -> "lightning".equalsIgnoreCase(type.toString()))) {
+                planetTypes.add("LIGHTNING");
+            }
+            if (monument != null && (planet == null || !monument.canBePlacedOnPlanetTypes(planetTypes))) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event, "That planet is not eligible for your Monument.");
+                return;
+            }
+        }
         if ("mf".equalsIgnoreCase(unitID) && "tyris".equalsIgnoreCase(player.getFaction())) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2008,6 +2044,7 @@ public final class ButtonHelperModifyUnits {
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
+                MonumentsAgendaService.resolveCathedralOfIxthPlacement(game, player, planetName);
                 successMessage = "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else {

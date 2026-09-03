@@ -19,6 +19,7 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -332,7 +333,15 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode.");
             return;
         }
-        List<String> defaultSecrets = Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck();
+        List<String> defaultSecrets =
+                new ArrayList<>(Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck());
+        if (game.isMonumentsMode()) {
+            Mapper.getSecretObjectives().values().stream()
+                    .filter(objective -> objective.getSource() == ComponentSource.monuments)
+                    .map(SecretObjectiveModel::getAlias)
+                    .filter(objective -> !defaultSecrets.contains(objective))
+                    .forEach(defaultSecrets::add);
+        }
         List<String> currentSecrets = new ArrayList<>(defaultSecrets);
         for (Player player : game.getPlayers().values()) {
             if (player == null) {

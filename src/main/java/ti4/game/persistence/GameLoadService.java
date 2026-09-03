@@ -632,6 +632,7 @@ class GameLoadService {
                     game.setCosmicPhenomenaeMode(parseBooleanOrDefault(info, false));
                 case Constants.MONUMENTS_TO_THE_AGES_MODE ->
                     game.setMonumentToTheAgesMode(parseBooleanOrDefault(info, false));
+                case Constants.MONUMENTS_MODE -> game.setMonumentsMode(parseBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(parseBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(parseBooleanOrDefault(info, false));

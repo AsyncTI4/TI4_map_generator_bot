@@ -2008,6 +2008,14 @@ public class ActionCardHelper {
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
 
+            if (game.isMonumentsMode()
+                    && List.of("monuments_festival", "monuments_rebel_bombing", "monuments_renovation")
+                            .contains(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.factionButtonChecker() + "resolveMonumentsActionCard_" + automationID, buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             // Lost Legacies AC's
             if ("unchart_space".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveUnchartedSpaceAC", buttonLabel));
