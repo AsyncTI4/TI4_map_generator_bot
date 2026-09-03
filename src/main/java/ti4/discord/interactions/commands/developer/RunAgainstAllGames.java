@@ -150,7 +150,7 @@ class RunAgainstAllGames extends Subcommand {
             for (Player player : game.getRealPlayers()) {
                 acCount += player.getActionCards().size();
             }
-            if (acCount < 140) {
+            if (acCount < 130) {
                 return 1;
             } else {
                 return 0;
