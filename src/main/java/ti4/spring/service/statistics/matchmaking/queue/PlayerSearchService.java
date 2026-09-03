@@ -27,7 +27,7 @@ public class PlayerSearchService {
     public List<String> searchAndAdd(PlayerSearchCriteria criteria, List<String> existingMemberIds, Duration hostWait) {
         if (DatabasePersistenceGate.isDisabled()) return List.of();
 
-        int targetSize = maxPlayerCount(criteria.playerCounts());
+        int targetSize = criteria.maxPlayerCount();
         int openSlots = targetSize - existingMemberIds.size();
         if (openSlots <= 0) return List.of();
 
@@ -119,9 +119,5 @@ public class PlayerSearchService {
             QueuedParty party, Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData) {
         PlayerMatchmakingData data = partyData.get(party.members().getFirst());
         return data == null ? Set.of() : new HashSet<>(data.tiglRanks());
-    }
-
-    private static int maxPlayerCount(List<String> playerCounts) {
-        return playerCounts.stream().mapToInt(Integer::parseInt).max().orElse(0);
     }
 }

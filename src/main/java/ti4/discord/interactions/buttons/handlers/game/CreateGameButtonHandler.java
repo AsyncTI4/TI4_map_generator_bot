@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
@@ -77,8 +78,14 @@ public class CreateGameButtonHandler {
     public static void finishSignup(ModalInteractionEvent event) {
         List<Member> members = event.getValue("players").getAsMentions().getMembers();
         List<Member> membersOG = fetchMembersFromMessage(event);
+        List<String> blocked = new ArrayList<>();
         for (Member member : members) {
             if (membersOG.contains(member)) continue;
+            Optional<String> blocker = findQueueJoinBlocker(event.getChannelId(), member.getId(), membersOG);
+            if (blocker.isPresent()) {
+                blocked.add(member.getAsMention() + " can't join because " + blocker.get());
+                continue;
+            }
             membersOG.add(member);
             MatchmakerService.get().leaveQueue(member.getId());
             MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " joined the game.");
@@ -86,6 +93,13 @@ public class CreateGameButtonHandler {
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
                 .queue();
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(membersOG));
+        if (!blocked.isEmpty()) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage(String.join("\n", blocked))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
     @ButtonHandler(value = "editPlayers~MDL", save = false)
@@ -115,6 +129,7 @@ public class CreateGameButtonHandler {
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
                 .queue();
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(membersOG));
     }
 
     @ModalHandler("addSillyNameModal")
@@ -167,6 +182,19 @@ public class CreateGameButtonHandler {
             }
         }
         return members;
+    }
+
+    public static List<Member> fetchMembersFromMessage(Message message, Guild guild) {
+        return fetchMembersFromMessage(message.getContentRaw(), guild);
+    }
+
+    private static Optional<String> findQueueJoinBlocker(
+            String threadId, String joiningUserId, List<Member> existingMembers) {
+        return MatchmakingQueueSearchService.get().findJoinBlocker(threadId, joiningUserId, memberIds(existingMembers));
+    }
+
+    private static List<String> memberIds(List<Member> members) {
+        return members.stream().map(Member::getId).toList();
     }
 
     private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
@@ -276,12 +304,22 @@ public class CreateGameButtonHandler {
     public static void joinGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         if (!members.contains(event.getMember())) {
+            Optional<String> blocker =
+                    findQueueJoinBlocker(event.getChannelId(), event.getUser().getId(), members);
+            if (blocker.isPresent()) {
+                event.getHook()
+                        .setEphemeral(true)
+                        .sendMessage("You can't join this game because " + blocker.get())
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
             members.add(event.getMember());
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(members));
         if (MatchmakerService.get().leaveQueue(event.getUser().getId())) {
             event.getHook()
                     .setEphemeral(true)
@@ -329,6 +367,7 @@ public class CreateGameButtonHandler {
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(members));
     }
 
     private static synchronized void createGameAndChannels(ButtonInteractionEvent event) {

@@ -21,6 +21,12 @@ class MatchmakingCompatibilityService {
         return data.activeHours().size() >= ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT;
     }
 
+    static boolean shareEnoughActiveHours(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        long sharedHours =
+                a.activeHours().stream().filter(b.activeHours()::contains).count();
+        return sharedHours >= ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT;
+    }
+
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
             return true;
@@ -29,11 +35,10 @@ class MatchmakingCompatibilityService {
         List<String> aRestrictions = a.restrictions();
         List<String> bRestrictions = b.restrictions();
 
-        if (MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
-                || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions)) {
-            long sharedHours =
-                    a.activeHours().stream().filter(b.activeHours()::contains).count();
-            if (sharedHours < ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT) return true;
+        if ((MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
+                        || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions))
+                && !shareEnoughActiveHours(a, b)) {
+            return true;
         }
 
         // TIGL parties only match other TIGL parties.
