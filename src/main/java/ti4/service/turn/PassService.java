@@ -20,6 +20,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.message.MessageHelper;
+import ti4.service.game.MonumentsService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -114,7 +115,9 @@ public class PassService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        if (game.isMonumentsMode() && player.hasUnit("arborec_monument")) {
+        if (game.isMonumentsMode()
+                && player.hasUnit("arborec_monument")
+                && MonumentsService.hasMonumentOnBoard(game, player)) {
             List<Button> buttons = MonumentsButtonHandler.getArborecMonumentPlacementButtons(game, player);
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(

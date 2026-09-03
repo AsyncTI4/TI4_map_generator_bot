@@ -77,6 +77,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
@@ -780,6 +781,7 @@ public final class ButtonHelperTacticalAction {
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (monumentOwner.hasUnit("creuss_monument")
+                        && MonumentsService.hasMonumentOnBoard(game, monumentOwner)
                         && ButtonHelper.doesPlayerHaveUnitHere("creuss_monument", monumentOwner, tile)) {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
                 }

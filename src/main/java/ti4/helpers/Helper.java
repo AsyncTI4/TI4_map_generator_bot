@@ -108,6 +108,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
@@ -1364,6 +1365,12 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "letnevMonument" ->
+                    msg.append("Used **Palatine Obelisk** for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
                 case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
                 case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
                 case "absolRexControlRepresentative" ->
@@ -2506,6 +2513,12 @@ public final class Helper {
             }
             productionValueTotal += numberOfCCInSystem;
         }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
+                && ButtonHelper.doesPlayerHaveUnitHere("letnev_monument", player, tile)) {
+            productionValueTotal *= 2;
+        }
+
         return productionValueTotal;
     }
 

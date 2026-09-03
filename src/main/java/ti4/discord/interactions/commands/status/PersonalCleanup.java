@@ -17,6 +17,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.RefreshLeaderService;
 
@@ -74,6 +75,7 @@ class PersonalCleanup extends GameStateSubcommand {
         player.clearExhaustedPlanets(true);
         player.clearExhaustedRelics();
         player.clearExhaustedAbilities();
+        MonumentsService.readyMonuments(game, player);
         List<Leader> leads = new ArrayList<>(player.getLeaders());
         for (Leader leader : leads) {
             if (!leader.isLocked()) {
