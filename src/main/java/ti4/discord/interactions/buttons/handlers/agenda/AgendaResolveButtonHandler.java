@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.GrantReallocati
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.IncentiveAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.MinisterAntiquitiesAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.MiscountMessageAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.MonumentsAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.MutinyAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.NexusAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.PlowsharesAgendaResolver;
@@ -129,6 +130,9 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("warrant", new WarrantAgendaResolver());
         AGENDA_HANDLERS.put("wormhole_recon", new WormholeReconAgendaResolver());
         AGENDA_HANDLERS.put("wormhole_research", new WormholeResearchAgendaResolver());
+
+        AGENDA_HANDLERS.put("cathedralofixth", new MonumentsAgendaResolver("cathedralofixth"));
+        AGENDA_HANDLERS.put("ministerofculture", new MonumentsAgendaResolver("ministerofculture"));
     }
 
     @ButtonHandler("agendaResolution_")

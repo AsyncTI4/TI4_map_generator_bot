@@ -146,6 +146,7 @@ public class GameProperties {
     private @ExportableField boolean callOfTheVoidMode;
     private @ExportableField boolean cosmicPhenomenaeMode;
     private @ExportableField boolean monumentToTheAgesMode;
+    private @ExportableField boolean monumentsMode;
     private @ExportableField boolean wildWildGalaxyMode;
     private @ExportableField boolean feastOrFamineMode;
     private @ExportableField boolean zealousOrthodoxyMode;

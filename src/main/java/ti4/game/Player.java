@@ -99,6 +99,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -1461,6 +1462,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (ButtonHelper.isLawInPlay(game, "absol_equality")) {
             bonus = 3 - getCommoditiesBase();
+        }
+        if (MonumentsAgendaService.hasMinisterOfCultureBonus(game, this)) {
+            bonus += 2;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;

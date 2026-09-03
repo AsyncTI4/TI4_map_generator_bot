@@ -12,10 +12,10 @@
             "CULTURAL"
         ],
         "spaceCannonHitsOn": 8,
-        "spaceCannonDieCount": 2,
+        "spaceCannonDieCount": 1,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you pass, place 1 infantry on a planet in or adjacent to this system other than Mecatol Rex that contains no other player's units.\nThen, gain control of that planet, if able."
+        "ability": "When you pass, place 1 infantry on a planet in or adjacent to this system other than Mecatol Rex. If that planet contains another player's units, place that unit into coexistence."
     },
     {
         "id": "argent_monument",
@@ -28,15 +28,18 @@
         "eligiblePlanetTypes": [
             "HAZARDOUS"
         ],
+        "ineligiblePlanetTypes": [
+            "LIGHTNING"
+        ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "ACTION: Exhaust this card to destroy 1 damaged ship in or adjacent to this system."
+        "ability": "ACTION: Exhaust this card to choose this or an adjacent system that does not contain 1 or more of your ships.\nProduce a hit against each ship in that system that has SUSTAIN DAMAGE."
     },
     {
         "id": "letnev_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Platine Obelisk",
+        "name": "Palatine Obelisk",
         "subtitle": "Letnev Monument",
         "source": "monuments",
         "faction": "letnev",
@@ -46,7 +49,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you exhaust this planet to cast votes, you may cast an additional number of votes equal to the number of your non-fighter ships in this system.\nDouble the PRODUCTION values of your units in this system."
+        "ability": "Double the PRODUCTION values of your units in this system.\nWhen you exhaust this planet to cast votes, you may cast an additional number of votes equal to the number of your non-fighter ships in this system."
     },
     {
         "id": "saar_monument",
@@ -64,7 +67,7 @@
         "spaceCannonDieCount": 2,
         "isStructure": true,
         "isMonument": true,
-        "ability": "This system is adjacent to your flagship."
+        "ability": "You may treat this system as being adjacent to 1 of your space docks."
     },
     {
         "id": "keleres_monument",
@@ -78,10 +81,13 @@
             "CULTURAL",
             "LEGENDARY"
         ],
+        "ineligiblePlanetTypes": [
+            "MECATOL_REX"
+        ],
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a law enters play, add a command token from your reinforcements to this card.\nWhen you would place a command token in this or an adjacent system, you may place that token from this card instead."
+        "ability": "After a law enters play, you may add a command token from your reinforcements to this card; When you would place a command token in this or an adjacent system, you may place that token from this card instead."
     },
     {
         "id": "muaat_monument",
@@ -96,7 +102,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you exhaust this planet to cast votes:\nFor each war sun or flagship you control in this system, and for each adjacent supernova, cast 2 additional votes or produce 1 hit against another player's ships in a system adjacent to this planet."
+        "ability": "When you exhaust this planet to cast votes, for each war sun or flagship you control in this system, and for each supernova adjacent to this system, choose: cast 3 additional votes, or produce a hit against another player's ships in this or an adjacent system."
     },
     {
         "id": "hacan_monument",
@@ -112,7 +118,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "As part of a transaction, one player may return any of their ships in or adjacent to this system to their reinforcements.\nFor each of those ships, the other player produces 1 ship of that type in this system without spending resources."
+        "ability": "Outside of combat, players may trade their units in the space area of this and adjacent systems as part of a transaction. A player who gained units this way then replaces them and moves them to a system that contains their ships and 1 of their command tokens, if able; otherwise, remove those units."
     },
     {
         "id": "empyrean_monument",
@@ -123,12 +129,16 @@
         "source": "monuments",
         "faction": "empyrean",
         "eligiblePlanetTypes": [
-            "EMPTY_NONANOMALY"
+            "EMPTY"
+        ],
+        "ineligiblePlanetTypes": [
+            "LIGHTNING",
+            "SUPERNOVA"
         ],
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit is placed in the space area of any system that is not an anomaly and does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
+        "ability": "This unit is placed in the space area of a non-fracture, non-supernova system that does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
     },
     {
         "id": "sol_monument",
@@ -144,7 +154,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you place 1 or more infantry on a planet, exhaust this card to place up to 4 of those infantry on this planet instead."
+        "ability": "When you place 1 or more infantry on a planet, exhaust this card to place any of those infantry on this planet instead."
     },
     {
         "id": "creuss_monument",
@@ -160,7 +170,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a player activates this system:\nFor each system adjacent to this planet that contains a wormhole, you may produce 1 hit against another player's ships in that system."
+        "ability": "After a player activates this system:\nYou may produce 1 hit against player's ships in each system adjacent to this planet that contains a wormhole."
     },
     {
         "id": "l1z1x_monument",
@@ -177,7 +187,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of your turn, you may exhaust this card to take a player's command token from an adjacent system and place it in this system, if it does not already contain that player's command token."
+        "ability": "At the start of your turn, you may exhaust this card to remove a player's command token from an adjacent system and place it in this system."
     },
     {
         "id": "mahact_monument",
@@ -194,7 +204,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool, if it does not already contain that player's token."
+        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool."
     },
     {
         "id": "mentak_monument",
@@ -211,7 +221,7 @@
         "productionValue": "2",
         "isStructure": true,
         "isMonument": true,
-        "ability": "When a player activates this system, you may take 1 of their unscored secret objective cards at random, if able. If you do, give that player 1 of your unscored secret objective cards."
+        "ability": "At the start of a player's turn, exhaust this card to have each ship in this or an adjacent system with SUSTAIN DAMAGE become damaged."
     },
     {
         "id": "naalu_monument",
@@ -226,7 +236,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During the agenda phase, when an outcome you voted for is resolved:\nPlace up to 2 fighters from your reinforcements in this or an adjacent system. If that system contains another player’s ships, immediately resolve\na space combat."
+        "ability": "Infantry that you commit to planets in this and adjacent systems may be committed into coexistence, if able."
     },
     {
         "id": "naaz-rokha_monument",
@@ -242,19 +252,25 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you are negotiating a transaction with a player who controls units in or adjacent to this system, 1 of your relics can be exchanged as part of that transaction."
+        "ability": "When you are negotiating a transaction with a player who controls units in or adjacent to this system, relics can be exchanged as part of that transaction; ignore \"when you gain\" effects of those relics."
     },
     {
         "id": "nekro_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Valefar Assimilator W",
+        "name": "Valefar Assimilator M",
         "subtitle": "Nekro Monument",
         "source": "monuments",
         "faction": "nekro",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "INDUSTRIAL",
+            "CULTURAL",
+            "LEGENDARY"
+        ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you gain control of a planet that contains another player's structure, you may place the \"W\" assimilator token on that player's monument card.\nWhile that token is on a monument card, this card gains that card's attributes, abilities, and ability text."
+        "ability": "When you destroy another player's structure, you may place or move an \"M\" or \"Z\" assimilator token onto that player's monument card.\nWhile any of those tokens are on a monument card, this card gains that card's attributes, abilities, and ability text."
     },
     {
         "id": "nomad_monument",
@@ -265,11 +281,13 @@
         "source": "monuments",
         "faction": "nomad",
         "eligiblePlanetTypes": [
-            "TECH_SPECIALTY"
+            "HAZARDOUS",
+            "INDUSTRIAL",
+            "CULTURAL"
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of your turn, you may return this unit to your reinforcements. If you do, produce your flagship in this system without spending resources."
+        "ability": "At the start of your turn, you may return this unit to your reinforcements to produce, or remove and produce, your flagship in this system."
     },
     {
         "id": "norr_monument",
@@ -280,11 +298,12 @@
         "source": "monuments",
         "faction": "sardakk",
         "eligiblePlanetTypes": [
-            "CULTURAL"
+            "HAZARDOUS",
+            "INDUSTRIAL"
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you place your monument, place 1 infantry on this planet, and a total of 2 infantry on up to 2 other planets you control in adjacent systems."
+        "ability": "When you place your monument, produce up to a total of 3 infantry or fighters in this or adjacent systems without spending resources.\nAt the end of your turn, you may replace this unit with a different structure from your reinforcements."
     },
     {
         "id": "titans_monument",
@@ -299,7 +318,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "ACTION: Exhaust this card to remove an attachment from a planet you control and attach it to a planet you control with the same planetary trait in this or an adjacent system."
+        "ability": "ACTION: Exhaust this card to place a sleeper token on a planet in this or an adjacent system that has a planetary trait."
     },
     {
         "id": "jolnar_monument",
@@ -325,16 +344,15 @@
         "source": "monuments",
         "faction": "cabal",
         "eligiblePlanetTypes": [
+            "HAZARDOUS",
             "CULTURAL",
             "INDUSTRIAL",
-            "HAZARDOUS",
-            "MECATOL_REX",
             "LEGENDARY"
         ],
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
-        "ability": "DEPLOY: When you gain control of a planet, you may place this unit on that planet and capture every other structure on that planet."
+        "ability": "DEPLOY: When you gain control of a planet that contains 1 or more structures, you may place this unit on that planet and capture each other structure on that planet as if it were a non-fighter ship."
     },
     {
         "id": "winnu_monument",
@@ -349,7 +367,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the agenda phase:\nIf your monument is on the game board, gain any number of trade goods on this card. Otherwise, spend any number of resources to place 1 trade good from the supply on this card for every 3 resources spent."
+        "ability": "At the start of the agenda phase, if your monument is on the game board, gain any number of trade goods on this card. Otherwise, spend any number of resources to place 1 trade good from the supply on this card for every 3 resources spent."
     },
     {
         "id": "xxcha_monument",
@@ -365,7 +383,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During the agenda phase, when an outcome you voted for or predicted is resolved, you may exhaust this card to place 1 PDS from your reinforcements on this planet."
+        "ability": "When an outcome you voted for or predicted is resolved, you may exhaust this card to place a structure on a planet you control in this system."
     },
     {
         "id": "yin_monument",
@@ -398,6 +416,258 @@
         "isStructure": true,
         "isMonument": true,
         "ability": "When another player plays an action card:\nIf that player controls 1 or more units in this or an adjacent system, you may gain 2 trade goods."
+    },
+    {
+        "id": "bastion_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Seraph Data Center",
+        "subtitle": "Bastion Monument",
+        "source": "monuments",
+        "faction": "bastion",
+        "eligiblePlanetTypes": [
+            "EMPTY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "notes": "This is a space station, and as such, has all the normal space station abilities.",
+        "ability": "This unit is a station and placed in the space area of a system that contains your ships and exactly 1 non-legendary planet. Take its matching station card while you control it.\nWhen you lost control of this station, destroy it and produce 2 hits against ships in this system."
+    },
+    {
+        "id": "crimson_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Veils Of Lost Creuss",
+        "subtitle": "Crimson Monument",
+        "source": "monuments",
+        "faction": "crimson",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "After a breach becomes or is placed active side up in any system, if that system is adjacent to this planet, you may produce 1 hit in that system against another player's ships."
+    },
+    {
+        "id": "deepwrought_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Pelagion",
+        "subtitle": "Deepwrought Monument",
+        "source": "monuments",
+        "faction": "deepwrought",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "Other player's ships in this system do not trigger space combat. After this unit is removed from a planet, choose a player with ships in that system to resolve a space combat. Repeat this until it contains no more than 1 player's ships."
+    },
+    {
+        "id": "firmament_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Epiphany",
+        "subtitle": "Firmament Monument",
+        "source": "monuments",
+        "faction": "firmament",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "After a player activates this system, you may replace 1 control token on one of your plots with 1 of that player's control tokens."
+    },
+    {
+        "id": "obsidian_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Epiphany Hollow",
+        "subtitle": "Decayed Monument",
+        "source": "monuments",
+        "faction": "obsidian",
+        "eligiblePlanetTypes": [],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "After a puppeted player activates this system, replace up to 2 of that player's infantry on a planet they control with your infantry; those units coexist."
+    },
+    {
+        "id": "ralnel_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Sor Tek Linkhub",
+        "subtitle": "Ral Nel Monument",
+        "source": "monuments",
+        "faction": "ralnel",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the end of your tactical action, you may move 1 structure in the space area of this or an adjacent system to the space area of a system adjacent to that structure."
+    },
+    {
+        "id": "blacktf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Flesh Cathedral",
+        "subtitle": "Raithborn Monument",
+        "source": "monuments",
+        "faction": "blacktf",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "INDUSTRIAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "productionValue": 2,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "Capture all infantry destroyed in this system. You may spend captured infantry as if they were resources when producing units on this planet."
+    },
+    {
+        "id": "bluetf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Caracas",
+        "subtitle": "Tempered Monument",
+        "source": "monuments",
+        "faction": "bluetf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "HAZARDOUS",
+            "INDUSTRIAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the start of any tactical action, you may choose any number of destroyers or cruisers in this system. Those units wihtout a capacity gain a capacity value of 1 until the end of this tactical action."
+    },
+    {
+        "id": "greentf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Crown Of Thorns",
+        "subtitle": "Blossoming Monument",
+        "source": "monuments",
+        "faction": "greentf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "CULTURAL",
+            "INDUSTRIAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the start of a ground combat not involving your units in this and adjacent systems, you may produce 1 hit against a player's units in that combat. Units cannot be placed into coexistence in this system."
+    },
+    {
+        "id": "orangetf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Starlit Redoubt",
+        "subtitle": "Divine Monument",
+        "source": "monuments",
+        "faction": "orangetf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "LEGENDARY",
+            "HAZARDOUS"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the start of an action you may allow any players' mechs in this and adjacent systems to gain +1 to their combat rolls until the end of that action."
+    },
+    {
+        "id": "pinktf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Avatar of Mirrors",
+        "subtitle": "Replicant Monument",
+        "source": "monuments",
+        "faction": "pinktf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "CULTURAL",
+            "HAZARDOUS"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "capacityUsed": 1,
+        "combatHitsOn": 4,
+        "combatDieCount": 2,
+        "isGroundForce": true,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "This unit is a ground force as well as a monument. It can be transported. This unit gains the non-DEPLOY unit abilities and text abilities of your ground forces."
+    },
+    {
+        "id": "purpletf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Halo Cortex",
+        "subtitle": "Paradox Monument",
+        "source": "monuments",
+        "faction": "purpletf",
+        "eligiblePlanetTypes": [
+            "EMPTY"
+        ],
+        "productionValue": 3,
+        "capacityValue": 3,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "This unit is placed in the space area of a system that contains a planet you control, instead of on a planet. 1 Ship in this system does not count against your fleet limit."
+    },
+    {
+        "id": "redtf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Serrated Throne",
+        "subtitle": "Vermillion Monument",
+        "source": "monuments",
+        "faction": "redtf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "HAZARDOUS",
+            "INDUSTRIAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "DEPLOY: At the start of a ground combat involving your units, place this unit on that planet, then produce 2 hits against each other player's units on this planet."
+    },
+    {
+        "id": "yellowtf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Aura Vault",
+        "subtitle": "Glimmering Monument",
+        "source": "monuments",
+        "faction": "yellowtf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "CULTURAL",
+            "HAZARDOUS"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you splice, you may place 1 command token from your reinforcements on this card, if able.\nYou may remove a token form this card to cancel a hit in this or an adjacent system."
     },
     {
         "id": "axis_monument",
@@ -442,13 +712,12 @@
         "source": "monuments",
         "faction": "mykomentori",
         "eligiblePlanetTypes": [
-            "CULTURAL",
-            "INDUSTRIAL"
+            "INDUSTRIAL",
+            "CULTURAL"
         ],
-        "planetaryShield": true,
         "isStructure": true,
         "isMonument": true,
-        "ability": "After each round of ground combat on this planet, if you have units in combat, place 1 infantry from your reinforcements on this planet."
+        "ability": "Up to 3 fighters in this and each adjacent system do not count against your ships' capacity. After a player uses an omen die, you may produce 1 fighter in this system without spending resources."
     },
     {
         "id": "cymiae_monument",
@@ -512,7 +781,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When a player activates this system, you may place 2 of their control tokens on your faction sheet."
+        "ability": "After another player with ships in this or an adjacent system replenishes commodities, if that player has control tokens on the Vaden player's faction sheet, you may take one of their commodities."
     },
     {
         "id": "florzen_monument",
@@ -528,7 +797,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After each round of space combat in this system, if you have any fighters in combat, you may place 1 fighter from your reinforcement in this system's space area."
+        "ability": "When you produce fighters, you may place that many plastic fighter units on this card instead. At the start of your turn, you may produce fighter units on this card in this system without spending resources."
     },
     {
         "id": "ghemina_monument",
@@ -543,9 +812,12 @@
             "INDUSTRIAL",
             "CULTURAL"
         ],
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 2,
+        "planetaryShield": true,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you win a space combat while you are the active player, ready this planet."
+        "ability": "You may treat this system as adjacent to systems that contain 2 of your structures of the same type."
     },
     {
         "id": "olradin_monument",
@@ -560,6 +832,7 @@
             "INDUSTRIAL",
             "CULTURAL"
         ],
+        "planetaryShield": true,
         "isStructure": true,
         "isMonument": true,
         "ability": "After you resolve the primary or secondary ability of the \"Diplomacy\" strategy card, ready this planet."
@@ -595,7 +868,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Once per space combat, when a ship you control that has SUSTAIN DAMAGE is destroyed in this system, you may place 1 unit of that type in this system damaged from your reinforcements; that unit cannot repair until after that space combat."
+        "ability": "ACTION: Exhaust this card and choose an adjacent system that contains another player's non-fighter ships. That player moves those ships into this system if able, until they have moved at least 4 resources worth of ships, or all ships. Then, resolve a space combat."
     },
     {
         "id": "nivyn_monument",
@@ -610,13 +883,13 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Other players' ships cannot move out of ore through this system.\nYour ships may treat this system as adjacent to the wound"
+        "ability": "Other players' ships cannot move out of or through this system.\nYour ships may treat this system as adjacent to the wound"
     },
     {
         "id": "rhodun_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "New Phrad",
+        "name": "Vault Of New Phrad",
         "subtitle": "Rhodun Monument",
         "source": "monuments",
         "faction": "zealots",
@@ -625,13 +898,27 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During space combat in this system, for each unit upgrade technology your opponent owns, apply +1 to each of your units' combat rolls."
+        "ability": "Start with this side face up; when a player activates this system, you may flip this card.\nDuring combat, apply +1 to each of your units' combat rolls in this and adjacent systems if your opponent has any unit technology upgrades."
+    },
+    {
+        "id": "rhodun_monumentback",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Reliquat Unleashed",
+        "subtitle": "Rhodun Monument",
+        "source": "monuments",
+        "eligiblePlanetTypes": [
+            "TECH_SPECIALTY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "Flip this card at any time.\nOther players with units in the Fracture cannot activate this system.\nDuring combat, apply +2 to each of your units' combat rolls in this and adjacent systems if your opponent has any units in the fracture."
     },
     {
         "id": "augurs_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "AI Onyxxa",
+        "name": "AI Conclave",
         "subtitle": "Augurs Monument",
         "source": "monuments",
         "faction": "augers",
@@ -640,7 +927,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After you explore another planet, you may explore this planet."
+        "ability": "When you would explore another planet, you may explore this planet instead. If you do, you may gain trade goods equal to the number of your scored objectives."
     },
     {
         "id": "veldyr_monument",
@@ -672,13 +959,13 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you lose a ground combat on this planet, destroy each unit on this planet."
+        "ability": "When you lose a ground combat on this planet, you may destroy each unit on this planet. At the start of your turn you may destroy 1 other player's unit in this system."
     },
     {
         "id": "vaylerian_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Drive Disruptor",
+        "name": "Aylor Raider Hoard",
         "subtitle": "Vaylerian Monument",
         "source": "monuments",
         "faction": "vaylerian",
@@ -688,7 +975,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Other players cannot declare a retreat during combat in this system.\nYou may treat this system as adjacent to the active system when you retreat."
+        "ability": "When a player spends trade goods during a space combat in or adjacent to this system, you may exhaust this card to draw 1 action card.\nWhile another player has ships in or adjacent to this system, your commodity value is increased by 1."
     },
     {
         "id": "free_systems_monument",
@@ -703,13 +990,13 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When a planet adjacent to this system is exhausted for influence, that planet produces 1 additional influence."
+        "ability": "After you resolve the primary or secondary ability of the \"Leadership\" strategy card, each other player with units in or adjacent to this system who reveals 1 of your promissory notes from their hand gains 1 command token."
     },
     {
         "id": "celdauri_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Jump Relay",
+        "name": "Hyperlane Relay",
         "subtitle": "Celdauri Monument",
         "source": "monuments",
         "faction": "celdauri",
@@ -718,7 +1005,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Ships you control in this system may treat this system as adjacent to each system that contains 1 or more of your space docks."
+        "ability": "During each of your tactical actions, you may commit ground forces on this planet to planets that contain your space docks."
     },
     {
         "id": "zelian_monument",
@@ -733,7 +1020,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During the first round of space combat in this system, cancel up to 2 hits produced against your units."
+        "ability": "This system is treated as an asteroid field. Units can move into this system as it it were a non-anomaly tile.\nPlace the Zelian asteroid field token in this system as a reminder."
     },
     {
         "id": "kollecc_monument",
@@ -761,9 +1048,11 @@
         "eligiblePlanetTypes": [
             "INDUSTRIAL"
         ],
+        "spaceCannonHitsOn": 7,
+        "spaceCannonDieCount": 2,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you produce 1 or more units, you may treat up to 4 of those units as if you produced them on this planet instead."
+        "ability": "When you produce any number of units in this system, reduce the combined cost of those units by 2."
     },
     {
         "id": "kortali_monument",
@@ -778,7 +1067,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of each round of space combat in this system, repair 1 ship you control in this system."
+        "ability": "When a non-fighter, non-infantry unit you control is destroyed in this system, roll a die. If you roll equal to or higher than that unit's combat value, or 8 if that unit has no combat value, produce 1 hit against another player's ships in this system."
     },
     {
         "id": "bentor_monument",
@@ -789,19 +1078,19 @@
         "source": "monuments",
         "faction": "bentor",
         "eligiblePlanetTypes": [
-            "HAZARDOUS",
             "INDUSTRIAL",
             "CULTURAL"
         ],
+        "productionValue": 1,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you pass, explore this planet twice."
+        "ability": "DEPLOY: After another player explores a planet that is not adjacent to a home system, you may place this unit into coexistence on that planet and explore it."
     },
     {
         "id": "kjalengard_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Bannerhall",
+        "name": "Krotas Bannerhall",
         "subtitle": "Kjalengard Monument",
         "source": "monuments",
         "faction": "kjalengard",
@@ -811,7 +1100,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When a player wins a combat in or adjacent to this system, you and that player may each gain 1 command token."
+        "ability": "Once per action, when a player wins a combat in or adjacent to this system, you and that player may each gain 1 command token."
     },
     {
         "id": "nokar_monument",
@@ -825,9 +1114,10 @@
             "INDUSTRIAL",
             "CULTURAL"
         ],
+        "productionValue": 3,
         "isStructure": true,
         "isMonument": true,
-        "ability": "Your ships may move out of this system, even if it contains 1 of your command tokens."
+        "ability": "Your ships may move out of this system, and transport units, even if it contains 1 of your command tokens."
     },
     {
         "id": "edyn_monument",
@@ -838,12 +1128,11 @@
         "source": "monuments",
         "faction": "edyn",
         "eligiblePlanetTypes": [
-            "LEGENDARY",
-            "MECATOL_REX"
+            "LEGENDARY"
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you exhaust this planet for resources or influence, it produces an additional resource or influence for each law in play."
+        "ability": "At any time, you may exhaust this card to produce a mech on this planet wihtout spending resources."
     },
     {
         "id": "lanefir_monument",
@@ -860,7 +1149,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Once per action, you may use the technology specialty of a planet in or adjacent to this system."
+        "ability": "Once per action, you may use the technology specialty of a planet in or adjacent to this system, even if it is exhausted."
     },
     {
         "id": "cheiran_monument",
@@ -873,7 +1162,7 @@
         "eligiblePlanetTypes": [
             "CULTURAL"
         ],
-        "productionValue": "+0",
+        "productionValue": "+1",
         "basicProduction": "struct",
         "isStructure": true,
         "isMonument": true,
@@ -892,7 +1181,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "This planet counts as a legendary planet with an attachment and a technology speciality of no type.\nWhen this unit is destroyed, you must place it on a valid adjacent planet you control, if able."
+        "ability": "This planet counts as a legendary planet with an attachment and a technology speciality of no type.\nWhen this unit is destroyed, you must place it on a planet you control in this or an adjacent system, if able. If you do, draw a relic."
     },
     {
         "id": "ghoti_monument",
@@ -907,7 +1196,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At any time, you may chose to treat this system as being adjacent to your home system."
+        "ability": "During movement, you may choose to treat this system as thought it contains no planets. You treat this system as though it contains a frontier token."
     },
     {
         "id": "kolume_monument",
@@ -920,33 +1209,33 @@
         "eligiblePlanetTypes": [
             "INDUSTRIAL"
         ],
-        "spaceCannonHitsOn": 4,
-        "spaceCannonDieCount": 1,
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 2,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When this unit produces a hit against another player's ships, gain 1 command token."
+        "ability": "When another player passes, choose this or an adjacent system that contains a unit with SPACE CANNON; either use this unit's SPACE CANNON against another player's ships in that system, or repeat this ability, starting in that system."
     },
     {
         "id": "gledge_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Central Mining Hub",
+        "name": "Verdant Halo",
         "subtitle": "Gledge Monument",
         "source": "monuments",
         "faction": "gledge",
         "eligiblePlanetTypes": [
-            "HAZARDOUS",
-            "INDUSTRIAL"
+            "CULTURAL"
         ],
+        "productionValue": 1,
         "isStructure": true,
         "isMonument": true,
-        "ability": "When a planet with an attachment is exhausted for resources in this or an adjacent system, that planet produces an additional resource."
+        "ability": "At the start of your turn, you may exhaust 2 planets you control that contain a Core token; 1 player treats all laws as blank until the end of this turn."
     },
     {
         "id": "drahn_monument",
         "baseType": "monument",
         "asyncId": "monument",
-        "name": "Drahn Monument",
+        "name": "Koldan's Outpost",
         "subtitle": "Drahn Monument",
         "source": "monuments",
         "faction": "drahn",
@@ -958,6 +1247,174 @@
         "spaceCannonDieCount": 2,
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the beginning of your turn you may remove this unit from this planet and place it onto a different valid planet you control."
+        "ability": "At the beginning of your turn you may remove this unit from this planet and place it onto a different planet you control."
+    },
+    {
+        "id": "atokera_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Deepmantle Interface",
+        "subtitle": "Atokera Monument",
+        "source": "monuments",
+        "faction": "atokera",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "INDUSTRIAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "During the agenda phase, when an outcome you voted for or predicted is resolved, produce up to 1 unit in this system."
+    },
+    {
+        "id": "belkosea_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Armageddon Project",
+        "subtitle": "Belkosea Monument",
+        "source": "monuments",
+        "faction": "belkosea",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the end of the strategy phase, choose and place 1 control token on a super weapon card in your play area. This card has the text abilities of each superweapon card in your play area that has 1 of your control tokens."
+    },
+    {
+        "id": "kaltrim_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Crown Temple",
+        "subtitle": "Kaltrim Monument",
+        "source": "monuments",
+        "faction": "kaltrim",
+        "eligiblePlanetTypes": [
+            "HOME_PLANET"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "DEPLOY: When the Kaltrim Crown token is revealed, place this structure on a planet in your home system.\nWhile you have the Kaltrim Crown token, other players must spend.1 command token from their command sheet to activate this system."
+    },
+    {
+        "id": "pharadn_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Black Pyramid",
+        "subtitle": "Pharadn Monument",
+        "source": "monuments",
+        "faction": "pharadn",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "LEGENDARY"
+        ],
+        "combatHitsOn": 8,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "This unit is treated as a structure and a ground force.\nDEPLOY: During your \"Commit Ground Forces\" step, if you control a planet in the active system, place this unit on a planet in that system."
+    },
+    {
+        "id": "qhet_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Sacred Pools",
+        "subtitle": "Qhet Monument",
+        "source": "monuments",
+        "faction": "qhet",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When 1 or more of your infantry would be destroyed, you may exhaust this card to place those units on this planet instead."
+    },
+    {
+        "id": "sarcosa_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Raider Stronghold",
+        "subtitle": "Sarcosa Monument",
+        "source": "monuments",
+        "faction": "sarcosa",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "CULTURAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "HOME_PLANET",
+            "LIGHTNING"
+        ],
+        "productionValue": 2,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "You may place this structure into coexistence on a non-home, non-Fracture planet adjacent to a system that contains your or neutral units."
+    },
+    {
+        "id": "toldar_monumentdishonor",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Charnel Fane",
+        "subtitle": "Toldar Monument",
+        "source": "monuments",
+        "faction": "toldar",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "If you have more Honor than Dishonor, flip this card.\nAfter a player wins a combat in this system, they may draw a secret objective.\nIf your Dishonor is 8, move this unit to the space area; it cannot be destroyed."
+    },
+    {
+        "id": "toldar_monumenthonor",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The People's Temple",
+        "subtitle": "Toldar Monument",
+        "source": "monuments",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "If you have more Dishonour and Honour, flip this card.\nThis unit gains the abilities matching your Honor:\n2+: PRODUCTION 2\n5+: PLANETARY SHIELD\n8: SPACE CANNON 4 (x3)"
+    },
+    {
+        "id": "uydai_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Hidden Oasis",
+        "subtitle": "Uydai Monument",
+        "source": "monuments",
+        "faction": "uydai",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the start of your turn, if this system contains 1 of your command tokens, you may exhaust this card to swap a plan card on your faction sheet for any other plan card."
+    },
+    {
+        "id": "xin_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Celestial Court",
+        "subtitle": "Xin Monument",
+        "source": "monuments",
+        "faction": "xin",
+        "eligiblePlanetTypes": [
+            "TECH_SPECIALTY",
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When a player activates this system, gain 1 balance token or flip 1 balance token on your faction sheet.\nThis unit may also be placed on a legendary planet."
     }
 ]

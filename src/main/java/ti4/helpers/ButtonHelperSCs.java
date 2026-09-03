@@ -979,7 +979,10 @@ public final class ButtonHelperSCs {
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")
-                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("te4construction")) {
+                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("te4construction")
+                    || game.getStrategyCardModelByInitiative(scNum)
+                            .get()
+                            .usesAutomationForSCID("monuments4construction")) {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
         }
@@ -990,8 +993,9 @@ public final class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("civitas").orElse(null);
         }
         int scNum = scModel.getInitiative();
-        boolean automationExists =
-                scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction");
+        boolean automationExists = scModel.usesAutomationForSCID("pok4construction")
+                || scModel.usesAutomationForSCID("te4construction")
+                || scModel.usesAutomationForSCID("monuments4construction");
         if (!used
                 && !player.getFollowedSCs().contains(scNum)
                 && automationExists
@@ -1047,14 +1051,26 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
-
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
+                if ("monument".equalsIgnoreCase(unit) && player.getUnitByBaseType("monument") == null) {
+                    MessageHelper.sendEphemeralMessageToEventChannel(event, "You do not have a Monument to place.");
+                    return;
+                }
+                if (unitKey == null) {
+                    MessageHelper.sendEphemeralMessageToEventChannel(event, "Unable to resolve that unit.");
+                    return;
+                }
                 String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                         + unitKey.unitName() + " on for **Construction**.";
                 if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
+                if (buttons.isEmpty()) {
+                    MessageHelper.sendEphemeralMessageToEventChannel(
+                            event, "You have no eligible planet on which to place that unit.");
+                    return;
+                }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             }
         }

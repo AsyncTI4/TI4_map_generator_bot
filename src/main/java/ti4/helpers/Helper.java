@@ -1127,10 +1127,39 @@ public final class Helper {
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
+        UnitModel unitModel = "monument".equalsIgnoreCase(unit) ? player.getUnitByBaseType("monument") : null;
         player.resetProducedUnits();
         for (String planet : planets) {
             Planet uh = game.getUnitHolderFromPlanet(planet);
             if (uh == null) continue; // custodia, ghoti, etc.
+
+            if (unitModel != null) {
+                List<String> planetTypes = new ArrayList<>(uh.getPlanetTypes());
+                Tile tile = game.getTileFromPlanet(planet);
+                if (tile != null && tile.isSupernova()) {
+                    planetTypes.add("SUPERNOVA");
+                }
+                if (tile != null && tile.equals(player.getHomeSystemTile())) {
+                    planetTypes.add("HOME_PLANET");
+                }
+                if (!uh.getTechSpecialities().isEmpty()) {
+                    planetTypes.add("TECH_SPECIALTY");
+                }
+                if (uh.isLegendary()) {
+                    planetTypes.add("LEGENDARY");
+                }
+                if (tile != null && tile.isMecatol(game)) {
+                    planetTypes.add("MECATOL_REX");
+                }
+                if (uh.getPlanetModel() != null
+                        && uh.getPlanetModel().getPlanetTypes().stream()
+                                .anyMatch(type -> "lightning".equalsIgnoreCase(type.toString()))) {
+                    planetTypes.add("LIGHTNING");
+                }
+                if (!unitModel.canBePlacedOnPlanetTypes(planetTypes)) {
+                    continue;
+                }
+            }
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 

@@ -555,6 +555,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.MONUMENTS_TO_THE_AGES_MODE + " " + game.isMonumentToTheAgesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MONUMENTS_MODE + " " + game.isMonumentsMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.COSMIC_CONVERGENCE_MODE + " " + game.isCosmicConvergenceMode());

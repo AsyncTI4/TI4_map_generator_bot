@@ -108,6 +108,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.databind.JsonNode;
@@ -961,6 +962,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Conventions of War Abandoned", isConventionsOfWarAbandonedMode());
         gameModes.put("Rapid Mobilization", isRapidMobilizationMode());
         gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
+        gameModes.put(SourceEmojis.Monuments + "Monuments+", isMonumentsMode());
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Cosmic Convergence", isCosmicConvergenceMode());
@@ -3421,6 +3423,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
+        setMonumentsMode(sources.getMonuments().isVal());
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
@@ -3450,6 +3453,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
+        setMonumentsMode(sources.getMonuments().isVal());
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
@@ -3517,6 +3521,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         } else {
             success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
         }
+
+        MonumentsService.applyMonuments(this);
 
         return success;
     }

@@ -8,11 +8,11 @@
             "pok3politics",
             "monuments4construction",
             "pok5trade",
-            "pok6warfare",
+            "te6warfare",
             "pok7technology",
             "pok8imperial"
         ],
-        "description": "Monuments SCs (PoK with new Construction)",
+        "description": "Monuments SCs (TE with new Construction)",
         "source": "monuments"
     }
 ]

@@ -40,6 +40,7 @@ import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
@@ -286,6 +287,7 @@ public class PlayerSetupService {
         // STARTING OWNED UNITS
         Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
+        MonumentsService.addFactionMonument(player, game);
         if (game.isBaseGameMode()) {
             UnitModel mech = player.getUnitByBaseType("mech");
             if (mech != null) {

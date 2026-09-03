@@ -1352,6 +1352,7 @@ public final class Constants {
     public static final String CONVENTIONS_OF_WAR_ABANDONED_MODE = "conventions_of_war_abandoned_mode";
     public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
+    public static final String MONUMENTS_MODE = "monuments_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
     public static final String COSMIC_CONVERGENCE_MODE = "cosmic_convergence_mode";
     public static final String MUAAT_MANIA_MODE = "muaat_mania_mode";

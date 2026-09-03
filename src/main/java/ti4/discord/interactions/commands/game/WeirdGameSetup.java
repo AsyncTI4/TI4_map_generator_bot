@@ -23,6 +23,7 @@ import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
 
@@ -72,6 +73,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 "True to enable Lore triggers in this non-FoW game (always on in FoW games)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MONUMENTS_MODE, "True to enable Monuments+"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -160,6 +162,23 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean feastOrFamineMode = event.getOption(Constants.FEAST_OR_FAMINE_MODE, null, OptionMapping::getAsBoolean);
         if (feastOrFamineMode != null) game.setFeastOrFamineMode(feastOrFamineMode);
+
+        Boolean monumentsMode = event.getOption(Constants.MONUMENTS_MODE, null, OptionMapping::getAsBoolean);
+        if (monumentsMode != null) {
+            game.setMonumentsMode(monumentsMode);
+            if (monumentsMode) {
+                MonumentsService.applyMonuments(game);
+                if (!game.isFrankenGame()) {
+                    game.getRealPlayers().forEach(player -> MonumentsService.addFactionMonument(player, game));
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Added Monuments+ cards and strategy cards"
+                                + (game.isFrankenGame()
+                                        ? ". Faction monuments are not added in Franken games."
+                                        : ", and added each player's faction monument."));
+            }
+        }
 
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
