@@ -1,11 +1,11 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -16,9 +16,6 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.game.UnitHolder;
-import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
@@ -27,7 +24,7 @@ import ti4.message.MessageHelper;
 class RunAgainstAllGames extends Subcommand {
 
     private static final String DRY_RUN_OPTION = "dry_run";
-
+    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 8, 1);
     /**
      * Older games stored every Council Keleres as a bare "keleres", which no faction file answers
      * to - faction_alias maps it to keleres_dont_use_this. Every statistic that reads a faction
@@ -96,13 +93,11 @@ class RunAgainstAllGames extends Subcommand {
         boolean dryRun = event.getOption(DRY_RUN_OPTION, false, OptionMapping::getAsBoolean);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Retyping legacy Keleres players across all games"
+                "Adding TE ACs to all TE games that started after " + PLAYER_TRACKING_START_DATE
                         + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
-        List<String> retypedGames = new ArrayList<>();
-        List<String> defaultedPlayers = new ArrayList<>();
-        int[] retypedPlayers = {0};
-        int[] restoredPositions = {0};
+        List<String> changedGames = new ArrayList<>();
+        int[] migratedTargets = {0};
 
         ConsumeGameUtility.consumeAllGames(
                 game -> {
