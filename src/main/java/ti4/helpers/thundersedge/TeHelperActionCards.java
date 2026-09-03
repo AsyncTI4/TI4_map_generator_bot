@@ -326,37 +326,17 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
-        // Bentor coexistence grants, Xin/Deepwrought), all under the identical prefix
-        // "<factionButtonChecker>exchangeProgramPart3", so a page-nav press cannot say which one built it.
-        // Three of the five narrow their list to non-home planets and two don't; resolution below never
-        // re-checks that either way, so it is disclosure-only. Rebuilding with the narrower spec is the safe
-        // default - the two unfiltered builders would only under-offer on a page 2 they are, in practice,
-        // very unlikely to ever reach.
-        var coexistSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
-                .where(p -> !p.isHomePlanet(game));
-        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, coexistSpec)) return;
 
         String planet = buttonID.split("_")[1];
-        // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
-        // Bentor coexistence grants, Xin/Deepwrought), and an off-map planet used to reach AddUnitService as
-        // a null tile. isHomePlanet mirrors coexistSpec's own where() above - that spec is only used for
-        // pagination, so a Blind Target press never passed through it and has to be re-checked here too.
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        if (game.getTileFromPlanet(planet) == null || unitHolder == null || unitHolder.isHomePlanet(game)) {
-            PlanetTargetService.fizzle(event, player);
-            return;
-        }
-        // Coexisting means sharing a planet with somebody. Every non-fog builder above already filters on
-        // that, so this changes nothing there; in fog it is hidden state, so it cannot narrow the candidate
-        // list and has to be checked here instead - otherwise a blind guess could plant an infantry on an
-        // empty planet and simply take it.
         boolean somebodyToCoexistWith = game.getRealPlayers().stream()
-                .anyMatch(other -> other != player
-                        && other.getColor() != null
-                        && unitHolder.getUnitCount(UnitType.Infantry, other.getColor()) > 0);
+                .anyMatch(other ->
+                        other != player && other.getColor() != null && unitHolder.getUnitCount(other.getColorID()) > 0);
         if (!somebodyToCoexistWith) {
-            PlanetTargetService.fizzle(event, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", there are no other players with units on that planet, so you cannot coexist there.");
             return;
         }
         game.setStoredValue("coexistFlag", "yes");

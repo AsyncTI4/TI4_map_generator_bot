@@ -1,12 +1,11 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,17 +16,15 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.game.UnitHolder;
+import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 class RunAgainstAllGames extends Subcommand {
 
     private static final String DRY_RUN_OPTION = "dry_run";
-
+    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 8, 1);
     /**
      * Older games stored every Council Keleres as a bare "keleres", which no faction file answers
      * to - faction_alias maps it to keleres_dont_use_this. Every statistic that reads a faction
@@ -96,91 +93,36 @@ class RunAgainstAllGames extends Subcommand {
         boolean dryRun = event.getOption(DRY_RUN_OPTION, false, OptionMapping::getAsBoolean);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Retyping legacy Keleres players across all games"
+                "Adding TE ACs to all TE games that started after " + PLAYER_TRACKING_START_DATE
                         + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
-        List<String> retypedGames = new ArrayList<>();
-        List<String> defaultedPlayers = new ArrayList<>();
-        int[] retypedPlayers = {0};
-        int[] restoredPositions = {0};
+        List<String> changedGames = new ArrayList<>();
+        int[] migratedTargets = {0};
 
         ConsumeGameUtility.consumeAllGames(
                 game -> {
-                    List<Player> legacyPlayers = game.getPlayers().values().stream()
-                            .filter(player -> LEGACY_KELERES_FACTION.equalsIgnoreCase(player.getFaction()))
-                            .toList();
-                    if (legacyPlayers.isEmpty()) {
+                    if (!startedAfterPlayerTracking(game) || game.isHasEnded()) {
                         return;
                     }
-
-                    String boardFaction = factionFromTheOnlyKeleresHomeOnTheBoard(game);
-                    String orphanedBaseFaction = factionFromAnOrphanedBaseHome(game);
-                    List<String> retyped = new ArrayList<>();
-                    for (Player player : legacyPlayers) {
-                        String faction = factionFromTheirHomePlanets(player);
-                        if (faction == null) {
-                            faction = factionFromTheirOwnHomeTile(game, player);
-                        }
-                        if (faction == null) {
-                            faction = boardFaction;
-                        }
-                        if (faction == null) {
-                            faction = orphanedBaseFaction;
-                        }
-                        if (faction == null) {
-                            faction = DEFAULT_KELERES_FACTION;
-                            defaultedPlayers.add(describeUndetermined(game, player));
-                        }
-                        String homePosition = homeSystemPositionFor(game, faction);
-                        if (homePosition != null) {
-                            restoredPositions[0]++;
-                        }
-                        if (!dryRun) {
-                            player.setFaction(faction);
-                            if (homePosition != null) {
-                                player.setHomeSystemPosition(homePosition);
-                            }
-                        }
-                        retyped.add(faction + (homePosition == null ? "" : "@" + homePosition));
-                    }
-
-                    if (retyped.isEmpty()) {
+                    int migrated = migrateLegacyTargets(game, dryRun);
+                    if (migrated == 0) {
                         return;
                     }
-                    retypedPlayers[0] += retyped.size();
-                    retypedGames.add(game.getName() + " -> " + String.join(", ", retyped));
+                    migratedTargets[0] += migrated;
+                    changedGames.add(game.getName() + " ");
                     if (!dryRun) {
-                        GameManager.save(game, "Retyped legacy Keleres players from their home system.");
+                        GameManager.save(game, "Added TE ACs.");
                     }
                 },
                 dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
-        report(event, dryRun, retypedGames, defaultedPlayers, retypedPlayers[0], restoredPositions[0]);
-    }
-
-    /**
-     * A player still sitting on a Keleres homeworld names their own flavour, which is the only
-     * signal that survives a game holding more than one legacy player.
-     */
-    static String factionFromTheirHomePlanets(Player player) {
-        Set<String> factions = player.getPlanets().stream()
-                .map(KELERES_FACTION_BY_HOME_PLANET::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        return factions.size() == 1 ? factions.iterator().next() : null;
-    }
-
-    /**
-     * Only one Council Keleres is ever at a table, so a single Keleres home system on the board
-     * says which flavour it was even after they lost the planets in it.
-     */
-    static String factionFromTheOnlyKeleresHomeOnTheBoard(Game game) {
-        Set<String> factions = game.getTileMap().values().stream()
-                .map(Tile::getTileID)
-                .map(KELERES_FACTION_BY_KELERES_TILE::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        return factions.size() == 1 ? factions.iterator().next() : null;
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                (dryRun ? "[DRY RUN] Would remove " : "Removed ") + "convert " + migratedTargets[0]
+                        + " leftover legacy targets"
+                        + " across " + changedGames.size() + " games out of " + GameManager.getGameCount() + " games: "
+                        + String.join(", ", changedGames));
     }
 
     /**
@@ -198,114 +140,41 @@ class RunAgainstAllGames extends Subcommand {
                 .orElse(null);
     }
 
-    /**
-     * The last resort, for a player who lost their home system and has no position left to name it.
-     * A borrowed home system in a game its own faction is not playing can only be the Keleres seat,
-     * whether it is still a tile on the board or only survives as planets in a conqueror's hands -
-     * the oldest games no longer carry the tile at all.
-     */
-    static String factionFromAnOrphanedBaseHome(Game game) {
-        Set<String> factionsAtTheTable = factionsAtTheTable(game);
-
-        Set<String> candidates = Stream.concat(
-                        game.getTileMap().values().stream().map(Tile::getTileID).map(KELERES_FACTION_BY_OWN_TILE::get),
-                        game.getPlayers().values().stream()
-                                .flatMap(player -> player.getPlanets().stream())
-                                .map(KELERES_FACTION_BY_HOME_PLANET::get))
-                .filter(Objects::nonNull)
-                .filter(keleresFaction -> !isAtTheTable(factionsAtTheTable, BORROWED_FROM.get(keleresFaction)))
-                .collect(Collectors.toSet());
-        return candidates.size() == 1 ? candidates.iterator().next() : null;
-    }
-
-    private static Set<String> factionsAtTheTable(Game game) {
-        return game.getPlayers().values().stream()
-                .map(Player::getFaction)
-                .filter(StringUtils::isNotBlank)
-                .map(faction -> faction.toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-    }
-
-    private static boolean isAtTheTable(Set<String> factionsAtTheTable, String baseFaction) {
-        return factionsAtTheTable.stream()
-                .anyMatch(faction -> faction.equals(baseFaction) || faction.endsWith("_" + baseFaction));
-    }
-
-    /**
-     * Where the flavour's home system is sitting, found by its planets rather than its tile id -
-     * these games carry it as 02, 14 or 58 as often as the re-skinned 93new or 94new. Null when the
-     * board no longer holds the tile at all, which is half of them.
-     */
-    static String homeSystemPositionFor(Game game, String keleresFaction) {
-        // With the borrowed faction at the table, a shared home system is theirs and not Keleres's -
-        // only the Keleres-only tiles can be claimed then.
-        boolean sharedHomesAreSpokenFor = isAtTheTable(factionsAtTheTable(game), BORROWED_FROM.get(keleresFaction));
-        return game.getTileMap().values().stream()
-                .filter(tile -> tile.getPlanetUnitHolders().stream()
-                        .map(UnitHolder::getName)
-                        .map(KELERES_FACTION_BY_HOME_PLANET::get)
-                        .anyMatch(keleresFaction::equals))
-                .filter(tile ->
-                        !sharedHomesAreSpokenFor || KELERES_FACTION_BY_KELERES_TILE.containsKey(tile.getTileID()))
-                .map(Tile::getPosition)
-                .filter(StringUtils::isNotBlank)
-                .findFirst()
-                .orElse(null);
-    }
-
-    /** Enough of the player to work out from a dry run why nothing placed them. */
-    private static String describeUndetermined(Game game, Player player) {
-        String position = StringUtils.defaultIfBlank(player.getHomeSystemPosition(), null);
-        if (position == null) {
-            position = StringUtils.defaultIfBlank(player.getPlayerStatsAnchorPosition(), null);
+    @SuppressWarnings("deprecation")
+    private static int migrateLegacyTargets(Game game, boolean dryRun) {
+        if (dryRun) {
+            if (!"action_cards_te".equalsIgnoreCase(game.getAcDeckID())) {
+                return 0;
+            }
+            // Counting instead of converting - a dry run must not touch the game.
+            int acCount = game.getActionCards().size()
+                    + game.getPurgedActionCards().size()
+                    + game.getDiscardActionCards().size();
+            for (Player player : game.getRealPlayers()) {
+                acCount += player.getActionCards().size();
+            }
+            if (acCount < 130) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
-        Tile tile = position == null ? null : game.getTileByPosition(position);
-        List<String> planets = player.getPlanets().stream().limit(8).toList();
-        String factions = game.getPlayers().values().stream()
-                .map(Player::getFaction)
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.joining(","));
-        return game.getName() + " (" + player.getUserName() + ") pos=" + (position == null ? "-" : position)
-                + " tile=" + (tile == null ? "-" : tile.getTileID())
-                + " tiles=" + game.getTileMap().size()
-                + " planets=" + (planets.isEmpty() ? "-" : String.join(",", planets))
-                + " factions=" + factions;
+        int pending = migrateLegacyTargets(game, true);
+        if (pending == 0) {
+            return 0;
+        }
+        game.addTeACs();
+        return pending;
     }
 
-    private static void report(
-            SlashCommandInteractionEvent event,
-            boolean dryRun,
-            List<String> retypedGames,
-            List<String> defaultedPlayers,
-            int retypedPlayers,
-            int restoredPositions) {
-        StringBuilder message = new StringBuilder();
-        message.append(dryRun ? "Would retype " : "Retyped ")
-                .append(retypedPlayers)
-                .append(" legacy Keleres player(s) across ")
-                .append(retypedGames.size())
-                .append(" game(s), out of ")
-                .append(GameManager.getGameCount())
-                .append(" games, ")
-                .append(restoredPositions)
-                .append(" of them with a home system position to restore.\n");
-        if (defaultedPlayers.isEmpty()) {
-            message.append("Every legacy Keleres player was placed from their own game.");
-        } else {
-            message.append("**Nothing in the game said which flavour, so ")
-                    .append(DEFAULT_KELERES_FACTION)
-                    .append(" was used (")
-                    .append(defaultedPlayers.size())
-                    .append("):**\n- ")
-                    .append(String.join("\n- ", defaultedPlayers));
+    static boolean startedAfterPlayerTracking(Game game) {
+        if (StringUtils.isBlank(game.getCreationDate())) {
+            return false;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
-
-        BotLogger.info((dryRun ? "[DRY RUN] Would retype " : "Retyped ") + retypedPlayers
-                + " legacy Keleres player(s) across " + retypedGames.size() + " games: "
-                + String.join(", ", retypedGames)
-                + (defaultedPlayers.isEmpty()
-                        ? ""
-                        : " | Defaulted to " + DEFAULT_KELERES_FACTION + ": " + String.join(", ", defaultedPlayers)));
+        try {
+            return GameHelper.getCreationDateAsLocalDate(game).isAfter(PLAYER_TRACKING_START_DATE);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
 }
