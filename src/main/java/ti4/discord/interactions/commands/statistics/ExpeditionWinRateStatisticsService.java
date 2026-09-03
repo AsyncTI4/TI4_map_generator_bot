@@ -39,7 +39,7 @@ class ExpeditionWinRateStatisticsService {
         int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough = {0, 0};
 
         ConsumeGameUtility.consumeAllGames(
-                ExpeditionWinRateStatisticsService::isEligibleGame,
+                GameStatisticsFilterer.getStandardCompetitiveGamesFilter().and(Game::isThundersEdge),
                 game -> consumeGame(
                         game,
                         factionExpeditionStats,
@@ -249,43 +249,6 @@ class ExpeditionWinRateStatisticsService {
                 }
             }
         }
-    }
-
-    private static boolean isEligibleGame(Game game) {
-        return game.getWinner().isPresent()
-                && game.getRealAndEliminatedPlayers().size() == 6
-                && game.getVp() == 10
-                && game.isThundersEdge()
-                && !game.hasHomebrew()
-                && !hasGalacticEvent(game)
-                && !hasScenario(game);
-    }
-
-    private static boolean hasScenario(Game game) {
-        return game.isLiberationC4Mode() || game.isOrdinianC1Mode() || game.isAllianceMode();
-    }
-
-    private static boolean hasGalacticEvent(Game game) {
-        return game.isAdventOfTheWarsunMode()
-                || game.isStellarAtomicsMode()
-                || game.isAgeOfFightersMode()
-                || game.isCivilizedSocietyMode()
-                || game.isDangerousWildsMode()
-                || game.isCallOfTheVoidMode()
-                || game.isHiddenAgendaMode()
-                || game.isWildWildGalaxyMode()
-                || game.isCulturalExchangeProgramMode()
-                || game.isCosmicPhenomenaeMode()
-                || game.isMercenariesForHireMode()
-                || game.isRapidMobilizationMode()
-                || game.isWeirdWormholesMode()
-                || game.isMonumentToTheAgesMode()
-                || game.isZealousOrthodoxyMode()
-                || game.isConventionsOfWarAbandonedMode()
-                || game.isAgeOfExplorationMode()
-                || game.isTotalWarMode()
-                || game.isAgeOfCommerceMode()
-                || game.isMinorFactionsMode();
     }
 
     private static boolean checkFactionsEqual(String faction1, String faction2) {

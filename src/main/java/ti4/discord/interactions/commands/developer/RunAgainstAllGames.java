@@ -1,9 +1,12 @@
 package ti4.discord.interactions.commands.developer;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,6 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
@@ -22,11 +28,65 @@ class RunAgainstAllGames extends Subcommand {
 
     private static final String DRY_RUN_OPTION = "dry_run";
 
-    // Games older than this did not have TE as the default.
-    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 8, 1);
+    /**
+     * Older games stored every Council Keleres as a bare "keleres", which no faction file answers
+     * to - faction_alias maps it to keleres_dont_use_this. Every statistic that reads a faction
+     * model drops those players, so retype them as the flavour their home system says they were.
+     */
+    private static final String LEGACY_KELERES_FACTION = "keleres";
+
+    /**
+     * What a player nothing in their game can place becomes. The handful this catches are all
+     * unfinished or fog games that no statistic reads, so the flavour is a label rather than a
+     * finding - each one is listed in the report so the guess stays visible.
+     */
+    private static final String DEFAULT_KELERES_FACTION = "keleresm";
+
+    /**
+     * The Keleres-only home systems. Nobody else sits on these, so one of them anywhere on a board
+     * names the flavour even when the player it belonged to cannot be placed any other way.
+     */
+    private static final Map<String, String> KELERES_FACTION_BY_KELERES_TILE =
+            Map.of("92new", "keleresx", "93new", "keleresa", "94new", "keleresm");
+
+    /**
+     * The same three home systems as the base factions wear them. Keleres predates the re-skinned
+     * 92new/93new/94new tiles, so the older games this command exists for seat Keleres on 02, 14 and
+     * 58 instead - which are also Mentak's, Xxcha's and Argent's, so these only count when the tile
+     * is the legacy Keleres player's own.
+     */
+    private static final Map<String, String> KELERES_FACTION_BY_OWN_TILE = Map.ofEntries(
+            Map.entry("92new", "keleresx"),
+            Map.entry("93new", "keleresa"),
+            Map.entry("94new", "keleresm"),
+            Map.entry("14", "keleresx"),
+            Map.entry("58", "keleresa"),
+            Map.entry("02", "keleresm"),
+            Map.entry("2", "keleresm"));
+
+    /**
+     * The faction each flavour borrows its home system from. Keleres never shares a table with that
+     * faction, so a home system of theirs in a game without them can only be the Keleres player's.
+     */
+    private static final Map<String, String> BORROWED_FROM =
+            Map.of("keleresx", "xxcha", "keleresa", "argent", "keleresm", "mentak");
+
+    private static final Map<String, String> KELERES_FACTION_BY_HOME_PLANET = Map.ofEntries(
+            Map.entry("archonrenk", "keleresx"),
+            Map.entry("archontauk", "keleresx"),
+            Map.entry("valkk", "keleresa"),
+            Map.entry("ylirk", "keleresa"),
+            Map.entry("avark", "keleresa"),
+            Map.entry("mollprimusk", "keleresm"),
+            Map.entry("archonren", "keleresx"),
+            Map.entry("archontau", "keleresx"),
+            Map.entry("valk", "keleresa"),
+            Map.entry("ylir", "keleresa"),
+            Map.entry("avar", "keleresa"),
+            Map.entry("mollprimus", "keleresm"));
 
     RunAgainstAllGames() {
-        super("run_against_all_games", "Runs this custom code against all games.");
+        super("run_against_all_games", "Retypes legacy 'keleres' players as keleresm, keleresa or keleresx.");
         addOptions(new OptionData(
                 OptionType.BOOLEAN, DRY_RUN_OPTION, "Report what would change without saving anything."));
     }
@@ -36,10 +96,14 @@ class RunAgainstAllGames extends Subcommand {
         boolean dryRun = event.getOption(DRY_RUN_OPTION, false, OptionMapping::getAsBoolean);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Running custom command against all games" + (dryRun ? " (dry run, nothing will be saved)." : "."));
+                "Retyping legacy Keleres players across all games"
+                        + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
-        List<String> changedGames = new ArrayList<>();
-        int[] migratedTargets = {0};
+        List<String> retypedGames = new ArrayList<>();
+        List<String> defaultedPlayers = new ArrayList<>();
+        int[] retypedPlayers = {0};
+        int[] restoredPositions = {0};
+
         ConsumeGameUtility.consumeAllGames(
                 game -> {
                     if (!startedAfterPlayerTracking(game) || game.isHasEnded()) {
@@ -63,10 +127,19 @@ class RunAgainstAllGames extends Subcommand {
                         + String.join(", ", changedGames));
     }
 
-    private static int removeFabricatedCancels(Game game, boolean dryRun) {
-        return dryRun
-                ? game.getGameStats().findFabricatedCancels().size()
-                : game.getGameStats().removeFabricatedCancels();
+    /**
+     * The tile the player is anchored to. Safe to read the base home systems from, unlike a sweep of
+     * the whole board, because this one is theirs.
+     */
+    static String factionFromTheirOwnHomeTile(Game game, Player player) {
+        return Stream.of(player.getHomeSystemPosition(), player.getPlayerStatsAnchorPosition())
+                .filter(position -> StringUtils.isNotBlank(position) && !"null".equalsIgnoreCase(position))
+                .map(game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .map(tile -> KELERES_FACTION_BY_OWN_TILE.get(tile.getTileID()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 
     @SuppressWarnings("deprecation")
