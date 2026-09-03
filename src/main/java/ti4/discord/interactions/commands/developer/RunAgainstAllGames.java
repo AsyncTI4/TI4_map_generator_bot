@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -13,20 +12,19 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.spring.service.statistics.overrule.OverruleStatsService;
 
 class RunAgainstAllGames extends Subcommand {
 
     private static final String DRY_RUN_OPTION = "dry_run";
 
-    // Games older than this recorded no player on any play, so a player-less cancel there says
-    // nothing about whether it really happened and the cleanup below cannot judge it.
-    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
+    // Games older than this did not have TE as the default.
+    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 8, 1);
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
@@ -42,28 +40,24 @@ class RunAgainstAllGames extends Subcommand {
                 "Running custom command against all games" + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
         List<String> changedGames = new ArrayList<>();
-        int[] removedPlays = {0};
         int[] migratedTargets = {0};
         ConsumeGameUtility.consumeAllGames(
                 game -> {
                     int migrated = migrateLegacyTargets(game, dryRun);
-                    int removed = startedAfterPlayerTracking(game) ? removeFabricatedCancels(game, dryRun) : 0;
-                    if (migrated == 0 && removed == 0) {
+                    if (!startedAfterPlayerTracking(game)) {
                         return;
                     }
                     migratedTargets[0] += migrated;
-                    removedPlays[0] += removed;
-                    changedGames.add(
-                            game.getName() + " (" + removed + (migrated == 0 ? "" : ", " + migrated + "T)") + ")");
+                    changedGames.add(game.getName() + " ");
                     if (!dryRun) {
-                        GameManager.save(game, "Removed action card cancels that never happened.");
+                        GameManager.save(game, "Added TE ACs.");
                     }
                 },
                 dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
-        BotLogger.info((dryRun ? "[DRY RUN] Would remove " : "Removed ") + removedPlays[0] + " fabricated cancel plays"
-                + " and convert " + migratedTargets[0] + " leftover legacy targets"
+        BotLogger.info((dryRun ? "[DRY RUN] Would remove " : "Removed ") + "convert " + migratedTargets[0]
+                + " leftover legacy targets"
                 + " across " + changedGames.size() + " games out of " + GameManager.getGameCount() + " games: "
                 + String.join(", ", changedGames));
     }
@@ -74,28 +68,30 @@ class RunAgainstAllGames extends Subcommand {
                 : game.getGameStats().removeFabricatedCancels();
     }
 
-    /**
-     * Targets kept being written until 2026-08-08, after the migration that converts them last ran,
-     * so a handful of games still carry some. Sweep them up here so the whole legacy target path can
-     * be deleted once this has run.
-     */
     @SuppressWarnings("deprecation")
     private static int migrateLegacyTargets(Game game, boolean dryRun) {
         if (dryRun) {
+            if (!game.getAcDeckID().equalsIgnoreCase("action_cards_te")) {
+                return 0;
+            }
             // Counting instead of converting - a dry run must not touch the game.
-            return (int) game.getGameStats().getActionCardPlays().stream()
-                    .filter(play -> play.getTarget() != null)
-                    .count();
+            int acCount = game.getActionCards().size()
+                    + game.getPurgedActionCards().size()
+                    + game.getDiscardActionCards().size();
+            for (Player player : game.getRealPlayers()) {
+                acCount += player.getActionCards().size();
+            }
+            if (acCount < 140) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
         int pending = migrateLegacyTargets(game, true);
         if (pending == 0) {
             return 0;
         }
-        Map<String, Integer> strategyCardChoices =
-                game.getGameStats().migrateTargetsToCanceledFlags().strategyCardChoices();
-        if (!strategyCardChoices.isEmpty()) {
-            OverruleStatsService.get().addMigratedCounts(game.getName(), strategyCardChoices);
-        }
+        game.addTeACs();
         return pending;
     }
 

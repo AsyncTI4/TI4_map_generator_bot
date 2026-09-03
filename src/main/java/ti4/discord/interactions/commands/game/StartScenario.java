@@ -479,6 +479,7 @@ public class StartScenario extends GameStateSubcommand {
             if (commanderName.contains("keleres")
                     || commanderName.contains("muaat")
                     || commanderName.contains("cabal")
+                    || commanderName.contains("neutral")
                     || commanderName.contains("crimson")) {
                 continue;
             }

@@ -177,6 +177,9 @@ public class AddPlanetService {
                 if (!player.hasAbility("blood_ties")) {
                     MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
                 }
+                if (game.isMuaatManiaMode()) {
+                    ButtonHelper.offerMMBoon(player, game);
+                }
             }
         }
         boolean alreadyOwned = false;
