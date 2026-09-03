@@ -3,7 +3,7 @@ package ti4.discord.interactions.commands.user;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.PlayerTitleHelper;
+import ti4.service.game.GameSurveyService;
 
 class Survey extends Subcommand {
 
@@ -13,6 +13,6 @@ class Survey extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        PlayerTitleHelper.answerSurvey(event, "spoof_yes_1");
+        GameSurveyService.answerSurvey(event, "spoof_yes_1");
     }
 }

@@ -1191,15 +1191,13 @@ public class StartPhaseService {
 
         if (game.getRound() == 1
                 && !game.isFowMode()
-                && game.getActionCards().contains("overrule")
                 && game.getStoredValue("offeredOverrulePurge").isEmpty()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("purgeOverrule", "Purge Overrule"));
             buttons.add(Buttons.gray("deleteButtons", "Keep Overrule"));
             MessageHelper.sendMessageToChannelWithButtons(
                     game.getTableTalkChannel(),
-                    "This game's action card deck contains _Overrule_ (_perform the primary ability of a readied or unchosen strategy card_)."
-                            + " Some groups prefer to play without it. If the table agrees to remove it, you can use these buttons to purge it from the deck.",
+                    "If the table agrees, you can use this button to purge _Overrule_.",
                     buttons);
             game.setStoredValue("offeredOverrulePurge", "yes");
         }
