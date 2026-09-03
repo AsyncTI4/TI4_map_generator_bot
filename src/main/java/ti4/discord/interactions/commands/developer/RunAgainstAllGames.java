@@ -16,7 +16,6 @@ import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 class RunAgainstAllGames extends Subcommand {
@@ -43,10 +42,10 @@ class RunAgainstAllGames extends Subcommand {
         int[] migratedTargets = {0};
         ConsumeGameUtility.consumeAllGames(
                 game -> {
-                    int migrated = migrateLegacyTargets(game, dryRun);
-                    if (!startedAfterPlayerTracking(game)) {
+                    if (!startedAfterPlayerTracking(game) || game.isHasEnded()) {
                         return;
                     }
+                    int migrated = migrateLegacyTargets(game, dryRun);
                     migratedTargets[0] += migrated;
                     changedGames.add(game.getName() + " ");
                     if (!dryRun) {
@@ -56,10 +55,12 @@ class RunAgainstAllGames extends Subcommand {
                 dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
-        BotLogger.info((dryRun ? "[DRY RUN] Would remove " : "Removed ") + "convert " + migratedTargets[0]
-                + " leftover legacy targets"
-                + " across " + changedGames.size() + " games out of " + GameManager.getGameCount() + " games: "
-                + String.join(", ", changedGames));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                (dryRun ? "[DRY RUN] Would remove " : "Removed ") + "convert " + migratedTargets[0]
+                        + " leftover legacy targets"
+                        + " across " + changedGames.size() + " games out of " + GameManager.getGameCount() + " games: "
+                        + String.join(", ", changedGames));
     }
 
     private static int removeFabricatedCancels(Game game, boolean dryRun) {
