@@ -318,11 +318,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         publicObjectives1 = Mapper.getShuffledDeck("public_stage_1_objectives_pok");
         publicObjectives2 = Mapper.getShuffledDeck("public_stage_2_objectives_pok");
         setSecretObjectives(Mapper.getShuffledDeck("secret_objectives_pok"));
-        setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
+        setActionCards(Mapper.getShuffledDeck("action_cards_te"));
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
         explore = Mapper.getShuffledDeck("explores_pok");
         setRelics(Mapper.getShuffledDeck("relics_pok_te"));
         setStrategyCardSet("te");
+        setThundersEdge(true);
 
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora
@@ -3562,6 +3563,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void resetActionCardDeck(DeckModel deck) {
         setAcDeckID(deck.getAlias());
         setActionCards(deck.getNewShuffledDeck());
+        removeOverruleIfPurged();
         getDiscardActionCards().clear();
         getDiscardACStatus().clear();
         getPlayedActionCards().clear();
@@ -3604,10 +3606,27 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
+        removeOverruleIfPurged();
+        return true;
+    }
+
+    public void removeOverruleIfPurged() {
         if ("true".equals(getStoredValue("removeOverrule"))) {
             getActionCards().removeIf("overrule"::equals);
         }
-        return true;
+    }
+
+    public void addTeACs() {
+        List<String> oldDeck =
+                new ArrayList<>(Mapper.getDeck("action_cards_pok").getNewShuffledDeck());
+        List<String> newDeck = new ArrayList<>(Mapper.getDeck("action_cards_te").getNewShuffledDeck());
+        for (String ac : oldDeck) {
+            newDeck.remove(ac);
+        }
+        for (String acID : newDeck) {
+            getActionCards().add(acID);
+        }
+        Collections.shuffle(getActionCards());
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {

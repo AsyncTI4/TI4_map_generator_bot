@@ -194,6 +194,9 @@ public class SecretObjectiveInfoService {
     private static String getSecretObjectiveRepresentation(String soID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        if (so == null) {
+            return "Unknown Secret Objective: " + soID;
+        }
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();

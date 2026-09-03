@@ -3414,8 +3414,9 @@ public class ButtonHelper {
     @ButtonHandler("finishMMElimination_")
     public static void finishMMElimination(Player p1, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        for (String planet : p2.getPlanets()) {
-            game.setupNeutralPlayer();
+        List<String> planets = new ArrayList<>(p2.getPlanets());
+        game.setupNeutralPlayer();
+        for (String planet : planets) {
             Player player = game.getPlayerFromColorOrFaction("neutral");
             Tile tile = game.getTileFromPlanet(planet);
             UnitHolder planetU = game.getUnitHolderFromPlanet(planet);
@@ -4592,9 +4593,9 @@ public class ButtonHelper {
                     + player.getEffectiveFleetCC()
                     + " command tokens in your fleet pool,"
                     + (fleetCap / 2 - player.getEffectiveFleetCC() > 0
-                            ? "plus the ability to hold"
+                            ? " plus the ability to hold "
                                     + (fleetCap / 2 - player.getEffectiveFleetCC())
-                                    + "additional ships, for a total of " + (fleetCap / 2)
+                                    + " additional ships, for a total of " + (fleetCap / 2)
                             : "")
                     + " and you currently are filling "
                     + (numFighter2sFleet + numOfCapitalShips + 1) / 2

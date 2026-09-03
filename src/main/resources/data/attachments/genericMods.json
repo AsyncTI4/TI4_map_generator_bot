@@ -32,6 +32,14 @@
         "source": "other"
     },
     {
+        "id": "taraniscrest",
+        "imagePath": "attachment_taraniscrest.png",
+        "influenceModifier": 1,
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
         "id": "positiveinf",
         "imagePath": "attachment_positiveinf.png",
         "influenceModifier": 1,
