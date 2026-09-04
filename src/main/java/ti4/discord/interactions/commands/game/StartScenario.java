@@ -44,6 +44,7 @@ import ti4.service.draft.PlayerSetupState;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
 import ti4.service.objectives.DrawSecretService;
@@ -458,7 +459,20 @@ public class StartScenario extends GameStateSubcommand {
                 PlayerSetupService.setupPlayer(setupState, player, game, event);
             }
             DrawSecretService.dealSOToAll(event, 2, game);
-
+            AddFrontierTokensService.addFrontierTokens(event, game);
+            if (game.getTile("82a") == null) {
+                if (game.getTileByPosition("tl") == null) {
+                    game.setTile(new Tile("82a", "tl"));
+                } else {
+                    if (game.getTileByPosition("tr") == null) {
+                        game.setTile(new Tile("82a", "tr"));
+                    } else {
+                        if (game.getTileByPosition("bl") == null) {
+                            game.setTile(new Tile("82a", "bl"));
+                        }
+                    }
+                }
+            }
             GameManager.save(game, "Nucleus generation");
         });
 
