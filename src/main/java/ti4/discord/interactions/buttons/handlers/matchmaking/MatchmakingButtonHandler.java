@@ -15,6 +15,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.label.LabelChildComponent;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
@@ -187,25 +188,25 @@ class MatchmakingButtonHandler {
         List<String> groupMemberIds = MatchmakerService.get().partyMemberIds(userId);
 
         final boolean REQUIRE_SELECTION = true;
-        CheckboxGroup expansions = buildCheckboxGroup(
+        LabelChildComponent expansions = buildMultiSelect(
                 EXPANSIONS_ID,
                 MatchmakingOptions.EXPANSION_OPTIONS,
                 userSettings.getMatchmakingExpansions(),
                 DEFAULT_EXPANSION_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup playerCounts = buildCheckboxGroup(
+        LabelChildComponent playerCounts = buildMultiSelect(
                 PLAYER_COUNTS_ID,
                 groupPlayerCountOptions(groupMemberIds.size()),
                 userSettings.getMatchmakingPlayerCounts(),
                 DEFAULT_PLAYER_COUNT_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup victoryPoints = buildCheckboxGroup(
+        LabelChildComponent victoryPoints = buildMultiSelect(
                 VICTORY_POINTS_ID,
                 VICTORY_POINT_OPTIONS,
                 userSettings.getMatchmakingVictoryPointGoals(),
                 DEFAULT_VICTORY_POINT_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup paces = buildCheckboxGroup(
+        LabelChildComponent paces = buildMultiSelect(
                 PACE_RESTRICTIONS_ID,
                 groupPaceOptions(groupMemberIds),
                 userSettings.getMatchmakingPaces(),
@@ -235,19 +236,19 @@ class MatchmakingButtonHandler {
         UserSettings userSettings = UserSettingsManager.get(userId);
 
         final boolean REQUIRE_SELECTION = true;
-        CheckboxGroup victoryPoints = buildCheckboxGroup(
+        LabelChildComponent victoryPoints = buildMultiSelect(
                 VICTORY_POINTS_ID,
                 VICTORY_POINT_OPTIONS,
                 userSettings.getMatchmakingVictoryPointGoals(),
                 DEFAULT_VICTORY_POINT_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup paces = buildCheckboxGroup(
+        LabelChildComponent paces = buildMultiSelect(
                 PACE_RESTRICTIONS_ID,
                 PartyValidator.getValidPaces(List.of(userId)),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup ranks = buildCheckboxGroup(
+        LabelChildComponent ranks = buildMultiSelect(
                 TIGL_RANKS_ID,
                 MatchmakingOptions.TIGL_RANK_OPTIONS,
                 userSettings.getMatchmakingTiglRanks(),
@@ -340,7 +341,7 @@ class MatchmakingButtonHandler {
         if (rankOptions.isEmpty()) {
             rankOptions = List.of(MatchmakingOptions.UNRANKED_OPTION);
         }
-        CheckboxGroup ranks = buildCheckboxGroup(
+        LabelChildComponent ranks = buildMultiSelect(
                 TIGL_RANKS_ID, rankOptions, userSettings.getMatchmakingTiglRanks(), DEFAULT_TIGL_RANK_OPTIONS, true);
         Modal.Builder modal = Modal.create(SEARCH_FOR_PLAYERS_TIGL_MODAL_ID, "Search for Players")
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
@@ -690,6 +691,19 @@ class MatchmakingButtonHandler {
 
     private static List<String> groupRestrictionOptions(List<String> groupMemberIds) {
         return new ArrayList<>(PartyValidator.getValidRestrictions(groupMemberIds, RESTRICTION_OPTIONS));
+    }
+
+    private static LabelChildComponent buildMultiSelect(
+            String id,
+            List<String> options,
+            List<String> selectedValues,
+            List<String> defaultValues,
+            boolean requireSelection) {
+        boolean rendersAsLockedCheckboxGroup = requireSelection && options.size() == 1;
+        if (rendersAsLockedCheckboxGroup) {
+            return buildSingleSelect(id, options, selectedValues, defaultValues);
+        }
+        return buildCheckboxGroup(id, options, selectedValues, defaultValues, requireSelection);
     }
 
     private static CheckboxGroup buildCheckboxGroup(
