@@ -22,6 +22,10 @@ import ti4.service.info.ListPlayerInfoService;
 @Data
 public class WebScoreBreakdown {
     private List<ScoreBreakdownEntry> entries;
+    // Score-track position, which isn't fogged. Under FoW a hidden player has no breakdown at all
+    // (see GameWebDataService#applyStatRedaction) - their total travels in hiddenPlayerVps instead,
+    // detached from any faction.
+    private Integer totalVps;
 
     @Data
     public static class ScoreBreakdownEntry {
@@ -109,6 +113,7 @@ public class WebScoreBreakdown {
 
         WebScoreBreakdown breakdown = new WebScoreBreakdown();
         breakdown.entries = new ArrayList<>();
+        breakdown.totalVps = player.getTotalVictoryPoints();
 
         addScoredEntries(player, game, breakdown.entries);
         addQualifiesAndPotentialEntries(player, game, breakdown.entries);
