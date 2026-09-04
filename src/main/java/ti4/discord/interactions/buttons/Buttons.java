@@ -111,7 +111,7 @@ public final class Buttons {
         if (game != null && !game.isFowMode()) {
             if (AsyncTi4WebsiteHelper.uploadsEnabled()) {
                 String url = "https://asyncti4.com/game/" + game.getName() + "/newui";
-                buttonsWeb.add(Button.link(url, "Website View"));
+                buttonsWeb.add(Button.link(url, "Web View"));
             }
             buttonsWeb.add(PLAYER_INFO);
         }
