@@ -127,8 +127,8 @@ public class FractureService {
                         }
                     }
                     String newTileID = "";
-                    List<String> redTilesToPullFrom = new ArrayList<>(
-                            List.of("ef1", "ef2", "ef3", "ef4", "ef5", "ef6", "ef7", "ef8", "ef9", "ef10"));
+                    List<String> redTilesToPullFrom = new ArrayList<>(List.of(
+                            "ef1", "ef2", "ef3", "ef4", "ef5", "ef6", "ef7", "ef8", "ef9", "ef10", "ef11", "ef12"));
                     List<Button> buttons = new ArrayList<>();
                     redTilesToPullFrom.removeAll(game.getTileMap().values().stream()
                             .map(Tile::getTileID)

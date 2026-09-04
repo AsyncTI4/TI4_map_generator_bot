@@ -67,7 +67,7 @@
     },
     {
         "id": "redcreussagent",
-        "faction": "ghost",
+        "faction": "crimson",
         "type": "agent",
         "name": "\"Who Knows?\"",
         "title": "Forlorn Shadow",
@@ -76,11 +76,11 @@
         "unlockCondition": "Always Unlocked",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreussagent.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreussagent_back.png?raw=true",
-        "source": "pok"
+        "source": "codex4"
     },
     {
         "id": "redcreusscommander",
-        "faction": "ghost",
+        "faction": "crimson",
         "type": "commander",
         "name": "\"Total Mystery\"",
         "title": "Wistful Soul",
@@ -89,11 +89,11 @@
         "unlockCondition": "Resolve a combat with another player",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusscommander.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusscommander_back.png?raw=true",
-        "source": "pok"
+        "source": "codex4"
     },
     {
         "id": "redcreusshero",
-        "faction": "ghost",
+        "faction": "crimson",
         "type": "hero",
         "name": "\"A Tall Stranger\"",
         "title": "Wayward Riftwalker",
@@ -103,7 +103,7 @@
         "unlockCondition": "Have 3 scored objectives.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusshero.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusshero_back.png?raw=true",
-        "source": "pok"
+        "source": "codex4"
     },
     {
         "id": "orlandohero",
