@@ -5327,8 +5327,42 @@ public class ButtonHelper {
         if (tile.getPlanetUnitHolders().isEmpty()) {
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
+        for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+            uH.addToken("token_relictoken.png");
+        }
+        Player neutral = game.getNeutral();
+        switch (newTileID) {
+            case "ef1" -> {
+                AddUnitService.addUnits(event, tile, game, neutral.getColor(), "2 cv, 2 ff, 2 inf p");
+            }
+            case "ef2" -> {
+                AddUnitService.addUnits(event, tile, game, neutral.getColor(), "fs, 3 ff, 1 mech h");
+            }
+            case "ef3" -> {
+                AddUnitService.addUnits(event, tile, game, neutral.getColor(), "1 dd, 1 inf p");
+            }
+            case "ef4" -> {
+                AddUnitService.addUnits(event, tile, game, neutral.getColor(), "1 dn, 1 ff");
+            }
+            case "ef7" -> {
+                AddUnitService.addUnits(
+                        event,
+                        tile,
+                        game,
+                        neutral.getColor(),
+                        "6 ff, 1 inf n, 1 inf hypnos, 1 inf hecate, 1 sd hecate, 1 sd n");
+            }
+            case "ef10" -> {
+                AddUnitService.addUnits(event, tile, game, neutral.getColor(), "ws, 4 ff, 1 inf m");
+            }
+            case "ef12" -> {
+                AddUnitService.addUnits(event, tile, game, neutral.getColor(), "2 cr, 2 ff, 1 inf c, 1 sd c");
+            }
+            default -> {
+                // No neutral units to add for this tile
+            }
+        }
         if (game.isDangerousWildsMode()) {
-            Player neutral = game.getNeutral();
             boolean added = false;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
@@ -5583,8 +5617,10 @@ public class ButtonHelper {
         String ringNum = buttonID.replace("ring_", "");
 
         if ("corners".equalsIgnoreCase(ringNum)) {
-            List<String> cornerPositions =
-                    List.of("tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
+            List<String> cornerPositions = List.of(
+                    "tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7", "frac8",
+                    "frac9", "frac10", "frac11", "frac12", "frac13", "frac14", "frac15", "frac16", "frac17", "frac18",
+                    "frac19", "frac20", "frac21", "frac22", "frac23", "frac24", "frac25");
             for (String pos : cornerPositions) {
                 Tile t = game.getTileByPosition(pos);
                 if (canActivateTile(game, player, t, visiblePositions)) {

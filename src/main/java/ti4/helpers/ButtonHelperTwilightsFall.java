@@ -293,14 +293,16 @@ public final class ButtonHelperTwilightsFall {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
         AddFrontierTokensService.addFrontierTokens(null, game);
-        if (game.getTileByPosition("tl") == null) {
-            game.setTile(new Tile("82a", "tl"));
-        } else {
-            if (game.getTileByPosition("tr") == null) {
-                game.setTile(new Tile("82a", "tr"));
+        if (game.getTile("82a") == null) {
+            if (game.getTileByPosition("tl") == null) {
+                game.setTile(new Tile("82a", "tl"));
             } else {
-                if (game.getTileByPosition("bl") == null) {
-                    game.setTile(new Tile("82a", "bl"));
+                if (game.getTileByPosition("tr") == null) {
+                    game.setTile(new Tile("82a", "tr"));
+                } else {
+                    if (game.getTileByPosition("bl") == null) {
+                        game.setTile(new Tile("82a", "bl"));
+                    }
                 }
             }
         }

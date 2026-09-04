@@ -151,6 +151,9 @@ public class SecretObjectiveInfoService {
                             .append(Helper.leftpad("" + so.getValue(), 3))
                             .append(")`\n> ")
                             .append(soModel.getText());
+                    if (soModel.getPoints() > 1) {
+                        sb.append(" (").append(soModel.getPoints()).append(" VP)");
+                    }
                     index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
