@@ -388,6 +388,7 @@ public class StartScenario extends GameStateSubcommand {
     private static void startMuaatMania(Game game, GenericInteractionCreateEvent event) {
         if (game.getPlayers().size() != 6) {
             MessageHelper.sendMessageToEventChannel(event, "Muaat mania needs exactly 6 players.");
+            return;
         }
         game.setMuaatManiaMode(true);
         game.removeRelicFromGame("shard");
