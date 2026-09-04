@@ -141,6 +141,30 @@ class GameTest extends BaseTi4Test {
         assertThat(game.getPlayedActionCards()).isEmpty();
     }
 
+    @Test
+    void shouldRemoveACustomPublicObjective() {
+        var game = new Game();
+        Integer poId = game.addCustomPO("Political Censure", 1);
+
+        assertThat(game.removeCustomPO(poId)).isTrue();
+
+        assertThat(game.getRevealedPublicObjectives()).doesNotContainKey("Political Censure");
+        assertThat(game.getCustomPublicVP()).doesNotContainKey("Political Censure");
+    }
+
+    @Test
+    void shouldNotRemoveANonCustomPublicObjective() {
+        // Regression test for https://github.com/AsyncTI4/TI4_map_generator_bot/issues/1395:
+        // /status remove_custom_po was purging real Stage I/II objectives, not just custom ones.
+        var game = new Game();
+        game.setRevealedPublicObjectives(new LinkedHashMap<>(Map.of("centralize_trade", 5)));
+
+        assertThat(game.removeCustomPO(5)).isFalse();
+        assertThat(game.removeCustomPO("centralize_trade")).isFalse();
+
+        assertThat(game.getRevealedPublicObjectives()).containsEntry("centralize_trade", 5);
+    }
+
     private Game createSinglePlayerGame() {
         var game = new Game();
         var player = createPlayer("player1", Set.of(), game);

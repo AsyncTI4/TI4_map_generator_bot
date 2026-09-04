@@ -2003,7 +2003,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean removeCustomPO(String id) {
-        if (!id.isEmpty()) {
+        if (!id.isEmpty() && customPublicVP.containsKey(id)) {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
             customPublicVP.remove(id);
