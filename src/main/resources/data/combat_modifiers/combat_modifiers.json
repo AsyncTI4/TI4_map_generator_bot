@@ -29,6 +29,20 @@
         ]
     },
     {
+        "alias": "plus1_orangetf_monument_mechs",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "mf",
+        "forCombatAbility": "combatround",
+        "persistenceType": "ONE_TACTICAL_ACTION",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "orangetf_monument"
+            }
+        ]
+    },
+    {
         "alias": "plus1_roll_mechs_naaz_flagship",
         "type": "extrarolls",
         "value": "+1",

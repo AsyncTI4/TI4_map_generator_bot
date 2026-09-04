@@ -55,6 +55,7 @@ import ti4.service.franken.FrankenPromissoryService;
 import ti4.service.franken.FrankenStartingTechService;
 import ti4.service.franken.FrankenStatsService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class FrankenButtonHandler {
@@ -203,6 +204,7 @@ public class FrankenButtonHandler {
             case MAHACTKING -> {
                 FactionModel faction = Mapper.getFaction(itemID);
                 player.setFaction(itemID);
+                MonumentsService.addFactionMonument(player, player.getGame());
                 List<String> units = List.of(itemID + "_flagship", itemID + "_mech", "tf_warsun");
                 FrankenUnitService.addUnits(event, player, units, false);
                 FrankenStatsService.setStartingComms(event, player, faction.getCommodities());

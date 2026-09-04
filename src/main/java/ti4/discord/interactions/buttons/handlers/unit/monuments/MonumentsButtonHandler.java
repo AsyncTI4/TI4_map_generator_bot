@@ -97,7 +97,7 @@ public class MonumentsButtonHandler {
             if (targetTile.hasPlayerCC(target)) {
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + L1_MOVE_CC + targetTile.getPosition() + "|" + target.getColor(),
-                        target.getRepresentationNoPing(),
+                        target.getFactionModel().getShortName(),
                         target.getFactionEmoji()));
             }
         }

@@ -30,6 +30,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class TEOptionService {
@@ -127,6 +128,12 @@ public class TEOptionService {
         Button button2 =
                 Buttons.rgToggle(game.isTwilightDS(), tedsID, "Discordant Stars", SourceEmojis.DiscordantStars);
         sections.add(Section.of(button2, teds.getRepresentationTextDisplays()));
+
+        SourceModel monuments = Mapper.getSource("monuments");
+        String monumentsId = idPre + "monuments";
+        Button monumentsButton =
+                Buttons.rgToggle(game.isMonumentsMode(), monumentsId, "Monuments+", SourceEmojis.Monuments);
+        sections.add(Section.of(monumentsButton, monuments.getRepresentationTextDisplays()));
         // sections.add(Separator.create(true, Spacing.LARGE));
 
         return sections;
@@ -160,6 +167,15 @@ public class TEOptionService {
                             homebrewChannel(game),
                             "Do you want to use just DS abilities or a mixture of Normal and DS abilities?",
                             buttons);
+                }
+            }
+            case "monuments" -> {
+                game.setMonumentsMode(!game.isMonumentsMode());
+                if (game.isMonumentsMode()) {
+                    MonumentsService.applyTwilightsFallMonuments(game);
+                    MessageHelper.sendMessageToChannel(
+                            homebrewChannel(game),
+                            "Added Monuments+ secret objectives and the Monuments+ Twilight's Fall strategy card set.");
                 }
             }
         }

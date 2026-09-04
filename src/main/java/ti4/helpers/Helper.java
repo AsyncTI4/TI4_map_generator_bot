@@ -65,6 +65,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1468,6 +1469,9 @@ public final class Helper {
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
             }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
+                player.removeSpentThing(thing);
+            }
             if (thing.contains("_")) {
                 continue;
             }
@@ -1546,6 +1550,9 @@ public final class Helper {
                         res += planet.getInfluence();
                     }
                 }
+                found = true;
+            }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
                 found = true;
             }
             if (!found
@@ -1809,6 +1816,13 @@ public final class Helper {
                 msg.append("> Released units with a total resource value of ")
                         .append(discount)
                         .append('\n');
+            }
+            int blacktfInfantry = TwilightsFallMonumentsButtonHandler.getBlacktfCapturedInfantrySpent(player);
+            if (blacktfInfantry > 0) {
+                res += blacktfInfantry;
+                msg.append("> Spent ")
+                        .append(blacktfInfantry)
+                        .append(" captured infantry with **The Flesh Cathedral**\n");
             }
             msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
@@ -3202,6 +3216,7 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                ccCount += TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player_);
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }

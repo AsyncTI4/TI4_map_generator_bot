@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -181,6 +182,7 @@ public class DestroyUnitService {
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
+        TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }

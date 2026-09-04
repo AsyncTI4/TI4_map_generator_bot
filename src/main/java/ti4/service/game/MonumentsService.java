@@ -33,6 +33,10 @@ public class MonumentsService {
         if (!game.isMonumentsMode()) {
             return;
         }
+        if (game.isTwilightsFallMode()) {
+            applyTwilightsFallMonuments(game);
+            return;
+        }
 
         game.setHomebrew(true);
         game.setStrategyCardSet("monuments");
@@ -68,8 +72,27 @@ public class MonumentsService {
         }
     }
 
+    public static void applyTwilightsFallMonuments(Game game) {
+        if (!game.isMonumentsMode()) {
+            return;
+        }
+
+        game.setHomebrew(true);
+        game.setStrategyCardSet("monuments_tf");
+
+        List<String> secretObjectives = Mapper.getSecretObjectives().values().stream()
+                .filter(objective -> objective.getSource() == ComponentSource.monuments)
+                .map(SecretObjectiveModel::getAlias)
+                .filter(objective -> !game.getSecretObjectives().contains(objective))
+                .toList();
+        if (!secretObjectives.isEmpty()) {
+            game.getSecretObjectives().addAll(secretObjectives);
+            Collections.shuffle(game.getSecretObjectives());
+        }
+    }
+
     public static void addFactionMonument(Player player, Game game) {
-        if (!game.isMonumentsMode() || game.isFrankenGame()) {
+        if (!game.isMonumentsMode() || (game.isFrankenGame() && !game.isTwilightsFallMode())) {
             return;
         }
 

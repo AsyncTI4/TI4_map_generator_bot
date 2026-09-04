@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -1419,16 +1420,20 @@ public final class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                if (player2.hasUnlockedBreakthrough("titansbt")
-                        || player.hasUnlockedBreakthrough("titansbt")
-                        || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
-                        || (player2.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
-                        || player.hasAbility("researchteam")
-                        || player.hasAbility("raider_coves")
-                        || player.hasUnit("tf-ambassador")
-                        || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
-                        || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player2, unitHolder.getName())
-                        || player2.hasAbility("researchteam")) {
+                if (!TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)
+                        && (player2.hasUnlockedBreakthrough("titansbt")
+                                || player.hasUnlockedBreakthrough("titansbt")
+                                || (player.hasUnit("firmament_mech")
+                                        && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
+                                || (player2.hasUnit("firmament_mech")
+                                        && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
+                                || player.hasAbility("researchteam")
+                                || player.hasAbility("raider_coves")
+                                || player.hasUnit("tf-ambassador")
+                                || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
+                                || TaBreakthroughHandler.canUseSafeHavensCoexistence(
+                                        game, player2, unitHolder.getName())
+                                || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
                             + " the bot is unsure if a combat should occur on " + planetName

@@ -586,6 +586,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "notes": "This will give +1 to all your mechs as long as you have 1 in or adjacent to the monument. Unfortunately, without a huge redo of how units work in async, there is no way to separate them. Keep track yourself of which/how many get the bonus.",
         "ability": "At the start of an action you may allow any players' mechs in this and adjacent systems to gain +1 to their combat rolls until the end of that action."
     },
     {
@@ -610,6 +611,7 @@
         "isGroundForce": true,
         "isStructure": true,
         "isMonument": true,
+        "notes": "Numeric values (afb, bombard, etc) are automated. It will show the text abilities on the unit card but they will not be automated.",
         "ability": "This unit is a ground force as well as a monument. It can be transported. This unit gains the non-DEPLOY unit abilities and text abilities of your ground forces."
     },
     {
@@ -627,6 +629,7 @@
         "capacityValue": 3,
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "This unit is placed in the space area of a system that contains a planet you control, instead of on a planet. 1 ship in this system does not count against your fleet limit."
     },
     {

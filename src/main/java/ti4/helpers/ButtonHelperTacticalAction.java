@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -596,6 +597,9 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
         game.removeStoredValue("tnelisCommanderTracker");
+        TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
+        TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
+        TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(game);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("ASN" + player.getFaction());
         }
@@ -662,6 +666,7 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static void beginTacticalAction(Game game, Player player) {
+        TwilightsFallMonumentsButtonHandler.sendBlueTfMonumentButton(game, player);
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -1201,6 +1206,9 @@ public final class ButtonHelperTacticalAction {
         }
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             movableFromPlanets.add(UnitType.Pds);
+        }
+        if (game.isMonumentsMode() && player.hasUnit("pinktf_monument")) {
+            movableFromPlanets.add(UnitType.Monument);
         }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);

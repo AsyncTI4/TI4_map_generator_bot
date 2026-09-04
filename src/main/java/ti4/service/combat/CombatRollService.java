@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -524,6 +525,7 @@ public class CombatRollService {
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
         RevenantLeadersHandler.addRevXytherisAgentModifier(tempMods, game, player, rollType);
+        TwilightsFallMonumentsButtonHandler.addOrangeTfMonumentModifier(tempMods, game, player, tile, rollType);
         if (player.hasTech("beironats")) {
             extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
                     game, player, opponent, tile, combatOnHolder, rollType));
@@ -708,6 +710,8 @@ public class CombatRollService {
                                         opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_"
                                                 + h,
                                         "Cancel a Hit"));
+                                TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                                        buttons, game, opponent, tile, "ground", h);
                                 AshenPromissoryHandler.addFromTheAshesButton(
                                         buttons, game, opponent, player, tile, combatOnHolder, h);
                                 if (round2 == 1 && opponent.hasTech("threvenantr")) {
@@ -730,6 +734,8 @@ public class CombatRollService {
                                 buttons.add(Buttons.gray(
                                         player.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_1",
                                         "Cancel a Hit"));
+                                TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                                        buttons, game, player, tile, "ground", 1);
                                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             }
                         } else {
@@ -793,6 +799,8 @@ public class CombatRollService {
                             buttons.add(Buttons.gray(
                                     factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Cancel a Hit"));
+                            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                                    buttons, game, opponent, tile, "space", h);
                         }
 
                         if (round2 == 1 && opponent.hasTech("threvenantr")) {
@@ -836,6 +844,8 @@ public class CombatRollService {
                     buttons.add(Buttons.gray(
                             opponent.factionButtonChecker() + "cancelAFBHits_" + tile.getPosition() + "_" + h,
                             "Cancel a Hit"));
+                    TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                            buttons, game, opponent, tile, "afb", h);
                 }
                 List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                         game, player, tile, rollType, opponent, h);
@@ -923,6 +933,8 @@ public class CombatRollService {
                     "Manually Assign Hit" + (h == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
                     factionChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                    buttons, game, opponent, tile, "pds", h);
             List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                     game, player, tile, rollType, opponent, h);
             if (!stingOfTheHiveButtons.isEmpty()) {
@@ -1092,6 +1104,8 @@ public class CombatRollService {
 
             String cancelID = opponent.factionButtonChecker() + "cancelSpaceHits_" + tile.getPosition() + "_" + hits;
             buttons.add(Buttons.gray(cancelID, "Cancel a Hit"));
+            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                    buttons, game, opponent, tile, "space", hits);
         }
 
         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign ";

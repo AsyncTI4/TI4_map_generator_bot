@@ -927,6 +927,7 @@ public class PlayStrategyCardService {
 
             // monuments
             case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
+            case "monumentstf4" -> getMonumentsConstructionButtons(sc, game);
 
             // riftset
             case "riftset_9" -> RiftSetModeService.getSacrificeButtons();

@@ -75,6 +75,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -743,6 +744,13 @@ public class ButtonHelper {
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
+        }
+        if ("res".equalsIgnoreCase(whatIsItFor)
+                && TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "spendBlacktfCapturedInfantry",
+                    "Spend 1 Captured Infantry",
+                    FactionEmojis.blacktf));
         }
         if (player.getNombox().hasUnits() && (player.hasAbility("forged_in_fire"))) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.ashen));
@@ -4313,6 +4321,9 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
+                    capacity += TwilightsFallMonumentsButtonHandler.getBlueTfMonumentCapacity(
+                                    game, player, unit.getUnitType(), unit.getCapacityValue())
+                            * entry.getValue();
                     if (ArvaxiBreakthroughHandler.hasEngineAttached(game)) {
                         capacity += ArvaxiBreakthroughHandler.getCapacityMod(game, player, unit) * entry.getValue();
                     }
@@ -4421,6 +4432,7 @@ public class ButtonHelper {
                         && player.hasUnlockedBreakthrough("xytherisbt")
                         && player.hasUpgradedUnit("pds2");
                 if (xytherisPds
+                        || "pinktf_monument".equals(unit.getId())
                         || "fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())
                         || "mech".equalsIgnoreCase(unit.getBaseType())) {
@@ -4481,6 +4493,9 @@ public class ButtonHelper {
         }
         if (!testingYardShipTypes.isEmpty()) {
             numOfCapitalShips = Math.max(0, numOfCapitalShips - (2 * testingYardShipTypes.size()));
+        }
+        if (TwilightsFallMonumentsButtonHandler.hasPurpleTfMonumentInSpace(game, player, tile)) {
+            numOfCapitalShips = Math.max(0, numOfCapitalShips - 2);
         }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;

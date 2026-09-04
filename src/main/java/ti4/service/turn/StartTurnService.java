@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -471,6 +472,7 @@ public class StartTurnService {
             boolean confirmed2ndAction) {
         if (doneActionThisTurn) {
             RevenantLeadersHandler.clearPurpleLeaderActionState(game);
+            TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
         }
         if (!doneActionThisTurn) {
             for (Player p2 : game.getRealPlayers()) {
@@ -501,6 +503,12 @@ public class StartTurnService {
         }
         if (!doneActionThisTurn && player.hasTechReady("becrysta")) {
             CrystellumTechHandler.addAtomizationButton(startButtons, game, player);
+        }
+        if (!doneActionThisTurn
+                && game.isMonumentsMode()
+                && player.hasUnit("orangetf_monument")
+                && MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
+            startButtons.add(TwilightsFallMonumentsButtonHandler.getOrangeTfMonumentButton(player));
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));

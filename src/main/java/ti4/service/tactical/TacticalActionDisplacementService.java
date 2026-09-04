@@ -82,6 +82,9 @@ public class TacticalActionDisplacementService {
         if (player.hasTech("dsmirvpds") || player.hasUnit("tk-keshnu") || player.hasUnit("mirveda_pds")) {
             movableFromPlanets.add(UnitType.Pds);
         }
+        if (game.isMonumentsMode() && player.hasUnit("pinktf_monument")) {
+            movableFromPlanets.add(UnitType.Monument);
+        }
 
         Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

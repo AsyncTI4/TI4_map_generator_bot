@@ -14,5 +14,21 @@
         ],
         "description": "Monuments SCs (TE with new Construction)",
         "source": "monuments"
+    },
+    {
+        "name": "Twilights Fall Monuments Strategy Cards",
+        "alias": "monuments_tf",
+        "scIDs": [
+            "tf1",
+            "tf2",
+            "tf3",
+            "monumentstf4",
+            "tf5",
+            "tf6",
+            "tf7",
+            "tf8"
+        ],
+        "description": "Twilights Fall Monuments SCs",
+        "source": "monuments"
     }
 ]
