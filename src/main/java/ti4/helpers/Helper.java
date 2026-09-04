@@ -65,6 +65,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -108,6 +109,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
@@ -1364,6 +1366,12 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "letnevMonument" ->
+                    msg.append("Used **Palatine Obelisk** for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
                 case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
                 case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
                 case "absolRexControlRepresentative" ->
@@ -1461,6 +1469,9 @@ public final class Helper {
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
             }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
+                player.removeSpentThing(thing);
+            }
             if (thing.contains("_")) {
                 continue;
             }
@@ -1539,6 +1550,9 @@ public final class Helper {
                         res += planet.getInfluence();
                     }
                 }
+                found = true;
+            }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
                 found = true;
             }
             if (!found
@@ -1802,6 +1816,13 @@ public final class Helper {
                 msg.append("> Released units with a total resource value of ")
                         .append(discount)
                         .append('\n');
+            }
+            int blacktfInfantry = TwilightsFallMonumentsButtonHandler.getBlacktfCapturedInfantrySpent(player);
+            if (blacktfInfantry > 0) {
+                res += blacktfInfantry;
+                msg.append("> Spent ")
+                        .append(blacktfInfantry)
+                        .append(" captured infantry with **The Flesh Cathedral**\n");
             }
             msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
@@ -2506,6 +2527,12 @@ public final class Helper {
             }
             productionValueTotal += numberOfCCInSystem;
         }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
+                && ButtonHelper.doesPlayerHaveUnitHere("letnev_monument", player, tile)) {
+            productionValueTotal *= 2;
+        }
+
         return productionValueTotal;
     }
 
@@ -3189,6 +3216,7 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                ccCount += TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player_);
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }

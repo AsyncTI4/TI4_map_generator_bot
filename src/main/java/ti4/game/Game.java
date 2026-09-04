@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
@@ -668,7 +669,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // Set other normal decks
         validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
         validateAndSetRelicDeck(Mapper.getDeck(relicDeck));
-        setStrategyCardSet(stratCards);
+        setStrategyCardSet(isMonumentsMode() ? "monuments_tf" : stratCards);
         validateAndSetActionCardDeck(event, Mapper.getDeck(acDeck));
         setTechnologyDeckID(techDeck);
 
@@ -1468,6 +1469,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         PonthousPromissoryHandler.clearThunderbirdPrototype(this);
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
+        TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(this);
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats

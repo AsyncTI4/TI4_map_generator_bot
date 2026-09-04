@@ -55,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -172,6 +173,10 @@ public class StartCombatService {
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
         if (enemyPlayer.isPresent()) {
+            if (TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)) {
+                startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+                return true;
+            }
             String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
             String msg = player.getRepresentation() + " the game is unsure if a combat should occur on " + planetName
                     + " or if you are coexisting. Please inform it with the buttons.";
@@ -526,7 +531,8 @@ public class StartCombatService {
         }
 
         // General Space Combat
-        sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
+        sendGeneralCombatButtonsToThread(
+                threadChannel, game, player1, player2, tile, spaceOrGround, unitHolderName, event);
         NetrunnersAbilitiesHandler.announceMimeticOverride(player1, player2, threadChannel);
         NetrunnersAbilitiesHandler.announceMimeticOverride(player2, player1, threadChannel);
         if (!game.isFowMode()) {
@@ -822,7 +828,7 @@ public class StartCombatService {
         }
         message.append("\nImage of System:");
         MessageHelper.sendMessageWithFile(threadChannel, systemWithContext, message.toString(), false);
-        sendGeneralCombatButtonsToThread(threadChannel, game, player, player, tile, "justPicture", event);
+        sendGeneralCombatButtonsToThread(threadChannel, game, player, player, tile, "justPicture", null, event);
     }
 
     public static void sendSpaceCannonButtonsToThread(
@@ -1506,8 +1512,13 @@ public class StartCombatService {
             Player player2,
             Tile tile,
             String spaceOrGround,
+            String unitHolderName,
             GenericInteractionCreateEvent event) {
         List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
+        if ("ground".equalsIgnoreCase(spaceOrGround)) {
+            TwilightsFallMonumentsButtonHandler.addGreenTfMonumentButtons(buttons, game, tile, unitHolderName);
+            TwilightsFallMonumentsButtonHandler.addRedTfMonumentButtons(buttons, game, tile, unitHolderName);
+        }
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for combat.", buttons);
     }
 
@@ -1531,6 +1542,8 @@ public class StartCombatService {
                     "Refresh Picture"));
             return buttons;
         }
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentGeneralCombatButton(buttons, game, p1, tile);
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentGeneralCombatButton(buttons, game, p2, tile);
         buttons.add(Buttons.red("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
         if (p1.isDummy() || p1.isNpc()) {
             buttons.add(Buttons.red(

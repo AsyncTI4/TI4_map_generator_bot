@@ -55,6 +55,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -403,6 +404,15 @@ public final class ButtonHelperAgents {
                 return;
             }
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
+        } else if ("monument".equalsIgnoreCase(thing)) {
+            if (!MonumentsService.readyMonument(game, player, detail)) {
+                return;
+            }
+            UnitModel monument = Mapper.getUnit(detail);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready "
+                            + (monument == null ? detail : monument.getName() + " Monument") + ".");
         } else {
             if ("planet".equalsIgnoreCase(thing)) {
                 player.removeExhaustedAbility(detail);

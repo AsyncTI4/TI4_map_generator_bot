@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -44,6 +45,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -73,6 +75,19 @@ public class CardsInfoService {
         if (playerCardsInfoThread == null) return;
 
         List<Button> buttons = new ArrayList<>();
+        if (game.isMonumentsMode()
+                && player.hasUnit("bluetf_monument")
+                && MonumentsService.isMonumentOnBoard(game, player, "bluetf_monument")) {
+            buttons.add(TwilightsFallMonumentsButtonHandler.getBlueTfMonumentButton(player));
+        }
+        if (game.isMonumentsMode()
+                && player.hasUnit("orangetf_monument")
+                && MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
+            buttons.add(TwilightsFallMonumentsButtonHandler.getOrangeTfMonumentButton(player));
+        }
+        if (game.isMonumentsMode() && player.hasUnit("yellowtf_monument")) {
+            buttons.add(TwilightsFallMonumentsButtonHandler.getYellowTfMonumentStatusButton(game, player));
+        }
         Button transaction = Buttons.blue("transaction", "Transaction");
         buttons.add(transaction);
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");

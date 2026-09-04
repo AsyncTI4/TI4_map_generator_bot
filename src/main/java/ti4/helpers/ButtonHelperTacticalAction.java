@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -77,6 +78,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
@@ -595,6 +597,9 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
         game.removeStoredValue("tnelisCommanderTracker");
+        TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
+        TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
+        TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(game);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("ASN" + player.getFaction());
         }
@@ -661,6 +666,7 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static void beginTacticalAction(Game game, Player player) {
+        TwilightsFallMonumentsButtonHandler.sendBlueTfMonumentButton(game, player);
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -780,6 +786,7 @@ public final class ButtonHelperTacticalAction {
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (monumentOwner.hasUnit("creuss_monument")
+                        && MonumentsService.hasMonumentOnBoard(game, monumentOwner)
                         && ButtonHelper.doesPlayerHaveUnitHere("creuss_monument", monumentOwner, tile)) {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
                 }
@@ -1199,6 +1206,9 @@ public final class ButtonHelperTacticalAction {
         }
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             movableFromPlanets.add(UnitType.Pds);
+        }
+        if (game.isMonumentsMode() && player.hasUnit("pinktf_monument")) {
+            movableFromPlanets.add(UnitType.Monument);
         }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);

@@ -31,6 +31,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -67,6 +69,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.QuantumEntanglerService;
@@ -469,6 +472,7 @@ public class StartTurnService {
             boolean confirmed2ndAction) {
         if (doneActionThisTurn) {
             RevenantLeadersHandler.clearPurpleLeaderActionState(game);
+            TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
         }
         if (!doneActionThisTurn) {
             for (Player p2 : game.getRealPlayers()) {
@@ -500,6 +504,12 @@ public class StartTurnService {
         if (!doneActionThisTurn && player.hasTechReady("becrysta")) {
             CrystellumTechHandler.addAtomizationButton(startButtons, game, player);
         }
+        if (!doneActionThisTurn
+                && game.isMonumentsMode()
+                && player.hasUnit("orangetf_monument")
+                && MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
+            startButtons.add(TwilightsFallMonumentsButtonHandler.getOrangeTfMonumentButton(player));
+        }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
         }
@@ -516,6 +526,9 @@ public class StartTurnService {
         if (player.hasPlanet("cineron")
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
             startButtons.add(ThronesThroneHandler.getCineronButton(player));
+        }
+        if (MonumentsService.isMonumentReady(game, player, "l1z1x_monument")) {
+            startButtons.add(MonumentsButtonHandler.getL1MonumentButton(player));
         }
         boolean hadAnyUnplayedSCs = false;
 

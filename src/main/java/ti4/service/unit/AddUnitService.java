@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUni
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -57,6 +58,11 @@ public class AddUnitService {
             String color,
             String unitList,
             List<RemovedUnit> removed) {
+        if (TwilightsFallMonumentsButtonHandler.blocksCoexistence(game, tile, unitList)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Units cannot be placed into coexistence in The Crown Of Thorns system.");
+            return;
+        }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
@@ -74,6 +80,11 @@ public class AddUnitService {
 
     public static void addUnits(
             GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+        if (TwilightsFallMonumentsButtonHandler.blocksCoexistence(game, tile, unitList)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Units cannot be placed into coexistence in The Crown Of Thorns system.");
+            return;
+        }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());

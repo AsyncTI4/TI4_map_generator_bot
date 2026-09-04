@@ -138,7 +138,7 @@
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit is placed in the space area of a non-fracture, non-supernova system that does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
+        "ability": "This unit is placed in the space area of a non-Fracture, non-supernova system that does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
     },
     {
         "id": "sol_monument",
@@ -170,7 +170,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a player activates this system:\nYou may produce 1 hit against player's ships in each system adjacent to this planet that contains a wormhole."
+        "ability": "After a player activates this system:\nYou may produce 1 hit against players ships in each system adjacent to this planet that contains a wormhole."
     },
     {
         "id": "l1z1x_monument",
@@ -287,7 +287,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of your turn, you may return this unit to your reinforcements to produce, or remove and produce, your flagship in this system."
+        "ability": "At the start of your turn: you may return this unit to your reinforcements to produce, or remove and produce, your flagship in this system."
     },
     {
         "id": "norr_monument",
@@ -345,8 +345,8 @@
         "faction": "cabal",
         "eligiblePlanetTypes": [
             "HAZARDOUS",
-            "CULTURAL",
             "INDUSTRIAL",
+            "CULTURAL",
             "LEGENDARY"
         ],
         "productionValue": "1",
@@ -430,8 +430,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "notes": "This is a space station, and as such, has all the normal space station abilities.",
-        "ability": "This unit is a station and placed in the space area of a system that contains your ships and exactly 1 non-legendary planet. Take its matching station card while you control it.\nWhen you lost control of this station, destroy it and produce 2 hits against ships in this system."
+        "ability": "This unit is a space station and placed in the space area of a system that contains your ships and exactly 1 non-legendary planet. Take its matching space station card while you control it.\nWhen you lose control of this space station, destroy it and produce 2 hits against ships in this system."
     },
     {
         "id": "crimson_monument",
@@ -463,7 +462,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Other player's ships in this system do not trigger space combat. After this unit is removed from a planet, choose a player with ships in that system to resolve a space combat. Repeat this until it contains no more than 1 player's ships."
+        "ability": "Other players ships in this system do not trigger space combat. After this unit is removed from a planet, choose a player with ships in that system to resolve a space combat. Repeat this until it contains no more than 1 player's ships."
     },
     {
         "id": "firmament_monument",
@@ -507,6 +506,7 @@
             "INDUSTRIAL",
             "CULTURAL"
         ],
+        "productionValue": 1,
         "isStructure": true,
         "isMonument": true,
         "ability": "At the end of your tactical action, you may move 1 structure in the space area of this or an adjacent system to the space area of a system adjacent to that structure."
@@ -549,7 +549,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of any tactical action, you may choose any number of destroyers or cruisers in this system. Those units wihtout a capacity gain a capacity value of 1 until the end of this tactical action."
+        "ability": "At the start of any tactical action, you may choose any number of destroyers or cruisers in this system. Those units without a capacity gain a capacity value of 1 until the end of this tactical action."
     },
     {
         "id": "greentf_monument",
@@ -586,6 +586,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "notes": "This will give +1 to all your mechs as long as you have 1 in or adjacent to the monument. Unfortunately, without a huge redo of how units work in async, there is no way to separate them. Keep track yourself of which/how many get the bonus.",
         "ability": "At the start of an action you may allow any players' mechs in this and adjacent systems to gain +1 to their combat rolls until the end of that action."
     },
     {
@@ -610,6 +611,7 @@
         "isGroundForce": true,
         "isStructure": true,
         "isMonument": true,
+        "notes": "Numeric values (afb, bombard, etc) are automated. It will show the text abilities on the unit card but they will not be automated.",
         "ability": "This unit is a ground force as well as a monument. It can be transported. This unit gains the non-DEPLOY unit abilities and text abilities of your ground forces."
     },
     {
@@ -627,7 +629,8 @@
         "capacityValue": 3,
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit is placed in the space area of a system that contains a planet you control, instead of on a planet. 1 Ship in this system does not count against your fleet limit."
+        "isPlanetOnly": false,
+        "ability": "This unit is placed in the space area of a system that contains a planet you control, instead of on a planet. 1 ship in this system does not count against your fleet limit."
     },
     {
         "id": "redtf_monument",
@@ -749,7 +752,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When another player activates this system, remove 1 command token from this system or gain 1 command token."
+        "ability": "When a player activates this system, remove 1 command token from this system or gain 1 command token."
     },
     {
         "id": "dihmohn_monument",
@@ -817,7 +820,7 @@
         "planetaryShield": true,
         "isStructure": true,
         "isMonument": true,
-        "ability": "You may treat this system as adjacent to systems that contain 2 of your structures of the same type."
+        "ability": "You may treat this system as adjacent to systems that contain 2 of your structures of the same unit type."
     },
     {
         "id": "olradin_monument",
@@ -868,7 +871,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "ACTION: Exhaust this card and choose an adjacent system that contains another player's non-fighter ships. That player moves those ships into this system if able, until they have moved at least 4 resources worth of ships, or all ships. Then, resolve a space combat."
+        "ability": "ACTION: Exhaust this card and choose an adjacent system that contains another player's non-fighter ships. That player moves those ships into this system if able, until they have moved at least 4 resources worth of ships, or all ships. Then, resolve a space combat in this system."
     },
     {
         "id": "nivyn_monument",
@@ -883,7 +886,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Other players' ships cannot move out of or through this system.\nYour ships may treat this system as adjacent to the wound"
+        "ability": "Other players' ships cannot move out of or through this system.\nYour ships may treat this system as adjacent to the Wound."
     },
     {
         "id": "rhodun_monument",
@@ -912,7 +915,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "Flip this card at any time.\nOther players with units in the Fracture cannot activate this system.\nDuring combat, apply +2 to each of your units' combat rolls in this and adjacent systems if your opponent has any units in the fracture."
+        "ability": "Flip this card at any time.\nOther players with units in The Fracture cannot activate this system.\nDuring combat, apply +2 to each of your units' combat rolls in this and adjacent systems if your opponent has any units in The Fracture."
     },
     {
         "id": "augurs_monument",
@@ -927,7 +930,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you would explore another planet, you may explore this planet instead. If you do, you may gain trade goods equal to the number of your scored objectives."
+        "ability": "When you would explore another planet, you may explore this planet instead. If you do, you may gain trade goods equal to the number of your scored secret objectives."
     },
     {
         "id": "veldyr_monument",
@@ -959,7 +962,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When you lose a ground combat on this planet, you may destroy each unit on this planet. At the start of your turn you may destroy 1 other player's unit in this system."
+        "ability": "When you lose a ground combat on this planet, you may destroy each unit on this planet. At the start of your turn you may destroy 1 other player's coexisting unit in this system."
     },
     {
         "id": "vaylerian_monument",
@@ -1005,7 +1008,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During each of your tactical actions, you may commit ground forces on this planet to planets that contain your space docks."
+        "ability": "During the \"Commit Ground Forces\" step: you may commit ground forces on this planet to planets that contain your space docks, if this system does not contain 1 of your command tokens."
     },
     {
         "id": "zelian_monument",
@@ -1020,7 +1023,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "This system is treated as an asteroid field. Units can move into this system as it it were a non-anomaly tile.\nPlace the Zelian asteroid field token in this system as a reminder."
+        "ability": "This system is treated as an asteroid field. Units can move into this system as if it were a non-anomaly tile.\nPlace the Zelian asteroid field token in this system as a reminder."
     },
     {
         "id": "kollecc_monument",
@@ -1132,7 +1135,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At any time, you may exhaust this card to produce a mech on this planet wihtout spending resources."
+        "ability": "At any time, you may exhaust this card to produce a mech on this planet without spending resources."
     },
     {
         "id": "lanefir_monument",
@@ -1181,7 +1184,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "This planet counts as a legendary planet with an attachment and a technology speciality of no type.\nWhen this unit is destroyed, you must place it on a planet you control in this or an adjacent system, if able. If you do, draw a relic."
+        "ability": "This planet counts as a legendary planet with an attachment and a technology specialty of no type.\nWhen this unit is destroyed, you must place it on a planet you control in this or an adjacent system, if able. If you do, draw a relic."
     },
     {
         "id": "ghoti_monument",
@@ -1196,7 +1199,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "During movement, you may choose to treat this system as thought it contains no planets. You treat this system as though it contains a frontier token."
+        "ability": "During movement, you may choose to treat this system as though it contains no planets. You treat this system as though it contains a frontier token."
     },
     {
         "id": "kolume_monument",
@@ -1213,6 +1216,7 @@
         "spaceCannonDieCount": 2,
         "isStructure": true,
         "isMonument": true,
+        "notes": "Basically, when someone passes, this unit can hit any system on the board as long as there are any player’s units with space cannon in each system between this unit and the target system.",
         "ability": "When another player passes, choose this or an adjacent system that contains a unit with SPACE CANNON; either use this unit's SPACE CANNON against another player's ships in that system, or repeat this ability, starting in that system."
     },
     {
@@ -1280,7 +1284,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the end of the strategy phase, choose and place 1 control token on a super weapon card in your play area. This card has the text abilities of each superweapon card in your play area that has 1 of your control tokens."
+        "ability": "At the end of the strategy phase, choose and place 1 control token on a super weapon card in your play area. This card has the text abilities of each super weapon card in your play area that has 1 of your control tokens."
     },
     {
         "id": "kaltrim_monument",
@@ -1383,7 +1387,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "If you have more Dishonour and Honour, flip this card.\nThis unit gains the abilities matching your Honor:\n2+: PRODUCTION 2\n5+: PLANETARY SHIELD\n8: SPACE CANNON 4 (x3)"
+        "ability": "If you have more Dishonor and Honor, flip this card.\nThis unit gains the abilities matching your Honor:\n2+: PRODUCTION 2\n5+: PLANETARY SHIELD\n8: SPACE CANNON 4 (x3)"
     },
     {
         "id": "uydai_monument",

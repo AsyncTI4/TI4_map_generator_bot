@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePr
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -167,6 +168,10 @@ class SpendingButtonHandler {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
+                    if ("spendBlacktfCapturedInfantry".equals(butt.getCustomId())
+                            && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
+                        continue;
+                    }
                     if (!Helper.doesListContainButtonID(buttons, butt.getCustomId())) {
                         buttons.add(butt);
                     }
@@ -197,6 +202,10 @@ class SpendingButtonHandler {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
+                    if ("spendBlacktfCapturedInfantry".equals(butt.getCustomId())
+                            && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
+                        continue;
+                    }
                     if (!buttons.contains(butt)) {
                         buttons.add(butt);
                     }

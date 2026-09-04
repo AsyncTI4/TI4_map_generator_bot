@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -856,13 +857,24 @@ public class PlayerAreaGenerator {
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.getDishonorCounter() < 1
-                && player.getHonorCounter() < 1
-                && player.getPathTokenCounter() < 1
-                && player.getSteelbalanceCounter() < 1
-                && player.getStarbalanceCounter() < 1
-                && !game.isVeiledHeartMode()) {
+        boolean hasAuraVault = game.isMonumentsMode() && player.hasUnit("yellowtf_monument");
+        boolean hasHonorOrPathTokens = player.getDishonorCounter() > 0
+                || player.getHonorCounter() > 0
+                || player.getPathTokenCounter() > 0
+                || player.getSteelbalanceCounter() > 0
+                || player.getStarbalanceCounter() > 0
+                || game.isVeiledHeartMode();
+        if (!hasHonorOrPathTokens && !hasAuraVault) {
             return xDeltaFromRightSide;
+        }
+        if (!hasHonorOrPathTokens) {
+            DrawingUtil.superDrawStringCenteredDefault(
+                    graphics,
+                    "Aura Tokens: "
+                            + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
+                    mapWidth - xDeltaFromRightSide - 300,
+                    yDelta + 50);
+            return xDeltaFromRightSide + 200;
         }
         if (game.isVeiledHeartMode()) {
             DrawingUtil.superDrawStringCenteredDefault(
@@ -904,6 +916,14 @@ public class PlayerAreaGenerator {
                         mapWidth - xDeltaFromRightSide - 300,
                         yDelta + 100);
             }
+        }
+        if (hasAuraVault) {
+            DrawingUtil.superDrawStringCenteredDefault(
+                    graphics,
+                    "Aura Tokens: "
+                            + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
+                    mapWidth - xDeltaFromRightSide - 300,
+                    yDelta + 150);
         }
         return xDeltaFromRightSide + 200;
     }

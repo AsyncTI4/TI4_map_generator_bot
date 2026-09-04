@@ -39,6 +39,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -59,6 +60,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -73,6 +75,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -1242,6 +1245,21 @@ public final class AgendaHelper {
                 CryypterHelper.handleWinningRiders(game, winner);
             }
         }
+        for (Player player : game.getRealPlayers()) {
+            boolean predictedWinner = Arrays.stream(game.getCurrentAgendaVotes()
+                            .getOrDefault(winner, "")
+                            .split(";"))
+                    .anyMatch(vote -> {
+                        int separator = vote.indexOf('_');
+                        if (separator < 1 || NumberUtils.isDigits(vote.substring(separator + 1))) {
+                            return false;
+                        }
+                        return player == game.getPlayerFromColorOrFaction(vote.substring(0, separator));
+                    });
+            if (getWinningVoters(winner, game).contains(player) || predictedWinner) {
+                MonumentsButtonHandler.offerJolNarMonumentInfantry(game, player);
+            }
+        }
         return winningRs;
     }
 
@@ -1711,6 +1729,29 @@ public final class AgendaHelper {
             }
         }
         if (!finalRes) {
+            if (!prevoting
+                    && game.isMonumentsMode()
+                    && player.hasUnit("letnev_monument")
+                    && player.getSpentThingsThisWindow().stream()
+                            .noneMatch(spent -> spent.startsWith("letnevMonument_"))) {
+                Tile tile = MonumentsService.getMonumentTile(game, player, "letnev_monument");
+                Planet monumentPlanet = tile == null
+                        ? null
+                        : tile.getPlanetUnitHolders().stream()
+                                .filter(planet ->
+                                        planet.getUnitCount(Units.getUnitKey(UnitType.Monument, player.getColor())) > 0)
+                                .findFirst()
+                                .orElse(null);
+                if (monumentPlanet != null
+                        && player.getSpentThingsThisWindow().contains("planet_" + monumentPlanet.getName())
+                        && (thing.equals("planet_" + monumentPlanet.getName()) || thing.contains("allPlanets"))) {
+                    int extraVotes = tile.getSpaceUnitHolder()
+                            .countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip);
+                    if (extraVotes > 0) {
+                        player.addSpentThing("letnevMonument_" + extraVotes);
+                    }
+                }
+            }
             String editedMessage = Helper.buildSpentThingsMessageForVoting(player, game, false);
             editedMessage = AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n\n" + editedMessage;
             event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);

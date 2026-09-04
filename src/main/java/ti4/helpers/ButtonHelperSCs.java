@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1051,6 +1052,21 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
+                if ("monument".equalsIgnoreCase(unit) && player.hasUnit("purpletf_monument")) {
+                    List<Button> buttons =
+                            TwilightsFallMonumentsButtonHandler.getPurpleTfMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "You have no controlled system in which to place Halo Cortex.");
+                        return;
+                    }
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            player.getRepresentationUnfogged()
+                                    + ", please choose the system in which to place **Halo Cortex** in space for **Construction**.",
+                            buttons);
+                    return;
+                }
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
                 if ("monument".equalsIgnoreCase(unit) && player.getUnitByBaseType("monument") == null) {
                     MessageHelper.sendEphemeralMessageToEventChannel(event, "You do not have a Monument to place.");
