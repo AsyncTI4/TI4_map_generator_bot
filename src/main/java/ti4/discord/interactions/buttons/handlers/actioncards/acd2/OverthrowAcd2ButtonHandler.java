@@ -11,9 +11,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
+import ti4.service.strategycard.StrategyCardSecondaryButtonService;
 
 @UtilityClass
 class OverthrowAcd2ButtonHandler {
@@ -32,37 +30,8 @@ class OverthrowAcd2ButtonHandler {
     }
 
     private static List<Button> getOverthrowAbilityButtons(Game game) {
-        List<Integer> scs = game.getSCList();
-        List<Button> scButtons = new ArrayList<>();
-        if (scs.contains(1)) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
-        }
-        if (scs.contains(2)) {
-            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
-            scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
-        }
-        if (scs.contains(4)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
-        }
-        if (scs.contains(5)) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
-        }
-        if (scs.contains(6)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
-        }
-        if (scs.contains(7)) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
-        }
-        if (scs.contains(8)) {
-            scButtons.add(Buttons.green("resolveAnarchy8Secondary", "Lift Command Token"));
-        }
-        if (scs.contains(9)) {
-            scButtons.add(Buttons.GET_A_TECH);
-        }
-        if (scs.contains(11)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
-        }
+        List<Button> scButtons =
+                new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, game.getSCList()));
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         return scButtons;
     }
