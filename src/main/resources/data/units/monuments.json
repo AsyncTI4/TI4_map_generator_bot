@@ -752,7 +752,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When a player activates this system, remove 1 command token from this system or gain 1 command token."
+        "ability": "When a player activates this system, remove another player's command token from this system or gain 1 command token."
     },
     {
         "id": "dihmohn_monument",
