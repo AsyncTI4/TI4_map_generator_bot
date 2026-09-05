@@ -1372,6 +1372,8 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "muaatMonument" ->
+                    msg.append("Used _Glory Furnace_ for ").append(count).append(" votes.\n");
                 case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
                 case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
                 case "absolRexControlRepresentative" ->
@@ -2529,7 +2531,7 @@ public final class Helper {
         }
         if (game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
-                && ButtonHelper.doesPlayerHaveUnitHere("letnev_monument", player, tile)) {
+                && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
             productionValueTotal *= 2;
         }
 

@@ -60,6 +60,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
@@ -1433,6 +1434,7 @@ public final class ButtonHelperModifyUnits {
                                 || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
                                 || TaBreakthroughHandler.canUseSafeHavensCoexistence(
                                         game, player2, unitHolder.getName())
+                                || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
                                 || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
@@ -1447,7 +1449,8 @@ public final class ButtonHelperModifyUnits {
                             || player.hasAbility("researchteam")
                             || player.hasAbility("raider_coves")
                             || player.hasUnit("tf-ambassador")
-                            || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())) {
+                            || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
+                            || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())) {
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));

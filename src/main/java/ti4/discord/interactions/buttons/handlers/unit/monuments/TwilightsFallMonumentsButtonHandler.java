@@ -63,7 +63,8 @@ public class TwilightsFallMonumentsButtonHandler {
         LinkedHashSet<Tile> tiles = new LinkedHashSet<>();
         for (String planet : player.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if (tile != null) {
+            if (tile != null
+                    && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())) {
                 tiles.add(tile);
             }
         }
@@ -81,6 +82,7 @@ public class TwilightsFallMonumentsButtonHandler {
                 || !hasPurpleTfMonument(player)
                 || MonumentsService.isMonumentOnBoard(game, player, "purpletf_monument")
                 || tile == null
+                || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())
                 || tile.getPlanetUnitHolders().stream()
                         .noneMatch(planet -> player.getPlanets().contains(planet.getName()))) {
             return;

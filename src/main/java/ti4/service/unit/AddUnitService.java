@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUni
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,6 +26,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
@@ -95,6 +97,12 @@ public class AddUnitService {
             handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
             MyrrLeadersHandler.resolveMyrrCommander(
                     event, game, player, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
+            if (game.isMonumentsMode()
+                    && player != null
+                    && MonumentsService.isMonumentOnBoard(game, player, "norr_monument")
+                    && parsedUnit.unitKey().unitType() == UnitType.Monument) {
+                MonumentsButtonHandler.sendFireflyProduction(game, player, 3, 0);
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);

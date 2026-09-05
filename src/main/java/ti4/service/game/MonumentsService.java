@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -96,13 +97,24 @@ public class MonumentsService {
             return;
         }
 
-        Mapper.getUnits().values().stream()
+        UnitModel monument = getFactionMonument(player);
+        if (monument != null && !player.ownsUnit(monument.getId())) {
+            player.addOwnedUnitByID(monument.getId());
+        }
+    }
+
+    public static UnitModel getFactionMonument(Player player) {
+        if (player == null) {
+            return null;
+        }
+        String faction = player.getFactionModel() == null
+                ? player.getFaction()
+                : player.getFactionModel().getHomebrewReplacesID().orElse(player.getFaction());
+        return Mapper.getUnits().values().stream()
                 .filter(unit -> unit.getSource() == ComponentSource.monuments)
-                .filter(unit ->
-                        unit.getFaction().filter(player.getFaction()::equals).isPresent())
-                .filter(unit -> !player.ownsUnit(unit.getId()))
+                .filter(unit -> unit.getFaction().filter(faction::equals).isPresent())
                 .findFirst()
-                .ifPresent(unit -> player.addOwnedUnitByID(unit.getId()));
+                .orElse(null);
     }
 
     public static boolean hasMonumentOnBoard(Game game, Player player) {
@@ -119,11 +131,17 @@ public class MonumentsService {
                 || player == null
                 || monument == null
                 || monument.getSource() != ComponentSource.monuments
-                || !player.hasUnit(monumentId)) {
+                || !game.isMonumentsMode()) {
             return false;
         }
-        return game.getTileMap().values().stream()
-                .anyMatch(tile -> ButtonHelper.doesPlayerHaveUnitHere(monumentId, player, tile));
+        return isOwnedMonumentOnBoard(game, player, monumentId)
+                || NekroMonumentService.hasCopiedMonument(game, player, monumentId);
+    }
+
+    private static boolean isOwnedMonumentOnBoard(Game game, Player player, String monumentId) {
+        return player.hasUnit(monumentId)
+                && game.getTileMap().values().stream()
+                        .anyMatch(tile -> ButtonHelper.doesPlayerHaveUnitHere(monumentId, player, tile));
     }
 
     public static boolean isMonumentExhausted(Game game, Player player, String monumentId) {
@@ -158,7 +176,6 @@ public class MonumentsService {
                 || !game.isMonumentsMode()
                 || monument == null
                 || monument.getSource() != ComponentSource.monuments
-                || !player.hasUnit(monumentId)
                 || !isMonumentOnBoard(game, player, monumentId)
                 || !isMonumentExhausted(game, player, monumentId)) {
             return false;
@@ -173,7 +190,6 @@ public class MonumentsService {
         }
         return Mapper.getUnits().values().stream()
                 .filter(unit -> unit.getSource() == ComponentSource.monuments)
-                .filter(unit -> player.hasUnit(unit.getId()))
                 .filter(unit -> isMonumentOnBoard(game, player, unit.getId()))
                 .filter(unit -> isMonumentExhausted(game, player, unit.getId()))
                 .toList();
@@ -202,13 +218,25 @@ public class MonumentsService {
     }
 
     public static Tile getMonumentTile(Game game, Player player, String monumentId) {
-        if (!isMonumentOnBoard(game, player, monumentId)) {
-            return null;
+        if (isOwnedMonumentOnBoard(game, player, monumentId)) {
+            return game.getTileMap().values().stream()
+                    .filter(tile -> ButtonHelper.doesPlayerHaveUnitHere(monumentId, player, tile))
+                    .findFirst()
+                    .orElse(null);
         }
-        return game.getTileMap().values().stream()
-                .filter(tile -> ButtonHelper.doesPlayerHaveUnitHere(monumentId, player, tile))
-                .findFirst()
-                .orElse(null);
+        return NekroMonumentService.hasCopiedMonument(game, player, monumentId)
+                ? getMonumentTile(game, player, "nekro_monument")
+                : null;
+    }
+
+    public static boolean isInOrAdjacentToMonumentSystem(Game game, Player player, String monumentId, Tile tile) {
+        Tile monumentTile = getMonumentTile(game, player, monumentId);
+        return monumentTile != null
+                && tile != null
+                && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())
+                && (monumentTile == tile
+                        || FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, false)
+                                .contains(tile.getPosition()));
     }
 
     public static List<Tile> getTilesInOrAdjacentToPlayerMonument(Game game, Player player) {
@@ -227,7 +255,8 @@ public class MonumentsService {
         List<Tile> tiles = new ArrayList<>();
         for (String position : systemPositions) {
             Tile tile = game.getTileByPosition(position);
-            if (tile != null) {
+            if (tile != null
+                    && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())) {
                 tiles.add(tile);
             }
         }
@@ -268,6 +297,49 @@ public class MonumentsService {
 
         if (SecretObjectiveHelper.scoreSO(event, game, player, secretIndex, player.getCorrectChannel())) {
             ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public static void recordNaaluMonumentInfantryCommit(Game game, Player player, Tile tile, String planetName) {
+        if (game == null
+                || player == null
+                || tile == null
+                || !game.isMonumentsMode()
+                || !isMonumentOnBoard(game, player, "naalu_monument")
+                || !getTilesInOrAdjacentToPlayerMonument(game, player).contains(tile)) {
+            return;
+        }
+        game.setStoredValue("naaluMonumentCoexistence_" + player.getFaction() + "_" + planetName, "yes");
+    }
+
+    public static boolean canUseNaaluMonumentCoexistence(Game game, Player player, String planetName) {
+        if (game == null
+                || player == null
+                || !game.isMonumentsMode()
+                || !isMonumentOnBoard(game, player, "naalu_monument")
+                || !"yes"
+                        .equals(game.getStoredValue(
+                                "naaluMonumentCoexistence_" + player.getFaction() + "_" + planetName))) {
+            return false;
+        }
+
+        Tile planetTile = game.getTileFromPlanet(planetName);
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        return planetTile != null
+                && planet != null
+                && planet.getUnitCount(UnitType.Infantry, player) > 0
+                && getTilesInOrAdjacentToPlayerMonument(game, player).contains(planetTile)
+                && ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet).stream()
+                        .anyMatch(otherPlayer -> otherPlayer != player);
+    }
+
+    public static void clearNaaluMonumentCoexistence(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            for (Tile tile : game.getTileMap().values()) {
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    game.removeStoredValue("naaluMonumentCoexistence_" + player.getFaction() + "_" + planet.getName());
+                }
+            }
         }
     }
 }

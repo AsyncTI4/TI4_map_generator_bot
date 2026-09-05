@@ -1644,6 +1644,9 @@ public final class AgendaHelper {
         if (!thing.contains("hacan") && !thing.contains("kyro") && !thing.contains("allPlanets")) {
             if (!finalRes) {
                 player.addSpentThing(thing);
+                if (thing.startsWith("planet_")) {
+                    MonumentsButtonHandler.offerGloryFurnace(game, player, thing.substring("planet_".length()));
+                }
             }
             if (thing.contains("planet_") && !prevoting) {
                 String planet = thing.replace("planet_", "");
@@ -1701,6 +1704,7 @@ public final class AgendaHelper {
                     if (getSpecificPlanetsVoteWorth(player, game, planet) > 0) {
                         if (!finalRes) {
                             player.addSpentThing("planet_" + planet);
+                            MonumentsButtonHandler.offerGloryFurnace(game, player, planet);
                         }
                         if (!prevoting) {
                             player.exhaustPlanet(planet);
@@ -1731,7 +1735,7 @@ public final class AgendaHelper {
         if (!finalRes) {
             if (!prevoting
                     && game.isMonumentsMode()
-                    && player.hasUnit("letnev_monument")
+                    && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
                     && player.getSpentThingsThisWindow().stream()
                             .noneMatch(spent -> spent.startsWith("letnevMonument_"))) {
                 Tile tile = MonumentsService.getMonumentTile(game, player, "letnev_monument");
