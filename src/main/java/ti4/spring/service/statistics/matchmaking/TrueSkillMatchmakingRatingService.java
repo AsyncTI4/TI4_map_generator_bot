@@ -9,8 +9,10 @@ import de.gesundkrank.jskills.Team;
 import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,19 +22,24 @@ import lombok.experimental.UtilityClass;
 class TrueSkillMatchmakingRatingService {
 
     private static final FactorGraphTrueSkillCalculator CALCULATOR = new FactorGraphTrueSkillCalculator();
-    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
+
+    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.7;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
+
+    static final int RECENT_GAMES_WINDOW = 10;
+    private static final int RATINGS_RETAINED_PER_PLAYER = RECENT_GAMES_WINDOW + 1;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
-        GameInfo gameInfo = GameInfo.getDefaultGameInfo();
+        GameInfo gameInfo = MatchmakingGameInfo.create();
         Map<String, Player<String>> userIdToTrueSkillPlayer = new HashMap<>();
         Map<IPlayer, Rating> trueSkillPlayerToRating = new HashMap<>();
         Map<String, String> userIdToUsername = new HashMap<>();
         Map<String, Integer> gamesPlayedByUserId = new HashMap<>();
         Map<String, Long> lastGameEndedDateByUserId = new HashMap<>();
+        Map<String, Deque<Rating>> recentRatingsByUserId = new HashMap<>();
 
         for (MatchmakingGame game : games) {
             List<MatchmakingPlayer> gamePlayers = game.players();
@@ -56,6 +63,7 @@ class TrueSkillMatchmakingRatingService {
 
             Map<IPlayer, Rating> newRatings = CALCULATOR.calculateNewRatings(gameInfo, teams, ranks);
             trueSkillPlayerToRating.putAll(newRatings);
+            recordRecentRatings(gamePlayers, userIdToTrueSkillPlayer, trueSkillPlayerToRating, recentRatingsByUserId);
         }
 
         return buildMatchmakingRatings(
@@ -64,7 +72,24 @@ class TrueSkillMatchmakingRatingService {
                 userIdToUsername,
                 gamesPlayedByUserId,
                 lastGameEndedDateByUserId,
+                recentRatingsByUserId,
                 useConservativeRating);
+    }
+
+    private static void recordRecentRatings(
+            List<MatchmakingPlayer> gamePlayers,
+            Map<String, Player<String>> userIdToTrueSkillPlayer,
+            Map<IPlayer, Rating> trueSkillPlayerToRating,
+            Map<String, Deque<Rating>> recentRatingsByUserId) {
+        for (MatchmakingPlayer gamePlayer : gamePlayers) {
+            Player<String> trueSkillPlayer = userIdToTrueSkillPlayer.get(gamePlayer.userId());
+            Deque<Rating> recentRatings =
+                    recentRatingsByUserId.computeIfAbsent(gamePlayer.userId(), _ -> new ArrayDeque<>());
+            recentRatings.addLast(trueSkillPlayerToRating.get(trueSkillPlayer));
+            if (recentRatings.size() > RATINGS_RETAINED_PER_PLAYER) {
+                recentRatings.removeFirst();
+            }
+        }
     }
 
     private static List<MatchmakingRating> buildMatchmakingRatings(
@@ -73,6 +98,7 @@ class TrueSkillMatchmakingRatingService {
             Map<String, String> userIdToUsername,
             Map<String, Integer> gamesPlayedByUserId,
             Map<String, Long> lastGameEndedDateByUserId,
+            Map<String, Deque<Rating>> recentRatingsByUserId,
             boolean useConservativeRating) {
         return players.entrySet().stream()
                 .filter(entry -> gamesPlayedByUserId.getOrDefault(entry.getKey(), 0) >= MINIMUM_GAMES_FOR_RANKING)
@@ -86,7 +112,7 @@ class TrueSkillMatchmakingRatingService {
                             .divide(standardDeviation, MathContext.DECIMAL64)
                             .multiply(ONE_HUNDRED);
                     BigDecimal calibrationPercent = calculatedPercent.min(ONE_HUNDRED);
-                    double rawRating = useConservativeRating ? rating.getConservativeRating() : rating.getMean();
+                    double rawRating = ratingValue(rating, useConservativeRating);
                     long lastGameEndedDate = lastGameEndedDateByUserId.getOrDefault(userId, 0L);
                     return new MatchmakingRating(
                             userId,
@@ -94,9 +120,23 @@ class TrueSkillMatchmakingRatingService {
                             BigDecimal.valueOf(rawRating),
                             standardDeviation,
                             calibrationPercent,
-                            lastGameEndedDate);
+                            lastGameEndedDate,
+                            recentRatingDelta(recentRatingsByUserId.get(userId), rawRating, useConservativeRating));
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();
+    }
+
+    private static BigDecimal recentRatingDelta(
+            Deque<Rating> recentRatings, double currentRating, boolean useConservativeRating) {
+        if (recentRatings == null || recentRatings.size() < RATINGS_RETAINED_PER_PLAYER) {
+            return null;
+        }
+        double ratingBeforeWindow = ratingValue(recentRatings.peekFirst(), useConservativeRating);
+        return BigDecimal.valueOf(currentRating - ratingBeforeWindow);
+    }
+
+    private static double ratingValue(Rating rating, boolean useConservativeRating) {
+        return useConservativeRating ? rating.getConservativeRating() : rating.getMean();
     }
 }
