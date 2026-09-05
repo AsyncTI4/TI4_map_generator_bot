@@ -52,7 +52,7 @@ public class StrategyCardSecondaryButtonService {
                 List.of(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
             case "cryypter_3" ->
                 List.of(Buttons.gray("cryypterSC3Draw", "Draw Action Cards", CardEmojis.getACEmoji(game)));
-            case "pok4construction", "te4construction", "monuments4construction" ->
+            case "pok4construction", "te4construction", "monuments4construction", "monumentstf4" ->
                 getConstructionButtons(game, scModel);
             case "pok5trade" -> List.of(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
             case "pok6warfare", "anarchy7", "luminous7" -> List.of(Buttons.green("warfareBuild", "Build At Home"));
@@ -83,8 +83,8 @@ public class StrategyCardSecondaryButtonService {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
         buttons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
-        if (scModel.usesAutomationForSCID("monuments4construction")) {
-            buttons.add(Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument));
+        if (scModel.usesAutomationForSCID("monuments4construction") || scModel.usesAutomationForSCID("monumentstf4")) {
+            buttons.add(Buttons.green("construction_monument", "Place 1 Monument", UnitEmojis.Monument));
         }
         if (game.isFacilitiesMode()) {
             buttons.add(Buttons.green("construction_facility", "Place A Facility"));
