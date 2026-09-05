@@ -47,10 +47,21 @@ public class MatchmakingQueueSearchService {
         repository.save(search);
     }
 
+    public boolean isRegistered(String threadId) {
+        if (DatabasePersistenceGate.isDisabled()) return false;
+        return repository.findByThreadId(threadId).isPresent();
+    }
+
+    /**
+     * @return whether a standing search existed for the thread and was removed
+     */
     @Transactional
-    public void remove(String threadId) {
-        if (DatabasePersistenceGate.isDisabled()) return;
-        repository.deleteByThreadId(threadId);
+    public boolean remove(String threadId) {
+        if (DatabasePersistenceGate.isDisabled()) return false;
+        Optional<MatchmakingQueueSearch> found = repository.findByThreadId(threadId);
+        if (found.isEmpty()) return false;
+        repository.delete(found.get());
+        return true;
     }
 
     public Optional<String> findJoinBlocker(String threadId, String joiningUserId, List<String> existingMemberIds) {
