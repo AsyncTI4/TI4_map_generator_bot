@@ -122,7 +122,7 @@ public class MatchmakingQueueSearchService {
         }
     }
 
-    private static PlayerSearchCriteria toCriteria(MatchmakingQueueSearch search) {
+    static PlayerSearchCriteria toCriteria(MatchmakingQueueSearch search) {
         return new PlayerSearchCriteria(
                 split(search.getPlayerCounts()),
                 split(search.getVictoryPointGoals()),

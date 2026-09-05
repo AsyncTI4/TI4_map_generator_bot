@@ -32,13 +32,12 @@ class MatchDescriber {
     }
 
     static String setupBody(MatchedGame game) {
-        String restrictionsText = game.restrictions().isEmpty() ? "None" : String.join(", ", game.restrictions());
         return "The players were matched on the following game setup:\n"
                 + "- **Player count:** " + game.playerCount() + "\n"
                 + "- **Victory point goal:** " + game.victoryPointGoal() + "\n"
                 + "- **Expansion:** " + game.expansion() + "\n"
                 + "- **Pace:** " + game.pace() + "\n"
-                + "- **Restrictions:** " + restrictionsText;
+                + "- **Similar active hours:** " + MatchmakingOptions.describeSimilarActiveHours(game.restrictions());
     }
 
     static void logFormedMatch(
@@ -58,9 +57,8 @@ class MatchDescriber {
     private static String titleRestrictions(MatchedGame game) {
         List<String> restrictions = game.restrictions();
         List<String> labels = new ArrayList<>();
-        if (restrictions.contains(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)) {
-            labels.add("similar timezone");
-        }
+        MatchmakingOptions.strictestSimilarActiveHours(restrictions)
+                .ifPresent(level -> labels.add(MatchmakingOptions.shortSimilarActiveHoursLabel(level)));
         return String.join(", ", labels);
     }
 
