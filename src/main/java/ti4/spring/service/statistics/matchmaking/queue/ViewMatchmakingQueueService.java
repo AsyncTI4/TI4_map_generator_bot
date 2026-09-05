@@ -125,8 +125,8 @@ public class ViewMatchmakingQueueService {
     }
 
     private static String labelRestriction(String restriction) {
-        if (MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
-            return "similar hours";
+        if (MatchmakingOptions.isSimilarActiveHoursLevel(restriction)) {
+            return MatchmakingOptions.shortSimilarActiveHoursLabel(restriction);
         }
         return restriction;
     }

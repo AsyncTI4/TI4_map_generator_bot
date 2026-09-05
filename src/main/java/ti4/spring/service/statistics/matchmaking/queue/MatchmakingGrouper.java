@@ -165,11 +165,9 @@ class MatchmakingGrouper {
         List<MatchmakingQueueMember> members = groupParties.stream()
                 .flatMap(party -> party.members().stream())
                 .collect(Collectors.toCollection(ArrayList::new));
-        List<String> restrictions = groupParties.stream()
+        List<String> restrictions = MatchmakingOptions.collapseToStrictestActiveHours(groupParties.stream()
                 .flatMap(party -> party.leaderSettings().getMatchmakingRestrictions().stream())
-                .distinct()
-                .sorted()
-                .toList();
+                .toList());
         MatchedGame game = new MatchedGame(
                 members,
                 new ArrayList<>(groupParties.stream().map(QueuedParty::party).toList()),

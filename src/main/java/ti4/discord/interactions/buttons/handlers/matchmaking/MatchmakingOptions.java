@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -36,7 +37,25 @@ public class MatchmakingOptions {
 
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
-    public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
+
+    public static final int STRICT_SIMILAR_ACTIVE_HOURS_REQUIREMENT = 12;
+    public static final int LOOSE_SIMILAR_ACTIVE_HOURS_REQUIREMENT = 10;
+    public static final String STRICT_SIMILAR_ACTIVE_HOURS_OPTION =
+            "Strict (" + STRICT_SIMILAR_ACTIVE_HOURS_REQUIREMENT + " hours must match)";
+    public static final String LOOSE_SIMILAR_ACTIVE_HOURS_OPTION =
+            "Loose (" + LOOSE_SIMILAR_ACTIVE_HOURS_REQUIREMENT + " hours must match)";
+    public static final String NO_SIMILAR_ACTIVE_HOURS_OPTION = "No";
+
+    public static final List<String> SIMILAR_ACTIVE_HOURS_OPTIONS_STRICTEST_FIRST =
+            List.of(STRICT_SIMILAR_ACTIVE_HOURS_OPTION, LOOSE_SIMILAR_ACTIVE_HOURS_OPTION);
+
+    private static final Map<String, Integer> SIMILAR_ACTIVE_HOURS_SHARED_HOUR_REQUIREMENTS = Map.of(
+            STRICT_SIMILAR_ACTIVE_HOURS_OPTION, STRICT_SIMILAR_ACTIVE_HOURS_REQUIREMENT,
+            LOOSE_SIMILAR_ACTIVE_HOURS_OPTION, LOOSE_SIMILAR_ACTIVE_HOURS_REQUIREMENT);
+
+    private static final Map<String, String> SIMILAR_ACTIVE_HOURS_SHORT_NAMES = Map.of(
+            STRICT_SIMILAR_ACTIVE_HOURS_OPTION, "strict",
+            LOOSE_SIMILAR_ACTIVE_HOURS_OPTION, "loose");
 
     // Discord role names the matchmaker tracks to keep Floaters and Warriors apart.
     public static final String FLOATERS_ROLE_NAME = "Floaters";
@@ -52,7 +71,7 @@ public class MatchmakingOptions {
     public static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT =
             Map.of(FASTER_PACE_OPTION, 21, FASTEST_PACE_OPTION, 11);
 
-    public static final List<String> RESTRICTION_OPTIONS = List.of(SIMILAR_ACTIVE_HOURS_OPTION);
+    public static final List<String> RESTRICTION_OPTIONS = SIMILAR_ACTIVE_HOURS_OPTIONS_STRICTEST_FIRST;
 
     private static final Map<String, String> PACE_SHORT_NAMES = Map.of(
             SLOWER_PACE_OPTION, "Slower",
@@ -77,8 +96,41 @@ public class MatchmakingOptions {
 
     private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 48;
 
-    public static boolean wantsSimilarActiveHours(Collection<String> restrictions) {
-        return restrictions.contains(SIMILAR_ACTIVE_HOURS_OPTION);
+    public static boolean isSimilarActiveHoursLevel(String restriction) {
+        return SIMILAR_ACTIVE_HOURS_SHARED_HOUR_REQUIREMENTS.containsKey(restriction);
+    }
+
+    public static int requiredSharedActiveHours(Collection<String> restrictions) {
+        return restrictions.stream()
+                .mapToInt(restriction -> SIMILAR_ACTIVE_HOURS_SHARED_HOUR_REQUIREMENTS.getOrDefault(restriction, 0))
+                .max()
+                .orElse(0);
+    }
+
+    public static Optional<String> strictestSimilarActiveHours(Collection<String> restrictions) {
+        return SIMILAR_ACTIVE_HOURS_OPTIONS_STRICTEST_FIRST.stream()
+                .filter(restrictions::contains)
+                .findFirst();
+    }
+
+    public static List<String> collapseToStrictestActiveHours(Collection<String> restrictions) {
+        Optional<String> strictest = strictestSimilarActiveHours(restrictions);
+        return restrictions.stream()
+                .distinct()
+                .filter(restriction -> !isSimilarActiveHoursLevel(restriction)
+                        || strictest.filter(restriction::equals).isPresent())
+                .sorted()
+                .toList();
+    }
+
+    public static String shortSimilarActiveHoursLabel(String similarActiveHoursOption) {
+        return "similar hours ("
+                + SIMILAR_ACTIVE_HOURS_SHORT_NAMES.getOrDefault(similarActiveHoursOption, similarActiveHoursOption)
+                + ")";
+    }
+
+    public static String describeSimilarActiveHours(Collection<String> restrictions) {
+        return strictestSimilarActiveHours(restrictions).orElse(NO_SIMILAR_ACTIVE_HOURS_OPTION);
     }
 
     public static String shortExpansionName(String expansion) {

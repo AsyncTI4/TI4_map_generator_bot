@@ -2,15 +2,13 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 
 @UtilityClass
 class MatchmakingCompatibilityService {
 
-    private static final long ACTIVE_HOUR_DATA_REQUIREMENT = 13;
-    private static final long ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT = 11;
+    private static final int ACTIVE_HOUR_DATA_MARGIN_OVER_SHARED_REQUIREMENT = 2;
 
     private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 3;
     private static final double SKILL_DIFFERENCE_WIDENING_PER_WINDOW = 1;
@@ -18,14 +16,18 @@ class MatchmakingCompatibilityService {
 
     private static final int HOURS_TO_AVOID_FLOATERS_WARRIORS = 8;
 
-    static boolean hasEnoughActiveHourDataToMatch(PlayerMatchmakingData data) {
-        return data.activeHours().size() >= ACTIVE_HOUR_DATA_REQUIREMENT;
+    static int requiredActiveHourData(int requiredSharedHours) {
+        return requiredSharedHours + ACTIVE_HOUR_DATA_MARGIN_OVER_SHARED_REQUIREMENT;
     }
 
-    static boolean shareEnoughActiveHours(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+    static boolean hasEnoughActiveHourDataToMatch(PlayerMatchmakingData data, int requiredSharedHours) {
+        return data.activeHours().size() >= requiredActiveHourData(requiredSharedHours);
+    }
+
+    static boolean shareEnoughActiveHours(PlayerMatchmakingData a, PlayerMatchmakingData b, int requiredSharedHours) {
         long sharedHours =
                 a.activeHours().stream().filter(b.activeHours()::contains).count();
-        return sharedHours >= ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT;
+        return sharedHours >= requiredSharedHours;
     }
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
@@ -33,12 +35,8 @@ class MatchmakingCompatibilityService {
             return true;
         }
 
-        List<String> aRestrictions = a.restrictions();
-        List<String> bRestrictions = b.restrictions();
-
-        if ((MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
-                        || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions))
-                && !shareEnoughActiveHours(a, b)) {
+        int requiredSharedHours = strictestRequiredSharedActiveHours(a, b);
+        if (requiredSharedHours > 0 && !shareEnoughActiveHours(a, b, requiredSharedHours)) {
             return true;
         }
 
@@ -57,6 +55,12 @@ class MatchmakingCompatibilityService {
         }
 
         return isSkillGapTooLarge(a, b);
+    }
+
+    private static int strictestRequiredSharedActiveHours(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        return Math.max(
+                MatchmakingOptions.requiredSharedActiveHours(a.restrictions()),
+                MatchmakingOptions.requiredSharedActiveHours(b.restrictions()));
     }
 
     private static boolean isSkillGapTooLarge(PlayerMatchmakingData a, PlayerMatchmakingData b) {

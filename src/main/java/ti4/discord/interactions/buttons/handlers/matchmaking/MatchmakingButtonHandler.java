@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
-import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.PACE_RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.PLAYER_COUNT_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.SLOWER_PACE_OPTION;
@@ -71,7 +70,7 @@ class MatchmakingButtonHandler {
     private static final String PLAYER_COUNTS_ID = "queue_player_counts";
     private static final String VICTORY_POINTS_ID = "queue_victory_points";
     private static final String PACE_RESTRICTIONS_ID = "queue_pace_restrictions";
-    private static final String RESTRICTIONS_ID = "queue_restrictions";
+    private static final String ACTIVE_HOURS_ID = "queue_active_hours";
     private static final String MAX_QUEUE_TIME_ID = "queue_max_time";
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
     private static final String GROUP_MEMBERS_ID = "queue_group_members";
@@ -83,8 +82,8 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_PLAYER_COUNT_OPTIONS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINT_OPTIONS = List.of("10");
     private static final List<String> DEFAULT_PACE_OPTIONS = List.of(SLOWER_PACE_OPTION);
-    private static final List<String> DEFAULT_RESTRICTION_OPTIONS =
-            List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION);
+    private static final String DEFAULT_SIMILAR_ACTIVE_HOURS_OPTION =
+            MatchmakingOptions.STRICT_SIMILAR_ACTIVE_HOURS_OPTION;
     private static final List<String> DEFAULT_TIGL_RANK_OPTIONS = List.of(MatchmakingOptions.UNRANKED_OPTION);
 
     private static final int MAX_GROUP_MEMBERS = 7;
@@ -218,16 +217,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces));
 
-        List<String> restrictionOptions = groupRestrictionOptions(groupMemberIds);
-        if (!restrictionOptions.isEmpty()) {
-            CheckboxGroup restrictions = buildCheckboxGroup(
-                    RESTRICTIONS_ID,
-                    restrictionOptions,
-                    userSettings.getMatchmakingRestrictions(),
-                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                    !REQUIRE_SELECTION);
-            modal.addComponents(Label.of("Restrictions", restrictions));
-        }
+        buildSimilarActiveHoursLabel(userSettings, groupMemberIds).ifPresent(modal::addComponents);
         return modal.build();
     }
 
@@ -259,16 +249,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Pace", paces))
                 .addComponents(Label.of("Rank", ranks));
 
-        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
-        if (!restrictionOptions.isEmpty()) {
-            CheckboxGroup restrictions = buildCheckboxGroup(
-                    RESTRICTIONS_ID,
-                    restrictionOptions,
-                    userSettings.getMatchmakingRestrictions(),
-                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                    !REQUIRE_SELECTION);
-            modal.addComponents(Label.of("Restrictions", restrictions));
-        }
+        buildSimilarActiveHoursLabel(userSettings, List.of(userId)).ifPresent(modal::addComponents);
         return modal.build();
     }
 
@@ -307,16 +288,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces));
 
-        List<String> restrictionOptions = groupRestrictionOptions(gameMemberIds);
-        if (!restrictionOptions.isEmpty()) {
-            CheckboxGroup restrictions = buildCheckboxGroup(
-                    RESTRICTIONS_ID,
-                    restrictionOptions,
-                    userSettings.getMatchmakingRestrictions(),
-                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                    false);
-            modal.addComponents(Label.of("Restrictions", restrictions));
-        }
+        buildSimilarActiveHoursLabel(userSettings, gameMemberIds).ifPresent(modal::addComponents);
         return modal.build();
     }
 
@@ -348,17 +320,28 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Pace", paces))
                 .addComponents(Label.of("Rank", ranks));
 
-        List<String> restrictionOptions = groupRestrictionOptions(gameMemberIds);
-        if (!restrictionOptions.isEmpty()) {
-            CheckboxGroup restrictions = buildCheckboxGroup(
-                    RESTRICTIONS_ID,
-                    restrictionOptions,
-                    userSettings.getMatchmakingRestrictions(),
-                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                    false);
-            modal.addComponents(Label.of("Restrictions", restrictions));
-        }
+        buildSimilarActiveHoursLabel(userSettings, gameMemberIds).ifPresent(modal::addComponents);
         return modal.build();
+    }
+
+    private static Optional<Label> buildSimilarActiveHoursLabel(UserSettings settings, List<String> memberIds) {
+        List<String> reachableLevels = groupRestrictionOptions(memberIds);
+        if (reachableLevels.isEmpty()) {
+            return Optional.empty();
+        }
+        List<String> options = new ArrayList<>(reachableLevels);
+        options.add(MatchmakingOptions.NO_SIMILAR_ACTIVE_HOURS_OPTION);
+        List<String> selected = List.of(selectedSimilarActiveHours(settings, options));
+        return Optional.of(
+                Label.of("Similar Active Hours", buildSingleSelect(ACTIVE_HOURS_ID, options, selected, selected)));
+    }
+
+    private static String selectedSimilarActiveHours(UserSettings settings, List<String> optionsStrictestFirst) {
+        String saved = MatchmakingOptions.strictestSimilarActiveHours(settings.getMatchmakingRestrictions())
+                .orElseGet(() -> settings.hasConfiguredMatchmakingRestrictions()
+                        ? MatchmakingOptions.NO_SIMILAR_ACTIVE_HOURS_OPTION
+                        : DEFAULT_SIMILAR_ACTIVE_HOURS_OPTION);
+        return optionsStrictestFirst.contains(saved) ? saved : optionsStrictestFirst.getFirst();
     }
 
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
@@ -439,14 +422,12 @@ class MatchmakingButtonHandler {
     }
 
     private static String describeQueuePreferences(UserSettings settings) {
-        String restrictionsText = settings.getMatchmakingRestrictions().isEmpty()
-                ? "None"
-                : String.join(", ", settings.getMatchmakingRestrictions());
         return "- **Expansions:** " + String.join(", ", settings.getMatchmakingExpansions()) + "\n"
                 + "- **Player counts:** " + String.join(", ", settings.getMatchmakingPlayerCounts()) + "\n"
                 + "- **Victory point goals:** " + String.join(", ", settings.getMatchmakingVictoryPointGoals()) + "\n"
                 + "- **Paces:** " + String.join(", ", settings.getMatchmakingPaces()) + "\n"
-                + "- **Restrictions:** " + restrictionsText + "\n";
+                + "- **Similar active hours:** "
+                + MatchmakingOptions.describeSimilarActiveHours(settings.getMatchmakingRestrictions()) + "\n";
     }
 
     @ModalHandler(QUEUE_FOR_TIGL_MODAL_ID)
@@ -517,7 +498,8 @@ class MatchmakingButtonHandler {
         if (criteria.tigl()) {
             message.append("\n- **Rank:** ").append(describeOptions(criteria.tiglRanks()));
         }
-        message.append("\n- **Restrictions:** ").append(describeOptions(criteria.restrictions()));
+        message.append("\n- **Similar active hours:** ")
+                .append(MatchmakingOptions.describeSimilarActiveHours(criteria.restrictions()));
         return message.append("\nThe matchmaker will keep adding matching players until the game is launched.")
                 .toString();
     }
@@ -541,7 +523,7 @@ class MatchmakingButtonHandler {
                 getSelectedValues(event, VICTORY_POINTS_ID),
                 getSelectedValues(event, EXPANSIONS_ID),
                 getSelectedValues(event, PACE_RESTRICTIONS_ID),
-                searchRestrictions(event),
+                selectedRestrictions(event),
                 false,
                 List.of());
     }
@@ -556,14 +538,14 @@ class MatchmakingButtonHandler {
                 getSelectedValues(event, VICTORY_POINTS_ID),
                 List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION),
                 getSelectedValues(event, PACE_RESTRICTIONS_ID),
-                searchRestrictions(event),
+                selectedRestrictions(event),
                 true,
                 allowedRanks);
     }
 
-    private static List<String> searchRestrictions(ModalInteractionEvent event) {
-        return getSelectedValues(event, RESTRICTIONS_ID).stream()
-                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
+    private static List<String> selectedRestrictions(ModalInteraction event) {
+        return getSelectedValues(event, ACTIVE_HOURS_ID).stream()
+                .filter(RESTRICTION_OPTIONS::contains)
                 .toList();
     }
 
@@ -614,9 +596,7 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingPlayerCounts(getSelectedValues(event, PLAYER_COUNTS_ID));
         userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
         userSettings.setMatchmakingPaces(getSelectedValues(event, PACE_RESTRICTIONS_ID));
-        userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
-                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
-                .toList());
+        userSettings.setMatchmakingRestrictions(selectedRestrictions(event));
         UserSettingsManager.save(userSettings);
     }
 
@@ -625,9 +605,7 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingPlayerCounts(List.of("6"));
         userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
         userSettings.setMatchmakingPaces(getSelectedValues(event, PACE_RESTRICTIONS_ID));
-        userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
-                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
-                .toList());
+        userSettings.setMatchmakingRestrictions(selectedRestrictions(event));
         userSettings.setMatchmakingTiglRanks(getSelectedValues(event, TIGL_RANKS_ID));
         UserSettingsManager.save(userSettings);
     }
