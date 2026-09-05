@@ -7,9 +7,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.springframework.stereotype.Service;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.logging.BotLogger;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -23,33 +30,75 @@ public class ViewMatchmakingQueueService {
 
     private final MatchmakingQueuePartyRepository partyRepository;
     private final MatchmakingQueueMemberRepository memberRepository;
+    private final MatchmakingQueueSearchRepository searchRepository;
 
     public List<MessageEmbed> getMessageEmbeds(Boolean tiglFilter) {
         if (DatabasePersistenceGate.isDisabled()) {
             return List.of(messageEmbed("Queueing is currently disabled."));
         }
 
-        List<MatchmakingQueueParty> parties = partyRepository.findAllByQueuedTrueOrderByQueuedAtAsc();
-        if (tiglFilter != null) {
-            parties = parties.stream()
-                    .filter(party -> party.isTigl() == tiglFilter)
-                    .toList();
-        }
-        if (parties.isEmpty()) {
+        List<String> lines = new ArrayList<>(queuedPartyLines(tiglFilter));
+        lines.addAll(queuedGameLines(tiglFilter));
+        if (lines.isEmpty()) {
             return List.of(messageEmbed("There are no players in the queue right now."));
+        }
+
+        return paginateIntoEmbeds(lines);
+    }
+
+    private List<String> queuedPartyLines(Boolean tiglFilter) {
+        List<MatchmakingQueueParty> parties = partyRepository.findAllByQueuedTrueOrderByQueuedAtAsc().stream()
+                .filter(party -> tiglFilter == null || party.isTigl() == tiglFilter)
+                .toList();
+        if (parties.isEmpty()) {
+            return List.of();
         }
 
         List<Long> partyIds = parties.stream().map(MatchmakingQueueParty::getId).toList();
         Map<Long, List<MatchmakingQueueMember>> membersByParty = memberRepository.findAllByPartyIdIn(partyIds).stream()
                 .collect(Collectors.groupingBy(MatchmakingQueueMember::getPartyId));
 
-        List<String> partyLines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
         for (MatchmakingQueueParty party : parties) {
             List<MatchmakingQueueMember> members = membersByParty.getOrDefault(party.getId(), List.of());
-            partyLines.add(describeQueuedParty(members, UserSettingsManager.get(party.getLeaderId()), party.isTigl()));
+            UserSettings settings = UserSettingsManager.get(party.getLeaderId());
+            lines.add(describeQueueEntry(memberMentions(members), partyCriteria(settings, party.isTigl())));
         }
+        return lines;
+    }
 
-        return paginateIntoEmbeds(partyLines);
+    private List<String> queuedGameLines(Boolean tiglFilter) {
+        Guild guild = JdaService.guildPrimary;
+        return searchRepository.findAllByOrderByCreatedAtAsc().stream()
+                .filter(search -> tiglFilter == null || search.isTigl() == tiglFilter)
+                .map(search -> describeQueueEntry(
+                        signedUpMentions(guild, search), MatchmakingQueueSearchService.toCriteria(search)))
+                .toList();
+    }
+
+    private static String signedUpMentions(Guild guild, MatchmakingQueueSearch search) {
+        List<Member> signedUp = signedUpMembers(guild, search);
+        if (signedUp.isEmpty()) {
+            return "<#" + search.getThreadId() + ">";
+        }
+        return signedUp.stream().map(Member::getAsMention).collect(Collectors.joining(", "));
+    }
+
+    private static List<Member> signedUpMembers(Guild guild, MatchmakingQueueSearch search) {
+        ThreadChannel thread = guild == null ? null : guild.getThreadChannelById(search.getThreadId());
+        if (thread == null) {
+            return List.of();
+        }
+        try {
+            Message signupMessage =
+                    thread.retrieveMessageById(search.getMessageId()).complete();
+            return CreateGameButtonHandler.fetchMembersFromMessage(signupMessage, guild).stream()
+                    .distinct()
+                    .toList();
+        } catch (RuntimeException e) {
+            BotLogger.warning("Could not read the sign-up message for queued game thread " + search.getThreadId(), e);
+            return List.of();
+        }
     }
 
     private static List<MessageEmbed> paginateIntoEmbeds(List<String> partyLines) {
@@ -86,29 +135,40 @@ public class ViewMatchmakingQueueService {
                 .build();
     }
 
-    private static String describeQueuedParty(
-            List<MatchmakingQueueMember> members, UserSettings settings, boolean tigl) {
-        String mentions =
-                members.stream().map(member -> "<@" + member.getUserId() + ">").collect(Collectors.joining(", "));
+    private static String memberMentions(List<MatchmakingQueueMember> members) {
+        return members.stream().map(member -> "<@" + member.getUserId() + ">").collect(Collectors.joining(", "));
+    }
+
+    private static PlayerSearchCriteria partyCriteria(UserSettings settings, boolean tigl) {
+        return new PlayerSearchCriteria(
+                settings.getMatchmakingPlayerCounts(),
+                settings.getMatchmakingVictoryPointGoals(),
+                settings.getMatchmakingExpansions(),
+                settings.getMatchmakingPaces(),
+                settings.getMatchmakingRestrictions(),
+                tigl,
+                settings.getMatchmakingTiglRanks());
+    }
+
+    private static String describeQueueEntry(String mentions, PlayerSearchCriteria criteria) {
         StringBuilder line = new StringBuilder("\n• ").append(mentions).append(" — ");
-        line.append(joinInOrder(settings.getMatchmakingPlayerCounts(), MatchmakingOptions.PLAYER_COUNT_OPTIONS, "/"))
+        line.append(joinInOrder(criteria.playerCounts(), MatchmakingOptions.PLAYER_COUNT_OPTIONS, "/"))
                 .append("p");
         line.append(" · ")
-                .append(joinInOrder(
-                        settings.getMatchmakingVictoryPointGoals(), MatchmakingOptions.VICTORY_POINT_OPTIONS, "/"))
+                .append(joinInOrder(criteria.victoryPointGoals(), MatchmakingOptions.VICTORY_POINT_OPTIONS, "/"))
                 .append("vp");
-        String expansions = settings.getMatchmakingExpansions().stream()
+        String expansions = criteria.expansions().stream()
                 .sorted(byCanonicalOrder(MatchmakingOptions.EXPANSION_OPTIONS))
                 .map(MatchmakingOptions::shortExpansionName)
                 .collect(Collectors.joining("/"));
         line.append(" · ").append(expansions);
-        String paces = settings.getMatchmakingPaces().stream()
+        String paces = criteria.paces().stream()
                 .sorted(byCanonicalOrder(MatchmakingOptions.PACE_RESTRICTION_OPTIONS))
                 .map(MatchmakingOptions::shortPaceName)
                 .map(String::toLowerCase)
                 .collect(Collectors.joining("/"));
         line.append(" · ").append(paces).append(" pace");
-        List<String> restrictions = settings.getMatchmakingRestrictions();
+        List<String> restrictions = criteria.restrictions();
         if (!restrictions.isEmpty()) {
             String restrictionsText = restrictions.stream()
                     .sorted(byCanonicalOrder(MatchmakingOptions.RESTRICTION_OPTIONS))
@@ -116,17 +176,17 @@ public class ViewMatchmakingQueueService {
                     .collect(Collectors.joining(", "));
             line.append(" · ").append(restrictionsText);
         }
-        if (tigl) {
+        if (criteria.tigl()) {
             line.append(" · TIGL (")
-                    .append(String.join("/", settings.getMatchmakingTiglRanks()))
+                    .append(String.join("/", criteria.tiglRanks()))
                     .append(")");
         }
         return line.toString();
     }
 
     private static String labelRestriction(String restriction) {
-        if (MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
-            return "similar hours";
+        if (MatchmakingOptions.isSimilarActiveHoursLevel(restriction)) {
+            return MatchmakingOptions.shortSimilarActiveHoursLabel(restriction);
         }
         return restriction;
     }
