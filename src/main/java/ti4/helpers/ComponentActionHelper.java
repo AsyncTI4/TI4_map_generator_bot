@@ -718,6 +718,7 @@ public class ComponentActionHelper {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("beginAuction_relic", "Relic", ExploreEmojis.Relic));
                     buttons.add(Buttons.blue("beginAuction_tech", "Faction Tech"));
+                    p1.addExhaustedAbility("contraband_auction");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol

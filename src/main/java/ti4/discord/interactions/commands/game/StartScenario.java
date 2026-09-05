@@ -145,7 +145,7 @@ public class StartScenario extends GameStateSubcommand {
         } else {
             String tech = drawRandomFactionTech(game);
             game.setStoredValue("auctionObject", "tech_" + tech);
-            TechnologyModel relic = Mapper.getTech(drawRandomFactionTech(game));
+            TechnologyModel relic = Mapper.getTech(tech);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getMainGameChannel(),
                     "Hacan has begun an auction on this technology:",
