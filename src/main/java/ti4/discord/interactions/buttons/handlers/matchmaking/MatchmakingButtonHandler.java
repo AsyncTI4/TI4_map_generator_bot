@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.label.LabelChildComponent;
@@ -32,6 +34,7 @@ import net.dv8tion.jda.api.interactions.modals.ModalInteraction;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
@@ -60,6 +63,8 @@ class MatchmakingButtonHandler {
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
+    private static final String CANCEL_SEARCH_CONFIRM_BUTTON_ID = "cancelMatchmakingSearchConfirm";
+    private static final String CANCEL_SEARCH_DECLINE_BUTTON_ID = "cancelMatchmakingSearchDecline";
     private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
     private static final String QUEUE_FOR_TIGL_MODAL_ID = "queueForTiglModal";
     private static final String SEARCH_FOR_PLAYERS_MODAL_ID = "searchForPlayersModal";
@@ -119,8 +124,43 @@ class MatchmakingButtonHandler {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
+        if (MatchmakingQueueSearchService.get().isRegistered(event.getChannelId())) {
+            offerCancelSearchPrompt(event);
+            return;
+        }
         Modal modal = isTiglThread(event) ? buildTiglSearchModal(event) : buildSearchModal(event);
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void offerCancelSearchPrompt(ButtonInteractionEvent event) {
+        Button yes = Buttons.red(CANCEL_SEARCH_CONFIRM_BUTTON_ID, "Yes");
+        Button no = Buttons.gray(CANCEL_SEARCH_DECLINE_BUTTON_ID, "No");
+        event.reply("This game is already in the matchmaking queue."
+                        + " Do you want to cancel your current matchmaking queue?")
+                .setEphemeral(true)
+                .addComponents(ActionRow.of(yes, no))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = CANCEL_SEARCH_CONFIRM_BUTTON_ID, save = false)
+    public static void cancelMatchmakingSearch(ButtonInteractionEvent event) {
+        if (!MatchmakingQueueSearchService.get().remove(event.getChannelId())) {
+            editPrompt(event, "This game was no longer in the matchmaking queue.");
+            return;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "This game has left the matchmaking queue. The matchmaker will no longer add players to it.");
+        editPrompt(event, "This game has been removed from the matchmaking queue.");
+    }
+
+    @ButtonHandler(value = CANCEL_SEARCH_DECLINE_BUTTON_ID, save = false)
+    public static void keepMatchmakingSearch(ButtonInteractionEvent event) {
+        editPrompt(event, "This game is still in the matchmaking queue.");
+    }
+
+    private static void editPrompt(ButtonInteractionEvent event, String message) {
+        event.getHook().editOriginal(message).setComponents().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean isTiglThread(ButtonInteractionEvent event) {
