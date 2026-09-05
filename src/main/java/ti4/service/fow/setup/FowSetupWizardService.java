@@ -164,6 +164,7 @@ public final class FowSetupWizardService {
             case GAME_TYPE -> renderGameType(game, state, sb, buttons);
             case GAME_OPTIONS -> FowSetupGameOptionsService.render(game, state, sb, buttons);
             case MAP_LOAD -> renderMapLoad(game, state, sb, buttons);
+            case PLAYER_ROLES -> FowSetupPlayerRolesService.render(game, state, sb, buttons);
             case FACTIONS -> FowSetupFactionService.render(game, state, sb, buttons);
             case TABLE_ORDER -> FowSetupTableOrderService.render(game, state, sb, buttons);
             case FOG_TYPE -> renderFogType(game, state, sb, buttons);
@@ -197,6 +198,7 @@ public final class FowSetupWizardService {
             case GAME_TYPE -> "Game Type & Scenario";
             case GAME_OPTIONS -> "Game Options";
             case MAP_LOAD -> "Load the Map";
+            case PLAYER_ROLES -> "Confirm Players";
             case FACTIONS -> "Assign Factions & Positions";
             case TABLE_ORDER -> "Table / Seat Order";
             case FOG_TYPE -> "Fog of War Type";
@@ -333,6 +335,14 @@ public final class FowSetupWizardService {
                 slot, and anomalies/wormholes that didn't come through from a pasted map string \
                 (re-add them with the commands above). If in doubt, `/map show_map_string` shows the \
                 current map as a string you can diff against your source.
+                """;
+            case PLAYER_ROLES -> """
+                ### Why is the GM in this list at all?
+                Creating a FoW game adds the GM as a full player entry alongside everyone else - their \
+                Discord GM role is the only thing that marks them different internally. This step just \
+                tells the wizard's own Factions/Table Order steps who to skip; it doesn't touch the \
+                underlying player list or affect anything outside this wizard. If your GM is also playing \
+                a faction, mark them "Playing" here like anyone else.
                 """;
             case FACTIONS -> """
                 ### Faction assignment options

@@ -23,6 +23,12 @@ public class FowSetupWizardState {
     private String gameType;
     private String scenarioNote;
 
+    // PLAYER_ROLES step: userIDs of roster entries marked as GM/observer rather than an actual player -
+    // excluded from FACTIONS/TABLE_ORDER candidate lists. Seeded once (see playerRolesInitialized) from
+    // Player.isGM(), then left entirely to the GM to toggle.
+    private Set<String> nonPlayingUserIds = new LinkedHashSet<>();
+    private boolean playerRolesInitialized = false;
+
     // FACTIONS step: factions chosen by the GM but not yet finalized with a home position
     private Map<String, String> pendingFactionByUserId = new LinkedHashMap<>();
 
