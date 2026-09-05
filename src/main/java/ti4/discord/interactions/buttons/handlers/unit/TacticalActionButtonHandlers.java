@@ -24,6 +24,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.game.MonumentsService;
 import ti4.service.regex.RegexService;
 import ti4.service.tactical.TacticalActionOutputService;
 import ti4.service.tactical.TacticalActionService;
@@ -287,6 +288,9 @@ class TacticalActionButtonHandlers {
                         // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
                         AddUnitService.addUnits(event, game, toAdd);
+                        if (type == UnitType.Infantry) {
+                            MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);
+                        }
                         if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
                             ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(
                                     game,

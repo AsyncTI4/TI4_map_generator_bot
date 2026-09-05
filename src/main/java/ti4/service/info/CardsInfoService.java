@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
@@ -46,6 +47,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
+import ti4.service.game.NekroMonumentService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -75,6 +77,9 @@ public class CardsInfoService {
         if (playerCardsInfoThread == null) return;
 
         List<Button> buttons = new ArrayList<>();
+        if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
+            buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
+        }
         if (game.isMonumentsMode()
                 && player.hasUnit("bluetf_monument")
                 && MonumentsService.isMonumentOnBoard(game, player, "bluetf_monument")) {
@@ -87,6 +92,9 @@ public class CardsInfoService {
         }
         if (game.isMonumentsMode() && player.hasUnit("yellowtf_monument")) {
             buttons.add(TwilightsFallMonumentsButtonHandler.getYellowTfMonumentStatusButton(game, player));
+        }
+        if (game.isMonumentsMode() && player.hasUnit("nekro_monument")) {
+            buttons.add(NekroMonumentService.getCopyMonumentButton(player));
         }
         Button transaction = Buttons.blue("transaction", "Transaction");
         buttons.add(transaction);
