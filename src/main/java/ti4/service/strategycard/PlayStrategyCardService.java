@@ -83,6 +83,26 @@ public class PlayStrategyCardService {
             Player player,
             boolean winnuHero,
             boolean isOverrule) {
+        playSC(
+                event,
+                scToPlay,
+                game,
+                mainGameChannel,
+                player,
+                winnuHero,
+                isOverrule,
+                isOverrule ? "overruled" : "played");
+    }
+
+    public static void playSC(
+            GenericInteractionCreateEvent event,
+            Integer scToPlay,
+            Game game,
+            MessageChannel mainGameChannel,
+            Player player,
+            boolean winnuHero,
+            boolean isOverrule,
+            String playVerb) {
         String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(
@@ -123,7 +143,7 @@ public class PlayStrategyCardService {
                         + game.getSCEmojiWordRepresentation(scToPlay));
 
         StringBuilder message = new StringBuilder();
-        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? " overruled" : " played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" ").append(playVerb);
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }

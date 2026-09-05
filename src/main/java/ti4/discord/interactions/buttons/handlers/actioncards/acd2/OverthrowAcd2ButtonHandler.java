@@ -10,59 +10,80 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.UnitEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.strategycard.StrategyCardSecondaryButtonService;
 
 @UtilityClass
 class OverthrowAcd2ButtonHandler {
 
     @ButtonHandler("resolveOverthrow")
     public static void resolveOverthrow(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverthrowAbilityButtons(game);
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = List.of(
+                Buttons.green(player.factionButtonChecker() + "overthrowChoosePrimary", "Perform Primary"),
+                Buttons.blue(player.factionButtonChecker() + "overthrowChooseSecondary", "Perform Secondary"),
+                Buttons.red("deleteButtons", "Done resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", resolve an ability of 1 of the strategy cards of the player you took the planet from."
+                        + " Perform the **primary** ability if that planet is in their home system, and the"
+                        + " **secondary** ability otherwise.",
+                buttons);
+    }
+
+    @ButtonHandler("overthrowChoosePrimary")
+    public static void chooseOverthrowPrimary(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", choose the strategy card ability to resolve for _Overthrow_. Resolve the **secondary**"
-                        + " ability of 1 of that player's strategy cards — or, if you gained control of a planet"
-                        + " in their home system, the **primary** ability instead. No command token is spent.",
-                buttons);
+                        + ", choose the strategy card whose **primary** ability you are resolving for _Overthrow_.",
+                getPrimaryAbilityButtons(game, player));
     }
 
-    private static List<Button> getOverthrowAbilityButtons(Game game) {
-        List<Integer> scs = game.getSCList();
+    @ButtonHandler("overthrowChooseSecondary")
+    public static void chooseOverthrowSecondary(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose the **secondary** ability you are resolving for _Overthrow_.",
+                getSecondaryAbilityButtons(game));
+    }
+
+    @ButtonHandler("overthrowPrimary_")
+    public static void resolveOverthrowPrimary(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        int sc = Integer.parseInt(buttonID.split("_")[1]);
+        ButtonHelper.deleteMessage(event);
+        PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, true, "overthrown");
+    }
+
+    private static List<Button> getPrimaryAbilityButtons(Game game, Player player) {
         List<Button> scButtons = new ArrayList<>();
-        if (scs.contains(1)) {
-            scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+        for (int sc : game.getSCList()) {
+            if (sc <= 0) continue;
+            String buttonID = player.factionButtonChecker() + "overthrowPrimary_" + sc;
+            String label = Helper.getSCName(sc, game);
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+            if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                scButtons.add(Buttons.gray(buttonID, label, scEmoji));
+            } else {
+                scButtons.add(Buttons.gray(buttonID, sc + " " + label));
+            }
         }
-        if (scs.contains(2)) {
-            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a Card (Other Than Strategy Card)"));
-            scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
-        }
-        if (scs.contains(4)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
-        }
-        if (scs.contains(5)) {
-            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
-        }
-        if (scs.contains(6)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
-        }
-        if (scs.contains(7)) {
-            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
-        }
-        if (scs.contains(8)) {
-            scButtons.add(Buttons.green("resolveAnarchy8Secondary", "Lift Command Token"));
-        }
-        if (scs.contains(9)) {
-            scButtons.add(Buttons.GET_A_TECH);
-        }
-        if (scs.contains(11)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
-        }
+        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        return scButtons;
+    }
+
+    private static List<Button> getSecondaryAbilityButtons(Game game) {
+        List<Button> scButtons =
+                new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, game.getSCList()));
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         return scButtons;
     }
