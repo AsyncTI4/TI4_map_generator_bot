@@ -8,4 +8,5 @@ record MatchmakingRating(
         BigDecimal rating,
         BigDecimal sigma,
         BigDecimal calibrationPercent,
-        long lastGameEndedDate) {}
+        long lastGameEndedDate,
+        BigDecimal recentRatingDelta) {}

@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import ti4.spring.service.statistics.matchmaking.MatchmakingGameInfo;
 
 @UtilityClass
 class MatchQualityCalculator {
 
-    private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();
+    private static final GameInfo GAME_INFO = MatchmakingGameInfo.create();
     private static final FactorGraphTrueSkillCalculator CALCULATOR = new FactorGraphTrueSkillCalculator();
 
     static double matchQuality(
