@@ -52,9 +52,6 @@ public class MatchmakingQueueSearchService {
         return repository.findByThreadId(threadId).isPresent();
     }
 
-    /**
-     * @return whether a standing search existed for the thread and was removed
-     */
     @Transactional
     public boolean remove(String threadId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
