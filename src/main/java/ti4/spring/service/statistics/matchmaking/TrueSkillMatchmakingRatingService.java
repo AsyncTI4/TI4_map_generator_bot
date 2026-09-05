@@ -28,7 +28,6 @@ class TrueSkillMatchmakingRatingService {
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
 
     static final int RECENT_GAMES_WINDOW = 10;
-    private static final int RATINGS_RETAINED_PER_PLAYER = RECENT_GAMES_WINDOW + 1;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
@@ -86,7 +85,7 @@ class TrueSkillMatchmakingRatingService {
             Deque<Rating> recentRatings =
                     recentRatingsByUserId.computeIfAbsent(gamePlayer.userId(), _ -> new ArrayDeque<>());
             recentRatings.addLast(trueSkillPlayerToRating.get(trueSkillPlayer));
-            if (recentRatings.size() > RATINGS_RETAINED_PER_PLAYER) {
+            if (recentRatings.size() > RECENT_GAMES_WINDOW + 1) {
                 recentRatings.removeFirst();
             }
         }
@@ -129,7 +128,7 @@ class TrueSkillMatchmakingRatingService {
 
     private static BigDecimal recentRatingDelta(
             Deque<Rating> recentRatings, double currentRating, boolean useConservativeRating) {
-        if (recentRatings == null || recentRatings.size() < RATINGS_RETAINED_PER_PLAYER) {
+        if (recentRatings == null || recentRatings.size() < RECENT_GAMES_WINDOW + 1) {
             return null;
         }
         double ratingBeforeWindow = ratingValue(recentRatings.peekFirst(), useConservativeRating);
