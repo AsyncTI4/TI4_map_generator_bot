@@ -32,7 +32,7 @@ class OverthrowAcd2ButtonHandler {
                 player.getRepresentationUnfogged()
                         + ", resolve an ability of 1 of the strategy cards of the player you took the planet from."
                         + " Perform the **primary** ability if that planet is in their home system, and the"
-                        + " **secondary** ability otherwise. No command token is spent.",
+                        + " **secondary** ability otherwise.",
                 buttons);
     }
 
