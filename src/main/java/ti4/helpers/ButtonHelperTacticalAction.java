@@ -600,6 +600,7 @@ public final class ButtonHelperTacticalAction {
         TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
         TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
         TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(game);
+        MonumentsService.clearNaaluMonumentCoexistence(game);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("ASN" + player.getFaction());
         }
@@ -785,9 +786,8 @@ public final class ButtonHelperTacticalAction {
         game.setActiveSystem(pos);
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
-                if (monumentOwner.hasUnit("creuss_monument")
-                        && MonumentsService.hasMonumentOnBoard(game, monumentOwner)
-                        && ButtonHelper.doesPlayerHaveUnitHere("creuss_monument", monumentOwner, tile)) {
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
                 }
             }

@@ -238,7 +238,10 @@ public class PlayStrategyCardService {
             Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
             if (titansMechPlayer != null) {
                 boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
-                                || scModel.usesAutomationForSCID("te4construction"))
+                                || scModel.usesAutomationForSCID("te4construction")
+                                || (game.isMonumentsMode()
+                                        && (scModel.usesAutomationForSCID("monuments4construction")
+                                                || scModel.usesAutomationForSCID("monumentstf4"))))
                         && !game.isFowMode()
                         && !ButtonHelper.isLawInPlay(game, "articles_war");
                 if (shouldAddTitansMechDeployButton) {

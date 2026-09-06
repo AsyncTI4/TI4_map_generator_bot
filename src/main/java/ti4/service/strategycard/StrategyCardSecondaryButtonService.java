@@ -83,9 +83,6 @@ public class StrategyCardSecondaryButtonService {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
         buttons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
-        if (scModel.usesAutomationForSCID("monuments4construction") || scModel.usesAutomationForSCID("monumentstf4")) {
-            buttons.add(Buttons.green("construction_monument", "Place 1 Monument", UnitEmojis.Monument));
-        }
         if (game.isFacilitiesMode()) {
             buttons.add(Buttons.green("construction_facility", "Place A Facility"));
         }

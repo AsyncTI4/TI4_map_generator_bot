@@ -530,6 +530,9 @@ public class StartTurnService {
         if (MonumentsService.isMonumentReady(game, player, "l1z1x_monument")) {
             startButtons.add(MonumentsButtonHandler.getL1MonumentButton(player));
         }
+        if (!doneActionThisTurn && MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
+            startButtons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
+        }
         boolean hadAnyUnplayedSCs = false;
 
         if (doneActionThisTurn && (player.hasTech("fl") || TyrisLeaderHandler.isHeroActiveThisRound(game, player))) {

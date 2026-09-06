@@ -982,10 +982,25 @@ public final class ButtonHelperSCs {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")
                     || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("te4construction")
                     || game.getStrategyCardModelByInitiative(scNum)
-                            .get()
-                            .usesAutomationForSCID("monuments4construction")) {
+                                    .get()
+                                    .usesAutomationForSCID("monuments4construction")
+                            && game.isMonumentsMode()
+                    || game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("monumentstf4")
+                            && game.isMonumentsMode()) {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
+        }
+        if (scModel == null) {
+            scModel = game.getPlayedSCs().stream()
+                    .map(game::getStrategyCardModelByInitiative)
+                    .flatMap(java.util.Optional::stream)
+                    .filter(model -> model.usesAutomationForSCID("pok4construction")
+                            || model.usesAutomationForSCID("te4construction")
+                            || (game.isMonumentsMode()
+                                    && (model.usesAutomationForSCID("monuments4construction")
+                                            || model.usesAutomationForSCID("monumentstf4"))))
+                    .findFirst()
+                    .orElse(null);
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("construction").orElse(null);
@@ -996,7 +1011,9 @@ public final class ButtonHelperSCs {
         int scNum = scModel.getInitiative();
         boolean automationExists = scModel.usesAutomationForSCID("pok4construction")
                 || scModel.usesAutomationForSCID("te4construction")
-                || scModel.usesAutomationForSCID("monuments4construction");
+                || (game.isMonumentsMode()
+                        && (scModel.usesAutomationForSCID("monuments4construction")
+                                || scModel.usesAutomationForSCID("monumentstf4")));
         if (!used
                 && !player.getFollowedSCs().contains(scNum)
                 && automationExists
@@ -1013,7 +1030,11 @@ public final class ButtonHelperSCs {
         String unit = buttonID.replace("construction_", "");
         if ("facility".equalsIgnoreCase(unit)) {
             String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
-            if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
+            if (!player.getSCs().contains(4)
+                    && !"te4construction".equals(scModel.getBotSCAutomationID())
+                    && (!game.isMonumentsMode()
+                            || (!"monuments4construction".equals(scModel.getBotSCAutomationID())
+                                    && !"monumentstf4".equals(scModel.getBotSCAutomationID())))) {
                 message += "\n## __It will place a command token in the system as well.__ ";
             }
             List<Button> buttons = getPossibleFacilities(game, player);
@@ -1038,7 +1059,11 @@ public final class ButtonHelperSCs {
                 }
                 String message = player.getRepresentationUnfogged()
                         + ", please choose the planet you wish to put your monument on for **Construction**.";
-                if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
+                if (!player.getSCs().contains(4)
+                        && !"te4construction".equals(scModel.getBotSCAutomationID())
+                        && (!game.isMonumentsMode()
+                                || (!"monuments4construction".equals(scModel.getBotSCAutomationID())
+                                        && !"monumentstf4".equals(scModel.getBotSCAutomationID())))) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = new ArrayList<>();
@@ -1052,7 +1077,9 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
-                if ("monument".equalsIgnoreCase(unit) && player.hasUnit("purpletf_monument")) {
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && player.hasUnit("purpletf_monument")) {
                     List<Button> buttons =
                             TwilightsFallMonumentsButtonHandler.getPurpleTfMonumentPlacementButtons(game, player);
                     if (buttons.isEmpty()) {
@@ -1078,7 +1105,11 @@ public final class ButtonHelperSCs {
                 }
                 String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                         + unitKey.unitName() + " on for **Construction**.";
-                if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
+                if (!player.getSCs().contains(4)
+                        && !"te4construction".equals(scModel.getBotSCAutomationID())
+                        && (!game.isMonumentsMode()
+                                || (!"monuments4construction".equals(scModel.getBotSCAutomationID())
+                                        && !"monumentstf4".equals(scModel.getBotSCAutomationID())))) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");

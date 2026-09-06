@@ -72,6 +72,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
@@ -909,6 +910,33 @@ public class StartPhaseService {
                 String cyberMessage = player.getRepresentationUnfogged() + ", a reminder to use _Machinations_.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
+        }
+
+        if (game.isMonumentsMode()
+                && (player.hasUnit("winnu_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "winnu_monument"))
+                && !MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation()
+                            + ", you may spend resources to place trade goods on _The Imperial Vault_."
+                            + "\n-# Each 3 resources spent places 1 trade good on the monument.",
+                    List.of(
+                            Buttons.green(
+                                    player.factionButtonChecker() + "winnuMonumentSpendResources",
+                                    "Spend Resources for Imperial Vault",
+                                    UnitEmojis.Monument),
+                            Buttons.red("deleteButtons", "Decline")));
+        } else if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
+            int gainedTg = MonumentsService.getWinnuMonumentTradeGoodCount(game, player);
+            player.setTg(player.getTg() + gainedTg);
+            MonumentsService.setWinnuMonumentTradeGoodCount(game, player, 0);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " gained " + gainedTg + " trade good" + (gainedTg == 1 ? "" : "s")
+                            + " from _The Imperial Vault_."
+                            + " Their trade goods are now " + player.getTg() + ".");
         }
     }
 

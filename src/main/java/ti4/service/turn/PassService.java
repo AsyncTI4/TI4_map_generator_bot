@@ -115,9 +115,7 @@ public class PassService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        if (game.isMonumentsMode()
-                && player.hasUnit("arborec_monument")
-                && MonumentsService.hasMonumentOnBoard(game, player)) {
+        if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "arborec_monument")) {
             List<Button> buttons = MonumentsButtonHandler.getArborecMonumentPlacementButtons(game, player);
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(

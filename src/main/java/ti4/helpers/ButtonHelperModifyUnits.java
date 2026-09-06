@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -60,6 +61,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
@@ -1433,6 +1435,7 @@ public final class ButtonHelperModifyUnits {
                                 || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
                                 || TaBreakthroughHandler.canUseSafeHavensCoexistence(
                                         game, player2, unitHolder.getName())
+                                || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
                                 || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
@@ -1447,7 +1450,8 @@ public final class ButtonHelperModifyUnits {
                             || player.hasAbility("researchteam")
                             || player.hasAbility("raider_coves")
                             || player.hasUnit("tf-ambassador")
-                            || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())) {
+                            || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
+                            || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())) {
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -2051,6 +2055,9 @@ public final class ButtonHelperModifyUnits {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
                 MonumentsAgendaService.resolveCathedralOfIxthPlacement(game, player, planetName);
                 successMessage = "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
+                if (player.hasUnit("saar_monument")) {
+                    MonumentsButtonHandler.sendSaarMonumentSpaceDockButtons(game, player, event, true);
+                }
             }
         } else {
             String producedOrPlaced = "Produced";
@@ -2223,7 +2230,9 @@ public final class ButtonHelperModifyUnits {
                 }
                 if (scModel != null
                         && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
-                                || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
+                                || (game.isMonumentsMode()
+                                        && ("monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                                || "monumentstf4".equalsIgnoreCase(scModel.getBotSCAutomationID()))))
                         && game.getScPlayed().containsKey(sc)) {
                     hasConstruction = true;
                     break;
@@ -2233,7 +2242,13 @@ public final class ButtonHelperModifyUnits {
                 for (Integer sc : p2.getSCs()) {
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
-                    if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
+                    if (scModel != null
+                            && ("te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                    || (game.isMonumentsMode()
+                                            && ("monuments4construction"
+                                                            .equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                                    || "monumentstf4"
+                                                            .equalsIgnoreCase(scModel.getBotSCAutomationID()))))) {
                         hasConstruction = true;
                     }
                 }

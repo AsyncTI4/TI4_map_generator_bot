@@ -39,6 +39,7 @@ import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
+import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -541,6 +542,21 @@ public final class FoWHelper {
                     continue;
                 }
                 adjacentPositions.add(tile.getPosition());
+            }
+        }
+
+        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "saar_monument");
+            String spaceDockPosition = game.getStoredValue("saarMonumentSpaceDock_" + player.getFaction());
+            Tile spaceDockTile = game.getTileByPosition(spaceDockPosition);
+
+            if (monumentTile != null
+                    && spaceDockTile != null
+                    && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                            .contains(spaceDockTile)
+                    && (position.equals(monumentTile.getPosition()) || position.equals(spaceDockPosition))) {
+                adjacentPositions.add(
+                        position.equals(monumentTile.getPosition()) ? spaceDockPosition : monumentTile.getPosition());
             }
         }
 

@@ -614,7 +614,9 @@ public class PlayerSetupService {
             }
         }
 
-        if (game.isMonumentsMode()) {
+        if (game.isMonumentsMode()
+                && game.getStoredValue("monumentsSetupAnnouncementSent").isEmpty()) {
+            game.setStoredValue("monumentsSetupAnnouncementSent", "true");
             String helpFileName = "Monuments.txt";
             String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
             try {

@@ -4432,7 +4432,7 @@ public class ButtonHelper {
                         && player.hasUnlockedBreakthrough("xytherisbt")
                         && player.hasUpgradedUnit("pds2");
                 if (xytherisPds
-                        || "pinktf_monument".equals(unit.getId())
+                        || (game.isMonumentsMode() && "pinktf_monument".equals(unit.getId()))
                         || "fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())
                         || "mech".equalsIgnoreCase(unit.getBaseType())) {

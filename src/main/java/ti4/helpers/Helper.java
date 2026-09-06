@@ -1372,6 +1372,8 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "muaatMonument" ->
+                    msg.append("Used _Glory Furnace_ for ").append(count).append(" votes.\n");
                 case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
                 case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
                 case "absolRexControlRepresentative" ->
@@ -1817,7 +1819,7 @@ public final class Helper {
                         .append(discount)
                         .append('\n');
             }
-            int blacktfInfantry = TwilightsFallMonumentsButtonHandler.getBlacktfCapturedInfantrySpent(player);
+            int blacktfInfantry = TwilightsFallMonumentsButtonHandler.getBlacktfCapturedInfantrySpent(game, player);
             if (blacktfInfantry > 0) {
                 res += blacktfInfantry;
                 msg.append("> Spent ")
@@ -2529,7 +2531,7 @@ public final class Helper {
         }
         if (game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
-                && ButtonHelper.doesPlayerHaveUnitHere("letnev_monument", player, tile)) {
+                && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
             productionValueTotal *= 2;
         }
 
@@ -2564,7 +2566,9 @@ public final class Helper {
                     }
                 }
                 totalUnits += entry.getValue();
-                if (player.hasUnit("tf-valefarprime") && removedUnit.getUnitType() == UnitType.Mech) {
+                if (player.hasUnit("tf-valefarprime")
+                        && (removedUnit.getUnitType() == UnitType.Mech
+                                || (game.isMonumentsMode() && "pinktf_monument".equals(removedUnit.getId())))) {
                     cost -= entry.getValue();
                 }
             }

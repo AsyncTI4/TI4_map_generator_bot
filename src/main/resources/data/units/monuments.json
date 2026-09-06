@@ -608,11 +608,10 @@
         "capacityUsed": 1,
         "combatHitsOn": 4,
         "combatDieCount": 2,
-        "isGroundForce": true,
         "isStructure": true,
         "isMonument": true,
-        "notes": "Numeric values (afb, bombard, etc) are automated. It will show the text abilities on the unit card but they will not be automated.",
-        "ability": "This unit is a ground force as well as a monument. It can be transported. This unit gains the non-DEPLOY unit abilities and text abilities of your ground forces."
+        "sustainDamage": true,
+        "ability": "While this unit is on the game baord it is a mech as well as a monument. It can be transported."
     },
     {
         "id": "purpletf_monument",

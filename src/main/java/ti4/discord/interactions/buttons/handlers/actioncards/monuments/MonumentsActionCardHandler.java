@@ -77,7 +77,9 @@ public class MonumentsActionCardHandler {
                 List<Button> buttons = new ArrayList<>();
                 for (Player neighbor : player.getNeighbouringPlayers(true)) {
                     for (Tile tile : game.getTileMap().values()) {
-                        if (tile.isHomeSystem(game)) {
+                        if (tile.isHomeSystem(game)
+                                || (tile.getTileModel() != null
+                                        && tile.getTileModel().isHyperlane())) {
                             continue;
                         }
                         for (UnitHolder holder : tile.getUnitHolders().values()) {
@@ -121,6 +123,9 @@ public class MonumentsActionCardHandler {
             case "monuments_renovation" -> {
                 List<Button> buttons = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
+                    if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) {
+                        continue;
+                    }
                     for (UnitHolder holder : tile.getUnitHolders().values()) {
                         for (UnitKey key : holder.getUnitKeysForPlayer(player)) {
                             UnitModel unit = player.getUnitFromUnitKey(key);
@@ -270,6 +275,7 @@ public class MonumentsActionCardHandler {
                 || key == null
                 || unit == null
                 || tile.isHomeSystem(game)
+                || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())
                 || !player.getNeighbouringPlayers(true).contains(target)
                 || !unit.getIsStructure()
                 || holder.getUnitCountForState(key, state) < 1) {
@@ -311,6 +317,7 @@ public class MonumentsActionCardHandler {
         UnitKey key = type == null ? null : new UnitKey(type, player.getColorID());
         UnitModel oldUnit = key == null ? null : player.getUnitFromUnitKey(key);
         if (tile == null
+                || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())
                 || holder == null
                 || type == null
                 || state == null

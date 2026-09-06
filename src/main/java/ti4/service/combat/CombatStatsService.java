@@ -77,11 +77,15 @@ public class CombatStatsService {
     }
 
     private static boolean isEidolonLandwasterMech(UnitModel unitModel, Player player) {
-        return unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonlandwaster");
+        return player.ownsUnit("tf-eidolonlandwaster")
+                && (unitModel.getUnitType() == UnitType.Mech
+                        || (player.getGame().isMonumentsMode() && "pinktf_monument".equals(unitModel.getId())));
     }
 
     private static boolean isEidolonTerminusMech(UnitModel unitModel, Player player) {
-        return unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonterminus");
+        return player.ownsUnit("tf-eidolonterminus")
+                && (unitModel.getUnitType() == UnitType.Mech
+                        || (player.getGame().isMonumentsMode() && "pinktf_monument".equals(unitModel.getId())));
     }
 
     private static boolean isBaseWinnuFlagship(UnitModel unitModel) {
