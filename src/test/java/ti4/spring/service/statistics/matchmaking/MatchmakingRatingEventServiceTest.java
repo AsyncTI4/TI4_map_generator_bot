@@ -17,7 +17,7 @@ class MatchmakingRatingEventServiceTest {
     private static final int[] RANKS_P0_WINS = {1, 2, 2, 4, 5, 5};
     private static final int[] RANKS_P4_WINS = {5, 2, 2, 4, 1, 5};
     private static final long GAME_ENDED_EPOCH_MILLIS = Instant.now().toEpochMilli();
-    private static final int MANY_GAMES = 300;
+    private static final int MANY_GAMES = 1000;
     private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES = BigDecimal.valueOf(0.7);
     private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_MANY_GAMES = BigDecimal.valueOf(0.05);
 

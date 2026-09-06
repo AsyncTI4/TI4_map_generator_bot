@@ -14,9 +14,9 @@ public class MatchmakingGameInfo {
     private static final double BETA = INITIAL_MEAN / 6.0;
     // Default is .1. However, our draw probability is truly .5, due to treating 7-9 points as equal.
     private static final double DRAW_PROBABILITY = 0.5;
-    // Default divides by 100. However, we divide by 25 to increase the number of points players
+    // Default divides by 100. However, we divide by 50 to increase the number of points players
     // lose and gain each game.
-    private static final double ASSUMED_SKILL_DRIFT_BETWEEN_GAMES = INITIAL_STANDARD_DEVIATION / 25.0;
+    private static final double ASSUMED_SKILL_DRIFT_BETWEEN_GAMES = INITIAL_STANDARD_DEVIATION / 50.0;
 
     public static GameInfo create() {
         return new GameInfo(
