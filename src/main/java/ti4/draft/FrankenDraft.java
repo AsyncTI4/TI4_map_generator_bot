@@ -208,7 +208,7 @@ public class FrankenDraft extends BagDraft {
         var units = UnitDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.UNIT, units);
 
-        var kings = MahactKingDraftItem.buildAllDraftableItems();
+        var kings = MahactKingDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.MAHACTKING, kings);
 
         var positions = SpeakerOrderDraftItem.buildAllDraftableItems(game);

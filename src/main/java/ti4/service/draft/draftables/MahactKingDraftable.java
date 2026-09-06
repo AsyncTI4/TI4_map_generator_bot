@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MahactKingDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
@@ -32,8 +33,21 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
     public static final DraftableType TYPE = DraftableType.of("King");
 
+    private static String switchFactionSet(String faction) {
+        return faction.contains("tf") ? faction.replace("tf", "tknova") : faction.replace("tknova", "tf");
+    }
+
     public void initialize(
             int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
+        initialize(numFactions, sources, presetFactions, bannedFactions, "");
+    }
+
+    public void initialize(
+            int numFactions,
+            List<ComponentSource> sources,
+            List<String> presetFactions,
+            List<String> bannedFactions,
+            String tkNovaSetupOption) {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
@@ -49,10 +63,17 @@ public class MahactKingDraftable extends SinglePickDraftable {
         int i = 0;
         List<String> output = new ArrayList<>();
         while (output.size() < numFactions) {
-            if (i >= randomOrder.size()) break;
+            if (i >= randomOrder.size()) {
+                break;
+            }
             String f = randomOrder.get(i);
             i++;
-            if (output.contains(f)) continue;
+            if (output.contains(f)) {
+                continue;
+            }
+            if ("onePerColor".equals(tkNovaSetupOption) && output.contains(switchFactionSet(f))) {
+                continue;
+            }
             output.add(f);
         }
 
@@ -281,13 +302,24 @@ public class MahactKingDraftable extends SinglePickDraftable {
         if (!game.isTwilightsFallMode()) {
             game.setupTwilightsFallMode(event);
         }
-
+        List<ComponentSource> sources;
+        String tkNovaSetupOption = "";
+        if (game.isTkNovaCup()) {
+            tkNovaSetupOption = game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option");
+            sources = switch (tkNovaSetupOption) {
+                case "onePerColor" -> List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
+                case "onlyNova" -> List.of(ComponentSource.tk_nova_cup);
+                default -> List.of(ComponentSource.twilights_fall);
+            };
+        } else {
+            sources = List.of(ComponentSource.twilights_fall);
+        }
         initialize(
                 kingSettings.getNumFactions().getVal(),
-                // TODO: TK_NOVA_CUP: allow nova cup kings in setup
-                List.of(ComponentSource.twilights_fall),
+                sources,
                 kingSettings.getPriFactions().getKeys().stream().toList(),
-                kingSettings.getBanFactions().getKeys().stream().toList());
+                kingSettings.getBanFactions().getKeys().stream().toList(),
+                tkNovaSetupOption);
 
         return null;
     }

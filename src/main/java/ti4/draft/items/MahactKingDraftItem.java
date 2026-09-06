@@ -6,6 +6,7 @@ import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -134,11 +135,36 @@ public class MahactKingDraftItem extends DraftItem {
         return allItems;
     }
 
+    public static List<DraftItem> buildAllDraftableItems(Game game) {
+        List<DraftItem> allItems = buildAllItems(game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MAHACTKING);
+        return allItems;
+    }
+
     public static List<DraftItem> buildAllItems() {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : Mapper.getFactions().values()) {
-            // TODO: TK_NOVA_CUP: allow nova cup kings in draft
             if (faction.getSource() == ComponentSource.twilights_fall) {
+                allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
+            }
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        List<ComponentSource> sources;
+        if (game.isTkNovaCup()) {
+            sources = switch (game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option")) {
+                case "onePerColor" -> List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
+                case "onlyNova" -> List.of(ComponentSource.tk_nova_cup);
+                default -> List.of(ComponentSource.twilights_fall);
+            };
+        } else {
+            sources = List.of(ComponentSource.twilights_fall);
+        }
+        for (FactionModel faction : Mapper.getFactions().values()) {
+            if (sources.contains(faction.getSource())) {
                 allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
             }
         }
