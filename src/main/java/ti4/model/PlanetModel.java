@@ -146,6 +146,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    private String getImageAltText() {
+        return Optional.ofNullable(name).orElse(id);
+    }
+
     public String getNameRepresentation() {
         return getEmoji() + " _" + name + "_ " + getPlanetTypeEmoji();
     }
@@ -193,7 +197,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (includeAliases) sb.append("\nAliases: ").append(aliases);
         eb.setFooter(sb.toString());
 
-        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
+        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL(), getImageAltText());
 
         return eb.build();
     }
@@ -212,7 +216,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (legendaryNotes != null) {
             eb.setDescription(legendaryAbilityText + "\n-# [" + legendaryNotes + "]");
         }
-        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
+        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL(), getImageAltText());
         return eb.build();
     }
 
