@@ -318,5 +318,45 @@
             "tk-heartofdominion"
         ],
         "source": "twilights_fall"
+    },
+    {
+        "alias": "tk_nova_genome",
+        "name": "TK Nova Genomes (Agents)",
+        "type": "OTHER",
+        "description": "All Genomes in a Twilight Kart (Nova Cup) game",
+        "cardIDs": [
+            "tknovaactionagent",
+            "titansagent",
+            "tknovaaristocraticagent",
+            "crimsonagent",
+            "tknovabrutalagent",
+            "saaragent",
+            "yssarilagent",
+            "empyreanagent",
+            "ralnelagent",
+            "naazagent",
+            "tknovadeploymentagent",
+            "xxchaagent",
+            "winnuagent",
+            "ghostagent",
+            "experimentalagent",
+            "tknovahumanagent",
+            "hyperagent",
+            "tknovainvestmentagent",
+            "naaluagent-te",
+            "tknovamirroragent",
+            "muaatagent",
+            "arborecagent",
+            "tknovaravenousagent",
+            "tknovarecursiveagent",
+            "researchagent",
+            "tknovascornfulagent",
+            "hacanagent",
+            "tknovaswarmagent",
+            "tknovasplittingagent",
+            "nomadagentthundarian",
+            "tknovavaliantagent"
+        ],
+        "source": "tk_nova_cup"
     }
 ]
