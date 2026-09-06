@@ -135,7 +135,9 @@ public class TEOptionService {
                         game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
                 getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
                 getSingleTfHomebrewInfo(
-                        game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars));
+                        game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars),
+                getSingleTfHomebrewInfo(
+                        game.isMonumentsMode(), Constants.MONUMENTS_MODE, "Monuments+", SourceEmojis.Monuments));
     }
 
     @ButtonHandler(TOGGLE_TF_HOMEBREW_PREFIX)
