@@ -1,6 +1,7 @@
 package ti4.spring.service.statistics.matchmaking;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ti4.spring.service.statistics.matchmaking.TrueSkillMatchmakingRatingService.RECENT_GAMES_WINDOW;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -13,23 +14,27 @@ import org.junit.jupiter.api.Test;
 class MatchmakingRatingEventServiceTest {
 
     private static final int GAMES_TO_QUALIFY = 3;
-    private static final int[] RANKS = {1, 2, 2, 4, 5, 5};
+    private static final int[] RANKS_P0_WINS = {1, 2, 2, 4, 5, 5};
+    private static final int[] RANKS_P4_WINS = {5, 2, 2, 4, 1, 5};
     private static final long GAME_ENDED_EPOCH_MILLIS = Instant.now().toEpochMilli();
+    private static final int MANY_GAMES = 1000;
+    private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES = BigDecimal.valueOf(0.7);
+    private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_MANY_GAMES = BigDecimal.valueOf(0.05);
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
-        List<MatchmakingRating> sortedRatings = sortedByRating(
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false));
-        List<MatchmakingRating> sortedRatings2 = sortedByRating(
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false));
+        List<MatchmakingRating> sortedRatings = sortedByRating(TrueSkillMatchmakingRatingService.calculateRatings(
+                buildRankedGames(GAMES_TO_QUALIFY, RANKS_P0_WINS), false));
+        List<MatchmakingRating> sortedRatings2 = sortedByRating(TrueSkillMatchmakingRatingService.calculateRatings(
+                buildRankedGames(GAMES_TO_QUALIFY, RANKS_P0_WINS), false));
 
         assertThat(sortedRatings).isEqualTo(sortedRatings2);
     }
 
     @Test
     void generatesSensibleRatings() {
-        List<MatchmakingRating> ratings =
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false);
+        List<MatchmakingRating> ratings = TrueSkillMatchmakingRatingService.calculateRatings(
+                buildRankedGames(GAMES_TO_QUALIFY, RANKS_P0_WINS), false);
 
         List<MatchmakingRating> sortedRatings = sortedByRating(ratings);
 
@@ -40,33 +45,79 @@ class MatchmakingRatingEventServiceTest {
         assertThat(winnerRating).isGreaterThan(rank2Rating);
 
         BigDecimal otherRank2Rating = sortedRatings.get(2).rating();
-        assertThat(otherRank2Rating.subtract(rank2Rating).abs()).isLessThan(BigDecimal.valueOf(0.02));
+        assertThat(otherRank2Rating.subtract(rank2Rating).abs())
+                .isLessThan(TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES);
 
         BigDecimal rank3Rating = sortedRatings.get(3).rating();
         assertThat(rank3Rating).isLessThan(rank2Rating);
     }
 
     @Test
+    void identicallyRankedPlayersConvergeAsTheyPlayMoreGames() {
+        BigDecimal gapAtQualifyingGames = tiedPlayerRatingGap(GAMES_TO_QUALIFY);
+        BigDecimal gapAtManyGames = tiedPlayerRatingGap(MANY_GAMES);
+
+        assertThat(gapAtQualifyingGames).isLessThan(TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES);
+        assertThat(gapAtManyGames).isLessThan(gapAtQualifyingGames);
+        assertThat(gapAtManyGames).isLessThan(TIED_PLAYER_RATING_TOLERANCE_AT_MANY_GAMES);
+    }
+
+    private static BigDecimal tiedPlayerRatingGap(int gameCount) {
+        List<MatchmakingRating> sortedRatings = sortedByRating(
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(gameCount, RANKS_P0_WINS), false));
+        return sortedRatings
+                .get(1)
+                .rating()
+                .subtract(sortedRatings.get(2).rating())
+                .abs();
+    }
+
+    @Test
     void excludesPlayersWithFewerThanThreeCompletedGames() {
         // Two games each means every player has only two completed games, below the three-game minimum.
-        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(2, RANKS), false))
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(2, RANKS_P0_WINS), false))
                 .isEmpty();
-        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(3, RANKS), false))
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(3, RANKS_P0_WINS), false))
                 .hasSize(6);
     }
 
     @Test
     void conservativeRatingsUseConservativeTrueSkillValue() {
-        List<MatchmakingRating> meanRatings =
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false);
-        List<MatchmakingRating> conservativeRatings =
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), true);
+        List<MatchmakingRating> meanRatings = TrueSkillMatchmakingRatingService.calculateRatings(
+                buildRankedGames(GAMES_TO_QUALIFY, RANKS_P0_WINS), false);
+        List<MatchmakingRating> conservativeRatings = TrueSkillMatchmakingRatingService.calculateRatings(
+                buildRankedGames(GAMES_TO_QUALIFY, RANKS_P0_WINS), true);
 
         MatchmakingRating meanWinnerRating = findRatingForUser(meanRatings, "p0");
         MatchmakingRating conservativeWinnerRating = findRatingForUser(conservativeRatings, "p0");
 
         assertThat(conservativeWinnerRating.rating()).isLessThan(meanWinnerRating.rating());
         assertThat(conservativeWinnerRating.calibrationPercent()).isEqualTo(meanWinnerRating.calibrationPercent());
+    }
+
+    @Test
+    void reportsNoRecentTrendUntilTheWindowIsFull() {
+        int gamesOneShortOfAFullWindow = RECENT_GAMES_WINDOW;
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(
+                        buildRankedGames(gamesOneShortOfAFullWindow, RANKS_P0_WINS), true))
+                .allSatisfy(rating -> assertThat(rating.recentRatingDelta()).isNull());
+
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(
+                        buildRankedGames(RECENT_GAMES_WINDOW + 1, RANKS_P0_WINS), true))
+                .allSatisfy(rating -> assertThat(rating.recentRatingDelta()).isNotNull());
+    }
+
+    @Test
+    void recentTrendFollowsTheDirectionOfRecentResults() {
+        List<MatchmakingGame> games = new ArrayList<>(buildRankedGames(30, RANKS_P0_WINS));
+        for (int i = 0; i < RECENT_GAMES_WINDOW; i++) {
+            games.add(buildMatchmakingGame("late" + i, RANKS_P4_WINS));
+        }
+
+        List<MatchmakingRating> ratings = TrueSkillMatchmakingRatingService.calculateRatings(games, true);
+
+        assertThat(findRatingForUser(ratings, "p4").recentRatingDelta()).isPositive();
+        assertThat(findRatingForUser(ratings, "p0").recentRatingDelta()).isNegative();
     }
 
     private static List<MatchmakingRating> sortedByRating(List<MatchmakingRating> ratings) {
