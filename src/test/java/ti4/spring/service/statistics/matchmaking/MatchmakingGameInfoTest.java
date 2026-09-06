@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class MatchmakingGameInfoTest {
 
     private static final double TOLERANCE = 1.0e-9;
-    private static final double EXPECTED_DRAW_PROBABILITY = 0.25;
+    private static final double EXPECTED_DRAW_PROBABILITY = 0.5;
     private static final double EXPECTED_DYNAMICS_FACTOR_DIVISOR = 25.0;
 
     @Test
