@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -48,6 +49,8 @@ import ti4.service.unit.RemoveUnitService;
 @UtilityClass
 public class TeHelperActionCards {
 
+    public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
+
     public static void nop() {}
 
     public static boolean resolveTeActionCard(ActionCardModel card, Player player, String introMsg) {
@@ -60,7 +63,12 @@ public class TeHelperActionCards {
                 buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
-            case "crisis", "extremeduress" -> nop(); // preset
+            case "crisis" -> nop(); // preset
+            case "extremeduress" -> {
+                if (!isAutoResolvingExtremeDuress(player.getGame())) {
+                    buttons.add(Buttons.green(ffcc + "extremeDuressStart", resolve));
+                }
+            }
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
             case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
@@ -111,6 +119,74 @@ public class TeHelperActionCards {
         String message = "Choose the player who you are trying to have an exchange with.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("extremeDuressStart")
+    private static void extremeDuressStart(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (!p2.hasUnplayedSCs()) {
+                continue;
+            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "extremeDuressTarget_" + p2.getColor(), "gray", p2));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", no other player has a readied strategy card, so there is no legal target for _Extreme Duress_ right now.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the player who will experience _Extreme Duress_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("extremeDuressTarget_")
+    private static void extremeDuressTarget(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String color = buttonID.split("_")[1];
+        Player target = game.getPlayerFromColorOrFaction(color);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find that player. Please resolve _Extreme Duress_ manually.");
+            return;
+        }
+        game.removeStoredValue("ExtremeDuress");
+        sendExtremeDuressResolutionButtons(target, player);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " played _Extreme Duress_ on " + target.getRepresentationNoPing() + ".");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void autoResolveExtremeDuress(
+            GenericInteractionCreateEvent event, Game game, Player target, Player duressPlayer) {
+        game.setStoredValue(EXTREME_DURESS_AUTO_RESOLVING, "true");
+        try {
+            ActionCardHelper.playAC(event, game, duressPlayer, "extremeduress", game.getMainGameChannel());
+        } finally {
+            game.removeStoredValue(EXTREME_DURESS_AUTO_RESOLVING);
+        }
+        sendExtremeDuressResolutionButtons(target, duressPlayer);
+    }
+
+    private static boolean isAutoResolvingExtremeDuress(Game game) {
+        return !game.getStoredValue(EXTREME_DURESS_AUTO_RESOLVING).isEmpty();
+    }
+
+    public static void sendExtremeDuressResolutionButtons(Player target, Player duressPlayer) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(
+                target.factionButtonChecker() + "concedeToED_" + duressPlayer.getFaction(),
+                "Lose Action Cards, Give Trade Goods, And Show Secrets"));
+        buttons.add(Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(), target.getRepresentation() + ", please resolve _Extreme Duress_.", buttons);
     }
 
     @ButtonHandler("concedeToED")
@@ -250,37 +326,17 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
-        // Bentor coexistence grants, Xin/Deepwrought), all under the identical prefix
-        // "<factionButtonChecker>exchangeProgramPart3", so a page-nav press cannot say which one built it.
-        // Three of the five narrow their list to non-home planets and two don't; resolution below never
-        // re-checks that either way, so it is disclosure-only. Rebuilding with the narrower spec is the safe
-        // default - the two unfiltered builders would only under-offer on a page 2 they are, in practice,
-        // very unlikely to ever reach.
-        var coexistSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
-                .where(p -> !p.isHomePlanet(game));
-        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, coexistSpec)) return;
 
         String planet = buttonID.split("_")[1];
-        // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
-        // Bentor coexistence grants, Xin/Deepwrought), and an off-map planet used to reach AddUnitService as
-        // a null tile. isHomePlanet mirrors coexistSpec's own where() above - that spec is only used for
-        // pagination, so a Blind Target press never passed through it and has to be re-checked here too.
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        if (game.getTileFromPlanet(planet) == null || unitHolder == null || unitHolder.isHomePlanet(game)) {
-            PlanetTargetService.fizzle(event, player);
-            return;
-        }
-        // Coexisting means sharing a planet with somebody. Every non-fog builder above already filters on
-        // that, so this changes nothing there; in fog it is hidden state, so it cannot narrow the candidate
-        // list and has to be checked here instead - otherwise a blind guess could plant an infantry on an
-        // empty planet and simply take it.
         boolean somebodyToCoexistWith = game.getRealPlayers().stream()
-                .anyMatch(other -> other != player
-                        && other.getColor() != null
-                        && unitHolder.getUnitCount(UnitType.Infantry, other.getColor()) > 0);
+                .anyMatch(other ->
+                        other != player && other.getColor() != null && unitHolder.getUnitCount(other.getColorID()) > 0);
         if (!somebodyToCoexistWith) {
-            PlanetTargetService.fizzle(event, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", there are no other players with units on that planet, so you cannot coexist there.");
             return;
         }
         game.setStoredValue("coexistFlag", "yes");

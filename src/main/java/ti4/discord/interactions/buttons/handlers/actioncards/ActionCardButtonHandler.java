@@ -53,6 +53,14 @@ class ActionCardButtonHandler {
                 target = p2.getRepresentationUnfogged();
             }
         }
+
+        if (player.equals(targetPlayer)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", you cannot cancel your own action card _" + acName + "_.");
+            return;
+        }
+
         String message = game.getPing() + ", the action card _" + acName + "_ played by " + target
                 + " has been canceled by " + player.getRepresentationUnfogged() + " with ";
         GameMessageManager.remove(game.getName(), event.getMessageId());

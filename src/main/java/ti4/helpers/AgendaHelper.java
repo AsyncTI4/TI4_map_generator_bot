@@ -33,13 +33,13 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -60,6 +60,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -74,6 +75,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -214,13 +216,11 @@ public final class AgendaHelper {
                 && !buttonID.contains("predictive")
                 && !buttonID.contains("everything")) {
             PlanetExhaust.doAction(player, planetName, game, false);
-            TaLeadersHandler.clearLenPredeclareForPlanet(game, player, planetName);
         }
         if (buttonID.contains("everything")) {
             for (String planet : player.getPlanets()) {
                 player.exhaustPlanet(planet);
             }
-            TaLeadersHandler.clearAllLenPredeclaresForPlayer(game, player);
         }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (!buttonID.contains("argent")
@@ -1245,6 +1245,22 @@ public final class AgendaHelper {
                 CryypterHelper.handleWinningRiders(game, winner);
             }
         }
+        for (Player player : game.getRealPlayers()) {
+            boolean predictedWinner = Arrays.stream(game.getCurrentAgendaVotes()
+                            .getOrDefault(winner, "")
+                            .split(";"))
+                    .anyMatch(vote -> {
+                        int separator = vote.indexOf('_');
+                        if (separator < 1 || NumberUtils.isDigits(vote.substring(separator + 1))) {
+                            return false;
+                        }
+                        return player == game.getPlayerFromColorOrFaction(vote.substring(0, separator));
+                    });
+            if (getWinningVoters(winner, game).contains(player) || predictedWinner) {
+                MonumentsButtonHandler.offerJolNarMonumentInfantry(game, player);
+                MonumentsButtonHandler.offerQanojShieldArray(game, player);
+            }
+        }
         return winningRs;
     }
 
@@ -1629,6 +1645,9 @@ public final class AgendaHelper {
         if (!thing.contains("hacan") && !thing.contains("kyro") && !thing.contains("allPlanets")) {
             if (!finalRes) {
                 player.addSpentThing(thing);
+                if (thing.startsWith("planet_")) {
+                    MonumentsButtonHandler.offerGloryFurnace(game, player, thing.substring("planet_".length()));
+                }
             }
             if (thing.contains("planet_") && !prevoting) {
                 String planet = thing.replace("planet_", "");
@@ -1686,6 +1705,7 @@ public final class AgendaHelper {
                     if (getSpecificPlanetsVoteWorth(player, game, planet) > 0) {
                         if (!finalRes) {
                             player.addSpentThing("planet_" + planet);
+                            MonumentsButtonHandler.offerGloryFurnace(game, player, planet);
                         }
                         if (!prevoting) {
                             player.exhaustPlanet(planet);
@@ -1714,6 +1734,29 @@ public final class AgendaHelper {
             }
         }
         if (!finalRes) {
+            if (!prevoting
+                    && game.isMonumentsMode()
+                    && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
+                    && player.getSpentThingsThisWindow().stream()
+                            .noneMatch(spent -> spent.startsWith("letnevMonument_"))) {
+                Tile tile = MonumentsService.getMonumentTile(game, player, "letnev_monument");
+                Planet monumentPlanet = tile == null
+                        ? null
+                        : tile.getPlanetUnitHolders().stream()
+                                .filter(planet ->
+                                        planet.getUnitCount(Units.getUnitKey(UnitType.Monument, player.getColor())) > 0)
+                                .findFirst()
+                                .orElse(null);
+                if (monumentPlanet != null
+                        && player.getSpentThingsThisWindow().contains("planet_" + monumentPlanet.getName())
+                        && (thing.equals("planet_" + monumentPlanet.getName()) || thing.contains("allPlanets"))) {
+                    int extraVotes = tile.getSpaceUnitHolder()
+                            .countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip);
+                    if (extraVotes > 0) {
+                        player.addSpentThing("letnevMonument_" + extraVotes);
+                    }
+                }
+            }
             String editedMessage = Helper.buildSpentThingsMessageForVoting(player, game, false);
             editedMessage = AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n\n" + editedMessage;
             event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1766,7 +1809,6 @@ public final class AgendaHelper {
                 voteAmount++;
             }
         }
-        voteAmount += TaLeadersHandler.getLenPredeclaredVoteBonus(game, player, planet);
         return voteAmount;
     }
 
@@ -1791,8 +1833,7 @@ public final class AgendaHelper {
             if (voteAmount != 0) {
                 Button button = Buttons.gray(
                         "exhaustForVotes_planet_" + planet,
-                        planetNameProper + " (" + voteAmount + ")"
-                                + TaLeadersHandler.getLenVoteLabelSuffix(game, player, planet),
+                        planetNameProper + " (" + voteAmount + ")",
                         PlanetEmojis.getPlanetEmoji(planet));
                 planetButtons.add(button);
             }

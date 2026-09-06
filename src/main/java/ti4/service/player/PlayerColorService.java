@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 import ti4.helpers.ColorChangeHelper;
@@ -25,11 +26,11 @@ public class PlayerColorService {
         String color = getUsersPreferredColor(player, unusedColors);
         if (color != null) return color;
 
-        List<String> usedHues = GameColorsService.getUsedHues(player.getGame());
-        color = getFactionsPreferredColor(faction, unusedColors, usedHues);
+        Set<String> usedCategories = GameColorsService.getUsedColorCategories(player.getGame());
+        color = getFactionsPreferredColor(faction, unusedColors, usedCategories);
         if (color != null) return color;
 
-        return getPreferredColor(unusedColors, usedHues);
+        return getPreferredColor(unusedColors, usedCategories);
     }
 
     private static String getUsersPreferredColor(Player player, Collection<ColorModel> unusedColors) {
@@ -41,22 +42,22 @@ public class PlayerColorService {
     }
 
     private static String getFactionsPreferredColor(
-            String faction, Collection<ColorModel> unusedColors, Collection<String> usedHues) {
+            String faction, Collection<ColorModel> unusedColors, Collection<String> usedCategories) {
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) return null;
         List<String> preferredColors = new ArrayList<>(factionModel.getPreferredColours());
         Collections.shuffle(preferredColors);
         return preferredColors.stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
-                .filter(color -> !usedHues.contains(Mapper.getColor(color).getHue()))
+                .filter(color -> !overlapsUsedCategories(Mapper.getColor(color), usedCategories))
                 .findFirst()
                 .map(Mapper::getColorName)
                 .orElse(null);
     }
 
-    private static String getPreferredColor(Collection<ColorModel> unusedColors, Collection<String> usedHues) {
+    private static String getPreferredColor(Collection<ColorModel> unusedColors, Collection<String> usedCategories) {
         return unusedColors.stream()
-                .filter(c -> !usedHues.contains(c.getHue()))
+                .filter(c -> !overlapsUsedCategories(c, usedCategories))
                 .findFirst()
                 .map(ColorModel::getName)
                 .map(Mapper::getColorName)
@@ -65,6 +66,10 @@ public class PlayerColorService {
                         .map(ColorModel::getName)
                         .map(Mapper::getColorName)
                         .orElse(null));
+    }
+
+    private static boolean overlapsUsedCategories(ColorModel color, Collection<String> usedCategories) {
+        return color.getColorCategories().stream().anyMatch(usedCategories::contains);
     }
 
     private static boolean canUseColor(Player player, String color) {

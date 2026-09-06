@@ -20,6 +20,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
@@ -54,6 +55,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -402,6 +404,15 @@ public final class ButtonHelperAgents {
                 return;
             }
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
+        } else if ("monument".equalsIgnoreCase(thing)) {
+            if (!MonumentsService.readyMonument(game, player, detail)) {
+                return;
+            }
+            UnitModel monument = Mapper.getUnit(detail);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready "
+                            + (monument == null ? detail : monument.getName() + " Monument") + ".");
         } else {
             if ("planet".equalsIgnoreCase(thing)) {
                 player.removeExhaustedAbility(detail);
@@ -1603,6 +1614,14 @@ public final class ButtonHelperAgents {
                 return;
             }
             VeylorLeadersHandler.startVeylorAgent(game, target);
+        }
+        if ("taagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Ta Agent target.");
+                return;
+            }
+            TaLeadersHandler.resolveTaAgentTarget(game, target);
         }
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {

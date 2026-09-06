@@ -50,7 +50,7 @@ public class SendPromissoryService {
             if (alias.endsWith("sftt")
                     && sender.getPromissoryNotesInPlayArea().contains(receiver.getColor() + "_sftt")) {
                 MessageHelper.sendMessageToChannel(
-                        sender.getCardsInfoThread(),
+                        sender.getCorrectChannel(),
                         sender.getRepresentation()
                                 + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                 return false;

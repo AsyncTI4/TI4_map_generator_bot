@@ -218,12 +218,49 @@ public class MatchmakingRatingEventService {
                             stringBuilder.append(" We cannot show your rating until it reaches high confidence.");
                         }
                     }
+                    if (showRating) {
+                        appendAverageOpponentRating(
+                                stringBuilder, ratingLabel, playerRating.userId(), games, playerRatings, averageRating);
+                    }
                 });
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(),
                 "Player Matchmaking Ratings",
                 stringBuilder.toString());
+    }
+
+    private static void appendAverageOpponentRating(
+            StringBuilder stringBuilder,
+            String ratingLabel,
+            String userId,
+            List<MatchmakingGame> games,
+            List<MatchmakingRating> playerRatings,
+            BigDecimal defaultRating) {
+        Map<String, BigDecimal> ratingByUserId =
+                playerRatings.stream().collect(Collectors.toMap(MatchmakingRating::userId, MatchmakingRating::rating));
+
+        BigDecimal opponentRatingSum = BigDecimal.ZERO;
+        int opponentCount = 0;
+        int gameCount = 0;
+        for (MatchmakingGame game : games) {
+            if (game.players().stream().noneMatch(player -> player.userId().equals(userId))) continue;
+
+            gameCount++;
+            for (MatchmakingPlayer opponent : game.players()) {
+                if (opponent.userId().equals(userId)) continue;
+                opponentRatingSum =
+                        opponentRatingSum.add(ratingByUserId.getOrDefault(opponent.userId(), defaultRating));
+                opponentCount++;
+            }
+        }
+        if (opponentCount == 0) return;
+
+        BigDecimal averageOpponentRating =
+                opponentRatingSum.divide(BigDecimal.valueOf(opponentCount), MathContext.DECIMAL64);
+        stringBuilder.append(String.format(
+                "\nThe average %s of your opponents across your %d games is `%d`.",
+                ratingLabel.toLowerCase(), gameCount, toDisplayRating(averageOpponentRating)));
     }
 
     private static Map<Long, Long> bucketPlayersByBracket(List<MatchmakingRating> playerRatings) {

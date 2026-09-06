@@ -42,7 +42,11 @@ public final class ExploreHelper {
             } else {
                 message += unitList + " on " + planetName;
             }
+            if (message.length() > 100) {
+                message = " a lot on " + planetName;
+            }
         }
+
         return message;
     }
 }

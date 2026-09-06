@@ -1,0 +1,32 @@
+[
+    {
+        "alias": "festival",
+        "name": "Festival",
+        "automationID": "monuments_festival",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Ready a non-home planet that contains 1 of your structures. If that planet contains your monument, place 4 infantry or 1 mech on it.",
+        "flavorText": "\"Party time, your excellency.\"",
+        "source": "monuments"
+    },
+    {
+        "alias": "rebelbombing",
+        "name": "Rebel Bombing",
+        "automationID": "monuments_rebel_bombing",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 2 trade goods to destroy 1 of your neighbor's structures in a non-home system.",
+        "flavorText": "The bombs were placed with care.",
+        "source": "monuments"
+    },
+    {
+        "alias": "renovation",
+        "name": "Renovation",
+        "automationID": "monuments_renovation",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Replace 1 of your structures with 1 structure from your reinforcements.",
+        "flavorText": "\"Necessity demands that this shell be repurposed for a greater good.\"",
+        "source": "monuments"
+    }
+]

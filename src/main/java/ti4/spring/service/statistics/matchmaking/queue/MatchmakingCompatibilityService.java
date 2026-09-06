@@ -9,7 +9,8 @@ import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 @UtilityClass
 class MatchmakingCompatibilityService {
 
-    private static final long ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT = 12;
+    private static final long ACTIVE_HOUR_DATA_REQUIREMENT = 13;
+    private static final long ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT = 11;
 
     private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 3;
     private static final double SKILL_DIFFERENCE_WIDENING_PER_WINDOW = 1;
@@ -18,7 +19,13 @@ class MatchmakingCompatibilityService {
     private static final int HOURS_TO_AVOID_FLOATERS_WARRIORS = 8;
 
     static boolean hasEnoughActiveHourDataToMatch(PlayerMatchmakingData data) {
-        return data.activeHours().size() >= ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT;
+        return data.activeHours().size() >= ACTIVE_HOUR_DATA_REQUIREMENT;
+    }
+
+    static boolean shareEnoughActiveHours(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        long sharedHours =
+                a.activeHours().stream().filter(b.activeHours()::contains).count();
+        return sharedHours >= ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT;
     }
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
@@ -29,11 +36,10 @@ class MatchmakingCompatibilityService {
         List<String> aRestrictions = a.restrictions();
         List<String> bRestrictions = b.restrictions();
 
-        if (MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
-                || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions)) {
-            long sharedHours =
-                    a.activeHours().stream().filter(b.activeHours()::contains).count();
-            if (sharedHours < ACTIVE_HOUR_SHARED_HOUR_REQUIREMENT) return true;
+        if ((MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
+                        || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions))
+                && !shareEnoughActiveHours(a, b)) {
+            return true;
         }
 
         // TIGL parties only match other TIGL parties.

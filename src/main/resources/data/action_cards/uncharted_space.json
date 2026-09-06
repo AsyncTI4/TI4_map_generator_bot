@@ -300,7 +300,7 @@
         "name": "Forbidden Knowledge",
         "phase": "Any",
         "window": "When you research a technology:",
-        "text": "You may ignore 1 of that technologys prerequisites. If that technology is not a unit upgrade technology, you may ignore 2 of that technology's prerequisites.",
+        "text": "You may ignore 1 of that technology's prerequisites. If that technology is not a unit upgrade technology, you may ignore 2 of that technology's prerequisites.",
         "flavorText": "The Zealots knew many secrets long forgotten.",
         "source": "ds",
         "actualSource": "uncharted_space"

@@ -10,12 +10,10 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.transaction.SendDebtService;
-import ti4.service.turn.EndTurnService;
 
 @UtilityClass
 public class NetrunnersAbilitiesHandler {
@@ -23,8 +21,7 @@ public class NetrunnersAbilitiesHandler {
     public static final String PROXY_NETWORK_ABILITY = "proxy_network";
     public static final String CONTROL_TOKEN_POOL = "hackerman";
     private static final String SHARED_NETWORK_ACCESS = "bepnnetrunners";
-    private static final String PROXY_TECH = "netrunnersProxyTech";
-    private static final String REVERSE_ENGINEERING_USED = "netrunnersReverseEngineeringUsed";
+    public static final String PROXY_TECH = "netrunnersProxyTech";
 
     public static void offerNeuralInstruments(Game game, Player techGainer) {
         if (game == null || techGainer == null) return;
@@ -37,23 +34,6 @@ public class NetrunnersAbilitiesHandler {
         }
         for (Player netrunner : netrunners) {
             if (netrunner.getDebtTokenCount(techGainer.getColor(), CONTROL_TOKEN_POOL) > 0) continue;
-            if (netrunner.hasUnlockedBreakthrough("netrunnersbt")
-                    && !techGainer.getBreakthroughIDs().isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        netrunner.getCorrectChannel(),
-                        netrunner.getRepresentationUnfogged() + ", you may use **Data Breach** instead of placing "
-                                + techGainer.getRepresentation(false, true) + "'s token.",
-                        List.of(
-                                Buttons.gray(
-                                        netrunner.factionButtonChecker() + "netrunnersDataBreachMove_"
-                                                + techGainer.getFaction(),
-                                        "Use Data Breach"),
-                                Buttons.red(
-                                        netrunner.factionButtonChecker() + "netrunnersDataBreachDecline_"
-                                                + techGainer.getFaction(),
-                                        "Decline")));
-                continue;
-            }
             SendDebtService.sendDebt(techGainer, netrunner, 1, CONTROL_TOKEN_POOL);
             MessageHelper.sendMessageToChannel(
                     netrunner.getCorrectChannel(),
@@ -80,84 +60,6 @@ public class NetrunnersAbilitiesHandler {
                             + opponent.getRepresentation() + " treats " + technologies
                             + " as having no ability text for this combat.\n-# This effect is player-enforced.");
         }
-    }
-
-    @ButtonHandler("netrunnersDataBreachMove_")
-    public static void moveDataBreachToken(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        if (game == null || netrunner == null) return;
-        String payload = buttonID.replace("netrunnersDataBreachMove_", "");
-        String[] parts = payload.split("_", 2);
-        Player target = game.getPlayerFromColorOrFaction(parts[0]);
-        if (target == null
-                || !netrunner.hasUnlockedBreakthrough("netrunnersbt")
-                || !netrunner.hasAbility(NEURAL_INSTRUMENTS_ABILITY)) return;
-        if (target.getBreakthroughIDs().isEmpty()) {
-            SendDebtService.sendDebt(target, netrunner, 1, CONTROL_TOKEN_POOL);
-            ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    netrunner.getRepresentationNoPing() + " placed 1 of "
-                            + target.getRepresentation(false, true)
-                            + "'s command tokens on their faction sheet via **Neural Instruments**.");
-            return;
-        }
-
-        String message =
-                netrunner.getRepresentationUnfogged() + ", choose the breakthrough for your **Data Breach** token.";
-        String buttonPrefix =
-                netrunner.factionButtonChecker() + "netrunnersDataBreachMove_" + target.getFaction() + "_";
-        List<Button> buttons = target.getBreakthroughIDs().stream()
-                .filter(bt -> Mapper.getBreakthrough(bt) != null)
-                .map(Mapper::getBreakthrough)
-                .map(breakthrough -> Buttons.green(
-                        buttonPrefix + breakthrough.getAlias(),
-                        NetrunnersBreakthroughHandler.getDataBreachBreakthroughLabel(breakthrough)))
-                .toList();
-        if (buttons.isEmpty()) {
-            SendDebtService.sendDebt(target, netrunner, 1, CONTROL_TOKEN_POOL);
-            ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    netrunner.getRepresentationNoPing() + " placed 1 of "
-                            + target.getRepresentation(false, true)
-                            + "'s command tokens on their faction sheet via **Neural Instruments**.");
-            return;
-        }
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) return;
-        if (parts.length == 1) {
-            ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
-            return;
-        }
-        String breakthroughId = parts[1];
-        if (!target.hasBreakthrough(breakthroughId) || Mapper.getBreakthrough(breakthroughId) == null) return;
-        game.setStoredValue(
-                "netrunnersDataBreach" + netrunner.getFaction(), target.getFaction() + "~" + breakthroughId);
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                netrunner.getRepresentation() + " moved their **Data Breach** token onto "
-                        + Mapper.getBreakthrough(breakthroughId).getNameRepresentation() + ".");
-    }
-
-    @ButtonHandler("netrunnersDataBreachDecline_")
-    public static void declineDataBreachToken(
-            Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        if (game == null || netrunner == null) return;
-        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("netrunnersDataBreachDecline_", ""));
-        if (target == null
-                || !netrunner.hasAbility(NEURAL_INSTRUMENTS_ABILITY)
-                || netrunner.getDebtTokenCount(target.getColor(), CONTROL_TOKEN_POOL) > 0) {
-            return;
-        }
-        SendDebtService.sendDebt(target, netrunner, 1, CONTROL_TOKEN_POOL);
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                netrunner.getRepresentationNoPing() + " placed 1 of " + target.getRepresentation(false, true)
-                        + "'s command tokens on their faction sheet via **Neural Instruments**.");
     }
 
     public static Button getProxyNetworkButton(Game game, Player netrunner) {
@@ -251,38 +153,6 @@ public class NetrunnersAbilitiesHandler {
                         + " via **Proxy Network** until the end of their turn.");
     }
 
-    public static boolean offerReverseEngineering(Game game, Player player) {
-        if (game == null || player == null) {
-            return false;
-        }
-        String techId = game.getStoredValue(PROXY_TECH + player.getFaction());
-        if (!player.hasAbility("reverse_engineering")
-                || techId.isEmpty()
-                || !player.hasTech(techId)
-                || player.getStrategicCC() < 1
-                || Integer.toString(game.getRound())
-                        .equals(game.getStoredValue(REVERSE_ENGINEERING_USED + player.getFaction()))) return false;
-        var tech = Mapper.getTech(techId);
-        if (tech == null) return false;
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", you may spend 1 strategy token to permanently gain "
-                        + tech.getNameRepresentation() + " with **Reverse Engineering**.",
-                List.of(
-                        Buttons.green(
-                                player.factionButtonChecker() + "netrunnersReverseEngineeringGain",
-                                "Use Reverse Engineering",
-                                FactionEmojis.netrunners),
-                        Buttons.red(player.factionButtonChecker() + "netrunnersReverseEngineeringDecline", "Decline")));
-        return true;
-    }
-
-    public static void clearReverseEngineering(Game game, Player player) {
-        if (game != null && player != null) {
-            game.removeStoredValue(REVERSE_ENGINEERING_USED + player.getFaction());
-        }
-    }
-
     public static void clearProxyNetwork(Game game, Player player) {
         if (game == null || player == null) {
             return;
@@ -292,37 +162,6 @@ public class NetrunnersAbilitiesHandler {
             player.removeTech(techId);
             game.removeStoredValue(PROXY_TECH + player.getFaction());
         }
-    }
-
-    @ButtonHandler("netrunnersReverseEngineeringGain")
-    public static void resolveReverseEngineering(Game game, Player player, ButtonInteractionEvent event) {
-        if (game == null || player == null) {
-            return;
-        }
-        String techId = game.getStoredValue(PROXY_TECH + player.getFaction());
-        if (!player.hasAbility("reverse_engineering")
-                || techId.isEmpty()
-                || !player.hasTech(techId)
-                || player.getStrategicCC() < 1) return;
-        player.setStrategicCC(player.getStrategicCC() - 1);
-        game.setStoredValue(REVERSE_ENGINEERING_USED + player.getFaction(), Integer.toString(game.getRound()));
-        game.removeStoredValue(PROXY_TECH + player.getFaction());
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + " spent 1 strategy token and permanently gained "
-                        + Mapper.getTech(techId).getNameRepresentation() + " with **Reverse Engineering**.");
-        EndTurnService.endTurnAndUpdateMap(event, game, player);
-    }
-
-    @ButtonHandler("netrunnersReverseEngineeringDecline")
-    public static void declineReverseEngineering(Game game, Player player, ButtonInteractionEvent event) {
-        if (game == null || player == null || !player.hasAbility("reverse_engineering")) {
-            return;
-        }
-        game.setStoredValue(REVERSE_ENGINEERING_USED + player.getFaction(), Integer.toString(game.getRound()));
-        ButtonHelper.deleteMessage(event);
-        EndTurnService.endTurnAndUpdateMap(event, game, player);
     }
 
     private static void offerSharedNetworkAccess(Game game, Player netrunner, String techId) {

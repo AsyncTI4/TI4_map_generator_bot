@@ -50,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
@@ -98,6 +99,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -1460,6 +1462,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (ButtonHelper.isLawInPlay(game, "absol_equality")) {
             bonus = 3 - getCommoditiesBase();
+        }
+        if (MonumentsAgendaService.hasMinisterOfCultureBonus(game, this)) {
+            bonus += 2;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
@@ -2839,6 +2844,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (getPlanets().contains(planet) && !getExhaustedPlanets().contains(planet)) {
             getExhaustedPlanets().add(planet);
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
+            TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null

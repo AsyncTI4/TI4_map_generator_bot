@@ -20,6 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.draft.FrankenButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
@@ -293,14 +294,16 @@ public final class ButtonHelperTwilightsFall {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
         AddFrontierTokensService.addFrontierTokens(null, game);
-        if (game.getTileByPosition("tl") == null) {
-            game.setTile(new Tile("82a", "tl"));
-        } else {
-            if (game.getTileByPosition("tr") == null) {
-                game.setTile(new Tile("82a", "tr"));
+        if (game.getTile("82a") == null) {
+            if (game.getTileByPosition("tl") == null) {
+                game.setTile(new Tile("82a", "tl"));
             } else {
-                if (game.getTileByPosition("bl") == null) {
-                    game.setTile(new Tile("82a", "bl"));
+                if (game.getTileByPosition("tr") == null) {
+                    game.setTile(new Tile("82a", "tr"));
+                } else {
+                    if (game.getTileByPosition("bl") == null) {
+                        game.setTile(new Tile("82a", "bl"));
+                    }
                 }
             }
         }
@@ -892,6 +895,7 @@ public final class ButtonHelperTwilightsFall {
                                 player.getRepresentation() + " has spliced in the _"
                                         + Mapper.getTech(cardID).getName() + "_ ability.",
                                 Mapper.getTech(cardID).getRepresentationEmbed());
+                        TwilightsFallMonumentsButtonHandler.offerYellowTfMonumentCommandToken(game, player);
                     }
                     if ("genome".equalsIgnoreCase(type)) {
                         if (Mapper.getLeader(cardID) == null) {
@@ -905,6 +909,7 @@ public final class ButtonHelperTwilightsFall {
                                 player.getRepresentation() + " has spliced in the "
                                         + Mapper.getLeader(cardID).getTFNameIfAble() + ".",
                                 Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
+                        TwilightsFallMonumentsButtonHandler.offerYellowTfMonumentCommandToken(game, player);
                     }
                     if ("units".equalsIgnoreCase(type)) {
                         if (Mapper.getUnit(cardID) == null) {
@@ -956,9 +961,11 @@ public final class ButtonHelperTwilightsFall {
                                 player.getRepresentation() + " has spliced in the "
                                         + Mapper.getUnit(cardID).getName() + " unit upgrade.",
                                 Mapper.getUnit(cardID).getRepresentationEmbed());
+                        TwilightsFallMonumentsButtonHandler.offerYellowTfMonumentCommandToken(game, player);
                     }
                 } else {
                     VeiledHeartService.doAction(VeiledHeartService.VeiledCardAction.SPLICE, player, cardID);
+                    TwilightsFallMonumentsButtonHandler.offerYellowTfMonumentCommandToken(game, player);
                 }
                 if (!buttonID.contains("spoof_")) {
                     triggerYellowUnits(game, player);

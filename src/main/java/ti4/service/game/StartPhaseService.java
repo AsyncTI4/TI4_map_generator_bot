@@ -72,6 +72,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
@@ -296,7 +297,11 @@ public class StartPhaseService {
                 VeiledHeartService.checkForAssigningTelepathic(game, p2);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
+        // In FoW, this may be triggered from the GM room (the `/fow setup` wizard's Start Game button) -
+        // route to the public game channel there instead of leaking into the GM's own channel. Non-fog
+        // callers all already fire from the main channel, so event.getMessageChannel() stays unchanged.
+        MessageHelper.sendMessageToChannel(
+                game.isFowMode() ? game.getMainGameChannel() : event.getMessageChannel(), "Started Round " + round);
         for (Player player : game.getRealPlayers()) {
             if (!player.hasAbility("allure_of_darkness")) {
                 continue;
@@ -549,7 +554,8 @@ public class StartPhaseService {
                     "Exhausted all cultural planets of those who voted \"Against\" on _Representative Government_.");
         }
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
+            // See the "Started Round" send above - same GM-room leak, same fix.
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player firstSCPicker;
         if (!game.hasAnyPriorityTrackMode()) {
@@ -905,6 +911,33 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
         }
+
+        if (game.isMonumentsMode()
+                && (player.hasUnit("winnu_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "winnu_monument"))
+                && !MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation()
+                            + ", you may spend resources to place trade goods on _The Imperial Vault_."
+                            + "\n-# Each 3 resources spent places 1 trade good on the monument.",
+                    List.of(
+                            Buttons.green(
+                                    player.factionButtonChecker() + "winnuMonumentSpendResources",
+                                    "Spend Resources for Imperial Vault",
+                                    UnitEmojis.Monument),
+                            Buttons.red("deleteButtons", "Decline")));
+        } else if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
+            int gainedTg = MonumentsService.getWinnuMonumentTradeGoodCount(game, player);
+            player.setTg(player.getTg() + gainedTg);
+            MonumentsService.setWinnuMonumentTradeGoodCount(game, player, 0);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " gained " + gainedTg + " trade good" + (gainedTg == 1 ? "" : "s")
+                            + " from _The Imperial Vault_."
+                            + " Their trade goods are now " + player.getTg() + ".");
+        }
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
@@ -1187,6 +1220,19 @@ public class StartPhaseService {
                     "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
                             + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
             game.setStoredValue("postedSurvey", "yes");
+        }
+
+        if (game.getRound() == 1
+                && !game.isFowMode()
+                && game.getStoredValue("offeredOverrulePurge").isEmpty()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("purgeOverrule", "Purge Overrule"));
+            buttons.add(Buttons.gray("deleteButtons", "Keep Overrule"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getTableTalkChannel(),
+                    "If the table agrees, you can use this button to purge _Overrule_.",
+                    buttons);
+            game.setStoredValue("offeredOverrulePurge", "yes");
         }
     }
 

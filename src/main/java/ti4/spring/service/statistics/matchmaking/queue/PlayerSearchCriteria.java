@@ -9,4 +9,9 @@ public record PlayerSearchCriteria(
         List<String> paces,
         List<String> restrictions,
         boolean tigl,
-        List<String> tiglRanks) {}
+        List<String> tiglRanks) {
+
+    public int maxPlayerCount() {
+        return playerCounts.stream().mapToInt(Integer::parseInt).max().orElse(0);
+    }
+}

@@ -63,6 +63,7 @@ class PlanetTargetLeakGuardTest {
             "SettlementsAcd2ButtonHandler.java#voter", // settlements
             // Whole-map loops (game.getPlanets()); these leak map inventory rather than ownership, and both
             // now take the PlanetTargetService path in fog.
+            "TaLeadersHandler.java#target",
             "VyserixLeaderHandler.java#game", // vyserix hero attachment
             "ButtonHelperAbilities.java#game", // ancient empire tomb tokens
             // Consensual / already-visible flows, audited as benign.

@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -65,6 +66,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.MapGenerator.HorizontalAlign;
@@ -90,6 +92,8 @@ import ti4.service.VeiledHeartService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
+import ti4.service.game.NekroMonumentService;
 import ti4.service.user.AFKService;
 import ti4.website.model.WebsiteOverlay;
 
@@ -392,11 +396,13 @@ public class PlayerAreaGenerator {
 
         // Row 2
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
+        xDeltaBottom = monument(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = techGenSynthesis(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = speakerToken(player, xDeltaBottom, yPlayAreaSecondRow);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
         xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = winnuMonumentTradeGoods(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = galvanizeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = theodisiTokenSupplies(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -704,14 +710,24 @@ public class PlayerAreaGenerator {
     }
 
     private int valefarZTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (!player.hasReadyBreakthrough("nekrobt")) {
+        if (!player.hasReadyBreakthrough("nekrobt") && (!game.isMonumentsMode() || !player.hasUnit("nekro_monument"))) {
             return xDeltaFromRightSide;
         }
         String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
         BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-        int tokensUsed = Math.min(
-                7, Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size());
-        int tokenCount = game.getRealPlayers().size() - 1 - tokensUsed;
+        int tokensUsed = (int) Math.min(
+                7,
+                Arrays.stream(game.getStoredValue("valefarZ").split("\\|"))
+                                .filter(faction -> !faction.isEmpty())
+                                .count()
+                        + Arrays.stream(game.getStoredValue("nekroMonumentAssimilatorZ")
+                                        .split("\\|"))
+                                .filter(faction -> !faction.isEmpty())
+                                .count());
+        int maxTokens = game.isMonumentsMode() && player.hasUnit("nekro_monument")
+                ? 7
+                : game.getRealPlayers().size() - 1;
+        int tokenCount = Math.max(0, maxTokens - tokensUsed);
         List<Point> points = new ArrayList<>();
         IntStream.range(0, tokenCount).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
 
@@ -856,13 +872,24 @@ public class PlayerAreaGenerator {
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.getDishonorCounter() < 1
-                && player.getHonorCounter() < 1
-                && player.getPathTokenCounter() < 1
-                && player.getSteelbalanceCounter() < 1
-                && player.getStarbalanceCounter() < 1
-                && !game.isVeiledHeartMode()) {
+        boolean hasAuraVault = game.isMonumentsMode() && player.hasUnit("yellowtf_monument");
+        boolean hasHonorOrPathTokens = player.getDishonorCounter() > 0
+                || player.getHonorCounter() > 0
+                || player.getPathTokenCounter() > 0
+                || player.getSteelbalanceCounter() > 0
+                || player.getStarbalanceCounter() > 0
+                || game.isVeiledHeartMode();
+        if (!hasHonorOrPathTokens && !hasAuraVault) {
             return xDeltaFromRightSide;
+        }
+        if (!hasHonorOrPathTokens) {
+            DrawingUtil.superDrawStringCenteredDefault(
+                    graphics,
+                    "Aura Tokens: "
+                            + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
+                    mapWidth - xDeltaFromRightSide - 300,
+                    yDelta + 50);
+            return xDeltaFromRightSide + 200;
         }
         if (game.isVeiledHeartMode()) {
             DrawingUtil.superDrawStringCenteredDefault(
@@ -905,7 +932,29 @@ public class PlayerAreaGenerator {
                         yDelta + 100);
             }
         }
+        if (hasAuraVault) {
+            DrawingUtil.superDrawStringCenteredDefault(
+                    graphics,
+                    "Aura Tokens: "
+                            + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
+                    mapWidth - xDeltaFromRightSide - 300,
+                    yDelta + 150);
+        }
         return xDeltaFromRightSide + 200;
+    }
+
+    private int winnuMonumentTradeGoods(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (!game.isMonumentsMode()
+                || (!player.hasUnit("winnu_monument")
+                        && !MonumentsService.isMonumentOnBoard(game, player, "winnu_monument"))) {
+            return xDeltaFromRightSide;
+        }
+        DrawingUtil.superDrawStringCenteredDefault(
+                graphics,
+                "Vault Trade Goods: " + MonumentsService.getWinnuMonumentTradeGoodCount(game, player),
+                mapWidth - xDeltaFromRightSide - 300,
+                yDelta + 125);
+        return xDeltaFromRightSide + 300;
     }
 
     private int creussWormholeTokens(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
@@ -1788,7 +1837,7 @@ public class PlayerAreaGenerator {
 
             if (reinforcementsPosition != null) {
                 int unitCap = player.getUnitCap(unitID);
-                if (unitCap == 0) {
+                if (unitCap == 0 && !"fs".equals(unitID)) {
                     unitCap = reinforcementsPosition.getPositionCount(unitID);
                 }
 
@@ -1897,6 +1946,30 @@ public class PlayerAreaGenerator {
             }
         }
         return xDeltaFromRightSide + 450;
+    }
+
+    private int monument(Player player, int xDeltaFromRightSide, int y) {
+        UnitModel monument = player.getUnitByBaseType("monument");
+        if (!game.isMonumentsMode() || monument == null) {
+            return xDeltaFromRightSide;
+        }
+
+        int x = mapWidth - 120 - xDeltaFromRightSide;
+        boolean onBoard = MonumentsService.hasMonumentOnBoard(game, player);
+        String monumentFile = "outline_monument.png";
+        if (!onBoard) {
+            UnitKey monumentKey = Units.getUnitKey(monument.getUnitType(), player.getColor());
+            monumentFile = monumentKey.getFileName();
+        }
+        BufferedImage image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", monumentFile));
+        if (image == null) {
+            image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", "black_monument.png"));
+        }
+        graphics.drawImage(image, x + 20, y + 40, null);
+        if (NekroMonumentService.hasAssimilatorOnMonument(game, player)) {
+            drawFactionIconImageBorder(graphics, "nekro", x + 52, y + 78, 36, 36);
+        }
+        return xDeltaFromRightSide + 120;
     }
 
     private static void fillUnits(

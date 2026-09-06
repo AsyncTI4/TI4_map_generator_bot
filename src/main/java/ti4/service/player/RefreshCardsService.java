@@ -9,6 +9,7 @@ import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass
@@ -31,6 +32,7 @@ public class RefreshCardsService {
             player.clearExhaustedPlanets(true);
             player.clearExhaustedRelics();
             player.clearExhaustedAbilities();
+            MonumentsService.readyMonuments(game, player);
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()) {

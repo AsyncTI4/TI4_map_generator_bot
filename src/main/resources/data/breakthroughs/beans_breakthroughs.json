@@ -49,14 +49,14 @@
     },
     {
         "alias": "tabt",
-        "name": "Adaptive Economy",
-        "shortName": "Adaptive\nEconomy",
+        "name": "Safe Havens",
+        "shortName": "Safe\nHavens",
         "faction": "ta",
         "synergy": [
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At the end of your turn, you may exhaust this card or spend 1 token from your strategy pool to remove 1 design from a non-home planet and attach it to a different non-home planet in an adjacent system that does not have a design attached to it. Then, place 2 infantry from your reinforcements on that planet and ready it.",
+        "text": "Once per action, when you exhaust a planet that has an attachment, you may place 1 infantry from your reinforcements on that planet. During invasion on a planet you control, if that planet has an attachment, you may force your ground forces into coexistence on that planet.",
         "source": "beans"
     },
     {
@@ -65,7 +65,7 @@
         "shortName": "Data\nBreach",
         "faction": "netrunners",
         "synergy": ["NONE"],
-        "text": "When you unlock this breakthrough, place one of your control tokens on another player's breakthrough. Your breakthrough has synergy in the colors on the breakthrough your control token is on. When you would place another player's control token on your faction sheet using your Neural Instruments ability, you may instead move your control token onto that player's breakthrough.",
+        "text": "When you unlock this breakthrough, place one of your control tokens on another player's breakthrough. Your breakthrough has synergy in the colors on the breakthrough your control token is on. At the end of your turn you may exhaust this card and spend a token from your strategy pool to gain the technology affected by your Proxy Network ability.",
         "source": "beans"
     },
     {

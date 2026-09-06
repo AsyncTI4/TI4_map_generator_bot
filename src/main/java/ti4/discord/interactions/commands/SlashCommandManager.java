@@ -32,6 +32,7 @@ import ti4.discord.interactions.commands.lazax.LazaxCommand;
 import ti4.discord.interactions.commands.leaders.LeaderCommand;
 import ti4.discord.interactions.commands.map.MapCommand;
 import ti4.discord.interactions.commands.milty.MiltyCommand;
+import ti4.discord.interactions.commands.monuments.MonumentsCommand;
 import ti4.discord.interactions.commands.omega_phase.OmegaPhaseCommand;
 import ti4.discord.interactions.commands.planet.PlanetCommand;
 import ti4.discord.interactions.commands.player.PlayerCommand;
@@ -125,6 +126,7 @@ public class SlashCommandManager {
                     new FOWCommand(),
                     new InstallationCommand(),
                     new MiltyCommand(),
+                    new MonumentsCommand(),
                     new FrankenCommand(),
                     new FrankenDrazCommand(),
                     new CaptureCommand(),

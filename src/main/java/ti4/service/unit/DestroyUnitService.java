@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -48,6 +49,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -180,6 +182,7 @@ public class DestroyUnitService {
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
+        TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
@@ -198,6 +201,24 @@ public class DestroyUnitService {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
+        if (game.isMonumentsMode()
+                && unit.unitKey().unitType() == UnitType.Monument
+                && game.getActiveSystem() != null) {
+            for (Player secretHolder : game.getRealPlayers()) {
+                if (secretHolder == player || !secretHolder.getSecretsUnscored().containsKey("tam")) {
+                    continue;
+                }
+                Button scoreButton = Buttons.green(
+                        secretHolder.factionButtonChecker() + "scoreToppleAMonument",
+                        "Score Topple a Monument",
+                        CardEmojis.SecretObjective);
+                MessageHelper.sendMessageToChannelWithButton(
+                        secretHolder.getCardsInfoThread(),
+                        secretHolder.getRepresentation() + ", a monument was destroyed during a tactical action. "
+                                + "If you destroyed another player's monument, you can score _Topple a Monument_.",
+                        scoreButton);
+            }
+        }
         if (player != null && player.hasAbility("fragmentation")) {
             CrystellumAbilityHandler.resolveFragmentation(event, game, player, unit);
         }
@@ -296,6 +317,19 @@ public class DestroyUnitService {
             case Warsun -> {
                 if (player != null && player.hasUnit("xan_flagship")) {
                     XanUnitHandler.offerFlagshipReplace(event, game, player);
+                }
+                if (player != null && game.isMuaatManiaMode()) {
+                    String msg = player.getRepresentation()
+                            + " it appears you have been defeated. Instruct your killer (if any) to use the attached buttons to buyout any of your planets that they want (and claim the boon) before pressing the button to finish your elimination";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("claimMMBoon", "Claim Boon"));
+                    for (String planet : player.getPlanets()) {
+                        buttons.add(Buttons.blue(
+                                "buyoutPlanet_" + planet + "_" + player.getFaction(),
+                                "Buy " + Helper.getPlanetRepresentation(planet, game)));
+                    }
+                    buttons.add(Buttons.red("finishMMElimination_" + player.getFaction(), "Finish Elimination"));
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }
             }
             case Flagship -> {

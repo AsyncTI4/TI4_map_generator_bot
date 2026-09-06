@@ -293,6 +293,7 @@ public class PlayerTechService {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "betaqr" -> TaFactionTechHandler.resolveQuantumRestructuring(event, game, player);
             case "thobliviong" -> {
                 OblivionTechHandler.offerACPlayFromDiscardButtons(event, player, game);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -389,6 +390,9 @@ public class PlayerTechService {
                     String msg = ident + " removed command token from " + tileRep + ".";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
+                }
+                if (game.isTwilightDS()) {
+                    player.exhaustTech("tf-dskortg");
                 }
             }
             case "td", "absol_td" -> // Transit Diodes
@@ -668,9 +672,6 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(), "Please choose a planet to explore.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
-            }
-            case "betaqr" -> { // Quantum Restructuring
-                TaFactionTechHandler.resolveQuantumRestructuring(event, game, player);
             }
             case "betaro" -> { // Resource Optimization
                 TaFactionTechHandler.resolveResOp(event, game, player);

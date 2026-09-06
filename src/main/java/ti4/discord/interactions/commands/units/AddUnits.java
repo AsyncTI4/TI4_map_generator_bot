@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
@@ -102,7 +103,9 @@ public class AddUnits extends GameStateCommand {
                         buttons);
             }
         }
-        if (!coexist) StartCombatService.combatCheck(game, event, tile);
+        if (!coexist || TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)) {
+            StartCombatService.combatCheck(game, event, tile);
+        }
         handleSlingRelayOption(event);
         UnitCommandHelper.handleCcUseOption(event, tile, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);

@@ -1,0 +1,12 @@
+{
+    "id": "ef11",
+    "name": "Fracture Void",
+    "aliases": [
+        "ef11"
+    ],
+    "imagePath": "ef11.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "expanded_fracture"
+}

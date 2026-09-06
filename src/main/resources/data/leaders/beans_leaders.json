@@ -142,8 +142,8 @@
     "type": "agent",
     "name": "Len",
     "title": "Appraiser",
-    "abilityWindow": "When a player would exhaust a planet to cast votes during the agenda phase:",
-    "abilityText": "You may exhaust this card to double that planet's influence value.",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Exhaust this card and choose a player. That player may select a planet they control and reveal the top card from a matching exploration deck. If it is an attachment, attach it to that planet. Otherwise, discard it and gain 2 trade goods.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -155,7 +155,7 @@
     "title": "Grand Architect",
     "abilityWindow": "When you explore a planet:",
     "abilityText": "Gain 1 commodity. If the explored planet has an attachment, you may convert that commodity to a trade good.",
-    "unlockCondition": "Control 4 planets with designs.",
+    "unlockCondition": "Control 4 planets that have an attachment.",
     "source": "beans"
   },
   {

@@ -10,6 +10,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -212,6 +213,7 @@ class CombatButtonHandler {
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_afb", "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "afb", h);
         String msg2 = "You may automatically assign " + h + " ANTI-FIGHTER BARRAGE hit" + (h == 1 ? "" : "s") + ".";
         event.getMessage()
                 .editMessage(msg2)
@@ -233,6 +235,7 @@ class CombatButtonHandler {
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "pds", h);
         String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
                 + (h == 1 ? "the hit" : "hits") + ". "
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, h, event, true, true);
@@ -262,6 +265,8 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                buttons, game, player, tile, "ground", h);
         String msg2 = player.getRepresentation() + " you may autoassign " + StringHelper.pluralize(h, "hit") + ".";
         event.getMessage()
                 .editMessage(msg2)
@@ -289,6 +294,7 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_spacecombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "space", h);
         String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
                 + (h == 1 ? "the hit" : "hits") + ". "
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, h, event, true);

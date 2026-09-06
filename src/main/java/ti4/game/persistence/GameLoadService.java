@@ -628,12 +628,14 @@ class GameLoadService {
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(parseBooleanOrDefault(info, false));
                 case Constants.COSMIC_CONVERGENCE_MODE ->
                     game.setCosmicConvergenceMode(parseBooleanOrDefault(info, false));
+                case Constants.MUAAT_MANIA_MODE -> game.setMuaatManiaMode(parseBooleanOrDefault(info, false));
                 case Constants.NO_FRACTURE -> game.setNoFractureMode(parseBooleanOrDefault(info, false));
                 case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(parseBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->
                     game.setCosmicPhenomenaeMode(parseBooleanOrDefault(info, false));
                 case Constants.MONUMENTS_TO_THE_AGES_MODE ->
                     game.setMonumentToTheAgesMode(parseBooleanOrDefault(info, false));
+                case Constants.MONUMENTS_MODE -> game.setMonumentsMode(parseBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(parseBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(parseBooleanOrDefault(info, false));

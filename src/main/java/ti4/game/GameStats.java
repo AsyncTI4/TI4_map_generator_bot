@@ -83,7 +83,79 @@ public class GameStats {
         return new OverruleTargetMigration(strategyCardChoices, changed);
     }
 
-    private static String getTrackedPlayerId(Player player) {
+    /**
+     * Indices of cancels that never happened, newest first so callers can remove them safely.
+     *
+     * <p>Between 2026-05-21 and 2026-07-19 the Sabotage button recorded its cancel before checking
+     * whether the presser held a Sabotage at all, so a stray press wrote a cancel out of thin air.
+     * Where that cancel named a card whose only play was already canceled, {@link
+     * #migrateTargetsToCanceledFlags()} had nothing left to mark and stood in a player-less
+     * placeholder - inserted at the index of the Sabotage that caused it, so the two sit adjacent
+     * and come out together.
+     *
+     * <p>Overrule placeholders are left alone whatever they look like. Legacy recorded no play for
+     * that card, so a placeholder is the only trace of a real play, and a game can hold more than
+     * one - which is indistinguishable from a stray press once the plays are all that is left.
+     *
+     * @deprecated one-off cleanup. Remove once it has run against all games.
+     */
+    @Deprecated
+    public List<Integer> findFabricatedCancels() {
+        List<Integer> indices = new ArrayList<>();
+        for (int i = actionCardPlays.size() - 1; i >= 0; i--) {
+            if (!isFabricatedCancel(i)) {
+                continue;
+            }
+            int pairedSabotage = i + 1;
+            if (pairedSabotage < actionCardPlays.size()
+                    && SABOTAGE.equals(actionCardPlays.get(pairedSabotage).getActionCard())
+                    // A player-less "Sabotage" here is a placeholder of its own, not the cause.
+                    && actionCardPlays.get(pairedSabotage).getPlayerId() != null) {
+                indices.add(pairedSabotage);
+            }
+            indices.add(i);
+        }
+        return indices;
+    }
+
+    private boolean isFabricatedCancel(int index) {
+        ActionCardPlay play = actionCardPlays.get(index);
+        if (play.getPlayerId() != null || !play.isCanceled()) {
+            return false;
+        }
+        // Legacy code recorded no play for Overrule, so a player-less cancel of it is the only trace
+        // a real play left behind. A second one in the same game can be genuine too - the deck's one
+        // copy is reshuffled and replayed in roughly a seventh of games - and nothing in the record
+        // separates that from a stray press, so no Overrule placeholder is ever removed.
+        if (OVERRULE.equals(play.getActionCard())) {
+            return false;
+        }
+
+        for (int i = 0; i < index; i++) {
+            ActionCardPlay earlier = actionCardPlays.get(i);
+            // A play still standing is one this cancel could have belonged to, so it is not ours to
+            // judge - the migration would have marked it rather than standing in a placeholder.
+            if (play.getActionCard().equals(earlier.getActionCard()) && !earlier.isCanceled()) {
+                return false;
+            }
+        }
+        // Every other card's play was recorded as it happened, so a placeholder means there was no
+        // play left to cancel when the button was pressed.
+        return true;
+    }
+
+    /**
+     * @deprecated one-off cleanup. Remove along with {@link #findFabricatedCancels()}.
+     */
+    @Deprecated
+    public int removeFabricatedCancels() {
+        List<Integer> indices = findFabricatedCancels();
+        // Descending, so each removal leaves the indices still to be removed where they were.
+        indices.forEach(index -> actionCardPlays.remove((int) index));
+        return indices.size();
+    }
+
+    public static String getTrackedPlayerId(Player player) {
         if (player == null) {
             return null;
         }

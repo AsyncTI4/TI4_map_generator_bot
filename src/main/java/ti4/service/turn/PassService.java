@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -19,6 +20,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.message.MessageHelper;
+import ti4.service.game.MonumentsService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -111,6 +113,18 @@ public class PassService {
                         + " since you have _Applied Biothermics_, you gained 1 commodity for each passed player"
                         + " (commodities went from " + oldComm + " -> " + player.getCommodities() + ").";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+        }
+        if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "arborec_monument")) {
+            List<Button> buttons = MonumentsButtonHandler.getArborecMonumentPlacementButtons(game, player);
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", choose a non-Mecatol planet in or adjacent to your Monument's system "
+                                + "to place 1 infantry with **Flaah Orbitals**. If it contains another player's units, "
+                                + "the infantry will enter coexistence.",
+                        buttons);
             }
         }
 

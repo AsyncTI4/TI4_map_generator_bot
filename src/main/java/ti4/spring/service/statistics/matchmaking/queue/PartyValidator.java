@@ -16,6 +16,19 @@ import ti4.spring.service.statistics.UserGameInfoService;
 @UtilityClass
 public class PartyValidator {
 
+    public static List<String> getValidPaces(List<String> userIds) {
+        UserGameInfoService userGameInfoService = UserGameInfoService.get();
+        List<String> paces = new ArrayList<>(MatchmakingOptions.PACE_RESTRICTION_OPTIONS);
+        for (String userId : userIds.stream().distinct().toList()) {
+            MatchmakingOptions.PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT.forEach((pace, days) -> {
+                if (!userGameInfoService.hasCompletedGameInDays(userId, days)) {
+                    paces.remove(pace);
+                }
+            });
+        }
+        return paces;
+    }
+
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
 
@@ -26,7 +39,7 @@ public class PartyValidator {
             if (!everyMemberCanUseRestriction(restriction, members, dataById)) {
                 continue;
             }
-            if (members.size() >= 2 && !groupInternallyCompatible(members, dataById)) {
+            if (members.size() >= 2 && !everyMemberPairSatisfiesRestriction(restriction, members, dataById)) {
                 continue;
             }
             available.add(restriction);
@@ -44,11 +57,14 @@ public class PartyValidator {
                 .allMatch(MatchmakingCompatibilityService::hasEnoughActiveHourDataToMatch);
     }
 
-    private static boolean groupInternallyCompatible(
-            List<String> members, Map<String, PlayerMatchmakingData> dataById) {
+    private static boolean everyMemberPairSatisfiesRestriction(
+            String restriction, List<String> members, Map<String, PlayerMatchmakingData> dataById) {
+        if (!MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+            return true;
+        }
         for (int i = 0; i < members.size(); i++) {
             for (int j = i + 1; j < members.size(); j++) {
-                if (MatchmakingCompatibilityService.areIncompatible(
+                if (!MatchmakingCompatibilityService.shareEnoughActiveHours(
                         dataById.get(members.get(i)), dataById.get(members.get(j)))) {
                     return false;
                 }

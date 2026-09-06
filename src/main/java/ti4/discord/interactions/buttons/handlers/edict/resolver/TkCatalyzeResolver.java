@@ -49,6 +49,8 @@ public class TkCatalyzeResolver implements EdictResolver {
             Tile styx = game.getTileFromPlanet("styx");
             if (styx != null) {
                 // Destroy Styx
+                String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
+                        + "! Styx has been wiped.";
                 DestroyUnitService.destroyAllUnitsInSystem(event, styx, game, false);
                 AddUnitService.addUnits(event, styx, game, game.getNeutralColor(), "2 dn, 1 dd, 3 inf s");
             } else if (FractureService.canFractureEnterPlay(game)) {

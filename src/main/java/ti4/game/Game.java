@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
@@ -108,6 +109,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.databind.JsonNode;
@@ -318,11 +320,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         publicObjectives1 = Mapper.getShuffledDeck("public_stage_1_objectives_pok");
         publicObjectives2 = Mapper.getShuffledDeck("public_stage_2_objectives_pok");
         setSecretObjectives(Mapper.getShuffledDeck("secret_objectives_pok"));
-        setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
+        setActionCards(Mapper.getShuffledDeck("action_cards_te"));
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
         explore = Mapper.getShuffledDeck("explores_pok");
         setRelics(Mapper.getShuffledDeck("relics_pok_te"));
         setStrategyCardSet("te");
+        setThundersEdge(true);
 
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora
@@ -671,7 +674,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // Set other normal decks
         validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
         validateAndSetRelicDeck(Mapper.getDeck(relicDeck));
-        setStrategyCardSet(stratCards);
+        setStrategyCardSet(isMonumentsMode() ? "monuments_tf" : stratCards);
         validateAndSetActionCardDeck(event, Mapper.getDeck(acDeck));
         setTechnologyDeckID(techDeck);
 
@@ -761,6 +764,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         if (player.getAllianceMembers().isEmpty()) {
+            return true;
+        }
+
+        Game game = player.getGame();
+        if (game.getRealPlayers().size() == 1
+                && player.isRealPlayer()
+                && game.getRealAndEliminatedPlayers().size() > 1) {
             return true;
         }
 
@@ -959,9 +969,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Conventions of War Abandoned", isConventionsOfWarAbandonedMode());
         gameModes.put("Rapid Mobilization", isRapidMobilizationMode());
         gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
+        gameModes.put(SourceEmojis.Monuments + "Monuments+", isMonumentsMode());
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Cosmic Convergence", isCosmicConvergenceMode());
+        gameModes.put("Muaat Mania", isMuaatManiaMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
@@ -1462,6 +1474,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         PonthousPromissoryHandler.clearThunderbirdPrototype(this);
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
+        TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(this);
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
@@ -1995,7 +2008,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean removeCustomPO(String id) {
-        if (!id.isEmpty()) {
+        if (!id.isEmpty() && customPublicVP.containsKey(id)) {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
             customPublicVP.remove(id);
@@ -3418,6 +3431,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
+        setMonumentsMode(sources.getMonuments().isVal());
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
@@ -3447,6 +3461,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
+        setMonumentsMode(sources.getMonuments().isVal());
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
@@ -3515,6 +3530,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
         }
 
+        MonumentsService.applyMonuments(this);
+
         return success;
     }
 
@@ -3559,6 +3576,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void resetActionCardDeck(DeckModel deck) {
         setAcDeckID(deck.getAlias());
         setActionCards(deck.getNewShuffledDeck());
+        removeOverruleIfPurged();
         getDiscardActionCards().clear();
         getDiscardACStatus().clear();
         getPlayedActionCards().clear();
@@ -3601,7 +3619,27 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
+        removeOverruleIfPurged();
         return true;
+    }
+
+    public void removeOverruleIfPurged() {
+        if ("true".equals(getStoredValue("removeOverrule"))) {
+            getActionCards().removeIf("overrule"::equals);
+        }
+    }
+
+    public void addTeACs() {
+        List<String> oldDeck =
+                new ArrayList<>(Mapper.getDeck("action_cards_pok").getNewShuffledDeck());
+        List<String> newDeck = new ArrayList<>(Mapper.getDeck("action_cards_te").getNewShuffledDeck());
+        for (String ac : oldDeck) {
+            newDeck.remove(ac);
+        }
+        for (String acID : newDeck) {
+            getActionCards().add(acID);
+        }
+        Collections.shuffle(getActionCards());
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {

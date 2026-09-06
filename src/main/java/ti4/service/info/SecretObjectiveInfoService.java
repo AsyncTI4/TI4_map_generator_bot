@@ -151,6 +151,9 @@ public class SecretObjectiveInfoService {
                             .append(Helper.leftpad("" + so.getValue(), 3))
                             .append(")`\n> ")
                             .append(soModel.getText());
+                    if (soModel.getPoints() > 1) {
+                        sb.append(" (").append(soModel.getPoints()).append(" VP)");
+                    }
                     index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
@@ -194,6 +197,9 @@ public class SecretObjectiveInfoService {
     private static String getSecretObjectiveRepresentation(String soID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        if (so == null) {
+            return "Unknown Secret Objective: " + soID;
+        }
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();

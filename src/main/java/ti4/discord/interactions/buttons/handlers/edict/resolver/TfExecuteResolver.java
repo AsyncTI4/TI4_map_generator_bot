@@ -24,5 +24,7 @@ public class TfExecuteResolver implements EdictResolver {
 
     public void handle(ButtonInteractionEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerPing(player), buttons(player));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), "Reminder that you cannot execute the same planet multiple times.");
     }
 }

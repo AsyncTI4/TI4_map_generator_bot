@@ -22,8 +22,10 @@ import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass
@@ -158,6 +160,12 @@ class OvertimeAcd2ButtonHandler {
                     MiscEmojis.LegendaryPlanet));
         }
 
+        for (UnitModel monument : MonumentsService.getExhaustedMonuments(game, player)) {
+            buttons.add(Buttons.blue(
+                    prefix + "monument_" + remainingComponents + "_" + monument.getId(),
+                    "Ready " + monument.getName() + " Monument"));
+        }
+
         return buttons;
     }
 
@@ -208,6 +216,13 @@ class OvertimeAcd2ButtonHandler {
                 }
                 PlanetModel planetModel = Mapper.getPlanet(componentId);
                 yield planetModel == null ? componentId : planetModel.getLegendaryNameRepresentation();
+            }
+            case "monument" -> {
+                if (!MonumentsService.readyMonument(game, player, componentId)) {
+                    yield null;
+                }
+                UnitModel monument = Mapper.getUnit(componentId);
+                yield monument == null ? componentId : monument.getName() + " Monument";
             }
             default -> null;
         };

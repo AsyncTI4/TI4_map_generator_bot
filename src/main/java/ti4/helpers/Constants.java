@@ -519,6 +519,7 @@ public final class Constants {
     public static final String EXPEDITION_WIN_RATES = "expedition_win_rates";
     public static final String TWILIGHTS_FALL_SPLICE_WIN_RATES = "tf_splice_win_rates";
     public static final String SLICE_TILE_WIN_RATES = "slice_tile_win_rates";
+    public static final String PLANET_WIN_RATES = "planet_win_rates";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
@@ -1131,7 +1132,6 @@ public final class Constants {
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
-    public static final String WINNING_PATH = "winning_path";
     public static final String TEXT_SIZE = "text_size";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
@@ -1358,8 +1358,10 @@ public final class Constants {
     public static final String CONVENTIONS_OF_WAR_ABANDONED_MODE = "conventions_of_war_abandoned_mode";
     public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
+    public static final String MONUMENTS_MODE = "monuments_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
     public static final String COSMIC_CONVERGENCE_MODE = "cosmic_convergence_mode";
+    public static final String MUAAT_MANIA_MODE = "muaat_mania_mode";
     public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -28,17 +29,17 @@ import ti4.spring.service.statistics.matchmaking.SkillTier;
 public class GameStatisticsFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
-    private static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
+    public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
     static final String FOG_FILTER = "is_fog";
     static final String HOMEBREW_FILTER = "has_homebrew";
-    private static final String HAS_WINNER_FILTER = "has_winner";
+    public static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
     private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
-    private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
+    public static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
     private static final String STARTED_AFTER_FILTER = "started_after";
     private static final String SKILL_TIER_FILTER = "skill_tier";
 
@@ -75,6 +76,13 @@ public class GameStatisticsFilterer {
         return filters;
     }
 
+    public static List<OptionData> gameStatsFiltersExcept(String... omittedFilters) {
+        Set<String> omitted = Set.of(omittedFilters);
+        return gameStatsFilters().stream()
+                .filter(filter -> !omitted.contains(filter.getName()))
+                .toList();
+    }
+
     private static OptionData skillTierFilterOption() {
         OptionData skillTierOption = new OptionData(
                 OptionType.STRING, SKILL_TIER_FILTER, "Skill of the game, by average player matchmaking rating");
@@ -91,7 +99,8 @@ public class GameStatisticsFilterer {
         return getGamesFilter(event, true);
     }
 
-    // 6-player, 10-victory-point, non-fog, non-Galactic-Event, non-Scenario games with winners.
+    // 6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with
+    // winners. Homebrew covers fog, and scenario covers Alliance.
     public static Predicate<Game> getStandardCompetitiveGamesFilter() {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(6, game);
         return playerCountPredicate
@@ -183,6 +192,13 @@ public class GameStatisticsFilterer {
         }
         return game.getWinners().stream()
                 .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
+    }
+
+    public static boolean hasAnyFaction(Game game, Set<String> factionAliases) {
+        return game.getFactions().stream()
+                .filter(faction -> faction != null && !faction.isBlank())
+                .map(faction -> faction.toLowerCase(Locale.ROOT))
+                .anyMatch(factionAliases::contains);
     }
 
     private static boolean filterOnFaction(String factionFilter, Game game) {

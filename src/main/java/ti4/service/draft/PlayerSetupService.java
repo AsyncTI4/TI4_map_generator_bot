@@ -1,5 +1,7 @@
 package ti4.service.draft;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +13,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
@@ -40,6 +43,7 @@ import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
@@ -286,6 +290,7 @@ public class PlayerSetupService {
         // STARTING OWNED UNITS
         Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
+        MonumentsService.addFactionMonument(player, game);
         if (game.isBaseGameMode()) {
             UnitModel mech = player.getUnitByBaseType("mech");
             if (mech != null) {
@@ -563,7 +568,7 @@ public class PlayerSetupService {
         if ("d11".equalsIgnoreCase(hsTile)) {
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
-        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
+        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports")) || game.isMuaatManiaMode()) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
         }
@@ -600,6 +605,26 @@ public class PlayerSetupService {
             if (game.isRapidMobilizationMode() || game.isCosmicConvergenceMode()) {
                 FractureService.spawnFracture(event, game);
                 FractureService.spawnIngressTokens(event, game, player, "nah");
+            }
+        }
+        if (game.isMuaatManiaMode()) {
+            player.addOwnedUnitByID("mm_warsun");
+            if (player.getHomeSystemTile() != null) {
+                AddUnitService.addUnits(event, tile, game, color, "ws");
+            }
+        }
+
+        if (game.isMonumentsMode()
+                && game.getStoredValue("monumentsSetupAnnouncementSent").isEmpty()) {
+            game.setStoredValue("monumentsSetupAnnouncementSent", "true");
+            String helpFileName = "Monuments.txt";
+            String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
+            try {
+                String message = Files.readString(Paths.get(path));
+                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), message);
+            } catch (Exception e) {
+                MessageHelper.sendMessageToChannel(
+                        game.getTableTalkChannel(), "HELP FILE " + helpFileName + " IS BLANK");
             }
         }
     }

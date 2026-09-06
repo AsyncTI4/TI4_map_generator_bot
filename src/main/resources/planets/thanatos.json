@@ -1,0 +1,23 @@
+{
+    "id": "thanatos",
+    "tileId": "ef12",
+    "name": "thanatos",
+    "aliases": [
+        "thanatos"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION",
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "thanatos",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 90
+        }
+    },
+    "source": "expanded_fracture"
+}

@@ -180,7 +180,7 @@ public abstract class SettingsMenu {
         parseInput(context.getEvent(), context.getOrigComponentID());
     }
 
-    private void parseInput(GenericInteractionCreateEvent event, String originalId) {
+    public void parseInput(GenericInteractionCreateEvent event, String originalId) {
         // This should only ever be run on the most top-level settings menu
         if (parent != null) {
             parent.parseInput(event, originalId);

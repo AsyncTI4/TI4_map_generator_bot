@@ -99,7 +99,7 @@
         "requirements": "Y",
         "faction": "ta",
         "source": "beans",
-        "text": "ACTION: Exhaust this card to choose a planet you control with a design. Place 1 structure from your reinforcements on that planet."
+        "text": "ACTION: Exhaust this card to choose a planet you control that has an attachment. Place 1 pds from your reinforcements on that planet."
     },
     {
         "alias": "betaro",

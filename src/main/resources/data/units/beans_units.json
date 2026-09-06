@@ -301,7 +301,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "1 planet in this system you control has its resource and influence values increased by 1, and 1 planet in this system controlled by another player has its resource and influence values reduced by 1."
+    "ability": "1 planet of your choice in this system you control has its resource and influence values increased by 1, and 1 planet of your choice in this system controlled by another player has its resource and influence values reduced by 1."
   },
   {
     "id": "ta_mech",
@@ -316,7 +316,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you attach a design to a planet, you may spend 1 resource to place a mech on that planet."
+    "ability": "DEPLOY: When you attach a card to a planet, you may spend 1 resource to place a mech on that planet."
   },
   {
     "id": "netrunners_flagship",

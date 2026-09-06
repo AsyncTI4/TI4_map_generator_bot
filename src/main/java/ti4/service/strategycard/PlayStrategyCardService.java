@@ -83,6 +83,26 @@ public class PlayStrategyCardService {
             Player player,
             boolean winnuHero,
             boolean isOverrule) {
+        playSC(
+                event,
+                scToPlay,
+                game,
+                mainGameChannel,
+                player,
+                winnuHero,
+                isOverrule,
+                isOverrule ? "overruled" : "played");
+    }
+
+    public static void playSC(
+            GenericInteractionCreateEvent event,
+            Integer scToPlay,
+            Game game,
+            MessageChannel mainGameChannel,
+            Player player,
+            boolean winnuHero,
+            boolean isOverrule,
+            String playVerb) {
         String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(
@@ -123,7 +143,7 @@ public class PlayStrategyCardService {
                         + game.getSCEmojiWordRepresentation(scToPlay));
 
         StringBuilder message = new StringBuilder();
-        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? " overruled" : " played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" ").append(playVerb);
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
@@ -218,7 +238,10 @@ public class PlayStrategyCardService {
             Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
             if (titansMechPlayer != null) {
                 boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
-                                || scModel.usesAutomationForSCID("te4construction"))
+                                || scModel.usesAutomationForSCID("te4construction")
+                                || (game.isMonumentsMode()
+                                        && (scModel.usesAutomationForSCID("monuments4construction")
+                                                || scModel.usesAutomationForSCID("monumentstf4"))))
                         && !game.isFowMode()
                         && !ButtonHelper.isLawInPlay(game, "articles_war");
                 if (shouldAddTitansMechDeployButton) {
@@ -927,6 +950,7 @@ public class PlayStrategyCardService {
 
             // monuments
             case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
+            case "monumentstf4" -> getMonumentsConstructionButtons(sc, game);
 
             // riftset
             case "riftset_9" -> RiftSetModeService.getSacrificeButtons();
@@ -1283,14 +1307,19 @@ public class PlayStrategyCardService {
      */
     private static List<Button> getMonumentsConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
-        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
-        Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
+        Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
+        Button sdButton = Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock);
+        Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
+        Button monumentButton = Buttons.green("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        List<Button> buttons = new ArrayList<>(List.of(followButton, buildButton, sdButton, pdsButton, monumentButton));
         if (game.isFacilitiesMode()) {
-            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
-            return List.of(followButton, sdButton, pdsButton, monumentButton, facilityButton, noFollowButton);
+            buttons.add(Buttons.green("construction_facility", "Place A Facility"));
         }
-        return List.of(followButton, sdButton, pdsButton, monumentButton, noFollowButton);
+        if (game.isMonumentToTheAgesMode()) {
+            buttons.add(Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)"));
+        }
+        buttons.add(noFollowButton);
+        return buttons;
     }
 }

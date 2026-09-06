@@ -299,7 +299,21 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = eligibleSystems >= 2;
             }
-            case "ta" -> shouldBeUnlocked = (TaAbilityHandler.getControlledPlanetCountWithAnyDesign(player, game) >= 4);
+            case "ta" -> {
+                int eligiblePlanets = 0;
+                for (String planetName : player.getPlanets()) {
+                    Tile tile = game.getTileFromPlanet(planetName);
+                    Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+
+                    if (planet == null || !TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+                        continue;
+                    }
+
+                    eligiblePlanets++;
+                }
+
+                shouldBeUnlocked = eligiblePlanets >= 4;
+            }
             case "netrunners" ->
                 shouldBeUnlocked = TechnologyType.mainFour.stream()
                         .anyMatch(type -> ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 3);

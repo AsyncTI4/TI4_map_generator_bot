@@ -28,7 +28,7 @@
         "alias": "metalivoidshielding",
         "name": "Metali Void Shielding",
         "text": "Each time hits are produced against 1 or more of your non-fighter ships, 1 of those ships may use SUSTAIN DAMAGE as if it had that ability.",
-        "flavourText": "Capable of more than destruction, the Metali also wrapped their ships in nigh-indestructable plating unable to be replicated using today's methods.",
+        "flavourText": "Capable of more than destruction, the Metali also wrapped their ships in nigh-indestructible plating unable to be replicated using today's methods.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/te/metalivoidshielding.png?raw=true",
         "source": "thunders_edge"
     },

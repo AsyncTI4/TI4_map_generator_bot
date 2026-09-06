@@ -19,6 +19,21 @@
         "isShip": true
     },
     {
+        "id": "mm_warsun",
+        "baseType": "warsun",
+        "asyncId": "ws",
+        "name": "Muaat Mania War Sun",
+        "source": "muaat_mania",
+        "moveValue": 1,
+        "capacityValue": 4,
+        "capacityUsed": 1,
+        "combatHitsOn": 5,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true
+    },
+    {
         "id": "tf-pws",
         "baseType": "warsun",
         "asyncId": "ws",
@@ -465,7 +480,7 @@
         "id": "tf-hcf",
         "baseType": "fighter",
         "asyncId": "ff",
-        "name": "Hybrid Crystral Fighter (TF)",
+        "name": "Hybrid Crystal Fighter (TF)",
         "source": "twilights_fall",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/tf-hcf.png?raw=true",
         "faction": "naalu",

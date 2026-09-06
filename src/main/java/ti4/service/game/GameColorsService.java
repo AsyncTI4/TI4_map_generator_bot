@@ -3,6 +3,8 @@ package ti4.service.game;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -37,7 +39,9 @@ public class GameColorsService {
                 .toList();
     }
 
-    public static List<String> getUsedHues(Game game) {
-        return getUsedColors(game).stream().map(ColorModel::getHue).toList();
+    public static Set<String> getUsedColorCategories(Game game) {
+        return getUsedColors(game).stream()
+                .flatMap(color -> color.getColorCategories().stream())
+                .collect(Collectors.toSet());
     }
 }

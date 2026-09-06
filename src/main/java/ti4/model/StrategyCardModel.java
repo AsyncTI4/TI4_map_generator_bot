@@ -182,6 +182,12 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
 
     @Nullable
     public String getEmojiWordRepresentation() {
+        if ("monuments4construction".equals(id)) {
+            return CardEmojis.SC4Mention();
+        }
+        if ("monumentstf4".equals(id)) {
+            return CardEmojis.TFSC4Mention();
+        }
         switch (source) {
             case pok, base, thunders_edge, codex1 -> {
                 return switch (initiative) {

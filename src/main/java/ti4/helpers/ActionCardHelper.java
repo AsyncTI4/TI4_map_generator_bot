@@ -23,6 +23,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -719,7 +720,9 @@ public class ActionCardHelper {
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
-            if (activePlayer != null && (activePlayer.hasTech("tp") || activePlayer.hasTech("tf-crafty"))) {
+            if (activePlayer != null
+                    && activePlayer != player
+                    && (activePlayer.hasTech("tp") || activePlayer.hasTech("tf-crafty"))) {
                 return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }
@@ -813,6 +816,8 @@ public class ActionCardHelper {
                     MiscEmojis.Sabotage);
             buttons.add(sabotageButton);
         }
+
+        MonumentsButtonHandler.gainKVDTradeGoods(game, player, actionCardTitle);
 
         if (actionCardIsCancelable) {
             Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
@@ -2007,6 +2012,14 @@ public class ActionCardHelper {
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
 
+            if (game.isMonumentsMode()
+                    && List.of("monuments_festival", "monuments_rebel_bombing", "monuments_renovation")
+                            .contains(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.factionButtonChecker() + "resolveMonumentsActionCard_" + automationID, buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             // Lost Legacies AC's
             if ("unchart_space".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveUnchartedSpaceAC", buttonLabel));
@@ -2291,6 +2304,10 @@ public class ActionCardHelper {
 
     private static boolean isActionCardCancelable(ActionCardModel actionCard) {
         return !actionCard.getText().contains("cannot be canceled");
+    }
+
+    public static boolean cannotBeSabotaged(ActionCardModel actionCard) {
+        return isSabotageOrShatter(actionCard.getAlias()) || !isActionCardCancelable(actionCard);
     }
 
     public static void serveManipulateInvestmentButtons(Game game, Player player) {

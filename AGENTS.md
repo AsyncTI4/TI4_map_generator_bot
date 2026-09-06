@@ -4,6 +4,22 @@ Reference notes for agents working on this Discord bot. Keep Discord's API limit
 mind whenever generating message content, embeds, buttons, select menus, or modals —
 exceeding them causes the message send to fail (or, for button labels, silent truncation).
 
+## Comments
+
+**Do not write comments in production code.** Code under `src/main/java` should be
+self-documenting: express intent through method and variable names, small focused
+methods, and early returns rather than through prose explaining what the code does.
+
+- If a block of code needs a comment to be understood, extract it into a
+  well-named method instead.
+- Do not add Javadoc, inline `//` notes, section banners, or "explain the change"
+  comments to production code.
+- Do not add comments to code you are only touching incidentally, and leave
+  existing comments alone unless the code they describe is being removed.
+
+The exception is test code (`src/test/java`), where comments explaining scenario
+setup, non-obvious assertions, or the reason a case exists are welcome.
+
 ## Discord limits
 
 ### Messages

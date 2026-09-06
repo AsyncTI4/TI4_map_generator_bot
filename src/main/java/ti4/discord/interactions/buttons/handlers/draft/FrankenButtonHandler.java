@@ -56,6 +56,7 @@ import ti4.service.franken.FrankenPromissoryService;
 import ti4.service.franken.FrankenStartingTechService;
 import ti4.service.franken.FrankenStatsService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class FrankenButtonHandler {
@@ -204,6 +205,7 @@ public class FrankenButtonHandler {
             case MAHACTKING -> {
                 FactionModel faction = Mapper.getFaction(itemID);
                 player.setFaction(itemID);
+                MonumentsService.addFactionMonument(player, player.getGame());
                 List<Units.UnitType> kingUnitTypes =
                         List.of(Units.UnitType.Flagship, Units.UnitType.Mech, Units.UnitType.Warsun);
                 List<String> units = faction.getUnits().stream()

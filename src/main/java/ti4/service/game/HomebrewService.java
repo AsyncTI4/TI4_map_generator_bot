@@ -39,6 +39,10 @@ public class HomebrewService {
         HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
         HBREDTAPE("Red Tape", "Red Tape mode", null),
         HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null),
+        HBMONUMENTS(
+                "Monuments+",
+                "Faction monuments plus Monuments action cards, agendas, secret objectives, and strategy cards",
+                SourceEmojis.Monuments),
         HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null),
         HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank),
         HBOMEGAPHASE("Omega Phase", "Enable Omega Phase homebrew mode", null),
@@ -97,6 +101,7 @@ public class HomebrewService {
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
         game.setVotcMode(false);
+        game.setMonumentsMode(false);
         game.setStoredValue("homebrewMode", "");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -160,6 +165,13 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Set the stuff (Relic, Agenda, SCs, Tech, Event) to Ignis Aurora stuff");
+            }
+            case HBMONUMENTS -> {
+                game.setMonumentsMode(true);
+                MonumentsService.applyMonuments(game);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Added Monuments+ cards and strategy cards. Each player will receive their faction monument during setup.");
             }
             case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);

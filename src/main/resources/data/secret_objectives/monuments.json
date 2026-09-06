@@ -1,0 +1,18 @@
+[
+    {
+    "alias": "dagw",
+    "name": "Defend A Great Work",
+    "phase": "Status",
+    "text": "Have a monument on the game board and at least 3 ground forces on its planet or in its space area.",
+    "points": 1,
+    "source": "monuments"
+  },
+  {
+    "alias": "tam",
+    "name": "Topple A Monument",
+    "phase": "Action",
+    "text": "Destroy another player's monument during a tactical action.",
+    "points": 1,
+    "source": "monuments"
+  }
+]

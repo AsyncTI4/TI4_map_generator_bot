@@ -56,11 +56,12 @@ final class FowSetupFactionService {
      * Human players only, in a state where they still need faction/position setup. Excludes dummies -
      * the neutral (Dicecord) player is a dummy with faction "neutral" and no position, so without this
      * it qualifies as "has a faction but needs a position" and shows up in the assign/randomize flows.
-     * Reachable whenever a GM sets up the neutral player and then steps back to Factions.
+     * Reachable whenever a GM sets up the neutral player and then steps back to Factions. Also excludes
+     * whoever the PLAYER_ROLES step marked GM/observer (see {@link FowSetupPlayerRolesService}).
      */
-    private static List<Player> setupCandidates(Game game) {
+    private static List<Player> setupCandidates(Game game, FowSetupWizardState state) {
         return game.getPlayers().values().stream()
-                .filter(player -> !player.isDummy())
+                .filter(player -> FowSetupPlayerRolesService.isPlayerCandidate(player, state))
                 .toList();
     }
 
@@ -80,7 +81,7 @@ final class FowSetupFactionService {
             sb.append("⚠ A draft is currently running. Assign positions **after** it finishes - starting or ")
                     .append("restarting a draft resets every player to a temporary off-map position.\n\n");
         }
-        for (Player player : setupCandidates(game)) {
+        for (Player player : setupCandidates(game, state)) {
             String effective = effectiveFaction(state, player);
             String pos = effectivePosition(player);
             List<String> dealt = state.getDealtFactionChoices().get(player.getUserID());
@@ -314,14 +315,14 @@ final class FowSetupFactionService {
 
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Player> targets = new ArrayList<>();
-        for (Player player : setupCandidates(game)) {
+        for (Player player : setupCandidates(game, state)) {
             if (StringUtils.isBlank(effectiveFaction(state, player))) {
                 targets.add(player);
             }
         }
         if (targets.isEmpty()) {
             StringBuilder sb = new StringBuilder("Every player already has a faction:\n");
-            for (Player player : setupCandidates(game)) {
+            for (Player player : setupCandidates(game, state)) {
                 sb.append("> ")
                         .append(player.getUserName())
                         .append(": ")
@@ -485,11 +486,12 @@ final class FowSetupFactionService {
     @ButtonHandler("fowSetupFactionManual")
     static void pickPlayerForFaction(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Button> playerButtons = new ArrayList<>();
         // Players don't count as "real" until they have both a faction and a color, so before any faction is
         // assigned everyone is still "not real" - same list `/game info` shows as "Other Players". Dummies
         // (the neutral player) are never real either, hence setupCandidates rather than getNotRealPlayers.
-        for (Player player : setupCandidates(game)) {
+        for (Player player : setupCandidates(game, state)) {
             if (player.isRealPlayer()) continue;
             playerButtons.add(Buttons.gray("fowSetupFactionPlayer_" + player.getUserID(), player.getUserName()));
         }
@@ -562,7 +564,7 @@ final class FowSetupFactionService {
         }
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Button> playerButtons = new ArrayList<>();
-        for (Player player : setupCandidates(game)) {
+        for (Player player : setupCandidates(game, state)) {
             if (StringUtils.isBlank(effectiveFaction(state, player)) || isPlacedOnMap(game, player)) {
                 continue;
             }
@@ -862,7 +864,7 @@ final class FowSetupFactionService {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
 
         List<Player> needsPosition = new ArrayList<>();
-        for (Player player : setupCandidates(game)) {
+        for (Player player : setupCandidates(game, state)) {
             if (StringUtils.isNotBlank(effectiveFaction(state, player)) && !isPlacedOnMap(game, player)) {
                 needsPosition.add(player);
             }

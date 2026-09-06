@@ -1,0 +1,22 @@
+[
+    {
+        "alias": "cathedralofixth",
+        "name": "Cathedral Of Ixth",
+        "type": "Law",
+        "target": "Elect Non-Home Planet",
+        "text1": "Attach this card to the elected planet. The owner of this planet gains 1 VP if their monument is on this planet.\nWhen a player places their monument on this planet, they gain 1 VP. When a player's monument on this planet is removed, they lose 1 VP.",
+        "text2": "",
+        "mapText": "When a player places their monument on this planet, they gain 1 VP. When a player's monument on this planet is removed, they lose 1 VP.",
+        "source": "monuments"
+    },
+    {
+        "alias": "ministerofculture",
+        "name": "Minister Of Culture",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "As long as the owner of this card controls their monument their commodity value is increased by 2.\nThe elected player gains this card and replenishes their commodities.",
+        "text2": "",
+        "mapText": "As long as the owner of this card controls their monument their commodity value is increased by 2.",
+        "source": "monuments"
+    }
+]

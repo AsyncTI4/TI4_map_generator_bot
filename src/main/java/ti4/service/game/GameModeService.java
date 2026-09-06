@@ -59,6 +59,7 @@ public class GameModeService {
                         Map.entry("Weird Wormholes", (Supplier<Boolean>) game::isWeirdWormholesMode),
                         Map.entry("Cosmic Phenomenae", (Supplier<Boolean>) game::isCosmicPhenomenaeMode),
                         Map.entry("Monument to the Ages", (Supplier<Boolean>) game::isMonumentToTheAgesMode),
+                        Map.entry("Monuments+", (Supplier<Boolean>) game::isMonumentsMode),
                         Map.entry("Wild, Wild Galaxy", (Supplier<Boolean>) game::isWildWildGalaxyMode),
                         Map.entry("Feast or Famine", (Supplier<Boolean>) game::isFeastOrFamineMode),
                         Map.entry("Zealous Orthodoxy", (Supplier<Boolean>) game::isZealousOrthodoxyMode),

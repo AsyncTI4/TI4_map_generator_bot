@@ -69,6 +69,7 @@ public class RoundOneService {
             game.removeRelicFromGame("thesilverflame");
             game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
         }
+        game.removeOverruleIfPurged();
         game.setupNeutralPlayer();
 
         if (game.isTwilightsFallMode()) {

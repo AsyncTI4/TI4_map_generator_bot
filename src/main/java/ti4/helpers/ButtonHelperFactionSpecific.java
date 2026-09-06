@@ -1087,8 +1087,11 @@ public final class ButtonHelperFactionSpecific {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByName("construction").orElse(null);
         int scNum = scModel.getInitiative();
-        boolean construction =
-                scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction");
+        boolean construction = scModel.usesAutomationForSCID("pok4construction")
+                || scModel.usesAutomationForSCID("te4construction")
+                || (game.isMonumentsMode()
+                        && (scModel.usesAutomationForSCID("monuments4construction")
+                                || scModel.usesAutomationForSCID("monumentstf4")));
         if (!used
                 && construction
                 && !player.getFollowedSCs().contains(scNum)

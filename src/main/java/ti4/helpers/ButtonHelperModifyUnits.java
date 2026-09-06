@@ -24,12 +24,15 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -50,6 +53,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.agenda.MonumentsAgendaService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
@@ -57,6 +61,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
@@ -482,7 +487,7 @@ public final class ButtonHelperModifyUnits {
         }
         if (!doesPlayerHaveGfOnPlanet(unitHolder, player)) {
             Player opponent = game.getActivePlayer();
-            if (opponent == player || !FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
+            if (opponent == null || opponent == player || !FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
                 for (Player p : game.getRealPlayersNNeutral()) {
                     if (p != player && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
                         opponent = p;
@@ -490,7 +495,7 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if (opponent != player && FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
+            if (opponent != null && opponent != player && FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
                 if (opponent.hasTech("dxa")) {
                     String msg3 = opponent.getRepresentation()
                             + " you may have an opportunity to use _Dacxive Animators_ on "
@@ -1417,14 +1422,21 @@ public final class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                if (player2.hasUnlockedBreakthrough("titansbt")
-                        || player.hasUnlockedBreakthrough("titansbt")
-                        || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
-                        || (player2.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
-                        || player.hasAbility("researchteam")
-                        || player.hasAbility("raider_coves")
-                        || player.hasUnit("tf-ambassador")
-                        || player2.hasAbility("researchteam")) {
+                if (!TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)
+                        && (player2.hasUnlockedBreakthrough("titansbt")
+                                || player.hasUnlockedBreakthrough("titansbt")
+                                || (player.hasUnit("firmament_mech")
+                                        && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
+                                || (player2.hasUnit("firmament_mech")
+                                        && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
+                                || player.hasAbility("researchteam")
+                                || player.hasAbility("raider_coves")
+                                || player.hasUnit("tf-ambassador")
+                                || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
+                                || TaBreakthroughHandler.canUseSafeHavensCoexistence(
+                                        game, player2, unitHolder.getName())
+                                || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
+                                || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
                             + " the bot is unsure if a combat should occur on " + planetName
@@ -1437,7 +1449,9 @@ public final class ButtonHelperModifyUnits {
                             || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                             || player.hasAbility("researchteam")
                             || player.hasAbility("raider_coves")
-                            || player.hasUnit("tf-ambassador")) {
+                            || player.hasUnit("tf-ambassador")
+                            || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
+                            || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())) {
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -1448,7 +1462,9 @@ public final class ButtonHelperModifyUnits {
                     if (player2.getPlanets().contains(unitHolder.getName())
                             && (player2.hasAbility("researchteam")
                                     || (player2.hasUnit("firmament_mech")
-                                            && unitHolder.getUnitCount(UnitType.Mech, player2) > 0))) {
+                                            && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
+                                    || TaBreakthroughHandler.canUseSafeHavensCoexistence(
+                                            game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 player2.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
@@ -1500,8 +1516,10 @@ public final class ButtonHelperModifyUnits {
                                 + " you may use this button to return fighters to space after combat concludes. This only needs to be done once.",
                         b2s);
             }
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
             if (game.isMonumentToTheAgesMode()
-                    && unitHolder.getUnitCount(UnitType.Spacedock, game.getPlayerFromColorOrFaction("neutral")) > 0
+                    && neutral != null
+                    && unitHolder.getUnitCount(UnitType.Spacedock, neutral) > 0
                     && !player.getPlanets().contains(unitHolder.getName())) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("takeMonument_" + unitHolder.getName(), "Take Control Of Monument"));
@@ -1951,6 +1969,41 @@ public final class ButtonHelperModifyUnits {
         String successMessage;
         String playerRep = player.getRepresentationNoPing();
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        if ("monument".equalsIgnoreCase(unitLong)) {
+            if (!game.isMonumentsMode()) {
+                MessageHelper.sendEphemeralMessageToEventChannel(event, "Monuments+ is not enabled for this game.");
+                return;
+            }
+            UnitModel monument = player.getUnitByBaseType("monument");
+            List<String> planetTypes = planet == null ? new ArrayList<>() : new ArrayList<>(planet.getPlanetTypes());
+            if (tile != null && tile.isSupernova()) {
+                planetTypes.add("SUPERNOVA");
+            }
+            if (tile != null && tile.equals(player.getHomeSystemTile())) {
+                planetTypes.add("HOME_PLANET");
+            }
+            if (planet != null && !planet.getTechSpecialities().isEmpty()) {
+                planetTypes.add("TECH_SPECIALTY");
+            }
+            if (planet != null && planet.isLegendary()) {
+                planetTypes.add("LEGENDARY");
+            }
+            if (tile != null && tile.isMecatol(game)) {
+                planetTypes.add("MECATOL_REX");
+            }
+            if (planet != null
+                    && planet.getPlanetModel() != null
+                    && planet.getPlanetModel().getPlanetTypes().stream()
+                            .anyMatch(type -> "lightning".equalsIgnoreCase(type.toString()))) {
+                planetTypes.add("LIGHTNING");
+            }
+            if (monument != null && (planet == null || !monument.canBePlacedOnPlanetTypes(planetTypes))) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event, "That planet is not eligible for your Monument.");
+                return;
+            }
+        }
         if ("mf".equalsIgnoreCase(unitID) && "tyris".equalsIgnoreCase(player.getFaction())) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2000,7 +2053,11 @@ public final class ButtonHelperModifyUnits {
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
+                MonumentsAgendaService.resolveCathedralOfIxthPlacement(game, player, planetName);
                 successMessage = "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
+                if (player.hasUnit("saar_monument")) {
+                    MonumentsButtonHandler.sendSaarMonumentSpaceDockButtons(game, player, event, true);
+                }
             }
         } else {
             String producedOrPlaced = "Produced";
@@ -2173,7 +2230,9 @@ public final class ButtonHelperModifyUnits {
                 }
                 if (scModel != null
                         && ("pok4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
-                                || "monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID()))
+                                || (game.isMonumentsMode()
+                                        && ("monuments4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                                || "monumentstf4".equalsIgnoreCase(scModel.getBotSCAutomationID()))))
                         && game.getScPlayed().containsKey(sc)) {
                     hasConstruction = true;
                     break;
@@ -2183,7 +2242,13 @@ public final class ButtonHelperModifyUnits {
                 for (Integer sc : p2.getSCs()) {
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
-                    if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
+                    if (scModel != null
+                            && ("te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                    || (game.isMonumentsMode()
+                                            && ("monuments4construction"
+                                                            .equalsIgnoreCase(scModel.getBotSCAutomationID())
+                                                    || "monumentstf4"
+                                                            .equalsIgnoreCase(scModel.getBotSCAutomationID()))))) {
                         hasConstruction = true;
                     }
                 }

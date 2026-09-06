@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -48,6 +49,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -75,6 +78,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
@@ -593,6 +597,10 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
         game.removeStoredValue("tnelisCommanderTracker");
+        TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
+        TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
+        TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(game);
+        MonumentsService.clearNaaluMonumentCoexistence(game);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("ASN" + player.getFaction());
         }
@@ -626,6 +634,7 @@ public final class ButtonHelperTacticalAction {
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamLeadersHandler.clearDreamAgentAnomaly(game);
+        TaBreakthroughHandler.clearSafeHavens(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
@@ -658,6 +667,7 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static void beginTacticalAction(Game game, Player player) {
+        TwilightsFallMonumentsButtonHandler.sendBlueTfMonumentButton(game, player);
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -774,6 +784,14 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        if (game.isMonumentsMode()) {
+            for (Player monumentOwner : game.getRealPlayers()) {
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {
+                    MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
+                }
+            }
+        }
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
@@ -1188,6 +1206,9 @@ public final class ButtonHelperTacticalAction {
         }
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             movableFromPlanets.add(UnitType.Pds);
+        }
+        if (game.isMonumentsMode() && player.hasUnit("pinktf_monument")) {
+            movableFromPlanets.add(UnitType.Monument);
         }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);

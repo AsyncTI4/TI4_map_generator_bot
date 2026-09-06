@@ -33,7 +33,7 @@ public class VerydithBreakthroughHandler {
 
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "verydithBt_" + planet.getName(),
-                    "Ready and explore " + planet.getName()));
+                    "Ready and Explore " + Helper.getPlanetRepresentation(planet.getName(), player.getGame())));
         }
 
         if (!buttons.isEmpty()) {

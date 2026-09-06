@@ -15,25 +15,28 @@ public class WinningPathHelper {
     private static final Pattern PATTERN = Pattern.compile("[^a-z]");
 
     public static String buildWinningPath(Game game, Player winner) {
-        int stage1Count = countPublicVictoryPoints(game, winner.getUserID(), 1);
-        int stage2Count = countPublicVictoryPoints(game, winner.getUserID(), 2);
-        int secretCount = winner.getSecretVictoryPoints();
-        int supportCount = winner.getSupportForTheThroneVictoryPoints();
-        String otherPoints = summarizeOtherVictoryPoints(game, winner.getUserID());
+        return describe(breakDownWinningPath(game, winner));
+    }
 
-        if (supportCount >= 2) {
-            return String.format(
-                    "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d _Supports for the Thrones_%s",
-                    stage1Count,
-                    stage2Count,
-                    secretCount,
-                    supportCount,
-                    otherPoints.isEmpty() ? "" : ", " + otherPoints);
-        }
+    public static WinningPathBreakdown breakDownWinningPath(Game game, Player winner) {
+        return new WinningPathBreakdown(
+                countPublicVictoryPoints(game, winner.getUserID(), 1),
+                countPublicVictoryPoints(game, winner.getUserID(), 2),
+                winner.getSecretVictoryPoints(),
+                winner.getSupportForTheThroneVictoryPoints(),
+                otherVictoryPoints(game, winner.getUserID()));
+    }
 
+    private static String describe(WinningPathBreakdown path) {
+        String otherPoints = summarizeOtherVictoryPoints(path.otherPoints());
         return String.format(
-                "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d _Support for the Throne_%s",
-                stage1Count, stage2Count, secretCount, supportCount, otherPoints.isEmpty() ? "" : ", " + otherPoints);
+                "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d %s%s",
+                path.stage1s(),
+                path.stage2s(),
+                path.secrets(),
+                path.supports(),
+                path.supports() >= 2 ? "_Supports for the Thrones_" : "_Support for the Throne_",
+                otherPoints.isEmpty() ? "" : ", " + otherPoints);
     }
 
     private static int countPublicVictoryPoints(Game game, String userId, int stage) {
@@ -45,8 +48,8 @@ public class WinningPathHelper {
                 .count();
     }
 
-    private static String summarizeOtherVictoryPoints(Game game, String userId) {
-        Map<String, Integer> otherVictoryPoints = game.getScoredPublicObjectives().entrySet().stream()
+    private static Map<String, Integer> otherVictoryPoints(Game game, String userId) {
+        return game.getScoredPublicObjectives().entrySet().stream()
                 .filter(entry -> entry.getValue().contains(userId))
                 .map(Map.Entry::getKey)
                 .filter(poID -> Mapper.getPublicObjective(poID) == null)
@@ -56,7 +59,9 @@ public class WinningPathHelper {
                         key -> Collections.frequency(
                                 game.getScoredPublicObjectives().get(key), userId),
                         Integer::sum));
+    }
 
+    private static String summarizeOtherVictoryPoints(Map<String, Integer> otherVictoryPoints) {
         return otherVictoryPoints.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue()
                         .reversed()
@@ -72,15 +77,15 @@ public class WinningPathHelper {
 
     private static String normalizeVictoryPointKey(String poID) {
         String normalized = PATTERN.matcher(poID.toLowerCase()).replaceAll("");
-        if (normalized.contains("seed")) return "seed";
-        if (normalized.contains("mutiny")) return "mutiny";
-        if (normalized.contains("shard")) return "shard";
-        if (normalized.contains("custodian")) return "custodian/imperial";
-        if (normalized.contains("imperial")) return "imperial rider";
-        if (normalized.contains("censure")) return "censure";
-        if (normalized.contains("crown") || normalized.contains("emph")) return "crown";
-        if (normalized.contains("latvinia")) return "latvinia";
-        if (normalized.contains("song")) return "styx";
-        return "other (probably _Classified Document Leaks_)";
+        if (normalized.contains("seed")) return WinningPathBreakdown.SEED;
+        if (normalized.contains("mutiny")) return WinningPathBreakdown.MUTINY;
+        if (normalized.contains("shard")) return WinningPathBreakdown.SHARD;
+        if (normalized.contains("custodian")) return WinningPathBreakdown.CUSTODIAN_OR_IMPERIAL;
+        if (normalized.contains("imperial")) return WinningPathBreakdown.IMPERIAL_RIDER;
+        if (normalized.contains("censure")) return WinningPathBreakdown.CENSURE;
+        if (normalized.contains("crown") || normalized.contains("emph")) return WinningPathBreakdown.CROWN;
+        if (normalized.contains("latvinia")) return WinningPathBreakdown.LATVINIA;
+        if (normalized.contains("song")) return WinningPathBreakdown.STYX;
+        return WinningPathBreakdown.UNRECOGNIZED;
     }
 }

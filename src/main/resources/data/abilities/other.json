@@ -149,7 +149,7 @@
         "id": "contraband_auction",
         "name": "Contraband Auction",
         "faction": "hacan",
-        "permanentEffect": "Draw 1 relic from the relic deck OR 1 faction technology from the reference deck. All players place a blind bid using Resources. The highest bidder gains the card. Then, gain 2 Trade Goods and exhaust this card.",
+        "permanentEffect": "ACTION: Draw 1 relic from the relic deck OR 1 faction technology from the reference deck. All players place a blind bid using Resources. The highest bidder gains the card. Then, gain 2 Trade Goods and exhaust this card.",
         "source": "erwans_gambit"
     },
     {

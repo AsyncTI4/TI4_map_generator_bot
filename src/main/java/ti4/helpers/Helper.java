@@ -65,6 +65,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -108,6 +109,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
@@ -1127,10 +1129,39 @@ public final class Helper {
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
+        UnitModel unitModel = "monument".equalsIgnoreCase(unit) ? player.getUnitByBaseType("monument") : null;
         player.resetProducedUnits();
         for (String planet : planets) {
             Planet uh = game.getUnitHolderFromPlanet(planet);
             if (uh == null) continue; // custodia, ghoti, etc.
+
+            if (unitModel != null) {
+                List<String> planetTypes = new ArrayList<>(uh.getPlanetTypes());
+                Tile tile = game.getTileFromPlanet(planet);
+                if (tile != null && tile.isSupernova()) {
+                    planetTypes.add("SUPERNOVA");
+                }
+                if (tile != null && tile.equals(player.getHomeSystemTile())) {
+                    planetTypes.add("HOME_PLANET");
+                }
+                if (!uh.getTechSpecialities().isEmpty()) {
+                    planetTypes.add("TECH_SPECIALTY");
+                }
+                if (uh.isLegendary()) {
+                    planetTypes.add("LEGENDARY");
+                }
+                if (tile != null && tile.isMecatol(game)) {
+                    planetTypes.add("MECATOL_REX");
+                }
+                if (uh.getPlanetModel() != null
+                        && uh.getPlanetModel().getPlanetTypes().stream()
+                                .anyMatch(type -> "lightning".equalsIgnoreCase(type.toString()))) {
+                    planetTypes.add("LIGHTNING");
+                }
+                if (!unitModel.canBePlacedOnPlanetTypes(planetTypes)) {
+                    continue;
+                }
+            }
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
@@ -1335,6 +1366,14 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "letnevMonument" ->
+                    msg.append("Used **Palatine Obelisk** for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
+                case "muaatMonument" ->
+                    msg.append("Used _Glory Furnace_ for ").append(count).append(" votes.\n");
                 case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
                 case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
                 case "absolRexControlRepresentative" ->
@@ -1432,6 +1471,9 @@ public final class Helper {
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
             }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
+                player.removeSpentThing(thing);
+            }
             if (thing.contains("_")) {
                 continue;
             }
@@ -1510,6 +1552,9 @@ public final class Helper {
                         res += planet.getInfluence();
                     }
                 }
+                found = true;
+            }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
                 found = true;
             }
             if (!found
@@ -1773,6 +1818,13 @@ public final class Helper {
                 msg.append("> Released units with a total resource value of ")
                         .append(discount)
                         .append('\n');
+            }
+            int blacktfInfantry = TwilightsFallMonumentsButtonHandler.getBlacktfCapturedInfantrySpent(game, player);
+            if (blacktfInfantry > 0) {
+                res += blacktfInfantry;
+                msg.append("> Spent ")
+                        .append(blacktfInfantry)
+                        .append(" captured infantry with **The Flesh Cathedral**\n");
             }
             msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
@@ -2368,8 +2420,7 @@ public final class Helper {
         if (game.isTwilightsFallMode()) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-
+                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                         Tile t2 = game.getTileByPosition(tilePos);
                         for (UnitHolder uH : t2.getUnitHolders().values()) {
                             if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -2478,6 +2529,12 @@ public final class Helper {
             }
             productionValueTotal += numberOfCCInSystem;
         }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
+                && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
+            productionValueTotal *= 2;
+        }
+
         return productionValueTotal;
     }
 
@@ -2509,7 +2566,9 @@ public final class Helper {
                     }
                 }
                 totalUnits += entry.getValue();
-                if (player.hasUnit("tf-valefarprime") && removedUnit.getUnitType() == UnitType.Mech) {
+                if (player.hasUnit("tf-valefarprime")
+                        && (removedUnit.getUnitType() == UnitType.Mech
+                                || (game.isMonumentsMode() && "pinktf_monument".equals(removedUnit.getId())))) {
                     cost -= entry.getValue();
                 }
             }
@@ -3161,6 +3220,7 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                ccCount += TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player_);
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }
@@ -3789,6 +3849,11 @@ public final class Helper {
                                 + "Press **End Game** only after done giving titles.",
                         titleButton);
             }
+            return true;
+        }
+        if (game.getRealPlayers().size() == 1
+                && player.isRealPlayer()
+                && game.getRealAndEliminatedPlayers().size() > 1) {
             return true;
         }
         return false;

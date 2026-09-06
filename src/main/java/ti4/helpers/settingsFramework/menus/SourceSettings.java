@@ -42,6 +42,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting whispers;
     private final BooleanSetting deepreaches;
     private final BooleanSetting lostLegacies;
+    private final BooleanSetting monuments;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -71,6 +72,7 @@ public class SourceSettings extends SettingsMenu {
         whispers = new BooleanSetting("WhispersVoid", "Whispers from the Void", false);
         deepreaches = new BooleanSetting("DeepReaches", "Deep Reaches", false);
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
+        monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -83,12 +85,15 @@ public class SourceSettings extends SettingsMenu {
         actionCardDeck2.setEmoji(SourceEmojis.ActionDeck2);
         deepreaches.setEmoji(SourceEmojis.DeepReaches);
         lostLegacies.setEmoji(SourceEmojis.Theodisi);
+        monuments.setEmoji(SourceEmojis.Monuments);
 
         // Other Initialization
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
+        monuments.setExtraInfo(
+                "Adds faction monuments plus Monuments action cards, agendas, secrets, and strategy cards.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -114,6 +119,7 @@ public class SourceSettings extends SettingsMenu {
             whispers.initialize(json.get("whispers"));
             deepreaches.initialize(json.get("deepreaches"));
             lostLegacies.initialize(json.get("lostLegacies"));
+            monuments.initialize(json.get("monuments"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -139,6 +145,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(whispers);
         ls.add(deepreaches);
         ls.add(lostLegacies);
+        ls.add(monuments);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -289,6 +296,7 @@ public class SourceSettings extends SettingsMenu {
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Eronous" -> {}
+            case "Monuments" -> game.setMonumentsMode(monuments.isVal());
         }
     }
 

@@ -34,18 +34,19 @@ final class FowSetupTableOrderService {
      * rather than {@code getRealPlayers()}. A player only becomes "real" once they have both a faction and a
      * colour, which would have meant you couldn't roll for seat order until everyone was already set up -
      * exactly backwards if you want the roll to decide draft/pick order. Private channels exist from game
-     * creation, so the roll buttons can be delivered regardless.
+     * creation, so the roll buttons can be delivered regardless. Also excludes whoever the PLAYER_ROLES
+     * step marked GM/observer (see {@link FowSetupPlayerRolesService}).
      */
-    private static List<Player> seatCandidates(Game game) {
+    private static List<Player> seatCandidates(Game game, FowSetupWizardState state) {
         return game.getPlayers().values().stream()
-                .filter(player -> !player.isDummy())
+                .filter(player -> FowSetupPlayerRolesService.isPlayerCandidate(player, state))
                 .toList();
     }
 
     static void render(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("### Current player order\n");
         int i = 1;
-        for (Player player : seatCandidates(game)) {
+        for (Player player : seatCandidates(game, state)) {
             sb.append("> ").append(i++).append(". ").append(player.getUserName());
             if (player.isSpeaker()) sb.append(" (speaker)");
             sb.append('\n');
@@ -96,7 +97,7 @@ final class FowSetupTableOrderService {
     private static void postRemainingPickButtons(
             ButtonInteractionEvent event, Game game, FowSetupWizardState state, boolean editInPlace) {
         List<Button> playerButtons = new ArrayList<>();
-        for (Player player : seatCandidates(game)) {
+        for (Player player : seatCandidates(game, state)) {
             if (state.getManualOrderPicks().contains(player.getUserID())) continue;
             playerButtons.add(Buttons.gray("fowSetupOrderPick_" + player.getUserID(), player.getUserName()));
         }
@@ -118,7 +119,7 @@ final class FowSetupTableOrderService {
         }
         FowSetupWizardService.saveState(game, state);
 
-        if (state.getManualOrderPicks().size() >= seatCandidates(game).size()) {
+        if (state.getManualOrderPicks().size() >= seatCandidates(game, state).size()) {
             finalizeOrder(event, game, state, state.getManualOrderPicks());
             state.getManualOrderPicks().clear();
             FowSetupWizardService.saveState(game, state);
@@ -133,8 +134,9 @@ final class FowSetupTableOrderService {
     @ButtonHandler("fowSetupPickSpeaker")
     static void pickSpeaker(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Button> playerButtons = new ArrayList<>();
-        for (Player player : seatCandidates(game)) {
+        for (Player player : seatCandidates(game, state)) {
             playerButtons.add(Buttons.gray("fowSetupSpeakerPick_" + player.getUserID(), player.getUserName()));
         }
         if (playerButtons.isEmpty()) {
@@ -200,7 +202,7 @@ final class FowSetupTableOrderService {
         // channel isn't linked, getCorrectChannel() silently falls back to the GM room instead of failing -
         // report that explicitly rather than leaving the GM to wonder why nobody got a button.
         List<String> missingPrivateChannel = new ArrayList<>();
-        for (Player player : seatCandidates(game)) {
+        for (Player player : seatCandidates(game, state)) {
             if (player.getPrivateChannel() == null) {
                 missingPrivateChannel.add(player.getUserName());
             }
@@ -211,8 +213,8 @@ final class FowSetupTableOrderService {
                     Buttons.green("fowSetupDiceRoll", "Roll for Table Order"));
         }
 
-        StringBuilder confirmation =
-                new StringBuilder("Roll buttons sent to " + seatCandidates(game).size() + " player(s).");
+        StringBuilder confirmation = new StringBuilder(
+                "Roll buttons sent to " + seatCandidates(game, state).size() + " player(s).");
         if (!missingPrivateChannel.isEmpty()) {
             confirmation
                     .append("\n**")
@@ -257,7 +259,7 @@ final class FowSetupTableOrderService {
         // The GM's panel only shows rolls when it's redrawn, and rolls land in each player's own private
         // channel where the GM can't see them - so tell the GM room once the last player is in, with the
         // full results, rather than leaving the GM to poll Refresh.
-        List<Player> waitingOn = seatCandidates(game).stream()
+        List<Player> waitingOn = seatCandidates(game, state).stream()
                 .filter(p -> !state.getDiceRolls().containsKey(p.getUserID()))
                 .toList();
         if (waitingOn.isEmpty()) {
@@ -298,7 +300,7 @@ final class FowSetupTableOrderService {
                 .sorted(comparator)
                 .map(Map.Entry::getKey)
                 .toList());
-        for (Player player : seatCandidates(game)) {
+        for (Player player : seatCandidates(game, state)) {
             if (!ordered.contains(player.getUserID())) {
                 ordered.add(player.getUserID());
             }

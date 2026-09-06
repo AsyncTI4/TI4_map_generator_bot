@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -75,6 +76,9 @@ public class ComponentActionHelper {
         String factionChecker = "FFCC_" + p1.getFaction() + "_";
         String prefix = "componentActionRes_";
         List<Button> compButtons = new ArrayList<>();
+        if (MonumentsButtonHandler.canUseYinMonument(game, p1)) {
+            compButtons.add(MonumentsButtonHandler.getYinMonumentButton(p1));
+        }
         // techs
         for (String tech : p1.getTechs()) {
             if (!p1.getExhaustedTechs().isEmpty() && p1.getExhaustedTechs().contains(tech)) {
@@ -652,7 +656,8 @@ public class ComponentActionHelper {
                             "kryxosagent",
                             "ardentiaagent",
                             "aeternaagent",
-                            "veyloragent");
+                            "veyloragent",
+                            "taagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
@@ -717,6 +722,7 @@ public class ComponentActionHelper {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("beginAuction_relic", "Relic", ExploreEmojis.Relic));
                     buttons.add(Buttons.blue("beginAuction_tech", "Faction Tech"));
+                    p1.addExhaustedAbility("contraband_auction");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol

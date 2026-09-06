@@ -183,16 +183,15 @@ class AutoCompleteProvider {
                 Map<String, String> values = new HashMap<>() {
                     {
                         put("RED", "Reds");
-                        put("GRAY", "Grays");
-                        // put("GRAY", "Greys");// TODO duplicate keys
-                        // put("GRAY", "Blacks");
                         put("ORANGE", "Oranges");
-                        // put("ORANGE", "Browns");
+                        put("BROWN", "Browns");
                         put("YELLOW", "Yellows");
                         put("GREEN", "Greens");
                         put("BLUE", "Blues");
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
+                        put("WHITE", "Whites");
+                        put("BLACK", "Blacks");
                         put("MULTI", "Multi-Colours");
                         put(Constants.ALL, "ALL COLOURS");
                     }
@@ -457,7 +456,11 @@ class AutoCompleteProvider {
             }
             case Constants.SCENARIO -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)", "erwan's gambit (homebrew)");
+                var tokens = List.of(
+                        "ordinian (codex 1)",
+                        "liberation (codex 4)",
+                        "erwan's gambit (homebrew)",
+                        "muaat mania (homebrew)");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -1490,6 +1493,9 @@ class AutoCompleteProvider {
                         List<Command.Choice> options = Mapper.getTechs().values().stream()
                                 .filter(entry -> entry.getFaction().isPresent())
                                 .filter(entry -> entry.search(enteredValue))
+                                .filter(model -> model.getSource() != ComponentSource.miltymod
+                                        && model.getSource() != ComponentSource.project_pi
+                                        && model.getSource() != ComponentSource.asteroid)
                                 .limit(25)
                                 .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
                                 .collect(Collectors.toList());
