@@ -144,8 +144,8 @@ public class TEOptionService {
         switch (homebrew) {
             case Constants.TK_DESTROYER_CUP -> {
                 game.setTkDestroyerCup(!game.isTkDestroyerCup());
+                game.setupTwilightsFallMode(event);
                 if (game.isTkDestroyerCup()) {
-                    game.setupTwilightsFallMode(event);
                     List<Button> buttons = new ArrayList<>();
                     game.removeStoredValue("bannedUnits");
                     buttons.add(Buttons.green("twilightDSSetup_pruned", "Just 4 units of each type"));
@@ -158,8 +158,12 @@ public class TEOptionService {
             }
             case Constants.TK_NOVA_CUP -> {
                 game.setTkNovaCup(!game.isTkNovaCup());
+                game.setupTwilightsFallMode(event);
                 if (game.isTkNovaCup()) {
-                    game.setupTwilightsFallMode(event);
+                    game.setStoredValue(Constants.TK_NOVA_CUP + "_setup_option", "onePerColor");
+                    postTkNovaSetupOptions(game);
+                } else {
+                    game.removeStoredValue(Constants.TK_NOVA_CUP + "_setup_option");
                 }
             }
             case Constants.TWILIGHT_DS -> {
@@ -176,6 +180,56 @@ public class TEOptionService {
             }
         }
         postTwilightFallHomebrewOptions(event, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void postTkNovaSetupOptions(Game game) {
+        String msg = """
+                The Nova Cup provides a set of alternate Mahact Kings which \
+                can be used in addition to or in place of the Vanilla Kings.
+                Which sets of Mahact Kings do you want to include in your game?
+                - **Both, but only 1 per Color (Default):** Include both sets. However, each color is only included once. \
+                (For each color, a coin is tossed to determine which set's king of that color is used.)
+                - **Only Nova Kings:** Only include the 8 Kings added in the Nova Cup.
+                - **Only Vanilla King:** Only include the 8 original, official Kings from vanilla TF.
+                """;
+        /*
+        Not implemented:
+               - **Both, but lock Colors:** Include all 16 Kings. However, when, for example, the
+               red vanilla king is picked, the red Nova Cup king can no longer be picked (and vice versa).
+               - **Both, but draft Color first:** Include all 16 Kings, but only draft the color at first.
+               After everyone has drafted a color, each player can choose which king of that color they want to play.
+               - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example,
+               the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
+        */
+        Map<String, String> options = Map.of(
+                "onePerColor", "Both, but only 1 per Color (Default)",
+                // "lockColor", "Both, but lock Colors",
+                // "chooseSet", "Both, but draft Color first",
+                // "unrestricted", "Both, no restrictions",
+                "onlyNova", "Only Nova Kings",
+                "onlyVanilla", "Only Vanilla Kings");
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, String> entry : options.entrySet()) {
+            String buttonID = "tkNovaSetup_" + entry.getKey();
+            String buttonLabel = entry.getValue();
+            if (entry.getKey().equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
+                buttons.add(Buttons.green(buttonID, buttonLabel));
+            } else {
+                buttons.add(Buttons.red(buttonID, buttonLabel));
+            }
+        }
+        MessageHelper.sendMessageToChannel(homebrewChannel(game), msg, buttons);
+    }
+
+    @ButtonHandler("tkNovaSetup_")
+    public static void tkNovaSetup(ButtonInteractionEvent event, Game game, String buttonID) {
+        String optionId = buttonID.split("_")[1];
+        if (optionId.equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
+            return;
+        }
+        game.setStoredValue(Constants.TK_NOVA_CUP + "_setup_option", optionId);
+        postTkNovaSetupOptions(game);
         ButtonHelper.deleteMessage(event);
     }
 
