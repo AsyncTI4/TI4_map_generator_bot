@@ -32,6 +32,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class TEOptionService {
@@ -178,6 +179,15 @@ public class TEOptionService {
                             homebrewChannel(game),
                             "Do you want to use just DS abilities or a mixture of Normal and DS abilities?",
                             buttons);
+                }
+            }
+            case Constants.MONUMENTS_MODE -> {
+                game.setMonumentsMode(!game.isMonumentsMode());
+                if (game.isMonumentsMode()) {
+                    MonumentsService.applyTwilightsFallMonuments(game);
+                    MessageHelper.sendMessageToChannel(
+                            homebrewChannel(game),
+                            "Added Monuments+ secret objectives and the Monuments+ Twilight's Fall strategy card set.");
                 }
             }
         }
