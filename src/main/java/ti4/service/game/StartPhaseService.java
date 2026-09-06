@@ -296,7 +296,11 @@ public class StartPhaseService {
                 VeiledHeartService.checkForAssigningTelepathic(game, p2);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
+        // In FoW, this may be triggered from the GM room (the `/fow setup` wizard's Start Game button) -
+        // route to the public game channel there instead of leaking into the GM's own channel. Non-fog
+        // callers all already fire from the main channel, so event.getMessageChannel() stays unchanged.
+        MessageHelper.sendMessageToChannel(
+                game.isFowMode() ? game.getMainGameChannel() : event.getMessageChannel(), "Started Round " + round);
         for (Player player : game.getRealPlayers()) {
             if (!player.hasAbility("allure_of_darkness")) {
                 continue;
@@ -549,7 +553,8 @@ public class StartPhaseService {
                     "Exhausted all cultural planets of those who voted \"Against\" on _Representative Government_.");
         }
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
+            // See the "Started Round" send above - same GM-room leak, same fix.
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player firstSCPicker;
         if (!game.hasAnyPriorityTrackMode()) {
