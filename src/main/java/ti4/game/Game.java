@@ -659,6 +659,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // Overrides for TK modes
         if (isTkNovaCup()) {
             acDeck = "action_cards_tk_nova";
+            setGenomeSpliceDeckID("tk_nova_genome");
         }
         // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
         if (isTwilightKart() || isTkDestroyerCup()) {
