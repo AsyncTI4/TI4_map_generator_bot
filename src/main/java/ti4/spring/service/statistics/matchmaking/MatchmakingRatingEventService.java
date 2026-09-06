@@ -210,6 +210,7 @@ public class MatchmakingRatingEventService {
                         stringBuilder.append(String.format(
                                 "\nYour %s is `%d`.",
                                 ratingLabel.toLowerCase(), toDisplayRating(playerRating.rating())));
+                        appendRecentTrend(stringBuilder, playerRating);
                     } else {
                         stringBuilder.append(String.format(
                                 "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
@@ -228,6 +229,14 @@ public class MatchmakingRatingEventService {
                 (MessageChannelUnion) event.getMessageChannel(),
                 "Player Matchmaking Ratings",
                 stringBuilder.toString());
+    }
+
+    private static void appendRecentTrend(StringBuilder stringBuilder, MatchmakingRating playerRating) {
+        BigDecimal recentRatingDelta = playerRating.recentRatingDelta();
+        if (recentRatingDelta == null) return;
+        stringBuilder.append(String.format(
+                " That is `%+d` over your last %d games.",
+                toDisplayRating(recentRatingDelta), TrueSkillMatchmakingRatingService.RECENT_GAMES_WINDOW));
     }
 
     private static void appendAverageOpponentRating(
