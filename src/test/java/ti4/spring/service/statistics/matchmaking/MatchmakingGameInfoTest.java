@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;
 class MatchmakingGameInfoTest {
 
     private static final double TOLERANCE = 1.0e-9;
+    private static final double EXPECTED_DRAW_PROBABILITY = 0.25;
+    private static final double EXPECTED_DYNAMICS_FACTOR_DIVISOR = 25.0;
 
     @Test
-    void matchesJskillsDefaultsApartFromTheDynamicsFactor() {
+    void keepsTheJskillsDefaultsForTheDistributionParameters() {
         GameInfo matchmaking = MatchmakingGameInfo.create();
         GameInfo jskillsDefault = GameInfo.getDefaultGameInfo();
 
@@ -19,13 +21,27 @@ class MatchmakingGameInfoTest {
         assertThat(matchmaking.getInitialStandardDeviation())
                 .isEqualTo(jskillsDefault.getInitialStandardDeviation(), within(TOLERANCE));
         assertThat(matchmaking.getBeta()).isEqualTo(jskillsDefault.getBeta(), within(TOLERANCE));
-        assertThat(matchmaking.getDrawProbability()).isEqualTo(jskillsDefault.getDrawProbability(), within(TOLERANCE));
     }
 
     @Test
-    void usesTheJskillsDefaultDynamicsFactor() {
-        assertThat(MatchmakingGameInfo.create().getDynamicsFactor())
-                .isEqualTo(GameInfo.getDefaultGameInfo().getDynamicsFactor(), within(TOLERANCE));
+    void tunesTheDrawProbabilityAboveTheJskillsDefault() {
+        GameInfo matchmaking = MatchmakingGameInfo.create();
+
+        assertThat(matchmaking.getDrawProbability()).isEqualTo(EXPECTED_DRAW_PROBABILITY, within(TOLERANCE));
+        assertThat(matchmaking.getDrawProbability())
+                .isGreaterThan(GameInfo.getDefaultGameInfo().getDrawProbability());
+    }
+
+    @Test
+    void tunesTheDynamicsFactorAboveTheJskillsDefault() {
+        GameInfo matchmaking = MatchmakingGameInfo.create();
+
+        assertThat(matchmaking.getDynamicsFactor())
+                .isEqualTo(
+                        matchmaking.getInitialStandardDeviation() / EXPECTED_DYNAMICS_FACTOR_DIVISOR,
+                        within(TOLERANCE));
+        assertThat(matchmaking.getDynamicsFactor())
+                .isGreaterThan(GameInfo.getDefaultGameInfo().getDynamicsFactor());
     }
 
     @Test

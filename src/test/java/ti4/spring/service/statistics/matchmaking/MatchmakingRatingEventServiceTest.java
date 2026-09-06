@@ -17,6 +17,7 @@ class MatchmakingRatingEventServiceTest {
     private static final int[] RANKS_P0_WINS = {1, 2, 2, 4, 5, 5};
     private static final int[] RANKS_P4_WINS = {5, 2, 2, 4, 1, 5};
     private static final long GAME_ENDED_EPOCH_MILLIS = Instant.now().toEpochMilli();
+    private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES = BigDecimal.valueOf(0.15);
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
@@ -42,10 +43,30 @@ class MatchmakingRatingEventServiceTest {
         assertThat(winnerRating).isGreaterThan(rank2Rating);
 
         BigDecimal otherRank2Rating = sortedRatings.get(2).rating();
-        assertThat(otherRank2Rating.subtract(rank2Rating).abs()).isLessThan(BigDecimal.valueOf(0.02));
+        assertThat(otherRank2Rating.subtract(rank2Rating).abs())
+                .isLessThan(TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES);
 
         BigDecimal rank3Rating = sortedRatings.get(3).rating();
         assertThat(rank3Rating).isLessThan(rank2Rating);
+    }
+
+    @Test
+    void identicallyRankedPlayersConvergeAsTheyPlayMoreGames() {
+        BigDecimal gapAtQualifyingGames = tiedPlayerRatingGap(GAMES_TO_QUALIFY);
+        BigDecimal gapAtManyGames = tiedPlayerRatingGap(100);
+
+        assertThat(gapAtQualifyingGames).isLessThan(TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES);
+        assertThat(gapAtManyGames).isLessThan(gapAtQualifyingGames);
+    }
+
+    private static BigDecimal tiedPlayerRatingGap(int gameCount) {
+        List<MatchmakingRating> sortedRatings = sortedByRating(
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(gameCount, RANKS_P0_WINS), false));
+        return sortedRatings
+                .get(1)
+                .rating()
+                .subtract(sortedRatings.get(2).rating())
+                .abs();
     }
 
     @Test
