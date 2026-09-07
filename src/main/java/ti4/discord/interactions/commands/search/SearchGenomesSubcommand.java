@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.search;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -33,12 +34,18 @@ class SearchGenomesSubcommand extends SearchComponentModelSubcommand {
                 return;
             }
         }
-        List<MessageEmbed> messageEmbeds = Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        messageEmbeds.addAll(Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
                 .map(Mapper::getLeader)
                 .filter(model -> model.search(searchString, source))
                 .sorted(Comparator.comparing(LeaderModel::getId))
                 .map(model -> model.getRepresentationEmbed(true, true, false, true, true))
-                .toList();
+                .toList());
+        messageEmbeds.addAll(Mapper.getLeaders().values().stream()
+                .filter(model -> model.searchSource(ComponentSource.tk_nova_cup) && model.search(searchString, source))
+                .sorted(Comparator.comparing(LeaderModel::getId))
+                .map(model -> model.getRepresentationEmbed(true, true, false, true, true))
+                .toList());
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }
