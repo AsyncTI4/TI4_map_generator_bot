@@ -10,7 +10,7 @@
     },
     {
         "alias": "tk-endorse",
-        "name": "Endorse",
+        "name": "Exalt",
         "category": "edict",
         "type": "Law",
         "target": "Elect Player",

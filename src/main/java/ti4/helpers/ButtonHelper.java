@@ -3335,11 +3335,8 @@ public class ButtonHelper {
         String mechName = mahact.hasUnit("mahact_mech_y") ? "Starlancer Y" : "Starlancer";
         MahactTokenService.removeMahactToken(mahact, target.getColor());
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-            if (!game.getStoredValue("absolLux").isEmpty()) {
-                target.setTacticalCC(target.getTacticalCC() + 1);
-            }
-            target.setTacticalCC(target.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, target, tile);
+            CommandCounterHelper.addCC(
+                    event, target, tile, true, game.getStoredValue("absolLux").isEmpty());
         }
 
         MessageHelper.sendMessageToChannel(
@@ -3375,11 +3372,8 @@ public class ButtonHelper {
         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                 mahact, game, event, FactionEmojis.Xxcha + " " + TechEmojis.CyberneticTech + "Nullification Field");
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-            if (!game.getStoredValue("absolLux").isEmpty()) {
-                target.setTacticalCC(target.getTacticalCC() + 1);
-            }
-            target.setTacticalCC(target.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, target, tile);
+            CommandCounterHelper.addCC(
+                    event, target, tile, true, game.getStoredValue("absolLux").isEmpty());
         }
         MessageHelper.sendMessageToChannel(
                 mahact.getCorrectChannel(),
@@ -3565,13 +3559,8 @@ public class ButtonHelper {
         }
 
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-            if (!CommandCounterHelper.hasCC(target, tile)) {
-                if (!game.getStoredValue("absolLux").isEmpty()) {
-                    target.setTacticalCC(target.getTacticalCC() + 1);
-                }
-                target.setTacticalCC(target.getTacticalCC() - 1);
-                CommandCounterHelper.addCC(event, target, tile);
-            }
+            CommandCounterHelper.addCC(
+                    event, target, tile, true, game.getStoredValue("absolLux").isEmpty());
         }
         MessageHelper.sendMessageToChannel(
                 minister.getCorrectChannel(),

@@ -476,22 +476,14 @@ public class PlayHeroService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" -> {
-                if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-                    player.setTacticalCC(player.getTacticalCC() - 1);
-                    CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
-                    game.setStoredValue("vaylerianHeroActive", "true");
-                }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
                 if (!removeCCs.isEmpty()) {
-                    for (int x = 0;
-                            x < ButtonHelperAgents.getGloryTokenTiles(game).size();
-                            x++) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCorrectChannel(),
-                                "Use buttons to remove 1 of your command tokens from the game board.",
-                                removeCCs);
-                    }
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            "Use buttons to remove 1 of your command tokens from the game board.",
+                            removeCCs);
                 }
+                game.setStoredValue("vaylerianHeroActive", "true");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), player.getFactionEmoji() + " may gain 1 command token.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);

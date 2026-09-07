@@ -392,7 +392,7 @@
         "combatDieCount": 1,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships’ capacity count against your fleet pool.  Once per combat this unit participates in, after 1 of your opponent's units is destroyed, you may discard 1 of your abilities to draw 1 ability.",
+        "ability": "This unit may move without being transported. Fighters in excess of your ships’ capacity count against your fleet pool.  Once per action, after another player's ship is destroyed in a system that contains your fighters, you may discard 1 ability to draw 1 ability.",
         "source": "twilight_kart"
     },
     {
@@ -470,8 +470,8 @@
         "planetaryShield": true,
         "isUpgrade": true,
         "isStructure": true,
-        "ability": "This unit can be transported by any ships; this does not require or count against capacity. At the end of your tactical action, you may place your PDS units that are in space areas onto planets you control in their respective systems.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-keshnu.png?raw=true",
+        "deepSpaceCannon": true,
+        "ability": "You may use this unit's space cannon ability against ships that are adjacent to this unit's system. This unit can be transported by any ships; this does not require or count against capacity. At the end of your tactical action, you may place your PDS units that are in space areas onto planets you control in their respective systems.",
         "source": "twilight_kart"
     },
     {
