@@ -13,21 +13,23 @@ import ti4.testUtils.BaseTi4Test;
 class MatchmakingRankTieAnalysisTest extends BaseTi4Test {
 
     private static final int VICTORY_POINT_GOAL = 10;
+    private static final int SAMPLE_SIZE = 5;
     private static final List<String> SCORING_SECRETS =
             List.of("pem", "otf", "mtm", "hrm", "eh", "dhw", "dfat", "te", "ose", "mrm");
-    private static final List<String> FACTIONS = List.of("sol", "hacan", "letnev", "xxcha");
-    private static final List<String> COLORS = List.of("blue", "red", "green", "yellow");
+    private static final List<String> FACTIONS = List.of("sol", "hacan", "letnev", "xxcha", "arborec", "saar");
+    private static final List<String> COLORS = List.of("blue", "red", "green", "yellow", "black", "purple");
 
     @Test
     void reportsATieAndTheMetricsThatWouldSeparateIt() {
-        Game game = agendaEndedGame();
+        Game game = endedGame();
         addPlayer(game, "winner", 1, VICTORY_POINT_GOAL);
-        Player firstTied = addPlayer(game, "tiedA", 2, 6);
-        Player secondTied = addPlayer(game, "tiedB", 3, 6);
-        addPlayer(game, "trailing", 4, 2);
-        firstTied.addPlanet("mr");
+        Player tiedWithAPlanet = addPlayer(game, "tiedA", 2, 6);
+        addPlayer(game, "tiedB", 3, 6);
+        addPlayer(game, "fourth", 4, 4);
+        addPlayer(game, "fifth", 5, 2);
+        tiedWithAPlanet.addPlanet("mr");
 
-        var analysis = new MatchmakingRankTieAnalysis(5);
+        var analysis = new MatchmakingRankTieAnalysis(SAMPLE_SIZE);
         analysis.consume(game);
         String summary = analysis.summary();
 
@@ -44,32 +46,86 @@ class MatchmakingRankTieAnalysisTest extends BaseTi4Test {
 
     @Test
     void reportsNothingForAGameWithoutTies() {
-        Game game = agendaEndedGame();
+        Game game = endedGame();
         addPlayer(game, "winner", 1, VICTORY_POINT_GOAL);
-        addPlayer(game, "second", 2, 7);
-        addPlayer(game, "third", 3, 4);
+        addPlayer(game, "second", 2, 8);
+        addPlayer(game, "third", 3, 6);
+        addPlayer(game, "fourth", 4, 4);
+        addPlayer(game, "fifth", 5, 2);
 
-        var analysis = new MatchmakingRankTieAnalysis(5);
+        var analysis = new MatchmakingRankTieAnalysis(SAMPLE_SIZE);
         analysis.consume(game);
 
+        assertThat(analysis.summary()).contains("ranked games: 1");
         assertThat(analysis.summary()).contains("games with at least one tie: 0");
         assertThat(analysis.summary()).contains("tied pairs: 0");
         assertThat(analysis.getSamples()).isEmpty();
     }
 
     @Test
-    void ignoresGamesThatCannotBeRanked() {
-        Game game = agendaEndedGame();
+    void ignoresGamesNobodyWon() {
+        Game game = endedGame();
         addPlayer(game, "first", 1, 4);
         addPlayer(game, "second", 2, 4);
+        addPlayer(game, "third", 3, 3);
+        addPlayer(game, "fourth", 4, 2);
+        addPlayer(game, "fifth", 5, 1);
 
-        var analysis = new MatchmakingRankTieAnalysis(5);
+        var analysis = new MatchmakingRankTieAnalysis(SAMPLE_SIZE);
         analysis.consume(game);
 
         assertThat(analysis.summary()).contains("ranked games: 0");
+        assertThat(analysis.summary()).contains("outside the rated 5-8 player corpus: 0");
     }
 
-    private static Game agendaEndedGame() {
+    @Test
+    void ignoresGamesBelowTheRatedPlayerCount() {
+        Game game = endedGame();
+        addPlayer(game, "winner", 1, VICTORY_POINT_GOAL);
+        addPlayer(game, "tiedA", 2, 6);
+        addPlayer(game, "tiedB", 3, 6);
+        addPlayer(game, "fourth", 4, 2);
+
+        var analysis = new MatchmakingRankTieAnalysis(SAMPLE_SIZE);
+        analysis.consume(game);
+
+        assertThat(analysis.summary()).contains("ranked games: 0");
+        assertThat(analysis.summary()).contains("outside the rated 5-8 player corpus: 1");
+    }
+
+    @Test
+    void ignoresGamesAboveTheRatedPlayerCount() {
+        Game game = endedGame();
+        addPlayer(game, "winner", 1, VICTORY_POINT_GOAL);
+        for (int seat = 1; seat <= 8; seat++) {
+            addPlayer(game, "player" + seat, seat, 6);
+        }
+
+        var analysis = new MatchmakingRankTieAnalysis(SAMPLE_SIZE);
+        analysis.consume(game);
+
+        assertThat(analysis.summary()).contains("ranked games: 0");
+        assertThat(analysis.summary()).contains("outside the rated 5-8 player corpus: 1");
+    }
+
+    @Test
+    void ignoresAllianceGames() {
+        Game game = endedGame();
+        game.setAllianceMode(true);
+        addPlayer(game, "winner", 1, VICTORY_POINT_GOAL);
+        addPlayer(game, "tiedA", 2, 6);
+        addPlayer(game, "tiedB", 3, 6);
+        addPlayer(game, "fourth", 4, 4);
+        addPlayer(game, "fifth", 5, 2);
+
+        var analysis = new MatchmakingRankTieAnalysis(SAMPLE_SIZE);
+        analysis.consume(game);
+
+        assertThat(analysis.summary()).contains("ranked games: 0");
+        assertThat(analysis.summary()).contains("outside the rated 5-8 player corpus: 1");
+    }
+
+    private static Game endedGame() {
         Game game = new Game();
         game.setName("tie-analysis-" + UUID.randomUUID());
         game.newGameSetup();

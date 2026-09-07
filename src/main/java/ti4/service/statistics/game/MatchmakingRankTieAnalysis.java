@@ -14,6 +14,8 @@ import ti4.service.statistics.game.MatchmakingGameRankEvaluator.SimulatedStandin
 public class MatchmakingRankTieAnalysis {
 
     private static final String INITIATIVE = "initiative";
+    private static final int MINIMUM_RATED_PLAYERS = 5;
+    private static final int MAXIMUM_RATED_PLAYERS = 8;
 
     private static final Map<String, ToIntFunction<Player>> TIE_BREAKER_CANDIDATES = buildTieBreakerCandidates();
 
@@ -28,6 +30,7 @@ public class MatchmakingRankTieAnalysis {
     private long totalAdjacentPairs;
     private long tiedAdjacentPairs;
     private long pairsSeparatedByAnyBoardMetric;
+    private int gamesOutsideTheRatedCorpus;
     private String lastSampledGame;
     private final Map<Integer, Integer> tieGroupSizes = new TreeMap<>();
     private final Map<String, Integer> tiesByPhase = new TreeMap<>();
@@ -51,6 +54,12 @@ public class MatchmakingRankTieAnalysis {
     }
 
     public void consume(Game game) {
+        if (!isRatedByMatchmaking(game)) {
+            if (game.isHasEnded()) {
+                gamesOutsideTheRatedCorpus++;
+            }
+            return;
+        }
         Map<String, SimulatedStanding> standings;
         try {
             standings = MatchmakingGameRankEvaluator.evaluateStandings(game);
@@ -85,6 +94,11 @@ public class MatchmakingRankTieAnalysis {
         if (gameHadTie) {
             gamesWithTies++;
         }
+    }
+
+    private static boolean isRatedByMatchmaking(Game game) {
+        int playerCount = game.getRealAndEliminatedPlayers().size();
+        return !game.isAllianceMode() && playerCount >= MINIMUM_RATED_PLAYERS && playerCount <= MAXIMUM_RATED_PLAYERS;
     }
 
     private void countAdjacentPairs(Map<String, SimulatedStanding> standings) {
@@ -160,6 +174,9 @@ public class MatchmakingRankTieAnalysis {
         StringBuilder summary = new StringBuilder();
         summary.append("## Simulated matchmaking rank ties\n");
         summary.append("- ranked games: ").append(rankedGames).append('\n');
+        summary.append("- ended games skipped as outside the rated 5-8 player corpus: ")
+                .append(gamesOutsideTheRatedCorpus)
+                .append('\n');
         summary.append("- games with at least one tie: ")
                 .append(gamesWithTies)
                 .append(percentOf(gamesWithTies, rankedGames))
