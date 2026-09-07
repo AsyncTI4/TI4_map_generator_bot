@@ -74,10 +74,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public TI4Emoji getLeaderEmoji() {
-        if (getHomebrewReplacesID().isPresent()) {
-            return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().get());
-        }
-        return LeaderEmojis.getLeaderEmoji(id);
+        return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().orElse(id));
     }
 
     public Optional<String> getTFName() {
@@ -116,31 +113,45 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public Optional<String> getTFAbilityWindow() {
-        if (tfAbilityWindow == null) {
-            return Optional.ofNullable(abilityWindow);
-        }
-        return Optional.of(tfAbilityWindow);
+        return Optional.ofNullable(tfAbilityWindow);
+    }
+
+    public String getTFAbilityWindowIfAble() {
+        return getTFAbilityWindow().orElse(abilityWindow);
     }
 
     public Optional<String> getTFAbilityText() {
-        if (tfAbilityText == null) {
-            return Optional.ofNullable(abilityText);
-        }
-        return Optional.of(tfAbilityText);
+        return Optional.ofNullable(tfAbilityText);
+    }
+
+    public String getTFAbilityTextIfAble() {
+        return getTFAbilityText().orElse(abilityText);
+    }
+
+    public boolean isTfCard() {
+        return source.isTwilightFallish()
+                || getTFName().isPresent()
+                || getTFTitle().isPresent()
+                || getTFAbilityWindow().isPresent()
+                || getTFAbilityText().isPresent();
     }
 
     public boolean isGenome() {
-        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(id);
+        return Constants.AGENT.equals(type) && isTfCard();
     }
 
     public boolean isParadigm() {
-        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(id);
+        return Constants.HERO.equals(type) && isTfCard();
     }
 
     public TI4Emoji getTFEmoji() {
-        if (isGenome()) return MiscEmojis.tf_genome;
-        if (isParadigm()) return MiscEmojis.tf_paradigm;
-        return null;
+        if (isGenome()) {
+            return MiscEmojis.tf_genome;
+        }
+        if (isParadigm()) {
+            return MiscEmojis.tf_paradigm;
+        }
+        return LeaderEmojis.getLeaderTypeEmoji(type);
     }
 
     private Optional<String> getFlavourText() {
@@ -240,11 +251,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FIELDS
         String abilityName = useTwilightsFallText ? " " : getAbilityName().orElse(" ");
-        String abilityWindow =
-                useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
+        String abilityWindow = useTwilightsFallText ? getTFAbilityWindowIfAble() : this.abilityWindow;
         String fieldTitle =
                 abilityName + (abilityWindow == null || abilityWindow.isBlank() ? "" : "\n**" + abilityWindow + "**");
-        String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(abilityText) : abilityText;
+        String fieldContent = useTwilightsFallText ? getTFAbilityTextIfAble() : abilityText;
         if (useTwilightsFallText && (tfNotes != null)) {
             fieldContent += "\n-# [" + tfNotes + "]";
         } else if (notes != null) {

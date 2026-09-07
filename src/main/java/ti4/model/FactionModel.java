@@ -231,7 +231,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             }
             sb.append('\n');
         }
-        eb.addField("__Abilities:__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Abilities:__", sb.toString(), false);
+        }
 
         // Faction Tech
         sb = new StringBuilder();
@@ -240,7 +242,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append(model.getCondensedReqsEmojis(false)).append(' ').append(model.getName());
             sb.append("\n> ").append(model.getText()).append('\n');
         }
-        eb.addField("__Faction Technologies__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Faction Technologies__", sb.toString(), false);
+        }
 
         // Special Units
         sb = new StringBuilder();
@@ -252,7 +256,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 sb.append("\n> ").append(model.getAbility().get());
             sb.append('\n');
         }
-        eb.addField("__Units__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Units__", sb.toString(), false);
+        }
 
         // Promissory Notes
         sb = new StringBuilder();
@@ -260,7 +266,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
             sb.append(model.getName()).append('\n');
         }
-        eb.addField("__Promissory Notes__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Promissory Notes__", sb.toString(), false);
+        }
 
         // Leaders
         sb = new StringBuilder();
@@ -271,11 +279,15 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                     .append(model.getName())
                     .append('\n');
         }
-        eb.addField("__Leaders__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Leaders__", sb.toString(), false);
+        }
 
         sb = new StringBuilder();
         sb.append(Helper.getUnitListEmojis(startingFleet)).append('\n');
-        eb.addField("__Starting Fleet__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Starting Fleet__", sb.toString(), false);
+        }
 
         sb = new StringBuilder();
         if (getStartingTech() != null && !getStartingTech().isEmpty()) {
@@ -298,7 +310,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb = new StringBuilder();
             sb.append("Choose 2 non-faction technologies owned by other players.");
         }
-        eb.addField("__Starting Tech__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            eb.addField("__Starting Tech__", sb.toString(), false);
+        }
 
         return eb.build();
     }

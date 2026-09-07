@@ -997,11 +997,24 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put(SourceEmojis.DiscordantStars + " Twilight DiscordantStars", isTwilightDS());
         gameModes.put("BlueReverie", isBlueReverieMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
+
+        // Twilight Kart Cups
+        List<String> tkCups = new ArrayList<>();
+        // isTwilightKart is deprecated. once removed, just check for isTkDestroyerCup
+        if (isTwilightKart() || isTkDestroyerCup()) {
+            tkCups.add("Destroyer Cup");
+        }
+        if (isTkNovaCup()) {
+            tkCups.add("Nova Cup");
+        }
+        gameModes.put(
+                SourceEmojis.TwilightKart + " Twilight Kart (" + String.join(" & ", tkCups) + ")", !tkCups.isEmpty());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);

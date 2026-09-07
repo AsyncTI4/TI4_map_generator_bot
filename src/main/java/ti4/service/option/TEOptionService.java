@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -122,7 +123,10 @@ public class TEOptionService {
         SourceModel source = Mapper.getSource(sourceId);
         String buttonId = TOGGLE_TF_HOMEBREW_PREFIX + sourceId;
         Button button = Buttons.rgToggle(isDisable, buttonId, buttonLabel, sourceEmoji);
-        return Section.of(button, source.getRepresentationTextDisplays());
+        List<TextDisplay> textDisplays = source != null
+                ? source.getRepresentationTextDisplays()
+                : List.of(TextDisplay.of("invalid sourceId: " + sourceId));
+        return Section.of(button, textDisplays);
     }
 
     private static ContainerChildComponent getSingleTfHomebrewInfo(
