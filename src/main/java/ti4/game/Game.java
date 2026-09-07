@@ -668,7 +668,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (isTwilightKart() || isTkDestroyerCup()) {
             agendaDeck = "agendas_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
-            acDeck = isTkNovaCup() ? "action_cards_tk_destroyer_and_nova" : "action_cards_twilight_kart";
+            acDeck = "action_cards_tk_destroyer_and_nova";
         }
 
         // Set other normal decks
