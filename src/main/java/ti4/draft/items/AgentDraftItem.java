@@ -14,7 +14,6 @@ import ti4.model.DeckModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 public class AgentDraftItem extends DraftItem {
@@ -74,7 +73,7 @@ public class AgentDraftItem extends DraftItem {
     public TI4Emoji getItemEmoji() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return LeaderEmojis.getLeaderEmoji(leader.getId());
+            return leader.getLeaderEmoji();
         }
         return null;
     }
