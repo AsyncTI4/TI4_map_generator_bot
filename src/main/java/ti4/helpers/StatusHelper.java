@@ -108,11 +108,7 @@ public final class StatusHelper {
             Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
             for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
                 String soID = entry.getKey();
-                if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
-                        && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
-                                > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
-                        && !"dp".equalsIgnoreCase(soID)) {
-
+                if (ListPlayerInfoService.canScoreStatusPhaseSecret(game, player, soID)) {
                     buttons.add(Buttons.green(
                             "preScoreObbie_SO_" + entry.getValue(),
                             Mapper.getSecretObjective(soID).getName()));
@@ -373,10 +369,7 @@ public final class StatusHelper {
             Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
             for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
                 String soID = entry.getKey();
-                if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
-                        && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
-                                > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
-                        && !"dp".equalsIgnoreCase(soID)) {
+                if (ListPlayerInfoService.canScoreStatusPhaseSecret(game, player, soID)) {
                     message3a
                             .append('\n')
                             .append(Mapper.getSecretObjective(soID).getRepresentation(false));

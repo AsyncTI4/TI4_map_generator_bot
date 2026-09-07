@@ -2,6 +2,7 @@ package ti4.service.info;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
@@ -1070,5 +1072,61 @@ public class ListPlayerInfoService {
             }
         }
         return 0;
+    }
+
+    public static boolean canScoreStatusPhaseSecret(Game game, Player player, String secretId) {
+        SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+        if (secretObjective == null || !"status".equalsIgnoreCase(secretObjective.getPhase())) {
+            return false;
+        }
+        int threshold = getObjectiveThreshold(secretId, game);
+        return threshold > 0 && getProgressOrZero(secretId, game, player) >= threshold;
+    }
+
+    public static List<String> getScoreableStatusPhaseSecrets(Game game, Player player) {
+        return player.getSecretsUnscored().keySet().stream()
+                .filter(secretId -> canScoreStatusPhaseSecret(game, player, secretId))
+                .sorted()
+                .toList();
+    }
+
+    public static List<String> getQualifyingPublicObjectiveIds(Game game, Player player) {
+        List<String> qualifying = new ArrayList<>();
+        for (String objectiveId : game.getRevealedPublicObjectives().keySet()) {
+            if (getPublicObjectivePoints(objectiveId) == null) {
+                continue;
+            }
+            if (game.getScoredPublicObjectives()
+                    .getOrDefault(objectiveId, List.of())
+                    .contains(player.getUserID())) {
+                continue;
+            }
+            int threshold = getObjectiveThreshold(objectiveId, game);
+            if (threshold > 0 && getProgressOrZero(objectiveId, game, player) >= threshold) {
+                qualifying.add(objectiveId);
+            }
+        }
+        qualifying.sort(Comparator.comparingInt((String objectiveId) -> publicObjectivePointsOrZero(objectiveId))
+                .reversed()
+                .thenComparing(Comparator.naturalOrder()));
+        return qualifying;
+    }
+
+    public static Integer getPublicObjectivePoints(String objectiveId) {
+        PublicObjectiveModel publicObjective = Mapper.getPublicObjective(objectiveId);
+        return publicObjective == null ? null : publicObjective.getPoints();
+    }
+
+    private static int publicObjectivePointsOrZero(String objectiveId) {
+        Integer points = getPublicObjectivePoints(objectiveId);
+        return points == null ? 0 : points;
+    }
+
+    private static int getProgressOrZero(String objectiveId, Game game, Player player) {
+        try {
+            return getPlayerProgressOnObjective(objectiveId, game, player);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }

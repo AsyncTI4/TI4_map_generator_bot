@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.PlayerEntity;
@@ -20,29 +21,19 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
 
         return gamePlayers.entrySet().stream()
                 .map(entry -> toMatchmakingGame(entry.getKey(), entry.getValue()))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     private static MatchmakingGame toMatchmakingGame(GameEntity game, List<PlayerEntity> players) {
+        if (players.stream().anyMatch(player -> player.getSimulatedRank() == null)) {
+            return null;
+        }
         List<MatchmakingPlayer> matchmakingPlayers = players.stream()
-                .map(player -> {
-                    int rank = calculatePlayerRank(player.isWinner(), game.getVictoryPointGoal(), player.getScore());
-                    return new MatchmakingPlayer(
-                            player.getUser().getId(), player.getUser().getName(), rank);
-                })
+                .map(player -> new MatchmakingPlayer(
+                        player.getUser().getId(), player.getUser().getName(), player.getSimulatedRank()))
                 .toList();
         long endedDate = game.getEndedEpochMilliseconds();
         return new MatchmakingGame(game.getGameName(), endedDate, matchmakingPlayers);
-    }
-
-    private static int calculatePlayerRank(boolean isWinner, int gameVictoryPointGoal, int playerScore) {
-        if (isWinner) {
-            return 1;
-        }
-        int pointsAwayFromVictory = gameVictoryPointGoal - playerScore;
-        if (pointsAwayFromVictory <= 3) {
-            return 2;
-        }
-        return 3 + pointsAwayFromVictory;
     }
 }
