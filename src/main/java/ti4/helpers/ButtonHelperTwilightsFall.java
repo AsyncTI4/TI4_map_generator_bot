@@ -1390,7 +1390,7 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String unit : player.getUnitsOwned()) {
-                if (unit.contains("tf_") || (!unit.contains("tf-") && !unit.contains("tk-"))) {
+                if (!Mapper.getUnit(unit).getIsUpgrade()) {
                     continue;
                 }
                 buttons.add(Buttons.red(
