@@ -206,7 +206,7 @@
       "name": "Starflare",
       "phase": "Action",
       "window": "After a player moves 1 or more ships into or out of an anomaly",
-      "text": "Roll 1 die for each of those ships. On a 1-3 destroy that unit.",
+      "text": "Roll 1 die for each of those ships. On a 1-3 remove that unit.",
       "source": "tk_nova_cup"
     }
 ]
