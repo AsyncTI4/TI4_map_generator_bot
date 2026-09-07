@@ -2683,6 +2683,11 @@ public final class Helper {
         boolean regulated =
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        boolean hasRallyingCryProduction = player.hasAbility("rallying_cry")
+                && tile.getSpaceUnitHolder()
+                                .countPlayersUnitsWithModelCondition(
+                                        player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                        == 1;
         String tp = tile.getPosition();
         String remaining;
         String checker = player.factionButtonChecker();
@@ -2911,7 +2916,8 @@ public final class Helper {
                                         game,
                                         tile,
                                         tile.getUnitHolders().get("space"))
-                                == 0) {
+                                == 0
+                        && !hasRallyingCryProduction) {
                     continue;
                 }
 
