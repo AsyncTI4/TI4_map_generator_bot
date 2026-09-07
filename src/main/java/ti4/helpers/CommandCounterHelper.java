@@ -29,10 +29,15 @@ public final class CommandCounterHelper {
     }
 
     public static void addCC(GenericInteractionCreateEvent event, Player player, Tile tile) {
-        addCC(event, player, tile, true);
+        addCC(event, player, tile, true, false);
     }
 
     public static void addCC(GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping) {
+        addCC(event, player, tile, ping, false);
+    }
+
+    public static void addCC(
+            GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping, boolean useTactic) {
         if (player == null || !Mapper.isValidColor(player.getColor())) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -44,6 +49,12 @@ public final class CommandCounterHelper {
             return;
         }
         String ccID = Mapper.getCCID(player.getColor());
+        if (tile.hasCC(ccID)) {
+            return;
+        }
+        if (useTactic) {
+            player.setTacticalCC(player.getTacticalCC() - 1);
+        }
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
             if (event != null) {
