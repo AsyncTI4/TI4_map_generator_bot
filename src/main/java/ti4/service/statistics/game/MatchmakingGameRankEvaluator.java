@@ -36,7 +36,15 @@ public class MatchmakingGameRankEvaluator {
     private static final int WINNER_RANK = 1;
     private static final int FIRST_RANK_BELOW_WINNER = 2;
 
+    public record SimulatedStanding(int rank, int simulatedScore) {}
+
     public static Map<String, Integer> evaluate(Game game) {
+        Map<String, Integer> ranks = new HashMap<>();
+        evaluateStandings(game).forEach((userId, standing) -> ranks.put(userId, standing.rank()));
+        return ranks;
+    }
+
+    public static Map<String, SimulatedStanding> evaluateStandings(Game game) {
         if (!game.isHasEnded()) {
             return Map.of();
         }
@@ -60,7 +68,7 @@ public class MatchmakingGameRankEvaluator {
             simulateStatusPhase(game, simulation, contenders, winner);
         }
 
-        return buildRanks(winner, contenders, simulation);
+        return buildStandings(winner, contenders, simulation);
     }
 
     public static boolean isExcludedForWinnerCount(Game game) {
@@ -126,12 +134,14 @@ public class MatchmakingGameRankEvaluator {
         }
     }
 
-    private static Map<String, Integer> buildRanks(Player winner, List<Player> contenders, Simulation simulation) {
-        Map<String, Integer> ranks = new HashMap<>();
-        ranks.put(winner.getUserID(), WINNER_RANK);
+    private static Map<String, SimulatedStanding> buildStandings(
+            Player winner, List<Player> contenders, Simulation simulation) {
+        Map<String, SimulatedStanding> standings = new HashMap<>();
+        standings.put(winner.getUserID(), new SimulatedStanding(WINNER_RANK, winner.getTotalVictoryPoints()));
 
         for (int i = 0; i < simulation.crossedGoalInOrder.size(); i++) {
-            ranks.put(simulation.crossedGoalInOrder.get(i), FIRST_RANK_BELOW_WINNER + i);
+            String userId = simulation.crossedGoalInOrder.get(i);
+            standings.put(userId, new SimulatedStanding(FIRST_RANK_BELOW_WINNER + i, simulation.scoreOf(userId)));
         }
 
         List<Player> remaining = contenders.stream()
@@ -149,9 +159,9 @@ public class MatchmakingGameRankEvaluator {
                 currentScore = score;
                 rankOfCurrentScore = firstRemainingRank + i;
             }
-            ranks.put(player.getUserID(), rankOfCurrentScore);
+            standings.put(player.getUserID(), new SimulatedStanding(rankOfCurrentScore, score));
         }
-        return ranks;
+        return standings;
     }
 
     private static String nextOnDemandActionSecret(Player player, Simulation simulation) {
@@ -274,7 +284,11 @@ public class MatchmakingGameRankEvaluator {
         }
 
         private int score(Player player) {
-            return scoreByUserId.getOrDefault(player.getUserID(), 0);
+            return scoreOf(player.getUserID());
+        }
+
+        private int scoreOf(String userId) {
+            return scoreByUserId.getOrDefault(userId, 0);
         }
 
         private void award(Player player, int points) {
