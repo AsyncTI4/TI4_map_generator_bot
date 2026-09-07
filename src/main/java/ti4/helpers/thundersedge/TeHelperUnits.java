@@ -61,7 +61,10 @@ public final class TeHelperUnits {
         UnitHolder space = tile.getSpaceUnitHolder();
         boolean hasBreach = space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
         boolean hasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip);
-        if (!hasBreach && !(game.isTwilightKart() && hasShips)) {
+
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        boolean tkRevenant = game.isTwilightKart() || game.isTkDestroyerCup();
+        if (!hasBreach && !(tkRevenant && hasShips)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "The system must have an active Breach in it to deploy a Revenant.");
             return;
@@ -71,7 +74,7 @@ public final class TeHelperUnits {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
             String planetRep = Helper.getPlanetRepresentation(planet, game);
             String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep + ".";
-            String flavorMsg = "Out of the cold depths of " + (game.isTwilightKart() ? "space" : "the active breach");
+            String flavorMsg = "Out of the cold depths of " + (tkRevenant ? "space" : "the active breach");
             flavorMsg += ", a Rebellion _Revenant_ has emerged, landing on " + planetRep + ".";
 
             String msg = RandomHelper.isOneInX(20) ? flavorMsg : boringMsg;

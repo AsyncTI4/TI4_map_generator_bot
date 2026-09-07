@@ -479,7 +479,10 @@ public class ButtonHelperCommanders {
         player.setGhostCommanderCounter(player.getGhostCommanderCounter() + 1);
         String factionEmoji = player.getFactionEmoji();
 
-        String method = game.isTwilightKart() ? "IFF Support Wing" : "Sai Seravus, the Creuss commander";
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        String method = game.isTwilightKart() || game.isTkDestroyerCup()
+                ? "IFF Support Wing"
+                : "Sai Seravus, the Creuss commander";
         String msg = factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
                 + " using " + method + ".\n-# " + factionEmoji
                 + " has placed a total of " + player.getGhostCommanderCounter()

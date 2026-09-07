@@ -812,7 +812,7 @@ public final class ButtonHelperTwilightsFall {
     @ButtonHandler("fixMahactColors")
     public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
         for (Player player : game.getRealPlayers()) {
-            String factionColor = player.getFaction().replace("tf", "");
+            String factionColor = player.getFaction().replace("tf", "").replace("tknova", "");
             if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
                 Player p2 = game.getPlayerFromColorOrFaction(factionColor);
                 if (p2 != null) {

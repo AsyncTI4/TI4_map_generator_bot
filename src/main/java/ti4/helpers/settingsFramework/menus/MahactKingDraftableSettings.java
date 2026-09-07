@@ -75,7 +75,7 @@ public class MahactKingDraftableSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
-        List<ComponentSource> sources = List.of(ComponentSource.twilights_fall);
+        List<ComponentSource> sources = List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
         Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(model -> sources.contains(model.getSource()))
                 .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
