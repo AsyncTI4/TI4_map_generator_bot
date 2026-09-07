@@ -27,7 +27,7 @@
         "alias": "action_cards_twilight_kart",
         "name": "Twilight Kart: Destroyer Cup Action Cards",
         "type": "action_card",
-        "description": "All action cards for the Homebrew; Twilight Kart: Destroyer Cup",
+        "description": "All action cards for the Homebrew; Twilight Kart: Destroyer Cup (Deprecated - still uses tf-starflare when it should use tk-nova-starflare) ",
         "cardIDs": [
             "tf-transpose1",
             "tf-transpose2",
