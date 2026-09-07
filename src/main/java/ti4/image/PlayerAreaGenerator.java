@@ -3439,7 +3439,7 @@ public class PlayerAreaGenerator {
                                 valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
                         unitFactionOffset.translate(-24, -24);
                     } else if (game.isTwilightsFallMode() && tfFlagCount >= 2) {
-                        if (unit.getAlias().endsWith("tf_flagship")) {
+                        if (!unit.getIsUpgrade()) {
                             if (tfFlagCount >= 3) unitFactionOffset.translate(0, 8);
                         } else {
                             if (tfFlagCount >= 3) unitFactionOffset.translate(0, -8);
@@ -3455,7 +3455,7 @@ public class PlayerAreaGenerator {
                 }
 
                 if ("mf".equals(unit.getAsyncId()) && game.isTwilightsFallMode() && tfMechCount >= 2) {
-                    if (unit.getAlias().endsWith("tf_mech")) {
+                    if (!unit.getIsUpgrade()) {
                         unitFactionOffset.translate(-12, 12);
                     } else {
                         tfMechIndex++;
