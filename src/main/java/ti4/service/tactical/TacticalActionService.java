@@ -180,14 +180,9 @@ public class TacticalActionService {
         }
 
         boolean skipPlacingAbilities = shouldSkipPlacingAbilities(game, player);
-        if (!skipPlacingAbilities
-                && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
-            if (!game.getStoredValue("absolLux").isEmpty()) {
-                player.setTacticalCC(player.getTacticalCC() + 1);
-            }
-            player.setTacticalCC(player.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, player, tile);
+        if (!skipPlacingAbilities) {
+            CommandCounterHelper.addCC(
+                    event, player, tile, true, game.getStoredValue("absolLux").isEmpty());
             ArdentiaTechHandler.offerOverlordMatrixButton(game, tile);
             return true;
         }
@@ -272,7 +267,6 @@ public class TacticalActionService {
         XytherisLeadersHandler.moveMyrixAgentShipToActiveSystem(game, player, tile);
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
         Tile updatedTile = game.getTileByPosition(tile.getPosition());
-        spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);
 
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
@@ -478,7 +472,7 @@ public class TacticalActionService {
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, tile, moveOrRemove);
     }
 
-    private boolean shouldSkipPlacingAbilities(Game game, Player player) {
+    public boolean shouldSkipPlacingAbilities(Game game, Player player) {
         return game.isNaaluAgent()
                 || game.isWarfareAction()
                 || game.isL1Hero()
