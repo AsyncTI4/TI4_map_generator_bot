@@ -61,7 +61,7 @@ public class AgentDraftItem extends DraftItem {
         LeaderModel leader = getLeader();
         if (leader != null) {
             if (game.isTwilightsFallMode()) {
-                return "*" + leader.getTFAbilityWindow() + "* " + leader.getTFAbilityText();
+                return "*" + leader.getTFAbilityWindowIfAble() + "* " + leader.getTFAbilityTextIfAble();
             } else {
                 return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
             }

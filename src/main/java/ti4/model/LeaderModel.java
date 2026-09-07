@@ -116,17 +116,19 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public Optional<String> getTFAbilityWindow() {
-        if (tfAbilityWindow == null) {
-            return Optional.ofNullable(abilityWindow);
-        }
-        return Optional.of(tfAbilityWindow);
+        return Optional.ofNullable(tfAbilityWindow);
+    }
+
+    public String getTFAbilityWindowIfAble() {
+        return getTFAbilityWindow().orElse(abilityWindow);
     }
 
     public Optional<String> getTFAbilityText() {
-        if (tfAbilityText == null) {
-            return Optional.ofNullable(abilityText);
-        }
-        return Optional.of(tfAbilityText);
+        return Optional.ofNullable(tfAbilityText);
+    }
+
+    public String getTFAbilityTextIfAble() {
+        return getTFAbilityText().orElse(abilityText);
     }
 
     public boolean isGenome() {
@@ -240,11 +242,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FIELDS
         String abilityName = useTwilightsFallText ? " " : getAbilityName().orElse(" ");
-        String abilityWindow =
-                useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
+        String abilityWindow = useTwilightsFallText ? getTFAbilityWindowIfAble() : this.abilityWindow;
         String fieldTitle =
                 abilityName + (abilityWindow == null || abilityWindow.isBlank() ? "" : "\n**" + abilityWindow + "**");
-        String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(abilityText) : abilityText;
+        String fieldContent = useTwilightsFallText ? getTFAbilityTextIfAble() : abilityText;
         if (useTwilightsFallText && (tfNotes != null)) {
             fieldContent += "\n-# [" + tfNotes + "]";
         } else if (notes != null) {
