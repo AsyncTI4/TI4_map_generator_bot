@@ -3303,7 +3303,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             AbilityModel model = Mapper.getAbility(id);
             sb.append(model.getNameRepresentation()).append('\n');
         }
-        addFieldSafely(eb, "__Abilities__", sb.toString(), true);
+        if (!sb.isEmpty()) {
+            addFieldSafely(eb, "__Abilities__", sb.toString(), true);
+        }
 
         // Faction Tech
         sb = new StringBuilder();
@@ -3311,7 +3313,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getNameRepresentation()).append('\n');
         }
-        addFieldSafely(eb, "__Faction Technologies__", sb.toString(), true);
+        if (!sb.isEmpty()) {
+            addFieldSafely(eb, "__Faction Technologies__", sb.toString(), true);
+        }
 
         // Techs
         sb = new StringBuilder();
@@ -3319,7 +3323,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getNameRepresentation()).append('\n');
         }
-        addFieldSafely(eb, "__Technologies__", sb.toString(), true);
+        if (!sb.isEmpty()) {
+            addFieldSafely(eb, "__Technologies__", sb.toString(), true);
+        }
 
         // Special Units
         sb = new StringBuilder();
@@ -3327,7 +3333,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             UnitModel model = Mapper.getUnit(id);
             sb.append(model.getNameRepresentation()).append('\n');
         }
-        addFieldSafely(eb, "__Units__", sb.toString(), true);
+        if (!sb.isEmpty()) {
+            addFieldSafely(eb, "__Units__", sb.toString(), true);
+        }
 
         // Promissory Notes
         sb = new StringBuilder();
@@ -3335,7 +3343,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
             sb.append(model.getNameRepresentation()).append('\n');
         }
-        addFieldSafely(eb, "__Promissory Notes__", sb.toString(), true);
+        if (!sb.isEmpty()) {
+            addFieldSafely(eb, "__Promissory Notes__", sb.toString(), true);
+        }
 
         // Leaders
         sb = new StringBuilder();
@@ -3343,7 +3353,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             LeaderModel model = Mapper.getLeader(id);
             sb.append(model.getNameRepresentation()).append('\n');
         }
-        addFieldSafely(eb, "__Leaders__", sb.toString(), false);
+        if (!sb.isEmpty()) {
+            addFieldSafely(eb, "__Leaders__", sb.toString(), false);
+        }
 
         // Add avatar, color and footer
         applyEmbedDefaults(eb);
