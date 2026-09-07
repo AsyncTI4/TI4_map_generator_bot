@@ -45,21 +45,6 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
         assertThat(render(List.of(game))).contains("  - 1 support: 100% (1/1; 50%)\n");
     }
 
-    /** A player's own support sitting in their own play area is not a point anyone gave them. */
-    @Test
-    void shouldNotCountAPlayersOwnSupportAsOneTheyHold() {
-        Game game = newGame("1");
-        Player sol = addPlayer(game, "sol", true);
-        addPlayer(game, "letnev", false);
-        sol.addPromissoryNoteToPlayArea(sol.getColor() + "_sftt");
-
-        String report = render(List.of(game));
-
-        assertThat(report).contains("- **All players**: 0.00 supports held on average, from 2 players\n");
-        assertThat(report).contains("  - 0 supports: 50% (1/2; 100%)\n");
-        assertThat(report).contains("- Kept it: 50% win rate (1/2; 100% of players)\n");
-    }
-
     @Test
     void shouldSplitOnWhereAPlayersOwnSupportEndedUp() {
         Game game = newGame("1");

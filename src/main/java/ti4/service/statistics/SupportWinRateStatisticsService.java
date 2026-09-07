@@ -158,7 +158,7 @@ public class SupportWinRateStatisticsService {
                     continue;
                 }
                 Player owner = supportOwners.get(support);
-                if (owner != null && !isSameSeat(owner, player)) {
+                if (owner != null) {
                     givers.add(owner.getFaction());
                 }
             }
@@ -192,9 +192,8 @@ public class SupportWinRateStatisticsService {
 
     private static SupportFate fateOf(
             String ownSupport, Player owner, Map<String, Player> playAreaHolders, Map<String, Player> handHolders) {
-        Player playAreaHolder = playAreaHolders.get(ownSupport);
-        if (playAreaHolder != null) {
-            return isSameSeat(playAreaHolder, owner) ? SupportFate.KEPT : SupportFate.SCORED_BY_ANOTHER;
+        if (playAreaHolders.containsKey(ownSupport)) {
+            return SupportFate.SCORED_BY_ANOTHER;
         }
         Player handHolder = handHolders.get(ownSupport);
         if (handHolder != null) {
@@ -211,8 +210,7 @@ public class SupportWinRateStatisticsService {
         List<String> blocks = new ArrayList<>();
 
         StringBuilder header = new StringBuilder("## __**Support for the Throne Win Rates**__\n");
-        header.append("_Where every Support for the Throne sat at the end of the game. A player's own support in"
-                + " their own play area is nobody's point, so it never counts as one held._\n");
+        header.append("_Where every Support for the Throne sat at the end of the game._\n");
         header.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with"
                 + " winners._\n");
         if (stats.players == 0) {
