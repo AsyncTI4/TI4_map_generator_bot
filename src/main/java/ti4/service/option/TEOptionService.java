@@ -137,8 +137,7 @@ public class TEOptionService {
                 getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
                 getSingleTfHomebrewInfo(
                         game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars),
-                getSingleTfHomebrewInfo(
-                        game.isMonumentsMode(), Constants.MONUMENTS_MODE, "Monuments+", SourceEmojis.Monuments));
+                getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+", SourceEmojis.Monuments));
     }
 
     @ButtonHandler(TOGGLE_TF_HOMEBREW_PREFIX)
@@ -181,7 +180,7 @@ public class TEOptionService {
                             buttons);
                 }
             }
-            case Constants.MONUMENTS_MODE -> {
+            case "monuments" -> {
                 game.setMonumentsMode(!game.isMonumentsMode());
                 if (game.isMonumentsMode()) {
                     MonumentsService.applyTwilightsFallMonuments(game);
