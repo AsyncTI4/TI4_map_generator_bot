@@ -1206,6 +1206,13 @@ public class ButtonHelper {
         if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
             return true;
         }
+        if (player.hasAbility("rallying_cry")
+                && tile.getSpaceUnitHolder()
+                                .countPlayersUnitsWithModelCondition(
+                                        player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                        == 1) {
+            return true;
+        }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet) {
                 continue;

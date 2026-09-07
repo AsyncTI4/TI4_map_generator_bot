@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -127,22 +128,20 @@ public class OblivionTechHandler {
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
 
-        List<Button> hitButtons = List.of(
-                Buttons.green(
-                        opponent.factionButtonChecker() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + hits,
-                        "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")),
-                Buttons.red(
-                        opponent.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()
-                                + "deleteThis_spacecombat",
-                        "Manually Assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
-
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + " purged 1 " + unitKey.humanReadableName()
-                        + " using _Oblivion Cannon_ to produce " + hits + " hit" + (hits == 1 ? "" : "s") + ".\n"
-                        + opponent.getRepresentation() + ", please assign the produced hits.",
-                hitButtons);
+        String message = player.getRepresentationNoPing() + " purged 1 " + unitKey.humanReadableName()
+                + " using _Oblivion Cannon_ to produce " + hits + " hit" + (hits == 1 ? "" : "s") + ".";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        List<Button> hitButtons = ButtonHelperModifyUnits.getOpposingUnitsToHit(player, game, tile, false).stream()
+                .filter(button -> button.getCustomId().contains("_" + opponent.getColor() + "_"))
+                .toList();
+        for (int hit = 1; hit <= hits; hit++) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", choose an opposing unit for _Oblivion Cannon_ hit " + hit + " of "
+                            + hits + ".",
+                    hitButtons);
+        }
     }
 
     private static List<UnitKey> getOblivionCannonShips(Player player, Tile tile) {
