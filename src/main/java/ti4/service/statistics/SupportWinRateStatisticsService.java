@@ -1,7 +1,6 @@
 package ti4.service.statistics;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,6 +28,7 @@ import ti4.model.FactionModel;
 public class SupportWinRateStatisticsService {
 
     private static final String SUPPORT_SUFFIX = "_sftt";
+    private static final String SUPPORTS_PURGED_KEY = "removeSupports";
     private static final int MINIMUM_FACTION_PLAYERS = 25;
     private static final int MINIMUM_PLAYERS_ON_EACH_SIDE_OF_THE_SPLIT = 10;
 
@@ -37,19 +37,6 @@ public class SupportWinRateStatisticsService {
                             entry.getValue().supportGap())
                     .reversed()
                     .thenComparing(Entry::getKey);
-
-    private enum SupportFate {
-        KEPT("Kept it"),
-        SCORED_BY_ANOTHER("Given away and played for the point"),
-        IN_ANOTHER_HAND("Given away but never played"),
-        OFF_THE_TABLE("No longer anywhere in the game");
-
-        private final String label;
-
-        SupportFate(String label) {
-            this.label = label;
-        }
-    }
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showSupportWinRates(event));
@@ -82,19 +69,23 @@ public class SupportWinRateStatisticsService {
         if (seats.isEmpty()) {
             return;
         }
+
+        Set<String> supportsInPlayAreas = supportsInPlayAreas(seats);
+        if (supportsAreOutOfPlay(game, supportsInPlayAreas)) {
+            stats.gamesWithoutSupportsInPlay++;
+            return;
+        }
         stats.games++;
 
         Map<String, Player> supportOwners = supportOwnersInTheGame(game);
-        Map<String, Player> playAreaHolders = supportsIn(seats, Player::getPromissoryNotesInPlayArea);
-        Map<String, Player> handHolders =
-                supportsIn(seats, player -> player.getPromissoryNotes().keySet());
         Map<String, Set<String>> supportsHeldByFaction = supportsHeldByFaction(seats, supportOwners);
         Set<String> swappingFactions = swappingFactions(supportsHeldByFaction);
+        int swaps = swappingFactions.size() / 2;
 
         stats.supportsPlayed +=
                 supportsHeldByFaction.values().stream().mapToInt(Set::size).sum();
-        stats.swaps += swappingFactions.size() / 2;
-        stats.gamesBySwapCount.merge(swappingFactions.size() / 2, 1, Integer::sum);
+        stats.swaps += swaps;
+        stats.gamesBySwapCount.merge(swaps, 1, Integer::sum);
 
         for (Player player : seats) {
             String faction = player.getFaction();
@@ -116,15 +107,26 @@ public class SupportWinRateStatisticsService {
 
             String ownSupport = ownSupport(player);
             if (ownSupport == null) {
-                stats.playersWithoutASupport++;
                 continue;
             }
-            SupportFate fate = fateOf(ownSupport, player, playAreaHolders, handHolders);
-            stats.playersByFate.computeIfAbsent(fate, _ -> new WinRateCount()).record(isWinner);
-            if (fate == SupportFate.SCORED_BY_ANOTHER) {
+            if (supportsInPlayAreas.contains(ownSupport)) {
+                stats.gaveAway.record(isWinner);
                 (swappingFactions.contains(faction) ? stats.inASwap : stats.gaveAwayOutsideASwap).record(isWinner);
+            } else {
+                stats.keptIt.record(isWinner);
             }
         }
+    }
+
+    private static boolean supportsAreOutOfPlay(Game game, Set<String> supportsInPlayAreas) {
+        return supportsInPlayAreas.isEmpty() || "true".equalsIgnoreCase(game.getStoredValue(SUPPORTS_PURGED_KEY));
+    }
+
+    private static Set<String> supportsInPlayAreas(List<Player> seats) {
+        return seats.stream()
+                .flatMap(player -> player.getPromissoryNotesInPlayArea().stream())
+                .filter(SupportWinRateStatisticsService::isSupport)
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     private static Map<String, Player> supportOwnersInTheGame(Game game) {
@@ -135,17 +137,6 @@ public class SupportWinRateStatisticsService {
                     .forEach(support -> supportOwners.put(support, player));
         }
         return supportOwners;
-    }
-
-    private static Map<String, Player> supportsIn(
-            List<Player> seats, Function<Player, Collection<String>> promissoryNotes) {
-        Map<String, Player> holders = new HashMap<>();
-        for (Player player : seats) {
-            promissoryNotes.apply(player).stream()
-                    .filter(SupportWinRateStatisticsService::isSupport)
-                    .forEach(support -> holders.put(support, player));
-        }
-        return holders;
     }
 
     private static Map<String, Set<String>> supportsHeldByFaction(
@@ -190,31 +181,15 @@ public class SupportWinRateStatisticsService {
                 .orElse(null);
     }
 
-    private static SupportFate fateOf(
-            String ownSupport, Player owner, Map<String, Player> playAreaHolders, Map<String, Player> handHolders) {
-        if (playAreaHolders.containsKey(ownSupport)) {
-            return SupportFate.SCORED_BY_ANOTHER;
-        }
-        Player handHolder = handHolders.get(ownSupport);
-        if (handHolder != null) {
-            return isSameSeat(handHolder, owner) ? SupportFate.KEPT : SupportFate.IN_ANOTHER_HAND;
-        }
-        return SupportFate.OFF_THE_TABLE;
-    }
-
-    private static boolean isSameSeat(Player one, Player other) {
-        return one.getFaction() != null && one.getFaction().equals(other.getFaction());
-    }
-
     private static List<String> buildReport(SupportStats stats) {
         List<String> blocks = new ArrayList<>();
 
         StringBuilder header = new StringBuilder("## __**Support for the Throne Win Rates**__\n");
-        header.append("_Where every Support for the Throne sat at the end of the game._\n");
         header.append("_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with"
                 + " winners._\n");
         if (stats.players == 0) {
             header.append("\nNo games matched.\n");
+            appendGamesWithoutSupportsInPlay(header, stats);
             blocks.add(header.toString());
             return blocks;
         }
@@ -223,20 +198,28 @@ public class SupportWinRateStatisticsService {
                 .append(" | Players analyzed: ")
                 .append(stats.players)
                 .append('\n');
+        appendGamesWithoutSupportsInPlay(header, stats);
         blocks.add(header.toString());
 
         appendSupportsHeldSection(blocks, stats);
-        appendOwnSupportSection(blocks, stats);
-        appendFactionSection(blocks, stats);
+        appendSupportLocationSection(blocks, stats);
         appendSwapSection(blocks, stats);
+        appendFactionSection(blocks, stats);
 
         return blocks;
     }
 
+    private static void appendGamesWithoutSupportsInPlay(StringBuilder header, SupportStats stats) {
+        if (stats.gamesWithoutSupportsInPlay == 0) {
+            return;
+        }
+        header.append("Dropped ")
+                .append(stats.gamesWithoutSupportsInPlay)
+                .append(" game(s) that purged Support for the Throne or never played one.\n");
+    }
+
     private static void appendSupportsHeldSection(List<String> blocks, SupportStats stats) {
         blocks.add("### Win rate by supports held\n"
-                + "_Another player's Support for the Throne in your play area at the end of the game, one victory"
-                + " point each._\n"
                 + "_Each row reads: win rate (wins/players; share of players who held that many)._\n");
 
         StringBuilder sb = new StringBuilder("- **All players**: ");
@@ -259,43 +242,96 @@ public class SupportWinRateStatisticsService {
         blocks.add(sb.toString());
     }
 
-    private static void appendOwnSupportSection(List<String> blocks, SupportStats stats) {
-        StringBuilder heading = new StringBuilder("### Win rate by what became of your own support\n");
-        heading.append("_The card the player started with, wherever it ended up._\n");
-        if (stats.playersWithoutASupport > 0) {
-            heading.append('_')
-                    .append(stats.playersWithoutASupport)
-                    .append(" player(s) owned no Support for the Throne at all and are left out of this section._\n");
-        }
-        blocks.add(heading.toString());
+    private static void appendSupportLocationSection(List<String> blocks, SupportStats stats) {
+        blocks.add("### Win rate by support location\n");
 
-        int playersWithASupport = stats.playersByFate.values().stream()
-                .mapToInt(WinRateCount::getPlayers)
-                .sum();
+        int playersWithASupport = stats.keptIt.getPlayers() + stats.gaveAway.getPlayers();
         if (playersWithASupport == 0) {
             blocks.add("- No player owned a Support for the Throne.\n");
             return;
         }
-
         StringBuilder sb = new StringBuilder();
-        for (SupportFate fate : SupportFate.values()) {
-            WinRateCount count = stats.playersByFate.get(fate);
-            if (count == null) {
-                continue;
-            }
-            sb.append("- ")
-                    .append(fate.label)
-                    .append(": ")
-                    .append(ActionCardStatsService.formatPercent(count.getWinRate()))
-                    .append(" win rate (")
-                    .append(count.getWins())
-                    .append('/')
-                    .append(count.getPlayers())
-                    .append("; ")
-                    .append(ActionCardStatsService.formatPercent(count.getPlayers() / (double) playersWithASupport))
-                    .append(" of players)\n");
-        }
+        appendLocationLine(sb, "Kept it", stats.keptIt, playersWithASupport);
+        appendLocationLine(sb, "Gave away", stats.gaveAway, playersWithASupport);
         blocks.add(sb.toString());
+    }
+
+    private static void appendLocationLine(
+            StringBuilder sb, String label, WinRateCount count, int playersWithASupport) {
+        sb.append("- ")
+                .append(label)
+                .append(": ")
+                .append(ActionCardStatsService.formatPercent(count.getWinRate()))
+                .append(" win rate (")
+                .append(count.getWins())
+                .append('/')
+                .append(count.getPlayers())
+                .append("; ")
+                .append(ActionCardStatsService.formatPercent(count.getPlayers() / (double) playersWithASupport))
+                .append(" of players)\n");
+    }
+
+    private static void appendSwapSection(List<String> blocks, SupportStats stats) {
+        blocks.add("### Support swaps\n"
+                + "_Two players who each ended the game holding the other's Support for the Throne._\n");
+
+        StringBuilder sb = new StringBuilder("- Swaps per game: ");
+        sb.append(String.format("%.2f", stats.swaps / (double) stats.games)).append(" on average\n");
+        stats.gamesBySwapCount.forEach((swaps, games) ->
+                appendSwapCountLine(sb, swaps + (swaps == 1 ? " swap" : " swaps"), games, stats.games));
+        int gamesWithASwap = stats.gamesBySwapCount.entrySet().stream()
+                .filter(entry -> entry.getKey() > 0)
+                .mapToInt(Entry::getValue)
+                .sum();
+        appendSwapCountLine(sb, "1+ swaps", gamesWithASwap, stats.games);
+        appendSwapRate(sb, stats);
+        appendSwapWinRates(sb, stats);
+        blocks.add(sb.toString());
+    }
+
+    private static void appendSwapCountLine(StringBuilder sb, String label, int games, int totalGames) {
+        sb.append("  - ")
+                .append(label)
+                .append(": ")
+                .append(games)
+                .append(" game(s) (")
+                .append(ActionCardStatsService.formatPercent(games / (double) totalGames))
+                .append(")\n");
+    }
+
+    private static void appendSwapRate(StringBuilder sb, SupportStats stats) {
+        sb.append("- Swap rate: ");
+        if (stats.supportsPlayed == 0) {
+            sb.append("no supports were played at all\n");
+            return;
+        }
+        sb.append(ActionCardStatsService.formatPercent(2.0 * stats.swaps / stats.supportsPlayed))
+                .append(" (")
+                .append(2 * stats.swaps)
+                .append('/')
+                .append(stats.supportsPlayed)
+                .append(" of the supports played)\n");
+    }
+
+    private static void appendSwapWinRates(StringBuilder sb, SupportStats stats) {
+        if (stats.inASwap.getPlayers() == 0 && stats.gaveAwayOutsideASwap.getPlayers() == 0) {
+            return;
+        }
+        sb.append("- Win rate after giving a support away:\n");
+        appendSwapWinRateLine(sb, "Swap", stats.inASwap);
+        appendSwapWinRateLine(sb, "No swap", stats.gaveAwayOutsideASwap);
+    }
+
+    private static void appendSwapWinRateLine(StringBuilder sb, String label, WinRateCount count) {
+        sb.append("  - ")
+                .append(label)
+                .append(": ")
+                .append(ActionCardStatsService.formatPercent(count.getWinRate()))
+                .append(" (")
+                .append(count.getWins())
+                .append('/')
+                .append(count.getPlayers())
+                .append(")\n");
     }
 
     private static void appendFactionSection(List<String> blocks, SupportStats stats) {
@@ -338,69 +374,6 @@ public class SupportWinRateStatisticsService {
                 .toString();
     }
 
-    private static void appendSwapSection(List<String> blocks, SupportStats stats) {
-        blocks.add("### Support swaps\n"
-                + "_Two players who each ended the game holding the other's Support for the Throne._\n");
-
-        int gamesWithASwap = stats.gamesBySwapCount.entrySet().stream()
-                .filter(entry -> entry.getKey() > 0)
-                .mapToInt(Entry::getValue)
-                .sum();
-        StringBuilder sb = new StringBuilder("- Games with at least one swap: ");
-        sb.append(gamesWithASwap)
-                .append('/')
-                .append(stats.games)
-                .append(" (")
-                .append(ActionCardStatsService.formatPercent(gamesWithASwap / (double) stats.games))
-                .append(")\n");
-        sb.append("- Swaps per game: ")
-                .append(String.format("%.2f", stats.swaps / (double) stats.games))
-                .append(" on average\n");
-        stats.gamesBySwapCount.forEach((swaps, games) -> sb.append("  - ")
-                .append(swaps)
-                .append(swaps == 1 ? " swap: " : " swaps: ")
-                .append(games)
-                .append(" game(s) (")
-                .append(ActionCardStatsService.formatPercent(games / (double) stats.games))
-                .append(")\n"));
-        appendReciprocalSupports(sb, stats);
-        appendSwapWinRates(sb, stats);
-        blocks.add(sb.toString());
-    }
-
-    private static void appendReciprocalSupports(StringBuilder sb, SupportStats stats) {
-        sb.append("- Supports played into a swap: ");
-        if (stats.supportsPlayed == 0) {
-            sb.append("no supports were played at all\n");
-            return;
-        }
-        sb.append(2 * stats.swaps)
-                .append('/')
-                .append(stats.supportsPlayed)
-                .append(" (")
-                .append(ActionCardStatsService.formatPercent(2.0 * stats.swaps / stats.supportsPlayed))
-                .append(" of the supports played)\n");
-    }
-
-    private static void appendSwapWinRates(StringBuilder sb, SupportStats stats) {
-        if (stats.inASwap.getPlayers() == 0 && stats.gaveAwayOutsideASwap.getPlayers() == 0) {
-            return;
-        }
-        sb.append("- Win rate after giving a support away: ")
-                .append(ActionCardStatsService.formatPercent(stats.inASwap.getWinRate()))
-                .append(" (")
-                .append(stats.inASwap.getWins())
-                .append('/')
-                .append(stats.inASwap.getPlayers())
-                .append(") in a swap, ")
-                .append(ActionCardStatsService.formatPercent(stats.gaveAwayOutsideASwap.getWinRate()))
-                .append(" (")
-                .append(stats.gaveAwayOutsideASwap.getWins())
-                .append('/')
-                .append(stats.gaveAwayOutsideASwap.getPlayers())
-                .append(") outside one\n");
-    }
-
     private static String formatPercentagePointGap(double gap) {
         return String.format("%+.1f pts", gap * 100);
     }
@@ -414,7 +387,9 @@ public class SupportWinRateStatisticsService {
     private static class SupportStats {
         final NavigableMap<Integer, WinRateCount> playersBySupportsHeld = new TreeMap<>();
 
-        final Map<SupportFate, WinRateCount> playersByFate = new HashMap<>();
+        final WinRateCount keptIt = new WinRateCount();
+
+        final WinRateCount gaveAway = new WinRateCount();
 
         final FactionSupportStats overall = new FactionSupportStats();
 
@@ -427,8 +402,8 @@ public class SupportWinRateStatisticsService {
         final WinRateCount gaveAwayOutsideASwap = new WinRateCount();
 
         int games;
+        int gamesWithoutSupportsInPlay;
         int players;
-        int playersWithoutASupport;
         int supportsHeldAtTheirRealCounts;
         int supportsPlayed;
         int swaps;

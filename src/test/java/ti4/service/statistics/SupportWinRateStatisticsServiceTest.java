@@ -46,41 +46,42 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldSplitOnWhereAPlayersOwnSupportEndedUp() {
+    void shouldSplitOnWhetherAPlayerGaveTheirOwnSupportAway() {
         Game game = newGame("1");
         Player sol = addPlayer(game, "sol", true);
         Player letnev = addPlayer(game, "letnev", false);
         Player jolnar = addPlayer(game, "jolnar", false);
         Player hacan = addPlayer(game, "hacan", false);
-        // Letnev's support was played for the point, Jol-Nar's was traded but never played, and
-        // Hacan's left the game entirely.
+        // Letnev and Jol-Nar gave theirs to Sol; Sol and Hacan still hold their own.
         playSupport(letnev, sol);
-        handSupportOver(jolnar, sol);
-        discardSupport(hacan);
+        playSupport(jolnar, sol);
 
         String report = render(List.of(game));
 
-        assertThat(report).contains("### Win rate by what became of your own support\n");
-        assertThat(report).contains("- Kept it: 100% win rate (1/1; 25% of players)\n");
-        assertThat(report).contains("- Given away and played for the point: 0% win rate (0/1; 25% of players)\n");
-        assertThat(report).contains("- Given away but never played: 0% win rate (0/1; 25% of players)\n");
-        assertThat(report).contains("- No longer anywhere in the game: 0% win rate (0/1; 25% of players)\n");
+        assertThat(report).contains("### Win rate by support location\n");
+        assertThat(report).contains("- Kept it: 50% win rate (1/2; 50% of players)\n");
+        assertThat(report).contains("- Gave away: 0% win rate (0/2; 50% of players)\n");
+        assertThat(hacan.getPromissoryNotes()).containsKey(hacan.getColor() + "_sftt");
     }
 
+    /** The Enlightenment ability leaves a player with no support to give. */
     @Test
-    void shouldLeavePlayersWhoOwnNoSupportOutOfTheOwnSupportSection() {
+    void shouldLeavePlayersWhoOwnNoSupportOutOfTheLocationSection() {
         Game game = newGame("1");
-        addPlayer(game, "sol", true);
+        Player sol = addPlayer(game, "sol", true);
         Player letnev = addPlayer(game, "letnev", false);
+        Player jolnar = addPlayer(game, "jolnar", false);
+        playSupport(jolnar, sol);
         letnev.removeOwnedPromissoryNoteByID(letnev.getColor() + "_sftt");
         letnev.removePromissoryNote(letnev.getColor() + "_sftt");
 
         String report = render(List.of(game));
 
-        assertThat(report).contains("Players analyzed: 2\n");
-        assertThat(report)
-                .contains("_1 player(s) owned no Support for the Throne at all and are left out of this section._\n");
-        assertThat(report).contains("- Kept it: 100% win rate (1/1; 100% of players)\n");
+        // Letnev is still one of the three players analyzed, just not one of the two with a support.
+        assertThat(report).contains("Players analyzed: 3\n");
+        assertThat(report).contains("- Kept it: 100% win rate (1/1; 50% of players)\n");
+        assertThat(report).contains("- Gave away: 0% win rate (0/1; 50% of players)\n");
+        assertThat(report).doesNotContain("owned no Support for the Throne");
     }
 
     @Test
@@ -96,26 +97,27 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldRankFactionsByTheGapBetweenHoldingASupportAndNot() {
+    void shouldSplitEachWellSampledFactionOnHoldingASupport() {
         List<Game> games = new ArrayList<>();
-        // Sol wins whenever it is handed a support and loses when it is not.
-        games.addAll(repeatGame(MINIMUM_SAMPLE, "won", game -> {
+        // Whoever is handed a support wins, so both Sol and Letnev see each side of the split.
+        games.addAll(repeatGame(MINIMUM_SAMPLE, "sol", game -> {
             Player sol = addPlayer(game, "sol", true);
             playSupport(addPlayer(game, "letnev", false), sol);
         }));
-        games.addAll(repeatGame(MINIMUM_SAMPLE, "lost", game -> {
+        games.addAll(repeatGame(MINIMUM_SAMPLE, "letnev", game -> {
             addPlayer(game, "sol", false);
-            addPlayer(game, "letnev", true);
+            Player letnev = addPlayer(game, "letnev", true);
+            playSupport(addPlayer(game, "jolnar", false), letnev);
         }));
 
         String report = render(games);
 
         assertThat(report)
-                .contains("- **All factions**: +66.7 pts - 100% (25/25) holding one, 33.33% (25/75) holding none\n");
-        assertThat(report).contains("+100.0 pts - 100% (25/25) holding one, 0% (0/25) holding none\n");
+                .contains("- **All factions**: +100.0 pts - 100% (50/50) holding one, 0% (0/75) holding none\n");
         assertThat(report).contains("The Federation of Sol");
-        // Letnev never held one, so it has no split to report.
-        assertThat(report).doesNotContain("Barony");
+        assertThat(report).contains("The Barony of Letnev");
+        // Jol-Nar only ever gave one away, so it has no with-a-support side to report.
+        assertThat(report).doesNotContain("Jol-Nar");
     }
 
     @Test
@@ -131,12 +133,15 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
         String report = render(List.of(game));
 
         assertThat(report).contains("### Support swaps\n");
-        assertThat(report).contains("- Games with at least one swap: 1/1 (100%)\n");
         assertThat(report).contains("- Swaps per game: 1.00 on average\n");
         assertThat(report).contains("  - 1 swap: 1 game(s) (100%)\n");
-        assertThat(report).contains("- Supports played into a swap: 2/3 (66.67% of the supports played)\n");
-        assertThat(report)
-                .contains("- Win rate after giving a support away: 50% (1/2) in a swap, 0% (0/1)" + " outside one\n");
+        assertThat(report).contains("  - 1+ swaps: 1 game(s) (100%)\n");
+        assertThat(report).contains("- Swap rate: 66.67% (2/3 of the supports played)\n");
+        assertThat(report).contains("- Win rate after giving a support away:\n");
+        assertThat(report).contains("  - Swap: 50% (1/2)\n");
+        assertThat(report).contains("  - No swap: 0% (0/1)\n");
+        // The swaps section is read before the faction split.
+        assertThat(report.indexOf("### Support swaps")).isLessThan(report.indexOf("by faction"));
     }
 
     @Test
@@ -147,26 +152,65 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
 
         String report = render(List.of(game));
 
-        assertThat(report).contains("- Games with at least one swap: 0/1 (0%)\n");
         assertThat(report).contains("- Swaps per game: 0.00 on average\n");
         assertThat(report).contains("  - 0 swaps: 1 game(s) (100%)\n");
-        assertThat(report).contains("- Supports played into a swap: 0/1 (0% of the supports played)\n");
+        assertThat(report).contains("  - 1+ swaps: 0 game(s) (0%)\n");
+        assertThat(report).contains("- Swap rate: 0% (0/1 of the supports played)\n");
     }
 
-    /** A support handed over but left in hand is a trade, not a swap - nobody scored anything. */
+    /** Nobody played a support, so the table almost certainly agreed not to use them. */
     @Test
-    void shouldNotCountUnplayedSupportsAsASwap() {
-        Game game = newGame("1");
-        Player sol = addPlayer(game, "sol", true);
-        Player letnev = addPlayer(game, "letnev", false);
-        handSupportOver(sol, letnev);
-        handSupportOver(letnev, sol);
+    void shouldDropGamesWhereEveryPlayerStillHoldsTheirOwnSupport() {
+        Game noneplayed = newGame("1");
+        addPlayer(noneplayed, "sol", true);
+        addPlayer(noneplayed, "letnev", false);
 
-        String report = render(List.of(game));
+        String report = render(List.of(noneplayed));
 
-        assertThat(report).contains("- Games with at least one swap: 0/1 (0%)\n");
-        assertThat(report).contains("- Supports played into a swap: no supports were played at all\n");
-        assertThat(report).contains("- Given away but never played: 50% win rate (1/2; 100% of players)\n");
+        assertThat(report).contains("No games matched.\n");
+        assertThat(report).contains("Dropped 1 game(s) that purged Support for the Throne or never played one.\n");
+    }
+
+    @Test
+    void shouldDropGamesFlaggedAsHavingPurgedSupports() {
+        Game purged = newGame("1");
+        Player sol = addPlayer(purged, "sol", true);
+        playSupport(addPlayer(purged, "letnev", false), sol);
+        purged.setStoredValue("removeSupports", "true");
+
+        // A support is sitting in a play area, but the game says they were purged, so it is stale data.
+        String report = render(List.of(purged));
+
+        assertThat(report).contains("No games matched.\n");
+        assertThat(report).contains("Dropped 1 game(s) that purged Support for the Throne or never played one.\n");
+    }
+
+    @Test
+    void shouldDropGamesWhoseSupportsWereRemovedOutright() {
+        Game purged = newGame("1");
+        for (String faction : List.of("sol", "letnev")) {
+            Player player = addPlayer(purged, faction, "sol".equals(faction));
+            player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
+            player.removePromissoryNote(player.getColor() + "_sftt");
+        }
+
+        assertThat(render(List.of(purged))).contains("No games matched.\n");
+    }
+
+    @Test
+    void shouldStillCountGamesAlongsideDroppedOnes() {
+        Game noneplayed = newGame("1");
+        addPlayer(noneplayed, "sol", true);
+        addPlayer(noneplayed, "letnev", false);
+
+        Game played = newGame("2");
+        Player sol = addPlayer(played, "sol", true);
+        playSupport(addPlayer(played, "letnev", false), sol);
+
+        String report = render(List.of(noneplayed, played));
+
+        assertThat(report).contains("Games analyzed: 1 | Players analyzed: 2\n");
+        assertThat(report).contains("Dropped 1 game(s) that purged Support for the Throne or never played one.\n");
     }
 
     @Test
@@ -185,7 +229,8 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
 
         assertThat(report).contains("- Swaps per game: 2.00 on average\n");
         assertThat(report).contains("  - 2 swaps: 1 game(s) (100%)\n");
-        assertThat(report).contains("- Supports played into a swap: 4/4 (100% of the supports played)\n");
+        assertThat(report).contains("  - 1+ swaps: 1 game(s) (100%)\n");
+        assertThat(report).contains("- Swap rate: 100% (4/4 of the supports played)\n");
     }
 
     @Test
@@ -246,15 +291,5 @@ class SupportWinRateStatisticsServiceTest extends BaseTi4Test {
     private static void playSupport(Player giver, Player receiver) {
         giver.removePromissoryNote(giver.getColor() + "_sftt");
         receiver.addPromissoryNoteToPlayArea(giver.getColor() + "_sftt");
-    }
-
-    /** Traded across the table but never played. */
-    private static void handSupportOver(Player giver, Player receiver) {
-        giver.removePromissoryNote(giver.getColor() + "_sftt");
-        receiver.setPromissoryNote(giver.getColor() + "_sftt");
-    }
-
-    private static void discardSupport(Player giver) {
-        giver.removePromissoryNote(giver.getColor() + "_sftt");
     }
 }
