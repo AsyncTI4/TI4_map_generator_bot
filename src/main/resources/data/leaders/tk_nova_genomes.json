@@ -9,7 +9,7 @@
         "abilityWindow": "When a player draws 1 or more edicts:",
         "abilityText": "You may exhaust this card to allow that player to draw 1 additional edict. If only 2 edicts were drawn, they choose 1 to resolve and discard the other.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/action_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/action_tk2.png?raw=true",
         "shortName": "Xander A. Victori III",
         "source": "tk_nova_cup"
     },
@@ -25,7 +25,7 @@
         "abilityWindow": "At the start of a space combat round:",
         "abilityText": "You may exhaust this card to choose up to 2 ships in the active system. Those ships roll 1 additional die during this combat round.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/aristocratic_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/aristocratic_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -38,7 +38,7 @@
         "abilityWindow": "After a player's unit uses PRODUCTION:",
         "abilityText": "You may exhaust this card to allow that player to place 1 mech from their reinforcements on a planet they control in that unit's system.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/brutal_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/brutal_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -52,7 +52,7 @@
         "abilityWindow": "At the start of a player's turn:",
         "abilityText": "You may exhaust this card to allow that player to remove up to 4 of their ground forces from the game board and place them on 1 or more planets they control.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/deployment_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/deployment_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -65,7 +65,7 @@
         "abilityWindow": "At the start of a ground combat round:",
         "abilityText": "You may exhaust this card to choose up to 2 ground forces in the active system; those ground forces roll 1 additional die during this combat round.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/human_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/human_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -79,7 +79,7 @@
         "abilityWindow": "When any player gains trade goods from the supply:",
         "abilityText": "You may exhaust this card to place an equal number of trade goods on this card. When this card readies, gain the trade goods on this card.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/investment_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/investment_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -92,7 +92,7 @@
         "abilityWindow": "When a player moves ships:",
         "abilityText": "You may exhaust this card; if you do, SPACE CANNON cannot be used against those ships; they can also move through other players' ships.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/mirror_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/mirror_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -105,7 +105,7 @@
         "abilityWindow": "When a player produces units:",
         "abilityText": "You may exhaust this card to allow that player to also produce up to 6 fighters or infantry; they do not count against that player's PRODUCTION limit.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/ravenous_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/ravenous_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -118,7 +118,7 @@
         "abilityWindow": "During the action phase:",
         "abilityText": "You may exhaust this card to choose a player; they may discard 1 action card, or spend 1 command token or 2 trade goods, to draw 1 action card, or gain 1 command token or 2 trade goods.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/recursive_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/recursive_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -131,7 +131,7 @@
         "abilityWindow": "When a player produces ground forces in a system:",
         "abilityText": "You may exhaust this card; that player may place those units on any planets they control or in the space areas of any systems that contain their ships.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/scornful_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/scornful_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -144,7 +144,7 @@
         "abilityWindow": "After a player's unit is destroyed:",
         "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry on its planet if it was a ground force.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/splitting_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/splitting_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -157,7 +157,7 @@
         "abilityWindow": "At the end of a player's turn:",
         "abilityText": "You may exhaust this card to allow that player to place 2 infantry from their reinforcements on a planet they control.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/swarm_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/swarm_tk2.png?raw=true",
         "source": "tk_nova_cup"
     },
     {
@@ -170,7 +170,7 @@
         "abilityWindow": "After a player's unit is destroyed during combat:",
         "abilityText": "You may exhaust this card to roll 1 die. If the result is equal to or greater than that unit's combat value, their opponent must choose and destroy 2 of their units.",
         "unlockCondition": "Always Unlocked",
-        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/valiant_genome.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/twilight_kart/valiant_tk2.png?raw=true",
         "source": "tk_nova_cup"
     }
 ]
