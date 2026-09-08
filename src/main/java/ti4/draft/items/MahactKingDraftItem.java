@@ -102,9 +102,9 @@ public class MahactKingDraftItem extends DraftItem {
     public TI4Emoji getItemEmoji() {
         FactionModel faction = Mapper.getFaction(getItemId());
         if (faction != null) {
-            return FactionEmojis.getFactionIcon(getItemId());
+            return FactionEmojis.getFactionIcon(faction.getHomebrewReplacesID().orElse(faction.getAlias()));
         }
-        return null;
+        return FactionEmojis.getFactionIcon(getItemId());
     }
 
     public static List<DraftItem> buildAllDraftableItems() {

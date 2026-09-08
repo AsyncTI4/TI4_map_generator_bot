@@ -84,9 +84,9 @@ public class TEOptionService {
     }
 
     @ButtonHandler("startTFDraft")
-    public static void startTFDraft(ButtonInteractionEvent event, Game game) {
+    public static void startTFDraft(ButtonInteractionEvent event, Game game, String buttonID) {
         game.setupTwilightsFallMode(event);
-        if (event.getButton().getCustomId().endsWith("_splice")) {
+        if (buttonID.endsWith("_splice")) {
             // force=false so any player the GM already set up through the wizard keeps their faction, colour
             // and (crucially) their assigned home position - setUpFrankenFactions with force=true re-parks
             // everyone at the temporary off-map 50x anchors, which would undo the wizard's placements.
