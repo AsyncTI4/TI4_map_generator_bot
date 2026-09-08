@@ -88,7 +88,7 @@ public class FrankenDraft extends BagDraft {
     }
 
     public static int getItemLimitForCategory(DraftCategory category, Game game) {
-        if (category == DraftCategory.MONUMENT && !game.isMonumentsMode()) {
+        if (game == null || (category == DraftCategory.MONUMENT && !game.isMonumentsMode())) {
             return 0;
         }
         BagDraft activeDraft = game.getActiveBagDraft();
