@@ -221,8 +221,7 @@ public class FrankenButtonHandler {
                 FactionModel faction = Mapper.getFaction(itemID);
                 player.setFaction(itemID);
                 MonumentsService.addFactionMonument(player, player.getGame());
-                List<Units.UnitType> kingUnitTypes =
-                        List.of(Units.UnitType.Flagship, Units.UnitType.Mech, Units.UnitType.Warsun);
+                List<Units.UnitType> kingUnitTypes = List.of(Units.UnitType.Flagship, Units.UnitType.Mech);
                 List<String> units = faction.getUnits().stream()
                         .filter(u -> kingUnitTypes.contains(Mapper.getUnit(u).getUnitType()))
                         .toList();

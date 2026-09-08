@@ -298,6 +298,11 @@ public class PlayerSetupService {
             }
         }
 
+        // In Twilight's Fall, every faction (including Franken) should always start with the base TF War Sun
+        if (game.isTwilightsFallMode()) {
+            player.addOwnedUnitByID("tf_warsun");
+        }
+
         // Don't do special stuff if Franken Faction
         if (faction.startsWith("franken")) {
             return;
