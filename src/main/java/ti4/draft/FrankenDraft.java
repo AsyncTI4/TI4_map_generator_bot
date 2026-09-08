@@ -222,7 +222,6 @@ public class FrankenDraft extends BagDraft {
             allDraftableItems.put(DraftCategory.MONUMENT, MonumentDraftItem.buildAllDraftableItems(game));
         }
 
-        var kings = MahactKingDraftItem.buildAllDraftableItems();
         var kings = MahactKingDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.MAHACTKING, kings);
 
