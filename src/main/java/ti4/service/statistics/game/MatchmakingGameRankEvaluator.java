@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -35,16 +36,25 @@ public class MatchmakingGameRankEvaluator {
     private static final int MECATOL_IMPERIAL_POINT = 1;
     private static final int WINNER_RANK = 1;
     private static final int FIRST_RANK_BELOW_WINNER = 2;
+    private static final ToDoubleFunction<String> UNRATED = userId -> 0.0;
 
     public record SimulatedStanding(int rank, int simulatedScore) {}
 
     public static Map<String, Integer> evaluate(Game game) {
+        return evaluate(game, UNRATED);
+    }
+
+    public static Map<String, Integer> evaluate(Game game, ToDoubleFunction<String> ratingByUserId) {
         Map<String, Integer> ranks = new HashMap<>();
-        evaluateStandings(game).forEach((userId, standing) -> ranks.put(userId, standing.rank()));
+        evaluateStandings(game, ratingByUserId).forEach((userId, standing) -> ranks.put(userId, standing.rank()));
         return ranks;
     }
 
     public static Map<String, SimulatedStanding> evaluateStandings(Game game) {
+        return evaluateStandings(game, UNRATED);
+    }
+
+    public static Map<String, SimulatedStanding> evaluateStandings(Game game, ToDoubleFunction<String> ratingByUserId) {
         if (!game.isHasEnded()) {
             return Map.of();
         }
@@ -63,12 +73,13 @@ public class MatchmakingGameRankEvaluator {
 
         String phaseCode = EndingRoundPhaseStatisticsService.normalizePhaseCode(game.getPhaseOfGame());
         if (ACTION_PHASE_CODE.equals(phaseCode)) {
-            simulateActionPhase(game, simulation, contenders);
+            simulateActionPhase(game, simulation, contenders, winner);
+            simulateStatusPhase(game, simulation, statusPhaseScorers(game, contenders));
         } else if (STATUS_PHASE_CODE.equals(phaseCode)) {
-            simulateStatusPhase(game, simulation, contenders, winner);
+            simulateStatusPhase(game, simulation, playersAfterTheWinner(game, contenders, winner));
         }
 
-        return buildStandings(winner, contenders, simulation);
+        return buildStandings(winner, contenders, simulation, ratingByUserId);
     }
 
     public static boolean isExcludedForWinnerCount(Game game) {
@@ -79,10 +90,12 @@ public class MatchmakingGameRankEvaluator {
         return game.isHasEnded() && game.getHighestScore() >= game.getVp();
     }
 
-    private static void simulateActionPhase(Game game, Simulation simulation, List<Player> contenders) {
-        List<Player> initiativeOrder = game.getActionPhaseTurnOrder().stream()
-                .filter(player -> containsPlayer(contenders, player))
-                .toList();
+    private static void simulateActionPhase(Game game, Simulation simulation, List<Player> contenders, Player winner) {
+        List<Player> initiativeOrder = resumeAfterWinner(
+                game.getActionPhaseTurnOrder().stream()
+                        .filter(player -> containsPlayer(contenders, player))
+                        .toList(),
+                winner);
         Player imperialHolder = findReadiedImperialHolder(game, initiativeOrder);
 
         boolean imperialBonusPending = imperialHolder != null;
@@ -96,7 +109,7 @@ public class MatchmakingGameRankEvaluator {
                 }
                 if (firstPass && imperialBonusPending && isSamePlayer(player, imperialHolder)) {
                     imperialBonusPending = false;
-                    simulation.award(player, imperialPrimaryPoints(game, player));
+                    simulation.award(player, imperialPrimaryPoints(game, player, simulation));
                     progressed = true;
                     continue;
                 }
@@ -118,24 +131,47 @@ public class MatchmakingGameRankEvaluator {
         }
     }
 
-    private static void simulateStatusPhase(Game game, Simulation simulation, List<Player> contenders, Player winner) {
+    private static List<Player> resumeAfterWinner(List<Player> initiativeOrder, Player winner) {
+        int resumeAt = 0;
+        while (resumeAt < initiativeOrder.size()
+                && initiativeOrder.get(resumeAt).getInitiative() < winner.getInitiative()) {
+            resumeAt++;
+        }
+        List<Player> rotated = new ArrayList<>(initiativeOrder.subList(resumeAt, initiativeOrder.size()));
+        rotated.addAll(initiativeOrder.subList(0, resumeAt));
+        return rotated;
+    }
+
+    private static List<Player> statusPhaseScorers(Game game, List<Player> contenders) {
+        return StatusHelper.getPlayersInScoringOrder(game).stream()
+                .filter(player -> containsPlayer(contenders, player))
+                .toList();
+    }
+
+    private static List<Player> playersAfterTheWinner(Game game, List<Player> contenders, Player winner) {
         List<Player> scoringOrder = StatusHelper.getPlayersInScoringOrder(game);
         int winnerIndex = indexOfPlayer(scoringOrder, winner);
         if (winnerIndex < 0) {
-            return;
+            return List.of();
         }
-        for (Player player : scoringOrder.subList(winnerIndex + 1, scoringOrder.size())) {
-            if (!containsPlayer(contenders, player)) {
+        return scoringOrder.subList(winnerIndex + 1, scoringOrder.size()).stream()
+                .filter(player -> containsPlayer(contenders, player))
+                .toList();
+    }
+
+    private static void simulateStatusPhase(Game game, Simulation simulation, List<Player> scorers) {
+        for (Player player : scorers) {
+            if (simulation.isFinished(player)) {
                 continue;
             }
             simulation.award(
                     player,
-                    bestScoreableStatusSecretPoints(game, player) + bestQualifyingPublicObjectivePoints(game, player));
+                    bestScoreableStatusSecretPoints(game, player) + scoreBestPublicObjective(game, player, simulation));
         }
     }
 
     private static Map<String, SimulatedStanding> buildStandings(
-            Player winner, List<Player> contenders, Simulation simulation) {
+            Player winner, List<Player> contenders, Simulation simulation, ToDoubleFunction<String> ratingByUserId) {
         Map<String, SimulatedStanding> standings = new HashMap<>();
         standings.put(winner.getUserID(), new SimulatedStanding(WINNER_RANK, winner.getTotalVictoryPoints()));
 
@@ -146,20 +182,26 @@ public class MatchmakingGameRankEvaluator {
 
         List<Player> remaining = contenders.stream()
                 .filter(player -> !simulation.isFinished(player))
-                .sorted(Comparator.comparingInt(simulation::score).reversed().thenComparing(Player::getUserID))
+                .sorted(Comparator.comparingInt(simulation::score)
+                        .thenComparingDouble(player -> ratingByUserId.applyAsDouble(player.getUserID()))
+                        .reversed()
+                        .thenComparing(Player::getUserID))
                 .toList();
 
         int firstRemainingRank = FIRST_RANK_BELOW_WINNER + simulation.crossedGoalInOrder.size();
-        int rankOfCurrentScore = firstRemainingRank;
-        Integer currentScore = null;
+        int rankOfCurrentGroup = firstRemainingRank;
+        int previousScore = 0;
+        double previousRating = 0;
         for (int i = 0; i < remaining.size(); i++) {
             Player player = remaining.get(i);
             int score = simulation.score(player);
-            if (currentScore == null || score != currentScore) {
-                currentScore = score;
-                rankOfCurrentScore = firstRemainingRank + i;
+            double rating = ratingByUserId.applyAsDouble(player.getUserID());
+            if (i == 0 || score != previousScore || rating != previousRating) {
+                rankOfCurrentGroup = firstRemainingRank + i;
+                previousScore = score;
+                previousRating = rating;
             }
-            standings.put(player.getUserID(), new SimulatedStanding(rankOfCurrentScore, score));
+            standings.put(player.getUserID(), new SimulatedStanding(rankOfCurrentGroup, score));
         }
         return standings;
     }
@@ -191,20 +233,23 @@ public class MatchmakingGameRankEvaluator {
                 .orElse(0);
     }
 
-    private static int bestQualifyingPublicObjectivePoints(Game game, Player player) {
+    private static int scoreBestPublicObjective(Game game, Player player, Simulation simulation) {
         if (!Helper.canPlayerScorePOs(game, player)) {
             return 0;
         }
-        List<String> qualifying = ListPlayerInfoService.getQualifyingPublicObjectiveIds(game, player);
-        if (qualifying.isEmpty()) {
-            return 0;
+        for (String objectiveId : ListPlayerInfoService.getQualifyingPublicObjectiveIds(game, player)) {
+            if (simulation.hasConsumedObjective(player, objectiveId)) {
+                continue;
+            }
+            simulation.consumeObjective(player, objectiveId);
+            Integer points = ListPlayerInfoService.getPublicObjectivePoints(objectiveId);
+            return points == null ? 0 : points;
         }
-        Integer points = ListPlayerInfoService.getPublicObjectivePoints(qualifying.getFirst());
-        return points == null ? 0 : points;
+        return 0;
     }
 
-    private static int imperialPrimaryPoints(Game game, Player player) {
-        int points = bestQualifyingPublicObjectivePoints(game, player);
+    private static int imperialPrimaryPoints(Game game, Player player, Simulation simulation) {
+        int points = scoreBestPublicObjective(game, player, simulation);
         if (player.controlsMecatol(true)) {
             points += MECATOL_IMPERIAL_POINT;
         }
@@ -268,6 +313,7 @@ public class MatchmakingGameRankEvaluator {
         private final int goal;
         private final Map<String, Integer> scoreByUserId = new HashMap<>();
         private final Map<String, Set<String>> consumedSecretsByUserId = new HashMap<>();
+        private final Map<String, Set<String>> consumedObjectivesByUserId = new HashMap<>();
         private final List<String> crossedGoalInOrder = new ArrayList<>();
         private final Set<String> finished = new HashSet<>();
 
@@ -306,6 +352,18 @@ public class MatchmakingGameRankEvaluator {
             return consumedSecretsByUserId
                     .getOrDefault(player.getUserID(), Set.of())
                     .contains(secretId);
+        }
+
+        private boolean hasConsumedObjective(Player player, String objectiveId) {
+            return consumedObjectivesByUserId
+                    .getOrDefault(player.getUserID(), Set.of())
+                    .contains(objectiveId);
+        }
+
+        private void consumeObjective(Player player, String objectiveId) {
+            consumedObjectivesByUserId
+                    .computeIfAbsent(player.getUserID(), userId -> new HashSet<>())
+                    .add(objectiveId);
         }
 
         private void consume(Player player, String secretId) {

@@ -15,13 +15,10 @@ import ti4.game.persistence.ManagedGame;
 import ti4.helpers.TIGLHelper;
 import ti4.logging.BotLogger;
 import ti4.service.map.FractureService;
-import ti4.service.statistics.game.MatchmakingGameRankEvaluator;
 
 @Service
 @RequiredArgsConstructor
 public class PersistAllEntitiesService {
-
-    private static final int MAX_LOGGED_EXCLUDED_GAMES = 25;
 
     private final GameEntityRepository gameEntityRepository;
     private final PlayerEntityRepository playerEntityRepository;
@@ -62,13 +59,11 @@ public class PersistAllEntitiesService {
 
         List<GameEntity> gameEntities = new ArrayList<>();
         List<TitleEntity> titleEntities = new ArrayList<>();
-        List<String> gamesExcludedForWinnerCount = new ArrayList<>();
         for (ManagedGame managedGame : GameManager.getManagedGames()) {
             Game game = managedGame.getGame();
             if (game.getRealAndEliminatedPlayers().size() < 3) continue;
 
-            Map<String, Integer> simulatedRanks = evaluateSimulatedRanks(game, gamesExcludedForWinnerCount);
-            var gameEntity = toEntity(game, userCache, simulatedRanks);
+            var gameEntity = toEntity(game, userCache);
             gameEntities.add(gameEntity);
             titleEntities.addAll(toTitleEntities(game, gameEntity, userCache));
         }
@@ -77,33 +72,9 @@ public class PersistAllEntitiesService {
         titleEntityRepository.saveAll(titleEntities);
         BotLogger.info(String.format("Persisted %,d game rows.", gameEntities.size()));
         BotLogger.info(String.format("Persisted %,d title rows.", titleEntities.size()));
-        logGamesExcludedForWinnerCount(gamesExcludedForWinnerCount);
     }
 
-    private static Map<String, Integer> evaluateSimulatedRanks(Game game, List<String> gamesExcludedForWinnerCount) {
-        try {
-            if (MatchmakingGameRankEvaluator.isExcludedForWinnerCount(game)) {
-                gamesExcludedForWinnerCount.add(game.getName());
-                return Map.of();
-            }
-            return MatchmakingGameRankEvaluator.evaluate(game);
-        } catch (Exception e) {
-            BotLogger.error("Failed to evaluate matchmaking ranks for " + game.getName(), e);
-            return Map.of();
-        }
-    }
-
-    private static void logGamesExcludedForWinnerCount(List<String> gameNames) {
-        if (gameNames.isEmpty()) {
-            return;
-        }
-        String sample = gameNames.stream().limit(MAX_LOGGED_EXCLUDED_GAMES).collect(Collectors.joining(", "));
-        BotLogger.info(String.format(
-                "Excluded %,d game(s) from matchmaking ranks for not having exactly one winner: %s",
-                gameNames.size(), sample));
-    }
-
-    private GameEntity toEntity(Game game, Map<String, UserEntity> userCache, Map<String, Integer> simulatedRanks) {
+    private GameEntity toEntity(Game game, Map<String, UserEntity> userCache) {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
         gameEntity.setRound(game.getRound());
@@ -131,7 +102,7 @@ public class PersistAllEntitiesService {
 
         var players = gameEntity.getPlayers();
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            var playerEntity = toEntity(player, gameEntity, userCache, simulatedRanks.get(player.getUserID()));
+            var playerEntity = toEntity(player, gameEntity, userCache);
             players.add(playerEntity);
         }
 
@@ -143,8 +114,7 @@ public class PersistAllEntitiesService {
         return endedDate == 0 ? null : endedDate;
     }
 
-    private PlayerEntity toEntity(
-            Player player, GameEntity gameEntity, Map<String, UserEntity> userCache, Integer simulatedRank) {
+    private PlayerEntity toEntity(Player player, GameEntity gameEntity, Map<String, UserEntity> userCache) {
         var playerEntity = new PlayerEntity();
 
         playerEntity.setFactionName(player.getFaction());
@@ -156,7 +126,6 @@ public class PersistAllEntitiesService {
         playerEntity.setEliminated(player.isEliminated());
         playerEntity.setWinner(player.getGame().getWinners().contains(player));
         playerEntity.setReplaced(!Objects.equals(player.getUserID(), player.getStatsTrackedUserID()));
-        playerEntity.setSimulatedRank(simulatedRank);
 
         playerEntity.setGame(gameEntity);
 

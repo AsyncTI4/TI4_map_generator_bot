@@ -40,6 +40,24 @@ public class CronManager {
         schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
     }
 
+    public static void schedulePeriodicallyAtTime(
+            Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId, int periodHours) {
+        CRONS.put(clazz.getSimpleName(), runnable);
+        long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId, periodHours);
+        long periodSeconds = TimeUnit.HOURS.toSeconds(periodHours);
+        schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
+    }
+
+    private static long calculateInitialDelaySeconds(int hour, int minute, ZoneId zoneId, int periodHours) {
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        ZonedDateTime nextRun =
+                now.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+        while (!nextRun.isAfter(now)) {
+            nextRun = nextRun.plusHours(periodHours);
+        }
+        return nextRun.toEpochSecond() - now.toEpochSecond();
+    }
+
     private static long calculateInitialDelaySeconds(int hour, int minute, ZoneId zoneId) {
         ZonedDateTime now = ZonedDateTime.now(zoneId);
         ZonedDateTime nextRun =

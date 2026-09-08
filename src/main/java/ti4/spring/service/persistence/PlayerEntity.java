@@ -61,9 +61,6 @@ public class PlayerEntity {
     @Column(name = "is_replaced")
     private boolean replaced;
 
-    @Column(name = "simulated_rank")
-    private Integer simulatedRank;
-
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;

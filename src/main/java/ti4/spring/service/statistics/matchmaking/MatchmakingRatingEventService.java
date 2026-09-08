@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.persistence.MatchmakingRatingEntity;
+import ti4.spring.service.persistence.MatchmakingRatingEntityRepository;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.PlayerEntityRepository;
 
@@ -47,6 +49,7 @@ public class MatchmakingRatingEventService {
             .build();
 
     private final PlayerEntityRepository playerEntityRepository;
+    private final MatchmakingRatingEntityRepository matchmakingRatingEntityRepository;
 
     @Transactional(readOnly = true)
     public void calculateRatings(SlashCommandInteractionEvent event) {
@@ -55,8 +58,8 @@ public class MatchmakingRatingEventService {
 
         List<PlayerEntity> players =
                 playerEntityRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(onlyTiglGames);
-        List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
-        List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games, true);
+        List<MatchmakingGame> games = MatchmakingGame.getGamesForReporting(players);
+        List<MatchmakingRating> playerRatings = getStoredRatings(onlyTiglGames, true);
         sendMessage(event, playerRatings, games, showRating);
     }
 
@@ -128,11 +131,11 @@ public class MatchmakingRatingEventService {
     }
 
     private List<MatchmakingRating> getCachedDefaultPlayerRatings() {
-        return unconservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, false));
+        return unconservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getStoredRatings(false, false));
     }
 
     private List<MatchmakingRating> getCachedConservativePlayerRatings() {
-        return conservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, true));
+        return conservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getStoredRatings(false, true));
     }
 
     private static Cache<String, List<MatchmakingRating>> createRatingsCache() {
@@ -143,11 +146,23 @@ public class MatchmakingRatingEventService {
                 .build();
     }
 
-    private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames, boolean useConservativeRating) {
-        List<PlayerEntity> players =
-                playerEntityRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(onlyTiglGames);
-        List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
-        return TrueSkillMatchmakingRatingService.calculateRatings(games, useConservativeRating);
+    private List<MatchmakingRating> getStoredRatings(boolean onlyTiglGames, boolean useConservativeRating) {
+        return matchmakingRatingEntityRepository.findAllByTiglOnly(onlyTiglGames).stream()
+                .map(row -> toMatchmakingRating(row, useConservativeRating))
+                .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
+                .toList();
+    }
+
+    private static MatchmakingRating toMatchmakingRating(MatchmakingRatingEntity row, boolean useConservativeRating) {
+        Double recentDelta = useConservativeRating ? row.getRecentConservativeDelta() : row.getRecentMeanDelta();
+        return new MatchmakingRating(
+                row.getUserId(),
+                row.getUsername(),
+                BigDecimal.valueOf(useConservativeRating ? row.getConservativeRating() : row.getMeanRating()),
+                BigDecimal.valueOf(row.getSigma()),
+                BigDecimal.valueOf(row.getCalibrationPercent()),
+                row.getLastGameEndedEpochMilliseconds(),
+                recentDelta == null ? null : BigDecimal.valueOf(recentDelta));
     }
 
     private static void sendMessage(

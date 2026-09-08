@@ -47,6 +47,7 @@ import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.MatchmakerCron;
+import ti4.cron.MatchmakingRatingCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.PersistToSqlCron;
 import ti4.cron.ReuploadStaleEmojisCron;
@@ -327,6 +328,7 @@ public class JdaService {
         LogCacheStatsCron.register();
         WinningPathCron.register();
         PersistToSqlCron.register();
+        MatchmakingRatingCron.register();
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
