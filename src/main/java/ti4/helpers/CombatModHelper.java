@@ -814,7 +814,7 @@ public class CombatModHelper {
                 case Constants.MOD_DESTROYERS ->
                     scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP ->
-                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
+                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem, true);
                 case Constants.MOD_OPPONENT_SHIP ->
                     scalingCount += ButtonHelper.checkNumberShips(opponent, activeSystem);
                 case "combat_round" -> {

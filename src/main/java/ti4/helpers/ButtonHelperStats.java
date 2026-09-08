@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import java.util.List;
-import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -9,34 +8,32 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.regex.RegexService;
 
 public final class ButtonHelperStats {
-
-    private static final Pattern convertCommsRegex =
-            Pattern.compile("convertComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
 
     @ButtonHandler("convertComms_") // convertComms_12(_stay)
     public static void convertCommButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         boolean deleteMsg = !buttonID.endsWith("_stay");
-        RegexService.runMatcher(convertCommsRegex, buttonID, matcher -> {
-            int amt = Integer.parseInt(matcher.group("amt"));
-            convertComms(event, game, player, amt, deleteMsg);
-        });
+        int amt = Integer.parseInt(buttonID.split("_")[1]);
+        Tile tile = null;
+        if (deleteMsg && buttonID.split("_").length == 3) {
+            tile = game.getTileByPosition(buttonID.split("_")[2]);
+        }
+        convertComms(event, game, player, amt, deleteMsg, tile);
     }
-
-    private static final Pattern gainCommsRegex =
-            Pattern.compile("gainComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
 
     @ButtonHandler("gainComms_") // gainComms_12(_stay)
     public static void gainCommsButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         boolean deleteMsg = !buttonID.endsWith("_stay");
-        RegexService.runMatcher(gainCommsRegex, buttonID, matcher -> {
-            int amt = Integer.parseInt(matcher.group("amt"));
-            gainComms(event, game, player, amt, deleteMsg);
-        });
+        int amt = Integer.parseInt(buttonID.split("_")[1]);
+        Tile tile = null;
+        if (deleteMsg && buttonID.split("_").length == 3) {
+            tile = game.getTileByPosition(buttonID.split("_")[2]);
+        }
+        gainComms(event, game, player, amt, deleteMsg, false, tile);
     }
 
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
@@ -46,6 +43,11 @@ public final class ButtonHelperStats {
 
     public static void convertComms(
             ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg) {
+        convertComms(event, game, player, amt, deleteMsg, null);
+    }
+
+    public static void convertComms(
+            ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg, Tile tile) {
         String message, ident = player.getRepresentation();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
@@ -61,6 +63,9 @@ public final class ButtonHelperStats {
                     + ") into " + player.getCommodities() + " trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
+        }
+        if (tile != null) {
+            message += " This is due to a combat that occurred in " + tile.getPosition() + ".";
         }
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, "C" + message);
 
@@ -82,6 +87,17 @@ public final class ButtonHelperStats {
             int amt,
             boolean deleteMsg,
             boolean skipOutput) {
+        gainComms(event, game, player, amt, deleteMsg, skipOutput, null);
+    }
+
+    public static void gainComms(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            int amt,
+            boolean deleteMsg,
+            boolean skipOutput,
+            Tile tile) {
         String message = player.getRepresentationNoPing();
         String fogMessage;
         int initComm = player.getCommodities();
@@ -101,6 +117,9 @@ public final class ButtonHelperStats {
                     + player.getCommoditiesRepresentation() + ").";
         }
         int finalComm = player.getCommodities();
+        if (tile != null) {
+            message += " This is due to a combat that occurred in " + tile.getPosition() + ".";
+        }
 
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, fogMessage);
