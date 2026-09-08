@@ -19,7 +19,7 @@ public final class ButtonHelperStats {
         boolean deleteMsg = !buttonID.endsWith("_stay");
         int amt = Integer.parseInt(buttonID.split("_")[1]);
         Tile tile = null;
-        if (!deleteMsg && buttonID.split("_").length == 3) {
+        if (deleteMsg && buttonID.split("_").length == 3) {
             tile = game.getTileByPosition(buttonID.split("_")[2]);
         }
         convertComms(event, game, player, amt, deleteMsg, tile);
@@ -30,7 +30,7 @@ public final class ButtonHelperStats {
         boolean deleteMsg = !buttonID.endsWith("_stay");
         int amt = Integer.parseInt(buttonID.split("_")[1]);
         Tile tile = null;
-        if (!deleteMsg && buttonID.split("_").length == 3) {
+        if (deleteMsg && buttonID.split("_").length == 3) {
             tile = game.getTileByPosition(buttonID.split("_")[2]);
         }
         gainComms(event, game, player, amt, deleteMsg, false, tile);
