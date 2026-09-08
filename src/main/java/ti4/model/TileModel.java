@@ -116,12 +116,14 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         // Image
         TI4Emoji emoji = getEmoji();
         if (emoji != null && emoji.asEmoji() instanceof CustomEmoji customEmoji) {
+            String altText = Optional.ofNullable(name).orElse(id);
             if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(imagePath)) {
                 eb.setThumbnail(
                         "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/"
-                                + imagePath + "?raw=true");
+                                + imagePath + "?raw=true",
+                        altText);
             } else {
-                eb.setThumbnail(customEmoji.getImageUrl());
+                eb.setThumbnail(customEmoji.getImageUrl(), altText);
             }
         }
 
