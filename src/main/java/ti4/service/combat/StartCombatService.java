@@ -774,7 +774,7 @@ public class StartCombatService {
                     + ", gain 1 commodity or convert 1 of your commodities to a trade good,"
                     + " with Ahk Siever, the Rebellion commander. Reminder to double check that a combat has actually occurred, as sometimes the bot is mistaken about this."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
-            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
+            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true, tile);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         }
     }
