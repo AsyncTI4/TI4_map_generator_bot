@@ -71,8 +71,13 @@ public class WebSocketNotifier {
                 // Sole writer of the web-data cache: if anything else wrote it, the diff
                 // baseline would drift from what clients last received.
                 if (game.isFowMode()) {
+                    // FoW views differ per-viewer, so don't stream a single patch like non-FoW
+                    // games. Refresh the (unfiltered) cache backing the GM's REST view and tell
+                    // clients to refetch web-data-fow, which re-applies each viewer's fog
+                    // server-side.
                     gameWebDataService.put(gameId, MAPPER.writeValueAsString(current));
-                    return; // cache refreshed for REST, but FoW games never stream
+                    notifyGameRefresh(gameId);
+                    return;
                 }
                 String previousJson = gameWebDataService.getIfCached(gameId);
                 JsonNode previous = previousJson == null ? null : MAPPER.readTree(previousJson);
