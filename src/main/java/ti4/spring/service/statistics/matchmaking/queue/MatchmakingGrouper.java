@@ -150,10 +150,23 @@ class MatchmakingGrouper {
                 searching.remove(seed);
                 continue;
             }
+            if (MatchQualityGate.isEnforced() && isBlockedByQualityGate(members, playerMatchmakingData)) {
+                // Group balance is too poor for its current wait; drop the seed like an incomplete group.
+                searching.remove(seed);
+                continue;
+            }
             groups.add(group);
             searching.removeAll(group);
         }
         return groups;
+    }
+
+    private static boolean isBlockedByQualityGate(
+            List<MatchmakingQueueMember> members,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
+        double normalized =
+                MatchQualityCalculator.calculate(members, playerMatchmakingData).normalized();
+        return MatchQualityGate.wouldBlock(normalized, MatchQualityGate.maxQueueWait(members, playerMatchmakingData));
     }
 
     private static void collectGames(
