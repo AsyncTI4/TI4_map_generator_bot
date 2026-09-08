@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1077,6 +1078,25 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && player.hasUnit("empyrean_monument")) {
+                    List<Button> buttons = MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "You have no empty non-Fracture, non-supernova system in which to place The Panopticon.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the empty system in which to place _The Panopticon_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placePanopticon_", 0));
+                    return;
+                }
                 if (game.isMonumentsMode()
                         && "monument".equalsIgnoreCase(unit)
                         && player.hasUnit("purpletf_monument")) {

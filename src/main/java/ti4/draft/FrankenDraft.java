@@ -17,6 +17,7 @@ import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
+import ti4.draft.items.MonumentDraftItem;
 import ti4.draft.items.PNDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
@@ -60,7 +61,7 @@ public class FrankenDraft extends BagDraft {
             case TECH, REDTILE, STARTINGFLEET -> 2;
             case STARTINGTECH, HOMESYSTEM, PN -> 2;
             case COMMODITIES, FLAGSHIP, MECH -> 2;
-            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 2;
+            case HERO, COMMANDER, AGENT, BREAKTHROUGH, MONUMENT -> 2;
             case DRAFTORDER -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
@@ -75,12 +76,21 @@ public class FrankenDraft extends BagDraft {
             case STARTINGTECH, HOMESYSTEM, PN -> 1;
             case COMMODITIES, FLAGSHIP, MECH -> 1;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+            case MONUMENT -> getConfiguredMonumentLimit();
             case DRAFTORDER, STARTINGFLEET -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 
+    protected int getConfiguredMonumentLimit() {
+        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.MONUMENT);
+        return configuredLimit.isEmpty() ? 2 : Integer.parseInt(configuredLimit);
+    }
+
     public static int getItemLimitForCategory(DraftCategory category, Game game) {
+        if (category == DraftCategory.MONUMENT && !game.isMonumentsMode()) {
+            return 0;
+        }
         BagDraft activeDraft = game.getActiveBagDraft();
         int baseLimit = activeDraft == null ? 0 : activeDraft.getItemLimitForCategory(category);
         if (baseLimit > 0 && !game.getStoredValue("frankenLimit" + category).isEmpty()) {
@@ -207,6 +217,10 @@ public class FrankenDraft extends BagDraft {
 
         var units = UnitDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.UNIT, units);
+
+        if (game.isMonumentsMode()) {
+            allDraftableItems.put(DraftCategory.MONUMENT, MonumentDraftItem.buildAllDraftableItems(game));
+        }
 
         var kings = MahactKingDraftItem.buildAllDraftableItems();
         allDraftableItems.put(DraftCategory.MAHACTKING, kings);

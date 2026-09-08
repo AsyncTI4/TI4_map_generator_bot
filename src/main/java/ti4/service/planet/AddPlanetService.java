@@ -112,7 +112,6 @@ public class AddPlanetService {
             player.gainCommodities(1);
             ButtonHelperStats.afterGainCommsChecks(game, player, 1);
         }
-
         int shrineCount = 0;
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);

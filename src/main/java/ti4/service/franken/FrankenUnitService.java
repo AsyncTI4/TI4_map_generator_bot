@@ -87,4 +87,18 @@ public class FrankenUnitService {
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
+
+    public static void removeMonuments(GenericInteractionCreateEvent event, Player player, List<String> monumentIDs) {
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed monuments:\n");
+        for (String monumentID : monumentIDs) {
+            if (!player.ownsUnit(monumentID)) {
+                sb.append("> ").append(monumentID).append(" (player did not have this monument)");
+            } else {
+                sb.append("> ").append(monumentID);
+                player.removeOwnedUnitByID(monumentID);
+            }
+            sb.append('\n');
+        }
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
+    }
 }

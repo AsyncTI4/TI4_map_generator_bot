@@ -65,6 +65,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -3014,6 +3015,17 @@ public final class Helper {
                         UnitEmojis.mech);
                 unitButtons.add(mfButton);
             }
+        }
+        if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)
+                && game.isMonumentsMode()
+                && player.getUnitByBaseType("monument") != null) {
+            unitButtons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "monument", placePrefix).stream()
+                    .filter(button -> tile.getPlanetUnitHolders().stream()
+                            .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
+                    .toList());
+            unitButtons.addAll(MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, player).stream()
+                    .filter(button -> button.getCustomId().endsWith("placePanopticon_" + tile.getPosition()))
+                    .toList());
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));

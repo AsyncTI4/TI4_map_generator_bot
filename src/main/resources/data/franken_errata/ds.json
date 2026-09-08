@@ -240,7 +240,8 @@
             "ABILITY:celestial_reclamation"
         ],
         "optionalSwaps": [
-            "BREAKTHROUGH:gledgebt"
+            "BREAKTHROUGH:gledgebt",
+            "MONUMENT:gledge_monument"
         ],
         "source": "ds"
     },
@@ -372,6 +373,9 @@
         "itemId": "cloaked_fleets",
         "additionalComponents": [
             "ABILITY:shroud_of_lith"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:kollecc_monument"
         ],
         "source": "ds"
     },
@@ -590,7 +594,8 @@
         ],
         "optionalSwaps": [
             "HERO:nivynhero",
-            "BREAKTHROUGH:nivynbt"
+            "BREAKTHROUGH:nivynbt",
+            "MONUMENT:nivyn_monument"
         ],
         "source": "ds"
     },
@@ -726,6 +731,9 @@
         "itemId": "collateralized_loans",
         "additionalComponents": [
             "ABILITY:fine_print"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:vaden_monument"
         ],
         "source": "ds"
     },
@@ -867,7 +875,8 @@
             "ABILITY:narrow_way"
         ],
         "optionalSwaps": [
-            "HOMESYSTEM:uydai"
+            "HOMESYSTEM:uydai",
+            "MONUMENT:uydai_monument"
         ],
         "source": "ds"
     },
@@ -981,7 +990,8 @@
         "optionalSwaps": [
             "COMMANDER:toldarcommander",
             "MECH:toldar_mech",
-            "BREAKTHROUGH:toldarbt"
+            "BREAKTHROUGH:toldarbt",
+            "MONUMENT:toldar_monumenthonor"
         ],
         "source": "ds"
     },
@@ -1025,7 +1035,8 @@
         ],
         "optionalSwaps": [
             "COMMANDER:belkoseacommander",
-            "BREAKTHROUGH:belkoseabt"
+            "BREAKTHROUGH:belkoseabt",
+            "MONUMENT:belkosea_monument"
         ],
         "source": "ds"
     },

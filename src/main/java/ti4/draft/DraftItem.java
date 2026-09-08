@@ -21,6 +21,7 @@ import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
+import ti4.draft.items.MonumentDraftItem;
 import ti4.draft.items.PNDraftItem;
 import ti4.draft.items.PlotDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -103,6 +104,7 @@ public abstract class DraftItem {
             case DRAFTORDER -> new SpeakerOrderDraftItem(itemId);
             case MAHACTKING -> new MahactKingDraftItem(itemId);
             case UNIT -> new UnitDraftItem(itemId);
+            case MONUMENT -> new MonumentDraftItem(itemId);
             case BREAKTHROUGH -> new BreakthroughDraftItem(itemId);
             case PLOT -> new PlotDraftItem(itemId);
         };
@@ -129,6 +131,7 @@ public abstract class DraftItem {
         items.addAll(FlagshipDraftItem.buildAllDraftableItems(factions));
         items.addAll(MechDraftItem.buildAllDraftableItems(factions));
         items.addAll(UnitDraftItem.buildAllDraftableItems());
+        items.addAll(MonumentDraftItem.buildAllDraftableItems());
         items.addAll(MahactKingDraftItem.buildAllDraftableItems());
         items.addAll(BreakthroughDraftItem.buildAllDraftableItems(factions));
         return items;
@@ -150,6 +153,7 @@ public abstract class DraftItem {
         items.addAll(FlagshipDraftItem.buildAllItems(factions));
         items.addAll(MechDraftItem.buildAllItems(factions));
         items.addAll(UnitDraftItem.buildAllItems());
+        items.addAll(MonumentDraftItem.buildAllItems());
         items.addAll(MahactKingDraftItem.buildAllItems());
         items.addAll(BreakthroughDraftItem.buildAllItems(factions));
         items.addAll(PlotDraftItem.buildAllItems());
@@ -201,10 +205,11 @@ public abstract class DraftItem {
             textFields.add(TextDisplay.of(String.join(System.lineSeparator(), adds)));
         }
 
-        if (hasOptionalSwaps() && !game.isTwilightsFallMode()) {
+        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
+        if (!optionalSwaps.isEmpty() && !game.isTwilightsFallMode()) {
             List<String> swaps = new ArrayList<>();
             swaps.add("**__Optional Component Swaps:__**");
-            for (DraftErrataModel i2 : Errata.getOptionalSwaps()) {
+            for (DraftErrataModel i2 : optionalSwaps) {
                 DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
                 swaps.add("> ♻️ " + item2.getTitle(game));
             }
@@ -225,9 +230,10 @@ public abstract class DraftItem {
             }
             sb.append("*");
         }
-        if (hasOptionalSwaps()) {
+        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(null);
+        if (!optionalSwaps.isEmpty()) {
             sb.append("\n>  - *Includes optional swaps: ");
-            for (DraftErrataModel i : Errata.getOptionalSwaps()) {
+            for (DraftErrataModel i : optionalSwaps) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
                 sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
                 sb.append(", ");
@@ -249,9 +255,10 @@ public abstract class DraftItem {
             }
             sb.append("*");
         }
-        if (hasOptionalSwaps()) {
+        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
+        if (!optionalSwaps.isEmpty()) {
             sb.append("\n>  - *Includes optional swaps: ");
-            for (DraftErrataModel i : Errata.getOptionalSwaps()) {
+            for (DraftErrataModel i : optionalSwaps) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
                 sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
                 sb.append(", ");
@@ -259,6 +266,13 @@ public abstract class DraftItem {
             sb.append("*");
         }
         return sb.toString();
+    }
+
+    private List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
+        return Errata.getOptionalSwaps().stream()
+                .filter(item -> item.getItemCategory() != DraftCategory.MONUMENT
+                        || MonumentDraftItem.isAvailable(game, item.getItemId()))
+                .toList();
     }
 
     private String getDisplayDescription(Game game, String defaultDescription) {

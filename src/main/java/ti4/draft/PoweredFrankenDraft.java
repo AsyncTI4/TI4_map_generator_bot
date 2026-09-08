@@ -16,7 +16,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
             case TECH, BLUETILE -> 3;
             case AGENT, COMMANDER, HERO -> 2;
             case STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 2;
-            case FLAGSHIP, MECH, BREAKTHROUGH -> 2;
+            case FLAGSHIP, MECH, BREAKTHROUGH, MONUMENT -> 2;
             case PN, COMMODITIES, REDTILE -> 2;
             case DRAFTORDER -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
@@ -33,6 +33,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
             case REDTILE -> 2;
             case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+            case MONUMENT -> getConfiguredMonumentLimit();
             case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };

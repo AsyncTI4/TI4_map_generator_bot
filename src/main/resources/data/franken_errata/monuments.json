@@ -1,0 +1,92 @@
+[
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "mahact_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "titans_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "cabal_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "crimson_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "firmament_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "obsidian_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "ralnel_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "gledge_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "kollecc_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "nivyn_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "vaden_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "belkosea_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "toldar_monumenthonor",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "toldar_monumentdishonor",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "uydai_monument",
+        "undraftable": true,
+        "source": "monuments"
+    }
+]

@@ -7,7 +7,8 @@
         ],
         "optionalSwaps": [
             "COMMANDER:crimsoncommander",
-            "BREAKTHROUGH:crimsonbt"
+            "BREAKTHROUGH:crimsonbt",
+            "MONUMENT:crimson_monument"
         ],
         "source": "thunders_edge"
     },
@@ -433,7 +434,8 @@
             "ABILITY:plotsplots"
         ],
         "optionalSwaps": [
-         "FLAGSHIP:firmament_flagship"
+         "FLAGSHIP:firmament_flagship",
+         "MONUMENT:firmament_monument"
         ],
         "source": "thunders_edge"
     },
@@ -460,6 +462,9 @@
         "itemId": "linkship2",
         "additionalComponents": [
             "ABILITY:miniaturization"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:ralnel_monument"
         ],
         "source": "thunders_edge"
     },

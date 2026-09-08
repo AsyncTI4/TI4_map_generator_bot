@@ -2069,6 +2069,9 @@ public class PlayerAreaGenerator {
         Point dreadnoughtPoint = new Point(284, 54);
         Point flagshipPoint = new Point(335, 47);
         Point warSunPoint = new Point(393, 56);
+        Point pdsPoint = new Point(340, 112);
+        Point spacedockPoint = new Point(395, 112);
+        Point monumentPoint = new Point(235, 120);
 
         String faction = player.getFaction();
         if (faction != null) {
@@ -2095,7 +2098,7 @@ public class PlayerAreaGenerator {
 
         BufferedImage image = null;
 
-        List<UnitType> order = List.of(
+        List<UnitType> order = new ArrayList<>(List.of(
                 UnitType.Mech,
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -2104,7 +2107,10 @@ public class PlayerAreaGenerator {
                 UnitType.Flagship,
                 UnitType.Warsun,
                 UnitType.Fighter,
-                UnitType.Infantry);
+                UnitType.Infantry));
+        if (game.isMonumentsMode()) {
+            order.addAll(List.of(UnitType.Pds, UnitType.Spacedock, UnitType.Monument));
+        }
 
         Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::unitType));
         for (UnitType orderKey : order) {
@@ -2167,6 +2173,9 @@ public class PlayerAreaGenerator {
                     case Flagship -> position.translate(flagshipPoint.x, flagshipPoint.y);
                     case Warsun -> position.translate(warSunPoint.x, warSunPoint.y);
                     case Mech -> position.translate(mechPoint.x, mechPoint.y);
+                    case Pds -> position.translate(pdsPoint.x, pdsPoint.y);
+                    case Spacedock -> position.translate(spacedockPoint.x, spacedockPoint.y);
+                    case Monument -> position.translate(monumentPoint.x, monumentPoint.y);
                     default -> {}
                 }
                 // Load voltron data

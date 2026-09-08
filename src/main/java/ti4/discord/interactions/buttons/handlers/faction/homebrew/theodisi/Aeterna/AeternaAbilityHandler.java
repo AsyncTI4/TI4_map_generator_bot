@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -138,7 +139,29 @@ public class AeternaAbilityHandler {
     public static void chooseFullMoonStructurePlanet(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String structure = buttonID.substring("fullMoonStructure_".length());
-        if (!List.of("sd", "pds").contains(structure)) return;
+        if (!List.of("sd", "pds", "monument").contains(structure)) return;
+
+        if ("monument".equals(structure)) {
+            if (!game.isMonumentsMode() || player.getUnitByBaseType("monument") == null) {
+                return;
+            }
+            List<Button> buttons =
+                    Helper.getPlanetPlaceUnitButtons(player, game, "monument", "placeOneNDone_skipbuild");
+            if (buttons.isEmpty() && player.hasUnit("empyrean_monument")) {
+                buttons = MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, player);
+            }
+            if (buttons.isEmpty()) {
+                return;
+            }
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.hasUnit("empyrean_monument")
+                            ? "Please choose the empty system in which to place _The Panopticon_ in space."
+                            : "Please choose a planet on which to place the structure.",
+                    buttons);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
 
         List<Button> buttons = player.getPlanets().stream()
                 .filter(planet -> game.getUnitHolderFromPlanet(planet) != null)
@@ -320,13 +343,22 @@ public class AeternaAbilityHandler {
     private static void resolveMoonReturnEffect(ButtonInteractionEvent event, Game game, Player player, String relic) {
         switch (relic) {
             case FULL_MOON -> {
+                List<Button> buttons = new ArrayList<>(List.of(
+                        Buttons.green(player.factionButtonChecker() + "fullMoonStructure_sd", "Place 1 Space Dock"),
+                        Buttons.green(player.factionButtonChecker() + "fullMoonStructure_pds", "Place 1 PDS")));
+                if (game.isMonumentsMode()
+                        && player.getUnitByBaseType("monument") != null
+                        && (!Helper.getPlanetPlaceUnitButtons(player, game, "monument", "placeOneNDone_skipbuild")
+                                        .isEmpty()
+                                || !MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, player)
+                                        .isEmpty())) {
+                    buttons.add(Buttons.green(
+                            player.factionButtonChecker() + "fullMoonStructure_monument", "Place 1 Monument"));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", please choose the structure to place due to _Full Moon_.",
-                        List.of(
-                                Buttons.green(
-                                        player.factionButtonChecker() + "fullMoonStructure_sd", "Place 1 Space Dock"),
-                                Buttons.green(player.factionButtonChecker() + "fullMoonStructure_pds", "Place 1 PDS")));
+                        buttons);
             }
             case WAXING_MOON -> {
                 ActionCardHelper.drawActionCards(player, 2);

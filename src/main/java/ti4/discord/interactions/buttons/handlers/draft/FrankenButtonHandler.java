@@ -27,6 +27,7 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
+import ti4.draft.items.MonumentDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -73,6 +74,12 @@ public class FrankenButtonHandler {
     }
 
     public static void resolveFrankenItemAdd(ButtonInteractionEvent event, Player player, DraftItem item) {
+        if (item.getItemCategory() == DraftCategory.MONUMENT
+                && !MonumentDraftItem.isAvailable(player.getGame(), item.getItemId())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That Monument is not available in this Franken draft.");
+            return;
+        }
         applyFrankenItemToPlayer(event, player, item);
         // Handle Errata
         if (!player.getGame().isTwilightsFallMode()) {
@@ -88,6 +95,10 @@ public class FrankenButtonHandler {
                         new StringBuilder("Added the following optional swaps to their respective categories:");
                 for (DraftErrataModel i : item.getErrata().getOptionalSwaps()) {
                     DraftItem addl = DraftItem.generate(i.getItemCategory(), i.getItemId());
+                    if (addl.getItemCategory() == DraftCategory.MONUMENT
+                            && !MonumentDraftItem.isAvailable(player.getGame(), addl.getItemId())) {
+                        continue;
+                    }
                     player.getDraftHand().Contents.add(addl);
                     msg.append("\n> ").append(addl.getTitle(player.getGame()));
                 }
@@ -191,6 +202,10 @@ public class FrankenButtonHandler {
     }
 
     private static void applyFrankenItemToPlayer(ButtonInteractionEvent event, Player player, DraftItem item) {
+        if (item.getItemCategory() == DraftCategory.MONUMENT
+                && !MonumentDraftItem.isAvailable(player.getGame(), item.getItemId())) {
+            return;
+        }
         String alias = item.getAlias();
         boolean alreadyHas = player.getStoredList("appliedFrankenItems").contains(alias);
         player.addToStoredList("appliedFrankenItems", alias);
@@ -211,6 +226,7 @@ public class FrankenButtonHandler {
             }
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP, UNIT -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+            case MONUMENT -> FrankenUnitService.addUnits(event, player, List.of(itemID), true);
             case COMMODITIES -> FrankenStatsService.addStartingComms(event, player, item);
             case PN -> FrankenPromissoryService.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> FrankenStartingTechService.addStartingTech(event, player, itemID);
@@ -233,6 +249,7 @@ public class FrankenButtonHandler {
             case BREAKTHROUGH -> FrankenBreakthroughService.removeBreakthrough(event, player, itemID);
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.removeLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP, UNIT -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
+            case MONUMENT -> FrankenUnitService.removeMonuments(event, player, List.of(itemID));
             case COMMODITIES -> FrankenStatsService.removeStartingComms(event, player, item);
             case PN -> FrankenPromissoryService.removePromissoryNotes(event, player, List.of(itemID));
             case STARTINGTECH -> FrankenStartingTechService.removeStartingTech(event, player, itemID);

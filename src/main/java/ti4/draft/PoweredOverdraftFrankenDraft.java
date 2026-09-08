@@ -16,7 +16,7 @@ public class PoweredOverdraftFrankenDraft extends FrankenDraft {
             case TECH, BLUETILE -> 3;
             case AGENT, COMMANDER, HERO -> 2;
             case STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 2;
-            case FLAGSHIP, MECH, BREAKTHROUGH -> 2;
+            case FLAGSHIP, MECH, BREAKTHROUGH, MONUMENT -> 2;
             case PN, COMMODITIES, REDTILE -> 2;
             case DRAFTORDER -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
@@ -25,6 +25,7 @@ public class PoweredOverdraftFrankenDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (category == DraftCategory.MONUMENT) return getConfiguredMonumentLimit();
         return getItemLimitForCategory(category);
     }
 

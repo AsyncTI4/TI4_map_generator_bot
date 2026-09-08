@@ -138,6 +138,7 @@
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "This unit is placed in the space area of a non-Fracture, non-supernova system that does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
     },
     {
@@ -204,7 +205,8 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool."
+        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool.",
+        "alternateText": "[Franken Only] At the start of the status phase, you may place 1 command token in this system into your fleet pool."
     },
     {
         "id": "mentak_monument",
@@ -909,6 +911,7 @@
         "name": "Reliquat Unleashed",
         "subtitle": "Rhodun Monument",
         "source": "monuments",
+        "faction": "zealots",
         "eligiblePlanetTypes": [
             "TECH_SPECIALTY"
         ],
@@ -1380,6 +1383,7 @@
         "name": "The People's Temple",
         "subtitle": "Toldar Monument",
         "source": "monuments",
+        "faction": "toldar",
         "eligiblePlanetTypes": [
             "CULTURAL",
             "LEGENDARY"
