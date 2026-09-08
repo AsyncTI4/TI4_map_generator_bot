@@ -2052,7 +2052,7 @@ public final class ButtonHelperFactionSpecific {
         goAgainButtons.add(done);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message2);
-        if (game.isFowMode() || !game.isNewTransactionMethod()) {
+        if (!TransactionHelper.useNewTransactionModel(game)) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         hacan.getPrivateChannel(),

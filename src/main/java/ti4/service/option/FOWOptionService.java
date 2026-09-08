@@ -58,6 +58,10 @@ public class FOWOptionService {
                 FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
+        NEW_TRANSACTIONS(
+                FOWOptionCategory.GAME,
+                "New transactions",
+                "Use the offer/accept transaction model instead of the legacy direct-send flow"),
 
         // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),

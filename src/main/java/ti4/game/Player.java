@@ -401,6 +401,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return transactionItemsWithPlayer;
     }
 
+    // TODO: this substring match is loose - "ing<faction>" matches both sending<faction> and
+    // receiving<faction>, and would also match a faction id that another id ends with.
     public void clearTransactionItemsWithPlayer(Player player) {
         List<String> newTransactionItems = new ArrayList<>();
         for (String item : getTransactionItems()) {

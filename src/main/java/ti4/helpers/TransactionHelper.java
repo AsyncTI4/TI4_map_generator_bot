@@ -45,10 +45,12 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
@@ -91,6 +93,51 @@ public class TransactionHelper {
             "the Fifth Moon Fund",
             "Dane's Torment Engine LLC");
 
+    /**
+     * Number of buttons offered for an amount the viewer isn't allowed to count for themselves. Kept
+     * deliberately independent of the other player's actual holdings - the length of the button row
+     * would otherwise disclose the exact balance.
+     */
+    private static final int BLIND_AMOUNT_BUTTONS = 10;
+
+    private static final int BLIND_CARD_BUTTONS = 7;
+    private static final int BLIND_FRAGMENT_BUTTONS = 3;
+
+    /**
+     * Whether this game uses the offer/accept transaction model rather than the legacy direct-send
+     * flow. Fog games opt in per game through {@link FOWOption#NEW_TRANSACTIONS}, since the model has
+     * to redact the other player's holdings to be safe there.
+     */
+    public static boolean useNewTransactionModel(Game game) {
+        return game.isFowMode() ? game.getFowOption(FOWOption.NEW_TRANSACTIONS) : game.isNewTransactionMethod();
+    }
+
+    /**
+     * Whether {@code viewer} is entitled to see {@code target}'s holdings. Outside fog everyone can
+     * read everyone's player area, so this is only ever restrictive in a fog game, where it is exactly
+     * "can I see their player sheet" - the same predicate that decides whether the map render draws
+     * their player area at all.
+     */
+    private static boolean canSeeSheet(Game game, Player target, Player viewer) {
+        return !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, target, viewer);
+    }
+
+    private static int fragmentPickerLimit(Player p1, String trait, boolean canSeeSheet) {
+        return canSeeSheet ? ButtonHelperExplore.getNormalFragmentCount(p1, trait) : BLIND_FRAGMENT_BUTTONS;
+    }
+
+    /**
+     * How a party to a transaction is named in a summary. {@code getRepresentation} already collapses
+     * to color under fog; this additionally hides the color from a viewer who isn't allowed to see that
+     * player at all. A null viewer means "render it the same way for everyone".
+     */
+    private static String identityFor(Game game, Player player, Player viewer) {
+        if (viewer != null && game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, player, viewer)) {
+            return "Someone";
+        }
+        return player.getRepresentation(false, false, true);
+    }
+
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         GameEventService.commit(
@@ -115,6 +162,16 @@ public class TransactionHelper {
         String privateSummary =
                 "The following transaction has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
         MessageHelper.sendMessageToChannel(channel, publicSummary);
+        if (game.isFowMode()) {
+            // getCorrectChannel is p1's own private channel under fog, so p2 and any observer entitled
+            // to the result have to be told separately. The pair's comm thread stands in for p2's
+            // channel when they have one, so the deal and its outcome stay in one conversation.
+            FowCommunicationThreadService.findOpenCommThread(game, p1, p2)
+                    .ifPresentOrElse(
+                            thread -> MessageHelper.sendMessageToChannel(thread, publicSummary),
+                            () -> MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), publicSummary));
+            notifyObserversOfRatifiedTransaction(game, p1, p2);
+        }
         boolean secretRefresh = false;
         for (Player sender : players) {
             Player receiver = p2;
@@ -245,7 +302,35 @@ public class TransactionHelper {
         }
     }
 
+    /**
+     * Tells everyone outside the deal who is entitled to the result. Under fog that is anyone who can
+     * see at least one party's player sheet - the same people who would watch the change happen on
+     * that sheet anyway. Each side is named only to viewers allowed to see it, and a player who can
+     * see neither hears nothing at all rather than an "someone transacted with someone" hint.
+     */
+    private static void notifyObserversOfRatifiedTransaction(Game game, Player p1, Player p2) {
+        for (Player viewer : game.getRealPlayers()) {
+            if (viewer == p1 || viewer == p2 || "null".equals(viewer.getColor())) continue;
+            if (!FoWHelper.canSeeStatsOfPlayer(game, p1, viewer) && !FoWHelper.canSeeStatsOfPlayer(game, p2, viewer))
+                continue;
+            MessageHelper.sendPrivateMessageToPlayer(
+                    viewer,
+                    game,
+                    "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true, viewer));
+        }
+    }
+
     private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean hidePrivateCardText) {
+        return buildTransactionOffer(p1, p2, game, hidePrivateCardText, null);
+    }
+
+    /**
+     * @param viewer whose perspective to render identities from, or null to render them the same way
+     *               for everyone. Only meaningful under fog, where a party the viewer isn't allowed to
+     *               see is rendered as "Someone" rather than by color.
+     */
+    private static String buildTransactionOffer(
+            Player p1, Player p2, Game game, boolean hidePrivateCardText, Player viewer) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         StringBuilder trans = new StringBuilder();
         List<Player> players = new ArrayList<>();
@@ -255,9 +340,7 @@ public class TransactionHelper {
             if (!trans.isEmpty()) {
                 trans.append('\n');
             }
-            trans.append("> ")
-                    .append(player.getRepresentation(false, false, true))
-                    .append(" gives:\n");
+            trans.append("> ").append(identityFor(game, player, viewer)).append(" gives:\n");
             boolean sendingNothing = true;
             for (String item : transactionItems) {
                 if (!item.contains("sending" + player.getFaction())) {
@@ -773,6 +856,11 @@ public class TransactionHelper {
         if (requesting) {
             requestOrOffer = "request";
         }
+        // See getStuffToTransButtonsNew: when the viewer can't read p1's sheet, the length of a picker
+        // row would give away the exact balance, so blind pickers use a fixed length instead.
+        boolean seeP1 = canSeeSheet(game, p1, player);
+        String blindNotice = " Since you cannot see their player sheet, you may ask for an amount they do not have"
+                + " - they simply won't be able to accept it.";
         switch (thingToTrans) {
             case "MonumentUnits" -> {
                 message += " Please choose units to offer with **Mowshir Freeport**.";
@@ -780,7 +868,9 @@ public class TransactionHelper {
             }
             case "TGs" -> {
                 message += " Please choose the number of trade goods you wish to " + requestOrOffer + ".";
-                for (int x = 1; x < p1.getTg() + 1 && x < 21; x++) {
+                int limit = seeP1 ? Math.min(p1.getTg(), 20) : BLIND_AMOUNT_BUTTONS;
+                if (!seeP1) message += blindNotice;
+                for (int x = 1; x <= limit; x++) {
                     Button transact = Buttons.green(
                             "offerToTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
@@ -788,7 +878,9 @@ public class TransactionHelper {
             }
             case "Comms" -> {
                 message += " Please choose the number of commodities you wish to " + requestOrOffer + ".";
-                for (int x = 1; x < p1.getCommodities() + 1; x++) {
+                int limit = seeP1 ? p1.getCommodities() : BLIND_AMOUNT_BUTTONS;
+                if (!seeP1) message += blindNotice;
+                for (int x = 1; x <= limit; x++) {
                     Button transact = Buttons.green(
                             "offerToTransact_Comms_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
@@ -879,7 +971,7 @@ public class TransactionHelper {
                             + " Please choose the number of action cards you wish to request."
                             + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                             + " these buttons will just make sure that the player is offered buttons to send them.";
-                    int limit = Math.min(7, p1.getAcCount());
+                    int limit = seeP1 ? Math.min(BLIND_CARD_BUTTONS, p1.getAcCount()) : BLIND_CARD_BUTTONS;
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
                                 "offerToTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction() + "_generic" + x,
@@ -902,18 +994,27 @@ public class TransactionHelper {
             case "PNs" -> {
                 if (requesting) {
                     message += player.getRepresentation(false, false)
-                            + " Please choose the promissory note you wish to request."
-                            + " Since promissory notes are private info, all of the player's starting promissory notes (which are not already in someone's play areas) are available,"
-                            + " though the player may not currently hold all of these."
-                            + " Please choose the \"TBD Promissory Note\" button if you wish to transact someone else's promissory note, and it will give the player the option to send it;"
-                            + " you should discuss this with the player you're transacting with.";
+                            + " Please choose the promissory note you wish to request.";
+                    if (seeP1) {
+                        message +=
+                                " Since promissory notes are private info, all of the player's starting promissory notes (which are not already in someone's play areas) are available,"
+                                        + " though the player may not currently hold all of these.";
+                    } else {
+                        message += " Since you cannot see their player sheet, their own promissory notes are not"
+                                + " listed here.";
+                    }
+                    message +=
+                            " Please choose the \"TBD Promissory Note\" button if you wish to transact someone else's promissory note, and it will give the player the option to send it;"
+                                    + " you should discuss this with the player you're transacting with.";
                     boolean hubris = player.hasAbility("hubris");
                     if (hubris) {
                         message += "\nSince you "
                                 + (game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact")
                                 + ", you cannot request the _Alliance_ promissory note.";
                     }
-                    for (String pnShortHand : p1.getPromissoryNotesOwned()) {
+                    // Listing a player's own promissory notes names their faction, so when their sheet
+                    // isn't visible only the generic "TBD Promissory Note" button below is offered.
+                    for (String pnShortHand : seeP1 ? p1.getPromissoryNotesOwned() : List.<String>of()) {
                         if (ButtonHelper.anyoneHaveInPlayArea(game, pnShortHand)) {
                             continue;
                         }
@@ -927,13 +1028,13 @@ public class TransactionHelper {
                                             "offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
                                                     + p1.getPromissoryNotes().get(pnShortHand),
                                             promissoryNote.getName())
-                                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                                    .withEmoji(Emoji.fromFormatted(owner.fogSafeEmoji())));
                         } else {
                             stuffToTransButtons.add(Buttons.green(
                                             "offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
                                                     + pnShortHand.replace("_", "fin9"),
                                             promissoryNote.getName())
-                                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                                    .withEmoji(Emoji.fromFormatted(owner.fogSafeEmoji())));
                         }
                     }
                     Button transact = Button.primary(
@@ -962,7 +1063,7 @@ public class TransactionHelper {
                                             "offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
                                                     + p1.getPromissoryNotes().get(pnShortHand),
                                             promissoryNote.getName())
-                                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                                    .withEmoji(Emoji.fromFormatted(owner.fogSafeEmoji()));
                             stuffToTransButtons.add(transact);
                         } else {
                             MessageHelper.sendMessageToChannel(
@@ -989,7 +1090,9 @@ public class TransactionHelper {
                             " Since unscored secret objectives are private info, you will have to discuss with other other player to explain which unscored secret objectives you wish to transact;";
                     message += " these buttons will just make sure that the player is offered buttons to send them.";
 
-                    int limit = p2.getSecretsUnscored().size();
+                    // TODO: this sizes the picker off p2 while every sibling branch sizes off p1, which
+                    // is the player being asked in the request direction. Pre-existing; left alone.
+                    int limit = seeP1 ? p2.getSecretsUnscored().size() : BLIND_FRAGMENT_BUTTONS;
                     String prefix = "offerToTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction() + "_generic";
                     for (int x = 1; x < limit + 1; x++) {
                         stuffToTransButtons.add(
@@ -1008,25 +1111,28 @@ public class TransactionHelper {
             }
             case "Frags" -> {
                 message += " Please choose the number of relic fragments you wish to " + requestOrOffer + ".";
+                if (!seeP1) message += blindNotice;
                 String prefix = "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction();
-                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.CULTURAL); x++) {
+                for (int x = 1; x <= fragmentPickerLimit(p1, Constants.CULTURAL, seeP1); x++) {
                     stuffToTransButtons.add(
                             Buttons.blue(prefix + "_CRF" + x, "Cultural Fragments (x" + x + ")", ExploreEmojis.CFrag));
                 }
-                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL); x++) {
+                for (int x = 1; x <= fragmentPickerLimit(p1, Constants.INDUSTRIAL, seeP1); x++) {
                     stuffToTransButtons.add(Buttons.green(
                             prefix + "_IRF" + x, "Industrial Fragments (x" + x + ")", ExploreEmojis.IFrag));
                 }
-                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS); x++) {
+                for (int x = 1; x <= fragmentPickerLimit(p1, Constants.HAZARDOUS, seeP1); x++) {
                     stuffToTransButtons.add(
                             Buttons.red(prefix + "_HRF" + x, "Hazardous Fragments (x" + x + ")", ExploreEmojis.HFrag));
                 }
-                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER); x++) {
+                for (int x = 1; x <= fragmentPickerLimit(p1, Constants.FRONTIER, seeP1); x++) {
                     stuffToTransButtons.add(
                             Buttons.gray(prefix + "_URF" + x, "Unknown Fragments (x" + x + ")", ExploreEmojis.UFrag));
                 }
-                List<Button> supermassiveButtons = getSupermassiveFragmentTransactionButtons(p1, prefix + "_");
-                stuffToTransButtons.addAll(supermassiveButtons);
+                // Supermassive fragments are named individually, so they stay hidden when blind.
+                if (seeP1) {
+                    stuffToTransButtons.addAll(getSupermassiveFragmentTransactionButtons(p1, prefix + "_"));
+                }
             }
             case "Relics" -> {
                 message += " Click the relics you wish to " + requestOrOffer + ".";
@@ -1084,6 +1190,7 @@ public class TransactionHelper {
     }
 
     // Left for future reference.
+    // TODO: dead code - nothing calls this, and no button routes to its "transactionModelFinish_" modal.
     private static Modal buildTransactionModel(Player p1, Player p2) {
         Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
         List<Player> players = new ArrayList<>();
@@ -1348,8 +1455,35 @@ public class TransactionHelper {
         buttons.add(Buttons.red("resetOffer_" + player.getFaction() + bmdSuffix, "Reject and CounterOffer"));
         String p2OfferMsg = p2.getRepresentation() + " you have received a transaction offer from "
                 + player.getRepresentationNoPing() + ":\n" + privateOfferText;
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2OfferMsg, buttons);
+        if (game.isFowMode()) {
+            // The buttons always live in p2's own cards info thread - acceptOffer_/rejectOffer_ carry no
+            // ownership prefix, so either occupant of a shared comm thread could press them. The comm
+            // thread (or p2's private channel) gets a readable copy pointing back at them instead.
+            MessageHelper.splitAndSentWithAction(
+                    p2OfferMsg,
+                    p2.getCardsInfoThread(),
+                    buttons,
+                    message -> postFogOfferPointer(game, player, p2, privateOfferText, message.getJumpUrl()));
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2OfferMsg, buttons);
+        }
         checkTransactionLegality(game, p2, player);
+    }
+
+    /**
+     * Under fog, tells p2 about an offer somewhere they will actually see it - their comm thread with
+     * p1 when managed comms has opened one, otherwise their private channel - and links back to the
+     * message in their cards info thread that carries the Accept/Reject buttons. Names only colors, and
+     * the link resolves for nobody but p2 and the GMs.
+     */
+    private static void postFogOfferPointer(Game game, Player p1, Player p2, String offerText, String jumpUrl) {
+        String pointer = p2.getRepresentation() + " you have received a transaction offer from "
+                + p1.getRepresentationNoPing() + ":\n" + offerText
+                + "\n**[Accept or reject the offer here](" + jumpUrl + ")**";
+        FowCommunicationThreadService.findOpenCommThread(game, p1, p2)
+                .ifPresentOrElse(
+                        thread -> MessageHelper.sendMessageToChannel(thread, pointer),
+                        () -> MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), pointer));
     }
 
     private static String buildTradeOfferText(
@@ -1989,11 +2123,20 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
         if (player2.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            sb.append(player2.getRepresentation(false, false))
-                    .append(" cannot transact during the Agenda Phase due to their ")
-                    .append(FactionEmojis.olradin)
-                    .append(" _Policy - The People: Control ➖_.");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+            if (game.isFowMode()) {
+                // Under fog this is player2's ability to know about, not player's - remind them directly.
+                MessageHelper.sendMessageToChannel(
+                        player2.getCorrectChannel(),
+                        "## " + player2.getRepresentationUnfogged() + ", this is a friendly reminder that you cannot"
+                                + " transact during the Agenda Phase due to your " + FactionEmojis.olradin
+                                + " _Policy - The People: Control ➖_.");
+            } else {
+                sb.append(player2.getRepresentation(false, false))
+                        .append(" cannot transact during the Agenda Phase due to their ")
+                        .append(FactionEmojis.olradin)
+                        .append(" _Policy - The People: Control ➖_.");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+            }
         }
     }
 
@@ -2039,24 +2182,34 @@ public class TransactionHelper {
         boolean graft = p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
         graft &= game.isTwilightsFallMode();
 
+        // Under fog we may not be allowed to read p1's holdings. When we can't, the mere presence or
+        // absence of a category button would disclose them, so anything countable is offered
+        // unconditionally and anything that names a specific asset is dropped entirely - those go
+        // through "Specify Deal" instead.
+        boolean seeP1 = canSeeSheet(game, p1, player);
+        boolean seeP2 = canSeeSheet(game, p2, player);
+
         List<Button> stuffToTransButtons = new ArrayList<>();
-        if (p1.getTg() > 0) {
+        if (!seeP1 || p1.getTg() > 0) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction(), "Trade Goods"));
         }
+        // Those are the viewer's own debt tokens sitting in p1's pool, so counting them leaks nothing.
         if (p1.getDebtTokenCount(p2.getColor()) > 0) {
             stuffToTransButtons.add(
                     Buttons.blue("newTransact_ClearDebt_" + p1.getFaction() + "_" + p2.getFaction(), "Clear Debt"));
         }
         stuffToTransButtons.add(
                 Buttons.red("newTransact_SendDebt_" + p1.getFaction() + "_" + p2.getFaction(), "Send Debt"));
-        if (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex")) {
+        if (!seeP1 || (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex"))) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Comms_" + p1.getFaction() + "_" + p2.getFaction(), "Commodities"));
         }
 
+        // The wash outcome is derived from both players' commodities and trade goods, so it only holds
+        // together once the viewer is allowed to read p2's sheet.
         if (p1 == player
-                && !game.isFowMode()
+                && seeP2
                 && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
                 && !p1.hasAbility("military_industrial_complex")
                 && !p1.getAllianceMembers().contains(p2.getFaction())) {
@@ -2064,38 +2217,41 @@ public class TransactionHelper {
                     "offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0",
                     "Wash Both Players' Commodities"));
         }
-        if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
+        if (seeP1 && !ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction(), "Axis Orders"));
         }
-        if (ButtonHelper.getNumberOfStarCharts(p1) > 0) {
+        if (seeP1 && ButtonHelper.getNumberOfStarCharts(p1) > 0) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction(), "Star Charts"));
         }
-        if ((p1.hasAbility("arbiters")
-                        || p2.hasAbility("arbiters")
-                        || p1.hasTech("tf-guildships")
-                        || p2.hasTech("tf-guildships")
-                        || blackMarket)
-                && p1.getAcCount() > 0) {
+        // Black market dealing is played publicly; the abilities and techs are only consulted for a
+        // player whose sheet the viewer can read.
+        boolean canTradeACs = blackMarket
+                || (seeP1 && (p1.hasAbility("arbiters") || p1.hasTech("tf-guildships")))
+                || (seeP2 && (p2.hasAbility("arbiters") || p2.hasTech("tf-guildships")));
+        if (canTradeACs && (!seeP1 || p1.getAcCount() > 0)) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(), "Action Cards"));
         }
-        if (p1.getPnCount() > 0) {
+        if (!seeP1 || p1.getPnCount() > 0) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
-        if ((blackMarket || p1.hasUnlockedBreakthrough("zooidbt") || p2.hasUnlockedBreakthrough("zooidbt"))
-                && !p1.getSecretsUnscored().isEmpty()) {
+        boolean canTradeSOs = blackMarket
+                || (seeP1 && p1.hasUnlockedBreakthrough("zooidbt"))
+                || (seeP2 && p2.hasUnlockedBreakthrough("zooidbt"));
+        if (canTradeSOs && (!seeP1 || !p1.getSecretsUnscored().isEmpty())) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
         }
-        if (!p1.getFragments().isEmpty()) {
+        if (!seeP1 || !p1.getFragments().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
         }
-        if (((blackMarket || graft) && !p1.getActualRelics().isEmpty())
-                || !p1.getTradableRelics().isEmpty()) {
+        if (seeP1
+                && (((blackMarket || graft) && !p1.getActualRelics().isEmpty())
+                        || !p1.getTradableRelics().isEmpty())) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_Relics_" + p1.getFaction() + "_" + p2.getFaction(), "Relics"));
         }
@@ -2107,28 +2263,32 @@ public class TransactionHelper {
             stuffToTransButtons.add(Buttons.blue(
                     "newTransact_DetailsInvert_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Specify Deal"));
         }
-        if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game)
-                .isEmpty()) {
+        if (seeP1
+                && !ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game)
+                        .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
         }
-        if (MonumentsButtonHandler.canTradeUnitsWithHacanMonument(game, p1)) {
+        if (seeP1 && MonumentsButtonHandler.canTradeUnitsWithHacanMonument(game, p1)) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_MonumentUnits_" + p1.getFaction() + "_" + p2.getFaction(),
                     "Units (Mowshir Freeport)"));
         }
-        if (game.isAgeOfCommerceMode()) {
+        if (seeP1 && game.isAgeOfCommerceMode()) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Technology_" + p1.getFaction() + "_" + p2.getFaction(), "Technology"));
         }
+        // Safe to enumerate blind: this only ever lists p1's planets that already carry p2's own units,
+        // and alliance partners can read each other's sheets anyway.
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game)
                 .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(),
                     "Alliance Planets",
-                    p2.getFactionEmoji()));
+                    p2.fogSafeEmoji()));
         }
-        if ((game.getPhaseOfGame().toLowerCase().contains("agenda")
+        if (seeP1
+                && (game.getPhaseOfGame().toLowerCase().contains("agenda")
                         || game.getPhaseOfGame().toLowerCase().contains("strategy"))
                 && !"no".equalsIgnoreCase(ButtonHelper.playerHasDMZPlanet(p1, game))) {
             Button transact = Buttons.gray(
@@ -2402,10 +2562,12 @@ public class TransactionHelper {
         if (p2 != null) {
             player.clearTransactionItemsWithPlayer(p2);
             List<Button> buttons = getStuffToTransButtonsOld(game, player, p2);
-            if (!game.isFowMode() && game.isNewTransactionMethod()) {
+            if (useNewTransactionModel(game)) {
                 buttons = getStuffToTransButtonsNew(game, player, player, p2);
                 if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
-                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2);
+                    // Drawn from this player's perspective: under fog the other side is anonymised
+                    // unless they are allowed to read that player's sheet.
+                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
                     FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
                 }

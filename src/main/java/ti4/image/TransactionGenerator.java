@@ -11,12 +11,14 @@ import java.util.function.Function;
 import ti4.ResourceHelper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.TransactionHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -31,6 +33,20 @@ public final class TransactionGenerator {
     private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2) {
+        return drawTransactableStuffImage(p1, p2, null);
+    }
+
+    /**
+     * Draws the side-by-side "what can these two trade" summary.
+     *
+     * @param viewer whose perspective to draw from, or null to draw everything. Under fog, a player
+     *               this viewer can't see the sheet of is anonymised: their faction icon becomes a
+     *               color chip, their name becomes their color, and every count on their side is
+     *               masked. The color bars stay - colors aren't secret under fog.
+     */
+    public static BufferedImage drawTransactableStuffImage(Player p1, Player p2, Player viewer) {
+        boolean seeP1 = canSeeSheet(p1, viewer);
+        boolean seeP2 = canSeeSheet(p2, viewer);
         int width = 500, height = 160;
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) img.getGraphics();
@@ -58,17 +74,17 @@ public final class TransactionGenerator {
 
         // Faction Icons
         int x = 5, y = 5;
-        g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(p1, 40, 40), x, y, null);
+        drawIdentityIcon(g2, p1, seeP1, x, y);
         x = width - 45;
-        g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(p2, 40, 40), x, y, null);
+        drawIdentityIcon(g2, p2, seeP2, x, y);
 
         // Faction Names
         g2.setFont(Storage.getFont18());
         x = 50;
         y = 25;
-        drawStringMultilineVertCenter(g2, p1.bannerName(), x, y, (width - 100) / 2, HorizontalAlign.Left);
+        drawStringMultilineVertCenter(g2, identityName(p1, seeP1), x, y, (width - 100) / 2, HorizontalAlign.Left);
         x = width - 50;
-        drawStringMultilineVertCenter(g2, p2.bannerName(), x, y, (width - 100) / 2, HorizontalAlign.Right);
+        drawStringMultilineVertCenter(g2, identityName(p2, seeP2), x, y, (width - 100) / 2, HorizontalAlign.Right);
 
         // STUFF TIME !!!
         int emojiSize = 50;
@@ -76,26 +92,24 @@ public final class TransactionGenerator {
         y = 50;
         x = 5;
         // TGs
-        drawEmojiWithCenteredInt(g2, MiscEmojis.tg, p1.getTg(), x, y);
-        drawEmojiWithCenteredInt(g2, MiscEmojis.tg, p2.getTg(), width - x - emojiSize, y);
+        drawEmojiWithCenteredCount(g2, MiscEmojis.tg, p1.getTg(), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, MiscEmojis.tg, p2.getTg(), seeP2, width - x - emojiSize, y);
         x += emojiSize + 5;
         // Comms
-        drawEmojiWithCenteredInt(g2, MiscEmojis.comm, p1.getCommodities(), x, y);
-        drawEmojiWithCenteredInt(g2, MiscEmojis.comm, p2.getCommodities(), width - x - emojiSize, y);
+        drawEmojiWithCenteredCount(g2, MiscEmojis.comm, p1.getCommodities(), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, MiscEmojis.comm, p2.getCommodities(), seeP2, width - x - emojiSize, y);
         // PNs
         x += emojiSize + 5;
-        drawEmojiWithCenteredInt(g2, CardEmojis.PN, p1.getPromissoryNotes().size(), x, y);
-        drawEmojiWithCenteredInt(g2, CardEmojis.PN, p2.getPromissoryNotes().size(), width - x - emojiSize, y);
-        // ACs
-        if (p1.hasAbility("arbiters")
-                || p2.hasAbility("arbiters")
-                || p1.hasTech("tf-guildships")
-                || p2.hasTech("tf-guildships")) {
+        drawEmojiWithCenteredCount(g2, CardEmojis.PN, p1.getPromissoryNotes().size(), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, CardEmojis.PN, p2.getPromissoryNotes().size(), seeP2, width - x - emojiSize, y);
+        // ACs - only consult a player's abilities and techs if this viewer may read their sheet
+        if ((seeP1 && (p1.hasAbility("arbiters") || p1.hasTech("tf-guildships")))
+                || (seeP2 && (p2.hasAbility("arbiters") || p2.hasTech("tf-guildships")))) {
             x += emojiSize + 5;
-            drawEmojiWithCenteredInt(
-                    g2, CardEmojis.getACEmoji(p1), p1.getActionCards().size(), x, y);
-            drawEmojiWithCenteredInt(
-                    g2, CardEmojis.getACEmoji(p2), p2.getActionCards().size(), width - x - emojiSize, y);
+            drawEmojiWithCenteredCount(
+                    g2, CardEmojis.getACEmoji(p1), p1.getActionCards().size(), seeP1, x, y);
+            drawEmojiWithCenteredCount(
+                    g2, CardEmojis.getACEmoji(p2), p2.getActionCards().size(), seeP2, width - x - emojiSize, y);
         }
 
         // Second Line, Frags
@@ -106,19 +120,51 @@ public final class TransactionGenerator {
                 (int) p2.getFragments().stream().filter(f -> f.startsWith(str)).count();
         y = 105;
         x = 5;
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.CFrag, p1fragcount.apply("crf"), x, y);
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.CFrag, p2fragcount.apply("crf"), width - x - emojiSize, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.CFrag, p1fragcount.apply("crf"), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.CFrag, p2fragcount.apply("crf"), seeP2, width - x - emojiSize, y);
         x += emojiSize + 5;
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.HFrag, p1fragcount.apply("hrf"), x, y);
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.HFrag, p2fragcount.apply("hrf"), width - x - emojiSize, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.HFrag, p1fragcount.apply("hrf"), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.HFrag, p2fragcount.apply("hrf"), seeP2, width - x - emojiSize, y);
         x += emojiSize + 5;
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.IFrag, p1fragcount.apply("irf"), x, y);
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.IFrag, p2fragcount.apply("irf"), width - x - emojiSize, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.IFrag, p1fragcount.apply("irf"), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.IFrag, p2fragcount.apply("irf"), seeP2, width - x - emojiSize, y);
         x += emojiSize + 5;
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.UFrag, p1fragcount.apply("urf"), x, y);
-        drawEmojiWithCenteredInt(g2, ExploreEmojis.UFrag, p2fragcount.apply("urf"), width - x - emojiSize, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.UFrag, p1fragcount.apply("urf"), seeP1, x, y);
+        drawEmojiWithCenteredCount(g2, ExploreEmojis.UFrag, p2fragcount.apply("urf"), seeP2, width - x - emojiSize, y);
 
         return img;
+    }
+
+    /** Null viewer, or a non-fog game, means everything is on show. */
+    private static boolean canSeeSheet(Player target, Player viewer) {
+        Game game = target.getGame();
+        return viewer == null || !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, target, viewer);
+    }
+
+    /** The player's faction icon, or a plain color chip when the viewer isn't allowed to see them. */
+    private static void drawIdentityIcon(Graphics2D g2, Player player, boolean canSeeSheet, int x, int y) {
+        if (canSeeSheet) {
+            g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(player, 40, 40), x, y, null);
+        } else {
+            DrawingUtil.drawEmoji(g2, ColorEmojis.getColorEmoji(player.getColor()), x, y, 40);
+        }
+    }
+
+    private static String identityName(Player player, boolean canSeeSheet) {
+        // A hidden sheet only happens under fog, where getFactionNameOrColor is the player's color.
+        return canSeeSheet
+                ? player.bannerName()
+                : player.getFactionNameOrColor().toUpperCase();
+    }
+
+    /** Draws a count, or a "?" in its place when the viewer isn't allowed to read that player's sheet. */
+    private static void drawEmojiWithCenteredCount(
+            Graphics2D g2, TI4Emoji emoji, int amount, boolean canSeeSheet, int x, int y) {
+        if (canSeeSheet) {
+            drawEmojiWithCenteredInt(g2, emoji, amount, x, y);
+        } else {
+            drawEmojiWithCenteredText(g2, emoji, "?", false, x, y);
+        }
     }
 
     public static BufferedImage drawTradeOfferMeme(Game game, Player p1, Player p2) {
@@ -286,16 +332,22 @@ public final class TransactionGenerator {
     }
 
     private static void drawEmojiWithCenteredInt(Graphics2D g2, TI4Emoji emoji, Integer amount, int x, int y) {
-        if (amount != null && amount == 0) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        boolean faded = amount != null && amount == 0;
+        drawEmojiWithCenteredText(g2, emoji, amount == null ? null : "" + amount, faded, x, y);
+    }
+
+    private static void drawEmojiWithCenteredText(
+            Graphics2D g2, TI4Emoji emoji, String text, boolean faded, int x, int y) {
+        if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
         DrawingUtil.drawEmoji(g2, emoji, x, y, 50);
-        if (amount != null && amount == 0) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        if (faded) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
         Font before = g2.getFont();
         g2.setFont(Storage.getFont32());
-        if (amount != null)
+        if (text != null)
             DrawingUtil.superDrawString(
                     g2,
-                    "" + amount,
+                    text,
                     x + 25,
                     y + 25,
                     Color.white,

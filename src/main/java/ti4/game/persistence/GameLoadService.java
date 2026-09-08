@@ -549,6 +549,8 @@ class GameLoadService {
                 case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(parseBooleanOrDefault(info, false));
                 case Constants.QUEUE_SO -> game.setQueueSO(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_BUBBLES -> game.setShowBubbles(parseBooleanOrDefault(info, false));
+                // TODO: GameProperties initialises newTransactionMethod to true, so a missing or
+                // unparsable token here silently drops a running game back to the legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
