@@ -659,11 +659,16 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setParadigmSpliceDeckID("tf_paradigm");
         setUnitSpliceDeckID("tf_units");
 
-        // Overrides for TK mode
-        if (isTwilightKart()) {
+        // Overrides for TK modes
+        if (isTkNovaCup()) {
+            acDeck = "action_cards_tk_nova";
+            setGenomeSpliceDeckID("tk_nova_genome");
+        }
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (isTwilightKart() || isTkDestroyerCup()) {
             agendaDeck = "agendas_twilight_kart";
-            acDeck = "action_cards_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
+            acDeck = "action_cards_tk_destroyer_and_nova";
         }
 
         // Set other normal decks
@@ -992,11 +997,24 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put(SourceEmojis.DiscordantStars + " Twilight DiscordantStars", isTwilightDS());
         gameModes.put("BlueReverie", isBlueReverieMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
+
+        // Twilight Kart Cups
+        List<String> tkCups = new ArrayList<>();
+        // isTwilightKart is deprecated. once removed, just check for isTkDestroyerCup
+        if (isTwilightKart() || isTkDestroyerCup()) {
+            tkCups.add("Destroyer Cup");
+        }
+        if (isTkNovaCup()) {
+            tkCups.add("Nova Cup");
+        }
+        gameModes.put(
+                SourceEmojis.TwilightKart + " Twilight Kart (" + String.join(" & ", tkCups) + ")", !tkCups.isEmpty());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);

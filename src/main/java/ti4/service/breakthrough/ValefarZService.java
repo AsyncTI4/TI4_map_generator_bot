@@ -8,6 +8,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
@@ -52,21 +53,13 @@ public class ValefarZService {
     public List<String> getFlagshipAbilitys(Game game, Player player) {
         List<String> abilities = new ArrayList<>();
         if (player == null) return abilities;
-        for (String fs : player.getUnitsOwned()) {
-            if (fs.contains("_flagship")) {
-                abilities.add(fs);
-            }
-        }
+        abilities.add(player.getUnitByType(Units.UnitType.Flagship).getAlias());
         // Check for Valefar Z
         if (player.hasUnlockedBreakthrough("nekrobt")) {
             String valefarZ = game.getStoredValue("valefarZ");
             for (Player p : game.getPlayers().values()) {
                 if (valefarZ.contains(p.getFaction())) {
-                    for (String fs : p.getUnitsOwned()) {
-                        if (fs.contains("_flagship")) {
-                            abilities.add(fs);
-                        }
-                    }
+                    abilities.add(p.getUnitByType(Units.UnitType.Flagship).getAlias());
                 }
             }
         }

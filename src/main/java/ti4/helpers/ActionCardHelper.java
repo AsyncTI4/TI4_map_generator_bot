@@ -385,6 +385,7 @@ public class ActionCardHelper {
                         .append(actionCard.getRepresentationJustText((game)))
                         .append('\n');
                 if (actionCard.getNotes() != null) {
+                    // isTwilightKart is Deprecated. remove entire if-statement once isTwilightKart is removed
                     if (game != null && game.isTwilightKart() && "tf-starflare".equalsIgnoreCase(actionCard.getID())) {
                         continue;
                     }

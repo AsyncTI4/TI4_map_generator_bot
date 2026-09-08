@@ -26,12 +26,16 @@ import ti4.service.regex.RegexService;
 public class FealtyUplinkService {
 
     private String rep(Game game) {
-        if (game.isTwilightKart()) return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (game.isTwilightKart() || game.isTkDestroyerCup())
+            return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
         return Mapper.getBreakthrough("l1z1xbt").getNameRepresentation();
     }
 
     private String name(Game game) {
-        if (game.isTwilightKart()) return "_" + Mapper.getUnit("tk-fealtycore").getName() + "_";
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (game.isTwilightKart() || game.isTkDestroyerCup())
+            return "_" + Mapper.getUnit("tk-fealtycore").getName() + "_";
         return "_" + Mapper.getBreakthrough("l1z1xbt").getName() + "_";
     }
 

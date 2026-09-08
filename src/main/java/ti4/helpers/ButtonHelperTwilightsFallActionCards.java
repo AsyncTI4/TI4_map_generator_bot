@@ -946,6 +946,8 @@ public final class ButtonHelperTwilightsFallActionCards {
     public static void resolveStarFlare(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         String msg = player.getRepresentation() + ", please choose the supernova you wish to have erupt.";
+        // isTwilightKart is Deprecated.
+        // remove entire if-statement (and just do the else-body) once isTwilightKart is removed
         if (game.isTwilightKart()) {
             for (Tile tile : game.getTileMap().values()) {
                 if (tile.getPlanetUnitHolders().isEmpty()
@@ -1009,6 +1011,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    // isTwilightKart is Deprecated. remove entire starFlareTKStep2 function once isTwilightKart is removed
     @ButtonHandler("starFlareTKStep2_")
     public static void starFlareTKStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tileOg = game.getTileByPosition(buttonID.split("_")[1]);

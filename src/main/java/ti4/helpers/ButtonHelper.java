@@ -1206,6 +1206,13 @@ public class ButtonHelper {
         if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
             return true;
         }
+        if (player.hasAbility("rallying_cry")
+                && tile.getSpaceUnitHolder()
+                                .countPlayersUnitsWithModelCondition(
+                                        player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                        == 1) {
+            return true;
+        }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet) {
                 continue;
@@ -7578,13 +7585,15 @@ public class ButtonHelper {
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(f -> f.getSource().isOfficial()
                         || (game.isDiscordantStarsMode() && f.getSource().isDs())
-                        || (game.isBlueReverieMode() && f.getSource().isBr()))
+                        || (game.isBlueReverieMode() && f.getSource().isBr())
+                        || (game.isTkNovaCup() && f.getSource() == ComponentSource.tk_nova_cup))
                 .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
                 .sorted((f1, f2) -> factionsOnMap.contains(f1)
                         ? (factionsOnMap.contains(f2) ? 0 : -1)
                         : (factionsOnMap.contains(f2) ? 1 : 0))
                 .toList();
 
+        List<ComponentSource> tfSources = List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
         Set<String> factionsComplete = new HashSet<>();
         for (FactionModel faction : allFactions) {
             String factionId = faction.getAlias();
@@ -7596,8 +7605,8 @@ public class ButtonHelper {
                     name = "The Council Keleres";
                 }
                 if (factionsComplete.contains(factionId)) continue;
-                if (!game.isTwilightsFallMode() && faction.getSource() == ComponentSource.twilights_fall) continue;
-                if (game.isTwilightsFallMode() && faction.getSource() != ComponentSource.twilights_fall) continue;
+                if (!game.isTwilightsFallMode() && tfSources.contains(faction.getSource())) continue;
+                if (game.isTwilightsFallMode() && !tfSources.contains(faction.getSource())) continue;
                 buttons.add(Buttons.green(
                         "setupStep2_" + userId + "_" + factionId, name, FactionEmojis.getFactionIcon(factionId)));
             }
@@ -8953,7 +8962,8 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planet);
             String message;
             String action = " Diplo ";
-            if (game.isTwilightKart()) {
+            // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+            if (game.isTwilightKart() || game.isTkDestroyerCup()) {
                 action = " make _Sanctuary_ in ";
             }
             if (tile != null) {

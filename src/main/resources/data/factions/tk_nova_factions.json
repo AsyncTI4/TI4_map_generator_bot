@@ -1,0 +1,258 @@
+[
+    {
+        "alias": "redtknova",
+        "homebrewReplacesID": "redtf",
+        "factionName": "The Ruby Monarch (Nova)",
+        "shortName": "Ruby Nova",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 2,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-thegarnetspear",
+            "infantry",
+            "tk-theforgedheart",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "red"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "orangetknova",
+        "homebrewReplacesID": "orangetf",
+        "factionName": "Radiant Aur (Nova)",
+        "shortName": "Radiant Nova",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 4,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-airoshirveritas",
+            "infantry",
+            "tk-aedile",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "org"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "yellowtknova",
+        "homebrewReplacesID": "yellowtf",
+        "factionName": "Avarice Rex (Nova)",
+        "shortName": "Avarice Nova",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 6,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-fortuna",
+            "infantry",
+            "tk-renegade",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "ylw"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "greentknova",
+        "homebrewReplacesID": "greentf",
+        "factionName": "Il Sai Lakoe, Herald of Thorns (Nova)",
+        "shortName": "Nova Lakoe",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-shadebriar",
+            "infantry",
+            "tk-lakoesthorns",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "grn"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "bluetknova",
+        "homebrewReplacesID": "bluetf",
+        "factionName": "The Saint of Swords (Nova)",
+        "shortName": "Saint of Nova",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-grus",
+            "infantry",
+            "tk-kladenets",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "blu"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "purpletknova",
+        "homebrewReplacesID": "purpletf",
+        "factionName": "Il Na Viroset (Nova)",
+        "shortName": "Nova Viroset",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 4,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-phantasm",
+            "infantry",
+            "tk-starlancerxl",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "ppl"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "pinktknova",
+        "homebrewReplacesID": "pinktf",
+        "factionName": "El Nen Janovet (Nova)",
+        "shortName": "Nova Janovet",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-thevisionsofjanovet",
+            "infantry",
+            "tk-clairvoyant",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "pnk"
+        ],
+        "source": "tk_nova_cup"
+    },
+    {
+        "alias": "blacktknova",
+        "homebrewReplacesID": "blacktf",
+        "factionName": "A Sickening Lurch (Nova)",
+        "shortName": "Sickening Nova",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 2,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "tk-ananguishedcry",
+            "infantry",
+            "tk-graspingdarkness",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "blk"
+        ],
+        "source": "tk_nova_cup"
+    }
+]

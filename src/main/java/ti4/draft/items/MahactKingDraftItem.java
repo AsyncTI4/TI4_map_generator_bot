@@ -6,6 +6,8 @@ import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
+import ti4.helpers.Constants;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -50,72 +52,49 @@ public class MahactKingDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         FactionModel faction = Mapper.getFaction(getItemId());
-        if (faction != null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(faction.getFactionName())
-                    .append("\n> Commodities: ")
-                    .append(faction.getCommodities())
-                    .append("\n> Flagship: ");
-            UnitModel unit = Mapper.getUnit(getItemId() + "_flagship");
-            sb.append(" Combat: ");
-            sb.append(unit.getCombatHitsOn());
-            if (unit.getCombatDieCount() > 1) {
-                sb.append("x").append(unit.getCombatDieCount());
-            }
-            sb.append(' ');
-            if (unit.getSustainDamage()) {
-                sb.append("SUSTAIN DAMAGE ");
-            }
-            if (unit.getAfbDieCount() > 0) {
-                sb.append("ANTI-FIGHTER BARRAGE ")
-                        .append(unit.getAfbHitsOn())
-                        .append("x")
-                        .append(unit.getAfbDieCount())
-                        .append(' ');
-            }
-            if (unit.getProductionValue() > 0) {
-                sb.append("PRODUCTION ");
-                sb.append(unit.getProductionValue());
-                sb.append(' ');
-            }
-            if (unit.getCapacityValue() > 0) {
-                sb.append("Capacity ");
-                sb.append(unit.getCapacityValue());
-                sb.append(' ');
-            }
-            if (unit.getMoveValue() > 0) {
-                sb.append("Move ");
-                sb.append(unit.getMoveValue());
-                sb.append(' ');
-            }
-            if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
-            unit = Mapper.getUnit(getItemId() + "_mech");
-            sb.append("\n> Mech: ");
-            sb.append(" Combat: ");
-            sb.append(unit.getCombatHitsOn());
-            if (unit.getCombatDieCount() > 1) {
-                sb.append("x").append(unit.getCombatDieCount());
-            }
-            sb.append(' ');
-            if (unit.getSustainDamage()) {
-                sb.append("SUSTAIN DAMAGE ");
-            }
-            if (unit.getAfbDieCount() > 0) {
-                sb.append("ANTI-FIGHTER BARRAGE ")
-                        .append(unit.getAfbHitsOn())
-                        .append("x")
-                        .append(unit.getAfbDieCount())
-                        .append(' ');
-            }
-            if (unit.getProductionValue() > 0) {
-                sb.append("PRODUCTION ");
-                sb.append(unit.getProductionValue());
-                sb.append(' ');
-            }
-            if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
-            return sb.toString();
+        if (faction == null) {
+            return "";
         }
-        return "";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(faction.getFactionName()).append("\n> Commodities: ").append(faction.getCommodities());
+        for (String unitId : faction.getUnits()) {
+            UnitModel unit = Mapper.getUnit(unitId);
+            if (unit == null) {
+                continue;
+            }
+            Units.UnitType type = unit.getUnitType();
+            if (type != Units.UnitType.Flagship && type != Units.UnitType.Mech) {
+                continue;
+            }
+
+            sb.append("\n> ").append(type.humanReadableName()).append(": ");
+            sb.append(" Combat: ");
+            sb.append(unit.getCombatHitsOn());
+            if (unit.getCombatDieCount() > 1) {
+                sb.append("x").append(unit.getCombatDieCount());
+            }
+            sb.append(' ');
+            if (unit.getSustainDamage()) {
+                sb.append("SUSTAIN DAMAGE ");
+            }
+            if (unit.getAfbDieCount() > 0) {
+                sb.append("ANTI-FIGHTER BARRAGE ")
+                        .append(unit.getAfbHitsOn())
+                        .append("x")
+                        .append(unit.getAfbDieCount())
+                        .append(' ');
+            }
+            if (unit.getProductionValue() > 0) {
+                sb.append("PRODUCTION ");
+                sb.append(unit.getProductionValue());
+                sb.append(' ');
+            }
+            if (unit.getAbility().isPresent()) {
+                sb.append(unit.getAbility().get());
+            }
+        }
+        return sb.toString();
     }
 
     @JsonIgnore
@@ -134,10 +113,36 @@ public class MahactKingDraftItem extends DraftItem {
         return allItems;
     }
 
+    public static List<DraftItem> buildAllDraftableItems(Game game) {
+        List<DraftItem> allItems = buildAllItems(game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MAHACTKING);
+        return allItems;
+    }
+
     public static List<DraftItem> buildAllItems() {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : Mapper.getFactions().values()) {
             if (faction.getSource() == ComponentSource.twilights_fall) {
+                allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
+            }
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        List<ComponentSource> sources;
+        if (game.isTkNovaCup()) {
+            sources = switch (game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option")) {
+                case "onePerColor" -> List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
+                case "onlyNova" -> List.of(ComponentSource.tk_nova_cup);
+                default -> List.of(ComponentSource.twilights_fall);
+            };
+        } else {
+            sources = List.of(ComponentSource.twilights_fall);
+        }
+        for (FactionModel faction : Mapper.getFactions().values()) {
+            if (sources.contains(faction.getSource())) {
                 allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
             }
         }

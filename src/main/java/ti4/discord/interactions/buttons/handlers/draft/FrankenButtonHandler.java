@@ -31,6 +31,7 @@ import ti4.draft.items.MonumentDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
@@ -220,7 +221,11 @@ public class FrankenButtonHandler {
                 FactionModel faction = Mapper.getFaction(itemID);
                 player.setFaction(itemID);
                 MonumentsService.addFactionMonument(player, player.getGame());
-                List<String> units = List.of(itemID + "_flagship", itemID + "_mech", "tf_warsun");
+                List<Units.UnitType> kingUnitTypes =
+                        List.of(Units.UnitType.Flagship, Units.UnitType.Mech, Units.UnitType.Warsun);
+                List<String> units = faction.getUnits().stream()
+                        .filter(u -> kingUnitTypes.contains(Mapper.getUnit(u).getUnitType()))
+                        .toList();
                 FrankenUnitService.addUnits(event, player, units, false);
                 FrankenStatsService.setStartingComms(event, player, faction.getCommodities());
             }

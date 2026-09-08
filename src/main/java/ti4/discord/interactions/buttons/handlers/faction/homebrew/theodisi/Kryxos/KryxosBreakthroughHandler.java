@@ -93,22 +93,46 @@ public class KryxosBreakthroughHandler {
             String[] values = entry.split(";", 5);
             if (values.length != 5) continue;
 
-            Tile tile = game.getTileByPosition(values[0]);
-            UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
-            if (holder == null) continue;
-
-            UnitKey unitKey = holder.getUnitKeys().stream()
-                    .filter(player::unitBelongsToPlayer)
-                    .filter(key -> values[2].equals(key.asyncID()))
-                    .findFirst()
-                    .orElse(null);
-            if (unitKey == null) continue;
-
             try {
                 int baseline = Integer.parseInt(values[3]);
-                int added = Integer.parseInt(values[4]);
-                int remove = Math.min(added, Math.max(0, holder.getGalvanizedUnitCount(unitKey) - baseline));
-                if (remove > 0) holder.removeGalvanizedUnit(unitKey, remove);
+                int remaining = Integer.parseInt(values[4]);
+                Tile tile = game.getTileByPosition(values[0]);
+                UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
+                if (holder != null) {
+                    UnitKey unitKey = holder.getUnitKeys().stream()
+                            .filter(player::unitBelongsToPlayer)
+                            .filter(key -> values[2].equals(key.asyncID()))
+                            .findFirst()
+                            .orElse(null);
+                    if (unitKey != null) {
+                        int remove =
+                                Math.min(remaining, Math.max(0, holder.getGalvanizedUnitCount(unitKey) - baseline));
+                        if (remove > 0) {
+                            holder.removeGalvanizedUnit(unitKey, remove);
+                            remaining -= remove;
+                        }
+                    }
+                }
+                if (remaining > 0) {
+                    for (Tile otherTile : game.getTileMap().values()) {
+                        for (UnitHolder otherHolder : otherTile.getUnitHolders().values()) {
+                            if (otherHolder == holder) continue;
+                            UnitKey unitKey = otherHolder.getUnitKeys().stream()
+                                    .filter(player::unitBelongsToPlayer)
+                                    .filter(key -> values[2].equals(key.asyncID()))
+                                    .findFirst()
+                                    .orElse(null);
+                            if (unitKey == null) continue;
+                            int remove = Math.min(remaining, otherHolder.getGalvanizedUnitCount(unitKey));
+                            if (remove > 0) {
+                                otherHolder.removeGalvanizedUnit(unitKey, remove);
+                                remaining -= remove;
+                            }
+                            if (remaining == 0) break;
+                        }
+                        if (remaining == 0) break;
+                    }
+                }
             } catch (NumberFormatException ignored) {
                 // Malformed state cannot safely be reversed; still remove it below so it cannot leak further.
             }
