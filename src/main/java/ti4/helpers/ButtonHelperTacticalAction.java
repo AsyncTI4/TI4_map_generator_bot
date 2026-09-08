@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -506,6 +507,7 @@ public final class ButtonHelperTacticalAction {
             OblivionAbilityHandler.offerReflectionPlacement(event, game, player, tile);
             MyrrTechHandler.offerSegmentedStructuring(event, game, player, tile);
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
+            MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
         }
     }
 

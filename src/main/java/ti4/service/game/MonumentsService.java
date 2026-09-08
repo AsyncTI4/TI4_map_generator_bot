@@ -135,6 +135,7 @@ public class MonumentsService {
                 : player.getFactionModel().getHomebrewReplacesID().orElse(player.getFaction());
         return Mapper.getUnits().values().stream()
                 .filter(unit -> unit.getSource() == ComponentSource.monuments)
+                .filter(unit -> !"rhodun_monumentback".equals(unit.getId()))
                 .filter(unit -> unit.getFaction().filter(faction::equals).isPresent())
                 .findFirst()
                 .orElse(null);
@@ -364,6 +365,9 @@ public class MonumentsService {
     }
 
     public static void clearNaaluMonumentCoexistence(Game game) {
+        if (game == null || !game.isMonumentsMode()) {
+            return;
+        }
         for (Player player : game.getRealPlayers()) {
             for (Tile tile : game.getTileMap().values()) {
                 for (Planet planet : tile.getPlanetUnitHolders()) {

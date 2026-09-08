@@ -32,6 +32,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.franken.FrankenDraftStartService;
+import ti4.service.game.MonumentsService;
 import tools.jackson.databind.JsonNode;
 
 @Getter
@@ -212,6 +213,7 @@ public class FrankenSettings extends SettingsMenu {
         }
         applyHomebrewSettings();
         deckSettings.applyDecks(game, event);
+        MonumentsService.applyMonuments(game);
         applyBanSettings();
         applyPriorityFactionSettings();
         return FrankenDraftStartService.startFrankenDraft(event, game, force.isVal(), selectedDraftMode());
@@ -289,6 +291,7 @@ public class FrankenSettings extends SettingsMenu {
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));
+        game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
     }
 
     private FrankenDraftMode selectedDraftMode() {
@@ -317,6 +320,10 @@ public class FrankenSettings extends SettingsMenu {
 
     public boolean isLostLegaciesEnabled() {
         return homebrewSettings.getLostLegacies().isVal();
+    }
+
+    boolean isMonumentsEnabled() {
+        return homebrewSettings.getMonuments().isVal();
     }
 
     void syncFrankendrazDsBrState(String lastSettingTouched) {

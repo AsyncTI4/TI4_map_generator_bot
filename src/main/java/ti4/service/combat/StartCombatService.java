@@ -55,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -285,6 +286,7 @@ public class StartCombatService {
                 buttons.add(Buttons.red(
                         player2.factionButtonChecker() + "removeAllStructures_" + unitHolder.getName(),
                         "Remove Structures"));
+                MonumentsPoKButtonHandler.addSheConsumesWorldsButton(buttons, game, player, tile, (Planet) unitHolder);
                 buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), msg2, buttons);
             }

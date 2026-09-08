@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -509,6 +510,7 @@ public final class StatusHelper {
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
             NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
+        MonumentsPoKButtonHandler.sendSpireOfIxthButtons(game);
 
         for (Player player : game.getRealPlayers()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());

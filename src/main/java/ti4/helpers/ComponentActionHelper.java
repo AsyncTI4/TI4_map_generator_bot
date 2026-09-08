@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -54,6 +55,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
@@ -590,6 +592,16 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(
                     factionChecker + prefix + "ability_muaatFSsigma", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
+        }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, p1, "argent_monument")
+                && MonumentsService.isMonumentReady(game, p1, "argent_monument")) {
+            compButtons.add(MonumentsPoKButtonHandler.getPhoenixCauldronButton(p1));
+        }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, p1, "titans_monument")
+                && MonumentsService.isMonumentReady(game, p1, "titans_monument")) {
+            compButtons.add(MonumentsPoKButtonHandler.getScepterButton(p1));
         }
 
         // Get Relic

@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -482,6 +483,12 @@ public final class ButtonHelperModifyUnits {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "removeAllStructures_" + unitHolder.getName(),
                     "Remove Structures"));
+            for (Player planetInvader : game.getRealPlayersNNeutral()) {
+                if (planetInvader != player && FoWHelper.playerHasUnitsOnPlanet(planetInvader, unitHolder)) {
+                    MonumentsPoKButtonHandler.addSheConsumesWorldsButton(
+                            buttons, game, planetInvader, tile, (Planet) unitHolder);
+                }
+            }
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
@@ -1402,6 +1409,7 @@ public final class ButtonHelperModifyUnits {
 
         String message = "Landed troops. Use buttons to decide if you wish to build or finish the activation.";
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
+        MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
         Tile tile = null;
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);

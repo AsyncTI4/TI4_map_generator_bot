@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
@@ -167,6 +168,15 @@ public class FactionDraftItem extends DraftItem {
         if (Mapper.isValidBreakthrough(breakthrough)) {
             addIfAllowed(game, components, DraftCategory.BREAKTHROUGH, breakthrough, breakthrough);
         }
+        if (game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
+            Mapper.getUnits().values().stream()
+                    .filter(UnitModel::getIsMonument)
+                    .filter(unit -> faction.getAlias().equals(unit.getFaction().orElse(null)))
+                    .filter(unit -> MonumentDraftItem.isAvailable(game, unit.getId()))
+                    .findFirst()
+                    .ifPresent(
+                            unit -> addIfAllowed(game, components, DraftCategory.MONUMENT, unit.getId(), unit.getId()));
+        }
         return components;
     }
 
@@ -214,7 +224,7 @@ public class FactionDraftItem extends DraftItem {
             case ABILITY -> Mapper.isValidAbility(itemId);
             case TECH -> Mapper.isValidTech(itemId);
             case AGENT, COMMANDER, HERO -> Mapper.isValidLeader(itemId);
-            case MECH, FLAGSHIP, UNIT -> Mapper.isValidUnit(itemId);
+            case MECH, FLAGSHIP, UNIT, MONUMENT -> Mapper.isValidUnit(itemId);
             case PN -> Mapper.isValidPromissoryNote(itemId);
             case HOMESYSTEM, STARTINGTECH, STARTINGFLEET, COMMODITIES, FACTION -> Mapper.isValidFaction(itemId);
             case BREAKTHROUGH -> Mapper.isValidBreakthrough(itemId);
