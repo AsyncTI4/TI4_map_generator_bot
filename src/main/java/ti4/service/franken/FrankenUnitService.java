@@ -1,10 +1,13 @@
 package ti4.service.franken;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.draft.DraftCategory;
 import ti4.game.Player;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -13,6 +16,28 @@ import ti4.service.VeiledHeartService;
 
 @UtilityClass
 public class FrankenUnitService {
+
+    private static void removeDuplicates(Player player, UnitModel addedUnit) {
+        boolean keepUpgrades = false;
+        if (player.getGame().isTwilightsFallMode()
+                && List.of(Units.UnitType.Flagship, Units.UnitType.Mech).contains(addedUnit.getUnitType())) {
+            if (addedUnit.getIsUpgrade()) {
+                // Adding a TF flagship/mech upgrade never removes existing units
+                return;
+            }
+            // Because the added flagship/mech is not an upgrade, it must belong to a Mahact King.
+            // These are normally only added during the draft, which means the franken faction's
+            // base factionless flagship/mech may still exist and must be removed.
+            // However, it's possible a flagship/mech upgrade has already been drafted.
+            // The Mahact King's units should not override that upgrade, so upgrades are kept.
+            keepUpgrades = true;
+        }
+        Stream<UnitModel> unitsToRemove = player.getUnitsByAsyncID(addedUnit.getAsyncId()).stream();
+        if (keepUpgrades) {
+            unitsToRemove = unitsToRemove.filter(Predicate.not(UnitModel::getIsUpgrade));
+        }
+        unitsToRemove.map(UnitModel::getAlias).forEach(player::removeOwnedUnitByID);
+    }
 
     public static void addUnits(
             GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean dupes) {
@@ -23,20 +48,12 @@ public class FrankenUnitService {
                 sb.append("> ").append(" veiled unit (reveal using the button in the `#cards-info` thread)");
                 continue;
             }
-            UnitModel unitModel = Mapper.getUnit(unitID);
-            if (player.getGame().isTwilightsFallMode()
-                    && ("fs".equalsIgnoreCase(unitModel.getAsyncId()) || "mf".equalsIgnoreCase(unitModel.getAsyncId()))
-                    && !unitID.contains("_")) {
-                dupes = true;
-            }
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
+                UnitModel unitModel = Mapper.getUnit(unitID);
                 if (!dupes) {
-                    UnitModel oldBaseType;
-                    while ((oldBaseType = player.getUnitByBaseType(unitModel.getBaseType())) != null) {
-                        player.removeOwnedUnitByID(oldBaseType.getAlias());
-                    }
+                    removeDuplicates(player, unitModel);
                 }
                 String unitText = unitID;
                 DraftCategory category = FrankenAlternateTextService.getUnitCategory(unitID);

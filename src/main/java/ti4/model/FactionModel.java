@@ -285,7 +285,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
         sb = new StringBuilder();
         sb.append(Helper.getUnitListEmojis(startingFleet)).append('\n');
-        if (!sb.isEmpty()) {
+        if (!startingFleet.isEmpty()) {
             eb.addField("__Starting Fleet__", sb.toString(), false);
         }
 

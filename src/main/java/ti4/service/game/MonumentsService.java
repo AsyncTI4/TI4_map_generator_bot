@@ -22,6 +22,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.FactionModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
@@ -126,19 +127,27 @@ public class MonumentsService {
         }
     }
 
+    private static UnitModel getFactionMonument(String factionId) {
+        return Mapper.getUnits().values().stream()
+                .filter(unit -> unit.getSource() == ComponentSource.monuments)
+                .filter(unit -> !"rhodun_monumentback".equals(unit.getId()))
+                .filter(unit -> unit.getFaction().filter(factionId::equals).isPresent())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static UnitModel getFactionMonument(FactionModel faction) {
+        return getFactionMonument(faction.getHomebrewReplacesID().orElse(faction.getAlias()));
+    }
+
     public static UnitModel getFactionMonument(Player player) {
         if (player == null) {
             return null;
         }
-        String faction = player.getFactionModel() == null
-                ? player.getFaction()
-                : player.getFactionModel().getHomebrewReplacesID().orElse(player.getFaction());
-        return Mapper.getUnits().values().stream()
-                .filter(unit -> unit.getSource() == ComponentSource.monuments)
-                .filter(unit -> !"rhodun_monumentback".equals(unit.getId()))
-                .filter(unit -> unit.getFaction().filter(faction::equals).isPresent())
-                .findFirst()
-                .orElse(null);
+        if (player.getFactionModel() == null) {
+            return getFactionMonument(player.getFaction());
+        }
+        return getFactionMonument(player.getFactionModel());
     }
 
     public static boolean hasMonumentOnBoard(Game game, Player player) {

@@ -102,6 +102,10 @@ public class FactionDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public TI4Emoji getItemEmoji() {
+        FactionModel faction = getFaction();
+        if (faction != null) {
+            return FactionEmojis.getFactionIcon(faction.getHomebrewReplacesID().orElse(faction.getAlias()));
+        }
         return FactionEmojis.getFactionIcon(getItemId());
     }
 

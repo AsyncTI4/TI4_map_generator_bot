@@ -84,9 +84,9 @@ public class TEOptionService {
     }
 
     @ButtonHandler("startTFDraft")
-    public static void startTFDraft(ButtonInteractionEvent event, Game game) {
+    public static void startTFDraft(ButtonInteractionEvent event, Game game, String buttonID) {
         game.setupTwilightsFallMode(event);
-        if (event.getButton().getCustomId().endsWith("_splice")) {
+        if (buttonID.endsWith("_splice")) {
             // force=false so any player the GM already set up through the wizard keeps their faction, colour
             // and (crucially) their assigned home position - setUpFrankenFactions with force=true re-parks
             // everyone at the temporary off-map 50x anchors, which would undo the wizard's placements.
@@ -217,15 +217,12 @@ public class TEOptionService {
                - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example,
                the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
         */
-        Map<String, String> options = Map.of(
-                "onePerColor", "Both, but only 1 per Color (Default)",
-                // "lockColor", "Both, but lock Colors",
-                // "chooseSet", "Both, but draft Color first",
-                // "unrestricted", "Both, no restrictions",
-                "onlyNova", "Only Nova Kings",
-                "onlyVanilla", "Only Vanilla Kings");
+        List<Map.Entry<String, String>> options = List.of(
+                Map.entry("onePerColor", "Both, but only 1 per Color (Default)"),
+                Map.entry("onlyNova", "Only Nova Kings"),
+                Map.entry("onlyVanilla", "Only Vanilla Kings"));
         List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, String> entry : options.entrySet()) {
+        for (Map.Entry<String, String> entry : options) {
             String buttonID = "tkNovaSetup_" + entry.getKey();
             String buttonLabel = entry.getValue();
             if (entry.getKey().equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
