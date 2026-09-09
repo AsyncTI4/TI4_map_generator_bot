@@ -38,6 +38,8 @@ public class MatchmakingRatingEventService {
     private static final Duration RATINGS_CACHE_TTL = Duration.ofHours(8);
     private static final Duration AVERAGE_RATING_CACHE_TTL = Duration.ofHours(8);
     private static final String RATINGS_CACHE_KEY = "key";
+    private static final List<String> DEBUG_RATING_PLAYERS =
+            List.of("tazing0", "bleezy4sheezy", "bearded_one", "inco.n.damus", "forleafs", "the_constellation_orion");
 
     private final Cache<String, List<MatchmakingRating>> unconservativeRatingsCache = createRatingsCache();
     private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache = createRatingsCache();
@@ -201,6 +203,8 @@ public class MatchmakingRatingEventService {
                 "games",
                 bucketGamesByBracket(games, playerRatings));
 
+        appendDebugRatings(stringBuilder, playerRatings);
+
         playerRatings.stream()
                 .filter(playerRating ->
                         playerRating.userId().equals(event.getUser().getId()))
@@ -229,6 +233,35 @@ public class MatchmakingRatingEventService {
                 (MessageChannelUnion) event.getMessageChannel(),
                 "Player Matchmaking Ratings",
                 stringBuilder.toString());
+    }
+
+    private static void appendDebugRatings(StringBuilder stringBuilder, List<MatchmakingRating> playerRatings) {
+        stringBuilder.append("\n__**Debug ratings:**__\n");
+        for (String debugPlayer : DEBUG_RATING_PLAYERS) {
+            MatchmakingRating playerRating = playerRatings.stream()
+                    .filter(rating -> matchesDebugPlayer(rating, debugPlayer))
+                    .findFirst()
+                    .orElse(null);
+            if (playerRating == null) {
+                stringBuilder.append(String.format(
+                        "`%s` not rated - fewer than 3 completed games, or stored under a different name\n",
+                        debugPlayer));
+                continue;
+            }
+            stringBuilder.append(String.format(
+                    "`%s` `Rating=%d` `Calibration=%.1f%%` `Sigma=%.3f`%s\n",
+                    playerRating.username(),
+                    toDisplayRating(playerRating.rating()),
+                    playerRating.calibrationPercent(),
+                    playerRating.sigma(),
+                    playerRating.recentRatingDelta() == null
+                            ? ""
+                            : String.format(" `Trend=%+d`", toDisplayRating(playerRating.recentRatingDelta()))));
+        }
+    }
+
+    private static boolean matchesDebugPlayer(MatchmakingRating playerRating, String debugPlayer) {
+        return debugPlayer.equalsIgnoreCase(playerRating.username()) || debugPlayer.equals(playerRating.userId());
     }
 
     private static void appendRecentTrend(StringBuilder stringBuilder, MatchmakingRating playerRating) {

@@ -16,9 +16,9 @@ public class MatchmakingGameInfo {
     // all share a rank. We deliberately use a lower value: it tightens the rating spread and smooths
     // the top of the ladder, and measured prediction accuracy is unchanged from .05 through .5.
     private static final double DRAW_PROBABILITY = 0.05;
-    // Default divides by 100. However, we divide by 50 to increase the number of points players
+    // Default divides by 100. However, we divide by 25 to increase the number of points players
     // lose and gain each game.
-    private static final double ASSUMED_SKILL_DRIFT_BETWEEN_GAMES = INITIAL_STANDARD_DEVIATION / 50.0;
+    private static final double ASSUMED_SKILL_DRIFT_BETWEEN_GAMES = INITIAL_STANDARD_DEVIATION / 25.0;
 
     public static GameInfo create() {
         return new GameInfo(
