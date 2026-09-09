@@ -694,7 +694,7 @@ public class StartCombatService {
         if (firstCombatThread) {
             for (Player p : game.getRealPlayers()) {
                 // offer buttons for all crimson commander holders
-                offerRedGhostCommanderButtons(p, game);
+                offerRedGhostCommanderButtons(p, game, tile);
 
                 boolean inExileRange = FoWHelper.isTileInExileRange(game, tile, p);
                 if (inExileRange) {
@@ -768,14 +768,15 @@ public class StartCombatService {
                 false);
     }
 
-    public static void offerRedGhostCommanderButtons(Player player, Game game) {
+    public static void offerRedGhostCommanderButtons(Player player, Game game, Tile tile) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
-                    + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
-                    + " with Ahk Siever, the Rebellion commander."
+                    + ", you may, at the __end__ of the combat occurring in " + tile.getRepresentationForButtons()
+                    + ", gain 1 commodity or convert 1 of your commodities to a trade good,"
+                    + " with Ahk Siever, the Rebellion commander. Reminder to double check that a combat has actually occurred, as sometimes the bot is mistaken about this."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
-            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
+            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true, tile);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         }
     }
