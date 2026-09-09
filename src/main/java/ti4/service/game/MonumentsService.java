@@ -120,7 +120,6 @@ public class MonumentsService {
         if (!game.isMonumentsMode() || (game.isFrankenGame() && !game.isTwilightsFallMode())) {
             return;
         }
-
         UnitModel monument = getFactionMonument(player);
         if (monument != null && !player.ownsUnit(monument.getId())) {
             player.addOwnedUnitByID(monument.getId());

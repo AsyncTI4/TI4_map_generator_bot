@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
@@ -93,6 +94,7 @@ public class PlayerTechService {
         player.addTech(techID);
         if (gainedTech) {
             ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
+            WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);

@@ -139,6 +139,7 @@ public class TEOptionService {
                 getSingleTfHomebrewInfo(
                         game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
                 getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
+                getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF", null),
                 getSingleTfHomebrewInfo(
                         game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars),
                 getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+", SourceEmojis.Monuments));
@@ -172,6 +173,7 @@ public class TEOptionService {
                     game.removeStoredValue(Constants.TK_NOVA_CUP + "_setup_option");
                 }
             }
+            case Constants.TF_BR -> game.setTfBr(!game.isTfBr());
             case Constants.TWILIGHT_DS -> {
                 game.setTwilightDS(!game.isTwilightDS());
                 if (game.isTwilightDS()) {
@@ -194,8 +196,8 @@ public class TEOptionService {
                 }
             }
         }
-        postTwilightFallHomebrewOptions(event, game);
         ButtonHelper.deleteMessage(event);
+        postTwilightFallHomebrewOptions(event, game);
     }
 
     private static void postTkNovaSetupOptions(Game game) {

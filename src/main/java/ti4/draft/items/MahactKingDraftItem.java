@@ -141,6 +141,10 @@ public class MahactKingDraftItem extends DraftItem {
         } else {
             sources = List.of(ComponentSource.twilights_fall);
         }
+        if (game.isTfBr()) {
+            sources = new ArrayList<>(sources);
+            sources.add(ComponentSource.tf_br);
+        }
         for (FactionModel faction : Mapper.getFactions().values()) {
             if (sources.contains(faction.getSource())) {
                 allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));

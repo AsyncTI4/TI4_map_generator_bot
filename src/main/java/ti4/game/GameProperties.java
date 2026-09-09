@@ -189,6 +189,7 @@ public class GameProperties {
     private @ExportableField boolean twilightKart; // Deprecated.
     private @ExportableField boolean tkDestroyerCup;
     private @ExportableField boolean tkNovaCup;
+    private @ExportableField boolean tfBr;
 
     // Discord Snowflakes
     private @ExportableField String guildID;

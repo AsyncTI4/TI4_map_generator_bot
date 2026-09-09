@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
@@ -1535,6 +1536,11 @@ public class StartCombatService {
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
+
+        if (isSpaceCombat) {
+            WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
+            WhiteTfUnitHandler.addFlagshipButton(buttons, game, p2, p1, tile);
+        }
 
         if (isGroundCombat) {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);

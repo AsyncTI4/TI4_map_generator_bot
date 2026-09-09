@@ -1,5 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,10 +28,14 @@ public class MahactKingDraftableSettings extends SettingsMenu {
     private final ListSetting<FactionModel> banFactions;
     private final ListSetting<FactionModel> priFactions;
 
+    @JsonIgnore
+    private final Game game;
+
     private static final String MENU_ID = "dsMahactKing";
 
     public MahactKingDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
         super(MENU_ID, "Mahact King Settings", "Control mahact king draft options.", parent);
+        this.game = game;
 
         int players = parent.getPlayerUserIds().size();
         numFactions = new IntegerSetting("#Kings", "Number of Kings", players, 2, 24, 1);
@@ -75,7 +80,11 @@ public class MahactKingDraftableSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
-        List<ComponentSource> sources = List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
+        List<ComponentSource> sources =
+                new ArrayList<>(List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup));
+        if (game.isTfBr()) {
+            sources.add(ComponentSource.tf_br);
+        }
         Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(model -> sources.contains(model.getSource()))
                 .collect(Collectors.toMap(FactionModel::getAlias, f -> f));

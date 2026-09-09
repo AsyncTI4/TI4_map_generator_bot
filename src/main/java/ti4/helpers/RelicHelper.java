@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
@@ -132,6 +133,7 @@ public class RelicHelper {
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
+        WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);

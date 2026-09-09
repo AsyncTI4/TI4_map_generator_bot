@@ -1423,5 +1423,27 @@
         "isStructure": true,
         "isMonument": true,
         "ability": "When a player activates this system, gain 1 balance token or flip 1 balance token on your faction sheet.\nThis unit may also be placed on a legendary planet."
+    },
+    {
+        "id": "whitetf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Alabaster Edifice",
+        "subtitle": "Arcane Monument",
+        "source": "monuments",
+        "faction": "whitetf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "CULTURAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 2,
+        "planetaryShield": true,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you draw a relic, gain 1 trade good and produce 1 unit on this planet."
     }
 ]

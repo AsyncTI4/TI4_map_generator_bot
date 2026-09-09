@@ -57,6 +57,9 @@ public enum FactionEmojis implements TI4Emoji {
     bluetf,
     orangetf,
 
+    // BR TF
+    whitetf,
+
     // Discordant Stars
     augers,
     axis,
@@ -371,6 +374,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "purpletf" -> purpletf;
             case "pinktf" -> pinktf;
             case "blacktf" -> blacktf;
+
+            case "whitetf" -> whitetf;
 
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;

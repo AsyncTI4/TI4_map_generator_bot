@@ -651,6 +651,7 @@ class GameSaveService {
         writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
         writeBoolLine(writer, Constants.TK_DESTROYER_CUP, game.isTkDestroyerCup());
         writeBoolLine(writer, Constants.TK_NOVA_CUP, game.isTkNovaCup());
+        writeBoolLine(writer, Constants.TF_BR, game.isTfBr());
         writeBoolLine(writer, Constants.TWILIGHT_DS, game.isTwilightDS());
 
         writer.write(Constants.BAG_DRAFT + " "

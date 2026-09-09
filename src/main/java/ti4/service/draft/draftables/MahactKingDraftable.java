@@ -314,6 +314,10 @@ public class MahactKingDraftable extends SinglePickDraftable {
         } else {
             sources = List.of(ComponentSource.twilights_fall);
         }
+        if (game.isTfBr()) {
+            sources = new ArrayList<>(sources);
+            sources.add(ComponentSource.tf_br);
+        }
         initialize(
                 kingSettings.getNumFactions().getVal(),
                 sources,
