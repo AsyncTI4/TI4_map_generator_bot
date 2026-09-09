@@ -31,8 +31,6 @@ import ti4.draft.items.MonumentDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Units;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
@@ -40,7 +38,6 @@ import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.DraftErrataModel;
-import ti4.model.FactionModel;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
@@ -48,6 +45,7 @@ import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenAbilityService;
 import ti4.service.franken.FrankenBreakthroughService;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.franken.FrankenFactionService;
 import ti4.service.franken.FrankenFactionTechService;
 import ti4.service.franken.FrankenHomeService;
 import ti4.service.franken.FrankenLeaderService;
@@ -57,7 +55,6 @@ import ti4.service.franken.FrankenPromissoryService;
 import ti4.service.franken.FrankenStartingTechService;
 import ti4.service.franken.FrankenStatsService;
 import ti4.service.franken.FrankenUnitService;
-import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class FrankenButtonHandler {
@@ -214,20 +211,10 @@ public class FrankenButtonHandler {
 
         String itemID = item.getItemId();
         switch (item.getItemCategory()) {
+            case MAHACTKING -> FrankenFactionService.setFaction(event, player, itemID);
             case ABILITY -> FrankenAbilityService.addAbilities(event, player, List.of(itemID));
             case TECH -> FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
             case BREAKTHROUGH -> FrankenBreakthroughService.addBreakthrough(event, player, itemID);
-            case MAHACTKING -> {
-                FactionModel faction = Mapper.getFaction(itemID);
-                player.setFaction(itemID);
-                MonumentsService.addFactionMonument(player, player.getGame());
-                List<Units.UnitType> kingUnitTypes = List.of(Units.UnitType.Flagship, Units.UnitType.Mech);
-                List<String> units = faction.getUnits().stream()
-                        .filter(u -> kingUnitTypes.contains(Mapper.getUnit(u).getUnitType()))
-                        .toList();
-                FrankenUnitService.addUnits(event, player, units, false);
-                FrankenStatsService.setStartingComms(event, player, faction.getCommodities());
-            }
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP, UNIT -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
             case MONUMENT -> FrankenUnitService.addUnits(event, player, List.of(itemID), true);
@@ -248,6 +235,7 @@ public class FrankenButtonHandler {
 
         String itemID = item.getItemId();
         switch (item.getItemCategory()) {
+            case MAHACTKING -> FrankenFactionService.unsetFaction(event, player, itemID);
             case ABILITY -> FrankenAbilityService.removeAbilities(event, player, List.of(itemID));
             case TECH -> FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
             case BREAKTHROUGH -> FrankenBreakthroughService.removeBreakthrough(event, player, itemID);
