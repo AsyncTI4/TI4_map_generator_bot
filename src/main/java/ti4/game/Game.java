@@ -661,11 +661,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // Overrides for TK modes
         if (isTkNovaCup()) {
+            setHomebrew(true);
             acDeck = "action_cards_tk_nova";
             setGenomeSpliceDeckID("tk_nova_genome");
         }
         // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
         if (isTwilightKart() || isTkDestroyerCup()) {
+            setHomebrew(true);
             agendaDeck = "agendas_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
             acDeck = "action_cards_tk_destroyer_and_nova";
@@ -4957,6 +4959,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
+                || isTwilightKart()
+                || isTkDestroyerCup()
+                || isTkNovaCup()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()
