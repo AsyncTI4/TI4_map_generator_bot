@@ -236,7 +236,8 @@ public class MatchmakingRatingEventService {
     }
 
     private static void appendDebugRatings(StringBuilder stringBuilder, List<MatchmakingRating> playerRatings) {
-        stringBuilder.append("\n__**Debug ratings:**__\n");
+        if (DEBUG_RATING_PLAYERS.isEmpty()) return;
+        stringBuilder.append("\n**Debug ratings:**\n");
         for (String debugPlayer : DEBUG_RATING_PLAYERS) {
             MatchmakingRating playerRating = playerRatings.stream()
                     .filter(rating -> matchesDebugPlayer(rating, debugPlayer))
@@ -244,19 +245,20 @@ public class MatchmakingRatingEventService {
                     .orElse(null);
             if (playerRating == null) {
                 stringBuilder.append(String.format(
-                        "`%s` not rated - fewer than 3 completed games, or stored under a different name\n",
-                        debugPlayer));
+                        "- `%s`: not rated - under 3 completed games, or stored under another name\n", debugPlayer));
                 continue;
             }
+            String trend = playerRating.recentRatingDelta() == null
+                    ? "n/a"
+                    : String.format("%+d", toDisplayRating(playerRating.recentRatingDelta()));
             stringBuilder.append(String.format(
-                    "`%s` `Rating=%d` `Calibration=%.1f%%` `Sigma=%.3f`%s\n",
+                    "- `%s`: rating %d, calibration %.1f%%, sigma %.3f, trend %s, id %s\n",
                     playerRating.username(),
                     toDisplayRating(playerRating.rating()),
                     playerRating.calibrationPercent(),
                     playerRating.sigma(),
-                    playerRating.recentRatingDelta() == null
-                            ? ""
-                            : String.format(" `Trend=%+d`", toDisplayRating(playerRating.recentRatingDelta()))));
+                    trend,
+                    playerRating.userId()));
         }
     }
 
