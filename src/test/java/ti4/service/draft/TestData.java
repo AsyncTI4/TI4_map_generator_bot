@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.ListHelper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.FactionDraftable;
@@ -91,7 +92,7 @@ public class TestData {
 
     public MahactKingDraftable createMahactKingDraftable() {
         MahactKingDraftable draftable = new MahactKingDraftable();
-        draftable.initialize(6, List.of(ComponentSource.twilights_fall), List.of(), List.of());
+        draftable.initialize(6, Mapper.getFactionsSources(ComponentSource.twilights_fall), List.of(), List.of(), "");
         return draftable;
     }
 

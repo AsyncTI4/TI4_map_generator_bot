@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import ti4.draft.items.MahactKingDraftItem;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
-import ti4.model.Source.ComponentSource;
 import tools.jackson.databind.JsonNode;
 
 @Getter
@@ -80,14 +80,8 @@ public class MahactKingDraftableSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
-        List<ComponentSource> sources =
-                new ArrayList<>(List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup));
-        if (game.isTfBr()) {
-            sources.add(ComponentSource.tf_br);
-        }
-        Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
-                .filter(model -> sources.contains(model.getSource()))
-                .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
+        Map<String, FactionModel> allFactions = MahactKingDraftItem.getAllFactions(game)
+                .collect(Collectors.toMap(FactionModel::getAlias, Function.identity()));
         banFactions.setAllValues(allFactions);
         priFactions.setAllValues(allFactions);
     }
