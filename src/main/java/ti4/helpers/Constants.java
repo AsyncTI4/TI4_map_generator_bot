@@ -99,6 +99,7 @@ public final class Constants {
     public static final String TWILIGHT_KART = "twilight_kart";
     public static final String TK_DESTROYER_CUP = "tk_destroyer_cup";
     public static final String TK_NOVA_CUP = "tk_nova_cup";
+    public static final String TF_BR = "tf_br";
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";

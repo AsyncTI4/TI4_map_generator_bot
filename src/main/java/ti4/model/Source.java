@@ -27,6 +27,7 @@ public class Source {
         codex4,
         thunders_edge,
         twilights_fall,
+        tf_br,
 
         // big homebrew
         ds,
@@ -164,7 +165,7 @@ public class Source {
 
         public boolean isTwilightFallish() {
             return switch (this) {
-                case twilights_fall, tk_destroyer_cup, tk_nova_cup, twilight_ds -> true;
+                case twilights_fall, tf_br, tk_destroyer_cup, tk_nova_cup, twilight_ds -> true;
                 default -> false;
             };
         }

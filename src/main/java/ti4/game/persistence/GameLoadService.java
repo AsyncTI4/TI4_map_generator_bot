@@ -575,6 +575,7 @@ class GameLoadService {
                 case Constants.TWILIGHT_KART -> game.setTwilightKart(parseBooleanOrDefault(info, false));
                 case Constants.TK_DESTROYER_CUP -> game.setTkDestroyerCup(parseBooleanOrDefault(info, false));
                 case Constants.TK_NOVA_CUP -> game.setTkNovaCup(parseBooleanOrDefault(info, false));
+                case Constants.TF_BR -> game.setTfBr(parseBooleanOrDefault(info, false));
                 case Constants.TWILIGHT_DS -> game.setTwilightDS(parseBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(parseBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(parseBooleanOrDefault(info, false));
