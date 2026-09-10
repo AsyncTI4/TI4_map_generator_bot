@@ -1889,8 +1889,7 @@ public final class ButtonHelperModifyUnits {
         Tile tile1 = game.getTileByPosition(pos1);
         Tile tile2 = game.getTileByPosition(pos2);
         tile2 = FlipTileService.flipTileIfNeeded(event, tile2, game);
-        UnitHolder sourceSpace = tile1.getSpaceUnitHolder();
-        Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceSpace);
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")
                 && !buttonID.contains("skilled")
                 && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
@@ -1919,40 +1918,14 @@ public final class ButtonHelperModifyUnits {
             }
         }
 
-        for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
-            UnitHolder unitHolder = entry.getValue();
-            Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-            if (unitHolder instanceof Planet) continue;
-            // retreat capacity units first to avoid false cap flags
-            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
-                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null) continue;
-                if (unitModel.getCapacityValue() < 1) continue;
+        UnitHolder sourceSpace = tile1.getSpaceUnitHolder();
+        Map<UnitKey, List<Integer>> unitsByState = sourceSpace.getUnitsByStateForPlayer(player);
+        String unitList = sourceSpace.getPlayersUnitListOnHolder(player);
 
-                UnitKey unitKey = unitEntry.getKey();
-                String unitName = unitKey.unitName();
-                int totalUnits = unitEntry.getValue();
-                MoveUnitService.moveUnits(
-                        event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
-            }
-            // this will catch all the capacity units left behind in the previous iteration
-            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
-                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null) continue;
-                if (unitModel.getCapacityValue() > 0) {
-                    continue;
-                }
-                UnitKey unitKey = unitEntry.getKey();
-                String unitName = unitKey.unitName();
-                int totalUnits = unitEntry.getValue();
-                MoveUnitService.moveUnits(
-                        event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
-            }
-        }
+        MoveUnitService.moveUnits(event, tile1, game, player.getColor(), unitList, tile2, Constants.SPACE);
+
         GameEventDraft.stageRetreat(
-                game, player, pos1, Constants.SPACE, pos2, Constants.SPACE, beforeRetreat, sourceSpace);
+                game, player, pos1, Constants.SPACE, pos2, Constants.SPACE, unitsByState, sourceSpace);
 
         if (tile2 != null && tile2.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");

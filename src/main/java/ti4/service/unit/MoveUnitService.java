@@ -42,7 +42,7 @@ public class MoveUnitService {
         List<RemovedUnit> removed = RemoveUnitService.removeUnits(event, tile, game, color, unitList, dmg);
         List<RemovedUnit> toAdd =
                 removed.stream().map(r -> r.onUnitHolder(dest, uhDest)).toList();
-        AddUnitService.addUnits(event, game, toAdd);
+        AddUnitService.addUnits(event, dest, game, color, toAdd);
 
         // Moving Aurelion briefly removes its attached station card; retain its prior exhausted state.
         if (player != null
