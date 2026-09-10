@@ -46,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -508,6 +509,7 @@ public final class ButtonHelperTacticalAction {
             MyrrTechHandler.offerSegmentedStructuring(event, game, player, tile);
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
             MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
+            MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
         }
     }
 

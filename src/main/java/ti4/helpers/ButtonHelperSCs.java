@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1078,6 +1079,25 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && player.hasUnit("bastion_monument")) {
+                    List<Button> buttons = MonumentsTEButtonHandler.getSDCPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "You have no system with your ships and exactly one non-legendary planet in which to place _Seraph Data Center_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Seraph Data Center_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeSeraphDataCenter_", 0));
+                    return;
+                }
                 if (game.isMonumentsMode()
                         && "monument".equalsIgnoreCase(unit)
                         && player.hasUnit("empyrean_monument")) {
