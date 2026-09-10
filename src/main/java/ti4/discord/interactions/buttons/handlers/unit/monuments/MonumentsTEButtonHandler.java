@@ -33,7 +33,6 @@ import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
 import ti4.service.planet.AddPlanetService;
-import ti4.service.planet.PlanetInfoService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -391,6 +390,8 @@ public class MonumentsTEButtonHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 "# THE THUNDERDOME IS OPEN!\n"
+                        + "### WARNING: Combat will be incredibly janky! It will ask people not participating to assign hits just because they have ships in the system.\n"
+                        + "-# To be clear, the DWS player selects someone, then that person chooses who they fight. Repeat until only 1 player is left in the space area.\n"
                         + tile.getRepresentationForButtons(game, player)
                         + " has become a no-holds-barred battle for survival. Choose a combatant; only one fleet may remain.");
         sendPelagionThunderdomeCombatantButtons(event.getMessageChannel(), game, player, tile);
@@ -414,11 +415,6 @@ public class MonumentsTEButtonHandler {
             MessageHelper.replyToMessage(event, "That fleet is no longer eligible for the Thunderdome.");
             return;
         }
-        if (StartCombatService.getCurrentCombat(game) != null) {
-            MessageHelper.replyToMessage(
-                    event, "Finish the current combat before starting another Thunderdome combat.");
-            return;
-        }
         List<Button> buttons = playersWithShips.stream()
                 .filter(opponent -> opponent != combatant)
                 .map(opponent -> Buttons.red(
@@ -428,8 +424,10 @@ public class MonumentsTEButtonHandler {
                 .toList();
         MessageHelper.sendMessageToChannelWithButtons(
                 combatant.getCorrectChannel(),
-                combatant.getRepresentationNoPing() + ", choose which fleet you will fight in the Thunderdome.",
+                combatant.getRepresentation() + ", choose which fleet you will fight in the Thunderdome.",
                 buttons);
+
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler(SELECT_PELAGION_THUNDERDOME_OPPONENT)
@@ -455,11 +453,6 @@ public class MonumentsTEButtonHandler {
             MessageHelper.replyToMessage(event, "That Thunderdome combat is no longer eligible.");
             return;
         }
-        if (StartCombatService.getCurrentCombat(game) != null) {
-            MessageHelper.replyToMessage(
-                    event, "Finish the current combat before starting another Thunderdome combat.");
-            return;
-        }
         StartCombatService.startSpaceCombat(game, combatant, opponent, tile, event, "-thunderdome");
         ButtonHelper.deleteMessage(event);
     }
@@ -474,7 +467,7 @@ public class MonumentsTEButtonHandler {
                 .toList();
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
-                owner.getRepresentationNoPing()
+                owner.getRepresentation()
                         + ", choose a fleet to enter the Thunderdome. This menu remains until only one player's ships remain in the system.",
                 buttons);
     }
@@ -699,7 +692,9 @@ public class MonumentsTEButtonHandler {
 
     // Seraph Data Center
     public static List<Button> getSDCPlacementButtons(Game game, Player player) {
-        if (!game.isMonumentsMode() || !player.hasUnit("bastion_monument")) {
+        if (!game.isMonumentsMode()
+                || (!player.hasUnit("bastion_monument")
+                        && !MonumentsService.isMonumentOnBoard(game, player, "bastion_monument"))) {
             return List.of();
         }
         return game.getTileMap().values().stream()

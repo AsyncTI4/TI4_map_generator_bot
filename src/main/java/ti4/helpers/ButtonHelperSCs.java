@@ -50,6 +50,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -1079,7 +1080,10 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
-                if (game.isMonumentsMode() && "monument".equalsIgnoreCase(unit) && player.hasUnit("bastion_monument")) {
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("bastion_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "bastion_monument"))) {
                     List<Button> buttons = MonumentsTEButtonHandler.getSDCPlacementButtons(game, player);
                     if (buttons.isEmpty()) {
                         MessageHelper.sendEphemeralMessageToEventChannel(
