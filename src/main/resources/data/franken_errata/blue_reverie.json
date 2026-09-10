@@ -1,0 +1,395 @@
+[
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "the_starlit_path",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "narrow_way",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "prescience",
+        "additionalComponents": [
+            "ABILITY:the_starlit_path",
+            "ABILITY:narrow_way"
+        ],
+        "optionalSwaps": [
+            "HOMESYSTEM:uydai",
+            "MONUMENT:uydai_monument"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "uydai",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "pharadn",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "ancient_empire",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "mark_of_pharadn",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "pharadncommander",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "pharadnhero",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "pharadnbt",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dspharinf",
+        "additionalComponents": [
+            "ABILITY:ancient_empire",
+            "ABILITY:mark_of_pharadn"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:pharadncommander",
+            "HERO:pharadnhero",
+            "BREAKTHROUGH:pharadnbt"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "black_ops",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "data_recovery",
+        "additionalComponents": [
+            "ABILITY:black_ops"
+        ],
+        "optionalSwaps": [
+            "HERO:qhethero"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "qhethero",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "toldarcommander",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "pride",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "the_code",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "toldar_mech",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "toldarbt",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "honor_bound",
+        "additionalComponents": [
+            "ABILITY:pride",
+            "ABILITY:the_code"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:toldarcommander",
+            "MECH:toldar_mech",
+            "BREAKTHROUGH:toldarbt",
+            "MONUMENT:toldar_monumenthonor"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "belkoseacommander",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "belkoseahero",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dsbelkff",
+        "optionalSwaps": [
+            "HERO:belkoseahero"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "superweapon_projects",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "belkoseabt",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "classified_developments",
+        "additionalComponents": [
+            "ABILITY:superweapon_projects"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:belkoseacommander",
+            "BREAKTHROUGH:belkoseabt",
+            "MONUMENT:belkosea_monument"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "atokeraagent",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "living_metals",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dsatoky",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "atokeracommander",
+        "optionalSwaps": [
+            "AGENT:atokeraagent"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "synthesis",
+        "additionalComponents": [
+            "ABILITY:living_metals"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "atokera_flagship",
+        "optionalSwaps": [
+            "TECH:dsatoky"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "intrigue",
+        "additionalComponents": [
+            "ABILITY:matters_of_state",
+            "ABILITY:harmony"
+        ],
+        "optionalSwaps": [
+            "FLAGSHIP:xin_flagship",
+            "TECH:dsxiny",
+            "TECH:dsxing",
+            "MECH:xin_mech",
+            "MONUMENT:xin_monument"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "dspnxin",
+        "optionalSwaps": [
+            "HERO:xinhero"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "matters_of_state",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "harmony",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "xin_flagship",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dsxiny",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dsxing",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "xinhero",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "xin_mech",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "questing_prince",
+        "additionalComponents": [
+            "ABILITY:lost_crown_of_kaltrim",
+            "ABILITY:shrines"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:kaltrimcommander",
+            "HERO:kaltrimhero",
+            "MONUMENT:kaltrim_monument"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "kaltrim_flagship",
+        "optionalSwaps": [
+            "PN:dspnkalt"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "lost_crown_of_kaltrim",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "shrines",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "kaltrimcommander",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "kaltrimhero",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "dspnkalt",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "kaltrim",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "raider_coves",
+        "optionalSwaps": [
+            "COMMANDER:sarcosacommander",
+            "ABILITY:evasive"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "sarcosacommander",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "evasive",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dssarcg",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "sarcosa",
+        "undraftable": true,
+        "source": "blue_reverie"
+    }
+]
