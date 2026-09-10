@@ -97,6 +97,15 @@ public class DraftSpec {
         SourceSettings sources = settings.getSourceSettings();
         specs.tileSources = sources.getTileSources();
         specs.factionSources = sources.getFactionSources();
+        if (pfSettings.getDsBrFactionsOnly().isVal()
+                && specs.factionSources.stream()
+                        .anyMatch(source ->
+                                source == Source.ComponentSource.ds || source == Source.ComponentSource.blue_reverie)) {
+            specs.factionSources = specs.factionSources.stream()
+                    .filter(source ->
+                            source == Source.ComponentSource.ds || source == Source.ComponentSource.blue_reverie)
+                    .toList();
+        }
 
         if (sliceSettings.getParsedSlices() != null) {
             specs.presetSlices = sliceSettings.getParsedSlices();
