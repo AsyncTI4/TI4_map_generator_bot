@@ -92,6 +92,15 @@
         "additionalComponents": [
             "ABILITY:black_ops"
         ],
+        "optionalSwaps": [
+            "HERO:qhethero"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "qhethero",
+        "undraftable": true,
         "source": "blue_reverie"
     },
     {
