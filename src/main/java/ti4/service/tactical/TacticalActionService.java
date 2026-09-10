@@ -36,6 +36,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.twilight_kart.TkHelperStarflare;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
@@ -199,6 +200,8 @@ public class TacticalActionService {
                 return false;
             }
         }
+
+        TkHelperStarflare.onTacticalMove(game, tile);
 
         return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
     }

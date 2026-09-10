@@ -45,6 +45,7 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.helpers.twilight_kart.TkHelperStarflare;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
@@ -1930,6 +1931,8 @@ public final class ButtonHelperModifyUnits {
         if (tile2 != null && tile2.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
+
+        TkHelperStarflare.onRetreat(game, tile1, tile2, unitsByState);
     }
 
     /**
