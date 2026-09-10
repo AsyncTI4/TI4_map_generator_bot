@@ -5,11 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.ListHelper;
+import ti4.image.Mapper;
+import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.FactionDraftable;
@@ -91,7 +94,11 @@ public class TestData {
 
     public MahactKingDraftable createMahactKingDraftable() {
         MahactKingDraftable draftable = new MahactKingDraftable();
-        draftable.initialize(6, List.of(ComponentSource.twilights_fall), List.of(), List.of());
+        Collection<String> factions = Mapper.getFactions().values().stream()
+                .filter(model -> model.getSource() == ComponentSource.twilights_fall)
+                .map(FactionModel::getAlias)
+                .toList();
+        draftable.initialize(6, factions, List.of(), List.of(), "");
         return draftable;
     }
 
