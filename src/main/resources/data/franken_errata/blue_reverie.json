@@ -296,6 +296,12 @@
         "source": "blue_reverie"
     },
     {
+        "itemCategory": "MECH",
+        "itemId": "xin_mech",
+        "undraftable": true,
+        "source": "blue_reverie"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "questing_prince",
         "additionalComponents": [
