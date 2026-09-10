@@ -25,6 +25,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -175,7 +176,7 @@ public class TkHelperStarflare {
         for (String entryStr : unitAmountsString.split("_")) {
             String[] entrySplit = entryStr.split(RegexHelper.DIGIT_BOUNDARY);
             int amount = Integer.parseInt(entrySplit[0]);
-            UnitType type = UnitType.valueOf(entrySplit[1]);
+            UnitType type = Units.findUnitType(entrySplit[1]);
             UnitState state = UnitState.values()[Integer.parseInt(entrySplit[2])];
             unitAmounts.add(new UnitAmountEntry(type, state, amount));
             totalAmount += amount;
