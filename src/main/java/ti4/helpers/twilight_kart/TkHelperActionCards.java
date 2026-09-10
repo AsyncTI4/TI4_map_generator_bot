@@ -111,6 +111,7 @@ public class TkHelperActionCards {
             case "tk-succor" -> // TODO
                 nop();
             case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
+            case TkHelperStarflare.AC_ID -> buttons.addAll(TkHelperStarflare.getResolveButtons(game, player));
         }
 
         if (!buttons.isEmpty()) {
