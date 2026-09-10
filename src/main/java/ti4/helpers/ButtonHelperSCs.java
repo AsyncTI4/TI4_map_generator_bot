@@ -1079,9 +1079,7 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
-                if (game.isMonumentsMode()
-                        && "monument".equalsIgnoreCase(unit)
-                        && player.hasUnit("bastion_monument")) {
+                if (game.isMonumentsMode() && "monument".equalsIgnoreCase(unit) && player.hasUnit("bastion_monument")) {
                     List<Button> buttons = MonumentsTEButtonHandler.getSDCPlacementButtons(game, player);
                     if (buttons.isEmpty()) {
                         MessageHelper.sendEphemeralMessageToEventChannel(

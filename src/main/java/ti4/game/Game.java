@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
@@ -2222,6 +2223,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     }
                 }
             }
+            MonumentsTEButtonHandler.offerKeleresMonumentCommandToken(this);
             return true;
         }
         return false;
@@ -4112,6 +4114,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("aurelionstation", new Planet("aurelionstation", new Point(0, 0)));
         planets.put("innersanctum", new Planet("innersanctum", new Point(0, 0)));
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
+        planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
         return planets.keySet();
     }
 

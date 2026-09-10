@@ -432,6 +432,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "This unit is a space station and placed in the space area of a system that contains your ships and exactly 1 non-legendary planet. Take its matching space station card while you control it.\nWhen you lose control of this space station, destroy it and produce 2 hits against ships in this system."
     },
     {

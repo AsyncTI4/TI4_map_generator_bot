@@ -66,6 +66,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvax
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -3239,6 +3240,7 @@ public final class Helper {
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
                 ccCount += TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player_);
+                ccCount += MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player_);
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }

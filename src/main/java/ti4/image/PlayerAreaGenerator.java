@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -873,22 +874,37 @@ public class PlayerAreaGenerator {
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
         boolean hasAuraVault = game.isMonumentsMode() && player.hasUnit("yellowtf_monument");
+        boolean hasPharusIustitiae = game.isMonumentsMode()
+                && (player.hasUnit("keleres_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument"));
         boolean hasHonorOrPathTokens = player.getDishonorCounter() > 0
                 || player.getHonorCounter() > 0
                 || player.getPathTokenCounter() > 0
                 || player.getSteelbalanceCounter() > 0
                 || player.getStarbalanceCounter() > 0
                 || game.isVeiledHeartMode();
-        if (!hasHonorOrPathTokens && !hasAuraVault) {
+        if (!hasHonorOrPathTokens && !hasAuraVault && !hasPharusIustitiae) {
             return xDeltaFromRightSide;
         }
         if (!hasHonorOrPathTokens) {
-            DrawingUtil.superDrawStringCenteredDefault(
-                    graphics,
-                    "Aura Tokens: "
-                            + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
-                    mapWidth - xDeltaFromRightSide - 300,
-                    yDelta + 50);
+            int tokenOffset = 50;
+            if (hasAuraVault) {
+                DrawingUtil.superDrawStringCenteredDefault(
+                        graphics,
+                        "Aura Tokens: "
+                                + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(
+                                        game, player),
+                        mapWidth - xDeltaFromRightSide - 300,
+                        yDelta + tokenOffset);
+                tokenOffset += 50;
+            }
+            if (hasPharusIustitiae) {
+                DrawingUtil.superDrawStringCenteredDefault(
+                        graphics,
+                        "Pharus Tokens: " + MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player),
+                        mapWidth - xDeltaFromRightSide - 300,
+                        yDelta + tokenOffset);
+            }
             return xDeltaFromRightSide + 200;
         }
         if (game.isVeiledHeartMode()) {
@@ -939,6 +955,13 @@ public class PlayerAreaGenerator {
                             + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 150);
+        }
+        if (hasPharusIustitiae) {
+            DrawingUtil.superDrawStringCenteredDefault(
+                    graphics,
+                    "Pharus Tokens: " + MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player),
+                    mapWidth - xDeltaFromRightSide - 300,
+                    yDelta + (hasAuraVault ? 200 : 150));
         }
         return xDeltaFromRightSide + 200;
     }

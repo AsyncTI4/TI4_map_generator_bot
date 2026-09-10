@@ -46,12 +46,12 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -277,6 +277,7 @@ public final class ButtonHelperTacticalAction {
             }
             resetStoredValuesForTacticalAction(game);
         }
+        MonumentsTEButtonHandler.offerRalNelMonumentStructureMove(game, player);
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         CrystellumTechHandler.clearResonanceDrive(game);
@@ -794,6 +795,20 @@ public final class ButtonHelperTacticalAction {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "firmament_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")) {
+                    MonumentsTEButtonHandler.sendEpiphanyMessage(monumentOwner);
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "obsidian_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "obsidian_monument")
+                        && monumentOwner.isOtherPlayerPuppeted(player)) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", the puppeted player " + player.getRepresentationNoPing()
+                                    + " has activated the system containing _Epiphany Hollow_. You may replace 2 infantry on a planet they control with your infantry, they enter coexistence.",
+                            MonumentsTEButtonHandler.sendEpiphanyHollowButton(monumentOwner, player));
                 }
             }
         }
