@@ -88,5 +88,17 @@
         "itemId": "uydai_monument",
         "undraftable": true,
         "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "xin_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "kaltrim_monument",
+        "undraftable": true,
+        "source": "monuments"
     }
 ]
