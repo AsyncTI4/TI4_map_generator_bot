@@ -1168,11 +1168,9 @@
         "eligiblePlanetTypes": [
             "CULTURAL"
         ],
-        "productionValue": "+1",
-        "basicProduction": "struct",
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system."
+        "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system.\n\nPRODUCTION X"
     },
     {
         "id": "kyro_monument",

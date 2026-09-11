@@ -59,6 +59,7 @@ public class PlayerProperties {
     private int irf;
     private int urf;
     private int stasisInfantry;
+    private int stasisFighters;
     private int autoSaboPassMedian;
     private int actualHits;
     private int expectedHitsTimes10;

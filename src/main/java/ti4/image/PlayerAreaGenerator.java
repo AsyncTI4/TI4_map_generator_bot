@@ -399,6 +399,7 @@ public class PlayerAreaGenerator {
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
         xDeltaBottom = monument(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = techGenSynthesis(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = florzenStasisFighters(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = speakerToken(player, xDeltaBottom, yPlayAreaSecondRow);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
@@ -3222,6 +3223,38 @@ public class PlayerAreaGenerator {
                 152,
                 "Gen Synthesis - " + infantryIITech.getName(),
                 genSynthesisInfantry + " infantry to revive.");
+
+        return xDeltaFromRightSide;
+    }
+
+    private int florzenStasisFighters(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
+        int stasisFighters = player.getStasisFighters();
+        if (stasisFighters < 1) {
+            return xDeltaFromRightSide;
+        }
+
+        xDeltaFromRightSide += 48;
+        int x = mapWidth - xDeltaFromRightSide;
+        BufferedImage fighter = ImageHelper.readScaled(getUnitPath(Mapper.getUnitKey("ff", player.getColor())), 36, 36);
+        graphics.drawImage(fighter, x + 4, yPlayAreaSecondRow + 10, null);
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont16());
+        DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, "Corsairs' Cove", x + 7, yPlayAreaSecondRow + 116, 100);
+
+        boolean shrinkText = stasisFighters >= 20;
+        DrawingUtil.drawCenteredString(
+                graphics,
+                Integer.toString(stasisFighters),
+                new Rectangle(x + (shrinkText ? 2 : 4), yPlayAreaSecondRow + (shrinkText ? 123 : 121), 42, 30),
+                shrinkText ? Storage.getFont30() : Storage.getFont36());
+        drawRectWithOverlay(
+                graphics,
+                x + 2,
+                yPlayAreaSecondRow - 2,
+                44,
+                152,
+                "Corsairs' Cove",
+                stasisFighters + " fighters in stasis.");
 
         return xDeltaFromRightSide;
     }

@@ -250,6 +250,31 @@ public class MonumentsService {
                 .orElse(null);
     }
 
+    public static Planet getPlayerMonumentPlanet(Game game, Player player) {
+        Tile monumentTile = getPlayerMonumentTile(game, player);
+        if (monumentTile == null) {
+            return null;
+        }
+        return monumentTile.getPlanetUnitHolders().stream()
+                .filter(planet -> planet.getUnitCount(UnitType.Monument, player) > 0)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static Player getMonumentOwner(Game game, String monumentId) {
+        UnitModel monument = Mapper.getUnit(monumentId);
+        if (game == null
+                || monument == null
+                || monument.getSource() != ComponentSource.monuments
+                || !game.isMonumentsMode()) {
+            return null;
+        }
+        return game.getRealPlayers().stream()
+                .filter(player -> player.hasUnit(monumentId))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static Tile getMonumentTile(Game game, Player player, String monumentId) {
         if (game == null || player == null || !game.isMonumentsMode()) {
             return null;

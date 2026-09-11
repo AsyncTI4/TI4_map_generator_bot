@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
@@ -515,6 +516,9 @@ public class StartTurnService {
                 && game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, player, "nomad_monument")) {
             startButtons.add(MonumentsPoKButtonHandler.getLodestarButton(player));
+        }
+        if (!doneActionThisTurn && MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
+            startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
