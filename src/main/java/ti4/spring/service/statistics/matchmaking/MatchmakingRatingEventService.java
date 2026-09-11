@@ -12,11 +12,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -42,11 +39,6 @@ public class MatchmakingRatingEventService {
     private static final Duration RATINGS_CACHE_TTL = Duration.ofHours(8);
     private static final Duration AVERAGE_RATING_CACHE_TTL = Duration.ofHours(8);
     private static final String RATINGS_CACHE_KEY = "key";
-    private static final int MINIMUM_RATED_GAMES = 3;
-    private static final int DEBUG_CANDIDATE_LIMIT = 5;
-    private static final int DEBUG_PARTIAL_MATCH_MINIMUM = 4;
-    private static final List<String> DEBUG_RATING_PLAYERS =
-            List.of("Tazingo", "bleezy4sheezy", "Bearded One", "inco.n.damus", "forleafs", "Blue");
 
     private final Cache<String, List<MatchmakingRating>> unconservativeRatingsCache = createRatingsCache();
     private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache = createRatingsCache();
@@ -66,7 +58,7 @@ public class MatchmakingRatingEventService {
                 playerEntityRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(onlyTiglGames);
         List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
         List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games, true);
-        sendMessage(event, playerRatings, games, players, showRating);
+        sendMessage(event, playerRatings, games, showRating);
     }
 
     public static long toDisplayRating(BigDecimal rating) {
@@ -163,7 +155,6 @@ public class MatchmakingRatingEventService {
             SlashCommandInteractionEvent event,
             List<MatchmakingRating> playerRatings,
             List<MatchmakingGame> games,
-            List<PlayerEntity> players,
             boolean showRating) {
         int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
         String ratingLabel = "Rating";
@@ -212,8 +203,6 @@ public class MatchmakingRatingEventService {
                 "games",
                 gameAverageDisplayRatings(games, playerRatings));
 
-        appendDebugRatings(stringBuilder, playerRatings, players);
-
         playerRatings.stream()
                 .filter(playerRating ->
                         playerRating.userId().equals(event.getUser().getId()))
@@ -242,78 +231,6 @@ public class MatchmakingRatingEventService {
                 (MessageChannelUnion) event.getMessageChannel(),
                 "Player Matchmaking Ratings",
                 stringBuilder.toString());
-    }
-
-    private static void appendDebugRatings(
-            StringBuilder stringBuilder, List<MatchmakingRating> playerRatings, List<PlayerEntity> players) {
-        if (DEBUG_RATING_PLAYERS.isEmpty()) return;
-        stringBuilder.append("\n**Debug ratings:**\n");
-        for (String debugPlayer : DEBUG_RATING_PLAYERS) {
-            List<MatchmakingRating> matchingRatings = playerRatings.stream()
-                    .filter(rating -> matchesDebugPlayer(rating, debugPlayer))
-                    .toList();
-            if (matchingRatings.isEmpty()) {
-                appendDebugCandidates(stringBuilder, debugPlayer, players);
-                continue;
-            }
-            for (MatchmakingRating playerRating : matchingRatings) {
-                appendDebugRating(stringBuilder, playerRating);
-            }
-        }
-    }
-
-    private static void appendDebugRating(StringBuilder stringBuilder, MatchmakingRating playerRating) {
-        String trend = playerRating.recentRatingDelta() == null
-                ? "n/a"
-                : String.format("%+d", toDisplayRating(playerRating.recentRatingDelta()));
-        stringBuilder.append(String.format(
-                "- `%s`: rating %d, calibration %.1f%%, sigma %.3f, trend %s, id %s\n",
-                playerRating.username(),
-                toDisplayRating(playerRating.rating()),
-                playerRating.calibrationPercent(),
-                playerRating.sigma(),
-                trend,
-                playerRating.userId()));
-    }
-
-    private static void appendDebugCandidates(
-            StringBuilder stringBuilder, String debugPlayer, List<PlayerEntity> players) {
-        Map<String, Long> gamesByUserId = new LinkedHashMap<>();
-        Map<String, String> nameByUserId = new HashMap<>();
-        for (PlayerEntity player : players) {
-            String storedName = player.getUser().getName();
-            if (!looselyMatchesDebugPlayer(storedName, debugPlayer)) continue;
-            gamesByUserId.merge(player.getUser().getId(), 1L, Long::sum);
-            nameByUserId.put(player.getUser().getId(), storedName);
-        }
-        if (gamesByUserId.isEmpty()) {
-            stringBuilder.append(
-                    String.format("- `%s`: no user in the rated game pool matches this name\n", debugPlayer));
-            return;
-        }
-        gamesByUserId.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .limit(DEBUG_CANDIDATE_LIMIT)
-                .forEach(entry -> stringBuilder.append(String.format(
-                        "- `%s`: matched `%s`, id %s, %d rated games, needs %d to be rated\n",
-                        debugPlayer,
-                        nameByUserId.get(entry.getKey()),
-                        entry.getKey(),
-                        entry.getValue(),
-                        MINIMUM_RATED_GAMES)));
-    }
-
-    private static boolean looselyMatchesDebugPlayer(String storedName, String debugPlayer) {
-        if (storedName == null) return false;
-        String stored = storedName.toLowerCase(Locale.ROOT);
-        String target = debugPlayer.toLowerCase(Locale.ROOT);
-        if (stored.equals(target)) return true;
-        if (stored.length() >= DEBUG_PARTIAL_MATCH_MINIMUM && target.contains(stored)) return true;
-        return target.length() >= DEBUG_PARTIAL_MATCH_MINIMUM && stored.contains(target);
-    }
-
-    private static boolean matchesDebugPlayer(MatchmakingRating playerRating, String debugPlayer) {
-        return debugPlayer.equalsIgnoreCase(playerRating.username()) || debugPlayer.equals(playerRating.userId());
     }
 
     private static void appendRecentTrend(StringBuilder stringBuilder, MatchmakingRating playerRating) {
