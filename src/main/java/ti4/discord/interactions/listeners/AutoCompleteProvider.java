@@ -690,9 +690,6 @@ class AutoCompleteProvider {
             case Constants.DRAFT_MODE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FrankenDraftMode> modes = new ArrayList<>(Arrays.asList(FrankenDraftMode.values()));
-
-                modes.remove(FrankenDraftMode.INAUGURALSPLICE);
-
                 List<Command.Choice> options = modes.stream()
                         .filter(mode -> mode.search(enteredValue))
                         .limit(25)
