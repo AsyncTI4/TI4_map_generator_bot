@@ -202,7 +202,7 @@ public class MatchmakingRatingEventService {
 
         appendBracketDistribution(
                 stringBuilder,
-                "Players per " + ratingLabel.toLowerCase() + " bracket",
+                "Calibrated players per " + ratingLabel.toLowerCase() + " bracket",
                 "players",
                 playerDisplayRatings(playerRatings));
         appendBracketDistribution(
@@ -358,6 +358,7 @@ public class MatchmakingRatingEventService {
 
     private static List<Long> playerDisplayRatings(List<MatchmakingRating> playerRatings) {
         return playerRatings.stream()
+                .filter(playerRating -> playerRating.calibrationPercent().compareTo(ONE_HUNDRED) >= 0)
                 .map(playerRating -> toDisplayRating(playerRating.rating()))
                 .toList();
     }
