@@ -78,20 +78,24 @@ class QueuedGameJoinValidator {
 
     private static Optional<String> findActiveHoursBlocker(
             PlayerSearchCriteria criteria, String joiningUserId, List<String> others) {
-        if (!MatchmakingOptions.wantsSimilarActiveHours(criteria.restrictions())) return Optional.empty();
+        int requiredSharedHours = MatchmakingOptions.requiredSharedActiveHours(criteria.restrictions());
+        if (requiredSharedHours == 0) return Optional.empty();
 
+        String level = MatchmakingOptions.describeSimilarActiveHours(criteria.restrictions());
         Map<String, PlayerMatchmakingData> dataById = PlayerMatchmakingDataFactory.buildForUsers(
                 Stream.concat(Stream.of(joiningUserId), others.stream()).toList(), criteria.restrictions());
         PlayerMatchmakingData joiner = dataById.get(joiningUserId);
-        if (!MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(joiner)) {
-            return Optional.of("it is queued with the **" + MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION
-                    + "** restriction and you have not set enough active hours. Use `/user active_hours` to set them.");
+        if (!MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(joiner, requiredSharedHours)) {
+            return Optional.of("it is queued with **similar active hours: " + level
+                    + "** and you have not set enough active hours (at least "
+                    + MatchmakingCompatibilityService.requiredActiveHourData(requiredSharedHours)
+                    + " are needed). Use `/user active_hours` to set them.");
         }
         for (String otherId : others) {
-            if (!MatchmakingCompatibilityService.shareEnoughActiveHours(joiner, dataById.get(otherId))) {
-                return Optional.of(
-                        "it is queued with the **" + MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION
-                                + "** restriction and your active hours do not overlap enough with the players already signed up.");
+            if (!MatchmakingCompatibilityService.shareEnoughActiveHours(
+                    joiner, dataById.get(otherId), requiredSharedHours)) {
+                return Optional.of("it is queued with **similar active hours: " + level
+                        + "** and your active hours do not overlap enough with the players already signed up.");
             }
         }
         return Optional.empty();
