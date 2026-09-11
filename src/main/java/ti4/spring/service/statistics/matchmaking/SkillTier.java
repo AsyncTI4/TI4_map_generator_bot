@@ -14,11 +14,9 @@ public enum SkillTier {
     public static final String EXCLUSION_PREFIX = "-";
 
     private static final class Bounds {
-        // Bottom ~9% of games
-        private static final long LOWER_MEDIUM = 1800;
+        private static final long LOWER_MEDIUM = 1900;
 
-        // ~83% of games fall between this and LOWER_MEDIUM
-        private static final long MEDIUM_HIGHER = 2200;
+        private static final long MEDIUM_HIGHER = 2150;
 
         private Bounds() {}
     }
