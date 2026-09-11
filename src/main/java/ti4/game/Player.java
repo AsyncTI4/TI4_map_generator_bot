@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -1920,16 +1921,34 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public boolean hasUnexhaustedLeader(String leaderId) {
-        if (hasLeader(leaderId)) {
-            return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
-        } else {
-            if (leaderId.contains("keleresagent")
-                    && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
-                return true;
-            }
-            return hasExternalAccessToLeader(leaderId)
-                    && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
+        List<Leader> matchingLeaders = leaders.stream()
+                .filter(l -> l.getId().equalsIgnoreCase(leaderId))
+                .toList();
+        if (matchingLeaders.stream().anyMatch(Predicate.not(Leader::isExhausted))) {
+            // Found an exact match that is ready, easy win
+            return true;
         }
+        if (!leaderId.contains("agent")) {
+            // Not an agent? Then getting a ready match was the only way, now there's no hope.
+            return false;
+        }
+
+        // Keleres special case
+        if (leaderId.contains("keleresagent")
+                && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
+            return true;
+        }
+
+        // Ready Yssaril Agents are our only remaining hope
+        if (leaders.stream()
+                .filter(Predicate.not(Leader::isExhausted))
+                .map(Leader::getId)
+                .noneMatch("yssarilagent"::equals)) {
+            // Didn't find any, R.I.P.
+            return false;
+        }
+        // Doesn't matter who has the agent
+        return !matchingLeaders.isEmpty() || game.isLeaderInGame(leaderId);
     }
 
     public Optional<Leader> getLeaderByType(String leaderType) {
