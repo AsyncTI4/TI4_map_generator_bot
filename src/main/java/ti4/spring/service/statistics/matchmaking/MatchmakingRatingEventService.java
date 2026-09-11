@@ -205,6 +205,7 @@ public class MatchmakingRatingEventService {
                 "Calibrated players per " + ratingLabel.toLowerCase() + " bracket",
                 "players",
                 playerDisplayRatings(playerRatings));
+        appendActiveCalibrationShare(stringBuilder, games, playerRatings, inactivityCutoff);
         appendBracketDistribution(
                 stringBuilder,
                 "Games per average-" + ratingLabel.toLowerCase() + " bracket",
@@ -354,6 +355,29 @@ public class MatchmakingRatingEventService {
         stringBuilder.append(String.format(
                 "\nThe average %s of your opponents across your %d games is `%d`.",
                 ratingLabel.toLowerCase(), gameCount, toDisplayRating(averageOpponentRating)));
+    }
+
+    private static void appendActiveCalibrationShare(
+            StringBuilder stringBuilder,
+            List<MatchmakingGame> games,
+            List<MatchmakingRating> playerRatings,
+            long inactivityCutoff) {
+        Set<String> activeUserIds = games.stream()
+                .filter(game -> game.endedDate() >= inactivityCutoff)
+                .flatMap(game -> game.players().stream())
+                .map(MatchmakingPlayer::userId)
+                .collect(Collectors.toSet());
+        if (activeUserIds.isEmpty()) return;
+        long calibratedCount = playerRatings.stream()
+                .filter(playerRating -> activeUserIds.contains(playerRating.userId()))
+                .filter(playerRating -> playerRating.calibrationPercent().compareTo(ONE_HUNDRED) >= 0)
+                .count();
+        stringBuilder.append(String.format(
+                "%.1f%% of players who played in the last %d months are calibrated (%d of %d).\n",
+                100.0 * calibratedCount / activeUserIds.size(),
+                INACTIVITY_MONTHS,
+                calibratedCount,
+                activeUserIds.size()));
     }
 
     private static List<Long> playerDisplayRatings(List<MatchmakingRating> playerRatings) {
