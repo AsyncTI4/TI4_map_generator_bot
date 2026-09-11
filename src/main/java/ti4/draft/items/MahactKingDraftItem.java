@@ -133,9 +133,9 @@ public class MahactKingDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllItems(Game game) {
-        return getAllFactions(game)
+        return new ArrayList<>(getAllFactions(game)
                 .map(king -> generate(DraftCategory.MAHACTKING, king.getAlias()))
-                .toList();
+                .toList());
     }
 
     public static Stream<FactionModel> getAllFactions(Game game) {
