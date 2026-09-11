@@ -45,7 +45,7 @@ public class MatchmakingRatingEventService {
     private static final int DEBUG_CANDIDATE_LIMIT = 5;
     private static final int DEBUG_PARTIAL_MATCH_MINIMUM = 4;
     private static final List<String> DEBUG_RATING_PLAYERS =
-            List.of("tazing0", "bleezy4sheezy", "bearded_one", "inco.n.damus", "forleafs", "the_constellation_orion");
+            List.of("Tazingo", "bleezy4sheezy", "Bearded One", "inco.n.damus", "forleafs", "Blue");
 
     private final Cache<String, List<MatchmakingRating>> unconservativeRatingsCache = createRatingsCache();
     private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache = createRatingsCache();
@@ -247,26 +247,31 @@ public class MatchmakingRatingEventService {
         if (DEBUG_RATING_PLAYERS.isEmpty()) return;
         stringBuilder.append("\n**Debug ratings:**\n");
         for (String debugPlayer : DEBUG_RATING_PLAYERS) {
-            MatchmakingRating playerRating = playerRatings.stream()
+            List<MatchmakingRating> matchingRatings = playerRatings.stream()
                     .filter(rating -> matchesDebugPlayer(rating, debugPlayer))
-                    .findFirst()
-                    .orElse(null);
-            if (playerRating == null) {
+                    .toList();
+            if (matchingRatings.isEmpty()) {
                 appendDebugCandidates(stringBuilder, debugPlayer, players);
                 continue;
             }
-            String trend = playerRating.recentRatingDelta() == null
-                    ? "n/a"
-                    : String.format("%+d", toDisplayRating(playerRating.recentRatingDelta()));
-            stringBuilder.append(String.format(
-                    "- `%s`: rating %d, calibration %.1f%%, sigma %.3f, trend %s, id %s\n",
-                    playerRating.username(),
-                    toDisplayRating(playerRating.rating()),
-                    playerRating.calibrationPercent(),
-                    playerRating.sigma(),
-                    trend,
-                    playerRating.userId()));
+            for (MatchmakingRating playerRating : matchingRatings) {
+                appendDebugRating(stringBuilder, playerRating);
+            }
         }
+    }
+
+    private static void appendDebugRating(StringBuilder stringBuilder, MatchmakingRating playerRating) {
+        String trend = playerRating.recentRatingDelta() == null
+                ? "n/a"
+                : String.format("%+d", toDisplayRating(playerRating.recentRatingDelta()));
+        stringBuilder.append(String.format(
+                "- `%s`: rating %d, calibration %.1f%%, sigma %.3f, trend %s, id %s\n",
+                playerRating.username(),
+                toDisplayRating(playerRating.rating()),
+                playerRating.calibrationPercent(),
+                playerRating.sigma(),
+                trend,
+                playerRating.userId()));
     }
 
     private static void appendDebugCandidates(
@@ -386,13 +391,17 @@ public class MatchmakingRatingEventService {
     private static void appendBracketDistribution(
             StringBuilder stringBuilder, String heading, String unitLabel, Map<Long, Long> countsByBracket) {
         if (countsByBracket.isEmpty()) return;
+        long total =
+                countsByBracket.values().stream().mapToLong(Long::longValue).sum();
         stringBuilder.append("\n**").append(heading).append(":**\n");
         for (Map.Entry<Long, Long> entry : countsByBracket.entrySet()) {
             long bracket = entry.getKey();
             long count = entry.getValue();
             String separator = bracket < 0 ? " to " : "-";
             String label = count == 1 ? unitLabel.substring(0, unitLabel.length() - 1) : unitLabel;
-            stringBuilder.append(String.format("- `%d%s%d`: %d %s\n", bracket, separator, bracket + 99, count, label));
+            double percent = 100.0 * count / total;
+            stringBuilder.append(String.format(
+                    "- `%d%s%d`: %d %s (%.1f%%)\n", bracket, separator, bracket + 99, count, label, percent));
         }
     }
 
