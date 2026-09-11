@@ -231,7 +231,7 @@ public class TkHelperStarflare {
             MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), sb.toString());
         }
 
-        ButtonHelper.deleteAllButtons(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     private record UnitAmountEntry(UnitType type, UnitState state, int amount) implements Comparable<UnitAmountEntry> {
