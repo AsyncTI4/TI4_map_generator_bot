@@ -37,7 +37,6 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
-import ti4.service.game.MonumentsService;
 import ti4.service.relic.AlluringThroneService;
 
 @UtilityClass

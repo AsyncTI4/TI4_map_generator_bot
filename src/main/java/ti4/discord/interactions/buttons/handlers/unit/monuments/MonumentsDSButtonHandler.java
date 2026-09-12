@@ -25,8 +25,8 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.UnitModel;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.game.MonumentsService;
@@ -103,8 +103,7 @@ public class MonumentsDSButtonHandler {
         }
         MonumentsService.exhaustMonument(game, player, "dihmohn_monument");
 
-        game.setStoredValue(
-                "dihmohnCyclotron_" + player.getFaction(), monumentTile.getPosition());
+        game.setStoredValue("dihmohnCyclotron_" + player.getFaction(), monumentTile.getPosition());
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -129,7 +128,8 @@ public class MonumentsDSButtonHandler {
 
     public static Button getTuccAcademyButton(Player monumentPlayer, Player exploringPlayer, Planet exploredPlanet) {
         return Buttons.green(
-                monumentPlayer.factionButtonChecker() + DEPLOY_TUCC + exploredPlanet.getName() + "|" + exploringPlayer.getFaction(),
+                monumentPlayer.factionButtonChecker() + DEPLOY_TUCC + exploredPlanet.getName() + "|"
+                        + exploringPlayer.getFaction(),
                 "Deploy Tucc Academy",
                 FactionEmojis.bentor);
     }
@@ -154,10 +154,12 @@ public class MonumentsDSButtonHandler {
         String planetName = payload.length == 2 ? payload[0] : null;
         Player exploringPlayer = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[1]) : null;
         Tile planetTile = planetName == null ? null : game.getTileFromPlanet(planetName);
-        Planet planet = planetTile == null ? null : planetTile.getPlanetUnitHolders().stream()
-                .filter(candidate -> candidate.getName().equals(planetName))
-                .findFirst()
-                .orElse(null);
+        Planet planet = planetTile == null
+                ? null
+                : planetTile.getPlanetUnitHolders().stream()
+                        .filter(candidate -> candidate.getName().equals(planetName))
+                        .findFirst()
+                        .orElse(null);
         UnitModel monument = Mapper.getUnit("bentor_monument");
         if (planet == null
                 || exploringPlayer == null
@@ -196,13 +198,16 @@ public class MonumentsDSButtonHandler {
     }
 
     @ButtonHandler(EXPLORE_TUCC)
-    public static void exploreTuccAcademyPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void exploreTuccAcademyPlanet(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(EXPLORE_TUCC.length()).split("\\|", 2);
         Tile tile = payload.length == 2 ? game.getTileFromPlanet(payload[0]) : null;
-        Planet planet = tile == null ? null : tile.getPlanetUnitHolders().stream()
-                .filter(candidate -> candidate.getName().equals(payload[0]))
-                .findFirst()
-                .orElse(null);
+        Planet planet = tile == null
+                ? null
+                : tile.getPlanetUnitHolders().stream()
+                        .filter(candidate -> candidate.getName().equals(payload[0]))
+                        .findFirst()
+                        .orElse(null);
         if (planet == null
                 || !MonumentsService.isMonumentOnBoard(game, player, "bentor_monument")
                 || MonumentsService.getPlayerMonumentPlanet(game, player) != planet

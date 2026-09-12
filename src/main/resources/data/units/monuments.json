@@ -205,8 +205,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool.",
-        "alternateText": "[Franken Only] At the start of the status phase, you may place 1 command token in this system into your fleet pool."
+        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool."
     },
     {
         "id": "mentak_monument",
