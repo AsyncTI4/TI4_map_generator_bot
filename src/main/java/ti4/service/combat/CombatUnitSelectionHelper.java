@@ -16,6 +16,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.UnitModel;
+import ti4.service.game.MonumentsService;
+import ti4.service.unit.UnitModelValueInjectionService;
 
 /**
  * Selects which units participate in a combat round for a given tile, holder, and player.
@@ -31,7 +33,7 @@ public class CombatUnitSelectionHelper {
         if (context.isSpaceCombat()) {
             return selectSpaceUnits(context);
         }
-        return selectGroundUnits(context.unitsOnCombatHolder());
+        return selectGroundUnits(context);
     }
 
     private static Map<UnitModel, Integer> selectSpaceUnits(CombatSelectionContext context) {
@@ -92,8 +94,30 @@ public class CombatUnitSelectionHelper {
         return filterUnits(unitsOnCombatHolder, UnitModel::getIsShip);
     }
 
-    private static Map<UnitModel, Integer> selectGroundUnits(Map<UnitModel, Integer> unitsOnCombatHolder) {
-        return filterUnits(unitsOnCombatHolder, unit -> unit.getIsGroundForce() || unit.getIsShip());
+    private static Map<UnitModel, Integer> selectGroundUnits(CombatSelectionContext context) {
+        Map<UnitModel, Integer> selectedUnits =
+                filterUnits(context.unitsOnCombatHolder(), unit -> unit.getIsGroundForce() || unit.getIsShip());
+
+        if (!MonumentsService.isMonumentOnBoard(context.player().getGame(), context.player(), "khrask_monument")
+                || context.tile()
+                        != MonumentsService.getMonumentTile(
+                                context.player().getGame(), context.player(), "khrask_monument")
+                || context.unitHolder().getUnitCount(UnitType.Monument, context.player()) < 1) {
+            return selectedUnits;
+        }
+
+        context.unitsOnCombatHolder().entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .filter(entry -> entry.getKey().getUnitType() == UnitType.Monument)
+                .findFirst()
+                .ifPresent(entry -> selectedUnits.put(
+                        UnitModelValueInjectionService.injectValues(
+                                entry.getKey(),
+                                UnitModelValueInjectionService.BooleanValueInjection.create()
+                                        .isGroundForce(true)),
+                        entry.getValue()));
+
+        return selectedUnits;
     }
 
     private static Map<UnitModel, Integer> collectEligibleUnitsFromSystem(

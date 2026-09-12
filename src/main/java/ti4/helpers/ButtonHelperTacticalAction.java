@@ -836,6 +836,14 @@ public final class ButtonHelperTacticalAction {
                                     + " +1 to their move values until the end of your tactical action.",
                             MonumentsDSButtonHandler.offerCyclotronButton(player));
                 }
+                if (monumentOwner == player && MonumentsService.isMonumentOnBoard(game, player, "ghoti_monument")) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "This is a reminder that "
+                                    + MonumentsService.getMonumentTile(game, player, "ghoti_monument")
+                                            .getRepresentation()
+                                    + " may be treated as having no planets during movement.");
+                }
             }
         }
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);

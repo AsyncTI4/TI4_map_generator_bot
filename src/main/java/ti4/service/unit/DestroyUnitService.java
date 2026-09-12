@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -183,6 +184,7 @@ public class DestroyUnitService {
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
         TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
+        MonumentsDSButtonHandler.resolveKortaliMonument(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
@@ -201,22 +203,23 @@ public class DestroyUnitService {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
-        if (game.isMonumentsMode()
-                && unit.unitKey().unitType() == UnitType.Monument
-                && game.getActiveSystem() != null) {
-            for (Player secretHolder : game.getRealPlayers()) {
-                if (secretHolder == player || !secretHolder.getSecretsUnscored().containsKey("tam")) {
-                    continue;
+        if (game.isMonumentsMode()) {
+            if (unit.unitKey().unitType() == UnitType.Monument && game.getActiveSystem() != null) {
+                for (Player secretHolder : game.getRealPlayers()) {
+                    if (secretHolder == player
+                            || !secretHolder.getSecretsUnscored().containsKey("tam")) {
+                        continue;
+                    }
+                    Button scoreButton = Buttons.green(
+                            secretHolder.factionButtonChecker() + "scoreToppleAMonument",
+                            "Score Topple a Monument",
+                            CardEmojis.SecretObjective);
+                    MessageHelper.sendMessageToChannelWithButton(
+                            secretHolder.getCardsInfoThread(),
+                            secretHolder.getRepresentation() + ", a monument was destroyed during a tactical action. "
+                                    + "If you destroyed another player's monument, you can score _Topple a Monument_.",
+                            scoreButton);
                 }
-                Button scoreButton = Buttons.green(
-                        secretHolder.factionButtonChecker() + "scoreToppleAMonument",
-                        "Score Topple a Monument",
-                        CardEmojis.SecretObjective);
-                MessageHelper.sendMessageToChannelWithButton(
-                        secretHolder.getCardsInfoThread(),
-                        secretHolder.getRepresentation() + ", a monument was destroyed during a tactical action. "
-                                + "If you destroyed another player's monument, you can score _Topple a Monument_.",
-                        scoreButton);
             }
         }
         if (player != null && player.hasAbility("fragmentation")) {

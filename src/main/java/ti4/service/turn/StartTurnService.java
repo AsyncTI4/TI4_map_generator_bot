@@ -227,6 +227,11 @@ public class StartTurnService {
         if (player.hasAbility("planetary_reconfiguration")) {
             TaAbilityHandler.sendPlanetaryReconfigurationStatus(player, game);
         }
+        if (game.isMonumentsMode()) {
+            for (Player affectedPlayer : game.getRealPlayers()) {
+                game.removeStoredValue("kjalengardMonumentUsed_" + affectedPlayer.getFaction());
+            }
+        }
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
         if (player.hasLeaderUnlocked("tyrishero")) {
@@ -512,13 +517,18 @@ public class StartTurnService {
                 && MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
             startButtons.add(TwilightsFallMonumentsButtonHandler.getOrangeTfMonumentButton(player));
         }
-        if (!doneActionThisTurn
-                && game.isMonumentsMode()
-                && MonumentsService.isMonumentOnBoard(game, player, "nomad_monument")) {
-            startButtons.add(MonumentsPoKButtonHandler.getLodestarButton(player));
-        }
-        if (!doneActionThisTurn && MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
-            startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
+        if (!doneActionThisTurn && game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "nomad_monument")) {
+                startButtons.add(MonumentsPoKButtonHandler.getLodestarButton(player));
+            }
+            if (MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
+                startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
+            }
+            if (MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
+                    && MonumentsDSButtonHandler.hasTwoReadiedCorePlanets(player, game)
+                    && game.getLaws().size() > 0) {
+                startButtons.add(MonumentsDSButtonHandler.getVerdantHaloButton(player));
+            }
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));

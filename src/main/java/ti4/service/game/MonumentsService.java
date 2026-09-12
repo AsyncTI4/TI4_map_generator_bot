@@ -290,6 +290,12 @@ public class MonumentsService {
                 : null;
     }
 
+    public static boolean treatsSystemAsGhotiAnchorpointFrontier(Game game, Player player, Tile tile) {
+        return tile != null
+                && isMonumentOnBoard(game, player, "ghoti_monument")
+                && tile == getMonumentTile(game, player, "ghoti_monument");
+    }
+
     public static boolean isInOrAdjacentToMonumentSystem(Game game, Player player, String monumentId, Tile tile) {
         if (game == null || player == null || !game.isMonumentsMode()) {
             return false;
