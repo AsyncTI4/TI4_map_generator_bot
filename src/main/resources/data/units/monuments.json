@@ -205,8 +205,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool.",
-        "alternateText": "[Franken Only] At the start of the status phase, you may place 1 command token in this system into your fleet pool."
+        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool."
     },
     {
         "id": "mentak_monument",
@@ -432,6 +431,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "This unit is a space station and placed in the space area of a system that contains your ships and exactly 1 non-legendary planet. Take its matching space station card while you control it.\nWhen you lose control of this space station, destroy it and produce 2 hits against ships in this system."
     },
     {
@@ -1167,11 +1167,9 @@
         "eligiblePlanetTypes": [
             "CULTURAL"
         ],
-        "productionValue": "+1",
-        "basicProduction": "struct",
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system."
+        "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system.\n\nPRODUCTION X"
     },
     {
         "id": "kyro_monument",

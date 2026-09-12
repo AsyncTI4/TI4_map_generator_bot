@@ -10,7 +10,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -175,6 +177,9 @@ public class RemoveUnitService {
             ParsedUnit parsedUnit,
             UnitState preferredState) {
         List<UnitHolder> unitHoldersToRemoveFrom = getUnitHoldersToRemoveFrom(tile, parsedUnit);
+        Player unitOwner = game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+        boolean removingPelagion = parsedUnit.unitKey().unitType() == UnitType.Monument
+                && MonumentsTEButtonHandler.isPelagionMonument(game, unitOwner, tile);
 
         if (unitHoldersToRemoveFrom.isEmpty()) {
             handleEmptyUnitHolders(event, tile, parsedUnit);
@@ -209,6 +214,10 @@ public class RemoveUnitService {
             if (removedUnit.unitKey().unitType() == UnitType.Monument) {
                 MonumentsAgendaService.resolveCathedralOfIxthRemoval(
                         game, removedUnit.getPlayer(game), removedUnit.uh().getName());
+                if (removingPelagion && removedUnit.uh() instanceof Planet) {
+                    MonumentsTEButtonHandler.offerPelagionThunderdome(
+                            game, unitOwner, tile, removedUnit.uh().getName());
+                }
             }
         }
 

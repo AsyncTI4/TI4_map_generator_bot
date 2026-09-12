@@ -50,7 +50,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -276,6 +278,7 @@ public final class ButtonHelperTacticalAction {
             }
             resetStoredValuesForTacticalAction(game);
         }
+        MonumentsTEButtonHandler.offerRalNelMonumentStructureMove(game, player);
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         CrystellumTechHandler.clearResonanceDrive(game);
@@ -508,6 +511,7 @@ public final class ButtonHelperTacticalAction {
             MyrrTechHandler.offerSegmentedStructuring(event, game, player, tile);
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
             MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
+            MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
         }
     }
 
@@ -605,6 +609,7 @@ public final class ButtonHelperTacticalAction {
         MonumentsService.clearNaaluMonumentCoexistence(game);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("ASN" + player.getFaction());
+            game.removeStoredValue("dihmohnCyclotron_" + player.getFaction());
         }
         game.removeStoredValue("planetsTakenThisRound");
         game.removeStoredValue("hiredGunsInPlay");
@@ -792,6 +797,44 @@ public final class ButtonHelperTacticalAction {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "firmament_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")
+                        && player != monumentOwner) {
+                    MonumentsTEButtonHandler.sendEpiphanyMessage(monumentOwner);
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "obsidian_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "obsidian_monument")
+                        && monumentOwner.isOtherPlayerPuppeted(player)) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", the puppeted player " + player.getRepresentationNoPing()
+                                    + " has activated the system containing _Epiphany Hollow_. You may replace 2 infantry on a planet they control with your infantry, they enter coexistence.",
+                            MonumentsTEButtonHandler.sendEpiphanyHollowButton(monumentOwner, player));
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "cymiae_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "cymiae_monument")
+                        && player != monumentOwner) {
+                    ActionCardHelper.sendACDiscardButtons(player);
+
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + ", you activated the system containing _Jatta's Palace_ and must now discard an action card, if able.\n"
+                                    + "-# Buttons to discard were sent to your `#cards-info`.");
+                }
+                if (monumentOwner == player
+                        && MonumentsService.isMonumentOnBoard(game, player, "dihmohn_monument")
+                        && MonumentsService.isMonumentReady(game, player, "dihmohn_monument")) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + ", you may exhaust _Flotilla Cyclotron_ to give units in "
+                                    + MonumentsService.getMonumentTile(game, player, "dihmohn_monument")
+                                            .getRepresentation()
+                                    + " +1 to their move values until the end of your tactical action.",
+                            MonumentsDSButtonHandler.offerCyclotronButton(player));
                 }
             }
         }

@@ -988,6 +988,8 @@ class GameSaveService {
 
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
+            writer.write(Constants.STASIS_FIGHTERS + " " + player.getStasisFighters());
+            writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
 

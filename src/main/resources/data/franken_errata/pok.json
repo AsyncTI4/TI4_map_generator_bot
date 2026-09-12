@@ -188,7 +188,6 @@
         "optionalSwaps": [
             "MONUMENT:mahact_monument"
         ],
-        "alwaysAddToPool": true,
         "source": "franken"
     },
     {
@@ -197,7 +196,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {
@@ -206,7 +207,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {
@@ -215,7 +218,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {

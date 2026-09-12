@@ -781,6 +781,7 @@ public final class Constants {
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String COMMODITIES_BASE = "commodities_base";
     public static final String STASIS_INFANTRY = "stasis_infantry";
+    public static final String STASIS_FIGHTERS = "stasis_fighters";
     public static final String MARK_FOLLOWED = "mark_followed";
     public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
     public static final String FACTION = "faction";

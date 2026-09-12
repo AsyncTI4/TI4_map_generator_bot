@@ -65,7 +65,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -2042,6 +2044,11 @@ public final class Helper {
 
         for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
             String unit = entry.getKey();
+            int amount = entry.getValue()
+                    - MonumentsDSButtonHandler.getFlorzenStasisFightersInProduction(game, player, unit);
+            if (amount < 1) {
+                continue;
+            }
             String tilePos = unit.split("_")[1];
             String planetOrSpace = unit.split("_")[2];
             if ("space".equalsIgnoreCase(planetOrSpace)) {
@@ -2052,13 +2059,10 @@ public final class Helper {
             Tile tile = game.getTileByPosition(tilePos);
             String un = unit.split("_")[0];
             RemoveUnitService.removeUnits(
-                    event,
-                    tile,
-                    game,
-                    player.getColor(),
-                    entry.getValue() + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
+                    event, tile, game, player.getColor(), amount + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
         }
 
+        MonumentsDSButtonHandler.resetFlorzenStasisFighters(game, player);
         player.resetProducedUnits();
     }
 
@@ -2094,6 +2098,28 @@ public final class Helper {
                 }
                 UnitModel unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
                 int productionValue = unitModel.getProductionValue();
+                if ("monument".equals(unitModel.getAsyncId())) {
+                    if (MonumentsService.isMonumentOnBoard(game, player, "cheiran_monument")
+                            && tile == MonumentsService.getPlayerMonumentTile(game, player)
+                            && uH == MonumentsService.getPlayerMonumentPlanet(game, player)) {
+                        int structures = tile.getUnitHolders().values().stream()
+                                .mapToInt(holder ->
+                                        holder.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure))
+                                .sum();
+
+                        for (String adjacentPosition :
+                                FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                            Tile adjacentTile = game.getTileByPosition(adjacentPosition);
+                            if (adjacentTile != null) {
+                                structures += adjacentTile.getUnitHolders().values().stream()
+                                        .mapToInt(holder -> holder.countPlayersUnitsWithModelCondition(
+                                                player, UnitModel::getIsStructure))
+                                        .sum();
+                            }
+                        }
+                        productionValue = structures;
+                    }
+                }
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
                     productionValueTotal += player.getFleetCC();
                 }
@@ -2811,6 +2837,13 @@ public final class Helper {
                 player.factionButtonChecker() + placePrefix + "_fighter_" + tp,
                 "Produce 1 Fighter",
                 UnitEmojis.fighter));
+        if ("place".equalsIgnoreCase(placePrefix)) {
+            Button florzenStasisFighterButton =
+                    MonumentsDSButtonHandler.getFlorzenStasisFighterButton(game, player, tile);
+            if (florzenStasisFighterButton != null) {
+                unitButtons.add(florzenStasisFighterButton);
+            }
+        }
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                 && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
@@ -3239,6 +3272,7 @@ public final class Helper {
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
                 ccCount += TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player_);
+                ccCount += MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player_);
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }
