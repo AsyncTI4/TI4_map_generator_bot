@@ -560,6 +560,33 @@ public final class FoWHelper {
             }
         }
 
+        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "ghemina_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "ghemina_monument");
+
+            if (monumentTile != null) {
+                Set<String> matchingStructureSystems = game.getTileMap().values().stream()
+                        .filter(tile -> tile.getUnitHolders().values().stream()
+                                .flatMap(holder -> holder.getUnitKeysForPlayer(player).stream())
+                                .filter(unitKey -> player.getUnitFromUnitKey(unitKey) != null)
+                                .filter(unitKey ->
+                                        player.getUnitFromUnitKey(unitKey).getIsStructure())
+                                .map(UnitKey::unitType)
+                                .distinct()
+                                .anyMatch(unitType -> tile.getUnitHolders().values().stream()
+                                                .mapToInt(holder -> holder.getUnitCount(unitType, player))
+                                                .sum()
+                                        >= 2))
+                        .map(Tile::getPosition)
+                        .collect(Collectors.toSet());
+
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.addAll(matchingStructureSystems);
+                } else if (matchingStructureSystems.contains(position)) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
+
         // If player has ghoti commander, is active player and has activated a system
         if (player != null
                 && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")

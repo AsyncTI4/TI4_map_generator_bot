@@ -165,6 +165,31 @@ public class CombatRollService {
         return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, false);
     }
 
+    public static int secondHalfOfSelectedSpaceCannonRoll(
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile targetTile,
+            UnitModel selectedUnit,
+            UnitHolder sourceUnitHolder,
+            Player targetPlayer) {
+        if (selectedUnit == null || sourceUnitHolder == null || targetPlayer == null) {
+            return 0;
+        }
+        Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits = new HashMap<>();
+        selectedUnits.put(new ImmutablePair<>(selectedUnit, sourceUnitHolder), 1);
+        return secondHalfOfCombatRoll(
+                player,
+                game,
+                event,
+                targetTile,
+                Constants.SPACE,
+                CombatRollType.SpaceCannonOffence,
+                false,
+                selectedUnits,
+                targetPlayer);
+    }
+
     public static UnitModel getMetaliAFBUnit(Player player) {
         UnitModel metaliFakeUnit = new UnitModel();
         metaliFakeUnit.setAfbDieCount(3);
@@ -213,6 +238,19 @@ public class CombatRollService {
             String unitHolderName,
             CombatRollType rollType,
             boolean automated) {
+        return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, automated, null, null);
+    }
+
+    private static int secondHalfOfCombatRoll(
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            String unitHolderName,
+            CombatRollType rollType,
+            boolean automated,
+            Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits,
+            Player targetPlayer) {
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
@@ -232,10 +270,13 @@ public class CombatRollService {
         if (XytherisLeadersHandler.offerHeroUnitAbilityRoll(event, game, player, tile, combatOnHolder, rollType)) {
             return 0;
         }
-        Player opponent = null;
+        Player opponent = targetPlayer;
 
         Map<Pair<UnitModel, UnitHolder>, Integer> playerUnitsByQuantity =
                 getUnitsInCombatByHolder(tile, combatOnHolder, player, event, rollType, game);
+        if (selectedUnits != null) {
+            playerUnitsByQuantity = new HashMap<>(selectedUnits);
+        }
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
             playerUnitsByQuantity.put(new ImmutablePair<>(getMetaliAFBUnit(player), combatOnHolder), 1);
         }
@@ -910,7 +951,7 @@ public class CombatRollService {
         if ((!game.isFowMode() || isFoWPrivateChannelRoll(player, event))
                 && rollType == CombatRollType.SpaceCannonOffence
                 && h > 0
-                && opponent != player) {
+                && (opponent != player || targetPlayer != null)) {
             MessageChannel channel =
                     isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
             String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered "
