@@ -44,6 +44,7 @@ import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 public final class GMService {
@@ -88,8 +89,10 @@ public final class GMService {
     public static void showGMButtons(Game game) {
         if (!game.isFowMode()) return;
 
+        List<Button> buttons = new ArrayList<>(GMBUTTONS);
+        FractureService.addFractureGMButton(game, buttons);
         String title = RandomHelper.isOneInX(20) ? RandomHelper.pickRandomFromList(GM) : "Game Master";
-        MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), title + " Buttons", GMBUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), title + " Buttons", buttons);
     }
 
     public static TextChannel getGMChannel(Game game) {
