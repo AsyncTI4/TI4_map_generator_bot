@@ -831,7 +831,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
-            if (unit == "monument") return 1;
+            if ("monument".equals(unit)) return 1;
             if (PositionMapper.getReinforcementsPosition(unit) == null) return 0;
             return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             // return 0;
