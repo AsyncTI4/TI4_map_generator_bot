@@ -1,7 +1,6 @@
 [
     {
         "alias": "redtknova",
-        "homebrewReplacesID": "redtf",
         "factionName": "The Ruby Monarch (Nova)",
         "shortName": "Ruby Nova",
         "homeSystem": "",
@@ -33,7 +32,6 @@
     },
     {
         "alias": "orangetknova",
-        "homebrewReplacesID": "orangetf",
         "factionName": "Radiant Aur (Nova)",
         "shortName": "Radiant Nova",
         "homeSystem": "",
@@ -65,7 +63,6 @@
     },
     {
         "alias": "yellowtknova",
-        "homebrewReplacesID": "yellowtf",
         "factionName": "Avarice Rex (Nova)",
         "shortName": "Avarice Nova",
         "homeSystem": "",
@@ -97,7 +94,6 @@
     },
     {
         "alias": "greentknova",
-        "homebrewReplacesID": "greentf",
         "factionName": "Il Sai Lakoe, Herald of Thorns (Nova)",
         "shortName": "Nova Lakoe",
         "homeSystem": "",
@@ -129,7 +125,6 @@
     },
     {
         "alias": "bluetknova",
-        "homebrewReplacesID": "bluetf",
         "factionName": "The Saint of Swords (Nova)",
         "shortName": "Saint of Nova",
         "homeSystem": "",
@@ -161,7 +156,6 @@
     },
     {
         "alias": "purpletknova",
-        "homebrewReplacesID": "purpletf",
         "factionName": "Il Na Viroset (Nova)",
         "shortName": "Nova Viroset",
         "homeSystem": "",
@@ -193,7 +187,6 @@
     },
     {
         "alias": "pinktknova",
-        "homebrewReplacesID": "pinktf",
         "factionName": "El Nen Janovet (Nova)",
         "shortName": "Nova Janovet",
         "homeSystem": "",
@@ -225,7 +218,6 @@
     },
     {
         "alias": "blacktknova",
-        "homebrewReplacesID": "blacktf",
         "factionName": "A Sickening Lurch (Nova)",
         "shortName": "Sickening Nova",
         "homeSystem": "",
