@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -93,6 +94,9 @@ public class ResonanceGeneratorService {
                 + tile.getRepresentationForButtons(game, player) + " system.";
         // msg += " using " + resonanceRep() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        if (Constants.TOKEN_BREACH_ACTIVE.equals(newState)) {
+            MonumentsTEButtonHandler.offerCrimsonMonumentHit(game, tile);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -138,7 +142,8 @@ public class ResonanceGeneratorService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
 
         // TODO: JAZZ - idk if you can have multiple, so don't double add for now
-        if (!space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)) {
+        boolean placedActive = !space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        if (placedActive) {
             space.addToken(Constants.TOKEN_BREACH_ACTIVE);
         }
 
@@ -146,6 +151,9 @@ public class ResonanceGeneratorService {
         msg += " using " + source + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
+        if (placedActive) {
+            MonumentsTEButtonHandler.offerCrimsonMonumentHit(game, tile);
+        }
         ButtonHelper.deleteMessage(event);
         checkBreachLimit(player, game);
     }

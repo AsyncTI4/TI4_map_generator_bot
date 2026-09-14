@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -50,6 +51,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -181,6 +183,14 @@ class DeleteButtonsButtonHandler {
             }
             ButtonHelper.checkFleetInEveryTile(player, game);
         }
+        if ("Done Gaining Command Tokens".equalsIgnoreCase(buttonLabel) && "leadership".equalsIgnoreCase(buttonID)) {
+            MonumentsDSButtonHandler.offerFreeSystemsMonumentPromissoryReveal(game, player);
+        }
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && buttonID.startsWith("florzenMonument_")) {
+            MonumentsDSButtonHandler.resolveFlorzenStasisProduction(game, player, buttonID);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                 || "Done Producing Units".equalsIgnoreCase(buttonLabel))) {
             Tile tile = null;
@@ -207,7 +217,20 @@ class DeleteButtonsButtonHandler {
                 ThronesThroneHandler.clearSkarnathDiscount(game, player);
             }
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
-                MonumentsButtonHandler.offerCenotaphAfterProduction(game, player);
+                if (game.isMonumentsMode()) {
+                    if (MonumentsService.isMonumentOnBoard(game, player, "sol_monument")) {
+                        MonumentsButtonHandler.offerCenotaphAfterProduction(game, player);
+                    }
+                    if (MonumentsService.isMonumentOnBoard(game, player, "axis_monument")
+                            && MonumentsDSButtonHandler.producedNonFighterShipInMonumentSystem(game, player)) {
+                        player.gainTG(1, true);
+
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation()
+                                        + ", gained 1 trade good due to producing at least 1 non-fighter ship in the system containing _Anvil of Atlas_.");
+                    }
+                }
                 event.getChannel().getHistory().retrievePast(2).queue(messageHistory -> {
                     Message previousMessage = messageHistory.get(1);
                     if (previousMessage.getContentRaw().contains("You have available to you")) {

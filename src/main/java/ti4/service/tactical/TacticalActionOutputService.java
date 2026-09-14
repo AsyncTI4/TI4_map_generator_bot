@@ -294,6 +294,15 @@ public class TacticalActionOutputService {
                     output.append(", __does not have _Gravity Drive___)");
                 }
             }
+            String cyclotronTilePosition = game.getStoredValue("dihmohnCyclotron_" + player.getFaction());
+            if (!cyclotronTilePosition.isEmpty()) {
+                Tile cyclotronTile = game.getTileByPosition(cyclotronTilePosition);
+                if (cyclotronTile != null) {
+                    output.append(" (ships moved from ")
+                            .append(cyclotronTile.getRepresentation())
+                            .append(" have +1 move from _Flotilla Cyclotron_)");
+                }
+            }
             if (player.hasUnit("tk-voidcarver")) {
                 maxBonus++;
                 output.append(" (has _Voidcarver_ for +1 movement for one other ship moving from the same system)");
@@ -460,7 +469,6 @@ public class TacticalActionOutputService {
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
-
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;

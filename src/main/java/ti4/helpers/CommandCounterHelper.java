@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -38,6 +39,16 @@ public final class CommandCounterHelper {
 
     public static void addCC(
             GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping, boolean useTactic) {
+        addCC(event, player, tile, ping, useTactic, false);
+    }
+
+    public static void addCC(
+            GenericInteractionCreateEvent event,
+            Player player,
+            Tile tile,
+            boolean ping,
+            boolean useTactic,
+            boolean skipKeleresMonumentPrompt) {
         if (player == null || !Mapper.isValidColor(player.getColor())) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -50,6 +61,11 @@ public final class CommandCounterHelper {
         }
         String ccID = Mapper.getCCID(player.getColor());
         if (tile.hasCC(ccID)) {
+            return;
+        }
+        if (!skipKeleresMonumentPrompt
+                && MonumentsTEButtonHandler.offerKeleresMonumentTokenReplacement(
+                        event, player, tile, ping, useTactic)) {
             return;
         }
         if (useTactic) {

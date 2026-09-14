@@ -27,6 +27,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
@@ -233,18 +234,36 @@ public class MonumentsPoKButtonHandler {
             return;
         }
         for (Player player : game.getRealPlayers()) {
-            List<Tile> monumentTiles = new ArrayList<>();
             if (game.isFrankenGame()) {
-                monumentTiles.addAll(game.getTileMap().values().stream()
-                        .filter(tile -> ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile))
-                        .toList());
-                if (MonumentsService.isMonumentOnBoard(game, player, "mahact_monument")) {
-                    Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mahact_monument");
-                    if (monumentTile != null && !monumentTiles.contains(monumentTile)) {
-                        monumentTiles.add(monumentTile);
-                    }
+                if (!player.hasAbility("primacy")) {
+                    continue;
                 }
-            } else if ("mahact".equals(player.getFaction())) {
+                Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mahact_monument");
+                if (monumentTile == null) {
+                    continue;
+                }
+                List<Button> buttons = game.getRealPlayers().stream()
+                        .filter(tokenOwner -> monumentTile.hasPlayerCC(tokenOwner))
+                        .filter(tokenOwner -> !player.getMahactCC().contains(tokenOwner.getColor()))
+                        .map(tokenOwner -> Buttons.green(
+                                player.factionButtonChecker() + RESOLVE_SPIRE_OF_IXTH + monumentTile.getPosition() + "|"
+                                        + tokenOwner.getColor(),
+                                "Place " + tokenOwner.getFactionNameOrColor() + " Token in Primacy",
+                                tokenOwner.getFactionEmojiOrColor()))
+                        .toList();
+                if (!buttons.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing()
+                                    + ", you may resolve _Spire Of Ixth_ to place a command token from "
+                                    + monumentTile.getRepresentationForButtons(game, player)
+                                    + " in your **Primacy** debt pool.",
+                            buttons);
+                }
+                continue;
+            }
+            List<Tile> monumentTiles = new ArrayList<>();
+            if ("mahact".equals(player.getFaction())) {
                 for (Player monumentOwner : game.getRealPlayers()) {
                     if (monumentOwner == player) {
                         monumentTiles.addAll(game.getTileMap().values().stream()
@@ -293,8 +312,9 @@ public class MonumentsPoKButtonHandler {
         boolean canUse = false;
         if (tile != null && tokenOwner != null && tile.hasPlayerCC(tokenOwner)) {
             if (game.isFrankenGame()) {
-                canUse = ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile)
-                        || tile == MonumentsService.getMonumentTile(game, player, "mahact_monument");
+                canUse = player.hasAbility("primacy")
+                        && !player.getMahactCC().contains(tokenOwner.getColor())
+                        && tile == MonumentsService.getMonumentTile(game, player, "mahact_monument");
             } else if ("mahact".equals(player.getFaction())) {
                 canUse = ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile)
                         || game.getRealPlayers().stream()
@@ -310,12 +330,17 @@ public class MonumentsPoKButtonHandler {
             return;
         }
         tile.removeCC(Mapper.getCCID(tokenOwner.getColor()));
-        player.getMahactCC().add(tokenOwner.getColor());
+        if (game.isFrankenGame()) {
+            MahactTokenService.addMahactToken(game, player, tokenOwner.getColor());
+        } else {
+            player.getMahactCC().add(tokenOwner.getColor());
+        }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " moved " + tokenOwner.getRepresentationNoPing()
                         + "'s command token from " + tile.getRepresentationForButtons(game, player)
-                        + " to their fleet pool with _Spire Of Ixth_.");
+                        + (game.isFrankenGame() ? " in their **Primacy** debt pool" : " to their fleet pool")
+                        + " with _Spire Of Ixth_.");
         ButtonHelper.deleteMessage(event);
     }
 

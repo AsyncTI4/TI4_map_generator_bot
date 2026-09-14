@@ -29,6 +29,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veryd
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
@@ -92,6 +94,11 @@ public class CardsInfoService {
         }
         if (game.isMonumentsMode() && player.hasUnit("yellowtf_monument")) {
             buttons.add(TwilightsFallMonumentsButtonHandler.getYellowTfMonumentStatusButton(game, player));
+        }
+        if (game.isMonumentsMode()
+                && (player.hasUnit("keleres_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument"))) {
+            buttons.add(MonumentsTEButtonHandler.getKeleresMonumentStatusButton(game, player));
         }
         if (game.isMonumentsMode() && player.hasUnit("nekro_monument")) {
             buttons.add(NekroMonumentService.getCopyMonumentButton(player));
@@ -505,8 +512,14 @@ public class CardsInfoService {
         if (player.hasRelicReady("economicboon") && player.getExhaustedPlanets().size() > 0) {
             buttons.add(LostLegaciesRelicHandler.getEconomicBoonCardsInfoButton(player));
         }
-        if (MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
-            buttons.add(MonumentsButtonHandler.getSaarMonumentButton(player));
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
+                buttons.add(MonumentsButtonHandler.getSaarMonumentButton(player));
+            }
+            if (MonumentsService.isMonumentOnBoard(game, player, "edyn_monument")
+                    && MonumentsService.isMonumentReady(game, player, "edyn_monument")) {
+                buttons.add(MonumentsDSButtonHandler.getTwilightThroneButton(player));
+            }
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

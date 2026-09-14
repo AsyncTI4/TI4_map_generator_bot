@@ -88,6 +88,7 @@ public class WebPlayerArea {
 
     // Units and combat
     private int stasisInfantry;
+    private int stasisFighters;
     private int actualHits;
     private int expectedHitsTimes10;
     private Set<String> unitsOwned;
@@ -255,6 +256,7 @@ public class WebPlayerArea {
 
         // Units and combat
         webPlayerArea.stasisInfantry = player.getStasisInfantry();
+        webPlayerArea.stasisFighters = player.getStasisFighters();
         webPlayerArea.actualHits = player.getActualHits();
         webPlayerArea.expectedHitsTimes10 = player.getExpectedHitsTimes10();
         webPlayerArea.unitsOwned = player.getUnitsOwned();

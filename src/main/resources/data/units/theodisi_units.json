@@ -163,7 +163,7 @@
     "source": "theodisi",
     "faction": "myrr",
     "moveValue": 2,
-    "capacityValue": 4,
+    "capacityValue": 2,
     "capacityUsed": 1,
     "cost": 4,
     "combatHitsOn": 5,

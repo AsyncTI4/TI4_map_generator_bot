@@ -317,6 +317,9 @@
             "ABILITY:puppetsoftheblade",
             "ABILITY:plotsplots"
         ],
+        "optionalSwaps": [
+            "MONUMENT:firmament_monument"
+        ],
         "source": "thunders_edge"
     },
     {
@@ -390,6 +393,9 @@
         "additionalComponents": [
             "PLOT:extract",
             "ABILITY:puppetsoftheblade"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:firmament_monument"
         ],
         "source": "thunders_edge"
     },

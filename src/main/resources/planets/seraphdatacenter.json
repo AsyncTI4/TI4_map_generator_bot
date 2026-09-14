@@ -1,0 +1,10 @@
+{
+    "id": "seraphdatacenter",
+    "name": "Seraph Data Center",
+    "shortName": "SDC",
+    "aliases": ["seraphdatacenter", "sdc"],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": ["SPACESTATION", "FAKE"],
+    "source": "monuments"
+}
