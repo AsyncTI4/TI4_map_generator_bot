@@ -617,7 +617,7 @@ public final class ButtonHelperAgents {
         if (agent.contains("_")) {
             agent = agent.substring(0, agent.indexOf('_'));
         }
-        Leader playerLeader = player.getLeader(agent).orElse(null);
+        Leader playerLeader = player.getLeaderByIdPreferReadied(agent).orElse(null);
         if (playerLeader == null) {
             return;
         }

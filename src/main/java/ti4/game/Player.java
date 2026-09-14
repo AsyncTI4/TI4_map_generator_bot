@@ -1920,35 +1920,53 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return AFKService.userIsAFK(getUserID());
     }
 
-    public boolean hasUnexhaustedLeader(String leaderId) {
-        List<Leader> matchingLeaders = leaders.stream()
-                .filter(l -> l.getId().equalsIgnoreCase(leaderId))
-                .toList();
-        if (matchingLeaders.stream().anyMatch(Predicate.not(Leader::isExhausted))) {
-            // Found an exact match that is ready, easy win
-            return true;
-        }
-        if (!leaderId.contains("agent")) {
-            // Not an agent? Then getting a ready match was the only way, now there's no hope.
-            return false;
+    /**
+     * Gets a readied leader with the specified ID.
+     * If none is found, gets a suitable alternative instead.
+     * If no suitable alternative is found either, returns an empty Optional
+     * (For example, a suitable alternative could be a yssaril agent
+     * or an exhausted leader with the specified ID.)
+     * @param leaderId ID (Alias) of the leader to search for
+     * @return The found leader with that ID (or suitable alternative)
+     */
+    public Optional<Leader> getLeaderByIdPreferReadied(String leaderId) {
+        Leader exhaustedFallbackLeader = null;
+        for (Leader leader : leaders) {
+            if (leader.getId().equalsIgnoreCase(leaderId)) {
+                if (!leader.isExhausted()) {
+                    return Optional.of(leader);
+                }
+                if (exhaustedFallbackLeader == null) {
+                    exhaustedFallbackLeader = leader;
+                }
+            }
         }
 
-        // Keleres special case
         if (leaderId.contains("keleresagent")
                 && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
-            return true;
+            // Return Dummy agent so that the Optional has some readied agent
+            return Optional.of(new Leader("keleresagent", "agent"));
+        }
+        if (leaderId.contains("agent")) {
+            for (Leader leader : leaders) {
+                if ("yssarilagent".equals(leader.getId())) {
+                    if (!leader.isExhausted()) {
+                        return Optional.of(leader);
+                    }
+                    if (exhaustedFallbackLeader == null) {
+                        exhaustedFallbackLeader = leader;
+                    }
+                }
+            }
         }
 
-        // Ready Yssaril Agents are our only remaining hope
-        if (leaders.stream()
+        return Optional.ofNullable(exhaustedFallbackLeader);
+    }
+
+    public boolean hasUnexhaustedLeader(String leaderId) {
+        return getLeaderByIdPreferReadied(leaderId)
                 .filter(Predicate.not(Leader::isExhausted))
-                .map(Leader::getId)
-                .noneMatch("yssarilagent"::equals)) {
-            // Didn't find any, R.I.P.
-            return false;
-        }
-        // Doesn't matter who has the agent
-        return !matchingLeaders.isEmpty() || game.isLeaderInGame(leaderId);
+                .isPresent();
     }
 
     public Optional<Leader> getLeaderByType(String leaderType) {
