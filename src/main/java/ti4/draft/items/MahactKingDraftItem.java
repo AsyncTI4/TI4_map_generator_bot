@@ -16,6 +16,7 @@ import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
+import ti4.service.draft.draftables.MahactKingDraftable;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
 
@@ -119,6 +120,16 @@ public class MahactKingDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(Game game) {
         List<DraftItem> allItems = buildAllItems(game);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MAHACTKING);
+        if (game.isTkNovaCup() && "onePerColor".equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
+            List<DraftItem> output = new ArrayList<>();
+            for (DraftItem item : allItems) {
+                String id = MahactKingDraftable.switchFactionSet(item.getItemId());
+                if (output.stream().map(DraftItem::getItemId).noneMatch(id::equals)) {
+                    output.add(item);
+                }
+            }
+            return output;
+        }
         return allItems;
     }
 
