@@ -2563,6 +2563,7 @@ public final class ButtonHelperAgents {
             if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) continue;
 
             if ((tile.isAsteroidField()
+                            && !tile.isZelianAsteroidField()
                             && !player.getTechs().contains("amd")
                             && !player.getTechs().contains("wavelength")
                             && !player.getRelics().contains("circletofthevoid"))

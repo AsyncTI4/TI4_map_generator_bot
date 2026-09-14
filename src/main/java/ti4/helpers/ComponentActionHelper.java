@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -593,15 +594,21 @@ public class ComponentActionHelper {
                     factionChecker + prefix + "ability_muaatFSsigma", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
-        if (game.isMonumentsMode()
-                && MonumentsService.isMonumentOnBoard(game, p1, "argent_monument")
-                && MonumentsService.isMonumentReady(game, p1, "argent_monument")) {
-            compButtons.add(MonumentsPoKButtonHandler.getPhoenixCauldronButton(p1));
-        }
-        if (game.isMonumentsMode()
-                && MonumentsService.isMonumentOnBoard(game, p1, "titans_monument")
-                && MonumentsService.isMonumentReady(game, p1, "titans_monument")) {
-            compButtons.add(MonumentsPoKButtonHandler.getScepterButton(p1));
+
+        // Monuments
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, p1, "argent_monument")
+                    && MonumentsService.isMonumentReady(game, p1, "argent_monument")) {
+                compButtons.add(MonumentsPoKButtonHandler.getPhoenixCauldronButton(p1));
+            }
+            if (MonumentsService.isMonumentOnBoard(game, p1, "titans_monument")
+                    && MonumentsService.isMonumentReady(game, p1, "titans_monument")) {
+                compButtons.add(MonumentsPoKButtonHandler.getScepterButton(p1));
+            }
+            if (MonumentsService.isMonumentOnBoard(game, p1, "mortheus_monument")
+                    && MonumentsService.isMonumentReady(game, p1, "mortheus_monument")) {
+                compButtons.add(MonumentsDSButtonHandler.getMirrorforgeButton(p1));
+            }
         }
 
         // Get Relic

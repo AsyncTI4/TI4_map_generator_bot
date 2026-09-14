@@ -1319,6 +1319,7 @@ public final class ButtonHelperModifyUnits {
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat, boolean feint) {
         if ((tile.isAsteroidField()
+                        && !tile.isZelianAsteroidField()
                         && !player.hasTech("amd")
                         && !player.hasTech("wavelength")
                         && !player.getRelics().contains("circletofthevoid"))

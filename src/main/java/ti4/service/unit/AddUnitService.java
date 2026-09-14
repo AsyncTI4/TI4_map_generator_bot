@@ -243,6 +243,10 @@ public class AddUnitService {
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
         }
+        if (unitKey.unitType() == UnitType.Monument) {
+            MonumentsService.syncKyroReliquaryAttachment(game, player);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
         if (!(event instanceof ButtonInteractionEvent buttonEvent)
                 || !buttonEvent.getComponentId().contains("place_")) {

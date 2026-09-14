@@ -56,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
 import ti4.draft.DraftBag;
@@ -1532,6 +1533,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     }
                 }
             }
+        }
+        if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
+            bonus++;
         }
 
         return bonus;

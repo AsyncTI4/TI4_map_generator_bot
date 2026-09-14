@@ -587,6 +587,22 @@ public final class FoWHelper {
             }
         }
 
+        if (forDistance && player != null && MonumentsService.isMonumentOnBoard(game, player, "nivyn_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "nivyn_monument");
+            Tile woundTile = game.getTileMap().values().stream()
+                    .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains("token_ds_wound.png"))
+                    .findFirst()
+                    .orElse(null);
+
+            if (monumentTile != null && woundTile != null) {
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.add(woundTile.getPosition());
+                } else if (position.equals(woundTile.getPosition())) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
+
         // If player has ghoti commander, is active player and has activated a system
         if (player != null
                 && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")

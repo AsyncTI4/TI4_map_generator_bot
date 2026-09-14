@@ -2036,6 +2036,23 @@ public final class Helper {
                         .append(neighborDiscount > 1 ? "s" : "");
             }
         }
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
+                Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
+
+                boolean productionIsInMonumentSystem = monumentTile != null
+                        && !producedUnits.isEmpty()
+                        && producedUnits.keySet().stream().anyMatch(producedUnit -> {
+                            String[] parts = producedUnit.split("_", 3);
+                            return parts.length == 3
+                                    && monumentTile.getPosition().equals(parts[1]);
+                        });
+
+                if (productionIsInMonumentSystem) {
+                    msg.append("\n-2 from Zha'Ren Foundry");
+                }
+            }
+        }
         return msg.toString();
     }
 
@@ -2634,6 +2651,23 @@ public final class Helper {
             }
             if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                 cost = Math.max(0, cost - 1);
+            }
+            if (game.isMonumentsMode()) {
+                if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
+                    Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
+
+                    boolean productionIsInMonumentSystem = monumentTile != null
+                            && !producedUnits.isEmpty()
+                            && producedUnits.keySet().stream().anyMatch(producedUnit -> {
+                                String[] parts = producedUnit.split("_", 3);
+                                return parts.length == 3
+                                        && monumentTile.getPosition().equals(parts[1]);
+                            });
+
+                    if (productionIsInMonumentSystem) {
+                        cost = Math.max(0, cost - 2);
+                    }
+                }
             }
             return cost;
         } else {

@@ -10,6 +10,7 @@ import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -26,6 +27,7 @@ class TransientGameInfoUpdater {
             VeylorUnitHandler.checkVeylorMech(game);
             VerydithLeadersHandler.checkVerydithCommander(game);
             DiscordantStarsHelper.checkUltimateAuthority(game);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
             TeHelperGeneral.checkTransientInfo(game);
             for (Player player : game.getRealPlayers()) {
                 CommanderUnlockCheckService.checkPlayer(player, "ta");

@@ -524,6 +524,10 @@ public class StartTurnService {
             if (MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
                 startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
             }
+            Button dawnstarHqButton = MonumentsDSButtonHandler.getDawnstarHqButton(game, player);
+            if (MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument") && dawnstarHqButton != null) {
+                startButtons.add(dawnstarHqButton);
+            }
             if (MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
                     && MonumentsDSButtonHandler.hasTwoReadiedCorePlanets(player, game)
                     && game.getLaws().size() > 0) {

@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -31,7 +32,9 @@ public class CheckDistanceHelper {
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
-        if (ButtonHelper.canMoveOutOfLockedSystems(player, game)) return true;
+        if (ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                || (game.isMonumentsMode() && MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)))
+            return true;
         return !CommandCounterHelper.hasCC(player, tile) || tile.getPosition().equalsIgnoreCase(game.getActiveSystem());
     }
 
@@ -88,6 +91,9 @@ public class CheckDistanceHelper {
             Map<String, Integer> distancesCopy = new HashMap<>(distances);
             for (String existingPosition : distancesCopy.keySet()) {
                 Tile tile = game.getTileByPosition(existingPosition);
+                if (MonumentsDSButtonHandler.blocksNivynMonumentMovement(game, player, tile)) {
+                    continue;
+                }
                 int num = 0;
                 int distance = i;
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
@@ -129,6 +135,7 @@ public class CheckDistanceHelper {
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
+                                    && !tile.isZelianAsteroidField()
                                     && player != null
                                     && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasTech("amd")
