@@ -54,6 +54,18 @@ For permissions, select "Administrator"
 Go to installation -> copy install link and open in your browser
 Add the bot to your server
 
+#### Local Database
+
+The bot stores data in PostgreSQL. With [Docker Desktop](https://www.docker.com/products/docker-desktop/) running, start a local database from the project root:
+
+```bash
+docker compose -f docker-compose.local.yml up -d
+```
+
+This matches the defaults in `src/main/resources/config/application.yml` (`localhost:5432`, database and user `tibot`, no password), so no extra environment variables are needed. Tables are created automatically the first time the bot starts. If port 5432 is already taken, set `POSTGRES_PORT=5433` before starting and point the bot at it with `POSTGRES_JDBC_URL=jdbc:postgresql://localhost:5433/tibot`.
+
+To query it: `docker exec -it tibot-postgres psql -U tibot -d tibot`. To stop it: `docker compose -f docker-compose.local.yml down` (add `-v` to delete the data too).
+
 ### JAVA, IntelliJ, VSCode, or other Java IDE
 
 The first time you attempt to Run/Debug in VSCode, it will ask you if you want it to create a launch configuration. Say yes, it should appear in the .vscode folder. Within the configurations section, add the "args" and "env" sections shown below. For VSCode, the file should look very similar to this:
