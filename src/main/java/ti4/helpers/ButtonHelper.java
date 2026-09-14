@@ -96,6 +96,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -5043,6 +5044,7 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             CrystellumLeadersHandler.addCrystellumAgentEndTurnButton(endButtons, game, player);
         }
+        endButtons.addAll(TkHelperGenomes.getEndOfTurnButtons(game, player));
 
         // OTHER stuff
         if (!player.hasAbility("arms_dealers")) {

@@ -839,7 +839,7 @@ public class StartTurnService {
                 startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
             }
 
-            startButtons.addAll(TkHelperGenomes.getStartOfTurnButtons(game, player, factionChecker));
+            startButtons.addAll(TkHelperGenomes.getStartOfTurnButtons(game, player));
         }
         if (player.hasTech("pa")
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {

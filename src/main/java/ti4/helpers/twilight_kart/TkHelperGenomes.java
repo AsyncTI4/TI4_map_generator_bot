@@ -4,7 +4,9 @@ import static ti4.helpers.ButtonHelperAgents.getYinAgentButtons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -14,10 +16,12 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @UtilityClass
 public class TkHelperGenomes {
@@ -25,6 +29,7 @@ public class TkHelperGenomes {
 
     private enum TkGenome {
         DEPLOYMENT,
+        SWARM,
         SPLITTING;
 
         static final String PREFIX = "tknova";
@@ -42,6 +47,20 @@ public class TkHelperGenomes {
             return StringUtils.capitalize(toString().toLowerCase()) + " Genome";
         }
 
+        TI4Emoji getEmoji() {
+            LeaderModel leaderModel = Mapper.getLeader(getId());
+            String faction = leaderModel != null ? leaderModel.getFaction() : "";
+            return FactionEmojis.getFactionIcon(faction);
+        }
+
+        Button getExhaustButton(Player player) {
+            if (!player.hasUnexhaustedLeader(getId())) {
+                return null;
+            }
+            return Buttons.gray(
+                    player.factionButtonChecker() + EXHAUST_AGENT + getId(), "Use " + getName(), getEmoji());
+        }
+
         static Optional<TkGenome> fromId(String id) {
             if (!id.startsWith(PREFIX) || !id.endsWith(SUFFIX)) {
                 return Optional.empty();
@@ -55,17 +74,18 @@ public class TkHelperGenomes {
         }
     }
 
-    public static List<Button> getStartOfTurnButtons(Game game, Player player, String factionChecker) {
-        List<Button> startButtons = new ArrayList<>();
+    public static List<Button> getStartOfTurnButtons(Game game, Player player) {
+        return Stream.of(TkGenome.DEPLOYMENT)
+                .map(genome -> genome.getExhaustButton(player))
+                .filter(Objects::nonNull)
+                .toList();
+    }
 
-        if ((player.hasUnexhaustedLeader(TkGenome.DEPLOYMENT.getId()))) {
-            startButtons.add(Buttons.gray(
-                    factionChecker + EXHAUST_AGENT + TkGenome.DEPLOYMENT.getId(),
-                    "Use " + TkGenome.DEPLOYMENT.getName(),
-                    FactionEmojis.Nomad));
-        }
-
-        return startButtons;
+    public static List<Button> getEndOfTurnButtons(Game game, Player player) {
+        return Stream.of(TkGenome.SWARM)
+                .map(genome -> genome.getExhaustButton(player))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public static List<Button> getGeneralCombatButtons(
@@ -106,6 +126,16 @@ public class TkHelperGenomes {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), exhaustText);
         switch (tkGenome) {
             case TkGenome.DEPLOYMENT -> ButtonHelper.resolveTransitDiodesStep1(game, player);
+
+            case TkGenome.SWARM -> {
+                String text = player.getRepresentation() + ", use buttons to drop 2 infantry on a planet.";
+                List<Button> buttons = new ArrayList<>(
+                        Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
+                if (!buttons.isEmpty()) {
+                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), text, buttons);
+            }
 
             case TkGenome.SPLITTING -> {
                 String[] args = rest.split("_");
