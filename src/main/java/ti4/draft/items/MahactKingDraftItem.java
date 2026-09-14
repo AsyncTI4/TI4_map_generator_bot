@@ -155,7 +155,7 @@ public class MahactKingDraftItem extends DraftItem {
         // Homebrew:
         if (game.isTkNovaCup()) {
             switch (game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option")) {
-                case "onePerColor" -> sources.add(ComponentSource.tk_nova_cup);
+                case "onePerColor", "unrestricted" -> sources.add(ComponentSource.tk_nova_cup);
                 case "onlyNova" -> {
                     sources.remove(ComponentSource.twilights_fall);
                     sources.add(ComponentSource.tk_nova_cup);

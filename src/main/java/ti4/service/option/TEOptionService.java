@@ -207,6 +207,8 @@ public class TEOptionService {
                 Which sets of Mahact Kings do you want to include in your game?
                 - **Both, but only 1 per Color (Default):** Include both sets. However, each color is only included once. \
                 (For each color, a coin is tossed to determine which set's king of that color is used.)
+                - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example, \
+                the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
                 - **Only Nova Kings:** Only include the 8 Kings added in the Nova Cup.
                 - **Only Vanilla King:** Only include the 8 original, official Kings from vanilla TF.
                 """;
@@ -216,11 +218,10 @@ public class TEOptionService {
                red vanilla king is picked, the red Nova Cup king can no longer be picked (and vice versa).
                - **Both, but draft Color first:** Include all 16 Kings, but only draft the color at first.
                After everyone has drafted a color, each player can choose which king of that color they want to play.
-               - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example,
-               the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
         */
         List<Map.Entry<String, String>> options = List.of(
                 Map.entry("onePerColor", "Both, but only 1 per Color (Default)"),
+                Map.entry("unrestricted", "Both, no restrictions"),
                 Map.entry("onlyNova", "Only Nova Kings"),
                 Map.entry("onlyVanilla", "Only Vanilla Kings"));
         List<Button> buttons = new ArrayList<>();
