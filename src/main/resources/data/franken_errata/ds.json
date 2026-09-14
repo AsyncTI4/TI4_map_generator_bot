@@ -854,5 +854,13 @@
             "ABILITY:paranoia"
         ],
         "source": "ds"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "zelian_flagship",
+        "optionalSwaps": [
+            "MONUMENT:zelian_monument"
+        ],
+        "source": "ds"
     }
 ]

@@ -844,6 +844,25 @@ public final class ButtonHelperTacticalAction {
                                             .getRepresentation()
                                     + " may be treated as having no planets during movement.");
                 }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "lizho_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "lizho_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", " + player.getRepresentationNoPing()
+                                    + " activated the system containing _Nightfall Fortress_. "
+                                    + "You may either remove 1 other player's token from this system, or gain 1 command token.",
+                            MonumentsDSButtonHandler.getNightfallButtons(player, monumentOwner, game, tile));
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "rhodun_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "rhodun_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", " + (player == monumentOwner ? " you " : player.getRepresentation())
+                                    + " activated the system containing _Vault of New Phrad_ and thus may flip it.",
+                            MonumentsDSButtonHandler.getVaultFlipButtons(monumentOwner));
+                }
             }
         }
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);

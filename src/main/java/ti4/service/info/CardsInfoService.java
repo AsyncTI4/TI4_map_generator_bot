@@ -82,6 +82,11 @@ public class CardsInfoService {
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
         }
+        if (MonumentsService.isMonumentOnBoard(game, player, "lanefir_monument")
+                && game.getStoredValue("lanefirMonumentUsed_" + player.getFaction())
+                        .isEmpty()) {
+            buttons.add(MonumentsDSButtonHandler.getForbiddenLibraryButton(player));
+        }
         if (game.isMonumentsMode()
                 && player.hasUnit("bluetf_monument")
                 && MonumentsService.isMonumentOnBoard(game, player, "bluetf_monument")) {
@@ -519,6 +524,9 @@ public class CardsInfoService {
             if (MonumentsService.isMonumentOnBoard(game, player, "edyn_monument")
                     && MonumentsService.isMonumentReady(game, player, "edyn_monument")) {
                 buttons.add(MonumentsDSButtonHandler.getTwilightThroneButton(player));
+            }
+            if (MonumentsService.hasMonument(game, player, "rhodun_monumentback")) {
+                buttons.add(MonumentsDSButtonHandler.getReliquatFlipButton(player));
             }
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));

@@ -272,8 +272,11 @@ public class ListTechService {
                     && !(player.hasTech("pa") || player.hasTech("absol_pa"))) {
                 continue;
             }
+            Planet unitHolder = game.getPlanetsInfo().get(planet);
+            if (unitHolder == null) {
+                continue;
+            }
             if (ButtonHelper.checkForTechSkips(game, planet)) {
-                Planet unitHolder = game.getPlanetsInfo().get(planet);
                 List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {

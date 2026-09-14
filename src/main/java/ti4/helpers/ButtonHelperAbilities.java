@@ -19,6 +19,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -45,6 +46,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
@@ -879,6 +881,13 @@ public final class ButtonHelperAbilities {
         int die = Integer.parseInt(buttonID.split("_")[1]);
         if ("no".equalsIgnoreCase(buttonID.split("_")[2])) {
             removeOmenDie(game, die);
+        }
+        if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "mykomentori_monument")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " may produce 1 fighter in the _Gravelord's Keep_ system without spending resources.",
+                    MonumentsDSButtonHandler.getGravelordProduceFighterButton(game, player));
         }
         String msg = player.getRepresentationUnfogged() + " used an **Omen** die with the number " + die + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

@@ -1636,6 +1636,7 @@ public class ButtonHelper {
         }
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
+                && !activeSystem.isZelianAsteroidField()
                 && !player.hasTech("amd")
                 && !player.hasTech("wavelength")
                 && !player.hasTech("absol_amd")
@@ -1647,6 +1648,7 @@ public class ButtonHelper {
         }
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
+                && !activeSystem.isZelianAsteroidField()
                 && ThreadLocalRandom.current().nextInt(1, 11) == 10) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -4416,6 +4418,11 @@ public class ButtonHelper {
         if (player.hasUnlockedBreakthrough("vyserixbt")) {
             fightersIgnored += 3 * totalPdsInSystem;
         }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, player, "mykomentori_monument")
+                && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "mykomentori_monument", tile)) {
+            fightersIgnored += 3;
+        }
         int ignoredFs = 0;
         int xytherisPdsInSpace = 0;
 
@@ -5600,6 +5607,17 @@ public class ButtonHelper {
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
+        if (game.isMonumentsMode()) {
+            if (game.getRealPlayers().stream()
+                    .anyMatch(monumentOwner -> monumentOwner != player
+                            && MonumentsService.isMonumentOnBoard(game, monumentOwner, "rhodun_monumentback")
+                            && tile == MonumentsService.getMonumentTile(game, monumentOwner, "rhodun_monumentback")
+                            && game.getTileMap().values().stream()
+                                    .anyMatch(fractureTile ->
+                                            fractureTile.isFracture() && fractureTile.containsPlayersUnits(player)))) {
+                return false;
+            }
+        }
         if (TransitRiderLLButtonHandler.isActive(game, player)
                 && !getOtherPlayersWithUnitsInTheSystem(player, game, tile).isEmpty()) {
             return false;

@@ -185,6 +185,7 @@ public class DestroyUnitService {
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
         TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
         MonumentsDSButtonHandler.resolveKortaliMonument(event, game, units);
+        MonumentsDSButtonHandler.offerKyroReliquaryRelocation(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }

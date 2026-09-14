@@ -25,6 +25,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.MonumentsAgendaService;
+import ti4.service.game.MonumentsService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 
 @UtilityClass
@@ -226,6 +227,18 @@ public class RemoveUnitService {
                 .map(removedUnit -> removedUnit.getPlayer(game))
                 .distinct()
                 .forEach(player -> ThronesUnitHandler.syncAurelionStation(game, player));
+
+        allUnitsRemoved.stream()
+                .filter(removedUnit -> removedUnit.unitKey().unitType() == UnitType.Monument)
+                .map(removedUnit -> removedUnit.getPlayer(game))
+                .filter(Objects::nonNull)
+                .distinct()
+                .forEach(player -> MonumentsService.syncKyroReliquaryAttachment(game, player));
+
+        if (allUnitsRemoved.stream()
+                .anyMatch(removedUnit -> removedUnit.unitKey().unitType() == UnitType.Monument)) {
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
         tile.getUnitHolders()
                 .values()

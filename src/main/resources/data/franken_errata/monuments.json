@@ -101,5 +101,11 @@
         "itemId": "kaltrim_monument",
         "undraftable": true,
         "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "zelian_monument",
+        "undraftable": true,
+        "source": "monuments"
     }
 ]
