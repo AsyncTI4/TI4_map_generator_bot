@@ -49,6 +49,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -851,6 +852,8 @@ public class StartTurnService {
             if (player.hasUnexhaustedLeader("oblivionagent")) {
                 startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
             }
+
+            startButtons.addAll(TkHelperGenomes.getStartOfTurnButtons(game, player));
         }
         if (player.hasTech("pa")
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {

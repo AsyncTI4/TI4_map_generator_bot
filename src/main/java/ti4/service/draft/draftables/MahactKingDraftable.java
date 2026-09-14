@@ -34,7 +34,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
     public static final DraftableType TYPE = DraftableType.of("King");
 
-    private static String switchFactionSet(String faction) {
+    public static String switchFactionSet(String faction) {
         return faction.contains("tf") ? faction.replace("tf", "tknova") : faction.replace("tknova", "tf");
     }
 
