@@ -38,6 +38,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAgents;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -1623,6 +1624,8 @@ public final class ButtonHelperAgents {
             }
             TaLeadersHandler.resolveTaAgentTarget(game, target);
         }
+
+        TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
