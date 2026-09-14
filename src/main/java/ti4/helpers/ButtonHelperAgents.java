@@ -2774,7 +2774,7 @@ public final class ButtonHelperAgents {
         return buttons;
     }
 
-    private static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
+    public static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
         List<Button> buttons = new ArrayList<>();
         Tile tile = game.getTileByPosition(pos);
         String placePrefix = "placeOneNDone_skipbuild";
