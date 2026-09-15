@@ -501,7 +501,7 @@ public class WebPlayerArea {
             Map<String, Map<String, Integer>> unitsByFaction = new HashMap<>();
             for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
                 String unitId = unitKey.asyncID();
-                if(unitKey.unitType() == Units.UnitType.Infantry || unitKey.unitType() == Units.UnitType.Fighter) {
+                if (unitKey.unitType() == Units.UnitType.Infantry || unitKey.unitType() == Units.UnitType.Fighter) {
                     // Skip infantry and fighters as they are not counted towards unit counts when captured
                     continue;
                 }
