@@ -49,6 +49,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -226,6 +227,11 @@ public class StartTurnService {
         }
         if (player.hasAbility("planetary_reconfiguration")) {
             TaAbilityHandler.sendPlanetaryReconfigurationStatus(player, game);
+        }
+        if (game.isMonumentsMode()) {
+            for (Player affectedPlayer : game.getRealPlayers()) {
+                game.removeStoredValue("kjalengardMonumentUsed_" + affectedPlayer.getFaction());
+            }
         }
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
@@ -512,13 +518,22 @@ public class StartTurnService {
                 && MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
             startButtons.add(TwilightsFallMonumentsButtonHandler.getOrangeTfMonumentButton(player));
         }
-        if (!doneActionThisTurn
-                && game.isMonumentsMode()
-                && MonumentsService.isMonumentOnBoard(game, player, "nomad_monument")) {
-            startButtons.add(MonumentsPoKButtonHandler.getLodestarButton(player));
-        }
-        if (!doneActionThisTurn && MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
-            startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
+        if (!doneActionThisTurn && game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "nomad_monument")) {
+                startButtons.add(MonumentsPoKButtonHandler.getLodestarButton(player));
+            }
+            if (MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
+                startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
+            }
+            Button dawnstarHqButton = MonumentsDSButtonHandler.getDawnstarHqButton(game, player);
+            if (MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument") && dawnstarHqButton != null) {
+                startButtons.add(dawnstarHqButton);
+            }
+            if (MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
+                    && MonumentsDSButtonHandler.hasTwoReadiedCorePlanets(player, game)
+                    && game.getLaws().size() > 0) {
+                startButtons.add(MonumentsDSButtonHandler.getVerdantHaloButton(player));
+            }
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
@@ -841,6 +856,8 @@ public class StartTurnService {
             if (player.hasUnexhaustedLeader("oblivionagent")) {
                 startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
             }
+
+            startButtons.addAll(TkHelperGenomes.getStartOfTurnButtons(game, player));
         }
         if (player.hasTech("pa")
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {

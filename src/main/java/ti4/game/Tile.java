@@ -557,8 +557,13 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAsteroidField() {
-        if (hasAnyToken("token_asteroids_async.png")) return true;
+        if (hasAnyToken("token_asteroids_async.png", "token_asteroids_zelian.png")) return true;
         return getTileModel().isAsteroidField();
+    }
+
+    @JsonIgnore
+    public boolean isZelianAsteroidField() {
+        return hasAnyToken("token_asteroids_zelian.png");
     }
 
     @JsonIgnore

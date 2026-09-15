@@ -224,6 +224,25 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player);
         String message = player.getRepresentationUnfogged() + ", please choose the planets you wish to ready.";
 
+        if (game.isMonumentsMode()) {
+            if (scModel != null
+                    && scModel.usesAutomationForSCID("pok2diplomacy")
+                    && game.getPlayedSCs().contains(scModel.getInitiative())
+                    && MonumentsService.isMonumentOnBoard(game, player, "olradin_monument")) {
+                Planet monumentPlanet = MonumentsService.getPlayerMonumentPlanet(game, player);
+                if (monumentPlanet != null) {
+                    player.refreshPlanet(monumentPlanet.getName());
+
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " readied "
+                                    + monumentPlanet.getRepresentation(game)
+                                    + " due to _Diplomatic Enclave_.");
+                }
+            }
+        }
+
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
@@ -498,6 +517,7 @@ public final class ButtonHelperSCs {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
+        ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
     }
 
     @ButtonHandler("sc_refresh_and_wash")
@@ -628,6 +648,9 @@ public final class ButtonHelperSCs {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, commoditiesTotal);
+        if (commoditiesTotal > 0) {
+            ButtonHelperStats.offerBountyBrokerageAfterTradeWash(game, player);
+        }
     }
 
     @ButtonHandler("anarchy7Build_")

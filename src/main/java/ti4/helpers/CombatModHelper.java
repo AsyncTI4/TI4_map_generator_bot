@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.MonumentsService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -717,6 +719,27 @@ public class CombatModHelper {
                 }
             }
             case "active_player" -> meetsCondition = game.getActivePlayer() == player;
+            case "rhodun_monument_combat" -> {
+                boolean opponentHasUnitUpgrade = opponent != null
+                        && opponent.getTechs().stream()
+                                .map(Mapper::getTech)
+                                .filter(Objects::nonNull)
+                                .anyMatch(TechnologyModel::isUnitUpgrade);
+
+                meetsCondition = opponentHasUnitUpgrade
+                        && MonumentsService.isMonumentOnBoard(game, player, "rhodun_monument")
+                        && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "rhodun_monument", tile);
+            }
+            case "rhodun_monumentback_combat" -> {
+                boolean opponentHasUnitsInFracture = opponent != null
+                        && game.getTileMap().values().stream()
+                                .anyMatch(fractureTile ->
+                                        fractureTile.isFracture() && fractureTile.containsPlayersUnits(opponent));
+
+                meetsCondition = opponentHasUnitsInFracture
+                        && MonumentsService.isMonumentOnBoard(game, player, "rhodun_monumentback")
+                        && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "rhodun_monumentback", tile);
+            }
             default -> meetsCondition = true;
         }
         return meetsCondition;

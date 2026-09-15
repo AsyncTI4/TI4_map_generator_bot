@@ -31,6 +31,7 @@ import ti4.model.UnitModel;
 public class MonumentsService {
     private static final String EXHAUSTED_MONUMENT_PREFIX = "exhaustedMonument_";
     private static final String WINNU_MONUMENT_TRADE_GOODS = "winnuMonumentTradeGoods_";
+    private static final String KYRO_RELIQUARY_ATTACHMENT = "attachment_kyro_monument.png";
 
     public static int getWinnuMonumentTradeGoodCount(Game game, Player player) {
         if (game == null || player == null || !game.isMonumentsMode()) {
@@ -149,6 +150,15 @@ public class MonumentsService {
         return getFactionMonument(player.getFactionModel());
     }
 
+    public static boolean hasMonument(Game game, Player player, String monumentId) {
+        return game != null
+                && player != null
+                && game.isMonumentsMode()
+                && (player.hasUnit(monumentId)
+                        || NekroMonumentService.getCopiedMonuments(game, player).stream()
+                                .anyMatch(monument -> monumentId.equals(monument.getId())));
+    }
+
     public static boolean hasMonumentOnBoard(Game game, Player player) {
         if (game == null || player == null || !game.isMonumentsMode()) {
             return false;
@@ -261,6 +271,55 @@ public class MonumentsService {
                 .orElse(null);
     }
 
+    public static boolean hasKyroReliquary(Game game, Player player) {
+        return game != null
+                && player != null
+                && game.isMonumentsMode()
+                && (player.hasUnit("kyro_monument")
+                        || NekroMonumentService.getCopiedMonuments(game, player).stream()
+                                .anyMatch(monument -> "kyro_monument".equals(monument.getId())));
+    }
+
+    public static void syncKyroReliquaryAttachment(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return;
+        }
+        boolean hasKyroReliquary = hasKyroReliquary(game, player);
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                boolean hasKyroMonument = hasKyroReliquary
+                        && planet.getUnitKeysForPlayer(player).stream()
+                                .filter(unitKey -> unitKey.unitType() == UnitType.Monument)
+                                .map(player::getUnitFromUnitKey)
+                                .anyMatch(unit -> unit != null
+                                        && ("kyro_monument".equals(unit.getId())
+                                                || ("nekro_monument".equals(unit.getId())
+                                                        && NekroMonumentService.hasCopiedMonument(
+                                                                game, player, "kyro_monument"))));
+                if (hasKyroMonument) {
+                    planet.addToken(KYRO_RELIQUARY_ATTACHMENT);
+                } else {
+                    planet.removeToken(KYRO_RELIQUARY_ATTACHMENT);
+                }
+            }
+        }
+    }
+
+    public static void syncZelianAsteroidFieldToken(Game game) {
+        if (game == null || !game.isMonumentsMode()) {
+            return;
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            boolean hasZelianMonument = game.getRealPlayers().stream()
+                    .anyMatch(player -> tile == getMonumentTile(game, player, "zelian_monument"));
+            if (hasZelianMonument) {
+                tile.getSpaceUnitHolder().addToken("token_asteroids_zelian.png");
+            } else {
+                tile.getSpaceUnitHolder().removeToken("token_asteroids_zelian.png");
+            }
+        }
+    }
+
     public static Player getMonumentOwner(Game game, String monumentId) {
         UnitModel monument = Mapper.getUnit(monumentId);
         if (game == null
@@ -288,6 +347,12 @@ public class MonumentsService {
         return NekroMonumentService.hasCopiedMonument(game, player, monumentId)
                 ? getMonumentTile(game, player, "nekro_monument")
                 : null;
+    }
+
+    public static boolean treatsSystemAsGhotiAnchorpointFrontier(Game game, Player player, Tile tile) {
+        return tile != null
+                && isMonumentOnBoard(game, player, "ghoti_monument")
+                && tile == getMonumentTile(game, player, "ghoti_monument");
     }
 
     public static boolean isInOrAdjacentToMonumentSystem(Game game, Player player, String monumentId, Tile tile) {

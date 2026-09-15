@@ -56,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -78,6 +79,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
@@ -89,6 +91,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -555,6 +558,30 @@ public class StartCombatService {
                         player1.getRepresentation()
                                 + ", your opponent has no action cards to play, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
+            if (game.isMonumentsMode()) {
+                Planet player1MonumentPlanet = MonumentsService.getPlayerMonumentPlanet(game, player1);
+                if (isGroundCombat
+                        && MonumentsService.isMonumentOnBoard(game, player1, "mirveda_monument")
+                        && player1MonumentPlanet != null
+                        && player1MonumentPlanet.getName().equals(unitHolderName)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + " your opponent has _Ado Citadel_ on this planet and thus is the only player to make combat rolls during the first round of combat."
+                                    + "\n-# This is not automated.");
+                }
+                Planet player2MonumentPlanet = MonumentsService.getPlayerMonumentPlanet(game, player2);
+                if (isGroundCombat
+                        && MonumentsService.isMonumentOnBoard(game, player2, "mirveda_monument")
+                        && player2MonumentPlanet != null
+                        && player2MonumentPlanet.getName().equals(unitHolderName)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + " your opponent has _Ado Citadel_ on this planet and thus is the only player to make combat rolls during the first round of combat."
+                                    + "\n-# This is not automated.");
+                }
+            }
             String ms2 = StartTurnService.getMissedSCFollowsText(game, player1);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(threadChannel, ms2);
@@ -865,6 +892,7 @@ public class StartCombatService {
         }
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
+        MonumentsDSButtonHandler.sendPerditionArrayReminder(threadChannel, game, tile, activePlayer);
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 if (ButtonHelper.doesPlayerHaveFSHere("argent_flagship", player, tile)) {
@@ -1528,6 +1556,7 @@ public class StartCombatService {
         if ("ground".equalsIgnoreCase(spaceOrGround)) {
             TwilightsFallMonumentsButtonHandler.addGreenTfMonumentButtons(buttons, game, tile, unitHolderName);
             TwilightsFallMonumentsButtonHandler.addRedTfMonumentButtons(buttons, game, tile, unitHolderName);
+            MonumentsDSButtonHandler.addDawnstarHqGroundCombatButton(buttons, game, tile, unitHolderName);
         }
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for combat.", buttons);
     }
@@ -1750,6 +1779,9 @@ public class StartCombatService {
                                 + "Yin Agent",
                         FactionEmojis.Yin));
             }
+
+            buttons.addAll(TkHelperGenomes.getGeneralCombatButtons(game, pos, p1, p2, agentHolder, factionChecker));
+
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())
                     && agentHolder.hasUnexhaustedLeader("ponthousagent")) {
@@ -2394,6 +2426,18 @@ public class StartCombatService {
                     factionChecker + "kortaliCommanderBlock_hm",
                     "Block with Kortali Commander",
                     FactionEmojis.kortali));
+        }
+        if (game.isMonumentsMode()) {
+            MonumentsDSButtonHandler.addKjalengardMonumentButton(buttons, game, tile, p1, p2);
+            if (isSpaceCombat) {
+                for (Player monumentOwner : game.getRealPlayers()) {
+                    if (MonumentsService.isMonumentReady(game, monumentOwner, "vaylerian_monument")
+                            && MonumentsService.isInOrAdjacentToMonumentSystem(
+                                    game, monumentOwner, "vaylerian_monument", tile)) {
+                        buttons.add(MonumentsDSButtonHandler.getAylorButton(monumentOwner, tile));
+                    }
+                }
+            }
         }
         for (UnitHolder unitH : tile.getUnitHolders().values()) {
             String nameOfHolder = "Space";

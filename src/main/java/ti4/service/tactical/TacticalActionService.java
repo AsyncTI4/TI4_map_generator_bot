@@ -429,6 +429,7 @@ public class TacticalActionService {
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
                 out.add(Buttons.green(

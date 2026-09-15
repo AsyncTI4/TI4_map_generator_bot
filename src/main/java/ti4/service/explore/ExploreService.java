@@ -1541,8 +1541,11 @@ public class ExploreService {
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename) || force) {
-            if (space.getTokenList().contains(frontierFilename) && !force) {
+        boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
+        boolean hasGhotiAnchorpointFrontier =
+                MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile);
+        if (hasFrontierToken || hasGhotiAnchorpointFrontier || force) {
+            if (hasFrontierToken && !force) {
                 space.removeToken(frontierFilename);
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
@@ -1566,8 +1569,13 @@ public class ExploreService {
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename)) {
-            space.removeToken(frontierFilename);
+        boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
+        boolean hasGhotiAnchorpointFrontier =
+                MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile);
+        if (hasFrontierToken || hasGhotiAnchorpointFrontier) {
+            if (hasFrontierToken) {
+                space.removeToken(frontierFilename);
+            }
             String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier
                     + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
