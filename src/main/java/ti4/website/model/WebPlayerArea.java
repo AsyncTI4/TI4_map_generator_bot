@@ -526,10 +526,6 @@ public class WebPlayerArea {
         }
         webPlayerArea.nombox = nomboxData;
 
-        System.out.println("WebPlayerArea for player " + player.getColor() + ": " + webPlayerArea);
-        System.out.println("unitcount for player " + player.getColor() + ": " + webPlayerArea.getUnitCounts());
-        System.out.println("nombox for player " + player.getColor() + ": " + webPlayerArea.getNombox());
-
         if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             webPlayerArea.mahactEdict = player.getMahactCC();
         } else {
