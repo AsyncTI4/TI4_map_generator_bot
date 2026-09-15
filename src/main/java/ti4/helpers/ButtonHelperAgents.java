@@ -38,6 +38,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAgents;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -617,6 +618,7 @@ public final class ButtonHelperAgents {
         if (agent.contains("_")) {
             agent = agent.substring(0, agent.indexOf('_'));
         }
+        // Leader playerLeader = player.getLeaderByIdPreferReadied(agent).orElse(null);
         Leader playerLeader = player.getLeader(agent).orElse(null);
         if (playerLeader == null) {
             return;
@@ -1623,6 +1625,8 @@ public final class ButtonHelperAgents {
             }
             TaLeadersHandler.resolveTaAgentTarget(game, target);
         }
+
+        TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
@@ -2773,7 +2777,7 @@ public final class ButtonHelperAgents {
         return buttons;
     }
 
-    private static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
+    public static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
         List<Button> buttons = new ArrayList<>();
         Tile tile = game.getTileByPosition(pos);
         String placePrefix = "placeOneNDone_skipbuild";

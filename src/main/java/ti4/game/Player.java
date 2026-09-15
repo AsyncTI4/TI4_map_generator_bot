@@ -1923,6 +1923,55 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return AFKService.userIsAFK(getUserID());
     }
 
+    /**
+     * Gets a readied leader with the specified ID.
+     * If none is found, gets a suitable alternative instead.
+     * If no suitable alternative is found either, returns an empty Optional
+     * (For example, a suitable alternative could be a yssaril agent
+     * or an exhausted leader with the specified ID.)
+     * @param leaderId ID (Alias) of the leader to search for
+     * @return The found leader with that ID (or suitable alternative)
+     */
+    public Optional<Leader> getLeaderByIdPreferReadied(String leaderId) {
+        Leader exhaustedFallbackLeader = null;
+        for (Leader leader : leaders) {
+            if (leader.getId().equalsIgnoreCase(leaderId)) {
+                if (!leader.isExhausted()) {
+                    return Optional.of(leader);
+                }
+                if (exhaustedFallbackLeader == null) {
+                    exhaustedFallbackLeader = leader;
+                }
+            }
+        }
+
+        if (leaderId.contains("keleresagent")
+                && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
+            // Return Dummy agent so that the Optional has some readied agent
+            return Optional.of(new Leader("keleresagent", "agent"));
+        }
+        if (leaderId.contains("agent")) {
+            for (Leader leader : leaders) {
+                if ("yssarilagent".equals(leader.getId())) {
+                    if (!leader.isExhausted()) {
+                        return Optional.of(leader);
+                    }
+                    if (exhaustedFallbackLeader == null) {
+                        exhaustedFallbackLeader = leader;
+                    }
+                }
+            }
+        }
+
+        return Optional.ofNullable(exhaustedFallbackLeader);
+    }
+
+    // public boolean hasUnexhaustedLeader(String leaderId) {
+    //     return getLeaderByIdPreferReadied(leaderId)
+    //             .filter(Predicate.not(Leader::isExhausted))
+    //             .isPresent();
+    // }
+
     public boolean hasUnexhaustedLeader(String leaderId) {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);

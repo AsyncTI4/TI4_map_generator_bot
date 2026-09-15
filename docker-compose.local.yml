@@ -1,0 +1,28 @@
+# Local development database. Matches the defaults in src/main/resources/config/application.yml,
+# so the bot connects without setting any POSTGRES_* environment variables.
+#
+#   Start:  docker compose -f docker-compose.local.yml up -d
+#   Stop:   docker compose -f docker-compose.local.yml down
+#   Wipe:   docker compose -f docker-compose.local.yml down -v
+services:
+  postgres:
+    image: postgres:16
+    container_name: tibot-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: tibot
+      POSTGRES_USER: tibot
+      # Local only: no password required
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - tibot-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tibot -d tibot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  tibot-pgdata:

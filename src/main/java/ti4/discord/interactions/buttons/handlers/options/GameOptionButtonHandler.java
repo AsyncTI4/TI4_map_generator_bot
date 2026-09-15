@@ -46,6 +46,7 @@ final class GameOptionButtonHandler {
     @ButtonHandler("disableAidReacts")
     public static void disableAidReact(ButtonInteractionEvent event, Game game) {
         game.setBotFactionReacts(false);
+        game.setBotColorReacts(false);
         game.setBotStratReacts(false);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "Reaction icons have been disabled. Use `/game options` to change this.");

@@ -2,7 +2,10 @@ package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
@@ -13,6 +16,7 @@ import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
+import ti4.service.draft.draftables.MahactKingDraftable;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
 
@@ -116,6 +120,16 @@ public class MahactKingDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(Game game) {
         List<DraftItem> allItems = buildAllItems(game);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MAHACTKING);
+        if (game.isTkNovaCup() && "onePerColor".equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
+            List<DraftItem> output = new ArrayList<>();
+            for (DraftItem item : allItems) {
+                String id = MahactKingDraftable.switchFactionSet(item.getItemId());
+                if (output.stream().map(DraftItem::getItemId).noneMatch(id::equals)) {
+                    output.add(item);
+                }
+            }
+            return output;
+        }
         return allItems;
     }
 
@@ -130,26 +144,28 @@ public class MahactKingDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllItems(Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        List<ComponentSource> sources;
+        return new ArrayList<>(getAllFactions(game)
+                .map(king -> generate(DraftCategory.MAHACTKING, king.getAlias()))
+                .toList());
+    }
+
+    public static Stream<FactionModel> getAllFactions(Game game) {
+        Set<ComponentSource> sources = new HashSet<>(Set.of(ComponentSource.twilights_fall));
+
+        // Homebrew:
         if (game.isTkNovaCup()) {
-            sources = switch (game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option")) {
-                case "onePerColor" -> List.of(ComponentSource.twilights_fall, ComponentSource.tk_nova_cup);
-                case "onlyNova" -> List.of(ComponentSource.tk_nova_cup);
-                default -> List.of(ComponentSource.twilights_fall);
-            };
-        } else {
-            sources = List.of(ComponentSource.twilights_fall);
-        }
-        if (game.isTfBr()) {
-            sources = new ArrayList<>(sources);
-            sources.add(ComponentSource.tf_br);
-        }
-        for (FactionModel faction : Mapper.getFactions().values()) {
-            if (sources.contains(faction.getSource())) {
-                allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
+            switch (game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option")) {
+                case "onePerColor", "unrestricted" -> sources.add(ComponentSource.tk_nova_cup);
+                case "onlyNova" -> {
+                    sources.remove(ComponentSource.twilights_fall);
+                    sources.add(ComponentSource.tk_nova_cup);
+                }
             }
         }
-        return allItems;
+        if (game.isTfBr()) {
+            sources.add(ComponentSource.tf_br);
+        }
+
+        return Mapper.getFactions().values().stream().filter(f -> sources.contains(f.getSource()));
     }
 }

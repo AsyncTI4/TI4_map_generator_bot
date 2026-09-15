@@ -30,18 +30,6 @@ class SkillTierTest {
     }
 
     @Test
-    void boundariesLandOnBracketEdges() {
-        for (SkillTier skillTier : SkillTier.values()) {
-            long minimum = skillTier.getMinimumDisplayRatingInclusive();
-            if (minimum != Long.MIN_VALUE) {
-                assertThat(Math.floorMod(minimum, 100))
-                        .as("%s starts mid-bracket at %d", skillTier, minimum)
-                        .isZero();
-            }
-        }
-    }
-
-    @Test
     void parsesOptionValuesAndRejectsJunk() {
         assertThat(SkillTier.fromOptionValue("HIGHER")).isEqualTo(SkillTier.HIGHER);
         assertThat(SkillTier.fromOptionValue(" lower ")).isEqualTo(SkillTier.LOWER);

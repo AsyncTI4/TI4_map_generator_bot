@@ -23,7 +23,7 @@ class TrueSkillMatchmakingRatingService {
 
     private static final FactorGraphTrueSkillCalculator CALCULATOR = new FactorGraphTrueSkillCalculator();
 
-    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
+    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.7;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
 
