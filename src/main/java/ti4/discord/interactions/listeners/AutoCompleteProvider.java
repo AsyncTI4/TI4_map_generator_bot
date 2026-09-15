@@ -738,12 +738,16 @@ class AutoCompleteProvider {
                 List<String> relicDeck =
                         Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
                 List<String> tableRelics = new ArrayList<>(relicDeck);
-                for (Player player : game.getRealPlayers()) {
-                    for (String relic : player.getRelics()) {
-                        if (Mapper.getRelic(relic) != null
-                                && Mapper.getRelic(relic).isFakeRelic()
-                                && !tableRelics.contains(relic)) {
-                            tableRelics.add(relic);
+                boolean fogRestricted = game.isFowMode()
+                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+                if (!fogRestricted) {
+                    for (Player player : game.getRealPlayers()) {
+                        for (String relic : player.getRelics()) {
+                            if (Mapper.getRelic(relic) != null
+                                    && Mapper.getRelic(relic).isFakeRelic()
+                                    && !tableRelics.contains(relic)) {
+                                tableRelics.add(relic);
+                            }
                         }
                     }
                 }
@@ -866,10 +870,13 @@ class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, TechnologyModel> techs = Mapper.getTechs().entrySet().stream()
-                        .filter(entry ->
-                                game != null && game.getTechnologyDeck().contains(entry.getKey()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                boolean fogRestricted = game.isFowMode()
+                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+                Map<String, TechnologyModel> techs = fogRestricted
+                        ? Mapper.getTechs()
+                        : Mapper.getTechs().entrySet().stream()
+                                .filter(entry -> game.getTechnologyDeck().contains(entry.getKey()))
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
                 List<Command.Choice> options = techs.entrySet().stream()
                         .filter(value ->
@@ -887,22 +894,28 @@ class AutoCompleteProvider {
 
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Set<BreakthroughModel> btSet = game.getPlayers().values().stream()
-                        .flatMap(p -> p.getBreakthroughIDs().stream())
-                        .map(Mapper::getBreakthrough)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
 
-                boolean addAllOpt = false;
-                for (Player p : game.getPlayers().values()) {
-                    if (p.getBreakthroughIDs().size() > 1) {
-                        addAllOpt = true;
-                        break;
-                    }
-                }
-                if (Constants.FRANKEN.equals(event.getName())) {
+                boolean fogRestricted = game.isFowMode()
+                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+                Set<BreakthroughModel> btSet;
+                boolean addAllOpt;
+                if (Constants.FRANKEN.equals(event.getName()) || fogRestricted) {
                     btSet = new HashSet<>(Mapper.getBreakthroughs().values());
                     addAllOpt = false;
+                } else {
+                    btSet = game.getPlayers().values().stream()
+                            .flatMap(p -> p.getBreakthroughIDs().stream())
+                            .map(Mapper::getBreakthrough)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toSet());
+
+                    addAllOpt = false;
+                    for (Player p : game.getPlayers().values()) {
+                        if (p.getBreakthroughIDs().size() > 1) {
+                            addAllOpt = true;
+                            break;
+                        }
+                    }
                 }
                 if (Constants.BREAKTHROUGH_SET_TG.equalsIgnoreCase(subcommandName)) {
                     addAllOpt = false;
