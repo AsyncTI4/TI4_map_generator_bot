@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -101,6 +102,8 @@ public class EndTurnService {
         AeternaUnitsHandler.clearCryptActionState(game);
         AeternaUnitsHandler.clearGraveyardActionState(game);
         RevenantLeadersHandler.clearPurpleLeaderActionState(game);
+        MonumentsDSButtonHandler.clearForbiddenLibraryActionState(game, player);
+        MonumentsDSButtonHandler.clearMirrorforgeActionState(game, player);
         if (player.hasAbility("phantom_energy")) {
             TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }

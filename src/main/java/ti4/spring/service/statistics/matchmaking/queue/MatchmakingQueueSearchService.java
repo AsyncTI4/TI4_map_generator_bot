@@ -69,6 +69,16 @@ public class MatchmakingQueueSearchService {
                         QueuedGameJoinValidator.findJoinBlocker(toCriteria(search), joiningUserId, existingMemberIds));
     }
 
+    public Optional<String> findLaunchBlocker(String threadId, int rosterSize) {
+        if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
+        return repository.findByThreadId(threadId).flatMap(search -> {
+            List<String> playerCounts = split(search.getPlayerCounts());
+            if (playerCounts.isEmpty() || playerCounts.contains(String.valueOf(rosterSize))) return Optional.empty();
+            return Optional.of("it is queued for **" + String.join(" or ", playerCounts) + "** players and has "
+                    + rosterSize + " signed up.");
+        });
+    }
+
     @Transactional
     public void updateForRoster(String threadId, List<String> memberIds) {
         if (DatabasePersistenceGate.isDisabled()) return;

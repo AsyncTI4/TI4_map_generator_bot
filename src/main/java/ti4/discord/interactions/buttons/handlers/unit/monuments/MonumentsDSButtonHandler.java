@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -14,27 +15,36 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
+import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
+import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
@@ -66,6 +76,649 @@ public class MonumentsDSButtonHandler {
     private static final String SHOW_KOLUME_MONUMENT_UNITS = "kolumeCannon_";
     private static final String SELECT_KOLUME_MONUMENT_TARGET = "kolumeTarget_";
     private static final String FIRE_KOLUME_MONUMENT_SPACE_CANNON = "kolumeFire_";
+    private static final String PLACE_KYRO_RELIQUARY = "placeKyroReliquary_";
+    private static final String USE_FORBIDDEN_LIBRARY = "useForbiddenLibrary";
+    private static final String SELECT_FORBIDDEN_LIBRARY_PLANET = "selectForbiddenLibraryPlanet_";
+    private static final String FORBIDDEN_LIBRARY_USED = "lanefirMonumentUsed_";
+    private static final String REMOVE_NIGHTFALL_CC = "removeNightfallCC_";
+    private static final String GAIN_NIGHTFALL_CC = "gainNightfallCC";
+    private static final String USE_MIRRORFORGE = "useMirrorforge";
+    private static final String SELECT_MIRRORFORGE_SOURCE = "selectMirrorforgeSource_";
+    private static final String MOVE_MIRRORFORGE_SHIP = "moveMirrorforgeShip_";
+    private static final String MIRRORFORGE_MOVEMENT = "mortheusMonumentMovement_";
+    private static final String FLIP_VAULT = "flipVaultToReliquat";
+    private static final String FLIP_RELIQUAT = "flipReliquatToVault";
+    private static final String USE_DAWNSTAR_HQ = "useDawnstarHq";
+    private static final String DESTROY_DAWNSTAR_UNIT = "destroyDawnstarUnit_";
+    private static final String RESOLVE_BB = "resolveBountyBrokerage_";
+    private static final String DRAW_AYLOR_AC = "drawAylorAc";
+
+    // Aylor Raider Hoard
+    public static Button getAylorButton(Player player, Tile tile) {
+        return Buttons.gray(
+                player.factionButtonChecker() + DRAW_AYLOR_AC + tile.getPosition(),
+                "Draw 1 AC (On TG Spend)",
+                FactionEmojis.vaylerian);
+    }
+
+    @ButtonHandler(DRAW_AYLOR_AC)
+    public static void drawAylorAc(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.substring(DRAW_AYLOR_AC.length()));
+        if (tile == null
+                || !game.isMonumentsMode()
+                || !MonumentsService.isMonumentReady(game, player, "vaylerian_monument")
+                || !MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "vaylerian_monument", tile)) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+
+        MonumentsService.exhaustMonument(game, player, "vaylerian_monument");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + " exhausted _Aylor Raider Hoard_ to draw an action card.");
+        ActionCardHelper.drawActionCards(player, 1);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    // Perdition Array
+    public static boolean hasVaylerianMonumentCommodityBonus(Game game, Player player) {
+        return game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, player, "vaylerian_monument")
+                && MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
+                        .anyMatch(tile -> game.getRealPlayers().stream()
+                                .anyMatch(otherPlayer -> otherPlayer != player
+                                        && FoWHelper.playerHasActualShipsInSystem(otherPlayer, tile)));
+    }
+
+    public static void sendPerditionArrayReminder(MessageChannel channel, Game game, Tile tile, Player opponent) {
+        List<Player> monumentOwners = game.getRealPlayers().stream()
+                .filter(player -> player != opponent)
+                .filter(player -> MonumentsService.isMonumentOnBoard(game, player, "veldyr_monument"))
+                .filter(player -> tile == MonumentsService.getMonumentTile(game, player, "veldyr_monument"))
+                .toList();
+        if (monumentOwners.isEmpty()) {
+            return;
+        }
+        MessageHelper.sendMessageToChannel(
+                channel,
+                opponent.getRepresentationNoPing() + ", _Perdition Array_ means hits produced by "
+                        + monumentOwners.stream()
+                                .map(Player::getRepresentationNoPing)
+                                .collect(java.util.stream.Collectors.joining(", "))
+                        + "'s SPACE CANNON abilities in this system cannot be canceled.");
+    }
+
+    // Bounty Brokerage
+    public static void offerBountyBrokerage(Game game, Player player, Player target) {
+        offerBountyBrokerage(game, player, target, false);
+    }
+
+    public static void offerBountyBrokerage(Game game, Player player, Player target, boolean wasWashed) {
+        if (!game.isMonumentsMode()
+                || player == target
+                || (target.getCommodities() < 1 && (!wasWashed || target.getTg() < 1))
+                || !MonumentsService.isMonumentOnBoard(game, player, "vaden_monument")
+                || player.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) < 1
+                || MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
+                        .noneMatch(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile))) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", you may take 1 commodity from "
+                        + target.getRepresentationNoPing() + " with _Bounty Brokerage_.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker()
+                                        + RESOLVE_BB
+                                        + target.getFaction()
+                                        + (wasWashed ? "|washed" : ""),
+                                "Take 1 Commodity from " + target.getColor(),
+                                FactionEmojis.vaden),
+                        Buttons.red("deleteButtons", "Decline")));
+    }
+
+    @ButtonHandler(RESOLVE_BB)
+    public static void resolveBountyBrokerage(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring(RESOLVE_BB.length()).split("\\|", 2);
+        String targetFaction = payload[0];
+        boolean wasWashed = payload.length > 1 && "washed".equals(payload[1]);
+        Player target = targetFaction.isBlank() ? null : game.getPlayerFromColorOrFaction(targetFaction);
+        if (!game.isMonumentsMode()
+                || target == null
+                || target == player
+                || (target.getCommodities() < 1 && (!wasWashed || target.getTg() < 1))
+                || !MonumentsService.isMonumentOnBoard(game, player, "vaden_monument")
+                || player.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) < 1
+                || MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
+                        .noneMatch(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile))) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        if (target.getCommodities() > 0) {
+            target.setCommodities(target.getCommodities() - 1);
+        } else {
+            target.setTg(target.getTg() - 1);
+        }
+        player.gainTG(1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(),
+                target.getRepresentation()
+                        + " the Vaden have come to collect on their bounty, and 1 commodity has been taken from you.");
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " took 1 commodity from " + target.getRepresentationNoPing()
+                        + " with _Bounty Brokerage_.");
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Vault of New Phrad
+    public static List<Button> getVaultFlipButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + FLIP_VAULT, "Flip Vault", FactionEmojis.zealots));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+
+        return buttons;
+    }
+
+    @ButtonHandler(FLIP_VAULT)
+    public static void flipVaultToReliquat(ButtonInteractionEvent event, Game game, Player player) {
+        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "rhodun_monument")) {
+            return;
+        }
+
+        player.removeOwnedUnitByID("rhodun_monument");
+        player.addOwnedUnitByID("rhodun_monumentback");
+
+        UnitModel monument = Mapper.getUnit("rhodun_monumentback");
+
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " flipped _Vault of New Phrad_.",
+                monument.getRepresentationEmbed());
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Reliquat Unleashed
+    public static Button getReliquatFlipButton(Player player) {
+        return Buttons.gray(player.factionButtonChecker() + FLIP_RELIQUAT, "Flip Reliquat", FactionEmojis.zealots);
+    }
+
+    @ButtonHandler(FLIP_RELIQUAT)
+    public static void flipReliquatToVault(ButtonInteractionEvent event, Game game, Player player) {
+        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "rhodun_monumentback")) {
+            return;
+        }
+
+        player.removeOwnedUnitByID("rhodun_monumentback");
+        player.addOwnedUnitByID("rhodun_monument");
+
+        UnitModel monument = Mapper.getUnit("rhodun_monument");
+
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " flipped _Reliquat Unleashed_.",
+                monument.getRepresentationEmbed());
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Freehold Starport
+    public static boolean canMoveOutOfFreeholdSystem(Game game, Player player, Tile tile) {
+        return game.isMonumentsMode() && tile == MonumentsService.getMonumentTile(game, player, "nokar_monument");
+    }
+
+    // The Maw
+    public static boolean blocksNivynMonumentMovement(Game game, Player movingPlayer, Tile tile) {
+        if (!game.isMonumentsMode() || movingPlayer == null || tile == null) {
+            return false;
+        }
+
+        return game.getRealPlayers().stream()
+                .anyMatch(monumentOwner -> monumentOwner != movingPlayer
+                        && MonumentsService.isMonumentOnBoard(game, monumentOwner, "nivyn_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "nivyn_monument"));
+    }
+
+    // Gravelord's Keep
+    public static List<Button> getGravelordProduceFighterButton(Game game, Player player) {
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mykomentori_monument");
+        if (monumentTile == null) {
+            return List.of();
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + "placeOneNDone_skipbuild_1ff_" + monumentTile.getPosition(),
+                "Produce 1 Fighter",
+                UnitEmojis.fighter));
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+
+        return buttons;
+    }
+
+    // Mirrorforge
+    public static Button getMirrorforgeButton(Player player) {
+        return Buttons.gray(player.factionButtonChecker() + USE_MIRRORFORGE, "Use Mirrorforge", FactionEmojis.mortheus);
+    }
+
+    public static void clearMirrorforgeActionState(Game game, Player player) {
+        if (game.isMonumentsMode()) {
+            game.removeStoredValue(MIRRORFORGE_MOVEMENT + player.getFaction());
+        }
+    }
+
+    @ButtonHandler(USE_MIRRORFORGE)
+    public static void useMirrorforge(ButtonInteractionEvent event, Game game, Player player) {
+        if (!MonumentsService.isMonumentReady(game, player, "mortheus_monument")) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mortheus_monument");
+        if (monumentTile == null) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        List<Button> buttons = getMirrorforgeSourceButtons(game, player, monumentTile);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " has no adjacent non-fighter ships to move with _Mirrorforge_.");
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose the ships to move with _Mirrorforge_.",
+                NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + SELECT_MIRRORFORGE_SOURCE, 0));
+        ButtonHelper.deleteTheOneButton(event);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+    }
+
+    @ButtonHandler(SELECT_MIRRORFORGE_SOURCE)
+    public static void selectMirrorforgeSource(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload =
+                buttonID.substring(SELECT_MIRRORFORGE_SOURCE.length()).split("\\|", 2);
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mortheus_monument");
+        if (payload.length == 1 && payload[0].startsWith("page") && monumentTile != null) {
+            try {
+                int page = Integer.parseInt(payload[0].substring(4));
+                String message = player.getRepresentationUnfogged() + ", choose the ships to move with _Mirrorforge_.";
+                NewStuffHelper.sendOrEditButtons(
+                        event,
+                        player.getCorrectChannel(),
+                        message,
+                        NewStuffHelper.buttonPagination(
+                                getMirrorforgeSourceButtons(game, player, monumentTile),
+                                player.factionButtonChecker() + SELECT_MIRRORFORGE_SOURCE,
+                                page));
+            } catch (NumberFormatException e) {
+                ButtonHelper.deleteTheOneButton(event);
+            }
+            return;
+        }
+        Player opponent = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
+        Tile sourceTile = payload.length == 2 ? game.getTileByPosition(payload[1]) : null;
+        if (opponent == null
+                || sourceTile == null
+                || monumentTile == null
+                || opponent == player
+                || !MonumentsService.exhaustMonument(game, player, "mortheus_monument")
+                || !FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, false)
+                        .contains(sourceTile.getPosition())) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        game.setStoredValue(
+                MIRRORFORGE_MOVEMENT + player.getFaction(),
+                opponent.getFaction() + "|" + sourceTile.getPosition() + "|0");
+        sendMirrorforgeShipButtons(event, game, player, opponent, sourceTile, monumentTile, 0F);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getMirrorforgeSourceButtons(Game game, Player player, Tile monumentTile) {
+        List<Button> buttons = new ArrayList<>();
+        for (String position :
+                FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, false)) {
+            Tile tile = game.getTileByPosition(position);
+            if (tile == null
+                    || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())) {
+                continue;
+            }
+            for (Player opponent : game.getRealPlayersNNeutral()) {
+                if (opponent == player
+                        || tile.getSpaceUnitHolder().getUnitKeysForPlayer(opponent).stream()
+                                .map(opponent::getUnitFromUnitKey)
+                                .noneMatch(unit ->
+                                        unit != null && unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)) {
+                    continue;
+                }
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + SELECT_MIRRORFORGE_SOURCE + opponent.getFaction() + "|"
+                                + position,
+                        "Move " + opponent.getColor() + " ships from " + tile.getRepresentationForButtons()));
+            }
+        }
+        return buttons;
+    }
+
+    @ButtonHandler(MOVE_MIRRORFORGE_SHIP)
+    public static void moveMirrorforgeShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String movement = game.getStoredValue(MIRRORFORGE_MOVEMENT + player.getFaction());
+        String[] movementParts = movement.split("\\|", 3);
+        Player opponent = movementParts.length == 3 ? game.getPlayerFromColorOrFaction(movementParts[0]) : null;
+        Tile sourceTile = movementParts.length == 3 ? game.getTileByPosition(movementParts[1]) : null;
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mortheus_monument");
+        float movedCost;
+        try {
+            movedCost = movementParts.length == 3 ? Float.parseFloat(movementParts[2]) : -1F;
+        } catch (NumberFormatException e) {
+            movedCost = -1F;
+        }
+        String asyncId = buttonID.substring(MOVE_MIRRORFORGE_SHIP.length());
+        UnitKey unitKey = opponent == null || sourceTile == null
+                ? null
+                : sourceTile.getSpaceUnitHolder().getUnitKeysForPlayer(opponent).stream()
+                        .filter(key -> asyncId.equals(key.asyncID()))
+                        .findFirst()
+                        .orElse(null);
+        UnitModel unit = unitKey == null || opponent == null ? null : opponent.getUnitFromUnitKey(unitKey);
+        if (opponent == null
+                || sourceTile == null
+                || monumentTile == null
+                || opponent == player
+                || movedCost < 0
+                || unit == null
+                || !unit.getIsShip()
+                || unit.getUnitType() == UnitType.Fighter
+                || sourceTile.getSpaceUnitHolder().getUnitCount(unitKey) < 1) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        MoveUnitService.moveUnits(
+                event, sourceTile, game, opponent.getColor(), "1 " + asyncId, monumentTile, Constants.SPACE);
+        movedCost += unit.getCost();
+        if (movedCost >= 4F
+                || sourceTile.getSpaceUnitHolder().getUnitKeysForPlayer(opponent).stream()
+                        .map(opponent::getUnitFromUnitKey)
+                        .noneMatch(model ->
+                                model != null && model.getIsShip() && model.getUnitType() != UnitType.Fighter)) {
+            game.removeStoredValue(MIRRORFORGE_MOVEMENT + player.getFaction());
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged() + " moved " + movedCost + " resources worth of "
+                            + opponent.getRepresentationNoPing() + " ships into "
+                            + monumentTile.getRepresentationForButtons()
+                            + " with _Mirrorforge_.");
+            StartCombatService.startSpaceCombat(game, player, opponent, monumentTile, event, "-mirrorforge");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        game.setStoredValue(
+                MIRRORFORGE_MOVEMENT + player.getFaction(),
+                opponent.getFaction() + "|" + sourceTile.getPosition() + "|" + movedCost);
+        sendMirrorforgeShipButtons(event, game, player, opponent, sourceTile, monumentTile, movedCost);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void sendMirrorforgeShipButtons(
+            ButtonInteractionEvent event,
+            Game game,
+            Player player,
+            Player opponent,
+            Tile sourceTile,
+            Tile monumentTile,
+            float movedCost) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey unitKey : sourceTile.getSpaceUnitHolder().getUnitKeysForPlayer(opponent)) {
+            UnitModel unit = opponent.getUnitFromUnitKey(unitKey);
+            if (unit == null || !unit.getIsShip() || unit.getUnitType() == UnitType.Fighter) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + MOVE_MIRRORFORGE_SHIP + unitKey.asyncID(),
+                    "Move 1 " + unit.getName() + " (" + unit.getCost() + ")",
+                    unit.getUnitEmoji()));
+        }
+        if (buttons.isEmpty()) {
+            game.removeStoredValue(MIRRORFORGE_MOVEMENT + player.getFaction());
+            StartCombatService.startSpaceCombat(game, player, opponent, monumentTile, event, "-mirrorforge");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", move non-fighter ships from "
+                        + sourceTile.getRepresentationForButtons()
+                        + " until at least 4 resources worth have moved. Moved: " + movedCost + "/4.",
+                buttons);
+    }
+
+    // Nightfall Fortress
+    public static List<Button> getNightfallButtons(Player activator, Player owner, Game game, Tile tile) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (player == owner && activator == owner) {
+                continue;
+            }
+            if (!tile.hasPlayerCC(player)) {
+                continue;
+            }
+
+            buttons.add(Buttons.green(
+                    owner.factionButtonChecker() + REMOVE_NIGHTFALL_CC + player.getFaction() + "|" + tile.getPosition(),
+                    "Remove " + player.getFactionNameOrColor() + "'s Command Token",
+                    player.getFactionEmojiOrColor()));
+        }
+        buttons.add(Buttons.green(owner.factionButtonChecker() + GAIN_NIGHTFALL_CC, "Gain 1 Command Token"));
+
+        return buttons;
+    }
+
+    @ButtonHandler(REMOVE_NIGHTFALL_CC)
+    public static void resolveNightfallCCRemoval(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "lizho_monument")) {
+            return;
+        }
+
+        String payload = buttonID.substring(REMOVE_NIGHTFALL_CC.length());
+        String[] parts = payload.split("\\|", 2);
+        if (parts.length != 2) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String target = parts[0];
+        String tilePos = parts[1];
+
+        Player targetPlayer = game.getPlayerFromColorOrFaction(target);
+        Tile tile = game.getTileByPosition(tilePos);
+        if (targetPlayer == null || tile == null) {
+            return;
+        }
+
+        String ccID = Mapper.getCCID(targetPlayer.getColor());
+        tile.removeCC(ccID);
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " removed " + targetPlayer.getRepresentation()
+                        + "'s command token from " + tile.getRepresentation()
+                        + " using _Nightfall Fortress_.");
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(GAIN_NIGHTFALL_CC)
+    public static void resolveNightfallCCGain(ButtonInteractionEvent event, Game game, Player player) {
+        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "lizho_monument")) {
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", please use the buttons to gain 1 command token due to _Nightfall Fortress_.",
+                ButtonHelper.getGainCCButtons(player));
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Forbidden Library
+    public static Button getForbiddenLibraryButton(Player player) {
+        return Buttons.gray(
+                player.factionButtonChecker() + USE_FORBIDDEN_LIBRARY, "Use Forbidden Library", FactionEmojis.lanefir);
+    }
+
+    public static void clearForbiddenLibraryActionState(Game game, Player player) {
+        if (game.isMonumentsMode()) {
+            game.removeStoredValue(FORBIDDEN_LIBRARY_USED + player.getFaction());
+        }
+    }
+
+    @ButtonHandler(USE_FORBIDDEN_LIBRARY)
+    public static void useForbiddenLibrary(ButtonInteractionEvent event, Game game, Player player) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "lanefir_monument")
+                || !game.getStoredValue(FORBIDDEN_LIBRARY_USED + player.getFaction())
+                        .isEmpty()) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player)) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.getTechSpecialities().stream()
+                        .anyMatch(type -> List.of("biotic", "cybernetic", "propulsion", "warfare")
+                                .contains(type.toLowerCase()))) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + SELECT_FORBIDDEN_LIBRARY_PLANET + planet.getName(),
+                            "Use " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                }
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged()
+                            + " has no technology-specialty planets in or adjacent to _Forbidden Library_.");
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose a technology-specialty planet to use with _Forbidden Library_.",
+                buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler(SELECT_FORBIDDEN_LIBRARY_PLANET)
+    public static void selectForbiddenLibraryPlanet(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String planetName = buttonID.substring(SELECT_FORBIDDEN_LIBRARY_PLANET.length());
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        Tile tile = game.getTileFromPlanet(planetName);
+        if (planet == null
+                || tile == null
+                || !MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "lanefir_monument", tile)
+                || !game.getStoredValue(FORBIDDEN_LIBRARY_USED + player.getFaction())
+                        .isEmpty()
+                || planet.getTechSpecialities().stream()
+                        .noneMatch(type -> List.of("biotic", "cybernetic", "propulsion", "warfare")
+                                .contains(type.toLowerCase()))) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        game.setStoredValue(FORBIDDEN_LIBRARY_USED + player.getFaction(), "used");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " is using the technology specialty of "
+                        + planet.getRepresentation(game) + " with _Forbidden Library_."
+                        + "\n-# This is not automated, and is just alerting the table of your intent.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Kyro Reliquary
+    public static void offerKyroReliquaryRelocation(
+            GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits) {
+        if (!game.isMonumentsMode()) {
+            return;
+        }
+        for (RemovedUnit destroyedUnit : destroyedUnits) {
+            Player player = destroyedUnit.getPlayer(game);
+            if (destroyedUnit.unitKey().unitType() != UnitType.Monument
+                    || !(destroyedUnit.uh() instanceof Planet)
+                    || !MonumentsService.hasKyroReliquary(game, player)) {
+                continue;
+            }
+            List<Button> buttons = new ArrayList<>();
+            List<Tile> tiles = new ArrayList<>();
+            tiles.add(destroyedUnit.tile());
+            FoWHelper.getAdjacentTilesAndNotThisTile(game, destroyedUnit.tile().getPosition(), player, false).stream()
+                    .map(game::getTileByPosition)
+                    .filter(tile -> tile != null
+                            && (tile.getTileModel() == null
+                                    || !tile.getTileModel().isHyperlane()))
+                    .forEach(tiles::add);
+            UnitModel monument = Mapper.getUnit("kyro_monument");
+            for (Tile tile : tiles) {
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    if (player.getPlanets().contains(planet.getName())
+                            && monument != null
+                            && monument.canBePlacedOnPlanetTypes(planet.getPlanetTypes())) {
+                        buttons.add(Buttons.green(
+                                player.factionButtonChecker() + PLACE_KYRO_RELIQUARY
+                                        + destroyedUnit.tile().getPosition() + "|" + planet.getName(),
+                                "Place Kyro Reliquary on " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                    }
+                }
+            }
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", place _Kyro Reliquary_ on a planet you control in this or an adjacent system to draw a relic.",
+                        buttons);
+            }
+        }
+    }
+
+    @ButtonHandler(PLACE_KYRO_RELIQUARY)
+    public static void placeKyroReliquary(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring(PLACE_KYRO_RELIQUARY.length()).split("\\|", 2);
+        Tile destroyedTile = payload.length == 2 ? game.getTileByPosition(payload[0]) : null;
+        Tile destinationTile = payload.length == 2 ? game.getTileFromPlanet(payload[1]) : null;
+        Planet destination = destinationTile == null
+                ? null
+                : destinationTile.getPlanetUnitHolders().stream()
+                        .filter(planet -> planet.getName().equals(payload[1]))
+                        .findFirst()
+                        .orElse(null);
+        UnitModel monument = Mapper.getUnit("kyro_monument");
+        if (destroyedTile == null
+                || destination == null
+                || monument == null
+                || !MonumentsService.hasKyroReliquary(game, player)
+                || !player.getPlanets().contains(destination.getName())
+                || !monument.canBePlacedOnPlanetTypes(destination.getPlanetTypes())
+                || (destroyedTile != destinationTile
+                        && !FoWHelper.getAdjacentTilesAndNotThisTile(game, destroyedTile.getPosition(), player, false)
+                                .contains(destinationTile.getPosition()))) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        AddUnitService.addUnits(event, destinationTile, game, player.getColor(), "1 monument " + destination.getName());
+        RelicHelper.drawRelicAndNotify(player, event, game);
+        ButtonHelper.deleteMessage(event);
+    }
 
     // Queen's Rest
     public static void resolveKortaliMonument(
@@ -128,6 +781,157 @@ public class MonumentsDSButtonHandler {
                             + (hits == 1 ? "." : "s."));
             CombatRollService.sendSpaceAssignHitsButtons(event, game, target, monumentTile, hits);
         }
+    }
+
+    // Dawnstar HQ
+    public static Button getDawnstarHqButton(Game game, Player player) {
+        return getDawnstarHqTargetButtons(game, player).isEmpty()
+                ? null
+                : Buttons.green(
+                        player.factionButtonChecker() + USE_DAWNSTAR_HQ, "Use Dawnstar HQ", FactionEmojis.tnelis);
+    }
+
+    @ButtonHandler(USE_DAWNSTAR_HQ)
+    public static void useDawnstarHq(ButtonInteractionEvent event, Game game, Player player) {
+        List<Button> buttons = getDawnstarHqTargetButtons(game, player);
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose 1 other player's coexisting unit to destroy with _Dawnstar HQ_.",
+                buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler(DESTROY_DAWNSTAR_UNIT)
+    public static void destroyDawnstarUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring(DESTROY_DAWNSTAR_UNIT.length()).split("\\|", 5);
+        Tile tile = payload.length == 5 ? game.getTileByPosition(payload[0]) : null;
+        Planet planet = tile == null
+                ? null
+                : tile.getPlanetUnitHolders().stream()
+                        .filter(candidate -> candidate.getName().equals(payload[1]))
+                        .findFirst()
+                        .orElse(null);
+        Player target = payload.length == 5 ? game.getPlayerFromColorOrFaction(payload[2]) : null;
+        UnitState state;
+        try {
+            state = payload.length == 5 ? UnitState.valueOf(payload[4]) : null;
+        } catch (IllegalArgumentException e) {
+            state = null;
+        }
+        UnitKey unitKey = planet == null || target == null
+                ? null
+                : planet.getUnitsByStateForPlayer(target).keySet().stream()
+                        .filter(key -> key.asyncID().equals(payload[3]))
+                        .findFirst()
+                        .orElse(null);
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "tnelis_monument");
+        if (tile == null
+                || planet == null
+                || target == null
+                || unitKey == null
+                || state == null
+                || tile != monumentTile
+                || !MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument")
+                || !FoWHelper.playerHasUnitsOnPlanet(player, planet)
+                || planet.getUnitCountForState(unitKey, state) < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        DestroyUnitService.destroyUnit(
+                event, tile, game, new ti4.service.unit.ParsedUnit(unitKey, 1, planet.getName()), false, state);
+        UnitModel unit = target.getPriorityUnitByAsyncID(unitKey.asyncID(), planet);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " destroyed 1 of "
+                        + target.getColorDisplayName() + "'s "
+                        + (unit == null ? unitKey.unitType().humanReadableName() : unit.getName()) + " on "
+                        + planet.getRepresentation(game) + " with _Dawnstar HQ_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void addDawnstarHqGroundCombatButton(
+            List<Button> buttons, Game game, Tile tile, String unitHolderName) {
+        Planet planet = tile.getPlanetUnitHolders().stream()
+                .filter(candidate -> candidate.getName().equals(unitHolderName))
+                .findFirst()
+                .orElse(null);
+        if (planet == null) {
+            return;
+        }
+        for (Player player : game.getRealPlayers()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument")
+                    && planet == MonumentsService.getPlayerMonumentPlanet(game, player)
+                    && FoWHelper.playerHasUnitsOnPlanet(player, planet)) {
+                buttons.add(Buttons.red(
+                        player.factionButtonChecker() + "destroyDawnstarAll_" + tile.getPosition() + "|"
+                                + planet.getName(),
+                        "Use Dawnstar HQ (On Loss)",
+                        FactionEmojis.tnelis));
+            }
+        }
+    }
+
+    @ButtonHandler("destroyDawnstarAll_")
+    public static void destroyDawnstarAll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring("destroyDawnstarAll_".length()).split("\\|", 2);
+        Tile tile = payload.length == 2 ? game.getTileByPosition(payload[0]) : null;
+        Planet planet = tile == null
+                ? null
+                : tile.getPlanetUnitHolders().stream()
+                        .filter(candidate -> candidate.getName().equals(payload[1]))
+                        .findFirst()
+                        .orElse(null);
+        if (tile == null
+                || planet == null
+                || tile != MonumentsService.getMonumentTile(game, player, "tnelis_monument")
+                || !MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        DestroyUnitService.destroyAllUnits(event, tile, game, planet, false);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " destroyed every unit on " + planet.getRepresentation(game)
+                        + " with _Dawnstar HQ_.");
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    private static List<Button> getDawnstarHqTargetButtons(Game game, Player player) {
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "tnelis_monument");
+        if (!MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument") || monumentTile == null) {
+            return List.of();
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Planet planet : monumentTile.getPlanetUnitHolders()) {
+            if (!FoWHelper.playerHasUnitsOnPlanet(player, planet)) {
+                continue;
+            }
+            for (Player target : game.getRealPlayersNNeutral()) {
+                if (target == player || !FoWHelper.playerHasUnitsOnPlanet(target, planet)) {
+                    continue;
+                }
+                for (UnitKey unitKey : planet.getUnitsByStateForPlayer(target).keySet()) {
+                    UnitModel unit = target.getPriorityUnitByAsyncID(unitKey.asyncID(), planet);
+                    for (UnitState state : planet.getNonZeroUnitStates(unitKey)) {
+                        buttons.add(Buttons.red(
+                                player.factionButtonChecker() + DESTROY_DAWNSTAR_UNIT + monumentTile.getPosition() + "|"
+                                        + planet.getName() + "|" + target.getFaction() + "|" + unitKey.asyncID()
+                                        + "|" + state.name(),
+                                "Destroy 1 of "
+                                        + target.getColorDisplayName() + "'s "
+                                        + (unit == null ? unitKey.unitType().humanReadableName() : unit.getName())
+                                        + " on " + Helper.getPlanetRepresentation(planet.getName(), game),
+                                unitKey.unitEmoji()));
+                    }
+                }
+            }
+        }
+        return buttons;
     }
 
     // Krotas Bannerhall

@@ -71,6 +71,19 @@ public class CreateGameButtonHandler {
             return;
         }
 
+        int rosterSize =
+                resolveMembers(event, event.getMessage().getContentRaw()).size();
+        Optional<String> launchBlocker =
+                MatchmakingQueueSearchService.get().findLaunchBlocker(event.getChannelId(), rosterSize);
+        if (launchBlocker.isPresent()) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage("This game can't launch because " + launchBlocker.get()
+                            + " You must first leave matchmaking.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
         createGameAndChannels(event);
     }
 
@@ -88,7 +101,8 @@ public class CreateGameButtonHandler {
             }
             membersOG.add(member);
             MatchmakerService.get().leaveQueue(member.getId());
-            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " joined the game.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, event.getUser().getEffectiveName() + " added " + member.getAsMention() + " to the game.");
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
@@ -124,7 +138,9 @@ public class CreateGameButtonHandler {
         for (Member member : members) {
             if (!membersOG.contains(member)) continue;
             membersOG.remove(member);
-            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " was removed from the game.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    event.getUser().getEffectiveName() + " removed " + member.getAsMention() + " from the game.");
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
@@ -139,6 +155,9 @@ public class CreateGameButtonHandler {
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, sillyName))
                 .queue();
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                event.getUser().getEffectiveName() + " set the game name to **" + sillyName.replace(":", "") + "**.");
     }
 
     @ButtonHandler(value = "addSillyName~MDL", save = false)

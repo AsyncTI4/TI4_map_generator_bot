@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
@@ -746,6 +747,8 @@ public class CombatRollService {
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                                         "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                                MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
+                                        buttons, game, opponent, tile, combatOnHolder.getName());
 
                                 buttons.add(Buttons.gray(
                                         opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_"
@@ -772,6 +775,8 @@ public class CombatRollService {
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                                         "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                                MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
+                                        buttons, game, player, tile, combatOnHolder.getName());
                                 buttons.add(Buttons.gray(
                                         player.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_1",
                                         "Cancel a Hit"));

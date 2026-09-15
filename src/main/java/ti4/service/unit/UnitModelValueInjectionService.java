@@ -10,6 +10,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
 
 @UtilityClass
@@ -127,6 +128,9 @@ public class UnitModelValueInjectionService {
                 injectedUnit.setCanBeDirectHit(Boolean.TRUE.equals(unit.getCanBeDirectHit())
                         || copiedMonuments.stream()
                                 .anyMatch(monument -> Boolean.TRUE.equals(monument.getCanBeDirectHit())));
+                injectedUnit.setIsGroundForce(Boolean.TRUE.equals(unit.getIsGroundForce())
+                        || copiedMonuments.stream()
+                                .anyMatch(monument -> Boolean.TRUE.equals(monument.getIsGroundForce())));
                 String copiedAbilityText = copiedMonuments.stream()
                         .map(monument -> "**" + monument.getName() + "**: "
                                 + monument.getAbility().orElse(""))
@@ -187,6 +191,20 @@ public class UnitModelValueInjectionService {
                     .isSpaceOnly(false)
                     .sustainDamage(true)
                     .canBeDirectHit(true);
+        }
+
+        if (player.getGame().isMonumentsMode()
+                && "toldar_monumenthonor".equals(unit.getId())
+                && MonumentsService.hasMonument(player.getGame(), player, "toldar_monumenthonor")) {
+            if (player.getHonorCounter() >= 2) {
+                integers.productionValue(2);
+            }
+            if (player.getHonorCounter() >= 5) {
+                booleans.planetaryShield(true);
+            }
+            if (player.getHonorCounter() == 8) {
+                integers.spaceCannonDieCount(3).spaceCannonHitsOn(4);
+            }
         }
 
         return UnitValueInjection.of(integers, floats, booleans);

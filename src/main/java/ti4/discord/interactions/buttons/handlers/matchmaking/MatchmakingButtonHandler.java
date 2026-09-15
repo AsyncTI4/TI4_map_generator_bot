@@ -63,6 +63,7 @@ class MatchmakingButtonHandler {
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
+    private static final String LEAVE_MATCHMAKING_BUTTON_ID = "leaveMatchmaking";
     private static final String CANCEL_SEARCH_CONFIRM_BUTTON_ID = "cancelMatchmakingSearchConfirm";
     private static final String CANCEL_SEARCH_DECLINE_BUTTON_ID = "cancelMatchmakingSearchDecline";
     private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
@@ -148,10 +149,24 @@ class MatchmakingButtonHandler {
             editPrompt(event, "This game was no longer in the matchmaking queue.");
             return;
         }
+        announceLeftMatchmaking(event);
+        editPrompt(event, "This game has been removed from the matchmaking queue.");
+    }
+
+    @ButtonHandler(value = LEAVE_MATCHMAKING_BUTTON_ID, save = false)
+    public static void leaveMatchmaking(ButtonInteractionEvent event) {
+        if (!MatchmakingQueueSearchService.get().remove(event.getChannelId())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "This game is not in the matchmaking queue.");
+            return;
+        }
+        announceLeftMatchmaking(event);
+    }
+
+    private static void announceLeftMatchmaking(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "This game has left the matchmaking queue. The matchmaker will no longer add players to it.");
-        editPrompt(event, "This game has been removed from the matchmaking queue.");
+                event.getUser().getEffectiveName()
+                        + " removed this game from the matchmaking queue. The matchmaker will no longer add players to it.");
     }
 
     @ButtonHandler(value = CANCEL_SEARCH_DECLINE_BUTTON_ID, save = false)
@@ -526,7 +541,8 @@ class MatchmakingButtonHandler {
         if (isMakingNewGamesOrTiglGamesThread) {
             MatchmakingQueueSearchService.get()
                     .register(event.getChannelId(), event.getMessage().getId(), criteria);
-            MessageHelper.sendMessageToChannel(event.getChannel(), describeQueuedGame(criteria));
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), describeQueuedGame(event.getUser().getEffectiveName(), criteria));
         }
         int added = CreateGameButtonHandler.addPlayersFromQueueSearch(event, criteria);
         String continuation = isMakingNewGamesOrTiglGamesThread
@@ -542,8 +558,9 @@ class MatchmakingButtonHandler {
                         + continuation);
     }
 
-    private static String describeQueuedGame(PlayerSearchCriteria criteria) {
-        StringBuilder message = new StringBuilder("This game has joined the ")
+    private static String describeQueuedGame(String presserName, PlayerSearchCriteria criteria) {
+        StringBuilder message = new StringBuilder(presserName)
+                .append(" added this game to the ")
                 .append(criteria.tigl() ? "TIGL " : "")
                 .append("matchmaking queue, looking for:\n")
                 .append("- **Player count:** ")

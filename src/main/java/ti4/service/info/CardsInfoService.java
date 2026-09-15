@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -81,6 +82,11 @@ public class CardsInfoService {
         List<Button> buttons = new ArrayList<>();
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
+        }
+        if (MonumentsService.isMonumentOnBoard(game, player, "lanefir_monument")
+                && game.getStoredValue("lanefirMonumentUsed_" + player.getFaction())
+                        .isEmpty()) {
+            buttons.add(MonumentsDSButtonHandler.getForbiddenLibraryButton(player));
         }
         if (game.isMonumentsMode()
                 && player.hasUnit("bluetf_monument")
@@ -426,6 +432,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
         }
+        MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }
@@ -519,6 +526,9 @@ public class CardsInfoService {
             if (MonumentsService.isMonumentOnBoard(game, player, "edyn_monument")
                     && MonumentsService.isMonumentReady(game, player, "edyn_monument")) {
                 buttons.add(MonumentsDSButtonHandler.getTwilightThroneButton(player));
+            }
+            if (MonumentsService.hasMonument(game, player, "rhodun_monumentback")) {
+                buttons.add(MonumentsDSButtonHandler.getReliquatFlipButton(player));
             }
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
