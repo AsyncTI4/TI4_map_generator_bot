@@ -30,12 +30,12 @@ public class PartyValidator {
     }
 
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
-        List<String> members = userIds.stream().distinct().toList();
+        if (restrictions.isEmpty()) return List.of();
 
+        List<String> members = userIds.stream().distinct().toList();
+        Map<String, PlayerMatchmakingData> dataById = PlayerMatchmakingDataFactory.buildForUsers(members, restrictions);
         List<String> available = new ArrayList<>();
         for (String restriction : restrictions) {
-            Map<String, PlayerMatchmakingData> dataById =
-                    PlayerMatchmakingDataFactory.buildForUsers(members, List.of(restriction));
             if (!everyMemberCanUseRestriction(restriction, members, dataById)) {
                 continue;
             }
@@ -49,23 +49,26 @@ public class PartyValidator {
 
     private static boolean everyMemberCanUseRestriction(
             String restriction, List<String> members, Map<String, PlayerMatchmakingData> dataById) {
-        if (!MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+        int requiredSharedHours = MatchmakingOptions.requiredSharedActiveHours(List.of(restriction));
+        if (requiredSharedHours == 0) {
             return true;
         }
         return members.stream()
                 .map(dataById::get)
-                .allMatch(MatchmakingCompatibilityService::hasEnoughActiveHourDataToMatch);
+                .allMatch(data ->
+                        MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(data, requiredSharedHours));
     }
 
     private static boolean everyMemberPairSatisfiesRestriction(
             String restriction, List<String> members, Map<String, PlayerMatchmakingData> dataById) {
-        if (!MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+        int requiredSharedHours = MatchmakingOptions.requiredSharedActiveHours(List.of(restriction));
+        if (requiredSharedHours == 0) {
             return true;
         }
         for (int i = 0; i < members.size(); i++) {
             for (int j = i + 1; j < members.size(); j++) {
                 if (!MatchmakingCompatibilityService.shareEnoughActiveHours(
-                        dataById.get(members.get(i)), dataById.get(members.get(j)))) {
+                        dataById.get(members.get(i)), dataById.get(members.get(j)), requiredSharedHours)) {
                     return false;
                 }
             }
