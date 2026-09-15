@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
@@ -1357,6 +1358,9 @@ public class PlayerAreaGenerator {
                 }
             } catch (Exception e) {
                 BotLogger.error(new LogOrigin(player), "Bad file: " + relicFileName, e);
+            }
+            if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(game, player, relicID)) {
+                DrawingUtil.getAndDrawControlToken(graphics, player, x + deltaX + 10, y + 60, false, 0.5f);
             }
 
             deltaX += 48;

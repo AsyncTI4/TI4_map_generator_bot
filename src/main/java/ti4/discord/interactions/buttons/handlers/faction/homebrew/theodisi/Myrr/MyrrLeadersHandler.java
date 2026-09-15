@@ -217,7 +217,9 @@ public class MyrrLeadersHandler {
                 || count < 1
                 || "setup".equalsIgnoreCase(game.getPhaseOfGame())
                 || !game.playerHasLeaderUnlockedOrAlliance(player, "myrrcommander")
-                || (unitKey.unitType() != UnitType.Pds && unitKey.unitType() != UnitType.Spacedock)
+                || (unitKey.unitType() != UnitType.Pds
+                        && unitKey.unitType() != UnitType.Spacedock
+                        && unitKey.unitType() != UnitType.Monument)
                 || !(tile.getUnitHolders().get(location) instanceof Planet)
                 || !player.getPlanets().contains(location)) {
             return;

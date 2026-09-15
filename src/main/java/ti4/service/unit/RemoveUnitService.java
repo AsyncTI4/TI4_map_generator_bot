@@ -83,7 +83,9 @@ public class RemoveUnitService {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
-            if (uk.unitType() == UnitType.Pds || uk.unitType() == UnitType.Spacedock) {
+            if (uk.unitType() == UnitType.Pds
+                    || uk.unitType() == UnitType.Spacedock
+                    || uk.unitType() == UnitType.Monument) {
                 continue;
             }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());

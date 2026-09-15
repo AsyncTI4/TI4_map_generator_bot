@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -431,6 +432,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
         }
+        MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }

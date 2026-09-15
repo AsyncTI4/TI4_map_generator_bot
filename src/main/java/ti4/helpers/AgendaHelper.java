@@ -39,6 +39,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -1259,6 +1260,7 @@ public final class AgendaHelper {
             if (getWinningVoters(winner, game).contains(player) || predictedWinner) {
                 MonumentsButtonHandler.offerJolNarMonumentInfantry(game, player);
                 MonumentsButtonHandler.offerQanojShieldArray(game, player);
+                MonumentsBRButtonHandler.offerDeepmantle(game, player);
             }
         }
         return winningRs;

@@ -124,6 +124,7 @@ public class MonumentsService {
         UnitModel monument = getFactionMonument(player);
         if (monument != null && !player.ownsUnit(monument.getId())) {
             player.addOwnedUnitByID(monument.getId());
+            player.setUnitCap("monument", 1);
         }
     }
 

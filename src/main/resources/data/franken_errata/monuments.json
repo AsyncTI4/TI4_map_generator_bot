@@ -107,5 +107,11 @@
         "itemId": "zelian_monument",
         "undraftable": true,
         "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "sarcosa_monument",
+        "undraftable": true,
+        "source": "monuments"
     }
 ]

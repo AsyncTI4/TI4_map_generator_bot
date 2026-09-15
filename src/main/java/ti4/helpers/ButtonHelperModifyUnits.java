@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -478,7 +479,8 @@ public final class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg.toString());
         if (!doesPlayerHaveGfOnPlanet(unitHolder, player)
                 && (unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                        || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+                        || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
+                        || unitHolder.getUnitCount(UnitType.Monument, player.getColor()) > 0)) {
             String msg2 = player.getRepresentation()
                     + " you should remove structures if your opponent is not playing _Infiltrate_ or using **Assimilate**. Use buttons to resolve.";
             List<Button> buttons = new ArrayList<>();
@@ -1957,6 +1959,8 @@ public final class ButtonHelperModifyUnits {
         String playerRep = player.getRepresentationNoPing();
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         Planet planet = game.getUnitHolderFromPlanet(planetName);
+        boolean placingSarcosaMonument = false;
+        boolean placingSarcosaMonumentInCoexistence = false;
         if ("monument".equalsIgnoreCase(unitLong)) {
             if (!game.isMonumentsMode()) {
                 MessageHelper.sendEphemeralMessageToEventChannel(event, "Monuments+ is not enabled for this game.");
@@ -1990,6 +1994,17 @@ public final class ButtonHelperModifyUnits {
                         event, "That planet is not eligible for your Monument.");
                 return;
             }
+            placingSarcosaMonument = monument != null && "sarcosa_monument".equals(monument.getId());
+            if (placingSarcosaMonument
+                    && !player.getPlanetsAllianceMode().contains(planetName)
+                    && !MonumentsBRButtonHandler.canPlaceSarcosaMonument(game, player, tile, planet)) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event,
+                        "Sarcosa's Monument must be placed on a non-home, non-Fracture planet adjacent to your or neutral units.");
+                return;
+            }
+            placingSarcosaMonumentInCoexistence =
+                    placingSarcosaMonument && !player.getPlanetsAllianceMode().contains(planetName);
         }
         if ("mf".equalsIgnoreCase(unitID) && "tyris".equalsIgnoreCase(player.getFaction())) {
             MessageHelper.sendMessageToChannel(
@@ -2039,11 +2054,32 @@ public final class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 monument in the space area of the "
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
+                String coexistFlag = game.getStoredValue("coexistFlag");
+                if (placingSarcosaMonumentInCoexistence) {
+                    game.setStoredValue("coexistFlag", "yes");
+                }
+                try {
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
+                } finally {
+                    if (placingSarcosaMonumentInCoexistence) {
+                        if (coexistFlag.isEmpty()) {
+                            game.removeStoredValue("coexistFlag");
+                        } else {
+                            game.setStoredValue("coexistFlag", coexistFlag);
+                        }
+                    }
+                }
                 MonumentsAgendaService.resolveCathedralOfIxthPlacement(game, player, planetName);
                 successMessage = "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
                 if (player.hasUnit("saar_monument")) {
                     MonumentsButtonHandler.sendSaarMonumentSpaceDockButtons(game, player, event, true);
+                }
+                if (buttonID.startsWith("place_monument_")) {
+                    UnitModel monument = player.getUnitByBaseType("monument");
+                    if (monument != null) {
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                player.getCorrectChannel(), successMessage, monument.getRepresentationEmbed());
+                    }
                 }
             }
         } else {

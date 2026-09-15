@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -1103,6 +1104,20 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
+                if (game.isMonumentsMode() && "monument".equalsIgnoreCase(unit) && player.hasUnit("sarcosa_monument")) {
+                    List<Button> buttons = MonumentsBRButtonHandler.getSarcosaMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "You have no eligible planet on which to place Raider Stronghold.");
+                        return;
+                    }
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            player.getRepresentationNoPing()
+                                    + ", choose a planet adjacent to your or neutral units on which to place _Raider Stronghold_.",
+                            buttons);
+                    return;
+                }
                 if (game.isMonumentsMode()
                         && "monument".equalsIgnoreCase(unit)
                         && (player.hasUnit("bastion_monument")

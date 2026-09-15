@@ -1336,6 +1336,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "notes": "Use the button BEFORE assigning hits.",
         "ability": "When 1 or more of your infantry would be destroyed, you may exhaust this card to place those units on this planet instead."
     },
     {
@@ -1373,6 +1374,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "If you have more Honor than Dishonor, flip this card.\nAfter a player wins a combat in this system, they may draw a secret objective.\nIf your Dishonor is 8, move this unit to the space area; it cannot be destroyed."
     },
     {
