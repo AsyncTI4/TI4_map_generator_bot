@@ -468,7 +468,7 @@ public class WebPlayerArea {
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                fillUnits(unitMapCount, unitHolder);
+                fillUnits(unitMapCount, unitHolder, false);
             }
         }
 
@@ -476,7 +476,7 @@ public class WebPlayerArea {
         for (Player gamePlayer : game.getPlayers().values()) {
             UnitHolder nombox = gamePlayer.getNomboxTile().getSpaceUnitHolder();
             if (nombox != null) {
-                fillUnits(unitMapCount, nombox);
+                fillUnits(unitMapCount, nombox, true);
             }
         }
 
@@ -501,10 +501,6 @@ public class WebPlayerArea {
             Map<String, Map<String, Integer>> unitsByFaction = new HashMap<>();
             for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
                 String unitId = unitKey.asyncID();
-                if (unitKey.unitType() == Units.UnitType.Infantry || unitKey.unitType() == Units.UnitType.Fighter) {
-                    // Skip infantry and fighters as they are not counted towards unit counts when captured
-                    continue;
-                }
                 // Get the actual player/faction that owns this captured unit
                 Player unitOwner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                 if (unitOwner != null) {
@@ -530,6 +526,10 @@ public class WebPlayerArea {
         }
         webPlayerArea.nombox = nomboxData;
 
+        System.out.println("WebPlayerArea for player " + player.getColor() + ": " + webPlayerArea);
+        System.out.println("unitcount for player " + player.getColor() + ": " + webPlayerArea.getUnitCounts());
+        System.out.println("nombox for player " + player.getColor() + ": " + webPlayerArea.getNombox());
+
         if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             webPlayerArea.mahactEdict = player.getMahactCC();
         } else {
@@ -548,9 +548,9 @@ public class WebPlayerArea {
         return webPlayerArea;
     }
 
-    private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder) {
+    private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean isCaptured) {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
-            if (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter) {
+            if (!isCaptured && (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter)) {
                 unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
                 continue;
             }
