@@ -3,15 +3,11 @@ package ti4.service.async;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -23,10 +19,12 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.MessageSearchService;
 
 @UtilityClass
 public class BanCleanupService {
 
+    private static final int MAX_SPAM_POSTS_TO_DELETE = 50;
     private static final List<String> BOT_QUESTION_CHANNEL_NAMES = List.of(
             "bot-questions-and-support-and-feedback",
             "bot-questions-and-feedback",
@@ -166,9 +164,7 @@ public class BanCleanupService {
             for (String channelName : BOT_QUESTION_CHANNEL_NAMES) {
                 List<TextChannel> channels = guild.getTextChannelsByName(channelName, true);
                 if (!channels.isEmpty()) {
-                    TextChannel channel = channels.getFirst();
-                    channel.getHistoryAround(channel.getLatestMessageId(), 100)
-                            .queue(hist -> findAndDeleteSpamPosts(user, hist), BotLogger::catchRestError);
+                    deleteSpamPosts(channels.getFirst(), user);
                 }
             }
         } catch (Exception e) {
@@ -178,23 +174,15 @@ public class BanCleanupService {
         return errors;
     }
 
-    private void findAndDeleteSpamPosts(User user, MessageHistory hist) {
-        for (Message m : hist.getRetrievedHistory()) {
-            if (authorIsUser(m.getAuthor(), user)) {
-                m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-        }
-    }
-
-    private boolean authorIsUser(User author, User user) {
-        String authorNameLower = author.getName().toLowerCase();
-        List<String> names = Stream.of(user.getName(), user.getEffectiveName(), user.getGlobalName())
-                .filter(Objects::nonNull)
-                .toList();
-        for (String n : names) {
-            if (authorNameLower.startsWith(n.toLowerCase())) return true;
-        }
-        return author.getId().equals(user.getId());
+    private void deleteSpamPosts(TextChannel channel, User user) {
+        MessageSearchService.findMessagesByAuthor(channel, user, MAX_SPAM_POSTS_TO_DELETE)
+                .thenAccept(spamPosts -> {
+                    if (!spamPosts.isEmpty()) channel.purgeMessages(spamPosts);
+                })
+                .exceptionally(error -> {
+                    BotLogger.catchRestError(error);
+                    return null;
+                });
     }
 
     private String formatGuildActionError(String action, UserSnowflake user, Guild guild) {
