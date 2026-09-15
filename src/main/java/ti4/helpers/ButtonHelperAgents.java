@@ -1808,7 +1808,8 @@ public final class ButtonHelperAgents {
         boolean present = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
-                    || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
+                    || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+                    || uH.getUnitCount(UnitType.Monument, player.getColor()) > 0) {
                 return true;
             }
             if (player.hasAbility("byssus")

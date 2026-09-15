@@ -863,6 +863,24 @@ public final class ButtonHelperTacticalAction {
                                     + " activated the system containing _Vault of New Phrad_ and thus may flip it.",
                             MonumentsDSButtonHandler.getVaultFlipButtons(monumentOwner));
                 }
+                if (monumentOwner != player
+                        && MonumentsService.isMonumentOnBoard(game, monumentOwner, "kaltrim_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "kaltrim_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " you must spend 1 command token from one of your pools to activate this system.",
+                            ButtonHelper.getLoseCCButtons(player));
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "xin_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "xin_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", " + (player == monumentOwner ? " you" : player.getRepresentationNoPing())
+                                    + " activated the system containing _Celestial Court_, and thus may either gain or flip 1 balance token.",
+                            ButtonHelper.getBalanceButtons(monumentOwner));
+                }
             }
         }
         KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
@@ -1275,7 +1293,7 @@ public final class ButtonHelperTacticalAction {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {
-            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
+            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds, UnitType.Monument));
         }
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             movableFromPlanets.add(UnitType.Pds);

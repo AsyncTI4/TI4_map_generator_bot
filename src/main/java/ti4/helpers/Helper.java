@@ -65,6 +65,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -1131,8 +1132,18 @@ public final class Helper {
 
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         UnitModel unitModel = "monument".equalsIgnoreCase(unit) ? player.getUnitByBaseType("monument") : null;
+        boolean placingSarcosaMonument = unitModel != null && "sarcosa_monument".equals(unitModel.getId());
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
+        if (placingSarcosaMonument) {
+            for (Tile tile : game.getTileMap().values()) {
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    if (!planets.contains(planet.getName())) {
+                        planets.add(planet.getName());
+                    }
+                }
+            }
+        }
         player.resetProducedUnits();
         for (String planet : planets) {
             Planet uh = game.getUnitHolderFromPlanet(planet);
@@ -1162,6 +1173,11 @@ public final class Helper {
                     planetTypes.add("LIGHTNING");
                 }
                 if (!unitModel.canBePlacedOnPlanetTypes(planetTypes)) {
+                    continue;
+                }
+                if (placingSarcosaMonument
+                        && !player.getPlanetsAllianceMode().contains(planet)
+                        && !MonumentsBRButtonHandler.canPlaceSarcosaMonument(game, player, tile, uh)) {
                     continue;
                 }
             }

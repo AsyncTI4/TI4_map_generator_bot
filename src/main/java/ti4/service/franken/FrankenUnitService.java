@@ -67,6 +67,9 @@ public class FrankenUnitService {
                 }
                 sb.append("> ").append(unitText);
                 player.addOwnedUnitByID(unitID);
+                if (player.getGame().isMonumentsMode() && unitModel.getUnitType() == UnitType.Monument) {
+                    player.setUnitCap("monument", 1);
+                }
             }
             if ("naaz_mech".equalsIgnoreCase(unitID)) {
                 player.addOwnedUnitByID("naaz_mech_space");

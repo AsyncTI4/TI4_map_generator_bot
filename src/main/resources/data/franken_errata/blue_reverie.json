@@ -363,6 +363,14 @@
         "source": "blue_reverie"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "sarcosabt",
+        "optionalSwaps": [
+            "MONUMENT:sarcosa_monument"
+        ],
+        "source": "blue_reverie"
+    },
+    {
         "itemCategory": "COMMANDER",
         "itemId": "sarcosacommander",
         "undraftable": true,

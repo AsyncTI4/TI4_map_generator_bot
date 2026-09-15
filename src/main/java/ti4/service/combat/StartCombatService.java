@@ -56,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -147,7 +148,8 @@ public class StartCombatService {
     }
 
     private static void spaceCombatCheck(Game game, Tile tile, GenericInteractionCreateEvent event) {
-        if (MonumentsTEButtonHandler.allowsPelagionSpaceCoexistence(game, tile)) {
+        if (MonumentsTEButtonHandler.allowsPelagionSpaceCoexistence(game, tile)
+                || MonumentsBRButtonHandler.preventsCharnelFaneSpaceCombat(game, tile)) {
             return;
         }
         List<Player> playersWithShipsInSystem = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
@@ -285,7 +287,8 @@ public class StartCombatService {
                     && unitHolder.getUnitCount(Units.UnitType.Mech, player2.getColor()) < 1
                     && unitHolder.getUnitCount(Units.UnitType.Infantry, player2.getColor()) < 1
                     && (unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) > 0
-                            || unitHolder.getUnitCount(Units.UnitType.Spacedock, player2.getColor()) > 0)) {
+                            || unitHolder.getUnitCount(Units.UnitType.Spacedock, player2.getColor()) > 0
+                            || unitHolder.getUnitCount(Units.UnitType.Monument, player2.getColor()) > 0)) {
                 String msg2 =
                         player2.getRepresentation() + ", you may wish to remove structures on " + unitHolder.getName()
                                 + " if your opponent is not playing _Infiltrate_ or using **Assimilate**. Use buttons to resolve.";
@@ -2024,6 +2027,14 @@ public class StartCombatService {
                     Buttons.gray(factionChecker + "toldarPN", "Gain 3 Commodities (Upon Win)", FactionEmojis.toldar));
         }
 
+        if (game.isMonumentsMode()) {
+            Player monumentOwner = MonumentsService.getMonumentOwner(game, "toldar_monumentdishonor");
+            if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "toldar_monumentdishonor")
+                    && tile == MonumentsService.getMonumentTile(game, monumentOwner, "toldar_monumentdishonor")) {
+                buttons.add(Buttons.gray("non_sc_draw_so", "Draw Secret (On Win)", FactionEmojis.toldar));
+            }
+        }
+
         if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
@@ -2037,6 +2048,14 @@ public class StartCombatService {
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
                     FactionEmojis.belkosea));
+        }
+        Button p2ArmageddonProjectCaled = MonumentsBRButtonHandler.getArmageddonProjectCaledButton(game, p2, tile);
+        if (!game.isFowMode() && p2ArmageddonProjectCaled != null) {
+            buttons.add(p2ArmageddonProjectCaled);
+        }
+        Button p1ArmageddonProjectCaled = MonumentsBRButtonHandler.getArmageddonProjectCaledButton(game, p1, tile);
+        if (p1ArmageddonProjectCaled != null) {
+            buttons.add(p1ArmageddonProjectCaled);
         }
 
         boolean hasDevotionShips = space != null
@@ -2225,7 +2244,7 @@ public class StartCombatService {
         } else {
             for (Player p3 : game.getRealPlayers()) {
                 if (CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                                game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock)
+                                game, p3, Units.UnitType.Pds, Units.UnitType.Spacedock, Units.UnitType.Monument)
                         .contains(tile)) {
                     gheminaCommanderApplicable = true;
                     break;

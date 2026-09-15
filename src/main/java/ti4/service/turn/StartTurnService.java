@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -38,6 +39,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMon
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -532,6 +534,16 @@ public class StartTurnService {
                     && MonumentsDSButtonHandler.hasTwoReadiedCorePlanets(player, game)
                     && game.getLaws().size() > 0) {
                 startButtons.add(MonumentsDSButtonHandler.getVerdantHaloButton(player));
+            }
+            Tile oasisTile = MonumentsService.getMonumentTile(game, player, "uydai_monument");
+            if (MonumentsService.isMonumentOnBoard(game, player, "uydai_monument")
+                    && MonumentsService.isMonumentReady(game, player, "uydai_monument")
+                    && oasisTile != null
+                    && oasisTile.hasPlayerCC(player)) {
+                Button oasisButton = MonumentsBRButtonHandler.getOasisButton(game, player);
+                if (oasisButton != null) {
+                    startButtons.add(oasisButton);
+                }
             }
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {

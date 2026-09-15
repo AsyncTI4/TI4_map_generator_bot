@@ -3,6 +3,7 @@ package ti4.game.persistence;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -31,6 +32,8 @@ class TransientGameInfoUpdater {
             TeHelperGeneral.checkTransientInfo(game);
             for (Player player : game.getRealPlayers()) {
                 CommanderUnlockCheckService.checkPlayer(player, "ta");
+                MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);
+                MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
             }
         } catch (Exception e) {
             BotLogger.error(

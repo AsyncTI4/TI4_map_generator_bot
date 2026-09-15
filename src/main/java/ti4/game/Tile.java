@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
@@ -590,6 +591,9 @@ public class Tile {
                 "token_nebula_async.png",
                 "token_beans_nexus.png")) return true;
         if (game != null) {
+            if (MonumentsBRButtonHandler.makesTileNebula(game, this)) {
+                return true;
+            }
             for (Player p : game.getPlayers().values()) {
                 if ((p.hasUnlockedBreakthrough("veldyrbt") || p.hasTech("tf-harnessedaurora"))
                         && p.getHomeSystemTile() == this) {
