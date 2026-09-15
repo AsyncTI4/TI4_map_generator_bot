@@ -178,6 +178,7 @@ public class MonumentsBRButtonHandler {
     public static boolean preventsCharnelFaneSpaceCombat(Game game, Tile tile) {
         Player owner = MonumentsService.getMonumentOwner(game, "toldar_monumentdishonor");
         return owner != null
+                && game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, owner, "toldar_monumentdishonor")
                 && tile == MonumentsService.getMonumentTile(game, owner, "toldar_monumentdishonor")
                 && tile.getSpaceUnitHolder().getUnitCount(UnitType.Monument, owner) > 0

@@ -1104,11 +1104,7 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
-                if (game.isMonumentsMode()
-                        && "monument".equalsIgnoreCase(unit)
-                        && player.getUnitByBaseType("monument") != null
-                        && "sarcosa_monument"
-                                .equals(player.getUnitByBaseType("monument").getId())) {
+                if (game.isMonumentsMode() && "monument".equalsIgnoreCase(unit) && player.hasUnit("sarcosa_monument")) {
                     List<Button> buttons = MonumentsBRButtonHandler.getSarcosaMonumentPlacementButtons(game, player);
                     if (buttons.isEmpty()) {
                         MessageHelper.sendEphemeralMessageToEventChannel(
