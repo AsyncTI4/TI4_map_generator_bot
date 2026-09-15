@@ -546,8 +546,10 @@ public class WebPlayerArea {
 
     private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean isCaptured) {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
-            if (!isCaptured && (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter)) {
-                unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
+            if (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter) {
+                if (!isCaptured) {
+                    unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
+                }
                 continue;
             }
 
