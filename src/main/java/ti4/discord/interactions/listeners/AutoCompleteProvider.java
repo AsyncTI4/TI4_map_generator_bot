@@ -870,12 +870,14 @@ class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                boolean fogRestricted = game.isFowMode()
+                boolean fogRestricted = game != null
+                        && game.isFowMode()
                         && !FoWHelper.isGameMaster(event.getUser().getId(), game);
                 Map<String, TechnologyModel> techs = fogRestricted
                         ? Mapper.getTechs()
                         : Mapper.getTechs().entrySet().stream()
-                                .filter(entry -> game.getTechnologyDeck().contains(entry.getKey()))
+                                .filter(entry ->
+                                        game != null && game.getTechnologyDeck().contains(entry.getKey()))
                                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
                 List<Command.Choice> options = techs.entrySet().stream()
