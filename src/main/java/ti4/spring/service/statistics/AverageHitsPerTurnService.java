@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
@@ -31,7 +30,6 @@ public class AverageHitsPerTurnService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    @Transactional(readOnly = true)
     public void getExpectedHitsPerTurn(SlashCommandInteractionEvent event) {
         boolean sortOrderAscending = event.getOption("ascending", Boolean.TRUE, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
@@ -90,7 +88,6 @@ public class AverageHitsPerTurnService {
         return userToAccumulators;
     }
 
-    @Transactional(readOnly = true)
     public String getAverageHitsPerTurn(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
