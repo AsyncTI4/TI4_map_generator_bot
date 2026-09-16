@@ -1285,7 +1285,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the end of the strategy phase, choose and place 1 control token on a super weapon card in your play area. This card has the text abilities of each super weapon card in your play area that has 1 of your control tokens."
+        "ability": "At the end of the strategy phase, choose and place 1 control token on a superweapon card in a play area. This card has the text abilities of each superweapon card in a play area that has 1 of your control tokens."
     },
     {
         "id": "kaltrim_monument",

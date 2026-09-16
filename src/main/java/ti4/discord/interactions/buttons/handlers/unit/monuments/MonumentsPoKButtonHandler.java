@@ -281,6 +281,7 @@ public class MonumentsPoKButtonHandler {
             for (Tile monumentTile : monumentTiles) {
                 List<Button> buttons = game.getRealPlayers().stream()
                         .filter(tokenOwner -> monumentTile.hasPlayerCC(tokenOwner))
+                        .filter(tokenOwner -> !player.getMahactCC().contains(tokenOwner.getColor()))
                         .map(tokenOwner -> Buttons.green(
                                 player.factionButtonChecker() + RESOLVE_SPIRE_OF_IXTH + monumentTile.getPosition() + "|"
                                         + tokenOwner.getColor(),
@@ -316,13 +317,14 @@ public class MonumentsPoKButtonHandler {
                         && !player.getMahactCC().contains(tokenOwner.getColor())
                         && tile == MonumentsService.getMonumentTile(game, player, "mahact_monument");
             } else if ("mahact".equals(player.getFaction())) {
-                canUse = ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile)
-                        || game.getRealPlayers().stream()
-                                .filter(monumentOwner ->
-                                        MonumentsService.isMonumentOnBoard(game, monumentOwner, "mahact_monument"))
-                                .map(monumentOwner ->
-                                        MonumentsService.getMonumentTile(game, monumentOwner, "mahact_monument"))
-                                .anyMatch(tile::equals);
+                canUse = !player.getMahactCC().contains(tokenOwner.getColor())
+                        && (ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile)
+                                || game.getRealPlayers().stream()
+                                        .filter(monumentOwner -> MonumentsService.isMonumentOnBoard(
+                                                game, monumentOwner, "mahact_monument"))
+                                        .map(monumentOwner -> MonumentsService.getMonumentTile(
+                                                game, monumentOwner, "mahact_monument"))
+                                        .anyMatch(tile::equals));
             }
         }
         if (!canUse) {
