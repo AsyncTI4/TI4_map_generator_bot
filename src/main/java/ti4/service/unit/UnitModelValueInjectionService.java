@@ -2,6 +2,7 @@ package ti4.service.unit;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
@@ -9,7 +10,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.model.UnitModel;
+import ti4.service.franken.FrankenUnitService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
 
@@ -19,6 +22,27 @@ public class UnitModelValueInjectionService {
     public UnitModel injectPlayerUnitValues(Player player, UnitModel unit) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(unit);
+
+        UnitModel injectedUnit = injectSingleUnitValues(player, unit);
+        if (!FrankenUnitService.isDuplicateUnitCombiningEnabled(player)) {
+            return injectedUnit;
+        }
+        List<UnitModel> matchingUnits = player.getUnitsOwned().stream()
+                .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
+                .filter(ownedUnit -> unit.getAsyncId().equalsIgnoreCase(ownedUnit.getAsyncId()))
+                .toList();
+        if (matchingUnits.size() < 2) {
+            return injectedUnit;
+        }
+        return combineDuplicateUnits(
+                injectedUnit,
+                matchingUnits.stream()
+                        .map(ownedUnit -> injectSingleUnitValues(player, ownedUnit))
+                        .toList());
+    }
+
+    private UnitModel injectSingleUnitValues(Player player, UnitModel unit) {
 
         UnitValueInjection values = getPlayerUnitValueInjection(player, unit);
         UnitModel injectedUnit = values.isEmpty() ? unit : injectValues(unit, values);
@@ -145,6 +169,93 @@ public class UnitModelValueInjectionService {
             }
         }
         return injectedUnit;
+    }
+
+    private UnitModel combineDuplicateUnits(UnitModel representative, List<UnitModel> units) {
+        UnitModel combined = copyUnit(representative);
+        List<UnitModel> displayedUnits =
+                units.stream().filter(unit -> unit.getFaction().isPresent()).toList();
+        if (displayedUnits.isEmpty()) {
+            displayedUnits = units;
+        }
+        combined.setName(displayedUnits.stream()
+                .map(UnitModel::getName)
+                .distinct()
+                .collect(java.util.stream.Collectors.joining(" / ")));
+        combined.setMoveValue(
+                units.stream().mapToInt(UnitModel::getMoveValue).max().orElse(combined.getMoveValue()));
+        combined.setProductionValue(
+                units.stream().mapToInt(UnitModel::getProductionValue).max().orElse(combined.getProductionValue()));
+        combined.setBasicProduction(units.stream()
+                .map(UnitModel::getBasicProduction)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(combined.getBasicProduction()));
+        combined.setCapacityValue(
+                units.stream().mapToInt(UnitModel::getCapacityValue).max().orElse(combined.getCapacityValue()));
+        combined.setFleetSupplyBonus(
+                units.stream().mapToInt(UnitModel::getFleetSupplyBonus).max().orElse(combined.getFleetSupplyBonus()));
+        combined.setCapacityUsed(
+                units.stream().mapToInt(UnitModel::getCapacityUsed).max().orElse(combined.getCapacityUsed()));
+        combined.setCost(
+                units.stream().map(UnitModel::getCost).max(Float::compare).orElse(combined.getCost()));
+        combined.setCombatDieCount(
+                units.stream().mapToInt(UnitModel::getCombatDieCount).max().orElse(combined.getCombatDieCount()));
+        combined.setCombatHitsOn(getBestHitsOn(
+                units, UnitModel::getCombatDieCount, UnitModel::getCombatHitsOn, combined.getCombatHitsOn()));
+        combined.setAfbDieCount(
+                units.stream().mapToInt(UnitModel::getAfbDieCount).max().orElse(combined.getAfbDieCount()));
+        combined.setAfbHitsOn(
+                getBestHitsOn(units, UnitModel::getAfbDieCount, UnitModel::getAfbHitsOn, combined.getAfbHitsOn()));
+        combined.setBombardDieCount(
+                units.stream().mapToInt(UnitModel::getBombardDieCount).max().orElse(combined.getBombardDieCount()));
+        combined.setBombardHitsOn(getBestHitsOn(
+                units, UnitModel::getBombardDieCount, UnitModel::getBombardHitsOn, combined.getBombardHitsOn()));
+        combined.setSpaceCannonDieCount(units.stream()
+                .mapToInt(UnitModel::getSpaceCannonDieCount)
+                .max()
+                .orElse(combined.getSpaceCannonDieCount()));
+        combined.setSpaceCannonHitsOn(getBestHitsOn(
+                units,
+                UnitModel::getSpaceCannonDieCount,
+                UnitModel::getSpaceCannonHitsOn,
+                combined.getSpaceCannonHitsOn()));
+        combined.setIsUpgrade(units.stream().anyMatch(UnitModel::getIsUpgrade));
+        combined.setDeepSpaceCannon(units.stream().anyMatch(UnitModel::getDeepSpaceCannon));
+        combined.setPlanetaryShield(units.stream().anyMatch(UnitModel::getPlanetaryShield));
+        combined.setSustainDamage(units.stream().anyMatch(UnitModel::getSustainDamage));
+        combined.setDisablesPlanetaryShield(units.stream().anyMatch(UnitModel::getDisablesPlanetaryShield));
+        combined.setCanBeDirectHit(units.stream().anyMatch(UnitModel::getCanBeDirectHit));
+        combined.setIsStructure(units.stream().anyMatch(UnitModel::getIsStructure));
+        combined.setIsMonument(units.stream().anyMatch(UnitModel::getIsMonument));
+        combined.setIsGroundForce(units.stream().anyMatch(UnitModel::getIsGroundForce));
+        combined.setIsShip(units.stream().anyMatch(UnitModel::getIsShip));
+        combined.setIsSpaceOnly(units.stream().anyMatch(UnitModel::getIsSpaceOnly));
+        combined.setIsPlanetOnly(units.stream().anyMatch(UnitModel::getIsPlanetOnly));
+        LinkedHashMap<String, String> abilities = new LinkedHashMap<>();
+        for (UnitModel ownedUnit : displayedUnits) {
+            ownedUnit
+                    .getAbility()
+                    .filter(ability -> !ability.isBlank())
+                    .ifPresent(
+                            ability -> abilities.putIfAbsent(ability, "**" + ownedUnit.getName() + "**: " + ability));
+        }
+        String combinedAbility = String.join("\n", abilities.values());
+        combined.setAbility(
+                combinedAbility.length() <= 1024 ? combinedAbility : combinedAbility.substring(0, 1021) + "...");
+        return combined;
+    }
+
+    private int getBestHitsOn(
+            List<UnitModel> units,
+            java.util.function.ToIntFunction<UnitModel> dieCount,
+            java.util.function.ToIntFunction<UnitModel> hitsOn,
+            int fallback) {
+        return units.stream()
+                .filter(unit -> dieCount.applyAsInt(unit) > 0)
+                .mapToInt(hitsOn)
+                .min()
+                .orElse(fallback);
     }
 
     // TODO: Add TF Nomad FS, 3 TF Mechs, TK Xxcha flag, Lightrail, PinkTF Flagship

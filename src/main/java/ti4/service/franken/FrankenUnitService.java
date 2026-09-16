@@ -17,6 +17,50 @@ import ti4.service.VeiledHeartService;
 @UtilityClass
 public class FrankenUnitService {
 
+    public static final String COMBINE_DUPLICATE_UNIT_TYPES = "frankenCombineDuplicateUnitTypes";
+
+    public static boolean isDuplicateUnitCombiningEnabled(Player player) {
+        return player != null
+                && player.getGame() != null
+                && player.getGame().isFrankenGame()
+                && !player.getGame().isTwilightsFallMode()
+                && "true".equals(player.getGame().getStoredValue(COMBINE_DUPLICATE_UNIT_TYPES));
+    }
+
+    public static boolean researchMatchingUnitUpgrades(Player player, String techID) {
+        if (!isDuplicateUnitCombiningEnabled(player)) {
+            return false;
+        }
+        UnitModel researchedUnit = Mapper.getUnitModelByTechUpgrade(techID);
+        if (researchedUnit == null) {
+            return false;
+        }
+        List<UnitModel> matchingUnits = player.getUnitsOwned().stream()
+                .map(Mapper::getUnit)
+                .filter(java.util.Objects::nonNull)
+                .filter(unit -> researchedUnit.getAsyncId().equalsIgnoreCase(unit.getAsyncId()))
+                .toList();
+        if (matchingUnits.size() < 2) {
+            return false;
+        }
+        List<UnitModel> matchingUpgrades = Stream.concat(
+                        Stream.of(researchedUnit),
+                        matchingUnits.stream()
+                                .map(UnitModel::getUpgradesToUnitId)
+                                .flatMap(java.util.Optional::stream)
+                                .map(Mapper::getUnit))
+                .filter(java.util.Objects::nonNull)
+                .filter(unit -> researchedUnit.getAsyncId().equalsIgnoreCase(unit.getAsyncId()))
+                .distinct()
+                .toList();
+        matchingUpgrades.forEach(unit -> {
+            unit.getRequiredTechId().ifPresent(player.getTechs()::add);
+            unit.getUpgradesFromUnitId().ifPresent(player::removeOwnedUnitByID);
+            player.addOwnedUnitByID(unit.getId());
+        });
+        return true;
+    }
+
     private static void removeDuplicates(Player player, UnitModel addedUnit) {
         boolean keepUpgrades = false;
         if (player.getGame().isTwilightsFallMode()
@@ -52,7 +96,7 @@ public class FrankenUnitService {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
                 UnitModel unitModel = Mapper.getUnit(unitID);
-                if (!dupes) {
+                if (!dupes && !isDuplicateUnitCombiningEnabled(player)) {
                     removeDuplicates(player, unitModel);
                 }
                 String unitText = unitID;
@@ -95,7 +139,10 @@ public class FrankenUnitService {
                 sb.append('\n');
                 player.removeOwnedUnitByID(unitID);
                 UnitModel u = Mapper.getUnit(unitID);
-                if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
+                if (u.getUnitType() != UnitType.Flagship
+                        && u.getUnitType() != UnitType.Mech
+                        && (!isDuplicateUnitCombiningEnabled(player)
+                                || player.getUnitsByAsyncID(u.getAsyncId()).isEmpty())) {
                     String replacementUnit = u.getBaseType();
                     player.addOwnedUnitByID(replacementUnit);
                 }
