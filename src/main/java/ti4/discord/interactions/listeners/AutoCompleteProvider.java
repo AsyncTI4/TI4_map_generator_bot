@@ -352,9 +352,7 @@ class AutoCompleteProvider {
                         .filter(unit -> (unit.getId() + " " + unit.getName())
                                 .toLowerCase()
                                 .contains(enteredValue))
-                        .filter(model -> model.getSource() != ComponentSource.miltymod
-                                && model.getSource() != ComponentSource.project_pi
-                                && model.getSource() != ComponentSource.asteroid)
+                        .filter(model -> !model.getSource().isHiddenFromSearch())
                         .limit(25)
                         .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() + ")", unit.getId()))
                         .collect(Collectors.toList());
@@ -1499,9 +1497,7 @@ class AutoCompleteProvider {
                         List<Command.Choice> options = Mapper.getTechs().values().stream()
                                 .filter(entry -> entry.getFaction().isPresent())
                                 .filter(entry -> entry.search(enteredValue))
-                                .filter(model -> model.getSource() != ComponentSource.miltymod
-                                        && model.getSource() != ComponentSource.project_pi
-                                        && model.getSource() != ComponentSource.asteroid)
+                                .filter(model -> !model.getSource().isHiddenFromSearch())
                                 .limit(25)
                                 .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
                                 .collect(Collectors.toList());

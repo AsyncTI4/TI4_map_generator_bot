@@ -1,6 +1,6 @@
 [
     {
-        "alias": "firmament-warsun2",
+        "alias": "nd_firmament_warsun2",
         "name": "The Dragon, Chained",
         "types": [
             "UNITUPGRADE"
@@ -12,7 +12,7 @@
         "text": "When you gain this card, purge all but 1 of your war sun units. Flip this card if the Obsidian faction is in play and place it on their faction sheet."
     },
     {
-        "alias": "obsidian-warsun2",
+        "alias": "nd_obsidian_warsun2",
         "name": "The Dragon, Freed",
         "types": [
             "UNITUPGRADE"
@@ -24,7 +24,7 @@
         "text": "This technology cannot be researched. When you gain this card, purge all but 1 of your warsun units. When this unit uses Bombardment, it uses it against each planet in its system and each adjacent system, even yours, ignoring PLANETARY SHIELD."
     },
     {
-        "alias": "jolnar_warsun2",
+        "alias": "nd_jolnar_warsun2",
         "name": "War Sun Project",
         "types": [
             "UNITUPGRADE"
@@ -36,7 +36,7 @@
         "text": "Other player's units in this system lose PLANETARY SHIELD"
     },
     {
-        "alias": "hacan_spacedock2",
+        "alias": "nd_hacan_spacedock2",
         "name": "Production Biomes II",
         "types": [
             "UNITUPGRADE"
@@ -48,7 +48,7 @@
         "text": "Up to 3 fighters in this system do not count against your ship's capacity.\nWhen this unit uses PRODUCTION, you may spend 1 token from your strategy pool to gain 4 trade goods and choose another player to gain 2 trade goods."
     },
     {
-        "alias": "empyrean_fighter2",
+        "alias": "nd_empyrean_fighter2",
         "name": "Tirune II",
         "types": [
             "UNITUPGRADE"
@@ -60,7 +60,7 @@
         "text": "This unit may move without being transported, counting against your fleetpool while doing so. During space combat in this system, you may remove 3 of your fighters to cancel an action card played by your opponent."
     },
     {
-        "alias": "naaz_fighter2",
+        "alias": "nd_naaz_fighter2",
         "name": "Morphwing II",
         "types": [
             "UNITUPGRADE"
@@ -72,7 +72,7 @@
         "text": "This unit may move without being transported, counting against your fleet pool while doing so. This unit can be committed during an invasion, after ground combat either return it to the space area or replace it with 1 infantry."
     },
     {
-        "alias": "letnev_dreadnought2",
+        "alias": "nd_letnev_dreadnought2",
         "name": "Dawncrusher II",
         "types": [
             "UNITUPGRADE"
@@ -84,7 +84,7 @@
         "text": "This unit cannot be destroyed by 'Direct Hit' action cards."
     },
     {
-        "alias": "yin_infantry2",
+        "alias": "nd_yin_infantry2",
         "name": "Yin Clone II",
         "types": [
             "UNITUPGRADE"
@@ -96,7 +96,7 @@
         "text": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control."
     },
     {
-        "alias": "yssaril_infantry2",
+        "alias": "nd_yssaril_infantry2",
         "name": "Guild Agents II",
         "types": [
             "UNITUPGRADE"
@@ -107,7 +107,7 @@
         "text": "After this unit is destroyed, place the unit on this card. After you commit this unit to another player's planet, you may look at that player's action cards and may remove 6 infantry from this card to take 1 of them."
     },
     {
-        "alias": "ghost_cruiser2",
+        "alias": "nd_ghost_cruiser2",
         "name": "Ahk Syl Fier II",
         "types": [
             "UNITUPGRADE"
@@ -119,7 +119,7 @@
         "text": "At the start of your turn, you may place or move a Creuss wormhole token into this system."
     },
     {
-        "alias": "cabal_carrier2",
+        "alias": "nd_cabal_carrier2",
         "name": "Vortexer II",
         "types": [
             "UNITUPGRADE"
@@ -131,7 +131,7 @@
         "text": "At the start of your turn, you may spend captured infantry or fighters to place matching units from your reinforcements in this system."
     },
     {
-        "alias": "keleresm_cruiser2",
+        "alias": "nd_keleresm_cruiser2",
         "name": "Saggitaria II",
         "types": [
             "UNITUPGRADE"
@@ -143,7 +143,7 @@
         "text": "Apply +1 to the results of this unit's combat rolls if there are at least 3 laws in play."
     },
     {
-        "alias": "keleresa_cruiser2",
+        "alias": "nd_keleresa_cruiser2",
         "name": "Saggitaria II",
         "types": [
             "UNITUPGRADE"
@@ -155,7 +155,7 @@
         "text": "Apply +1 to the results of this unit's combat rolls if there are at least 3 laws in play."
     },
     {
-        "alias": "keleresx_cruiser2",
+        "alias": "nd_keleresx_cruiser2",
         "name": "Saggitaria II",
         "types": [
             "UNITUPGRADE"
@@ -167,7 +167,7 @@
         "text": "Apply +1 to the results of this unit's combat rolls if there are at least 3 laws in play."
     },
     {
-        "alias": "winnu_pds2",
+        "alias": "nd_winnu_pds2",
         "name": "Justicer Rail II",
         "types": [
             "UNITUPGRADE"
@@ -179,7 +179,7 @@
         "text": "You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\nHits produced by this unit must be assigned to non-fighter ships if able."
     },
     {
-        "alias": "xxcha_pds2",
+        "alias": "nd_xxcha_pds2",
         "name": "Keeper Matrix II",
         "types": [
             "UNITUPGRADE"
