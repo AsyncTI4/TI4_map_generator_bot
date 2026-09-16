@@ -111,6 +111,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
+import ti4.service.franken.FrankenUnitService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -994,11 +995,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public List<UnitModel> getUnitModels() {
-        return getUnitsOwned().stream()
+        var units = getUnitsOwned().stream()
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
-                .map(this::injectPlayerUnitValues)
                 .toList();
+        if (FrankenUnitService.isDuplicateUnitCombiningEnabled(this)) {
+            units = new ArrayList<>(units.stream()
+                    .collect(Collectors.toMap(
+                            UnitModel::getAsyncId,
+                            Function.identity(),
+                            (first, second) -> getUnitModelPriority(first, null) >= getUnitModelPriority(second, null)
+                                    ? first
+                                    : second,
+                            LinkedHashMap::new))
+                    .values());
+        }
+        return units.stream().map(this::injectPlayerUnitValues).toList();
     }
 
     public UnitModel getUnitByBaseType(String unitType) {
@@ -1012,12 +1024,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public List<UnitModel> getUnitsByAsyncID(String asyncID) {
-        return getUnitsOwned().stream()
+        var units = getUnitsOwned().stream()
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
-                .map(this::injectPlayerUnitValues)
                 .toList();
+        if (FrankenUnitService.isDuplicateUnitCombiningEnabled(this) && !units.isEmpty()) {
+            units = new ArrayList<>(units);
+            units.sort((first, second) -> getUnitModelPriority(second, null) - getUnitModelPriority(first, null));
+            return List.of(injectPlayerUnitValues(units.getFirst()));
+        }
+        return units.stream().map(this::injectPlayerUnitValues).toList();
     }
 
     private UnitModel injectPlayerUnitValues(UnitModel unit) {
@@ -1025,17 +1042,32 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public UnitModel getPriorityUnitByAsyncID(String asyncID, UnitHolder unitHolder) {
-        List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
+        if (!FrankenUnitService.isDuplicateUnitCombiningEnabled(this)) {
+            List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
+            if (allUnits.isEmpty()) {
+                return null;
+            }
+            if (allUnits.size() == 1) {
+                return allUnits.getFirst();
+            }
+            allUnits.sort((d1, d2) -> getUnitModelPriority(d2, unitHolder) - getUnitModelPriority(d1, unitHolder));
+            return allUnits.getFirst();
+        }
+        List<UnitModel> allUnits = getUnitsOwned().stream()
+                .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
+                .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         if (allUnits.isEmpty()) {
             return null;
         }
         if (allUnits.size() == 1) {
-            return allUnits.getFirst();
+            return injectPlayerUnitValues(allUnits.getFirst());
         }
         allUnits.sort((d1, d2) -> getUnitModelPriority(d2, unitHolder) - getUnitModelPriority(d1, unitHolder));
 
-        return allUnits.getFirst();
+        return injectPlayerUnitValues(allUnits.getFirst());
     }
 
     private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
@@ -2731,7 +2763,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         if (techModel.isUnitUpgrade()) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-            if (unitModel != null) {
+            if (unitModel != null && !FrankenUnitService.researchMatchingUnitUpgrades(this, techID)) {
                 // Remove all non-faction-upgrade matching units
                 String asyncId = unitModel.getAsyncId();
                 List<UnitModel> unitsToRemove = getUnitsByAsyncID(asyncId).stream()

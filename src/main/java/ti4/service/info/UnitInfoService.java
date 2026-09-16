@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.franken.FrankenAlternateTextService;
+import ti4.service.franken.FrankenUnitService;
 import ti4.service.unit.UnitModelValueInjectionService;
 
 @UtilityClass
@@ -50,9 +51,16 @@ public class UnitInfoService {
         } else {
             unitList.addAll(player.getSpecialUnitsOwned());
         }
-        for (UnitModel unitModel : unitList.stream()
-                .sorted()
-                .map(Mapper::getUnit)
+        List<UnitModel> unitModels =
+                unitList.stream().sorted().map(Mapper::getUnit).toList();
+        if (FrankenUnitService.isDuplicateUnitCombiningEnabled(player)) {
+            unitModels = unitModels.stream()
+                    .map(UnitModel::getAsyncId)
+                    .distinct()
+                    .map(asyncId -> player.getPriorityUnitByAsyncID(asyncId, null))
+                    .toList();
+        }
+        for (UnitModel unitModel : unitModels.stream()
                 .map(unit -> UnitModelValueInjectionService.injectPlayerUnitValues(player, unit))
                 .toList()) {
             MessageEmbed unitRepresentationEmbed =
