@@ -106,6 +106,9 @@ public class CardsInfoService {
                         || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument"))) {
             buttons.add(MonumentsTEButtonHandler.getKeleresMonumentStatusButton(game, player));
         }
+        if (MonumentsService.hasMonument(game, player, "firmament_monument")) {
+            buttons.add(MonumentsTEButtonHandler.getEpiphanyControlTokensButton(game, player));
+        }
         if (game.isMonumentsMode() && player.hasUnit("nekro_monument")) {
             buttons.add(NekroMonumentService.getCopyMonumentButton(player));
         }

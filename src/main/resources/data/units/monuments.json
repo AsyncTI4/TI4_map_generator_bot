@@ -205,7 +205,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool."
+        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool if it is their own token, or if it does not already have 1 of that player's tokens."
     },
     {
         "id": "mentak_monument",
@@ -481,7 +481,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a player activates this system, you may replace 1 control token on one of your plots with 1 of that player's control tokens."
+        "ability": "When a player activates this system, place their control token on this card if it does not have one. When you research a technology, you may remove a control token from this card to skip 1 prerequisite, or move a non-Firmament player's control token to a plot card."
     },
     {
         "id": "obsidian_monument",
@@ -1285,7 +1285,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the end of the strategy phase, choose and place 1 control token on a super weapon card in your play area. This card has the text abilities of each super weapon card in your play area that has 1 of your control tokens."
+        "ability": "At the end of the strategy phase, choose and place 1 control token on a superweapon card in a play area. This card has the text abilities of each superweapon card in a play area that has 1 of your control tokens."
     },
     {
         "id": "kaltrim_monument",
