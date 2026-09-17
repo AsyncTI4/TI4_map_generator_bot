@@ -1082,14 +1082,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("tf-swa".equals(unit.getAlias())) {
             score += 99;
         }
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
-                && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
-        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
+        if (unit.getFaction().isPresent() && unit.getIsUpgrade()) {
+            score += 4;
+        }
+        if (unit.getFaction().isPresent()) {
+            score += 3;
+        }
+        if (unit.getIsUpgrade()) {
+            score += 2;
+        }
         if (unitHolder != null
                 && ((Constants.SPACE.equals(unitHolder.getName()) && unit.getIsShip())
-                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) score++;
-        if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) {
+            score++;
+        }
+        if (unit.getSource().isTwilightFallish()
+                && unit.getIsUpgrade()
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
         }
