@@ -1043,6 +1043,23 @@
         "ability": "After movement, if this is the active system and contains no more than 1 other player's ships, you may place any of your captured units from your faction sheet into this system."
     },
     {
+        "id": "roh'dhna_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Zha'Ren Foundry (Legacy)",
+        "subtitle": "Roh'Dhna Monument (Legacy)",
+        "source": "monuments",
+        "faction": "rohdhna",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL"
+        ],
+        "spaceCannonHitsOn": 7,
+        "spaceCannonDieCount": 2,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you produce any number of units in this system, reduce the combined cost of those units by 2."
+    },
+    {
         "id": "rohdhna_monument",
         "baseType": "monument",
         "asyncId": "monument",
