@@ -799,9 +799,8 @@ public final class ButtonHelperTacticalAction {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
                 }
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "firmament_monument")
-                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")
-                        && player != monumentOwner) {
-                    MonumentsTEButtonHandler.sendEpiphanyMessage(monumentOwner);
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")) {
+                    MonumentsTEButtonHandler.placeEpiphanyControlToken(game, monumentOwner, player);
                 }
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "obsidian_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "obsidian_monument")

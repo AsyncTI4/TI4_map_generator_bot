@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -823,6 +824,7 @@ public class PlayerTechService {
         ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         if (isResearch) {
             ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
+            MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
         }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
