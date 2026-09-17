@@ -552,6 +552,9 @@ public final class Constants {
     public static final String SET_FOG_FILTER = "set_fog_filter";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
+    public static final String TARGET_PLANET_PING = "target_planet";
+    public static final String TARGET_SYSTEM_PING = "target_system";
+    public static final String TARGET_PLAYER_PING = "target_player_ping";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
     public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
@@ -724,6 +727,11 @@ public final class Constants {
     public static final String PLAYER = "player";
     public static final String SO_SCORE_FROM_HAND = "so_score_hand_";
     public static final String AC_PLAY_FROM_HAND = "ac_play_from_hand_";
+    public static final String AC_PING_PICK = "acPingPick_";
+    public static final String AC_PING_PLANET = "acPingPlanet";
+    public static final String AC_PING_SYSTEM = "acPingSystem";
+    public static final String AC_PING_PLAYER = "acPingPlayer";
+    public static final String AC_PING_ROUTE = "acPingRoute_";
     public static final String SLING_RELAY = "sling_relay";
     public static final String PO_SCORING = "po_scoring_";
     public static final String PO_NO_SCORING = "po_no_scoring";
