@@ -14,7 +14,7 @@ class ButtonHelperCapacityTest extends BaseTi4Test {
     private static final String PLAYER_COLOR = "red";
 
     private Tile createFlagshipTile() {
-        Tile tile = new Tile("flagship tile", null, null, null, null);
+        Tile tile = new Tile("flagship_tile", "000", null, null, null);
         tile.getSpaceUnitHolder().addUnit(new UnitKey(UnitType.Flagship, PLAYER_COLOR), 1);
         return tile;
     }
