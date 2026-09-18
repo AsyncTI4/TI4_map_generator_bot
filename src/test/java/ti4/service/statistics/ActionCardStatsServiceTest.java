@@ -602,6 +602,23 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         assertThat(rendered).contains("- Overrule: 1\n");
     }
 
+    @Test
+    void shouldShowEachOverruleTargetsShareOfAllOverrules() {
+        StringBuilder message = new StringBuilder();
+        ActionCardStatsService.appendOverruleStats(message, Map.of("Politics", 3, "Technology", 1));
+
+        // The share is spelled out on the leading row only, as the rows below it read the same way.
+        assertThat(message.toString()).isEqualTo("- Politics: 3 (75% of all Overrules)\n" + "- Technology: 1 (25%)\n");
+    }
+
+    @Test
+    void shouldSayNothingMatchedWhenNoOverruleWasRecorded() {
+        StringBuilder message = new StringBuilder();
+        ActionCardStatsService.appendOverruleStats(message, Map.of());
+
+        assertThat(message.toString()).isEqualTo("No Overrule data matched the selected filters.\n");
+    }
+
     private static UnattributedPlays unattributedPlays(Map<String, String> creationDatePerGameName) {
         UnattributedPlays plays = new UnattributedPlays();
         creationDatePerGameName.forEach((gameName, creationDate) -> plays.record(
