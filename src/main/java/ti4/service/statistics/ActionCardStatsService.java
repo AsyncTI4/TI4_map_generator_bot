@@ -117,7 +117,10 @@ public class ActionCardStatsService {
         Predicate<Game> gameFilter = GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
                 .and(game -> DEFAULT_AC_DECK_ID.equals(game.getAcDeckID()))
                 .and(game ->
-                        deckCardIds.containsAll(game.getDiscardActionCards().keySet()));
+                        deckCardIds.containsAll(game.getDiscardActionCards().keySet()))
+                // A table that purged Overrule played a different deck: every other card is drawn
+                // more often, and Overrule itself would read as never played rather than absent.
+                .and(game -> !game.isOverrulePurged());
         if (options.factionControl()) {
             gameFilter = gameFilter.and(
                     game -> !GameStatisticsFilterer.hasAnyFaction(game, ACTION_CARD_DISTORTING_FACTIONS));
@@ -286,7 +289,7 @@ public class ActionCardStatsService {
         String header =
                 "\n_6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with winners, using deck '"
                         + acDeck.getName()
-                        + "'"
+                        + "' with Overrule left in"
                         + (options.factionControl() ? ", excluding any game with " + FACTION_CONTROL_NAMES : "")
                         + "._\n";
         blocks.add(header);
