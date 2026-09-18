@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 
 @Service
@@ -24,7 +25,11 @@ public class PlayerSearchService {
         return SpringContext.getBean(PlayerSearchService.class);
     }
 
-    public List<String> searchAndAdd(PlayerSearchCriteria criteria, List<String> existingMemberIds, Duration hostWait) {
+    public List<String> searchAndAdd(
+            PlayerSearchCriteria criteria,
+            List<String> existingMemberIds,
+            Set<String> exemptUserIds,
+            Duration hostWait) {
         if (DatabasePersistenceGate.isDisabled()) return List.of();
 
         int targetSize = criteria.maxPlayerCount();
@@ -33,7 +38,7 @@ public class PlayerSearchService {
 
         MatchmakingQueueLock.LOCK.lock();
         try {
-            return searchAndAddLocked(criteria, existingMemberIds, hostWait, targetSize, openSlots);
+            return searchAndAddLocked(criteria, existingMemberIds, exemptUserIds, hostWait, targetSize, openSlots);
         } finally {
             MatchmakingQueueLock.LOCK.unlock();
         }
@@ -42,6 +47,7 @@ public class PlayerSearchService {
     private List<String> searchAndAddLocked(
             PlayerSearchCriteria criteria,
             List<String> existingMemberIds,
+            Set<String> exemptUserIds,
             Duration hostWait,
             int targetSize,
             int openSlots) {
@@ -50,8 +56,13 @@ public class PlayerSearchService {
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData =
                 PlayerMatchmakingDataFactory.buildForParties(queued);
+        List<String> criteriaMemberIds = existingMemberIds.stream()
+                .filter(id -> !exemptUserIds.contains(id))
+                .toList();
+        List<String> exemptMemberIds =
+                existingMemberIds.stream().filter(exemptUserIds::contains).toList();
         Map<String, PlayerMatchmakingData> hostData = PlayerMatchmakingDataFactory.buildForUsers(
-                existingMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks(), hostWait);
+                criteriaMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks(), hostWait);
 
         Set<String> takenUserIds = new HashSet<>(existingMemberIds);
         List<PlayerMatchmakingData> selectedGroup = new ArrayList<>(hostData.values());
@@ -75,6 +86,7 @@ public class PlayerSearchService {
             }
 
             if (!isPartyCompatible(party, partyData, selectedGroup)) continue;
+            if (avoidsAnExemptMember(party, partyData, exemptMemberIds)) continue;
 
             for (MatchmakingQueueMember member : party.members()) {
                 selectedGroup.add(partyData.get(member));
@@ -102,6 +114,23 @@ public class PlayerSearchService {
             }
         }
         return true;
+    }
+
+    private static boolean avoidsAnExemptMember(
+            QueuedParty party,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData,
+            List<String> exemptMemberIds) {
+        for (String exemptId : exemptMemberIds) {
+            List<String> exemptAvoids = UserSettingsManager.get(exemptId).getMatchmakingAvoidList();
+            for (MatchmakingQueueMember member : party.members()) {
+                PlayerMatchmakingData candidate = partyData.get(member);
+                if (exemptAvoids.contains(member.getUserId())
+                        || (candidate != null && candidate.avoidList().contains(exemptId))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static boolean doesConfigMatch(PlayerSearchCriteria criteria, QueuedParty party, int targetSize) {

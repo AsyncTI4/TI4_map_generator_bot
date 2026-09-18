@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
@@ -37,6 +38,7 @@ import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
+import ti4.spring.service.statistics.matchmaking.queue.JoinBlocker;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakingQueueSearchService;
 import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchCriteria;
@@ -91,15 +93,21 @@ public class CreateGameButtonHandler {
     public static void finishSignup(ModalInteractionEvent event) {
         List<Member> members = event.getValue("players").getAsMentions().getMembers();
         List<Member> membersOG = fetchMembersFromMessage(event);
+        boolean addedByPlayerInTheGame = membersOG.contains(event.getMember());
         List<String> blocked = new ArrayList<>();
+        List<String> exemptedIds = new ArrayList<>();
         for (Member member : members) {
             if (membersOG.contains(member)) continue;
-            Optional<String> blocker = findQueueJoinBlocker(event.getChannelId(), member.getId(), membersOG);
+            Optional<JoinBlocker> blocker = addedByPlayerInTheGame
+                    ? findMemberAddBlocker(event.getChannelId(), member.getId(), membersOG)
+                    : findQueueJoinBlocker(event.getChannelId(), member.getId(), membersOG);
             if (blocker.isPresent()) {
-                blocked.add(member.getAsMention() + " can't join because " + blocker.get());
+                blocked.add(member.getAsMention() + " can't join because "
+                        + blocker.get().reason());
                 continue;
             }
             membersOG.add(member);
+            if (addedByPlayerInTheGame) exemptedIds.add(member.getId());
             MatchmakerService.get().leaveQueue(member.getId());
             MessageHelper.sendMessageToEventChannel(
                     event, event.getUser().getEffectiveName() + " added " + member.getAsMention() + " to the game.");
@@ -107,6 +115,7 @@ public class CreateGameButtonHandler {
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
                 .queue();
+        MatchmakingQueueSearchService.get().addExemptMembers(event.getChannelId(), exemptedIds);
         MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(membersOG));
         if (!blocked.isEmpty()) {
             event.getHook()
@@ -207,9 +216,15 @@ public class CreateGameButtonHandler {
         return fetchMembersFromMessage(message.getContentRaw(), guild);
     }
 
-    private static Optional<String> findQueueJoinBlocker(
+    private static Optional<JoinBlocker> findQueueJoinBlocker(
             String threadId, String joiningUserId, List<Member> existingMembers) {
         return MatchmakingQueueSearchService.get().findJoinBlocker(threadId, joiningUserId, memberIds(existingMembers));
+    }
+
+    private static Optional<JoinBlocker> findMemberAddBlocker(
+            String threadId, String joiningUserId, List<Member> existingMembers) {
+        return MatchmakingQueueSearchService.get()
+                .findMemberAddBlocker(threadId, joiningUserId, memberIds(existingMembers));
     }
 
     private static List<String> memberIds(List<Member> members) {
@@ -323,12 +338,13 @@ public class CreateGameButtonHandler {
     public static void joinGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         if (!members.contains(event.getMember())) {
-            Optional<String> blocker =
+            Optional<JoinBlocker> blocker =
                     findQueueJoinBlocker(event.getChannelId(), event.getUser().getId(), members);
             if (blocker.isPresent()) {
                 event.getHook()
                         .setEphemeral(true)
-                        .sendMessage("You can't join this game because " + blocker.get())
+                        .sendMessage("You can't join this game because "
+                                + blocker.get().reason() + askToBeAddedSuggestion(blocker.get()))
                         .queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
@@ -347,18 +363,25 @@ public class CreateGameButtonHandler {
         }
     }
 
-    public static int addPlayersFromQueueSearch(ModalInteractionEvent event, PlayerSearchCriteria criteria) {
-        return addPlayersFromQueueSearch(event.getGuild(), event.getMessage(), criteria);
+    private static String askToBeAddedSuggestion(JoinBlocker blocker) {
+        if (!blocker.canBeAddedByMember()) return "";
+        return "\nIf you believe you would be a good match for this game, ask one of the players currently signed up"
+                + " to add you to it. Alternatively, they can leave the matchmaking queue.";
     }
 
-    public static int addPlayersFromQueueSearch(Guild guild, Message message, PlayerSearchCriteria criteria) {
+    public static int addPlayersFromQueueSearch(ModalInteractionEvent event, PlayerSearchCriteria criteria) {
+        return addPlayersFromQueueSearch(event.getGuild(), event.getMessage(), criteria, Set.of());
+    }
+
+    public static int addPlayersFromQueueSearch(
+            Guild guild, Message message, PlayerSearchCriteria criteria, Set<String> exemptUserIds) {
         String content = message.getContentRaw();
         List<Member> members = fetchMembersFromMessage(content, guild);
         List<String> existingIds = members.stream().map(Member::getId).toList();
 
         Duration hostWait = Duration.between(message.getTimeCreated().toInstant(), Instant.now());
         if (hostWait.isNegative()) hostWait = Duration.ZERO;
-        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds, hostWait);
+        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds, exemptUserIds, hostWait);
 
         List<Member> added = new ArrayList<>();
         for (String id : addedIds) {
