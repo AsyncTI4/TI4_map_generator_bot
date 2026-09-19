@@ -1485,7 +1485,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
 
-        return getCommoditiesBase() + getCommoditiesBonus();
+        int commodityValue = getCommoditiesBase();
+        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+            return commodityValue = 2;
+        }
+
+        return commodityValue + getCommoditiesBonus();
     }
 
     public int getCommoditiesBonus() {
@@ -1501,9 +1506,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
-        }
-        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
-            bonus -= 2;
         }
         if (hasTech("tf-corporateimperialism")) {
             bonus += 4;
