@@ -28,14 +28,10 @@ public class IndustrexService {
                 typesAvailable.add(unitModel.getUnitType());
             }
         }
-        if (game.isTwilightsFallMode()) {
-            for (String unit : player.getUnitsOwned()) {
-                if (unit.contains("tf-") || unit.contains("tk-")) {
-                    UnitModel unitModel = Mapper.getUnit(unit);
-                    if (unitModel != null && unitModel.getIsShip()) {
-                        typesAvailable.add(unitModel.getUnitType());
-                    }
-                }
+        for (String unitID : player.getUnitsOwned()) {
+            UnitModel unit = Mapper.getUnit(unitID);
+            if (unit != null && unit.getSource().isTwilightFallish() && unit.getIsUpgrade() && unit.getIsShip()) {
+                typesAvailable.add(unit.getUnitType());
             }
         }
 
