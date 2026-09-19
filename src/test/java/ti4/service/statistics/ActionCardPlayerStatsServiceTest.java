@@ -248,7 +248,7 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
 
         // Sol leads on play rate, so its row spells out the labels.
         List<String> blocks = new ArrayList<>();
-        stats.appendTo(blocks);
+        stats.appendOverruleTo(blocks);
         assertThat(blocks)
                 .anyMatch(block -> block.startsWith("- `66.67% of 3 games` ")
                         && block.endsWith(": 100% (1/1) win rate with it resolved, 0% (0/1) without playing it\n"));
@@ -263,9 +263,9 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         String rendered = render(new ActionCardPlayerStatsService());
 
         assertThat(rendered)
-                .contains("**Win rate by cards played**")
-                .contains("**Cards played per faction**")
-                .contains("**Overrule by faction**")
+                .contains("### Win rate by cards played")
+                .contains("### Cards played per faction")
+                .contains("### Overrule by faction")
                 .contains("No tracked action card plays matched the selected filters.");
     }
 
@@ -299,9 +299,12 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         }
     }
 
+    // The report puts the deck-wide Overrule targets between the two, which has nothing to say
+    // about these sections - joined back up here, they read as they do in the report.
     private static String render(ActionCardPlayerStatsService stats) {
         List<String> blocks = new ArrayList<>();
         stats.appendTo(blocks);
+        stats.appendOverruleTo(blocks);
         return String.join("", blocks);
     }
 }

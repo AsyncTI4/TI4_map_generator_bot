@@ -292,7 +292,7 @@ public class ActionCardStatsService {
         blocks.add(header);
 
         StringBuilder impactScoreNotes = new StringBuilder();
-        impactScoreNotes.append("\n**Impact Score**\n");
+        impactScoreNotes.append("### Impact Score\n");
         impactScoreNotes
                 .append("_Only games started after ")
                 .append(PLAYER_TRACKING_START_DATE)
@@ -310,19 +310,20 @@ public class ActionCardStatsService {
                 options.weights(),
                 options.fullDetails());
 
+        playerStats.appendTo(blocks);
+
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             StringBuilder overruleTargets = new StringBuilder();
-            overruleTargets.append("\n**Overrule targets**\n");
+            overruleTargets.append("### Overrule targets\n");
             appendTrackingStartNote(overruleTargets);
             appendOverruleStats(overruleTargets, OverruleStatsService.get().getCountPerStrategyCard(includedGameNames));
             blocks.add(overruleTargets.toString());
         }
-
-        playerStats.appendTo(blocks);
+        playerStats.appendOverruleTo(blocks);
 
         StringBuilder playAndCancelStats = new StringBuilder();
         Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);
-        playAndCancelStats.append("\n**Plays vs estimated draws, and cancel rates**\n");
+        playAndCancelStats.append("### Plays vs estimated draws, and cancel rates\n");
         appendRecoveredDataNote(playAndCancelStats);
         appendEstimatedDrawsNote(
                 playAndCancelStats, computeEstimatedDrawsPerCopyCount(actionCardsPlayedCounts, copiesPerName));
@@ -341,7 +342,7 @@ public class ActionCardStatsService {
     // Every game in the correlation section is new enough to record who played each card, so this
     // should always be empty. Anything listed here is a live recording path dropping the player.
     static void appendUnattributedPlayDebug(StringBuilder message, Map<String, UnattributedPlays> unattributedPlays) {
-        message.append("\n**Unattributed plays (developer debug)**\n");
+        message.append("### Unattributed plays (developer debug)\n");
         message.append(
                 "_Play-to-win correlation plays with no recorded player, per card, with the games they came from._\n");
         if (unattributedPlays.isEmpty()) {
@@ -500,12 +501,13 @@ public class ActionCardStatsService {
                 + "%";
     }
 
-    private static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {
+    static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {
         if (overruleCounts.isEmpty()) {
             message.append("No Overrule data matched the selected filters.\n");
             return;
         }
 
+        int total = overruleCounts.values().stream().mapToInt(Integer::intValue).sum();
         overruleCounts.entrySet().stream()
                 .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
                         .reversed()
@@ -514,7 +516,11 @@ public class ActionCardStatsService {
                         .append(entry.getKey())
                         .append(": ")
                         .append(entry.getValue())
-                        .append('\n'));
+                        .append(" (")
+                        // Zero is only reachable if every card recorded no Overrule at all, in which
+                        // case every share is zero rather than a division by nothing.
+                        .append(formatPercent(total == 0 ? 0 : entry.getValue() / (double) total))
+                        .append(")\n"));
     }
 
     static void accumulateActionCardPlayToWinCorrelation(

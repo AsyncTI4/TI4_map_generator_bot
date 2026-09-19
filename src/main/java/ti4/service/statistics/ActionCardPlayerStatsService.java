@@ -135,12 +135,17 @@ class ActionCardPlayerStatsService {
     void appendTo(List<String> blocks) {
         appendWinRateByCardsPlayed(blocks);
         appendCardsPlayedPerFaction(blocks);
+    }
+
+    // Left for the caller to place rather than following the sections above, so the deck-wide
+    // Overrule targets can sit directly in front of it and the two Overrule sections read together.
+    void appendOverruleTo(List<String> blocks) {
         appendOverrulePerFaction(blocks);
     }
 
     private void appendWinRateByCardsPlayed(List<String> blocks) {
         StringBuilder heading = new StringBuilder();
-        heading.append("\n**Win rate by cards played**\n");
+        heading.append("### Win rate by cards played\n");
         heading.append("_Only games started after ")
                 .append(ActionCardStatsService.PLAYER_TRACKING_START_DATE)
                 .append(", when we started tracking who played each card.");
@@ -204,7 +209,7 @@ class ActionCardPlayerStatsService {
 
     private void appendCardsPlayedPerFaction(List<String> blocks) {
         StringBuilder heading = new StringBuilder();
-        heading.append("\n**Cards played per faction**\n");
+        heading.append("### Cards played per faction\n");
         heading.append("_Average action cards played per game, over the same sample of games as above._\n");
         if (gamesPerFaction.isEmpty()) {
             heading.append("No tracked action card plays matched the selected filters.\n");
@@ -240,7 +245,7 @@ class ActionCardPlayerStatsService {
 
     private void appendOverrulePerFaction(List<String> blocks) {
         StringBuilder heading = new StringBuilder();
-        heading.append("\n**Overrule by faction**\n");
+        heading.append("### Overrule by faction\n");
         heading.append("_How many of its games each faction played Overrule in, counting those canceled, then its win"
                 + " rate in games where its Overrule resolved against games where it played none. A game where every"
                 + " Overrule it played was canceled counts toward neither win rate. Same sample of games as above._\n");
