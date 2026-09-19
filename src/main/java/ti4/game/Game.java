@@ -3641,9 +3641,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void removeOverruleIfPurged() {
-        if ("true".equals(getStoredValue("removeOverrule"))) {
+        if (isOverrulePurged()) {
             getActionCards().removeIf("overrule"::equals);
         }
+    }
+
+    public boolean isOverrulePurged() {
+        return "true".equals(getStoredValue("removeOverrule"));
     }
 
     public void addTeACs() {
