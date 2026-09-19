@@ -1487,7 +1487,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         int commodityValue = getCommoditiesBase();
         if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
-            return commodityValue = 2;
+            return commodityValue = 2 + getCommoditiesBonus();
         }
 
         return commodityValue + getCommoditiesBonus();
