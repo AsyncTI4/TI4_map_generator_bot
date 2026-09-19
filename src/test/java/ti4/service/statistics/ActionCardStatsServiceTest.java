@@ -607,8 +607,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         StringBuilder message = new StringBuilder();
         ActionCardStatsService.appendOverruleStats(message, Map.of("Politics", 3, "Technology", 1));
 
-        // The share is spelled out on the leading row only, as the rows below it read the same way.
-        assertThat(message.toString()).isEqualTo("- Politics: 3 (75% of all Overrules)\n" + "- Technology: 1 (25%)\n");
+        assertThat(message.toString()).isEqualTo("- Politics: 3 (75%)\n" + "- Technology: 1 (25%)\n");
     }
 
     @Test

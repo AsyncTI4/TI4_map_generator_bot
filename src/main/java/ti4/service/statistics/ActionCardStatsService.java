@@ -508,26 +508,19 @@ public class ActionCardStatsService {
         }
 
         int total = overruleCounts.values().stream().mapToInt(Integer::intValue).sum();
-        boolean[] labelPending = {true};
         overruleCounts.entrySet().stream()
                 .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
                         .reversed()
                         .thenComparing(Map.Entry::getKey))
-                .forEach(entry -> {
-                    message.append("- ")
-                            .append(entry.getKey())
-                            .append(": ")
-                            .append(entry.getValue())
-                            .append(" (")
-                            // Zero is only reachable if every card recorded no Overrule at all, in
-                            // which case every share is zero rather than a division by nothing.
-                            .append(formatPercent(total == 0 ? 0 : entry.getValue() / (double) total));
-                    if (labelPending[0]) {
-                        message.append(" of all Overrules");
-                        labelPending[0] = false;
-                    }
-                    message.append(")\n");
-                });
+                .forEach(entry -> message.append("- ")
+                        .append(entry.getKey())
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append(" (")
+                        // Zero is only reachable if every card recorded no Overrule at all, in which
+                        // case every share is zero rather than a division by nothing.
+                        .append(formatPercent(total == 0 ? 0 : entry.getValue() / (double) total))
+                        .append(")\n"));
     }
 
     static void accumulateActionCardPlayToWinCorrelation(
