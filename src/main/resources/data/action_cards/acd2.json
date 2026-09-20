@@ -189,7 +189,7 @@
         "phase": "Action",
         "window": "After you move ships into the active system",
         "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of that system.",
-        "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
+        "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. He loathed eliminating children, but this messiah must remain unrisen.",
         "source": "action_deck_2"
     },
     {
@@ -316,7 +316,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 player that has 1 or more action cards. That player may allow you to look at their action cards and take 1 of those cards. If they do not, they must give you 1 random promissory note from their hand.",
+        "text": "Choose another player that has 1 or more action cards. That player may allow you to look at their action cards and take 1 of those cards. If they do not, they must give you 1 random promissory note from their hand.",
         "automationID": "espionage",
         "flavorText": "The informant continued, \"And get this, apparently the councilor is a ghostwriter for a series about dating Dirzuga!\" Connor yawned, \"Gesundheit.\"",
         "source": "action_deck_2"
@@ -576,8 +576,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "outmaneuver1",
-        "name": "Outmaneuver",
+        "alias": "outrun1",
+        "name": "Outrun",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
         "text": "Cancel that hit.",
@@ -585,8 +585,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "outmaneuver2",
-        "name": "Outmaneuver",
+        "alias": "outrun2",
+        "name": "Outrun",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
         "text": "Cancel that hit.",
@@ -594,8 +594,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "outmaneuver3",
-        "name": "Outmaneuver",
+        "alias": "outrun3",
+        "name": "Outrun",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
         "text": "Cancel that hit.",
@@ -603,8 +603,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "outmaneuver4",
-        "name": "Outmaneuver",
+        "alias": "outrun4",
+        "name": "Outrun",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
         "text": "Cancel that hit.",
@@ -727,8 +727,8 @@
         "alias": "rendezvous",
         "name": "Rendezvous",
         "phase": "Action",
-        "window": "Before you move units during a tactical action",
-        "text": "Choose 1 of your units. During this tactical action, that unit can transport units from systems that are adjacent to systems it moves out of, into, or through.",
+        "window": "When 1 of your units moves",
+        "text": "During this movement, that unit can transport units from systems that are adjacent to systems it moves out of, into, or through.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_deck_2"
     },
@@ -809,8 +809,8 @@
         "alias": "shortcut1",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "When your units move",
+        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this movement.",
         "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -819,8 +819,8 @@
         "alias": "shortcut2",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "When your units move",
+        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this movement.",
         "flavorText": "\"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed. \"They call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -829,8 +829,8 @@
         "alias": "shortcut3",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "When your units move",
+        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this movement.",
         "flavorText": "The ship's power flickered off, but the strain remained. The pilot had flung them into the void, trusting his intuition, and Mendosa was not eager to discover what awaited them on the other end.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -839,8 +839,8 @@
         "alias": "shortcut4",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a system",
-        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "When your units move",
+        "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this movement.",
         "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -1012,7 +1012,7 @@
         "phase": "Action",
         "window": "After your ships move out of, into, or through a system that does not contain planets",
         "text": "Explore a frontier token in that system or gain 2 commodities.",
-        "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+        "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, betrayed what they once were.",
         "source": "action_deck_2"
     },
     {
@@ -1081,7 +1081,7 @@
         "text": "Gain a technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
-        "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
+        "flavorText": "As the council meeting drew to a close, Xander stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
     },
     {
@@ -1092,7 +1092,7 @@
         "text": "Gain a technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
-        "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
+        "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as she interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
     },
     {
@@ -1103,7 +1103,7 @@
         "text": "Gain a technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
+        "flavorText": "After the meeting, Maeve wore a look of endearment. \"I swear, Xander, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
     },
     {
@@ -1114,7 +1114,7 @@
         "text": "Gain a technology that has no prerequisites.",
         "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
-        "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
+        "flavorText": "Xander parted his hair, revealing a small metal plate indicative of a neural implant. Maeve gasped, realizing he must have had the surgery long ago. \"You did this before the trials were completed?\" Xander shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"
     },
     {
@@ -1134,7 +1134,7 @@
         "window": "At the end of your turn",
         "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "automationID": "survey",
-        "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
     {
@@ -1258,27 +1258,25 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "sacrifice1",
-        "name": "Sacrifice",
+        "alias": "concord",
+        "name": "Concord",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
-        "automationID": "sacrifice",
-        "flavorText": "Sharsiss exulted. Each puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
+        "text": "Each other player must give you 1 promissory note from their hand. Then, give each other player 1 card from your hand or promissory note from your play area.",
+        "flavorText": "Maeve weaved through the symposium, binding old wounds into new alliances. A web of promises, each strengthening the rest into a shield against the galaxy's multitude of dooms.",
         "source": "action_deck_2"
     },
     {
-        "alias": "sacrifice2",
-        "name": "Sacrifice",
+        "alias": "fractured_reality",
+        "name": "Fractured Reality",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
-        "automationID": "sacrifice",
-        "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
+        "window": "When you would roll a die",
+        "text": "Roll 2 dice instead; you may cancel 1 of those results.",
+        "flavorText": "\"Shen're Ix Ianovar,\" Ahk-Syl Siven murmured, seeming afraid to invoke the name. \"Al'Raith Ix Ianovar,\" he continued, his voice barely a whisper.",
         "source": "action_deck_2"
     },
     {
-        "alias": "sacrifice3",
+        "alias": "sacrifice",
         "name": "Sacrifice",
         "phase": "Action",
         "window": "ACTION",
@@ -1288,13 +1286,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "sacrifice4",
-        "name": "Sacrifice",
+        "alias": "scorched_earth",
+        "name": "Scorched Earth",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
-        "automationID": "sacrifice",
-        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "window": "At the end of a ground combat on a non-home planet",
+        "text": "Destroy up to 2 units on that planet. Then, if that planet does not contain units, return its planet card to the planet card deck.",
+        "flavorText": "Ibna Vel Syd's unnatural life had given him time to reflect on his people's fatal error. One cannot control a thing without possessing the power to destroy it.",
         "source": "action_deck_2"
     },
     {
