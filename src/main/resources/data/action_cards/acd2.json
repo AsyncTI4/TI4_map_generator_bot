@@ -1291,7 +1291,7 @@
         "phase": "Action",
         "window": "At the end of a ground combat that you are participating in on a non-home planet",
         "text": "Destroy up to 2 of another player's units on that planet. Then, if that planet does not contain units, return its planet card to the planet card deck.",
-        "flavorText": "Ibna Vel Syd's unnatural life had given him time to reflect on his people's fatal error. One cannot control a thing without possessing the power to destroy it.",
+        "flavorText": "\"One cannot control a thing without possessing the power to destroy it,\" Ibna Vel Syd reflected.",
         "source": "action_deck_2"
     },
     {
