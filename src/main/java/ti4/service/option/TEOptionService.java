@@ -173,10 +173,16 @@ public class TEOptionService {
                     game.removeStoredValue(Constants.TK_NOVA_CUP + "_setup_option");
                 }
             }
-            case Constants.TF_BR -> game.setTfBr(!game.isTfBr());
+            case Constants.TF_BR -> {
+                game.setTfBr(!game.isTfBr());
+                if (game.isTfBr()) {
+                    game.setHomebrew(true);
+                }
+            }
             case Constants.TWILIGHT_DS -> {
                 game.setTwilightDS(!game.isTwilightDS());
                 if (game.isTwilightDS()) {
+                    game.setHomebrew(true);
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("twilightDSSetup_justds", "Just DS Abilities"));
                     buttons.add(Buttons.blue("twilightDSSetup_mixture", "Mixture of Normal and DS abilities"));
