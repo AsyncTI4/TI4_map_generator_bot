@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
@@ -24,20 +23,16 @@ import ti4.website.UltimateStatisticsWebsiteHelper;
 public class TiglReportService {
 
     public static void handleTiglReporting(Game game, GenericInteractionCreateEvent event) {
-        handleTiglReporting(game, event.getMessageChannel());
-    }
-
-    public static void handleTiglReporting(Game game, MessageChannel channel) {
         if (!game.isCompetitiveTIGLGame() || game.getWinner().isEmpty()) {
             return;
         }
 
-        MessageHelper.sendMessageToChannel(channel, getTIGLFormattedGameEndText(game));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
 
-        UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), channel);
+        UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
     }
 
-    private static String getTIGLFormattedGameEndText(Game game) {
+    private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑")
@@ -50,7 +45,7 @@ public class TiglReportService {
         int index = 1;
         for (Player player : game.getRealAndEliminatedPlayers()) {
             int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPoints();
-            Optional<User> user = Optional.ofNullable(JdaService.jda.getUserById(player.getUserID()));
+            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
             if (user.isPresent()) {

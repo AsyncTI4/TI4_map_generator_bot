@@ -1653,7 +1653,6 @@ public final class Constants {
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
-    public static final String TIGL_REPORT_MANUALLY = "tigl_report_manually";
     public static final String LAZAX = "lazax";
     public static final String LAZAX_MY_POINTS = "my_points";
     public static final String LAZAX_TOP_100 = "top_100";
