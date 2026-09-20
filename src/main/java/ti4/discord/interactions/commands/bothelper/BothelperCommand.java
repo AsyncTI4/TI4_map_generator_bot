@@ -37,8 +37,7 @@ public class BothelperCommand implements ParentCommand {
                     new ReserveGame(),
                     new DeleteFOWCommThreads(),
                     new KeepThreadAlive(),
-                    new ManageRoles(),
-                    new TiglReportManually())
+                    new ManageRoles())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
