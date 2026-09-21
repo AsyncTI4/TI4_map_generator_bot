@@ -1,9 +1,9 @@
 {
-    "id": "ponthous",
-    "tileId": "th13",
-    "name": "Ponthous",
+    "id": "petra",
+    "tileId": "th16",
+    "name": "Petra",
     "aliases": [
-        "ponthous"
+        "petra"
     ],
     "positionInTile": {
         "x": 170.0,
@@ -11,14 +11,14 @@
     },
     "resources": 3,
     "influence": 3,
-    "factionHomeworld": "ponthous",
+    "factionHomeworld": "stoneborn",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "Fractured Souls",
-    "legendaryAbilityText": "When Ponthous is exhausted you may exhaust this card to ready it.",
+    "legendaryAbilityName": "Petra - Dormant",
+    "legendaryAbilityText": "UNLEASH: Remove 3 Fragmentum Tokens of the same from your player sheet. When you pass you may exhaust this card to explore 1 planet you control.",
     "unitPositions": {
-        "unitHolderName": "ponthous",
+        "unitHolderName": "petra",
         "coordinateMap": {
             "control": [
                 {

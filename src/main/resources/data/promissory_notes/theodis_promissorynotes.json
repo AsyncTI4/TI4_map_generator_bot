@@ -69,7 +69,7 @@
         "playImmediately": false,
         "attachment": "kairnoutpost",
         "source": "theodisi",
-        "text": "ACTION: Attach this card to 1 non-home planet. When you activate this planet's system, explore it."
+        "text": "ACTION: Attach this card to 1 non-home planet. When a player activates this planet's system, explore it."
     },
     {
         "alias": "thpnkryxos",
@@ -97,7 +97,8 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "When you produce hits with a unit ability against your opponent's units, place this card face up in your play area. You may place fighters in a system contianing 1 of your ships equal to the number of hits produced. Then, return this card to the Xytheris player."
+        "text": "When you roll dice for a unit ability: Apply +2 to those results. Then, return this promissory note to the Xytheris player.",
+        "notes": "Play this BEFORE the affected unit ability roll."
     },
     {
         "alias": "thpnoblivion",
@@ -146,5 +147,53 @@
         "source": "theodisi",
         "text": "At the start of space combat select 1 of your ground forces in that system: That unit participates in combat as if it were a ship and you may treat them as Galvanized until the end of the combat. Return this card to the Ponthous player at the end of that combat.",
         "notes": "Bot can't detect end of space combat, so it is returned either when another combat starts or end of turn/tactical action."
+    },
+    {
+        "alias": "thpnvanguard",
+        "name": "Guild Call",
+        "faction": "vanguard",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "theodisi",
+        "text": "Before you assign hits to your ships during a space combat, place this card face up in your play area. Cancel up to 2 hits. At the start of the Iron Keep player's turn, return this card to the Iron Keep player."
+    },
+    {
+        "alias": "thpnscrapyard",
+        "name": "Second Hand Sale",
+        "faction": "scrapyard",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "When you gain this card, gain 1 unused \"Custom Rig\" card, then purge this card."
+    },
+    {
+        "alias": "thpnstoneborn",
+        "name": "Unleashed Potential",
+        "faction": "stoneborn",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "theodisi",
+        "text": "ACTION: Place this face up in your play area and gain your breakthrough or unlock your commander. Return this to the Stratum player at the end of the status phase."
+    },
+    {
+        "alias": "thpnmorpha",
+        "name": "Morphic Symbiosis",
+        "faction": "morpha",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "theodisi",
+        "text": "At the start of your turn, you may place this card face up in your play area and draw 2 random hydromorphic cards, then shuffle 1 back into the deck. At the end of the status phase, return this card to the Morpha player."
+    },
+    {
+        "alias": "thpnthurviali",
+        "name": "Radiant Assembly",
+        "faction": "thurviali",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "ACTION: Place this card face up in your play area and place 1 structure from your reinforcements onto a planet you control. Return this promissory note to the Thurviali player at the end of the status phase."
     }
 ]

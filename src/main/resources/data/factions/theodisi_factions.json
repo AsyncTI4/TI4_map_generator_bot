@@ -3,7 +3,7 @@
         "alias": "ardentia",
         "factionName": "The Slavers of Ardentia",
         "homeSystem": "th1",
-        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 2 inf w, 2 inf a, 1 sd w, 1 pds a",
+        "startingFleet": "1 cr, 2 dd, 5 ff, 2 inf w, 1 inf a, 1 sd w, 1 pds a",
         "commodities": 3,
         "factionTech": [
             "thardentiar",
@@ -186,7 +186,7 @@
         "alias": "kairn",
         "factionName": "The Explorers of Kairn",
         "homeSystem": "th5",
-        "startingFleet": "2 dn, 1 cv, 2 ff, 1 mf d, 1 mf p, 1 sd p, 1 sd d",
+        "startingFleet": "2 dn, 2 ff, 1 mf d, 1 mf p, 1 sd p, 1 sd d, 1 pds p, 1 pds d",
         "commodities": 3,
         "factionTech": [
             "thkairny",
@@ -202,7 +202,6 @@
             "plotyz"
         ],
         "abilities": [
-            "expeditionary_cache",
             "shared_discoveries",
             "colony_outposts"
         ],
@@ -412,7 +411,7 @@
         "alias": "revenant",
         "factionName": "The Revenant Glory",
         "homeSystem": "th10",
-        "startingFleet": "2 cv, 3 ff, 3 inf h, 2 inf t, 1 sd h",
+        "startingFleet": "1 cv, 2 cr, 5 ff, 2 inf h, 1 inf t, 1 sd h",
         "commodities": 4,
         "factionTech": [
             "threvenanty",
@@ -574,6 +573,222 @@
             "ponthous_flagship",
             "infantry",
             "ponthous_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "vanguard",
+        "factionName": "The Iron Keep Vanguard",
+        "homeSystem": "th14",
+        "startingFleet": "2 dn, 1 dd, 3 ff, 4 inf ironkeep, 1 sd ironkeep, 1 pds ironkeep",
+        "commodities": 3,
+        "factionTech": [
+            "thvanguardr",
+            "thvanguardy"
+        ],
+        "startingTech": [
+            "dxa"
+        ],
+        "homePlanets": [
+            "ironkeep"
+        ],
+        "abilities": [
+            "interlocking_shields",
+            "shielded_transports",
+            "enhanced_fundamentals"
+        ],
+        "leaders": [
+            "vanguardagent",
+            "vanguardcommander",
+            "vanguardhero"
+        ],
+        "promissoryNotes": [
+            "thpnvanguard"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vanguard_flagship",
+            "infantry",
+            "vanguard_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "scrapyard",
+        "factionName": "The Scrapyard Pack",
+        "homeSystem": "th15",
+        "startingFleet": "",
+        "commodities": 2,
+        "factionTech": [
+            "thscrapyardff",
+            "thscrapyardr"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "junkyard",
+            "scrapheap"
+        ],
+        "abilities": [
+            "custom_rigs",
+            "drive_decoherence",
+            "repurposed_parts"
+        ],
+        "leaders": [
+            "scrapyardagent",
+            "scrapyardcommander",
+            "scrapyardhero"
+        ],
+        "promissoryNotes": [
+            "thpnscrapyard"
+        ],
+        "units": [
+            "scrapyard_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "scrapyard_flagship",
+            "infantry",
+            "scrapyard_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "stoneborn",
+        "factionName": "The Stoneborn Stratum",
+        "homeSystem": "th16",
+        "startingFleet": "1 cv, 1 dd, 3 ff, 3 mf p, 1 sd p",
+        "commodities": 4,
+        "factionTech": [
+            "thstoneborng",
+            "thstoneborndn"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "petra"
+        ],
+        "abilities": [
+            "fragmentum_unleashed",
+            "adaptive",
+            "trovantous"
+        ],
+        "leaders": [
+            "stonebornagentdormant",
+            "stoneborncommanderdormant",
+            "stonebornherodormant"
+        ],
+        "promissoryNotes": [
+            "thpnstoneborn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "stoneborn_dreadnought",
+            "stoneborn_flagship",
+            "infantry",
+            "stoneborn_mechdormant",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "morpha",
+        "factionName": "The Formless Morpha",
+        "homeSystem": "th17",
+        "startingFleet": "1 dn, 1 cv, 1 dd, 3 ff, 2 inf n, 2 inf m, 1 sd n",
+        "commodities": 3,
+        "factionTech": [
+            "thmorphag",
+            "thmorphacv"
+        ],
+        "startingTech": [
+            "nm",
+            "amd"
+        ],
+        "homePlanets": [
+            "nuclei",
+            "mito"
+        ],
+        "abilities": [
+            "hydromorphic",
+            "hydrospheric_extraction"
+        ],
+        "leaders": [
+            "morphaagent",
+            "morphacommander",
+            "morphahero"
+        ],
+        "promissoryNotes": [
+            "thpnmorpha"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "morpha_carrier",
+            "dreadnought",
+            "morpha_flagship",
+            "infantry",
+            "morpha_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "thurviali",
+        "factionName": "The Radiant Thurviali",
+        "homeSystem": "th18",
+        "startingFleet": "1 cv, 2 cr, 4 ff, 2 inf t, 1 inf a, 1 mf a, 1 sd t, 1 pds a",
+        "commodities": 4,
+        "factionTech": [
+            "ththurvialig",
+            "ththurvialib"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "thtiamat",
+            "amarok"
+        ],
+        "abilities": [
+            "radiant_grafting",
+            "mutualism"
+        ],
+        "leaders": [
+            "thurvialiagent",
+            "thurvialicommander",
+            "thurvialihero"
+        ],
+        "promissoryNotes": [
+            "thpnthurviali"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "thurviali_flagship",
+            "infantry",
+            "thurviali_mech",
             "pds",
             "spacedock"
         ],

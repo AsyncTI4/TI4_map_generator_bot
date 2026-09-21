@@ -1,24 +1,24 @@
 {
-    "id": "ponthous",
-    "tileId": "th13",
-    "name": "Ponthous",
+    "id": "ironkeep",
+    "tileId": "th14",
+    "name": "Iron Keep",
     "aliases": [
-        "ponthous"
+        "ironkeep"
     ],
     "positionInTile": {
         "x": 170.0,
         "y": 128.0
     },
-    "resources": 3,
-    "influence": 3,
-    "factionHomeworld": "ponthous",
+    "resources": 4,
+    "influence": 4,
+    "factionHomeworld": "vanguard",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "Fractured Souls",
-    "legendaryAbilityText": "When Ponthous is exhausted you may exhaust this card to ready it.",
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "ponthous",
+        "unitHolderName": "ironkeep",
         "coordinateMap": {
             "control": [
                 {

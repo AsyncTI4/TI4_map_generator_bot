@@ -4,7 +4,7 @@
         "name": "Economic Boon",
         "type": "Industrial",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. When you would exhaust a planet you control you may exhaust this card instead.",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the number of planets adjacent to this system. When this card no longer has control tokens on it, discard it. At the start of your turn you can remove any number of control tokens from this card to produce a non-fighter ship with a cost up to the number of tokens removed in a system containing 1 of your space docks.",
         "flavorText": "*\"If you'll just sign here the deal will be done. I'm sure you're familiar with the terms and conditions but just in case...\"*",
         "source": "theodisi"
     },
@@ -57,7 +57,7 @@
         "name": "Nature's Boon",
         "type": "Hazardous",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchnaged as part of a transaction. When you exhaust a planet you may exhaust this card to combine the values of that planet's resources and influence. Treat the combined value as if it were both resources and influence of that planet.",
+        "text": "Place this card face up in your play area & place control tokens on it equal to the resource value of that planet + 1. When this card no longer has control tokens on it, discard it. When you activate a system you may remove any number of control tokens from this card & increase the resource value of a planet you control by 1 for each token removed until the end of that tactical action.",
         "flavorText": "*With no profit motive, the Myrr was able to take its time removing the resources of the planet without disturbing its natural beauty and ecosystems.*",
         "source": "theodisi"
     },
@@ -130,7 +130,7 @@
         "name": "Diplomatic Boon",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 of your ships. Place 1 infantry or fighter in that system up to the influence value of that planet.",
+        "text": "Place this card face up in your play area & place control tokens on it equal to the influence value of this planet + 1. When this card no longer has control tokens on it, discard it. At any time you may remove any number of control tokens from this card to place that many fighters in systems that contain your ships or infantry on planets you control.",
         "flavorText": "*\"Not to worry, we'll be providing a Verydith security detail to ensure safety of all politicians involved.\"*",
         "source": "theodisi"
     },
@@ -165,7 +165,7 @@
         "name": "Cosmic Boon",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. At the end of your turn you may exhaust this card to explore 2 planets you control.",
+        "text": "Place this card face up in your play area & place control tokens on it equal to the number of systems with no planets adjacent to this system + 1. When this card no longer has control tokens on it, discard it. At the end of your tactical action you may remove 1 control token from this card & explore 1 planet  you control in the active system.",
         "flavorText": "*What Nothi found in the core of the Veydra would go on to reshape the future of the Nihlus system.*",
         "source": "theodisi"
     },
@@ -183,7 +183,7 @@
         "name": "Mutagen",
         "type": "Hazardous",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction.ACTION: Purge 2 of your Mutagen cards and draw 1 random unused faction reference card. Gain 1 of that faction's unused non-unit faction technologies, agents or its alliance card.",
         "flavorText": "*Test 31: Introducing foreign DNA into Kryxos Broodlings seems to have a profound effect on the expressed traits and physical characteristics. Further analysis into the viability of potential enhancements requested by the High Evolutionary.*",
         "source": "theodisi"
     },
@@ -192,7 +192,7 @@
         "name": "Mutagen",
         "type": "Industrial",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction.ACTION: Purge 2 of your Mutagen cards and draw 1 random unused faction reference card. Gain 1 of that faction's unused non-unit faction technologies, agents or its alliance card.",
         "flavorText": "*Test 4081: Tests with bipdel species yield the most consistent results. Enhanced intelligence and adopting the strengths of their genetic contributors.*",
         "source": "theodisi"
     },
@@ -201,7 +201,7 @@
         "name": "Mutagen",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction.ACTION: Purge 2 of your Mutagen cards and draw 1 random unused faction reference card. Gain 1 of that faction's unused non-unit faction technologies, agents or its alliance card.",
         "flavorText": "*Test 17413: Integration with Xytheris DNA alters Broodling brain chemistry making them more subservient to \"Matriarch\" figures, defending their chosen mothers with their life.*",
         "source": "theodisi"
     },
@@ -210,7 +210,7 @@
         "name": "Mutagen",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction.ACTION: Purge 2 of your Mutagen cards and draw 1 random unused faction reference card. Gain 1 of that faction's unused non-unit faction technologies, agents or its alliance card.",
         "flavorText": "*Test 203411: The chaotic forces of the Throne of Pride's genetic material have been deemed entirely unfit for integration with Kryxos broods. Chaotic and unpredictable results make finding any meaningful results a futile effort.*",
         "source": "theodisi"
     }

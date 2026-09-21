@@ -1,9 +1,9 @@
 {
-    "id": "heroh",
-    "tileId": "th10",
-    "name": "Heroh",
+    "id": "junkyard",
+    "tileId": "th15",
+    "name": "Junkyard",
     "aliases": [
-        "heroh"
+        "junkyard"
     ],
     "positionInTile": {
         "x": 134.0,
@@ -11,14 +11,14 @@
     },
     "resources": 3,
     "influence": 0,
-    "factionHomeworld": "revenant",
+    "factionHomeworld": "scrapyard",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "heroh",
+        "unitHolderName": "junkyard",
         "coordinateMap": {
             "control": [
                 {

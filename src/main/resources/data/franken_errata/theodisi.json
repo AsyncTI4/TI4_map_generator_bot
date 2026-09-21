@@ -44,14 +44,6 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "expeditionary_cache",
-        "additionalComponents": [
-            "ABILITY:shared_discoveries"
-        ],
-        "source": "theodisi"
-    },
-    {
-        "itemCategory": "ABILITY",
-        "itemId": "shared_discoveries",
         "undraftable": true,
         "source": "theodisi"
     },
@@ -173,7 +165,7 @@
     },
     {
         "itemCategory": "STARTINGTECH",
-        "itemId": "aeterna",
+        "itemId": "revenant",
         "alternateText": "Choose up to 2 technologies with 0 prerequisites owned by no other player.",
         "source": "theodisi"
     },
@@ -185,7 +177,7 @@
     },
     {
         "itemCategory": "STARTINGTECH",
-        "itemId": "revenant",
+        "itemId": "aeterna",
         "alternateText": "Choose 2 technologies in different colors with 1 total prerequisite.",
         "source": "theodisi"
     },

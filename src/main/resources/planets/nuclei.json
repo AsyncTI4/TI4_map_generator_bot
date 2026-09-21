@@ -1,24 +1,24 @@
 {
-    "id": "heroh",
-    "tileId": "th10",
-    "name": "Heroh",
+    "id": "nuclei",
+    "tileId": "th17",
+    "name": "Nuclei",
     "aliases": [
-        "heroh"
+        "nuclei"
     ],
     "positionInTile": {
         "x": 134.0,
         "y": 86.0
     },
-    "resources": 3,
-    "influence": 0,
-    "factionHomeworld": "revenant",
+    "resources": 4,
+    "influence": 1,
+    "factionHomeworld": "morpha",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "heroh",
+        "unitHolderName": "nuclei",
         "coordinateMap": {
             "control": [
                 {

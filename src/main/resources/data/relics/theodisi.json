@@ -2,7 +2,7 @@
     {
         "alias": "full_moonphase",
         "name": "Full Moon",
-        "text": "At the end of your turn:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 3 or more to place 1 structure on a planet you control.",
+        "text": "At the end of your turn:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 4 or more to place 1 structure on a planet you control.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
@@ -23,7 +23,7 @@
     {
         "alias": "waning_moonphase",
         "name": "Waning Moon",
-        "text": "When you pass:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 4 or more to research 1 technology.",
+        "text": "When you pass:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 5 or more to research 1 technology.",
         "isFakeRelic": true,
         "source": "theodisi"
     },

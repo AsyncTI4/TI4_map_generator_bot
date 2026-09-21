@@ -59,23 +59,23 @@
         "name": "Factory Lease",
         "faction": "myrr",
         "window": "During setup, gain the Factory Lease promissory notes. At the start of the agenda phase:",
-        "windowEffect": "You may produce 1 unit other than a war sun in a system containing 1 of your space docks and no other players' ships for each Factory Lease attachment on the game board.",
-        "source": "theodisi"
-    },
-    {
-        "id": "expeditionary_cache",
-        "name": "Expeditionary Cache",
-        "faction": "kairn",
-        "window": "When you gain 1 or more commodities:",
-        "windowEffect": "You may spend any number of commodities to place expedition tokens on planets, up to the number of commodities spent.",
+        "windowEffect": "You may produce 1 with a cost of 4 or less in a system containing 1 of your space docks and no other players' ships for each Factory Lease attachment on the game board.",
         "source": "theodisi"
     },
     {
         "id": "shared_discoveries",
         "name": "Shared Discoveries",
         "faction": "kairn",
-        "window": "At the end of a player's tactical action:",
-        "windowEffect": "You may remove 1 expedition token from a planet the active player controls in that system to allow them to explore that planet as if it had any planet trait.",
+        "window": "At the end of a player's tactical action in a non-home system:",
+        "windowEffect": "You may spend 1 commodity to allow that player to explore a planet in the active system as if it had any planet trait.",
+        "source": "theodisi"
+    },
+    {
+        "id": "expeditionary_cache",
+        "name": "Expeditionary Cache",
+        "faction": "kairn",
+        "window": "Legacy:",
+        "windowEffect": "This retired ability is retained only for existing games.",
         "source": "theodisi"
     },
     {
@@ -91,7 +91,7 @@
         "name": "Battle-Tested Designs",
         "faction": "kryxos",
         "window": "When you research a unit upgrade technology:",
-        "windowEffect": "You may exhaust 1 planet you control to ignore 1 prerequisite of that technology.\n\nThen, you may produce 1 unit of that type in a system that contains your units and no other player's ships, reducing its cost by 1.",
+        "windowEffect": "you may ignore 1 prerequisite.",
         "source": "theodisi"
     },
     {
@@ -142,7 +142,7 @@
         "id": "hive_echo",
         "name": "Hive Echo",
         "faction": "xytheris",
-        "permanentEffect": "When you would use SPACE CANNON, ANTI-FIGHTER BARRAGE, or BOMBARDMENT, except during SPACE CANNON DEFENSE, in a system containing your ships, a unit with that unit ability up to 2 systems away may use it as if it were in the active system.",
+        "permanentEffect": "When you would use SPACE CANNON, ANTI-FIGHTER BARRAGE, or BOMBARDMENT, except during SPACE CANNON DEFENSE, in a system containing your ships; A unit with that unit ability up to 2 systems away may use it as if it were in the active system.",
         "source": "theodisi"
     },
     {
@@ -173,7 +173,7 @@
         "name": "Call of the Haunted",
         "faction": "revenant",
         "window": "During setup:",
-        "windowEffect": "Select 1 Revenant leader set to play with. Purge the unchosen leaders. You have 1 additional leader of each type.",
+        "windowEffect": "Purge your alliance promissory note & 1 Revenant Pantheon card. Then, gain each of the leaders on that card. You have 1 additional leader of each type.",
         "source": "theodisi"
     },
     {
@@ -267,6 +267,182 @@
         "name": "Rallying Cry",
         "faction": "ponthous",
         "permanentEffect": "Systems that contain exactly 1 of your non-fighter ships gain PRODUCTION 2 as if they were units.",
+        "source": "theodisi"
+    },
+    {
+        "id": "interlocking_shields",
+        "name": "Interlocking Shields",
+        "faction": "vanguard",
+        "window": "Once per combat round, when you cancel 1 or more hits:",
+        "windowEffect": "Cancel an additional hit.",
+        "source": "theodisi"
+    },
+    {
+        "id": "shielded_transports",
+        "name": "Shielded Transports",
+        "faction": "vanguard",
+        "permanentEffect": "Your non-fighter ships with SUSTIAN DAMAGE gain capacity 1. If they already have a capacity value, increase that value by 1 instead.",
+        "source": "theodisi"
+    },
+    {
+        "id": "enhanced_fundamentals",
+        "name": "Enhanced Fundamentals",
+        "faction": "vanguard",
+        "window": "When you win a ground combat:",
+        "windowEffect": "You may spend 2 trade goods to research a technology with no prerequisites.",
+        "source": "theodisi"
+    },
+    {
+        "id": "custom_rigs",
+        "name": "Custom Rigs",
+        "faction": "scrapyard",
+        "window": "During setup:",
+        "windowEffect": "Choose 2 \"Custom Rig\" cards to gain. Your units of that type gian those effects and adjust their printed values by those amounts.",
+        "source": "theodisi"
+    },
+    {
+        "id": "drive_decoherence",
+        "name": "Drive Decoherence",
+        "faction": "scrapyard",
+        "window": "When a player exhausts a custom rig card for its effect:",
+        "windowEffect": "They must destroy 1 unit of that type at the end of the action.",
+        "source": "theodisi"
+    },
+    {
+        "id": "repurposed_parts",
+        "name": "Repurposed Parts",
+        "faction": "scrapyard",
+        "window": "Once per combat round, when one of your units is destroyed:",
+        "windowEffect": "You can produce a unit with a lower cost at a space dock you control.",
+        "source": "theodisi"
+    },
+    {
+        "id": "fragmentum_unleashed",
+        "name": "Fragmentum Unleashed",
+        "faction": "stoneborn",
+        "window": "When you would purge 1 or more relic fragments:",
+        "windowEffect": "You may place a corresponding Fragmentum Token on your faction sheet that matches 1 of those fragments.",
+        "source": "theodisi"
+    },
+    {
+        "id": "adaptive",
+        "name": "Adaptive",
+        "faction": "stoneborn",
+        "window": "During setup:",
+        "windowEffect": "Gain each of your components' \"Dormant\" counterparts. Components with an UNLEASH effect gain the following:\nAt the start of your turn, you may pay the listed cost and purge this component to gain that component's corresponding \"Unleashed\" counterpart.",
+        "notes": "This does not mean you gain your starting techs. Just that you start the game with the \"Dormant\" versions of all your components.",
+        "source": "theodisi"
+    },
+    {
+        "id": "trovantous",
+        "name": "Trovantous",
+        "faction": "stoneborn",
+        "window": "At the start of the strategy phase:",
+        "windowEffect": "Draw 1 random Stoneborn relic fragment.",
+        "source": "theodisi"
+    },
+    {
+        "id": "hydromorphic",
+        "name": "Hydromorphic",
+        "faction": "morpha",
+        "permanentEffect": "You cannot use the effects of Action Cards. At the start of the strategy phase, draw 2 Action Cards and 2 random \"Hydromorphic\" cards. Choose 1 Hydromorphic card to keep and return the other to the deck. Hydromorphic cards may be exchanged as part of a transaction.",
+        "source": "theodisi"
+    },
+    {
+        "id": "hydrospheric_extraction",
+        "name": "Hydrospheric Extraction",
+        "faction": "morpha",
+        "window": "Once per action, when you gain control of a planet:",
+        "windowEffect": "You may destroy 1 of your units on that planet to draw 1 Action Card.",
+        "source": "theodisi"
+    },
+    {
+        "id": "radiant_grafting",
+        "name": "Radiant Grafting",
+        "faction": "thurviali",
+        "window": "When your units enter into coexistence on a planet:",
+        "windowEffect": "Choose 1 Radiant Grafting ability card to gain and place it face up in your play area. At any time you have more Radiant Grafting ability cards than there are planets that have your coexisting units, remove Radiant Grafting ability cards until you do not.",
+        "source": "theodisi"
+    },
+    {
+        "id": "celestial_envoys",
+        "name": "Celestial Envoys",
+        "faction": "thurviali",
+        "window": "Once per your strategic actions, when a player performs the secondary ability of that strategy card:",
+        "windowEffect": "Place 1 infantry into coexistence on a non-home planet that contains their ground forces.",
+        "source": "theodisi"
+    },
+    {
+        "id": "destroyer_customrig",
+        "name": "Custom Rig: Destroyer",
+        "faction": "scrapyard",
+        "window": "When you activate a system:",
+        "windowEffect": "You may exhaust this card. During this tactical action, your destroyers have no capacity and you may transport them in your ships with capacity. They do not count against your fleet pool while being transported.",
+        "permanentEffect": "Passive: -2 COMBAT value.",
+        "source": "theodisi"
+    },
+    {
+        "id": "cruiser_customrig",
+        "name": "Custom Rig: Cruiser",
+        "faction": "scrapyard",
+        "window": "During the \"Commit Ground Forces\" step:",
+        "windowEffect": "You may exhaust this card to commit any number of your cruisers from the space area of that system to those planets. Return them to the space area at the end of the tactical action",
+        "permanentEffect": "Passive: COST -1.",
+        "source": "theodisi"
+    },
+    {
+        "id": "carrier_customrig",
+        "name": "Custom Rig: Carrier",
+        "faction": "scrapyard",
+        "window": "When you activate a system:",
+        "windowEffect": "You may exhaust this card and reduce each of your carriers' capacity by any amount to apply +1 to their movement values for every 2 capacity decreased until the end of this action.",
+        "permanentEffect": "Passive: SUSTAIN DAMAGE",
+        "source": "theodisi"
+    },
+    {
+        "id": "dreadnought_customrig",
+        "name": "Custom Rig: Dreadnought",
+        "faction": "scrapyard",
+        "window": "When you activate a system:",
+        "windowEffect": "You may exhaust this card. Your dreadnoughts lose SUSTAIN DAMAGE and roll 3 additional dice during BOMBARDMENT and ignore PLANETARY SHIELD.",
+        "permanentEffect": "Passive: CAPACITY +1.",
+        "source": "theodisi"
+    },
+    {
+        "id": "radiant_grafting_flight",
+        "name": "Radiant Grafting: Flight",
+        "faction": "thurviali",
+        "window": "At the end of your tactical actions:",
+        "windowEffect": "You may place your structures that are in space areas onto planets you control in their respective systems. Blockaded structures in the space area of a system are destroyed.",
+        "permanentEffect": "Your structures are also ships with MOVE 1 and count against your fleet pool, and cannot use unit abilities while in the space area.",
+        "source": "theodisi"
+    },
+    {
+        "id": "radiant_grafting_claws",
+        "name": "Radiant Grafting: Claws",
+        "faction": "thurviali",
+        "permanentEffect": "Your structures are treated as ground forces and gain a COMBAT value of 6 if they do not have it, and they participate in combats that occur where they are placed.",
+        "source": "theodisi"
+    },
+    {
+        "id": "radiant_grafting_parturition",
+        "name": "Radiant Grafting: Parturition",
+        "faction": "thurviali",
+        "permanentEffect": "Your PDS and Space Docks gain a COST value of 4 and may be produced by your units with PRODUCTION and placed on any planets you control in that unit’s system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "radiant_grafting_scales",
+        "name": "Radiant Grafting: Scales",
+        "faction": "thurviali",
+        "permanentEffect": "Your structures gain SUSTAIN DAMAGE if they do not have it. Your structures may use their SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in their system or ground forces on their planet.",
+        "source": "theodisi"
+    },
+    {
+        "id": "radiant_grafting_phalanges",
+        "name": "Radiant Grafting: Phalanges",
+        "faction": "thurviali",
+        "permanentEffect": "Your mechs gain PRODUCTION 1 and SPACE CANNON 9 and are treated as structures for all purposes.",
         "source": "theodisi"
     }
 ]

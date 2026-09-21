@@ -1,9 +1,9 @@
 {
-    "id": "ponthous",
-    "tileId": "th13",
-    "name": "Ponthous",
+    "id": "petraunleashed",
+    "tileId": "th16",
+    "name": "Petra Unleashed",
     "aliases": [
-        "ponthous"
+        "petraunleashed"
     ],
     "positionInTile": {
         "x": 170.0,
@@ -11,14 +11,14 @@
     },
     "resources": 3,
     "influence": 3,
-    "factionHomeworld": "ponthous",
+    "factionHomeworld": "stoneborn",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "Fractured Souls",
-    "legendaryAbilityText": "When Ponthous is exhausted you may exhaust this card to ready it.",
+    "legendaryAbilityName": "Petra - Unleashed",
+    "legendaryAbilityText": "Apply +2 to the resource and influence values of Petra. At the end of your tactical action you may exhaust this card to explore 1 planet you control.",
     "unitPositions": {
-        "unitHolderName": "ponthous",
+        "unitHolderName": "petraunleashed",
         "coordinateMap": {
             "control": [
                 {
