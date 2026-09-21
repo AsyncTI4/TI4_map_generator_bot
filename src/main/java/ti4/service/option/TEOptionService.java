@@ -29,7 +29,6 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
@@ -143,8 +142,7 @@ public class TEOptionService {
                         game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
                 getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
                 getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF"),
-                getSingleTfHomebrewInfo(
-                        game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars"),
+                getSingleTfHomebrewInfo(game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars"),
                 getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+"));
     }
 
