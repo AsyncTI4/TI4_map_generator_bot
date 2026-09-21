@@ -111,12 +111,13 @@
     },
     {
         "alias": "thpnrevenant",
-        "name": "Revenant Alliance",
+        "name": "Revenant Rebirth",
         "faction": "revenant",
         "color": "",
         "playArea": true,
+        "playImmediately": false,
         "source": "theodisi",
-        "text": "When you receive this card and you are not the Revenant Glory player, place it face up in your play area: While this is in your play area, you can use the Revenant Glory player's Pantheon commander ability if it is unlocked. If you activate a system that contains 1 or more of the Revenant player's units, return this card to the Revenant player."
+        "text": "ACTION: Place this card face up in your play area and purge 1 random unused Revenant Pantheon card and gain the agent listed on that card. At the start of the status phase return this card to the Revenant player."
     },
     {
         "alias": "thpnthrones",

@@ -669,7 +669,7 @@
     {
         "alias": "stoneborn",
         "factionName": "The Stoneborn Stratum",
-        "homeSystem": "th16",
+        "homeSystem": "th16a",
         "startingFleet": "1 cv, 1 dd, 3 ff, 3 mf p, 1 sd p",
         "commodities": 4,
         "factionTech": [
@@ -770,7 +770,7 @@
         ],
         "abilities": [
             "radiant_grafting",
-            "mutualism"
+            "celestial_envoys"
         ],
         "leaders": [
             "thurvialiagent",
