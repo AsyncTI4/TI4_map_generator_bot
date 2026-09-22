@@ -141,7 +141,7 @@
         "alias": "myrr",
         "factionName": "The Wrought of Myrr",
         "homeSystem": "th4",
-        "startingFleet": "1 cr, 2 dn, 6 ff, 2 inf m, 1 sd m, 1 pds m",
+        "startingFleet": "1 cr, 2 dn, 5 ff, 3 inf m, 1 sd m, 1 pds m",
         "commodities": 2,
         "factionTech": [
             "thmyrry",

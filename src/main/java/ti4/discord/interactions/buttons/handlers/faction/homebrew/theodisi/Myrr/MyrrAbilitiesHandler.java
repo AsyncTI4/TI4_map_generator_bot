@@ -79,7 +79,7 @@ public class MyrrAbilitiesHandler {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + ", you may use **Factory Lease** to produce 1 unit other than a **War Sun** in a system containing your space dock. You must pay its cost.",
+                                + ", you may use **Factory Lease** to produce 1 unit with a cost of 4 or less in a system containing your space dock. You must pay its cost.",
                         buttons);
             }
         }
@@ -102,7 +102,7 @@ public class MyrrAbilitiesHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", please choose 1 unit other than a **War Sun** to produce using **Factory Lease**.",
+                        + ", please choose 1 unit with a cost of 4 or less to produce using **Factory Lease**.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }

@@ -444,6 +444,9 @@ public final class ButtonHelperTacticalAction {
             TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
+        if (unitsWereMoved && player.hasUnexhaustedLeader("myrragent")) {
+            MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
+        }
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(
                     player,
@@ -889,7 +892,6 @@ public final class ButtonHelperTacticalAction {
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
         RevenantLeadersHandler.openRevXytherisAgentWindow(game, player);
-        MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         ThronesTechHandler.offerRiftTouchedBastion(game, tile);
         game.setStoredValue("lastActiveSystem", pos);
