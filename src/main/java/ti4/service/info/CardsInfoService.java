@@ -148,7 +148,7 @@ public class CardsInfoService {
         if (player.hasLeader("myrragent")) {
             buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
         }
-        if (player.hasAbility("shared_discoveries")) {
+        if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {

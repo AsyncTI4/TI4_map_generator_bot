@@ -44,7 +44,6 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
@@ -827,14 +826,6 @@ public class PlayerAreaGenerator {
     }
 
     private int theodisiTokenSupplies(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.hasAbility("expeditionary_cache")) {
-            xDeltaFromRightSide = displayTheodisiTokenSupply(
-                    "token_theodisi_kairnexpedition.png",
-                    5,
-                    KairnAbilityHandler.getAvailableExpeditionTokens(game),
-                    xDeltaFromRightSide,
-                    yDelta);
-        }
         if (player.hasAbility("sting_of_the_hive")) {
             xDeltaFromRightSide = displayTheodisiTokenSupply(
                     "token_theodisi_mine.png",

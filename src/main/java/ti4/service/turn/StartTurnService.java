@@ -499,8 +499,6 @@ public class StartTurnService {
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
             startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
         }
-        if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
-            startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
         }
         if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
             Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);
