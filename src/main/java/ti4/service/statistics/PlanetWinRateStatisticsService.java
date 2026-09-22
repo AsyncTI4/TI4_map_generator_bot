@@ -27,6 +27,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -199,9 +200,7 @@ public class PlanetWinRateStatisticsService {
                             .record(isWinner));
         }
 
-        if (hasStyx(game)) {
-            accumulateStyx(seats, winner, stats);
-        }
+        accumulateStyx(game, seats, winner, stats);
     }
 
     /** Styx sits on a Fracture tile, so it only exists once the Fracture is on the board (or someone holds it). */
@@ -209,23 +208,26 @@ public class PlanetWinRateStatisticsService {
         return everyPlanetInPlay(game).anyMatch(STYX::equals);
     }
 
-    private static void accumulateStyx(List<PlayerHome> seats, Player winner, PlanetWinRateStats stats) {
-        stats.gamesWithStyx++;
+    private static void accumulateStyx(Game game, List<PlayerHome> seats, Player winner, PlanetWinRateStats stats) {
+        boolean styxInGame = hasStyx(game);
         boolean anyoneHeldStyx = false;
         for (PlayerHome seat : seats) {
             String faction = seat.player().getFaction();
             boolean heldStyx = seat.player().getPlanets().contains(STYX);
             boolean isWinner = faction.equals(winner.getFaction());
             anyoneHeldStyx |= heldStyx;
-            stats.overallStyx.record(heldStyx, isWinner);
+            stats.overallStyx.record(styxInGame, heldStyx, isWinner);
             for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
                 stats.byFactionStyx
                         .computeIfAbsent(factionKey, _ -> new StyxStats())
-                        .record(heldStyx, isWinner);
+                        .record(styxInGame, heldStyx, isWinner);
             }
         }
-        if (anyoneHeldStyx) {
-            stats.gamesWithStyxHeld++;
+        if (styxInGame) {
+            stats.gamesWithStyx++;
+            if (anyoneHeldStyx) {
+                stats.gamesWithStyxHeld++;
+            }
         }
     }
 
@@ -371,10 +373,10 @@ public class PlanetWinRateStatisticsService {
             appendCoexistedPlanetsSection(blocks, stats);
         }
         appendHomePlanetsLostSection(blocks, stats);
+        appendPerPlanetSection(blocks, stats);
         if (!stats.pokOnly) {
             appendStyxSection(blocks, stats);
         }
-        appendPerPlanetSection(blocks, stats);
 
         return blocks;
     }
@@ -384,8 +386,8 @@ public class PlanetWinRateStatisticsService {
             return;
         }
         header.append("Dropped ")
-                .append(stats.gamesWithLaterPlanets)
-                .append(" game(s) that were not flagged as Thunder's Edge but had planets from it in play.\n");
+                .append(StringHelper.pluralize(stats.gamesWithLaterPlanets, "game"))
+                .append(" not flagged as Thunder's Edge that had planets from it in play.\n");
     }
 
     private static void appendSkippedPlayersSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -394,8 +396,8 @@ public class PlanetWinRateStatisticsService {
         }
         StringBuilder sb = new StringBuilder("### Skipped players\n");
         sb.append("_")
-                .append(stats.playersWithoutAKnownHome)
-                .append(" player(s) had no home planets on file for their faction and no home system on the board, so"
+                .append(StringHelper.pluralize(stats.playersWithoutAKnownHome, "player"))
+                .append(" had no home planets on file for their faction and no home system on the board, so"
                         + " they are in none of the numbers above or below. Each row names a game to look at._\n");
 
         List<Entry<String, Integer>> byFaction = stats.skippedPlayersByFaction.entrySet().stream()
@@ -404,14 +406,14 @@ public class PlanetWinRateStatisticsService {
         byFaction.stream().limit(SKIPPED_FACTIONS_LISTED).forEach(entry -> sb.append("- `")
                 .append(entry.getKey())
                 .append("` - ")
-                .append(entry.getValue())
-                .append(" player(s), e.g. game `")
+                .append(StringHelper.pluralize(entry.getValue(), "player"))
+                .append(", e.g. game `")
                 .append(stats.skippedGameNames.get(entry.getKey()))
                 .append("`\n"));
         if (byFaction.size() > SKIPPED_FACTIONS_LISTED) {
             sb.append("- and ")
-                    .append(byFaction.size() - SKIPPED_FACTIONS_LISTED)
-                    .append(" more faction(s)\n");
+                    .append(StringHelper.pluralize(byFaction.size() - SKIPPED_FACTIONS_LISTED, "more faction"))
+                    .append('\n');
         }
         blocks.add(sb.toString());
     }
@@ -612,36 +614,45 @@ public class PlanetWinRateStatisticsService {
 
     private static void appendStyxSection(List<String> blocks, PlanetWinRateStats stats) {
         StringBuilder header = new StringBuilder("### Styx\n");
-        header.append("_Only games where Styx was in play at the end. Each row reads: share of those games the"
-                + " faction ended holding Styx, then its win rate when it held Styx and when it did not._\n");
-        if (stats.gamesWithStyx == 0) {
-            blocks.add(header.append("- Styx was not in play in any of these games.\n")
-                    .toString());
-            return;
-        }
+        header.append("_Each row reads: how often Styx was held at the end of the games it was in, then the win rate"
+                + " when held, when not held with Styx in the game, with Styx in the game, and without Styx._\n");
         header.append("Styx was in play in ")
                 .append(stats.gamesWithStyx)
-                .append(" game(s) and held at the end of ")
-                .append(stats.gamesWithStyxHeld)
+                .append(" of ")
+                .append(StringHelper.pluralize(stats.games, "game"))
                 .append(" (")
-                .append(ActionCardStatsService.formatPercent(stats.gamesWithStyxHeld / (double) stats.gamesWithStyx))
+                .append(ActionCardStatsService.formatPercent(
+                        stats.games == 0 ? 0 : stats.gamesWithStyx / (double) stats.games))
                 .append(").\n");
         blocks.add(header.toString());
+        if (stats.gamesWithStyx == 0) {
+            return;
+        }
 
-        blocks.add(renderStyxLine("**All factions**", stats.overallStyx));
+        // A faction sits in a game at most once, so its seats at Styx tables are its games with Styx. The
+        // combined row has six seats a game, so its hold rate is counted in games instead.
+        blocks.add(renderStyxLine("**All factions**", stats.gamesWithStyxHeld, stats.gamesWithStyx, stats.overallStyx));
         stats.byFactionStyx.entrySet().stream()
-                .filter(entry -> entry.getValue().players() >= MINIMUM_FACTION_PLAYERS)
+                .filter(entry -> entry.getValue().gamesWithStyx() >= MINIMUM_FACTION_PLAYERS)
                 .sorted(BY_STYX_CONTROL_RATE_DESC)
-                .forEach(entry -> blocks.add(renderStyxLine(factionLabel(entry.getKey()), entry.getValue())));
+                .forEach(entry -> blocks.add(renderStyxLine(
+                        factionLabel(entry.getKey()),
+                        entry.getValue().held.getPlayers(),
+                        entry.getValue().gamesWithStyx(),
+                        entry.getValue())));
     }
 
-    private static String renderStyxLine(String label, StyxStats group) {
-        return "- " + label + ": held Styx in " + group.held.getPlayers() + '/' + group.players() + " ("
-                + ActionCardStatsService.formatPercent(group.controlRate()) + "). "
-                + ActionCardStatsService.formatPercent(group.held.getWinRate()) + " win rate when held ("
-                + group.held.getWins() + '/' + group.held.getPlayers() + "), "
-                + ActionCardStatsService.formatPercent(group.notHeld.getWinRate()) + " when not ("
-                + group.notHeld.getWins() + '/' + group.notHeld.getPlayers() + ")\n";
+    private static String renderStyxLine(String label, int heldGames, int styxGames, StyxStats group) {
+        return "- " + label + ": held in " + heldGames + " of " + StringHelper.pluralize(styxGames, "game")
+                + " with Styx (" + ActionCardStatsService.formatPercent(heldGames / (double) styxGames)
+                + "). Win rate: " + formatWinRate(group.held) + " when held, " + formatWinRate(group.notHeld)
+                + " when not held, " + formatWinRate(group.inGame()) + " with Styx in the game, "
+                + formatWinRate(group.absent) + " without Styx\n";
+    }
+
+    private static String formatWinRate(WinRateCount count) {
+        return ActionCardStatsService.formatPercent(count.getWinRate()) + " (" + count.getWins() + '/'
+                + count.getPlayers() + ')';
     }
 
     private static void appendPerPlanetSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -774,23 +785,35 @@ public class PlanetWinRateStatisticsService {
         }
     }
 
-    /** Seats at tables where Styx was in play, split on whether that seat ended the game holding it. */
+    /**
+     * Seats split three ways: at a Styx table holding it, at a Styx table not holding it, and at a table
+     * Styx never reached.
+     */
     private static class StyxStats {
         final WinRateCount held = new WinRateCount();
 
         final WinRateCount notHeld = new WinRateCount();
 
-        void record(boolean heldStyx, boolean isWinner) {
-            (heldStyx ? held : notHeld).record(isWinner);
+        final WinRateCount absent = new WinRateCount();
+
+        void record(boolean styxInGame, boolean heldStyx, boolean isWinner) {
+            (!styxInGame ? absent : heldStyx ? held : notHeld).record(isWinner);
         }
 
-        int players() {
+        WinRateCount inGame() {
+            WinRateCount inGame = new WinRateCount();
+            inGame.players = held.players + notHeld.players;
+            inGame.wins = held.wins + notHeld.wins;
+            return inGame;
+        }
+
+        int gamesWithStyx() {
             return held.getPlayers() + notHeld.getPlayers();
         }
 
         double controlRate() {
-            int players = players();
-            return players == 0 ? 0 : (double) held.getPlayers() / players;
+            int games = gamesWithStyx();
+            return games == 0 ? 0 : (double) held.getPlayers() / games;
         }
     }
 
