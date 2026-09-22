@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -22,6 +23,7 @@ import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 
@@ -50,10 +52,8 @@ public class ActionCardPingButtonHandler {
                 Buttons.gray(base + SYSTEM + suffix, "Ping System Target", SYSTEM_EMOJI),
                 Buttons.gray(base + PLAYER + suffix, "Ping Player Target", PLAYER_EMOJI),
                 Buttons.red("deleteButtons", "No Target")));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", ping a target for _" + actionCardTitle + "_?",
-                buttons);
+        sendPrivately(
+                player, player.getRepresentationUnfogged() + ", ping a target for _" + actionCardTitle + "_?", buttons);
     }
 
     @ButtonHandler(Constants.AC_PING_PICK)
@@ -128,10 +128,7 @@ public class ActionCardPingButtonHandler {
     private static void offerPlanetChoices(Game game, Player player, String token) {
         List<Button> buttons =
                 PlanetTargetService.targetButtons(game, player, planetSpec(player, token), new ArrayList<>());
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose the planet you're pinging.",
-                buttons);
+        sendPrivately(player, player.getRepresentationUnfogged() + ", choose the planet you're pinging.", buttons);
     }
 
     @ButtonHandler(Constants.AC_PING_PLANET)
@@ -158,10 +155,7 @@ public class ActionCardPingButtonHandler {
                     buttonPrefix + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
         BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, buttonPrefix);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose the system you're pinging.",
-                buttons);
+        sendPrivately(player, player.getRepresentationUnfogged() + ", choose the system you're pinging.", buttons);
     }
 
     @ButtonHandler(Constants.AC_PING_SYSTEM)
@@ -185,14 +179,10 @@ public class ActionCardPingButtonHandler {
             buttons.add(FoWHelper.fogSafeTargetButton(buttonPrefix + "_" + candidate.getFaction(), "gray", candidate));
         }
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentationUnfogged() + ", there is nobody else to ping.");
+            sendPrivately(player, player.getRepresentationUnfogged() + ", there is nobody else to ping.");
             return;
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose the player you're pinging.",
-                buttons);
+        sendPrivately(player, player.getRepresentationUnfogged() + ", choose the player you're pinging.", buttons);
     }
 
     @ButtonHandler(Constants.AC_PING_PLAYER)
@@ -215,8 +205,8 @@ public class ActionCardPingButtonHandler {
         List<Button> buttons = new ArrayList<>(List.of(
                 Buttons.blue(base + ROUTE_PUBLIC + suffix, "Public"),
                 Buttons.gray(base + ROUTE_LOCAL + suffix, "Local")));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
+        sendPrivately(
+                player,
                 player.getRepresentationUnfogged() + ", announce this to the whole table, or keep it to yourself?",
                 buttons);
     }
@@ -266,14 +256,12 @@ public class ActionCardPingButtonHandler {
             return false;
         }
         if (!isPublic) {
-            MessageHelper.sendMessageToChannel(
-                    actor.getCorrectChannel(), planetPingFor(game, actor, planetId, actorLine));
-            return true;
+            return sendPrivately(actor, planetPingFor(game, actor, planetId, actorLine));
         }
         for (Player viewer : game.getRealPlayers()) {
             if (actorCouldKnowPlanet(game, viewer, planetId)) {
-                MessageHelper.sendMessageToChannel(
-                        viewer.getCorrectChannel(),
+                sendPrivately(
+                        viewer,
                         viewer.getRepresentationUnfogged() + " - " + planetPingFor(game, viewer, planetId, actorLine));
             }
         }
@@ -291,13 +279,12 @@ public class ActionCardPingButtonHandler {
         }
         Tile tile = game.getTileByPosition(position);
         if (!isPublic) {
-            MessageHelper.sendMessageToChannel(actor.getCorrectChannel(), systemPingFor(game, actor, tile, actorLine));
-            return true;
+            return sendPrivately(actor, systemPingFor(game, actor, tile, actorLine));
         }
         for (Player viewer : game.getRealPlayers()) {
             if (FoWHelper.getTilePositionsToShow(game, viewer).contains(position)) {
-                MessageHelper.sendMessageToChannel(
-                        viewer.getCorrectChannel(),
+                sendPrivately(
+                        viewer,
                         viewer.getRepresentationUnfogged() + " - " + systemPingFor(game, viewer, tile, actorLine));
             }
         }
@@ -313,10 +300,48 @@ public class ActionCardPingButtonHandler {
         if (target == null || target == actor) {
             return false;
         }
-        String label = target.fogSafeEmoji() + " " + target.getFactionNameOrColor();
-        MessageChannel channel = isPublic ? game.getMainGameChannel() : actor.getCorrectChannel();
-        MessageHelper.sendMessageToChannel(channel, actorLine + " " + PLAYER_EMOJI + " " + label + ".");
+        String message = actorLine + " " + PLAYER_EMOJI + " " + target.fogSafeEmoji() + " "
+                + target.getFactionNameOrColor() + ".";
+        if (!isPublic) {
+            return sendPrivately(actor, message);
+        }
+        MessageChannel mainChannel = game.getMainGameChannel();
+        if (mainChannel == null) {
+            return false;
+        }
+        MessageHelper.sendMessageToChannel(mainChannel, message);
         return true;
+    }
+
+    private static boolean sendPrivately(Player player, String message) {
+        TextChannel privateChannel = privateChannelOrReport(player);
+        if (privateChannel == null) {
+            return false;
+        }
+        MessageHelper.sendMessageToChannel(privateChannel, message);
+        return true;
+    }
+
+    private static boolean sendPrivately(Player player, String message, List<Button> buttons) {
+        TextChannel privateChannel = privateChannelOrReport(player);
+        if (privateChannel == null) {
+            return false;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(privateChannel, message, buttons);
+        return true;
+    }
+
+    private static TextChannel privateChannelOrReport(Player player) {
+        TextChannel privateChannel = player.getPrivateChannel();
+        if (privateChannel == null) {
+            GMService.logActivity(
+                    player.getGame(),
+                    "⚠️ Action card target ping could not be delivered: "
+                            + player.getRepresentationUnfogged()
+                            + " has no private channel.",
+                    true);
+        }
+        return privateChannel;
     }
 
     private static String targetingLine(Game game, Player actor, String cardTitle) {
