@@ -64,7 +64,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Draw and reveal 2 secret objectives; give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
-        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, her pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "notes": "Other players do not get to see which secret objective you gave away. You keep both secrets if no player can receive the other.",
         "source": "action_deck_2"
     },
@@ -209,7 +209,7 @@
         "window": "After another player produces ships",
         "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any systems that do not contain another player's units.",
         "automationID": "defectors",
-        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
+        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Its human minions had done well.",
         "source": "action_deck_2"
     },
     {
@@ -239,7 +239,7 @@
         "window": "ACTION",
         "text": "Place 1 PDS from your reinforcements on a planet you control.",
         "automationID": "defense_installation",
-        "flavorText": "Tellurian raised their arms above their head and emitted a strange noise that the locals presumed to be joyous. In the near distance, one of its kind broke through the earth, shattering the landscape.",
+        "flavorText": "Tellurian raised their arms above their head and emitted a strange noise that the locals presumed to be joyous. In the near distance, one of their kind broke through the earth, shattering the landscape.",
         "source": "action_deck_2"
     },
     {
