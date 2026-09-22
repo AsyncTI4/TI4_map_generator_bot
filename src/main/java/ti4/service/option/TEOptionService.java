@@ -29,7 +29,6 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
@@ -119,19 +118,22 @@ public class TEOptionService {
     }
 
     private static ContainerChildComponent getSingleTfHomebrewInfo(
-            boolean isDisable, String sourceId, String buttonLabel, TI4Emoji sourceEmoji) {
-        SourceModel source = Mapper.getSource(sourceId);
+            boolean isDisable, String sourceId, String buttonLabel) {
+        List<TextDisplay> textDisplays = List.of(TextDisplay.of("invalid sourceId: " + sourceId));
+        TI4Emoji sourceEmoji = null;
+
+        SourceModel sourceModel = Mapper.getSource(sourceId);
+        if (sourceModel != null) {
+            textDisplays = sourceModel.getRepresentationTextDisplays();
+            ComponentSource componentSource = sourceModel.getSource();
+            if (componentSource != null) {
+                sourceEmoji = componentSource.getRawEmoji();
+            }
+        }
+
         String buttonId = TOGGLE_TF_HOMEBREW_PREFIX + sourceId;
         Button button = Buttons.rgToggle(isDisable, buttonId, buttonLabel, sourceEmoji);
-        List<TextDisplay> textDisplays = source != null
-                ? source.getRepresentationTextDisplays()
-                : List.of(TextDisplay.of("invalid sourceId: " + sourceId));
         return Section.of(button, textDisplays);
-    }
-
-    private static ContainerChildComponent getSingleTfHomebrewInfo(
-            boolean isDisable, String sourceId, String buttonLabel) {
-        return getSingleTfHomebrewInfo(isDisable, sourceId, buttonLabel, SourceEmojis.TwilightKart);
     }
 
     public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
@@ -139,10 +141,9 @@ public class TEOptionService {
                 getSingleTfHomebrewInfo(
                         game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
                 getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
-                getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF", null),
-                getSingleTfHomebrewInfo(
-                        game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars),
-                getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+", SourceEmojis.Monuments));
+                getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF"),
+                getSingleTfHomebrewInfo(game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars"),
+                getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+"));
     }
 
     @ButtonHandler(TOGGLE_TF_HOMEBREW_PREFIX)
