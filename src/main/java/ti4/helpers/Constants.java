@@ -1651,6 +1651,7 @@ public final class Constants {
     public static final String TIGL_RANK = "tigl_rank";
     public static final String TIGL = "tigl";
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
+    public static final String TIGL_REPORT_MANUALLY = "report_manually";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
     public static final String LAZAX = "lazax";
