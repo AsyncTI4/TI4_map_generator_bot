@@ -538,8 +538,9 @@ public final class AgendaWhensAftersHelper {
             if (!lastPlayerToPlayAnAfter.isEmpty()) {
                 agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(
                         game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
-                agendaAbilityResolutionOrder =
-                        Helper.getSpeakerOrFullPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = agendaAbilityResolutionOrder.size() > 1
+                        ? Helper.getSpeakerOrFullPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game)
+                        : List.of();
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnAfters = game.getStoredValue("declinedAfters");

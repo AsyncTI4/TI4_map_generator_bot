@@ -2470,6 +2470,16 @@ public final class AgendaHelper {
         }
         List<Button> resActionRow = new ArrayList<>();
         boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasTech("thveylory")) {
+                player.refreshTech("thveylory");
+
+                MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                        + " readied _Kleptocratic Politics_ due to the agenda being resolved with no effect.");
+            }
+        }
                 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
         boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
         int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
