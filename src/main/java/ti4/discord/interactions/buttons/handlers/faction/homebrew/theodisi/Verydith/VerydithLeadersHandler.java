@@ -112,14 +112,12 @@ public class VerydithLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 receiver.getCorrectChannel(),
-                receiver.getRepresentation() + ", you may gain 1 CC and perform a transaction with "
-                        + sender.getRepresentationNoPing() + " due to _Seris Kael_, the Verydith Agent",
+                receiver.getRepresentation() + ", you may gain 1 CC due to _Seris Kael_, the Verydith Agent",
                 ButtonHelper.getGainCCButtons(receiver));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 sender.getCorrectChannel(),
-                sender.getRepresentation() + ", you may gain 1 CC and perform a transaction with "
-                        + receiver.getRepresentationNoPing() + " due to _Seris Kael_, the Verydith Agent",
+                sender.getRepresentation() + ", you may gain 1 CC due to _Seris Kael_, the Verydith Agent",
                 ButtonHelper.getGainCCButtons(sender));
 
         ButtonHelper.deleteMessage(event);
@@ -127,26 +125,20 @@ public class VerydithLeadersHandler {
 
     // Commander
     public static void checkVerydithCommander(Game activeMap) {
-        for (Player player : activeMap.getRealPlayers()) {
-            String tokenToAddOrRemove = Constants.VERYDITH_ATTACHMENT_PNG;
-            if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")) {
-                for (Tile tile : activeMap.getTileMap().values()) {
-                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                        if (unitHolder instanceof Planet planet) {
-                            if (player.getPlanets().contains(planet.getName())) {
-                                for (Player otherPlayer : activeMap.getRealPlayersExcludingThis(player)) {
-                                    String ccID = Mapper.getCCID(otherPlayer.getColor());
-                                    if (!tile.hasCC(ccID)
-                                            && planet.getTokenList().contains(tokenToAddOrRemove)) {
-                                        planet.removeToken(tokenToAddOrRemove);
-                                    } else if (tile.hasCC(ccID)
-                                            && !planet.getTokenList().contains(tokenToAddOrRemove)) {
-                                        planet.addToken(tokenToAddOrRemove);
-                                    }
-                                }
-                            }
-                        }
+        boolean commanderActive = activeMap.getRealPlayers().stream()
+                .anyMatch(player -> activeMap.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander"));
+        for (Tile tile : activeMap.getTileMap().values()) {
+            boolean hasCommandToken = activeMap.getRealPlayers().stream().anyMatch(tile::hasPlayerCC);
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (!(unitHolder instanceof Planet planet)) {
+                    continue;
+                }
+                if (commanderActive && hasCommandToken) {
+                    if (!planet.getTokenList().contains(Constants.VERYDITH_ATTACHMENT_PNG)) {
+                        planet.addToken(Constants.VERYDITH_ATTACHMENT_PNG);
                     }
+                } else {
+                    planet.removeToken(Constants.VERYDITH_ATTACHMENT_PNG);
                 }
             }
         }
