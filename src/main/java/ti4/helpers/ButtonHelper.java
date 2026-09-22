@@ -5755,7 +5755,8 @@ public class ButtonHelper {
             }
         }
         for (String unitID : player.getUnitsOwned()) {
-            if (unitID.contains("tf-") || unitID.contains("tk-")) {
+            UnitModel unit = Mapper.getUnit(unitID);
+            if (unit != null && unit.getSource().isTwilightFallish() && unit.getIsUpgrade()) {
                 count++;
             }
         }

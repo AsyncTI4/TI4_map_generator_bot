@@ -2,9 +2,11 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -61,12 +63,13 @@ public class MatchmakingQueueSearchService {
         return true;
     }
 
-    public Optional<String> findJoinBlocker(String threadId, String joiningUserId, List<String> existingMemberIds) {
+    public Optional<JoinBlocker> findJoinBlocker(
+            String threadId, String joiningUserId, List<String> existingMemberIds) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
         return repository
                 .findByThreadId(threadId)
-                .flatMap(search ->
-                        QueuedGameJoinValidator.findJoinBlocker(toCriteria(search), joiningUserId, existingMemberIds));
+                .flatMap(search -> QueuedGameJoinValidator.findJoinBlocker(
+                        toCriteria(search), joiningUserId, existingMemberIds, exemptUserIds(search)));
     }
 
     public Optional<String> findLaunchBlocker(String threadId, int rosterSize) {
@@ -77,6 +80,28 @@ public class MatchmakingQueueSearchService {
             return Optional.of("it is queued for **" + String.join(" or ", playerCounts) + "** players and has "
                     + rosterSize + " signed up.");
         });
+    }
+
+    public Optional<JoinBlocker> findMemberAddBlocker(
+            String threadId, String joiningUserId, List<String> existingMemberIds) {
+        Optional<MatchmakingQueueSearch> search =
+                DatabasePersistenceGate.isDisabled() ? Optional.empty() : repository.findByThreadId(threadId);
+        return search.map(found -> QueuedGameJoinValidator.findMemberAddBlocker(
+                        toCriteria(found), joiningUserId, existingMemberIds))
+                .orElseGet(() -> QueuedGameJoinValidator.findAvoidListBlocker(joiningUserId, existingMemberIds));
+    }
+
+    @Transactional
+    public void addExemptMembers(String threadId, List<String> userIds) {
+        if (DatabasePersistenceGate.isDisabled() || userIds.isEmpty()) return;
+        Optional<MatchmakingQueueSearch> found = repository.findByThreadId(threadId);
+        if (found.isEmpty()) return;
+
+        MatchmakingQueueSearch search = found.get();
+        Set<String> exempt = new LinkedHashSet<>(split(search.getExemptUserIds()));
+        if (!exempt.addAll(userIds)) return;
+        search.setExemptUserIds(join(List.copyOf(exempt)));
+        repository.save(search);
     }
 
     @Transactional
@@ -95,6 +120,9 @@ public class MatchmakingQueueSearchService {
             return;
         }
         search.setPlayerCounts(join(reachableCounts));
+        search.setExemptUserIds(join(split(search.getExemptUserIds()).stream()
+                .filter(memberIds::contains)
+                .toList()));
         if (search.isTigl()) {
             List<String> ranks = narrowTiglRanks(split(search.getTiglRanks()), memberIds);
             if (!ranks.isEmpty()) {
@@ -129,9 +157,11 @@ public class MatchmakingQueueSearchService {
                 continue;
             }
             PlayerSearchCriteria criteria = toCriteria(search);
+            Set<String> exemptUserIds = exemptUserIds(search);
             thread.retrieveMessageById(search.getMessageId())
                     .queue(
-                            message -> CreateGameButtonHandler.addPlayersFromQueueSearch(guild, message, criteria),
+                            message -> CreateGameButtonHandler.addPlayersFromQueueSearch(
+                                    guild, message, criteria, exemptUserIds),
                             // Only drop the record if the message is truly gone; ignore transient REST failures.
                             new ErrorHandler()
                                     .handle(
@@ -149,6 +179,10 @@ public class MatchmakingQueueSearchService {
                 split(search.getRestrictions()),
                 search.isTigl(),
                 split(search.getTiglRanks()));
+    }
+
+    private static Set<String> exemptUserIds(MatchmakingQueueSearch search) {
+        return Set.copyOf(split(search.getExemptUserIds()));
     }
 
     private static String join(List<String> values) {

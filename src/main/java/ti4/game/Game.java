@@ -1014,7 +1014,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             tkCups.add("Destroyer Cup");
         }
         if (isTkNovaCup()) {
-            tkCups.add("Nova Cup");
+            tkCups.add("Nova Cup " + SourceEmojis.TkNovaCup);
         }
         gameModes.put(
                 SourceEmojis.TwilightKart + " Twilight Kart (" + String.join(" & ", tkCups) + ")", !tkCups.isEmpty());
@@ -3641,9 +3641,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void removeOverruleIfPurged() {
-        if ("true".equals(getStoredValue("removeOverrule"))) {
+        if (isOverrulePurged()) {
             getActionCards().removeIf("overrule"::equals);
         }
+    }
+
+    public boolean isOverrulePurged() {
+        return "true".equals(getStoredValue("removeOverrule"));
     }
 
     public void addTeACs() {
@@ -4959,12 +4963,19 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
+                || isUnchartedSpaceStuff()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
                 || isTwilightKart()
                 || isTkDestroyerCup()
                 || isTkNovaCup()
+                || isTfBr()
+                || isTwilightDS()
+                || isMuaatManiaMode()
+                || isCosmicConvergenceMode()
+                || isLiberationC4Mode()
+                || isErwansGambitMode()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()

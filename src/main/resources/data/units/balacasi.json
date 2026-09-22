@@ -244,24 +244,6 @@
         "ability": "For each of your other mechs on this planet, apply +1 to this unit's combat rolls."
     },
     {
-        "id": "xan_warsun",
-        "baseType": "warsun",
-        "asyncId": "ws",
-        "name": "Stellar Architect I",
-        "upgradesToUnitId": "xan_warsun2",
-        "source": "balacasi",
-        "faction": "xan",
-        "moveValue": 2,
-        "capacityValue": 4,
-        "capacityUsed": 1,
-        "combatHitsOn": 3,
-        "combatDieCount": 1,
-        "bombardHitsOn": 3,
-        "bombardDieCount": 1,
-        "cost": 12,
-        "isShip": true
-    },
-    {
         "id": "xan_warsun2",
         "baseType": "warsun",
         "asyncId": "ws",
@@ -285,10 +267,10 @@
         "ability": "During space combat, this unit rolls 1 additional die for each space dock in this system. Other players' units in this system lose PLANETARY SHIELD."
     },
     {
-        "id": "xan_warsun_omega",
+        "id": "xan_warsun",
         "baseType": "warsun",
         "asyncId": "ws",
-        "name": "Stellar Architect I Ω",
+        "name": "Stellar Architect I",
         "upgradesToUnitId": "xan_warsun2",
         "source": "balacasi",
         "faction": "xan",
