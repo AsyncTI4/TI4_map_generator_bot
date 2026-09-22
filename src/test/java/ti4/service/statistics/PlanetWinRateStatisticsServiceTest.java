@@ -471,6 +471,57 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
         assertThat(render(List.of(baseGame))).contains("No games matched.\n");
     }
 
+    @Test
+    void shouldSplitEachFactionsWinRateOnWhetherItHeldStyx() {
+        String report = render(repeatGame(MINIMUM_SAMPLE, game -> {
+            addPlayer(game, "sol", true, "jord", "styx");
+            addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+        }));
+
+        assertThat(report).contains("### Styx\n");
+        assertThat(report).contains("Styx was in play in 25 game(s) and held at the end of 25 (100%).\n");
+        assertThat(report)
+                .contains("- **All factions**: held Styx in 25/50 (50%). 100% win rate when held (25/25), 0% when"
+                        + " not (0/25)\n");
+        assertThat(report).contains("held Styx in 25/25 (100%). 100% win rate when held (25/25), 0% when not (0/0)\n");
+        assertThat(report).contains("held Styx in 0/25 (0%). 0% win rate when held (0/0), 0% when not (0/25)\n");
+    }
+
+    @Test
+    void shouldCountAGameWhereStyxIsOnTheBoardButNobodyHoldsIt() {
+        Game heldGame = newGame("1");
+        addPlayer(heldGame, "sol", false, "jord", "styx");
+        addPlayer(heldGame, "letnev", true, "arcprime", "wrenterra");
+        Game unheldGame = newGame("2");
+        unheldGame.setTile(new Tile("fracture4", "frac4"));
+        addPlayer(unheldGame, "sol", true, "jord");
+        addPlayer(unheldGame, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(heldGame, unheldGame));
+
+        assertThat(report).contains("Styx was in play in 2 game(s) and held at the end of 1 (50%).\n");
+        assertThat(report)
+                .contains("- **All factions**: held Styx in 1/4 (25%). 0% win rate when held (0/1), 66.67% when"
+                        + " not (2/3)\n");
+    }
+
+    @Test
+    void shouldLeaveGamesWithoutStyxOutOfTheStyxSection() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        String report = render(List.of(game));
+
+        assertThat(report).contains("### Styx\n");
+        assertThat(report).contains("- Styx was not in play in any of these games.\n");
+    }
+
+    @Test
+    void shouldDropTheStyxSectionForPokOnly() {
+        assertThat(render(List.of(prophecyOfKingsGame("1")), true)).doesNotContain("### Styx");
+    }
+
     private static Game pokAndThundersEdgeGame(String suffix) {
         Game game = newGame(suffix);
         game.setThundersEdge(true);
