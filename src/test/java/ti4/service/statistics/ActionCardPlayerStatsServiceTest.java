@@ -232,7 +232,8 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         resolvedGame.getGameStats().recordAcPlay(GameStats.OVERRULE, sol);
         stats.accumulate(resolvedGame, sol);
 
-        // Played but canceled, and lost: counts as a game with Overrule, but toward neither rate.
+        // Played but canceled, and lost: counts as a game with Overrule, but toward the unresolved
+        // win rate alongside games where the faction never played it at all.
         Game canceledGame = new Game();
         Player canceledSol = addPlayer(canceledGame, "sol-player", "sol");
         Player xxcha = addPlayer(canceledGame, "xxcha-player", "xxcha");
@@ -249,13 +250,14 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         // Sol leads on play rate, so its row spells out the labels.
         List<String> blocks = new ArrayList<>();
         stats.appendOverruleTo(blocks);
+        // Sol's canceled play joins its never-played game in the unresolved bucket: 0 wins of 2.
         assertThat(blocks)
                 .anyMatch(block -> block.startsWith("- `66.67% of 3 games` ")
-                        && block.endsWith(": 100% (1/1) win rate with it resolved, 0% (0/1) without playing it\n"));
+                        && block.endsWith(": 100% (1/1) win rate with it resolved, 0% (0/2) when it wasn't\n"));
         // Xxcha never played it, so it has no resolved games to rate rather than a 0% win rate.
         assertThat(blocks)
                 .anyMatch(block -> block.startsWith("- `    0% of 3 games` ")
-                        && block.endsWith(": - (0/0) resolved, 66.67% (2/3) without\n"));
+                        && block.endsWith(": - (0/0) resolved, 66.67% (2/3) unresolved\n"));
     }
 
     @Test
