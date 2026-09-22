@@ -1082,14 +1082,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("tf-swa".equals(unit.getAlias())) {
             score += 99;
         }
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
-                && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
-        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
+        if (unit.getFaction().isPresent() && unit.getIsUpgrade()) {
+            score += 4;
+        }
+        if (unit.getFaction().isPresent()) {
+            score += 3;
+        }
+        if (unit.getIsUpgrade()) {
+            score += 2;
+        }
         if (unitHolder != null
                 && ((Constants.SPACE.equals(unitHolder.getName()) && unit.getIsShip())
-                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) score++;
-        if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) {
+            score++;
+        }
+        if (unit.getSource().isTwilightFallish()
+                && unit.getIsUpgrade()
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
         }
@@ -1485,7 +1493,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
 
-        return getCommoditiesBase() + getCommoditiesBonus();
+        int commodityValue = getCommoditiesBase();
+        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+            return commodityValue = 2 + getCommoditiesBonus();
+        }
+
+        return commodityValue + getCommoditiesBonus();
     }
 
     public int getCommoditiesBonus() {
@@ -1501,9 +1514,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
-        }
-        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
-            bonus -= 2;
         }
         if (hasTech("tf-corporateimperialism")) {
             bonus += 4;

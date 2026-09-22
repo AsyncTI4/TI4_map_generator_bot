@@ -222,12 +222,50 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldSplitAFactionsOverruleWinRateByWhetherItResolved() {
+        ActionCardPlayerStatsService stats = new ActionCardPlayerStatsService();
+
+        // Resolved and won.
+        Game resolvedGame = new Game();
+        Player sol = addPlayer(resolvedGame, "sol-player", "sol");
+        addPlayer(resolvedGame, "xxcha-player", "xxcha");
+        resolvedGame.getGameStats().recordAcPlay(GameStats.OVERRULE, sol);
+        stats.accumulate(resolvedGame, sol);
+
+        // Played but canceled, and lost: counts as a game with Overrule, but toward neither rate.
+        Game canceledGame = new Game();
+        Player canceledSol = addPlayer(canceledGame, "sol-player", "sol");
+        Player xxcha = addPlayer(canceledGame, "xxcha-player", "xxcha");
+        canceledGame.getGameStats().recordAcPlay(GameStats.OVERRULE, canceledSol);
+        canceledGame.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
+        stats.accumulate(canceledGame, xxcha);
+
+        // Not played, and lost.
+        Game quietGame = new Game();
+        addPlayer(quietGame, "sol-player", "sol");
+        Player quietXxcha = addPlayer(quietGame, "xxcha-player", "xxcha");
+        stats.accumulate(quietGame, quietXxcha);
+
+        // Sol leads on play rate, so its row spells out the labels.
+        List<String> blocks = new ArrayList<>();
+        stats.appendOverruleTo(blocks);
+        assertThat(blocks)
+                .anyMatch(block -> block.startsWith("- `66.67% of 3 games` ")
+                        && block.endsWith(": 100% (1/1) win rate with it resolved, 0% (0/1) without playing it\n"));
+        // Xxcha never played it, so it has no resolved games to rate rather than a 0% win rate.
+        assertThat(blocks)
+                .anyMatch(block -> block.startsWith("- `    0% of 3 games` ")
+                        && block.endsWith(": - (0/0) resolved, 66.67% (2/3) without\n"));
+    }
+
+    @Test
     void shouldSayNothingMatchedWhenNoGameWasTracked() {
         String rendered = render(new ActionCardPlayerStatsService());
 
         assertThat(rendered)
-                .contains("**Win rate by cards played**")
-                .contains("**Cards played per faction**")
+                .contains("### Win rate by cards played")
+                .contains("### Cards played per faction")
+                .contains("### Overrule by faction")
                 .contains("No tracked action card plays matched the selected filters.");
     }
 
@@ -261,9 +299,12 @@ class ActionCardPlayerStatsServiceTest extends BaseTi4Test {
         }
     }
 
+    // The report puts the deck-wide Overrule targets between the two, which has nothing to say
+    // about these sections - joined back up here, they read as they do in the report.
     private static String render(ActionCardPlayerStatsService stats) {
         List<String> blocks = new ArrayList<>();
         stats.appendTo(blocks);
+        stats.appendOverruleTo(blocks);
         return String.join("", blocks);
     }
 }

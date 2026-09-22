@@ -21,6 +21,7 @@ public enum SourceEmojis implements TI4Emoji {
     Flagshipping,
     PromisesPromises,
     TwilightKart,
+    TkNovaCup,
     Eronous,
     IgnisAurora,
     MiltyMod,

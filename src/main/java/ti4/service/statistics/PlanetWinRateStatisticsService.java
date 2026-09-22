@@ -46,6 +46,8 @@ public class PlanetWinRateStatisticsService {
     /** The factions that coexist by design, and so the only ones the coexistence section reports. */
     private static final List<String> COEXISTING_FACTIONS = List.of(COEXISTING_FACTION, "titans");
 
+    private static final String STYX = "styx";
+
     private static final int BAND_SIZE = 2;
     private static final int OPEN_ENDED_BAND_START = 11;
     private static final int COEXIST_OPEN_ENDED_BAND_START = 5;
@@ -75,6 +77,11 @@ public class PlanetWinRateStatisticsService {
                             entry.getValue().averageCoexistedPlanets())
                     .reversed()
                     .thenComparing(Entry::getKey);
+
+    private static final Comparator<Entry<String, StyxStats>> BY_STYX_CONTROL_RATE_DESC = Comparator.comparingDouble(
+                    (Entry<String, StyxStats> entry) -> entry.getValue().controlRate())
+            .reversed()
+            .thenComparing(Entry::getKey);
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         boolean pokOnly = event.getOption(POK_ONLY_OPTION, false, OptionMapping::getAsBoolean);
@@ -190,6 +197,35 @@ public class PlanetWinRateStatisticsService {
                     .forEach(planet -> stats.byPlanet
                             .computeIfAbsent(planet, _ -> new WinRateCount())
                             .record(isWinner));
+        }
+
+        if (hasStyx(game)) {
+            accumulateStyx(seats, winner, stats);
+        }
+    }
+
+    /** Styx sits on a Fracture tile, so it only exists once the Fracture is on the board (or someone holds it). */
+    private static boolean hasStyx(Game game) {
+        return everyPlanetInPlay(game).anyMatch(STYX::equals);
+    }
+
+    private static void accumulateStyx(List<PlayerHome> seats, Player winner, PlanetWinRateStats stats) {
+        stats.gamesWithStyx++;
+        boolean anyoneHeldStyx = false;
+        for (PlayerHome seat : seats) {
+            String faction = seat.player().getFaction();
+            boolean heldStyx = seat.player().getPlanets().contains(STYX);
+            boolean isWinner = faction.equals(winner.getFaction());
+            anyoneHeldStyx |= heldStyx;
+            stats.overallStyx.record(heldStyx, isWinner);
+            for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
+                stats.byFactionStyx
+                        .computeIfAbsent(factionKey, _ -> new StyxStats())
+                        .record(heldStyx, isWinner);
+            }
+        }
+        if (anyoneHeldStyx) {
+            stats.gamesWithStyxHeld++;
         }
     }
 
@@ -335,6 +371,9 @@ public class PlanetWinRateStatisticsService {
             appendCoexistedPlanetsSection(blocks, stats);
         }
         appendHomePlanetsLostSection(blocks, stats);
+        if (!stats.pokOnly) {
+            appendStyxSection(blocks, stats);
+        }
         appendPerPlanetSection(blocks, stats);
 
         return blocks;
@@ -571,6 +610,40 @@ public class PlanetWinRateStatisticsService {
                 .append(')');
     }
 
+    private static void appendStyxSection(List<String> blocks, PlanetWinRateStats stats) {
+        StringBuilder header = new StringBuilder("### Styx\n");
+        header.append("_Only games where Styx was in play at the end. Each row reads: share of those games the"
+                + " faction ended holding Styx, then its win rate when it held Styx and when it did not._\n");
+        if (stats.gamesWithStyx == 0) {
+            blocks.add(header.append("- Styx was not in play in any of these games.\n")
+                    .toString());
+            return;
+        }
+        header.append("Styx was in play in ")
+                .append(stats.gamesWithStyx)
+                .append(" game(s) and held at the end of ")
+                .append(stats.gamesWithStyxHeld)
+                .append(" (")
+                .append(ActionCardStatsService.formatPercent(stats.gamesWithStyxHeld / (double) stats.gamesWithStyx))
+                .append(").\n");
+        blocks.add(header.toString());
+
+        blocks.add(renderStyxLine("**All factions**", stats.overallStyx));
+        stats.byFactionStyx.entrySet().stream()
+                .filter(entry -> entry.getValue().players() >= MINIMUM_FACTION_PLAYERS)
+                .sorted(BY_STYX_CONTROL_RATE_DESC)
+                .forEach(entry -> blocks.add(renderStyxLine(factionLabel(entry.getKey()), entry.getValue())));
+    }
+
+    private static String renderStyxLine(String label, StyxStats group) {
+        return "- " + label + ": held Styx in " + group.held.getPlayers() + '/' + group.players() + " ("
+                + ActionCardStatsService.formatPercent(group.controlRate()) + "). "
+                + ActionCardStatsService.formatPercent(group.held.getWinRate()) + " win rate when held ("
+                + group.held.getWins() + '/' + group.held.getPlayers() + "), "
+                + ActionCardStatsService.formatPercent(group.notHeld.getWinRate()) + " when not ("
+                + group.notHeld.getWins() + '/' + group.notHeld.getPlayers() + ")\n";
+    }
+
     private static void appendPerPlanetSection(List<String> blocks, PlanetWinRateStats stats) {
         blocks.add("### Win rate by planet controlled\n"
                 + "_A player's win rate when they held the planet at the end of the game. Home planets are left"
@@ -624,6 +697,12 @@ public class PlanetWinRateStatisticsService {
 
         final Map<String, String> skippedGameNames = new HashMap<>();
 
+        final StyxStats overallStyx = new StyxStats();
+
+        final Map<String, StyxStats> byFactionStyx = new HashMap<>();
+
+        int gamesWithStyx;
+        int gamesWithStyxHeld;
         int games;
         int gamesWithLaterPlanets;
         int playersWithoutAKnownHome;
@@ -692,6 +771,26 @@ public class PlanetWinRateStatisticsService {
 
         double homeLossRate() {
             return players == 0 ? 0 : (double) lostAHomePlanet.getPlayers() / players;
+        }
+    }
+
+    /** Seats at tables where Styx was in play, split on whether that seat ended the game holding it. */
+    private static class StyxStats {
+        final WinRateCount held = new WinRateCount();
+
+        final WinRateCount notHeld = new WinRateCount();
+
+        void record(boolean heldStyx, boolean isWinner) {
+            (heldStyx ? held : notHeld).record(isWinner);
+        }
+
+        int players() {
+            return held.getPlayers() + notHeld.getPlayers();
+        }
+
+        double controlRate() {
+            int players = players();
+            return players == 0 ? 0 : (double) held.getPlayers() / players;
         }
     }
 
