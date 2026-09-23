@@ -567,6 +567,7 @@ public class CombatRollService {
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
         RevenantLeadersHandler.addRevXytherisAgentModifier(tempMods, game, player, rollType);
+        XytherisPromissoryHandler.addSwarmSpawnModifier(tempMods, game, player, rollType);
         TwilightsFallMonumentsButtonHandler.addOrangeTfMonumentModifier(tempMods, game, player, tile, rollType);
         if (player.hasTech("beironats")) {
             extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
@@ -672,6 +673,7 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        XytherisPromissoryHandler.resolveSwarmSpawnAfterRoll(event, game, player, rollType);
         if (massHypnosisHits > 0 && !game.isFowMode()) {
             CombatRollService.sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
         }
@@ -2256,13 +2258,6 @@ public class CombatRollService {
             totalHits++;
             result += "\n" + player.getFactionEmoji()
                     + " produced 1 additional hit from _Zythrix_ the Xytheris Commander.";
-        }
-        if (totalHits > 0
-                && rollType != CombatRollType.combatround
-                && opponent != player
-                && player.hasPlayablePromissoryInHand("thpnxytheris")
-                && !player.getPromissoryNotesInPlayArea().contains("thpnxytheris")) {
-            XytherisPromissoryHandler.offerXytherisPnButton(game, player, totalHits);
         }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 

@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -275,6 +276,9 @@ public class PromissoryNoteHelper {
 
         if ("bepncryst".equalsIgnoreCase(id)) {
             CrystellumPromissoryHandler.resolveFracture(game, player, event);
+        }
+        if ("thpnxytheris".equalsIgnoreCase(id)) {
+            XytherisPromissoryHandler.activateSwarmSpawn(game, player);
         }
 
         if (id.contains("dspnveld")) {
