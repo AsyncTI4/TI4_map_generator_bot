@@ -450,7 +450,7 @@ public class ButtonHelper {
                 transact = Buttons.green(
                         "naaluHeroSend_" + receiver.getFaction() + "_"
                                 + sender.getPromissoryNotes().get(pnShortHand),
-                        owner.getColor() + " " + promissoryNote.getName());
+                        PromissoryNoteHelper.ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
             } else {
                 String id = "naaluHeroSend_" + receiver.getFaction() + "_"
                         + sender.getPromissoryNotes().get(pnShortHand);
