@@ -52,7 +52,7 @@
     "name": "Velorine Nevorith",
     "title": "Keeper of Keys",
     "abilityWindow": "At any time:",
-    "abilityText": "Increase the influence and resource values of planets in systems that contain command tokens by 1.",
+    "abilityText": "Increase the influence and resource values of planets you control in systems that contain command tokens by 1.",
     "unlockCondition": "Have units in a system that contains 2 or more other players' command tokens.",
     "source": "theodisi"
   },
