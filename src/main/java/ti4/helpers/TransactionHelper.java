@@ -1558,7 +1558,7 @@ public class TransactionHelper {
                     if (game.isFowMode()) {
                         transact = Buttons.green(
                                 factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
-                                owner.getColor() + " " + promissoryNote.getName());
+                                PromissoryNoteHelper.ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
                     } else {
                         transact = Buttons.green(
                                 factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,

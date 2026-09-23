@@ -36,7 +36,8 @@ public class VyserixLeaderHandler {
                     PlanetTargetSpec.of(player.factionButtonChecker() + "vyserixHeroAttach")
                             .where(p -> !p.isHomePlanet()
                                     && !p.isFake()
-                                    && p.getTechSpecialities().isEmpty()),
+                                    && p.getTechSpecialities().isEmpty())
+                            .withPageNavPrefix(player.factionButtonChecker() + "vyserixHeroAttach_"),
                     buttons);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             return;
@@ -62,7 +63,8 @@ public class VyserixLeaderHandler {
         var spec = PlanetTargetSpec.of(player.factionButtonChecker() + "vyserixHeroAttach")
                 .where(p -> !p.isHomePlanet()
                         && !p.isFake()
-                        && p.getTechSpecialities().isEmpty());
+                        && p.getTechSpecialities().isEmpty())
+                .withPageNavPrefix(player.factionButtonChecker() + "vyserixHeroAttach_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         String planet = buttonID.replace("vyserixHeroAttach_", "");
         Tile tile = game.getTileFromPlanet(planet);

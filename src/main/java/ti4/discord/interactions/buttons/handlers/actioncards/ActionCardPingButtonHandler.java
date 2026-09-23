@@ -35,7 +35,7 @@ public class ActionCardPingButtonHandler {
     private static final String PLAYER = "player";
 
     private static final String ROUTE_PUBLIC = "public";
-    private static final String ROUTE_LOCAL = "local";
+    private static final String ROUTE_NON_PUBLIC = "local";
 
     private static final String PING_KEY_PREFIX = "acPingCard";
     private static final Pattern LEADING_DIGITS = Pattern.compile("^(\\d+)");
@@ -44,16 +44,25 @@ public class ActionCardPingButtonHandler {
     private static final String SYSTEM_EMOJI = "🌌";
     private static final String PLAYER_EMOJI = "🎯";
 
+    private static final int MAX_TITLE_LENGTH_IN_BUTTON_ID = 30;
+
     public static void sendPingPrompt(Player player, String actionCardMessageId, String actionCardTitle) {
         String base = player.factionButtonChecker() + Constants.AC_PING_PICK;
-        String suffix = "_" + actionCardMessageId + "_" + actionCardTitle;
+        String titleForButtonId = StringUtils.truncate(actionCardTitle, MAX_TITLE_LENGTH_IN_BUTTON_ID);
+        String suffix = "_" + actionCardMessageId + "_" + titleForButtonId;
         List<Button> buttons = new ArrayList<>(List.of(
                 Buttons.gray(base + PLANET + suffix, "Ping Planet Target", PLANET_EMOJI),
                 Buttons.gray(base + SYSTEM + suffix, "Ping System Target", SYSTEM_EMOJI),
                 Buttons.gray(base + PLAYER + suffix, "Ping Player Target", PLAYER_EMOJI),
                 Buttons.red("deleteButtons", "No Target")));
         sendPrivately(
-                player, player.getRepresentationUnfogged() + ", ping a target for _" + actionCardTitle + "_?", buttons);
+                player,
+                player.getRepresentationUnfogged() + ", ping a target for _" + actionCardTitle + "_?\n"
+                        + "> " + PLANET_EMOJI + " any planet, including your own.\n"
+                        + "> " + SYSTEM_EMOJI + " any system.\n"
+                        + "> " + PLAYER_EMOJI + " any other player.\n"
+                        + "> Anything else: pick _No Target_ and use `/fow announce` instead.",
+                buttons);
     }
 
     @ButtonHandler(Constants.AC_PING_PICK)
@@ -103,9 +112,9 @@ public class ActionCardPingButtonHandler {
         stale.forEach(game::removeStoredValue);
     }
 
-    private static String takeCardTitle(Game game, Player player, String token) {
-        String stored = game.removeStoredValue(pingKey(player, token));
-        return stored == null ? "" : StringUtils.substringAfter(stored, "|");
+    private static String peekCardTitle(Game game, Player player, String token) {
+        String stored = game.getStoredValue(pingKey(player, token));
+        return stored.isEmpty() ? "" : StringUtils.substringAfter(stored, "|");
     }
 
     private static String tokenFrom(String payload) {
@@ -144,7 +153,7 @@ public class ActionCardPingButtonHandler {
             return;
         }
         ButtonHelper.deleteMessage(event);
-        offerRouteChoice(player, PLANET, planetId, takeCardTitle(game, player, token));
+        offerRouteChoice(player, PLANET, planetId, token);
     }
 
     private static void offerSystemChoices(Game game, Player player, String token) {
@@ -168,7 +177,7 @@ public class ActionCardPingButtonHandler {
             return;
         }
         ButtonHelper.deleteMessage(event);
-        offerRouteChoice(player, SYSTEM, position, takeCardTitle(game, player, token));
+        offerRouteChoice(player, SYSTEM, position, token);
     }
 
     private static void offerPlayerChoices(Game game, Player player, String token) {
@@ -196,19 +205,26 @@ public class ActionCardPingButtonHandler {
             return;
         }
         ButtonHelper.deleteMessage(event);
-        offerRouteChoice(player, PLAYER, faction, takeCardTitle(game, player, token));
+        offerRouteChoice(player, PLAYER, faction, token);
     }
 
-    private static void offerRouteChoice(Player player, String type, String targetKey, String cardTitle) {
+    private static void offerRouteChoice(Player player, String type, String targetKey, String token) {
         String base = player.factionButtonChecker() + Constants.AC_PING_ROUTE;
-        String suffix = "_" + type + "_" + cardTitle + "_" + targetKey;
+        String suffix = "_" + type + "_" + token + "_" + targetKey;
         List<Button> buttons = new ArrayList<>(List.of(
                 Buttons.blue(base + ROUTE_PUBLIC + suffix, "Public"),
-                Buttons.gray(base + ROUTE_LOCAL + suffix, "Local")));
+                Buttons.gray(base + ROUTE_NON_PUBLIC + suffix, "Non-Public")));
         sendPrivately(
                 player,
-                player.getRepresentationUnfogged() + ", announce this to the whole table, or keep it to yourself?",
+                player.getRepresentationUnfogged() + ", announce this in the main channel, or "
+                        + nonPublicAudience(type) + "?",
                 buttons);
+    }
+
+    private static String nonPublicAudience(String type) {
+        return PLAYER.equals(type)
+                ? "tell only the targeted player"
+                : "tell only the players who can currently see the targeted system";
     }
 
     @ButtonHandler(value = Constants.AC_PING_ROUTE, save = false)
@@ -219,9 +235,10 @@ public class ActionCardPingButtonHandler {
         }
         boolean isPublic = ROUTE_PUBLIC.equals(parts[0]);
         String type = parts[1];
+        String token = parts[2];
         String targetKey = parts[3];
 
-        String cardTitle = parts[2];
+        String cardTitle = peekCardTitle(game, player, token);
         boolean sent =
                 switch (type) {
                     case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
@@ -252,25 +269,29 @@ public class ActionCardPingButtonHandler {
     }
 
     private static boolean routePlanet(Game game, Player actor, String planetId, boolean isPublic, String actorLine) {
-        if (!planetExists(game, planetId) || !actorCouldKnowPlanet(game, actor, planetId)) {
+        Tile tile = game.getTileFromPlanet(planetId);
+        if (tile == null || !planetExists(game, planetId) || !actorCouldKnowPlanet(game, actor, planetId)) {
             return false;
         }
-        if (!isPublic) {
-            return sendPrivately(actor, planetPingFor(game, actor, planetId, actorLine));
+        if (isPublic) {
+            return postPublicly(game, planetPingFor(game, null, planetId, actorLine));
         }
-        for (Player viewer : game.getRealPlayers()) {
-            if (actorCouldKnowPlanet(game, viewer, planetId)) {
-                sendPrivately(
-                        viewer,
-                        viewer.getRepresentationUnfogged() + " - " + planetPingFor(game, viewer, planetId, actorLine));
-            }
+        for (Player recipient : playersSeeing(game, actor, tile)) {
+            sendPrivately(
+                    recipient,
+                    recipient.getRepresentationUnfogged() + " - "
+                            + planetPingFor(game, recipient, planetId, actorLine));
         }
+        confirmRevealedPing(actor, PLANET_EMOJI + " " + planetLabelFor(game, actor, planetId));
         return true;
     }
 
     private static String planetPingFor(Game game, Player viewer, String planetId, String actorLine) {
-        String label = PlanetTargetService.fogSafeLabeller(game, viewer).apply(planetId);
-        return actorLine + " " + PLANET_EMOJI + " " + label + ".";
+        return actorLine + " " + PLANET_EMOJI + " " + planetLabelFor(game, viewer, planetId) + ".";
+    }
+
+    private static String planetLabelFor(Game game, Player viewer, String planetId) {
+        return PlanetTargetService.fogSafeLabeller(game, viewer).apply(planetId);
     }
 
     private static boolean routeSystem(Game game, Player actor, String position, boolean isPublic, String actorLine) {
@@ -278,16 +299,15 @@ public class ActionCardPingButtonHandler {
             return false;
         }
         Tile tile = game.getTileByPosition(position);
-        if (!isPublic) {
-            return sendPrivately(actor, systemPingFor(game, actor, tile, actorLine));
+        if (isPublic) {
+            return postPublicly(game, systemPingFor(game, null, tile, actorLine));
         }
-        for (Player viewer : game.getRealPlayers()) {
-            if (FoWHelper.getTilePositionsToShow(game, viewer).contains(position)) {
-                sendPrivately(
-                        viewer,
-                        viewer.getRepresentationUnfogged() + " - " + systemPingFor(game, viewer, tile, actorLine));
-            }
+        for (Player recipient : playersSeeing(game, actor, tile)) {
+            sendPrivately(
+                    recipient,
+                    recipient.getRepresentationUnfogged() + " - " + systemPingFor(game, recipient, tile, actorLine));
         }
+        confirmRevealedPing(actor, SYSTEM_EMOJI + " " + tile.getRepresentationForButtons(game, actor));
         return true;
     }
 
@@ -295,21 +315,51 @@ public class ActionCardPingButtonHandler {
         return actorLine + " " + SYSTEM_EMOJI + " " + tile.getRepresentationForButtons(game, viewer) + ".";
     }
 
+    private static List<Player> playersSeeing(Game game, Player actor, Tile tile) {
+        return game.getRealPlayers().stream()
+                .filter(candidate -> candidate != actor)
+                .filter(candidate ->
+                        FoWHelper.getTilePositionsToShow(game, candidate).contains(tile.getPosition()))
+                .toList();
+    }
+
+    private static void confirmRevealedPing(Player actor, String targetLabel) {
+        sendPrivately(
+                actor,
+                actor.getRepresentationUnfogged() + ", any players who can currently see " + targetLabel
+                        + " have been privately notified that it is being targeted.");
+    }
+
     private static boolean routePlayer(Game game, Player actor, String faction, boolean isPublic, String actorLine) {
         Player target = game.getPlayerFromColorOrFaction(faction);
         if (target == null || target == actor) {
             return false;
         }
-        String message = actorLine + " " + PLAYER_EMOJI + " " + target.fogSafeEmoji() + " "
-                + target.getFactionNameOrColor() + ".";
-        if (!isPublic) {
-            return sendPrivately(actor, message);
+        String targetLabel = target.fogSafeEmoji() + " " + target.getFactionNameOrColor();
+        if (isPublic) {
+            return postPublicly(game, actorLine + " " + PLAYER_EMOJI + " " + targetLabel + ".");
         }
+        return pingTargetPrivately(actor, target, targetLabel, actorLine);
+    }
+
+    private static boolean postPublicly(Game game, String message) {
         MessageChannel mainChannel = game.getMainGameChannel();
         if (mainChannel == null) {
             return false;
         }
         MessageHelper.sendMessageToChannel(mainChannel, message);
+        return true;
+    }
+
+    private static boolean pingTargetPrivately(Player actor, Player target, String targetLabel, String actorLine) {
+        String targetMessage = target.getRepresentationUnfogged() + " - " + actorLine + " you " + PLAYER_EMOJI + ".";
+        if (!sendPrivately(target, targetMessage)) {
+            return false;
+        }
+        sendPrivately(
+                actor,
+                actor.getRepresentationUnfogged() + ", " + PLAYER_EMOJI + " " + targetLabel
+                        + " has been privately notified that they are being targeted.");
         return true;
     }
 

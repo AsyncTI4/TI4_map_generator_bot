@@ -78,7 +78,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getShrineButtons(Player p2, Player viewer, Game game) {
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) {
-            buttons = PlanetTargetService.targetButtons(game, viewer, PlanetTargetSpec.of("shrineView"), buttons);
+            buttons = PlanetTargetService.targetButtons(
+                    game, viewer, PlanetTargetSpec.of("shrineView").withPageNavPrefix("shrineView_"), buttons);
             buttons.add(Buttons.red("deleteButtons", "Gain 2 CC instead"));
             return buttons;
         }
@@ -96,7 +97,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("shrineView_")
     public static void resolveShrineView(
             Player player, Player p2, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, PlanetTargetSpec.of("shrineView")))
+        if (PlanetTargetService.handlePlanetPage(
+                event, game, player, buttonID, PlanetTargetSpec.of("shrineView").withPageNavPrefix("shrineView_")))
             return;
         String planet = buttonID.replace("shrineView_", "");
         ButtonHelper.deleteMessage(event);

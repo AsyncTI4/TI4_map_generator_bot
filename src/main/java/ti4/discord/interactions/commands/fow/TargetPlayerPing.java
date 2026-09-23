@@ -20,7 +20,10 @@ class TargetPlayerPing extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Player you are targeting")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLIC, "Announce it in the main channel")
+        addOptions(new OptionData(
+                        OptionType.BOOLEAN,
+                        Constants.PUBLIC,
+                        "True: announce in the main channel. False: tell only the targeted player")
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD, "Action card you are resolving"));
     }

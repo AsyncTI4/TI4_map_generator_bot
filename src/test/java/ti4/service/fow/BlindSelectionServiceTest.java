@@ -32,6 +32,23 @@ class BlindSelectionServiceTest extends BaseTi4Test {
                 .orElse(null);
     }
 
+    /**
+     * Discord rejects a modal label over 45 characters with an IllegalArgumentException thrown synchronously,
+     * which killed the whole Blind Target flow for unit-holder targets ("Planet name, or a system position for
+     * the one in space" was 54). The detail belongs in the placeholder, which allows 100.
+     */
+    @Test
+    void everyBlindPromptLabelFitsDiscordsModalLimit() {
+        for (String type : new String[] {POSITION, PLANET, UNIT_HOLDER}) {
+            assertThat(BlindSelectionService.blindPromptLabel(type))
+                    .as("label for type %s", type)
+                    .hasSizeLessThanOrEqualTo(45);
+            assertThat(BlindSelectionService.blindPromptPlaceholder(type))
+                    .as("placeholder for type %s", type)
+                    .hasSizeLessThanOrEqualTo(100);
+        }
+    }
+
     @Test
     void positionPrompt_acceptsAPositionOrAPlanetName() {
         try (var harness = TestGameHarness.forDefaultMap()) {

@@ -68,8 +68,10 @@ public class MindsieveService {
                 continue;
             }
             Player owner = game.getPNOwner(pn);
-            buttons.add(
-                    Buttons.green("mindsieveFollow_" + sc + "_" + pn, "Send " + model.getName(), owner.fogSafeEmoji()));
+            buttons.add(Buttons.green(
+                    "mindsieveFollow_" + sc + "_" + pn,
+                    "Send " + model.getName(),
+                    PromissoryNoteHelper.ownerEmoji(game, owner, pn)));
         }
         buttons.add(
                 Buttons.DONE_DELETE_BUTTONS.withLabel("Decline Mindsieve").withEmoji(FactionEmojis.Naalu.asEmoji()));

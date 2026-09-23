@@ -326,6 +326,8 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        var exchangeSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3");
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, exchangeSpec)) return;
 
         String planet = buttonID.split("_")[1];
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);

@@ -104,7 +104,8 @@ public class PlotCardsService {
                         player,
                         PlanetTargetSpec.of(player.factionButtonChecker() + "resolveSeethe")
                                 .where(pl -> game.getTileFromPlanet(pl.getName()) != null
-                                        && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game)),
+                                        && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game))
+                                .withPageNavPrefix(player.factionButtonChecker() + "resolveSeethe_"),
                         buttons);
                 message = player.getRepresentation() + ", please choose a non-home planet to eradicate.";
             } else {
@@ -154,7 +155,8 @@ public class PlotCardsService {
     private static void resolveSeethe(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         var seetheSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "resolveSeethe")
                 .where(pl -> game.getTileFromPlanet(pl.getName()) != null
-                        && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game));
+                        && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game))
+                .withPageNavPrefix(player.factionButtonChecker() + "resolveSeethe_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, seetheSpec)) return;
         // planetNameRegex, not unitHolderRegex: the latter only matches planets on THIS map, so a
         // Blind-Target press naming a real-but-off-map planet would never match and the interaction would
