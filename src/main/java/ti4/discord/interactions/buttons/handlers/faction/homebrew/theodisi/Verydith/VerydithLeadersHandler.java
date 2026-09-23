@@ -125,15 +125,16 @@ public class VerydithLeadersHandler {
 
     // Commander
     public static void checkVerydithCommander(Game activeMap) {
-        boolean commanderActive = activeMap.getRealPlayers().stream()
-                .anyMatch(player -> activeMap.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander"));
         for (Tile tile : activeMap.getTileMap().values()) {
             boolean hasCommandToken = activeMap.getRealPlayers().stream().anyMatch(tile::hasPlayerCC);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (!(unitHolder instanceof Planet planet)) {
                     continue;
                 }
-                if (commanderActive && hasCommandToken) {
+                boolean controlledByCommanderHolder = activeMap.getRealPlayers().stream()
+                        .anyMatch(player -> activeMap.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")
+                                && player.getPlanets().contains(planet.getName()));
+                if (hasCommandToken && controlledByCommanderHolder) {
                     if (!planet.getTokenList().contains(Constants.VERYDITH_ATTACHMENT_PNG)) {
                         planet.addToken(Constants.VERYDITH_ATTACHMENT_PNG);
                     }
