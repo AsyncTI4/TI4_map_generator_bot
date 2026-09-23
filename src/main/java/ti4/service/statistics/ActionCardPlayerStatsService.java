@@ -47,8 +47,8 @@ class ActionCardPlayerStatsService {
     private final Map<String, Integer> overruleGamesPerFaction = new HashMap<>();
     private final Map<String, Integer> resolvedOverruleGames = new HashMap<>();
     private final Map<String, Integer> resolvedOverruleWins = new HashMap<>();
-    private final Map<String, Integer> noOverruleGames = new HashMap<>();
-    private final Map<String, Integer> noOverruleWins = new HashMap<>();
+    private final Map<String, Integer> unresolvedOverruleGames = new HashMap<>();
+    private final Map<String, Integer> unresolvedOverruleWins = new HashMap<>();
 
     // Kept apart from the rows above, which collapse everything at the cap into one key and so
     // cannot be summed back into a true total.
@@ -116,12 +116,12 @@ class ActionCardPlayerStatsService {
         if (played) {
             FactionStatisticsHelper.incrementFactionsIntValue(overruleGamesPerFaction, faction);
         }
-        // A game where every Overrule the faction played was canceled belongs to neither side: the
-        // card never took effect, yet the faction did draw and spend it, unlike one that never had it.
+        // A canceled Overrule never took effect, so it counts with games where the faction played
+        // none at all - both are "Overrule wasn't resolved" for this faction's game.
         if (resolved) {
             recordWinRate(resolvedOverruleGames, resolvedOverruleWins, faction, won);
-        } else if (!played) {
-            recordWinRate(noOverruleGames, noOverruleWins, faction, won);
+        } else {
+            recordWinRate(unresolvedOverruleGames, unresolvedOverruleWins, faction, won);
         }
     }
 
@@ -247,8 +247,8 @@ class ActionCardPlayerStatsService {
         StringBuilder heading = new StringBuilder();
         heading.append("### Overrule by faction\n");
         heading.append("_How many of its games each faction played Overrule in, counting those canceled, then its win"
-                + " rate in games where its Overrule resolved against games where it played none. A game where every"
-                + " Overrule it played was canceled counts toward neither win rate. Same sample of games as above._\n");
+                + " rate in games where its Overrule resolved against games where it didn't - whether it never played"
+                + " Overrule or every copy it played was canceled. Same sample of games as above._\n");
         if (gamesPerFaction.isEmpty()) {
             heading.append("No tracked action card plays matched the selected filters.\n");
             blocks.add(heading.toString());
@@ -280,8 +280,8 @@ class ActionCardPlayerStatsService {
                 .append(": ");
         appendFactionWinRate(row, resolvedOverruleWins, resolvedOverruleGames, faction);
         row.append(spellOutLabels ? " win rate with it resolved, " : " resolved, ");
-        appendFactionWinRate(row, noOverruleWins, noOverruleGames, faction);
-        row.append(spellOutLabels ? " without playing it\n" : " without\n");
+        appendFactionWinRate(row, unresolvedOverruleWins, unresolvedOverruleGames, faction);
+        row.append(spellOutLabels ? " when it wasn't\n" : " unresolved\n");
         return row.toString();
     }
 
