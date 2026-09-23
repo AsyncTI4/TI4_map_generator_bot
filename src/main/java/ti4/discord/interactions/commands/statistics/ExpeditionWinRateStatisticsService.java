@@ -37,6 +37,7 @@ class ExpeditionWinRateStatisticsService {
         WinRateCount thundersEdgeControlStats = new WinRateCount();
         int[] gamesThatDidNotFinishExpeditionsVersusDid = {0, 0};
         int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough = {0, 0};
+        int[] lastExpeditionPlayersControllingThundersEdgeVersusTotal = {0, 0};
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getStandardCompetitiveGamesFilter().and(Game::isThundersEdge),
@@ -48,7 +49,8 @@ class ExpeditionWinRateStatisticsService {
                         lastExpeditionStats,
                         thundersEdgeControlStats,
                         gamesThatDidNotFinishExpeditionsVersusDid,
-                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough),
+                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough,
+                        lastExpeditionPlayersControllingThundersEdgeVersusTotal),
                 ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
@@ -80,6 +82,18 @@ class ExpeditionWinRateStatisticsService {
 
         sb.append("\n**Who completed the last expedition**\n");
         sb.append("- ").append(lastExpeditionStats).append('\n');
+        int lastExpeditionPlayersControllingThundersEdge = lastExpeditionPlayersControllingThundersEdgeVersusTotal[0];
+        int lastExpeditionPlayersTotal = lastExpeditionPlayersControllingThundersEdgeVersusTotal[1];
+        long lastExpeditionThundersEdgePercent = lastExpeditionPlayersTotal > 0
+                ? Math.round(lastExpeditionPlayersControllingThundersEdge * 100.0 / lastExpeditionPlayersTotal)
+                : 0;
+        sb.append("- Also controlled Thunder's Edge: ")
+                .append(lastExpeditionPlayersControllingThundersEdge)
+                .append('/')
+                .append(lastExpeditionPlayersTotal)
+                .append(" (")
+                .append(lastExpeditionThundersEdgePercent)
+                .append("%)\n");
 
         sb.append("\n**Who controls Thunder's Edge**\n");
         sb.append("- ").append(thundersEdgeControlStats).append('\n');
@@ -166,7 +180,8 @@ class ExpeditionWinRateStatisticsService {
             WinRateCount lastExpeditionStats,
             WinRateCount thundersEdgeControlStats,
             int[] gamesThatDidNotFinishExpeditionsVersusDid,
-            int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough) {
+            int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough,
+            int[] lastExpeditionPlayersControllingThundersEdgeVersusTotal) {
 
         Player winner = game.getWinner().orElse(null);
         if (winner == null) {
@@ -257,6 +272,10 @@ class ExpeditionWinRateStatisticsService {
                 lastExpeditionStats.total++;
                 if (isWinner) {
                     lastExpeditionStats.wins++;
+                }
+                lastExpeditionPlayersControllingThundersEdgeVersusTotal[1] += 1;
+                if (player.hasPlanet(THUNDERS_EDGE)) {
+                    lastExpeditionPlayersControllingThundersEdgeVersusTotal[0] += 1;
                 }
             }
         }
