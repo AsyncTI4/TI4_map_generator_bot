@@ -37,29 +37,29 @@
     {
         "alias": "economicboon",
         "name": "Economic Boon",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. When you would exhaust a planet you control you may exhaust this card instead.",
-        "notes": "Button will be in cards info, use it to ready selected planet after exhausting the target planet.",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the number of planets adjacent to this system. When this card no longer has control tokens on it, discard it. At the start of your turn you can remove any number of control tokens from this card to produce a non-fighter ship with a cost up to the number of tokens removed in a system containing 1 of your space docks.",
+        "notes": "Control-token count is initialized when this Boon is explored.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "naturesboon",
         "name": "Nature's Boon",
-        "text": "Place this card face up in your play area. This card may be exchnaged as part of a transaction. When you exhaust a planet you may exhaust this card to combine the values of that planet's resources and influence. Treat the combined value as if it were both resources and influence of that planet.",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the resource value of that planet + 1. When this card no longer has control tokens on it, discard it. When you activate a system you may remove any number of control tokens from this card & increase the resource value of a planet you control by 1 for each token removed until the end of that tactical action.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "diplomaticboon",
         "name": "Diplomatic Boon",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 or more of your ships. Place any combination of infantry or fighters in that system up to the influence value of that planet.",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the influence value of this planet + 1. When this card no longer has control tokens on it, discard it. At any time you may remove any number of control tokens from this card to place that many fighters in systems that contain your ships or infantry on planets you control.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "cosmicboon",
         "name": "Cosmic Boon",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. At the end of your turn you may exhaust this card to explore 2 planets you control.",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the number of systems with no planets adjacent to this system + 1. When this card no longer has control tokens on it, discard it. At the end of your tactical action you may remove 1 control token from this card & explore 1 planet  you control in the active system.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
