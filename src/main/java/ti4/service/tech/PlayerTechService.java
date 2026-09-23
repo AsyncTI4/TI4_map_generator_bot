@@ -27,7 +27,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
@@ -831,7 +830,6 @@ public class PlayerTechService {
         }
         if (techM.isUnitUpgrade()) {
             if (isResearch) {
-                KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
                 UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(techID);
                 if (player.hasPlayablePromissoryInHand("thpnkryxos")
                         && !player.ownsPromissoryNote("thpnkryxos")
