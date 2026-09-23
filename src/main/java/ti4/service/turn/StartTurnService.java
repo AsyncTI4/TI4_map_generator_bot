@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
@@ -499,6 +500,11 @@ public class StartTurnService {
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
             startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
         }
+        if (!doneActionThisTurn) {
+            Button veylaButton = ArcanumLeadersHandler.getVeylaStartTurnButton(game, player);
+            if (veylaButton != null) {
+                startButtons.add(veylaButton);
+            }
         }
         if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
             Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);

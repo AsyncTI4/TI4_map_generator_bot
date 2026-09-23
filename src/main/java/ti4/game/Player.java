@@ -2868,9 +2868,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedTechs().add(tech);
 
             if (game != null) {
-                if (game.playerHasLeaderUnlockedOrAlliance(this, "arcanumcommander")) {
-                    ArcanumLeadersHandler.offerArcanumTechExhaustCommanderButtons(this);
-                }
                 if (hasUnexhaustedLeader("revenantagent")) {
                     RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
                 }

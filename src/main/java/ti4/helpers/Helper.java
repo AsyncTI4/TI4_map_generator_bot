@@ -1586,6 +1586,7 @@ public final class Helper {
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("netrunnersAgentDiscount")
                     && !thing.contains("aida")
+                    && !thing.contains("arcanumRunebound")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
                     && !thing.contains("Agent")) {
@@ -1776,6 +1777,9 @@ public final class Helper {
                         msg.append("to ignore a prerequisite on a unit upgrade technology");
                     }
                     msg.append(".\n");
+                }
+                if (thing.contains("arcanumRunebound")) {
+                    msg.append("> Damaged _Rune-Bound Sentinel_ to ignore a prerequisite on a technology.\n");
                 }
                 if (thing.startsWith("netrunnersAgentDiscount_")) {
                     // Already included above as a cost discount.

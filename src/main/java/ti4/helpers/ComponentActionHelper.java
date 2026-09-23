@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
@@ -618,6 +619,11 @@ public class ComponentActionHelper {
                 getRelicButton = Buttons.green(factionChecker + prefix + "getRelic_", "Purge Fragments to Explore");
             }
             compButtons.add(getRelicButton);
+        } else {
+            Button arcanumCommanderRelicButton = ArcanumLeadersHandler.getArcanumCommanderGetRelicButton(game, p1);
+            if (arcanumCommanderRelicButton != null) {
+                compButtons.add(arcanumCommanderRelicButton);
+            }
         }
 
         // ACs

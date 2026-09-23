@@ -22,7 +22,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
@@ -92,7 +91,6 @@ public class PlayerTechService {
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
         if (gainedTech) {
-            ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
@@ -819,10 +817,6 @@ public class PlayerTechService {
         player.addTech(techID);
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
-        ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
-        if (isResearch) {
-            ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
-        }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
         if (buttonIDComponents.contains("scrollOfAscension")) {
@@ -1084,6 +1078,7 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        buttons.addAll(ArcanumUnitHandler.getRuneboundPrerequisiteSkipButtons(game, player, tech, payType));
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
         }
