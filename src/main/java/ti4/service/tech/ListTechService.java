@@ -342,6 +342,9 @@ public class ListTechService {
             if (player.hasTechReady("aida") || player.hasTechReady("absol_aida")) {
                 wilds++;
             }
+            if (player.hasAbility("battle_tested_designs")) {
+                wilds++;
+            }
         } else if (player.hasAbility("analytical")) {
             wilds++;
         }

@@ -339,7 +339,7 @@ public enum LeaderEmojis implements TI4Emoji {
     MorphaHero,
     ThurvialiAgent,
     ThurvialiCommander,
-    ThruvialiHero,
+    ThurvialiHero,
 
     // Generic
     Agent,

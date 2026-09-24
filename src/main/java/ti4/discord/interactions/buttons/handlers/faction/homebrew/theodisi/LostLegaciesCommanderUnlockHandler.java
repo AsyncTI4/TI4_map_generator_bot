@@ -9,15 +9,17 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.ExploreModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
-import ti4.model.TechnologyModel;
 
 @UtilityClass
 public class LostLegaciesCommanderUnlockHandler {
@@ -208,8 +210,6 @@ public class LostLegaciesCommanderUnlockHandler {
 
                 yield false;
             }
-            case "thrones" -> {
-                int unitsAdjacentToAnomalies = 0;
             case "revenantvanguard" -> {
                 int noPrereqTechs = 0;
 
@@ -228,8 +228,10 @@ public class LostLegaciesCommanderUnlockHandler {
                 yield false;
             }
             case "revenantveylor" -> true;
+            case "thrones" -> {
+                int unitsAdjacentToAnomalies = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (!tile.containsPlayersUnits(player)) {
+                    if (tile.isHomeSystem(game) || !tile.containsPlayersUnits(player)) {
                         continue;
                     }
 
@@ -256,6 +258,39 @@ public class LostLegaciesCommanderUnlockHandler {
 
                 yield false;
             }
+            case "scrapyard" -> {
+                Set<UnitType> shipTypes = new HashSet<>();
+                for (Tile tile : game.getTileMap().values()) {
+                    for (UnitKey unitKey : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
+                        UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                        if (unitModel != null && unitModel.isNonFighterShip()) {
+                            shipTypes.add(unitKey.unitType());
+                        }
+                    }
+                }
+                yield shipTypes.size() >= 5;
+            }
+            case "morpha" ->
+                game.getDiscardActionCards().keySet().stream()
+                                .filter(actionCard -> game.getDiscardACStatus().get(actionCard) != ACStatus.purged)
+                                .count()
+                        >= 3;
+            case "thurviali" -> {
+                int planetsWithStructures = 0;
+                for (String planetName : player.getPlanetsAllianceMode()) {
+                    Tile tile = game.getTileFromPlanet(planetName);
+                    Planet planet = game.getUnitHolderFromPlanet(planetName);
+                    if (tile == null || planet == null || tile.isHomeSystem(game)) {
+                        continue;
+                    }
+                    if (planet.getUnitKeysForPlayer(player).stream()
+                            .map(player::getUnitFromUnitKey)
+                            .anyMatch(unitModel -> unitModel != null && unitModel.getIsStructure())) {
+                        planetsWithStructures++;
+                    }
+                }
+                yield planetsWithStructures >= 2;
+            }
             default -> false;
         };
     }
@@ -272,7 +307,10 @@ public class LostLegaciesCommanderUnlockHandler {
             }
             for (String adjacentPosition : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                 Tile adjacentTile = game.getTileByPosition(adjacentPosition);
-                if (adjacentTile != null && adjacentTile.getPlanetUnitHolders().isEmpty()) {
+                if (adjacentTile != null
+                        && (adjacentTile.getTileModel() == null
+                                || !adjacentTile.getTileModel().isHyperlane())
+                        && adjacentTile.getPlanetUnitHolders().isEmpty()) {
                     qualifyingUnitTiles.add(tile);
                     break;
                 }

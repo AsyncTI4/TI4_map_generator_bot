@@ -99,7 +99,8 @@ public class VeylorLeadersHandler {
         if (player.getReadiedPlanets().size() > 3) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentationUnfogged() + " must exhaust all but 3 controlled planets to unlock Cyrala Vey.");
+                    player.getRepresentationUnfogged()
+                            + " must exhaust all but 3 controlled planets to unlock Cyrala Vey.");
             return;
         }
 
@@ -295,10 +296,7 @@ public class VeylorLeadersHandler {
         String message = player.getRepresentation()
                 + ", produce 1 unit in " + tile.getRepresentation()
                 + " with cost up to your " + votesCast + " votes cast due to Cyrala Vey, the Veylor commander.";
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                message,
-                buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
         ButtonHelper.deleteMessage(event);
     }
@@ -331,5 +329,4 @@ public class VeylorLeadersHandler {
         }
         return systemsWithShips;
     }
-
 }

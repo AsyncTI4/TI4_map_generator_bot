@@ -2470,18 +2470,18 @@ public final class AgendaHelper {
         } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
-        List<Button> resActionRow = new ArrayList<>();
-        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
         for (Player player : game.getRealPlayers()) {
             if (player.hasTech("thveylory")) {
                 player.refreshTech("thveylory");
 
                 MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                        + " readied _Kleptocratic Politics_ due to the agenda being resolved with no effect.");
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " readied _Kleptocratic Politics_ due to the agenda being resolved with no effect.");
             }
         }
+        List<Button> resActionRow = new ArrayList<>();
+        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
                 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
         boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
         int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
@@ -2972,6 +2972,14 @@ public final class AgendaHelper {
                 && game.getLaws().size() == 2) {
             MessageHelper.sendMessageToChannel(
                     channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
+        }
+        if (!action
+                && aCount <= 2
+                && game.getRealPlayers().stream()
+                        .anyMatch(player -> player.hasLeader("veylorhero") && player.hasLeaderUnlocked("veylorhero"))) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "## This is a reminder that someone has _Speaker Gilbrand_ unlocked and that there will be 3 agendas this agenda phase.");
         }
         RevenantLeadersHandler.offerRevVeylorCommanderPlanets(game);
         if (game.getLaws().size() > 2 && game.getStoredValue("executiveOrder").isEmpty()) {

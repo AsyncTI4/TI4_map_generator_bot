@@ -231,7 +231,10 @@ public class ThronesLeadersHandler {
     }
 
     private static boolean isEligibleShipModel(UnitModel unitModel) {
-        return unitModel != null && !unitModel.getIsStructure() && unitModel.getCost() <= 4; // USed to be ship only now its unit, easier to change this than remove a ton of stuff
+        return unitModel != null
+                && !unitModel.getIsStructure()
+                && unitModel.getCost()
+                        <= 4; // USed to be ship only now its unit, easier to change this than remove a ton of stuff
     }
 
     private static List<Tile> getEligibleDestinationTiles(Game game, Player target) {

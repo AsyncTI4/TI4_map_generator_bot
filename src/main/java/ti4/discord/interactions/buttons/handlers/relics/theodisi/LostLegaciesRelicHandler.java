@@ -1065,7 +1065,8 @@ public class LostLegaciesRelicHandler {
     }
 
     public static void clearNaturesBoon(Game game, Player player) {
-        String[] values = game.getStoredValue(NATURE_BONUS + player.getFaction()).split("\\|", 2);
+        String[] values =
+                game.getStoredValue(NATURE_BONUS + player.getFaction()).split("\\|", 2);
         if (values.length == 2) {
             Planet planet = game.getUnitHolderFromPlanet(values[0]);
             if (planet != null) {

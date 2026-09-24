@@ -1359,12 +1359,7 @@ public class PlayerAreaGenerator {
                 int tokenCount = LostLegaciesRelicHandler.getBoonTokens(game, player, relicID);
                 for (int token = 0; token < tokenCount; token++) {
                     DrawingUtil.getAndDrawControlToken(
-                            graphics,
-                            player,
-                            x + deltaX + 2 + token % 3 * 14,
-                            y + 52 + token / 3 * 13,
-                            false,
-                            0.25f);
+                            graphics, player, x + deltaX + 2 + token % 3 * 14, y + 52 + token / 3 * 13, false, 0.25f);
                 }
             }
 
@@ -1419,9 +1414,11 @@ public class PlayerAreaGenerator {
                         default -> -1;
                     };
             if (leaderRank1 == leaderRank2) {
-                return Mapper.getLeader(leader1.getId())
-                        .getName()
-                        .compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
+                LeaderModel leaderModel1 = Mapper.getLeader(leader1.getId());
+                LeaderModel leaderModel2 = Mapper.getLeader(leader2.getId());
+                String leaderName1 = leaderModel1 == null ? leader1.getId() : leaderModel1.getName();
+                String leaderName2 = leaderModel2 == null ? leader2.getId() : leaderModel2.getName();
+                return leaderName1.compareToIgnoreCase(leaderName2);
             }
             return leaderRank1 - leaderRank2;
         };
@@ -1486,6 +1483,12 @@ public class PlayerAreaGenerator {
             }
 
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+            if (leaderModel == null) {
+                g2.setFont(Storage.getFont14());
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, leader.getId(), x + deltaX + 7, y + 30, 120, true);
+                deltaX += 48;
+                continue;
+            }
             boolean shrink = game.isTwilightsFallMode() ? leaderModel.getTFShrinkName() : leaderModel.getShrinkName();
             String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
 

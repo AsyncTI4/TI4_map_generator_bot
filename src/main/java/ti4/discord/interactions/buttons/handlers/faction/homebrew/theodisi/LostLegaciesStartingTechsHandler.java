@@ -90,6 +90,22 @@ public class LostLegaciesStartingTechsHandler {
     }
 
     public static void offerAeternaStartingTechs(Game game, Player player) {
+        List<TechnologyModel> techs = eligibleTechnologies(game, player, 1);
+        sendTechPrompt(
+                player,
+                techs,
+                player.getRepresentationUnfogged()
+                        + " choose your first non-faction starting technology. You must choose **2 technologies in different colors with 1 total prerequisite**. Choose one zero-prerequisite technology and one one-prerequisite technology.",
+                false);
+        sendTechPrompt(
+                player,
+                techs,
+                player.getRepresentationUnfogged()
+                        + " choose your second non-faction starting technology. It must have a **different color** from your first choice, and the two choices must have **1 total prerequisite**.",
+                false);
+    }
+
+    public static void offerRevenantStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
         String rule =
                 "You may choose up to **2 non-faction technologies with no prerequisites owned by no other player**. "
@@ -106,22 +122,6 @@ public class LostLegaciesStartingTechsHandler {
                 player.getRepresentationUnfogged() + " choose your second starting technology, or press **Done**. "
                         + rule,
                 true);
-    }
-
-    public static void offerRevenantStartingTechs(Game game, Player player) {
-        List<TechnologyModel> techs = eligibleTechnologies(game, player, 1);
-        sendTechPrompt(
-                player,
-                techs,
-                player.getRepresentationUnfogged()
-                        + " choose your first non-faction starting technology. You must choose **2 technologies in different colors with 1 total prerequisite**. Choose one zero-prerequisite technology and one one-prerequisite technology.",
-                false);
-        sendTechPrompt(
-                player,
-                techs,
-                player.getRepresentationUnfogged()
-                        + " choose your second non-faction starting technology. It must have a **different color** from your first choice, and the two choices must have **1 total prerequisite**.",
-                false);
     }
 
     private static List<TechnologyModel> eligibleTechnologies(Game game, Player player, int maxPrerequisites) {
