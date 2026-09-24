@@ -726,11 +726,15 @@ public class MonumentsBRButtonHandler {
         ButtonHelperAbilities.morsPart2(player, game, "morsPart2_" + position, event);
     }
 
-    private static Set<String> getArmageddonProjectSuperweapons(Game game, Player player) {
+    public static Set<String> getArmageddonProjectSuperweapons(Game game, Player player) {
         String stored = game.getStoredValue(ARMAGEDDON_PROJECT_SUPERWEAPONS + player.getFaction());
         if (stored.isEmpty()) {
             return new LinkedHashSet<>();
         }
         return new LinkedHashSet<>(Arrays.asList(stored.split(",")));
+    }
+
+    public static void setArmageddonProjectSuperweapons(Game game, Player player, Set<String> superweapons) {
+        game.setStoredValue(ARMAGEDDON_PROJECT_SUPERWEAPONS + player.getFaction(), String.join(",", superweapons));
     }
 }

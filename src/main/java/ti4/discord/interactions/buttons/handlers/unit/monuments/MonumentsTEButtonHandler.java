@@ -413,7 +413,7 @@ public class MonumentsTEButtonHandler {
                         FactionEmojis.Firmament)));
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + ", after researching " + technology.getNameRepresentation()
                         + ", you may remove a control token from _Epiphany_ to skip 1 prerequisite or move a non-Firmament player's control token to a plot card.",
                 buttons);
@@ -464,7 +464,7 @@ public class MonumentsTEButtonHandler {
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + ", choose the plot card to receive "
                         + game.getPlayerFromColorOrFaction(parts[1]).getFactionEmojiOrColor() + "'s control token.",
                 buttons);
@@ -491,11 +491,10 @@ public class MonumentsTEButtonHandler {
         player.setPlotCardFaction(parts[1], parts[0]);
         Player tokenOwner = game.getPlayerFromColorOrFaction(parts[0]);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + " moved "
                         + (tokenOwner == null ? parts[0] : tokenOwner.getFactionEmojiOrColor())
-                        + "'s control token from _Epiphany_ to "
-                        + ti4.image.Mapper.getPlot(parts[1]).getNameRepresentation() + ".");
+                        + "'s control token from _Epiphany_ to a plot card.");
         ButtonHelper.deleteMessage(event);
     }
 
