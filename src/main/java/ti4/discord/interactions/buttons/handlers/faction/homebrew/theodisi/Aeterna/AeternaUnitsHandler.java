@@ -176,12 +176,10 @@ public class AeternaUnitsHandler {
         if (holder == null || opponent == null || opponent.equals(player) || state == null || remaining < 1) {
             return;
         }
-        UnitKey unitKey = holder == null
-                ? null
-                : holder.getUnitKeysForPlayer(opponent).stream()
-                        .filter(key -> key.asyncID().equals(payload[3]))
-                        .findFirst()
-                        .orElse(null);
+        UnitKey unitKey = holder.getUnitKeysForPlayer(opponent).stream()
+                .filter(key -> key.asyncID().equals(payload[3]))
+                .findFirst()
+                .orElse(null);
         UnitModel unit = unitKey == null || opponent == null ? null : opponent.getUnitFromUnitKey(unitKey);
         if (unit == null || !unit.getIsGroundForce() || holder.getUnitCountForState(unitKey, state) < 1) {
             return;

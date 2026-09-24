@@ -495,10 +495,8 @@ public class StartTurnService {
         String factionChecker = player.factionButtonChecker();
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
-        if (!doneActionThisTurn) {
-            Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
-            if (economicBoonButton != null) startButtons.add(economicBoonButton);
-        }
+        Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
+        if (economicBoonButton != null) startButtons.add(economicBoonButton);
         if (!doneActionThisTurn
                 && player.hasRelicReady("waxing_moonphase")
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
