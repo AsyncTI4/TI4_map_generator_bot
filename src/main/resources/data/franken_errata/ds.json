@@ -531,7 +531,8 @@
             "ABILITY:divination"
         ],
         "optionalSwaps": [
-            "AGENT:mykomentoriagent"
+            "AGENT:mykomentoriagent",
+            "MONUMENT:mykomentori_monument"
         ],
         "source": "ds"
     },
