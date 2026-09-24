@@ -16,7 +16,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RelicHelper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.UnlockLeaderService;
 
 @UtilityClass
@@ -38,22 +37,10 @@ public class OnyxxaLeaderHandler {
 
     // Commander: Strategist Kreel — unlock condition:
     // "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas."
-    public static void offerCommanderUnlockButton(Player player) {
-        Button button = Buttons.gray(
-                player.factionButtonChecker() + "onyxxaCommanderUnlock",
-                "Unlock Strategist Kreel",
-                FactionEmojis.onyxxa);
-        MessageHelper.sendMessageToChannelWithButton(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged()
-                        + ", only click if you resolved the primary of a strategy card in a neighbor's play area.",
-                button);
-    }
-
-    @ButtonHandler("onyxxaCommanderUnlock")
-    public static void handleCommanderUnlock(ButtonInteractionEvent event, Game game, Player player) {
+    public static void checkCommanderUnlock(Game game, Player player, Player holder) {
+        if (!player.hasLeader("onyxxacommander") || player.hasLeaderUnlocked("onyxxacommander")) return;
+        if (!player.isNeighboursWith(holder)) return;
         UnlockLeaderService.unlockLeader("onyxxacommander", game, player);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static void onDrawRelic(Player player) {

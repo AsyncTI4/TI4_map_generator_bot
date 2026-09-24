@@ -4,7 +4,7 @@
         "name": "Underhanded Maneuver",
         "faction": "arvaxi",
         "window": "At the start of the strategy phase",
-        "windowEffect": "You may choose 1 of your neighbours. That player must give you 1 action card from their hand.",
+        "windowEffect": "You may choose 1 of your neighbours. That player must give you 1 action card from their hand, if able.",
         "source": "balacasi"
     },
     {
@@ -89,7 +89,7 @@
         "id": "strategic_fluidity",
         "name": "Strategic Fluidity",
         "faction": "onyxxa",
-        "permanentEffect": "When you would spend a token from your strategy pool to resolve the secondary ability of a strategy card other than Politics, you may spend an additional command token from your strategy pool to resolve the primary ability of that card instead.",
+        "permanentEffect": "Once per action, when you would spend a token from your strategy pool to resolve the secondary ability of a strategy card other than Politics, you may spend an additional command token from your strategy pool to resolve the primary ability of that card instead.",
         "source": "balacasi"
     },
     {

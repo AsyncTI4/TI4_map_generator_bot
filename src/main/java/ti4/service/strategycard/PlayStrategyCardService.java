@@ -20,8 +20,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Administra
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaTechHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -413,6 +413,9 @@ public class PlayStrategyCardService {
         }
 
         if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
+            for (Player sacrificialPlayer : playersToFollow) {
+                OnyxxaTechHandler.serveSacrificialCommandButtons(game, sacrificialPlayer, scToPlay);
+            }
             String sillySpelling = RelicHelper.sillySpelling();
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + sillySpelling);
             Button cognitiveParallax =
@@ -559,18 +562,11 @@ public class PlayStrategyCardService {
                     player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
                     graceButtons);
         }
+        OnyxxaAbilityHandler.onStrategyCardPlayed(game, player, scToPlay);
         if (player.hasAbility("matters_of_state")) {
             String message2 = player.getRepresentationUnfogged() + " please gain or flip 1 balance token.";
             List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
-        }
-        for (Player p : game.getRealPlayers()) {
-            if (p.hasUnlockedBreakthrough("onyxxabt")) {
-                OnyxxaBreakthroughHandler.offerSCRollButton(game, p);
-            }
-            if (p != player && !p.hasLeaderUnlocked("onyxxacommander") && p.hasLeader("onyxxacommander")) {
-                OnyxxaLeaderHandler.offerCommanderUnlockButton(p);
-            }
         }
         if (scModel.usesAutomationForSCID("anarchy8")) {
             MessageHelper.sendMessageToChannel(
@@ -666,8 +662,10 @@ public class PlayStrategyCardService {
             List<Button> scButtons) {
         String stratCardName = Helper.getSCName(scToPlay, game);
         List<Player> playersToReact = new ArrayList<>();
-        playersToReact.add(player);
-        player.addFollowedSC(scToPlay, event);
+        if (!OnyxxaAbilityHandler.handleDetachmentOnPlay(game, player, scToPlay)) {
+            playersToReact.add(player);
+            player.addFollowedSC(scToPlay, event);
+        }
         boolean isSpecialPbdGame =
                 "pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName());
         if (!game.isFowMode() && !isSpecialPbdGame && !game.isHomebrewSCMode()) {
@@ -694,6 +692,7 @@ public class PlayStrategyCardService {
                         && !p2.hasUnexhaustedLeader("yssarilagent")
                         && !AdministrativeExemptionLLButtonHandler.hasExemption(game, p2)
                         && !MindsieveService.canUseMindsieve(p2, player, scModel)
+                        && !p2.hasTech(OnyxxaTechHandler.SACRIFICIAL_COMMAND)
                         && !StoneEmbraceService.canUseStoneEmbrace(p2, player, scModel)
                         && scToPlay != 1) {
                     markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);

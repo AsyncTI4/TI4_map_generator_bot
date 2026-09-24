@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -602,6 +603,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
+        game.removeStoredValue(ArvaxiLeaderHandler.HERO_ACTIVE_KEY);
         game.removeStoredValue("tnelisCommanderTracker");
         TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
         TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
