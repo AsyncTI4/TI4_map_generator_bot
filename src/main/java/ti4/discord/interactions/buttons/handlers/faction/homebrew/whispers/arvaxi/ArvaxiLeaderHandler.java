@@ -9,6 +9,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
@@ -17,6 +18,7 @@ import ti4.service.actioncard.ForceGiveActionCardService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.PurgeHeroService;
 
 @UtilityClass
 public class ArvaxiLeaderHandler {
@@ -110,6 +112,32 @@ public class ArvaxiLeaderHandler {
                         + " to allow " + target.getRepresentationNoPing() + " to retrieve _" + acName
                         + "_ " + CardEmojis.getACEmoji(game) + " from the discard pile.");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static final String HERO_ACTIVE_KEY = "arvaxiHeroActive";
+
+    public static Button getPurgeHeroButton(Player player, String tilePosition) {
+        return Buttons.gray(
+                "FFCC_" + player.getFaction() + "_purgeArvaxiHero_" + tilePosition,
+                "Purge Arvaxi Hero",
+                FactionEmojis.arvaxi);
+    }
+
+    @ButtonHandler("purgeArvaxiHero_")
+    public static void purgeArvaxiHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String tilePosition = buttonID.replace("purgeArvaxiHero_", "");
+        PurgeHeroService.purgeHeroPreamble(
+                event, player, game, "arvaxihero", "Kaelen, the Invincible, the Arvaxi hero");
+        game.setStoredValue(HERO_ACTIVE_KEY, player.getFaction() + "_" + tilePosition);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", during this combat each of your ships whose unit upgrade technology you have researched rolls 1 additional die.");
+    }
+
+    public static boolean isHeroActiveForCombat(Game game, Player player, Tile tile) {
+        return tile != null
+                && game.getStoredValue(HERO_ACTIVE_KEY).equals(player.getFaction() + "_" + tile.getPosition());
     }
 
     public static void sendCombatButtons(Player player, Player opponent, Game game, String msg) {
