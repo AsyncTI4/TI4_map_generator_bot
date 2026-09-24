@@ -1435,6 +1435,7 @@ public final class Constants {
     public static final String START_NEW_SPLICE = "start_new_splice";
     public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
+    public static final String SKULLS = "skulls";
     public static final String FIX_COLORS = "fix_colors";
     public static final String GUILD_AGENTS = "guild_agents";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
@@ -1478,6 +1479,7 @@ public final class Constants {
     public static final String MECH_ID = "mech";
     public static final String FLAGSHIP_ID = "flagship";
     public static final String OBSERVER = "observer";
+    public static final String AMOUNT = "amount";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
     public static final String SET_GAME_LIMIT = "set_game_limit";
