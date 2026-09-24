@@ -490,8 +490,8 @@
         "forCombatAbility": "combatround",
         "related": [
             {
-                "type": "action_cards",
-                "alias": "classified_weapons1",
+                "type": "custom",
+                "alias": "custom",
                 "message": "_Classified Weapons_ gives +2 dice to the chosen unit"
             }
         ]

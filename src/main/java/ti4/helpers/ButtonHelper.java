@@ -425,6 +425,10 @@ public class ButtonHelper {
     }
 
     public static List<Button> getForcedPNSendButtons(Game game, Player receiver, Player sender) {
+        return getForcedPNSendButtons(game, receiver, sender, "naaluHeroSend_");
+    }
+
+    public static List<Button> getForcedPNSendButtons(Game game, Player receiver, Player sender, String buttonPrefix) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         String idNPC = "";
         List<String> nullOwnerPNs = new ArrayList<>();
@@ -445,17 +449,16 @@ public class ButtonHelper {
                 nullOwnerPNs.add(pnShortHand);
                 continue;
             }
+            String pnPayload =
+                    receiver.getFaction() + "_" + sender.getPromissoryNotes().get(pnShortHand);
             Button transact;
             if (game.isFowMode()) {
                 transact = Buttons.green(
-                        "naaluHeroSend_" + receiver.getFaction() + "_"
-                                + sender.getPromissoryNotes().get(pnShortHand),
+                        buttonPrefix + pnPayload,
                         PromissoryNoteHelper.ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
             } else {
-                String id = "naaluHeroSend_" + receiver.getFaction() + "_"
-                        + sender.getPromissoryNotes().get(pnShortHand);
-                idNPC = id;
-                transact = Buttons.green(id, promissoryNote.getName(), owner.getFactionEmoji());
+                idNPC = "naaluHeroSend_" + pnPayload;
+                transact = Buttons.green(buttonPrefix + pnPayload, promissoryNote.getName(), owner.getFactionEmoji());
             }
             stuffToTransButtons.add(transact);
         }
@@ -467,6 +470,27 @@ public class ButtonHelper {
             ButtonHelperHeroes.resolveNaaluHeroSend(sender, game, idNPC, null);
         }
         return stuffToTransButtons;
+    }
+
+    public static void sendForcedPNSendButtonsToOtherPlayers(Game game, Player receiver, String instructions) {
+        sendForcedPNSendButtonsToOtherPlayers(game, receiver, instructions, "naaluHeroSend_");
+    }
+
+    public static List<Player> sendForcedPNSendButtonsToOtherPlayers(
+            Game game, Player receiver, String instructions, String buttonPrefix) {
+        List<Player> playersAwaitingChoice = new ArrayList<>();
+        for (Player sender : game.getRealPlayers()) {
+            if (sender == receiver) {
+                continue;
+            }
+            List<Button> stuffToTransButtons = getForcedPNSendButtons(game, receiver, sender, buttonPrefix);
+            String message = sender.getRepresentationUnfogged() + ", " + instructions;
+            MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
+            if (!stuffToTransButtons.isEmpty() && !sender.isNpc()) {
+                playersAwaitingChoice.add(sender);
+            }
+        }
+        return playersAwaitingChoice;
     }
 
     public static boolean shouldKeleresRiderExist(Game game) {
