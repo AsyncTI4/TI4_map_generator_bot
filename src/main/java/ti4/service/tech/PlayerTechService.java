@@ -818,9 +818,7 @@ public class PlayerTechService {
         player.addTech(techID);
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
-        ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         if (isResearch) {
-            ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
         }
         GameEventService.commit(
