@@ -112,7 +112,7 @@
         "requirements": "G",
         "faction": "onyxxa",
         "source": "balacasi",
-        "text": "When you perform a strategic action, you may treat the secondary ability's text as blank to gain 1 command token. Apply +1 to your units' combat rolls unless your opponent has a readied strategy card in their play area."
+        "text": "After you resolve the primary ability of a strategy card, you may resolve the secondary ability of a strategy card in your play area. Apply +1 to your units' combat rolls unless your opponent has a readied strategy card in their play area."
     },
     {
         "alias": "batyriy",
@@ -169,7 +169,7 @@
         "requirements": "Y",
         "faction": "zephyrion",
         "source": "balacasi",
-        "text": "ACTION: Exhaust this card to place or move any number of bounty tokens from other players' faction sheets to unit spaces of non-fighter ships on other players' faction sheets. During space combat, your opponent cannot announce retreat unless you allow it."
+        "text": "You may exhaust this card at the end of your turn to place or move any number of bounty tokens from other players' faction sheets to unit spaces of non-fighter ships on other players' faction sheets. During space combat, your opponent cannot announce retreat unless you allow it."
     },
     {
         "alias": "bazephcr",

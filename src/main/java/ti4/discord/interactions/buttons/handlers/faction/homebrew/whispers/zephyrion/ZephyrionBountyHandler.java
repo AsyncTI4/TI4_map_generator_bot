@@ -1,6 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -15,6 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
@@ -71,6 +73,16 @@ public class ZephyrionBountyHandler {
             }
         }
         return bounties;
+    }
+
+    public static boolean hasBountyOnAnyUnit(Game game, Player owner, Collection<UnitModel> units) {
+        if (owner == null) {
+            return false;
+        }
+        return units.stream()
+                .map(unit -> unit.getUnitType().humanReadableName().toLowerCase())
+                .anyMatch(unitTypeString -> !game.getStoredValue("bounties" + owner.getFaction() + unitTypeString)
+                        .isEmpty());
     }
 
     @ButtonHandler("bountyPickPlayer_")

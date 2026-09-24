@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -124,6 +125,7 @@ public class CheckDistanceHelper {
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
+                                    && !OnyxxaBreakthroughHandler.canMoveThroughIngressSystem(player, tile)
                                     && tile2 != null
                                     && (!game.isErwansGambitMode()
                                             || !"saar".equalsIgnoreCase(player.getFaction())

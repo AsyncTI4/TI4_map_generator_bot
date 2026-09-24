@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -517,6 +519,10 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "arvaxihero" -> meetsCondition = ArvaxiLeaderHandler.isHeroActiveForCombat(game, player, tile);
+            case "zephyrion_flagship_bounty" ->
+                meetsCondition = opponentUnitsByQuantity != null
+                        && ZephyrionBountyHandler.hasBountyOnAnyUnit(game, opponent, opponentUnitsByQuantity.keySet());
             case "tnelisopponentfs" -> {
                 if (ButtonHelper.doesPlayerHaveFSHere("tnelis_flagship", opponent, tile)
                         && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)

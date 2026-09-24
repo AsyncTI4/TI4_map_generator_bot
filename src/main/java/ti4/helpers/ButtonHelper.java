@@ -5048,15 +5048,17 @@ public class ButtonHelper {
                 "tf-industrialjuggernaut",
                 "absol_nm",
                 "absol_pa",
-                "betaro");
+                "betaro",
+                "bazephy");
         for (String tech : endOfTurnTechs) {
             if (!player.hasTechReady(tech)) continue;
 
             // Check for special requirements
             if ("dsceldr".equals(tech) && !hasStratCC) continue;
             if ("absol_pa".equals(tech) && player.getActionCards().size() < 2) continue;
-            if ("betaro".equals(tech) && player.getReadiedPlanets().isEmpty()
-                    || player.getExhaustedPlanets().isEmpty()) continue;
+            if ("betaro".equals(tech)
+                    && (player.getReadiedPlanets().isEmpty()
+                            || player.getExhaustedPlanets().isEmpty())) continue;
 
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);

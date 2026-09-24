@@ -272,6 +272,15 @@ public final class BreakthroughCommandHelper {
                     }
                 }
             }
+            if ("onyxxabt".equalsIgnoreCase(bt.getID()) && btIDs.size() == 1) {
+                if (FractureService.enterPlayOrExplain(null, game, player, bt.getID())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation(false, false)
+                                    + " has gained _Styx and Stones_, and so The Fracture enters play automatically!"
+                                    + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.");
+                }
+            }
             if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
                 SowingReapingService.sendTheSowingButtons(game);
             }
@@ -318,6 +327,10 @@ public final class BreakthroughCommandHelper {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.Cabal.asEmoji());
             message =
                     "You can roll for other breakthroughs first and then spawn The Fracture with _Al'Raith Ix Ianovar_.";
+        }
+        if ("onyxxabt".equals(btID)) {
+            rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.onyxxa.asEmoji());
+            message = "You can roll for other breakthroughs first and then spawn The Fracture with _Styx and Stones_.";
         }
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
     }
