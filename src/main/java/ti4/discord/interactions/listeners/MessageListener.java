@@ -444,29 +444,17 @@ class MessageListener extends ListenerAdapter {
                                 .getGame()
                                 .getStoredValue(player.getFaction() + "skulls")
                                 .isEmpty()) {
-                            int skulls = Integer.getInteger(
+                            int skulls = Integer.parseInt(
                                     managedGame.getGame().getStoredValue(player.getFaction() + "skulls"));
                             for (int x = 1; x < skulls + 1; x++) {
-                                var emoji = MiscEmojis.skull1.asEmoji();
+                                Emoji emoji;
                                 switch (x) {
-                                    case 2: {
-                                        emoji = MiscEmojis.skull2.asEmoji();
-                                    }
-                                    case 3: {
-                                        emoji = MiscEmojis.skull3.asEmoji();
-                                    }
-                                    case 4: {
-                                        emoji = MiscEmojis.skull4.asEmoji();
-                                    }
-                                    case 5: {
-                                        emoji = MiscEmojis.skull5.asEmoji();
-                                    }
-                                    case 6: {
-                                        emoji = MiscEmojis.skull6.asEmoji();
-                                    }
-                                    default: {
-                                        emoji = MiscEmojis.skull1.asEmoji();
-                                    }
+                                    case 2 -> emoji = MiscEmojis.skull2.asEmoji();
+                                    case 3 -> emoji = MiscEmojis.skull3.asEmoji();
+                                    case 4 -> emoji = MiscEmojis.skull4.asEmoji();
+                                    case 5 -> emoji = MiscEmojis.skull5.asEmoji();
+                                    case 6 -> emoji = MiscEmojis.skull6.asEmoji();
+                                    default -> emoji = MiscEmojis.skull1.asEmoji();
                                 }
                                 messages.getFirst()
                                         .addReaction(emoji)

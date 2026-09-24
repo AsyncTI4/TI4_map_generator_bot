@@ -12,9 +12,7 @@ class Skulls extends GameStateSubcommand {
 
     Skulls() {
         super(Constants.SKULLS, "Specify how many skulls to have next to your name (max 6)", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AMOUNT, "skull count (max 6)")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AMOUNT, "skull count (max 6)").setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                         .setAutoComplete(true));
