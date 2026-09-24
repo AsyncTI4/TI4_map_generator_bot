@@ -513,9 +513,8 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("verydithagent")) {
             buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
         }
-        if (player.hasRelicReady("economicboon") && player.getExhaustedPlanets().size() > 0) {
-            buttons.add(LostLegaciesRelicHandler.getEconomicBoonCardsInfoButton(player));
-        }
+        Button diplomaticBoonButton = LostLegaciesRelicHandler.getDiplomaticBoonCardsInfoButton(game, player);
+        if (diplomaticBoonButton != null) buttons.add(diplomaticBoonButton);
         if (game.isMonumentsMode()) {
             if (MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
                 buttons.add(MonumentsButtonHandler.getSaarMonumentButton(player));

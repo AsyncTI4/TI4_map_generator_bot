@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
@@ -1350,6 +1351,10 @@ public class ExploreService {
                     "mutagenfrontier" -> {
                 game.purgeExplore(ogID);
                 player.addRelic(cardID);
+                if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                        .contains(cardID)) {
+                    LostLegaciesRelicHandler.initializeBoon(game, player, cardID, tile, planetID);
+                }
                 message =
                         new StringBuilder("Card has been added to play area.\nAdded as a relic (not actually a relic)");
                 MessageHelper.sendMessageToEventChannel(event, message.toString());

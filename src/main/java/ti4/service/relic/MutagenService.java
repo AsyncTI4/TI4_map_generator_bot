@@ -33,6 +33,7 @@ public class MutagenService {
             Set.of("mutagenhazardous", "mutagenindustrial", "mutagencultural", "mutagenfrontier");
     private static final String OPTIONS_KEY = "mutagenOptions_";
     private static final String REMAINING_KEY = "mutagenRemaining_";
+    private static final String FACTION_KEY = "mutagenFaction_";
     private static final String CHOOSE_MUTAGEN_OPTION = "chooseMutagenOption_";
 
     public static boolean isMutagen(String relicID) {
@@ -45,8 +46,16 @@ public class MutagenService {
 
     public static void resolveMutagenPurge(
             ButtonInteractionEvent event, Game game, Player player, boolean volatileMutagenics) {
+        if (!game.getStoredValue(REMAINING_KEY + player.getFaction()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + ", please finish choosing your current _Mutagen_ components first.");
+            return;
+        }
         game.removeStoredValue(OPTIONS_KEY + player.getFaction());
         game.removeStoredValue(REMAINING_KEY + player.getFaction());
+        game.removeStoredValue(FACTION_KEY + player.getFaction());
         if (!volatileMutagenics && getMutagenCount(player) < 2) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -58,7 +67,7 @@ public class MutagenService {
             return;
         }
 
-        List<String> options = drawMutagenOptions(game, player);
+        List<String> options = drawMutagenOptions(game, player, !volatileMutagenics);
         if (options.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -90,12 +99,15 @@ public class MutagenService {
 
         game.setStoredValue(OPTIONS_KEY + player.getFaction(), String.join(",", options));
         game.setStoredValue(REMAINING_KEY + player.getFaction(), volatileMutagenics ? "2" : "1");
+        FactionModel faction = Mapper.getFaction(game.getStoredValue(FACTION_KEY + player.getFaction()));
+        String message = volatileMutagenics
+                ? player.getRepresentationNoPing() + ", choose 2 components to gain from _Volatile Mutagenics_."
+                : player.getRepresentationNoPing() + " revealed unused components from "
+                        + (faction == null ? "a random faction" : faction.getFactionName())
+                        + ". Choose 1 component to gain from your _Mutagen_ cards.";
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", choose " + (volatileMutagenics ? "2 components" : "1 component")
-                        + (volatileMutagenics
-                                ? " to gain from _Volatile Mutagenics_."
-                                : " to gain from your _Mutagen_ cards."),
+                message,
                 getMutagenOptionEmbeds(options),
                 getMutagenOptionButtons(player, options));
     }
@@ -121,6 +133,7 @@ public class MutagenService {
             if (options.isEmpty()) {
                 game.setStoredValue(OPTIONS_KEY + player.getFaction(), "");
                 game.setStoredValue(REMAINING_KEY + player.getFaction(), "");
+                game.removeStoredValue(FACTION_KEY + player.getFaction());
                 ButtonHelper.deleteMessage(event);
             } else {
                 game.setStoredValue(OPTIONS_KEY + player.getFaction(), String.join(",", options));
@@ -171,6 +184,7 @@ public class MutagenService {
         if (remaining == 0 || options.isEmpty()) {
             game.setStoredValue(OPTIONS_KEY + player.getFaction(), "");
             game.setStoredValue(REMAINING_KEY + player.getFaction(), "");
+            game.removeStoredValue(FACTION_KEY + player.getFaction());
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -183,40 +197,68 @@ public class MutagenService {
                 getMutagenOptionButtons(player, options));
     }
 
-    private static List<String> drawMutagenOptions(Game game, Player player) {
-        List<String> options = new ArrayList<>();
-        List<FactionModel> factions = Mapper.getFactionsValues().stream()
+    private static List<String> drawMutagenOptions(Game game, Player player, boolean factionScoped) {
+        List<FactionModel> factions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(faction -> faction.getSource().isOfficial()
                         || (game.isDiscordantStarsMode() && faction.getSource().isDs())
                         || (game.isBlueReverieMode() && faction.getSource().isBr())
                         || faction.getSource() == ComponentSource.theodisi)
-                .toList();
-        List<String> factionTechs = factions.stream()
-                .filter(faction -> !game.getFactions().contains(faction.getAlias()))
-                .flatMap(faction -> faction.getFactionTech().stream())
-                .filter(Mapper::isValidTech)
-                .filter(techID -> {
-                    TechnologyModel tech = Mapper.getTech(techID);
-                    return tech.isFactionTech() && !tech.isUnitUpgrade() && isFactionTechAvailable(game, techID);
-                })
-                .distinct()
-                .toList();
-        String factionTech = getRandom(factionTechs);
-        if (factionTech != null) {
-            options.add("tech|" + factionTech);
+                .toList());
+        if (!factionScoped) {
+            List<String> options = new ArrayList<>();
+            String factionTech = getRandom(factions.stream()
+                    .filter(faction -> !game.getFactions().contains(faction.getAlias()))
+                    .flatMap(faction -> faction.getFactionTech().stream())
+                    .filter(Mapper::isValidTech)
+                    .filter(techID -> {
+                        TechnologyModel tech = Mapper.getTech(techID);
+                        return tech.isFactionTech() && !tech.isUnitUpgrade() && isFactionTechAvailable(game, techID);
+                    })
+                    .distinct()
+                    .toList());
+            if (factionTech != null) {
+                options.add("tech|" + factionTech);
+            }
+            String agent = getRandom(getEligibleLeaders(game, factions, "agent"));
+            if (agent != null) {
+                options.add("agent|" + agent);
+            }
+            String commander = getRandom(getEligibleLeaders(game, factions, "commander"));
+            if (commander != null) {
+                options.add("commander|" + commander);
+            }
+            return options;
         }
 
-        List<String> agents = getEligibleLeaders(game, factions, "agent");
-        String agent = getRandom(agents);
-        if (agent != null) {
-            options.add("agent|" + agent);
+        factions.removeIf(faction -> game.getFactions().contains(faction.getAlias()));
+        Collections.shuffle(factions);
+        for (FactionModel faction : factions) {
+            List<String> options = new ArrayList<>();
+            String factionTech = getRandom(faction.getFactionTech().stream()
+                    .filter(Mapper::isValidTech)
+                    .filter(techID -> {
+                        TechnologyModel tech = Mapper.getTech(techID);
+                        return tech.isFactionTech() && !tech.isUnitUpgrade() && isFactionTechAvailable(game, techID);
+                    })
+                    .toList());
+            if (factionTech != null) {
+                options.add("tech|" + factionTech);
+            }
+
+            String agent = getRandom(getEligibleLeaders(game, List.of(faction), "agent"));
+            if (agent != null) {
+                options.add("agent|" + agent);
+            }
+            String commander = getRandom(getEligibleLeaders(game, List.of(faction), "commander"));
+            if (commander != null) {
+                options.add("commander|" + commander);
+            }
+            if (!options.isEmpty()) {
+                game.setStoredValue(FACTION_KEY + player.getFaction(), faction.getAlias());
+                return options;
+            }
         }
-        List<String> commanders = getEligibleLeaders(game, factions, "commander");
-        String commander = getRandom(commanders);
-        if (commander != null) {
-            options.add("commander|" + commander);
-        }
-        return options;
+        return List.of();
     }
 
     private static List<String> getEligibleLeaders(Game game, List<FactionModel> factions, String type) {

@@ -76,7 +76,7 @@
         "name": "Battleworld",
         "type": "Hazardous",
         "resolution": "Attach",
-        "text": "ATTACH: At the end of your turn if this planet has no neutral units on it, place 1 infantry from your reinforcements, 1 neutral mech, and 2 neutral infantry on this planet. Those neutral units enter coexistence. When a player wins a combat against neutral units on this planet, they main gain 1 command token.",
+        "text": "ATTACH: If a neutral player controls this planet, its attachments are not removed. At the end of your turn if this planet has no neutral units on it, place 1 infantry from your reinforcements, 1 neutral mech, and 2 neutral infantry on this planet. Those neutral units enter coexistence. When a player wins a combat against neutral units on this planet, they main gain 1 command token.",
         "attachmentId": "battleworld",
         "flavorText": "*The crowd roared as the Arcanum grandmaster was struck down by the Xytheris soldier.*",
         "source": "theodisi"

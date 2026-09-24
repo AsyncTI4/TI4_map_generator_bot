@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -1352,6 +1353,19 @@ public class PlayerAreaGenerator {
             }
             if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(game, player, relicID)) {
                 DrawingUtil.getAndDrawControlToken(graphics, player, x + deltaX + 10, y + 60, false, 0.5f);
+            }
+            if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                    .contains(relicID)) {
+                int tokenCount = LostLegaciesRelicHandler.getBoonTokens(game, player, relicID);
+                for (int token = 0; token < tokenCount; token++) {
+                    DrawingUtil.getAndDrawControlToken(
+                            graphics,
+                            player,
+                            x + deltaX + 2 + token % 3 * 14,
+                            y + 52 + token / 3 * 13,
+                            false,
+                            0.25f);
+                }
             }
 
             deltaX += 48;

@@ -772,9 +772,6 @@ public class ButtonHelper {
                 && player.hasUnlockedBreakthrough("tyrisbt")) {
             TyrisBreakthroughHandler.getPlaceButton(player, game).ifPresent(buttons::add);
         }
-        if (!whatIsItFor.contains("tgsonly") && player.hasRelicReady("naturesboon")) {
-            buttons.add(LostLegaciesRelicHandler.getNaturesBoonSpendButton(player, whatIsItFor));
-        }
         buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         return buttons;
     }
@@ -4952,9 +4949,8 @@ public class ButtonHelper {
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
-        if (player.hasRelicReady("cosmicboon")) {
-            endButtons.add(LostLegaciesRelicHandler.getCosmicBoonButton(player));
-        }
+        Button cosmicBoonButton = LostLegaciesRelicHandler.getCosmicBoonTokenButton(game, player);
+        if (cosmicBoonButton != null) endButtons.add(cosmicBoonButton);
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(

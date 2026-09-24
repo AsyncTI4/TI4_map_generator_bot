@@ -49,6 +49,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -100,6 +101,7 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        LostLegaciesRelicHandler.clearNaturesBoon(game, player);
         RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
@@ -801,6 +803,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        LostLegaciesRelicHandler.offerNaturesBoon(game, player);
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
