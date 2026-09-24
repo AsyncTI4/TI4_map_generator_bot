@@ -1263,6 +1263,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Each other player must give you 1 promissory note from their hand. Then, give each other player 1 card from your hand or promissory note from your play area.",
+        "automationID": "concord",
         "flavorText": "Maeve weaved through the symposium, binding old wounds into new alliances. A web of promises, each strengthening the rest into a shield against the galaxy's multitude of dooms.",
         "source": "action_deck_2"
     },
@@ -1272,6 +1273,7 @@
         "phase": "Action",
         "window": "When you would roll a die",
         "text": "Roll 2 dice instead; you may cancel 1 of those results.",
+        "automationID": "fractured_reality",
         "flavorText": "\"Shen're Ix Ianovar,\" Ahk-Syl Siven murmured, seeming afraid to invoke the name. \"Al'Raith Ix Ianovar,\" he continued, his voice barely a whisper.",
         "source": "action_deck_2"
     },
@@ -1291,6 +1293,7 @@
         "phase": "Action",
         "window": "At the end of a ground combat that you are participating in on a non-home planet",
         "text": "Destroy up to 2 of another player's units on that planet. Then, if that planet does not contain units, return its planet card to the planet card deck.",
+        "automationID": "scorched_earth",
         "flavorText": "\"One cannot control a thing without possessing the power to destroy it,\" Ibna Vel Syd reflected.",
         "source": "action_deck_2"
     },
