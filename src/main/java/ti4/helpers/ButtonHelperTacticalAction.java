@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -101,6 +102,8 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        LostLegaciesRelicHandler.clearNaturesBoon(game, player);
+        RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
@@ -179,7 +182,9 @@ public final class ButtonHelperTacticalAction {
                                 + ", you may exhaust _Discovery_ to explore a frontier token in a planetless system containing your ships.",
                         NatauDoctrineHandler.getUseDiscoveryButton(player));
             }
-            if (player.hasTech("thkairny") && player.hasTechReady("thkairny")) {
+            if (player.hasTech("thkairny")
+                    && player.hasTechReady("thkairny")
+                    && !KairnTechHandler.hasUsedSurveyorsLens(game, player)) {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCorrectChannel(),
                         player.getRepresentation()
@@ -202,8 +207,11 @@ public final class ButtonHelperTacticalAction {
                                 + ", you have _Colony Outposts_ and explored a planet during this tactical action.\nYou may spend a strategy token to find an attachment in that planet's exploration deck and attach it to that planet:",
                         KairnAbilityHandler.offerColonyOutposts(player));
             }
+            Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+            if (!activeSystem.isHomeSystem() && player.getCommodities() >= 1) {
+                KairnAbilityHandler.offerSharedDiscoveries(game, player);
+            }
             if (player.ownsUnit("kairn_mech")) {
-                Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
                 if (activeSystem != null) {
                     List<Button> excavatorPlanets = new ArrayList<>();
                     for (Planet planet : activeSystem.getPlanetUnitHolders()) {
@@ -445,6 +453,9 @@ public final class ButtonHelperTacticalAction {
             TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
+        if (unitsWereMoved && player.hasUnexhaustedLeader("myrragent")) {
+            MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
+        }
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(
                     player,
@@ -794,6 +805,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        LostLegaciesRelicHandler.offerNaturesBoon(game, player);
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
@@ -884,13 +896,10 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         }
-        KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
-        RevenantLeadersHandler.openRevXytherisAgentWindow(game, player);
-        MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         ThronesTechHandler.offerRiftTouchedBastion(game, tile);
         game.setStoredValue("lastActiveSystem", pos);
@@ -1239,13 +1248,7 @@ public final class ButtonHelperTacticalAction {
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
         }
-        List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();
-        if (!planetUnitHolders.isEmpty()
-                && planetUnitHolders.stream()
-                        .anyMatch(planet -> player.getPlanetsAllianceMode().contains(planet.getName())
-                                && planet.getAttachments().contains("attachment_kairnoutpost.png"))) {
-            KairnPromissoryHandler.offerArchaeologicalOutpostExplore(player, game, tile);
-        }
+        KairnPromissoryHandler.offerArchaeologicalOutpostExplore(game, tile);
 
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(

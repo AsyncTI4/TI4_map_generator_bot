@@ -274,7 +274,7 @@ public class AddUnitService {
             MonumentsButtonHandler.offerCenotaph(game, player, tile, unitKey, location, amount);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones", "crystellum");
+                player, "dream", "myrr", "natau", "oblivion", "revenantxytheris", "thrones", "crystellum");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

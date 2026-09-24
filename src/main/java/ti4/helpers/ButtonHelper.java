@@ -61,6 +61,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
@@ -794,9 +795,6 @@ public class ButtonHelper {
         if ((whatIsItFor.contains("res") || whatIsItFor.contains("both"))
                 && player.hasUnlockedBreakthrough("tyrisbt")) {
             TyrisBreakthroughHandler.getPlaceButton(player, game).ifPresent(buttons::add);
-        }
-        if (!whatIsItFor.contains("tgsonly") && player.hasRelicReady("naturesboon")) {
-            buttons.add(LostLegaciesRelicHandler.getNaturesBoonSpendButton(player, whatIsItFor));
         }
         buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         return buttons;
@@ -4991,9 +4989,8 @@ public class ButtonHelper {
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
-        if (player.hasRelicReady("cosmicboon")) {
-            endButtons.add(LostLegaciesRelicHandler.getCosmicBoonButton(player));
-        }
+        Button cosmicBoonButton = LostLegaciesRelicHandler.getCosmicBoonTokenButton(game, player);
+        if (cosmicBoonButton != null) endButtons.add(cosmicBoonButton);
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
@@ -5821,11 +5818,17 @@ public class ButtonHelper {
         int count = 0;
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
+            if (techM == null) {
+                continue;
+            }
             if (player.getSingularityTechs().contains(tech)) {
                 continue;
             }
             if (techM.getTypes().contains(type)) {
-                count++;
+                count += player.getGame().playerHasLeaderUnlockedOrAlliance(player, "revenantvanguardcommander")
+                                && techM.getRequirements().isEmpty()
+                        ? 2
+                        : 1;
             }
         }
         return count;
@@ -6417,6 +6420,10 @@ public class ButtonHelper {
                 String buttonLabel = "Explore " + planetRepresentation
                         + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
+                Button kairnAgentButton = KairnLeadershandler.getKairnAgentExplorePromptButton(player, planet, trait);
+                if (kairnAgentButton != null) {
+                    buttons.add(kairnAgentButton);
+                }
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.factionButtonChecker() + "movedNExplored_" + source + planetId + "_"
                             + trait + "kolleccbt";
@@ -6440,7 +6447,7 @@ public class ButtonHelper {
                 buttons.add(MonumentsDSButtonHandler.getAiConclaveButton(game, player));
             }
         }
-        RevenantLeadersHandler.addRevArcanumAgentButtons(buttons, game, player, planet);
+        RevenantLeadersHandler.addRevStratumExploreButtons(buttons, game, player, planet);
         return buttons;
     }
 

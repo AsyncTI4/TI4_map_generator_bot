@@ -8,127 +8,105 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
-import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.combat.CombatRollType;
-import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ArcanumUnitHandler {
     private static final String RUNEBOUND = "arcanum_mech";
-    private static final String PLACE_INF_WITH_MECH = "placeInfWithRuneboundMech_";
+    private static final String DAMAGE_RUNEBOUND = "arcanumDamageRunebound_";
 
-    public static void getRuneboundButtons(Player player, Game game, String techID) {
+    public static int getReadyRuneboundCount(Game game, Player player) {
+        if (game == null || player == null || !player.ownsUnit(RUNEBOUND)) {
+            return 0;
+        }
+        UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        return game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getUnitHolders().values().stream())
+                .mapToInt(holder -> Math.max(0, holder.getUnitCount(mechKey) - holder.getDamagedUnitCount(mechKey)))
+                .sum();
+    }
+
+    public static List<Button> getRuneboundPrerequisiteSkipButtons(
+            Game game, Player player, String techID, String payType) {
         if (player == null
                 || game == null
                 || techID == null
                 || !player.ownsUnit(RUNEBOUND)
-                || ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
-                        .isEmpty()) {
-            return;
+                || Mapper.getTech(techID) == null
+                || Mapper.getTech(techID).getRequirements().orElse("").isEmpty()) {
+            return List.of();
         }
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
-            for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.getUnitCount(UnitType.Mech, player.getColor()) <= 0) {
+        UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder holder : tile.getUnitHolders().values()) {
+                int readyMechs = holder.getUnitCount(mechKey) - holder.getDamagedUnitCount(mechKey);
+                if (readyMechs <= 0) {
                     continue;
                 }
-                String planetName = planet.getName();
-
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + PLACE_INF_WITH_MECH + planetName + "|" + techID,
-                        Helper.getPlanetRepresentation(planetName, game)));
+                for (int i = 1; i <= readyMechs; i++) {
+                    buttons.add(Buttons.green(
+                            player.factionButtonChecker()
+                                    + DAMAGE_RUNEBOUND
+                                    + tile.getPosition()
+                                    + ";"
+                                    + holder.getName()
+                                    + ";"
+                                    + techID
+                                    + ";"
+                                    + i
+                                    + ";"
+                                    + payType,
+                            "Damage Rune-Bound Sentinel in "
+                                    + (Constants.SPACE.equals(holder.getName())
+                                            ? "space area of " + tile.getRepresentationForButtons(game, player)
+                                            : Helper.getPlanetRepresentation(holder.getName(), game))
+                                    + (readyMechs > 1 ? " (" + i + "/" + readyMechs + ")" : "")));
+                }
             }
         }
-        if (buttons.isEmpty()) {
-            return;
-        }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-
-        TechnologyModel tech = Mapper.getTech(techID);
-        int prereqs = tech == null || tech.getRequirements().isEmpty()
-                ? 0
-                : tech.getRequirements().get().length() + 1;
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentation() + ", you may place " + prereqs
-                        + " infantry on a planet that contains a Rune-Bound Sentinel (Arcanum mech).",
-                buttons);
+        return buttons;
     }
 
-    @ButtonHandler(PLACE_INF_WITH_MECH)
-    public static void resolveRuneboundInfPlacement(
+    @ButtonHandler(DAMAGE_RUNEBOUND)
+    public static void resolveRuneboundPrerequisiteSkip(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null
-                || player == null
-                || !player.ownsUnit(RUNEBOUND)
-                || ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
-                        .isEmpty()) {
-            return;
-        }
-
-        String payload = buttonID.substring(PLACE_INF_WITH_MECH.length());
-        String[] parts = payload.split("\\|", 2);
-        if (parts.length != 2) {
-            return;
-        }
-
-        String planetName = parts[0];
-        String techID = parts[1];
-
-        TechnologyModel tech = Mapper.getTech(techID);
-
-        if (planetName == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that planet.");
+        if (game == null || player == null || !player.ownsUnit(RUNEBOUND)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-
-        if (tech == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve the technology.");
+        String[] parts = buttonID.substring(DAMAGE_RUNEBOUND.length()).split(";", 5);
+        if (parts.length < 3) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-
-        Tile tile = game.getTileFromPlanet(planetName);
-        Planet planet = tile == null
-                ? null
-                : tile.getPlanetUnitHolders().stream()
-                        .filter(holder -> planetName.equals(holder.getName()))
-                        .findFirst()
-                        .orElse(null);
-        if (planet == null || planet.getUnitCount(UnitType.Mech, player.getColor()) <= 0) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "That planet no longer contains one of your mechs.");
+        Tile tile = game.getTileByPosition(parts[0]);
+        UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(parts[1]);
+        UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        if (holder == null || holder.getUnitCount(mechKey) <= holder.getDamagedUnitCount(mechKey)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-
-        int prereqs = tech == null || tech.getRequirements().isEmpty()
-                ? 0
-                : tech.getRequirements().get().length() + 1;
-
-        AddUnitService.addUnits(event, tile, game, player.getColor(), prereqs + " inf " + planetName);
-        ButtonHelper.deleteMessage(event);
-
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " placed " + prereqs + " infantry on "
-                        + Helper.getPlanetRepresentation(planetName, game)
-                        + " using a Rune-Bound Sentinel (Arcanum mech).");
+        holder.addDamagedUnit(mechKey, 1);
+        player.addSpentThing("arcanumRunebound");
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+        String payType = parts.length == 5 ? parts[4] : "res";
+        event.getMessage()
+                .editMessage(Helper.buildSpentThingsMessage(player, game, payType))
+                .queue();
     }
 
     // Flagship

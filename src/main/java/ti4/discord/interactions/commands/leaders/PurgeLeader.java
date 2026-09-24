@@ -35,7 +35,7 @@ class PurgeLeader extends GameStateSubcommand {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             if (Constants.COMMANDER.equals(playerLeader.getType()) || Constants.HERO.equals(playerLeader.getType())) {
-                RevenantTechHandler.doLazarusPodsLeaderCheck(getGame());
+                RevenantTechHandler.doLazarusPodsLeaderCheck(getGame(), player);
             }
             MessageHelper.sendMessageToEventChannel(
                     event, LeaderEmojis.getLeaderEmoji(playerLeader).toString());

@@ -9,14 +9,14 @@
         "x": 170.0,
         "y": 128.0
     },
-    "resources": 0,
-    "influence": 0,
+    "resources": 3,
+    "influence": 3,
     "factionHomeworld": "ponthous",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Fractured Souls",
-    "legendaryAbilityText": "When you gain this card, place the Ponthous +/- cards in your play area. When Ponthous is exhausted you may exhaust this card and either Ponthous +/- to ready it.",
+    "legendaryAbilityText": "When Ponthous is exhausted you may exhaust this card to ready it.",
     "unitPositions": {
         "unitHolderName": "ponthous",
         "coordinateMap": {

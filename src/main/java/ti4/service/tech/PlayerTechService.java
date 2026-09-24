@@ -22,12 +22,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
@@ -94,7 +92,6 @@ public class PlayerTechService {
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
         if (gainedTech) {
-            ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
@@ -125,7 +122,7 @@ public class PlayerTechService {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners");
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -821,9 +818,7 @@ public class PlayerTechService {
         player.addTech(techID);
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
-        ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         if (isResearch) {
-            ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
         }
         GameEventService.commit(
@@ -833,7 +828,6 @@ public class PlayerTechService {
         }
         if (techM.isUnitUpgrade()) {
             if (isResearch) {
-                KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
                 UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(techID);
                 if (player.hasPlayablePromissoryInHand("thpnkryxos")
                         && !player.ownsPromissoryNote("thpnkryxos")
@@ -1088,6 +1082,7 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        buttons.addAll(ArcanumUnitHandler.getRuneboundPrerequisiteSkipButtons(game, player, tech, payType));
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
         }

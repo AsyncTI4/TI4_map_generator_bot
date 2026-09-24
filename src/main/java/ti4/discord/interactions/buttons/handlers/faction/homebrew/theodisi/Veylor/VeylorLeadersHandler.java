@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -15,12 +14,10 @@ import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.UnlockLeaderService;
 
@@ -31,7 +28,6 @@ public class VeylorLeadersHandler {
     private static final String DONE = "doneVeylorCommander";
     private static final String GAIN_HERO_CC = "gainVeylorHeroCC_";
     private static final String CHOOSE_COMMANDER_SYSTEM = "veylorCommanderSelectSystem_";
-    private static final String CHOOSE_COMMANDER_SHIP = "veylorCommanderSelectShip_";
 
     // Agent
     public static void startVeylorAgent(Game game, Player target) {
@@ -97,6 +93,14 @@ public class VeylorLeadersHandler {
                 || player == null
                 || !player.hasLeader("veylorcommander")
                 || player.hasLeaderUnlocked("veylorcommander")) {
+            return;
+        }
+
+        if (player.getReadiedPlanets().size() > 3) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged()
+                            + " must exhaust all but 3 controlled planets to unlock Cyrala Vey.");
             return;
         }
 
@@ -288,96 +292,13 @@ public class VeylorLeadersHandler {
             return;
         }
 
-        List<Button> buttons = getVeylorCommanderShipButtons(player, tile, votesCast);
-
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No eligible unit can be produced.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String message = "Please choose the unit to produce in " + tile.getRepresentation() + " with cost up to your "
-                + votesCast + " votes cast.";
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                message,
-                NewStuffHelper.buttonPagination(
-                        buttons,
-                        player.factionButtonChecker() + CHOOSE_COMMANDER_SHIP + "page_" + tile.getPosition() + "|"
-                                + votesCast + "_",
-                        0));
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "veylorCommander", "place");
+        String message = player.getRepresentation()
+                + ", produce 1 unit in " + tile.getRepresentation()
+                + " with cost up to your " + votesCast + " votes cast due to Cyrala Vey, the Veylor commander.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(CHOOSE_COMMANDER_SHIP)
-    public static void produceVeylorCommanderSelectedShip(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null || player == null || !game.playerHasLeaderUnlockedOrAlliance(player, "veylorcommander")) {
-            return;
-        }
-
-        String payload = buttonID.substring(CHOOSE_COMMANDER_SHIP.length());
-        if (payload.startsWith("page_")) {
-            String[] pageParts = payload.substring("page_".length()).split("_", 2);
-            String[] pageData = pageParts[0].split("\\|", 2);
-            if (pageParts.length != 2 || pageData.length != 2) {
-                ButtonHelper.deleteMessage(event);
-                return;
-            }
-            Tile pageTile = game.getTileByPosition(pageData[0]);
-            try {
-                int votesCast = Integer.parseInt(pageData[1]);
-                if (pageTile == null || !FoWHelper.playerHasShipsInSystem(player, pageTile)) {
-                    ButtonHelper.deleteMessage(event);
-                    return;
-                }
-                List<Button> buttons = getVeylorCommanderShipButtons(player, pageTile, votesCast);
-                String message = "Please choose the unit to produce in " + pageTile.getRepresentation()
-                        + " with cost up to your " + votesCast + " votes cast:";
-                NewStuffHelper.checkAndHandlePaginationChange(
-                        event,
-                        event.getMessageChannel(),
-                        buttons,
-                        message,
-                        player.factionButtonChecker() + CHOOSE_COMMANDER_SHIP + "page_" + pageTile.getPosition() + "|"
-                                + votesCast + "_",
-                        buttonID);
-                return;
-            } catch (NumberFormatException e) {
-                ButtonHelper.deleteMessage(event);
-                return;
-            }
-        }
-
-        String[] parts = payload.split("\\|", 3);
-        if (parts.length != 3) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        Tile tile = game.getTileByPosition(parts[1]);
-        int votesCast;
-        try {
-            votesCast = Integer.parseInt(parts[2]);
-        } catch (NumberFormatException e) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        if (tile == null || !FoWHelper.playerHasShipsInSystem(player, tile)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> buttons = getVeylorCommanderShipButtons(player, tile, votesCast);
-        String message = "Please choose the unit to produce in " + tile.getRepresentation() + " with cost up to your "
-                + votesCast + " votes cast:";
-        if (buttons.stream().noneMatch(button -> buttonID.equals(button.getCustomId()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        ButtonHelperModifyUnits.placeUnitAndDeleteButton(
-                "placeOneNDone_dontskip_" + parts[0] + "_" + tile.getPosition(), event, game, player);
     }
 
     private static int getVotesCast(Player player, Game game) {
@@ -407,17 +328,5 @@ public class VeylorLeadersHandler {
             }
         }
         return systemsWithShips;
-    }
-
-    private static List<Button> getVeylorCommanderShipButtons(Player player, Tile tile, int votesCast) {
-        return player.getUnitModels().stream()
-                .filter(unit -> unit.getCost() <= votesCast)
-                .sorted(Comparator.comparing(UnitModel::getName))
-                .map(unit -> Buttons.green(
-                        player.factionButtonChecker() + CHOOSE_COMMANDER_SHIP + unit.getAsyncId() + "|"
-                                + tile.getPosition() + "|" + votesCast,
-                        "Produce 1 " + unit.getName(),
-                        unit.getUnitEmoji()))
-                .toList();
     }
 }

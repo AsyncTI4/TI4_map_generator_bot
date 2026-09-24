@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
@@ -411,7 +412,6 @@ public class ComponentActionHelper {
                             "circletofthevoid",
                             "endurance_steroids",
                             "the_incursion_gate",
-                            "diplomaticboon",
                             "ancient_radar",
                             "horn_of_the_abyss");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
@@ -618,6 +618,11 @@ public class ComponentActionHelper {
                 getRelicButton = Buttons.green(factionChecker + prefix + "getRelic_", "Purge Fragments to Explore");
             }
             compButtons.add(getRelicButton);
+        } else {
+            Button arcanumCommanderRelicButton = ArcanumLeadersHandler.getArcanumCommanderGetRelicButton(game, p1);
+            if (arcanumCommanderRelicButton != null) {
+                compButtons.add(arcanumCommanderRelicButton);
+            }
         }
 
         // ACs
@@ -1367,22 +1372,6 @@ public class ComponentActionHelper {
                     event.getMessageChannel(),
                     "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though.",
                     buttons);
-        } else if ("diplomaticboon".equalsIgnoreCase(relicID)) {
-            List<Button> buttons = LostLegaciesRelicHandler.getDiplomaticBoonPlanets(event, game, player);
-            if (buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        player.getRepresentationNoPing()
-                                + " has no eligible non-home planets, other than Mecatol Rex, for _Diplomatic Boon_.");
-                return;
-            }
-            player.addExhaustedRelic(relicID);
-            purgeOrExhaust = "exhausted";
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + ", please choose a non-home planet, other than Mecatol Rex, for _Diplomatic Boon_.",
-                    buttons);
         } else if ("ancient_radar".equalsIgnoreCase(relicID)) {
             List<Button> buttons = LostLegaciesRelicHandler.getAncientRadarPlanets(event, game, player);
             if (buttons.isEmpty()) {
@@ -1508,7 +1497,6 @@ public class ComponentActionHelper {
                     "circletofthevoid",
                     "endurance_steroids",
                     "the_incursion_gate",
-                    "diplomaticboon",
                     "ancient_radar",
                     "horn_of_the_abyss" -> {
                 // handled above

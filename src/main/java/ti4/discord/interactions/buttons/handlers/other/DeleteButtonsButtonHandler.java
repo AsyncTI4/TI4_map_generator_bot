@@ -217,6 +217,8 @@ class DeleteButtonsButtonHandler {
                 ThronesThroneHandler.clearSkarnathDiscount(game, player);
             }
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+                CommanderUnlockCheckService.checkPlayer(player, "revenantponthous");
+                RevenantLeadersHandler.offerRevPonthousCommander(game, player, tile);
                 if (game.isMonumentsMode()) {
                     if (MonumentsService.isMonumentOnBoard(game, player, "sol_monument")) {
                         MonumentsButtonHandler.offerCenotaphAfterProduction(game, player);
@@ -437,10 +439,6 @@ class DeleteButtonsButtonHandler {
                     buttons2.add(Buttons.green("startRallyTheHorde", "Rally The Horde"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
-                }
-                CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "revenantmyrrcommander")) {
-                    RevenantLeadersHandler.offerRevMyrrCommander(game, player, tile);
                 }
             }
         }

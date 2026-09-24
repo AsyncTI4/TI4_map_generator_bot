@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "th16b",
+    "name": "Petra Unleashed - Stoneborn",
+    "aliases": [
+        "th16b",
+        "petraunleashed",
+        "unleashed"
+    ],
+    "imagePath": "th16b_stonebornhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "petraunleashed"
+    ],
+    "source": "theodisi"
+}

@@ -139,19 +139,13 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
         }
-        if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useRevArcanumAgent_other",
-                    "Use Revenant Arcanum Agent",
-                    FactionEmojis.revenant));
-        }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
         }
         if (player.hasLeader("myrragent")) {
             buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
         }
-        if (player.hasAbility("shared_discoveries")) {
+        if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
@@ -503,14 +497,17 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("revenantagent")) {
             buttons.add(RevenantLeadersHandler.getRevenantAgentButton(player));
         }
+        if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
+            buttons.add(RevenantLeadersHandler.getRevScrapyardCardsInfoButton(game, player));
+        }
+        if (player.hasUnexhaustedLeader("revenantstonebornagent")) {
+            buttons.add(RevenantLeadersHandler.getRevStratumCardsInfoButton(player));
+        }
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
-            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(game, player));
+            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(player));
         }
-        if (player.hasUnexhaustedLeader("revenantxytherisagent")) {
-            buttons.add(RevenantLeadersHandler.getRevXytherisCardsInfoButton(player));
-        }
-        if (player.hasLeaderUnlocked("revenantthroneshero")) {
-            buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
+        if (player.hasLeaderUnlocked("revenantmyrrhero")) {
+            buttons.add(RevenantLeadersHandler.getRevMyrrHeroButton(player));
         }
         if (player.hasPlanet("cineron")
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
@@ -519,9 +516,8 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("verydithagent")) {
             buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
         }
-        if (player.hasRelicReady("economicboon") && player.getExhaustedPlanets().size() > 0) {
-            buttons.add(LostLegaciesRelicHandler.getEconomicBoonCardsInfoButton(player));
-        }
+        Button diplomaticBoonButton = LostLegaciesRelicHandler.getDiplomaticBoonCardsInfoButton(game, player);
+        if (diplomaticBoonButton != null) buttons.add(diplomaticBoonButton);
         if (game.isMonumentsMode()) {
             if (MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
                 buttons.add(MonumentsButtonHandler.getSaarMonumentButton(player));

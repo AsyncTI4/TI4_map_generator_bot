@@ -287,13 +287,6 @@ public final class BreakthroughCommandHelper {
             if ("revenantbt".equalsIgnoreCase(bt.getID())) {
                 RevenantBreakthroughHandler.gainAttachedAgent(game, player);
             }
-            if ("xytherisbt".equalsIgnoreCase(bt.getID())) {
-                player.setUnitCap("pd", player.getUnitCap("pd") + 4);
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(),
-                        player.getRepresentation() + ", your PDS unit cap has been increased to "
-                                + player.getUnitCap("pd"));
-            }
             if (player.hasBreakthrough("arcanumbt")) {
                 ArcanumBreakthroughHandler.offerArcanumBTFlipOnGain(game, player);
             }

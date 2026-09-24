@@ -17,8 +17,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -296,6 +298,9 @@ public class PromissoryNoteHelper {
 
         if ("bepncryst".equalsIgnoreCase(id)) {
             CrystellumPromissoryHandler.resolveFracture(game, player, event);
+        }
+        if ("thpnxytheris".equalsIgnoreCase(id)) {
+            XytherisPromissoryHandler.activateSwarmSpawn(game, player);
         }
 
         if (id.contains("dspnveld")) {
@@ -761,6 +766,9 @@ public class PromissoryNoteHelper {
                     player.getRepresentation()
                             + ", buttons to discard an action card have been sent to your #cards-info thread.");
             VeylorPromissoryHandler.sendDiscardButtonsForPn(event, game, player);
+        }
+        if ("thpnrevenant".equalsIgnoreCase(id)) {
+            RevenantPromissoryHandler.getRevenantPNButtons(game, player);
         }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");

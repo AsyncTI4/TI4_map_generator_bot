@@ -419,9 +419,9 @@ public class AeternaAbilityHandler {
 
     private static int getMoonReturnMinimumCost(String relic) {
         return switch (relic) {
-            case FULL_MOON -> 3;
+            case FULL_MOON -> 4;
             case WAXING_MOON, LUNAR_ECLIPSE -> 2;
-            case WANING_MOON -> 4;
+            case WANING_MOON -> 5;
             default -> 0;
         };
     }

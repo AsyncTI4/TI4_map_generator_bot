@@ -350,13 +350,6 @@ public class TacticalActionOutputService {
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (unit.unitType() == UnitType.Destroyer) {
-                if (player.ownsUnit("ponthous_destroyer2")) {
-                    output.append("**REMINDER**: Renegade II can only transport ground forces.");
-                } else if (player.ownsUnit("ponthous_destroyer")) {
-                    output.append("**REMINDER**: Renegade I can only transport infantry.");
-                }
-            }
             if (player.hasPlanet("gyraxis")
                     && player.getExhaustedPlanetsAbilities().contains("gyraxis")
                     && "yes".contains(game.getStoredValue("gyraxisActive"))) {

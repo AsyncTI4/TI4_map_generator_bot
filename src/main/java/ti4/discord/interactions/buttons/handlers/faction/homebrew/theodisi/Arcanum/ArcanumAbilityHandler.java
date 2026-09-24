@@ -182,6 +182,7 @@ public class ArcanumAbilityHandler {
         game.setStoredValue(
                 RITUAL_FRAGS_PURGED + player.getFaction(),
                 selected.isEmpty() ? fragmentId : selected + "|" + fragmentId);
+        ArcanumLeadersHandler.offerArcanumCommanderTechPurge(game, player, event, selectedFragments.size() + 1);
         ButtonHelper.deleteTheOneButton(event);
 
         ExploreModel fragment = Mapper.getExplore(fragmentId);

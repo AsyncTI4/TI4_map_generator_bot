@@ -4119,6 +4119,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("innersanctum", new Planet("innersanctum", new Point(0, 0)));
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
         planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
+        planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4290,18 +4291,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if ("thpnrevenant".equals(pnID)) {
-                Player pnOwner = getPNOwner(pnID);
-                Leader commander = getRevenantPantheonCommander(pnOwner);
-                if (pnOwner != null
-                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
-                        && commander != null
-                        && commander.getId().equalsIgnoreCase(leaderID)
-                        && !commander.isLocked()) {
-                    return true;
-                }
-                continue;
-            }
             if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null
@@ -4376,17 +4365,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    public Leader getRevenantPantheonCommander(Player revenantPlayer) {
-        if (revenantPlayer == null || !"revenant".equalsIgnoreCase(revenantPlayer.getFaction())) {
-            return null;
-        }
-        return revenantPlayer.getLeaders().stream()
-                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                .filter(leader -> Constants.CALL_OF_THE_HAUNTED_LEADERS.contains(leader.getId()))
-                .findFirst()
-                .orElse(null);
-    }
-
     public Leader getRevenantLichCommander(Player lichPoolOwner, Player target) {
         if (lichPoolOwner == null || target == null) {
             return null;
@@ -4411,14 +4389,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if ("thpnrevenant".equals(pnID)) {
-                Player pnOwner = getPNOwner(pnID);
-                Leader commander = getRevenantPantheonCommander(pnOwner);
-                if (pnOwner != null && !pnOwner.equals(player) && commander != null && !commander.isLocked()) {
-                    leaders.add(commander);
-                }
-                continue;
-            }
             if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {

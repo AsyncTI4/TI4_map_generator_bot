@@ -50,6 +50,16 @@ public class LostLegaciesRelicHandler {
     private static final String FINISH_DBOON = "finishDiplomaticBoonPlacement";
     // Cosmic Boon
     private static final String USE_CBOON = "useCosmicBoon";
+    private static final String BOON_TOKENS = "boonTokens_";
+    private static final String ECONOMIC_AMOUNT = "economicBoonAmount_";
+    private static final String ECONOMIC_SYSTEM = "economicBoonSystem_";
+    private static final String ECONOMIC_SHIP = "economicBoonShip_";
+    private static final String NATURE_AMOUNT = "naturesBoonAmount_";
+    private static final String NATURE_PLANET = "naturesBoonPlanet_";
+    private static final String DIPLOMATIC_AMOUNT = "diplomaticBoonAmount_";
+    private static final String DIPLOMATIC_PLACE = "diplomaticBoonPlace_";
+    private static final String COSMIC_EXPLORE = "cosmicBoonExplore_";
+    private static final String NATURE_BONUS = "naturesBoonBonus_";
     // Ancient Radar
     private static final String RADAR_EXPLORE = "exploreAncientRadar_";
     // Horn of the Abyss
@@ -421,22 +431,7 @@ public class LostLegaciesRelicHandler {
 
     @ButtonHandler(USE_CBOON)
     public static void resolveCosmicBoon(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null || player == null || !player.hasRelicReady("cosmicboon")) {
-            return;
-        }
-
-        player.addExhaustedRelic("cosmicboon");
-        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", choose the first planet to explore with _Cosmic Boon_.",
-                buttons);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", choose the second planet to explore with _Cosmic Boon_.",
-                buttons);
-
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        resolveCosmicBoonTokens(event, game, player);
     }
 
     // Diplomatic Boon
@@ -723,5 +718,427 @@ public class LostLegaciesRelicHandler {
                     Helper.getPlanetRepresentation(spentThing, game)));
         }
         return buttons;
+    }
+
+    public static void initializeBoon(Game game, Player player, String boon, Tile tile, String planetName) {
+        if (game == null || player == null || tile == null) return;
+        Planet planet = tile.getPlanetUnitHolders().stream()
+                .filter(candidate -> candidate.getName().equalsIgnoreCase(planetName))
+                .findFirst()
+                .orElse(null);
+        var adjacentPositions = FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false);
+        int tokens =
+                switch (boon) {
+                    case "economicboon" ->
+                        (int) game.getTileMap().values().stream()
+                                .filter(adjacent -> !adjacent.getTileModel().isHyperlane())
+                                .filter(adjacent -> !adjacent.getPosition().equals(tile.getPosition()))
+                                .filter(adjacent -> adjacentPositions.contains(adjacent.getPosition()))
+                                .mapToLong(adjacent -> adjacent.getPlanetUnitHolders().stream()
+                                        .filter(candidate -> !candidate.isSpaceStation())
+                                        .count())
+                                .sum();
+                    case "naturesboon" -> planet == null ? 0 : planet.getResources() + 1;
+                    case "diplomaticboon" -> planet == null ? 0 : planet.getInfluence() + 1;
+                    case "cosmicboon" ->
+                        (int) game.getTileMap().values().stream()
+                                        .filter(adjacent ->
+                                                !adjacent.getTileModel().isHyperlane())
+                                        .filter(adjacent -> adjacentPositions.contains(adjacent.getPosition()))
+                                        .filter(adjacent ->
+                                                adjacent.getPlanetUnitHolders().isEmpty())
+                                        .count()
+                                + 1;
+                    default -> 0;
+                };
+        if (tokens == 0) {
+            player.removeRelic(boon);
+            player.removeExhaustedRelic(boon);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " discarded _"
+                            + Mapper.getRelic(boon).getName() + "_ because it has no control tokens.");
+            return;
+        }
+        game.setStoredValue(BOON_TOKENS + player.getFaction() + "_" + boon, Integer.toString(tokens));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " placed " + tokens + " control token" + (tokens == 1 ? "" : "s")
+                        + " on _" + Mapper.getRelic(boon).getName() + "_.");
+    }
+
+    public static int getBoonTokens(Game game, Player player, String boon) {
+        try {
+            return Integer.parseInt(game.getStoredValue(BOON_TOKENS + player.getFaction() + "_" + boon));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static boolean spendBoonTokens(Game game, Player player, String boon, int amount) {
+        int remaining = getBoonTokens(game, player, boon) - amount;
+        if (!player.hasRelic(boon) || amount < 1 || remaining < 0) return false;
+        if (remaining == 0) {
+            game.removeStoredValue(BOON_TOKENS + player.getFaction() + "_" + boon);
+            player.removeRelic(boon);
+            player.removeExhaustedRelic(boon);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " discarded _"
+                            + Mapper.getRelic(boon).getName() + "_ after removing its final control token.");
+        } else {
+            game.setStoredValue(BOON_TOKENS + player.getFaction() + "_" + boon, Integer.toString(remaining));
+        }
+        return true;
+    }
+
+    public static Button getEconomicBoonStartTurnButton(Game game, Player player) {
+        return player.hasRelic("economicboon") && getBoonTokens(game, player, "economicboon") > 0
+                ? Buttons.green(player.factionButtonChecker() + "boonEconomic", "Use Economic Boon")
+                : null;
+    }
+
+    @ButtonHandler("boonEconomic")
+    public static void resolveEconomicBoonTokens(ButtonInteractionEvent event, Game game, Player player) {
+        if (!player.hasRelic("economicboon")) return;
+        List<Button> buttons = new ArrayList<>();
+        for (int amount = 1; amount <= getBoonTokens(game, player, "economicboon"); amount++) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + ECONOMIC_AMOUNT + amount,
+                    "Remove " + amount + " Token" + (amount == 1 ? "" : "s")));
+        }
+        if (!buttons.isEmpty()) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", choose how many _Economic Boon_ tokens to remove.",
+                    buttons);
+        }
+    }
+
+    @ButtonHandler(ECONOMIC_AMOUNT)
+    public static void chooseEconomicBoonSystem(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        int amount;
+        try {
+            amount = Integer.parseInt(buttonID.substring(ECONOMIC_AMOUNT.length()));
+        } catch (NumberFormatException e) {
+            return;
+        }
+        List<Button> buttons = game.getTileMap().values().stream()
+                .filter(tile -> !tile.getTileModel().isHyperlane())
+                .filter(tile -> tile.getUnitHolders().values().stream()
+                        .anyMatch(holder -> holder.getUnitCount(UnitType.Spacedock, player) > 0))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker() + ECONOMIC_SYSTEM + amount + "|" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)))
+                .toList();
+        if (amount > 0 && amount <= getBoonTokens(game, player, "economicboon") && !buttons.isEmpty()) {
+            MessageHelper.editMessageWithButtons(
+                    event,
+                    player.getRepresentationNoPing() + ", choose a space dock system for _Economic Boon_.",
+                    buttons);
+        }
+    }
+
+    @ButtonHandler(ECONOMIC_SYSTEM)
+    public static void chooseEconomicBoonShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(ECONOMIC_SYSTEM.length()).split("\\|", 2);
+        if (values.length != 2) return;
+        int amount;
+        try {
+            amount = Integer.parseInt(values[0]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        Tile tile = game.getTileByPosition(values[1]);
+        if (tile == null
+                || tile.getUnitHolders().values().stream()
+                        .noneMatch(holder -> holder.getUnitCount(UnitType.Spacedock, player) > 0)) return;
+        List<Button> buttons = player.getUnitModels().stream()
+                .filter(UnitModel::getIsShip)
+                .filter(unit -> unit.getUnitType() != UnitType.Fighter && unit.getCost() <= amount)
+                .map(unit -> Buttons.green(
+                        player.factionButtonChecker() + ECONOMIC_SHIP + amount + "|" + values[1] + "|"
+                                + unit.getAsyncId(),
+                        "Produce " + unit.getName(),
+                        unit.getUnitEmoji()))
+                .toList();
+        if (amount > 0 && amount <= getBoonTokens(game, player, "economicboon") && !buttons.isEmpty()) {
+            MessageHelper.editMessageWithButtons(
+                    event, player.getRepresentationNoPing() + ", choose a ship to produce.", buttons);
+        }
+    }
+
+    @ButtonHandler(ECONOMIC_SHIP)
+    public static void produceEconomicBoonShip(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(ECONOMIC_SHIP.length()).split("\\|", 3);
+        if (values.length != 3) return;
+        int amount;
+        try {
+            amount = Integer.parseInt(values[0]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        Tile tile = game.getTileByPosition(values[1]);
+        UnitModel unit = player.getUnitFromAsyncID(values[2]);
+        if (tile == null
+                || unit == null
+                || !unit.getIsShip()
+                || unit.getUnitType() == UnitType.Fighter
+                || unit.getCost() > amount
+                || tile.getUnitHolders().values().stream()
+                        .noneMatch(holder -> holder.getUnitCount(UnitType.Spacedock, player) > 0)
+                || !spendBoonTokens(game, player, "economicboon", amount)) return;
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit.getAsyncId());
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " produced 1 " + unit.getName() + " with _Economic Boon_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static Button getDiplomaticBoonCardsInfoButton(Game game, Player player) {
+        return player.hasRelic("diplomaticboon") && getBoonTokens(game, player, "diplomaticboon") > 0
+                ? Buttons.gray(player.factionButtonChecker() + "boonDiplomatic", "Use Diplomatic Boon")
+                : null;
+    }
+
+    @ButtonHandler("boonDiplomatic")
+    public static void chooseDiplomaticBoonAmount(ButtonInteractionEvent event, Game game, Player player) {
+        if (!player.hasRelic("diplomaticboon")) return;
+        List<Button> buttons = new ArrayList<>();
+        for (int amount = 1; amount <= getBoonTokens(game, player, "diplomaticboon"); amount++) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + DIPLOMATIC_AMOUNT + amount,
+                    "Remove " + amount + " Token" + (amount == 1 ? "" : "s")));
+        }
+        if (!buttons.isEmpty())
+            MessageHelper.editMessageWithButtons(
+                    event,
+                    player.getRepresentationNoPing() + ", choose how many _Diplomatic Boon_ tokens to remove.",
+                    buttons);
+    }
+
+    @ButtonHandler(DIPLOMATIC_AMOUNT)
+    public static void chooseDiplomaticBoonPlacement(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        int amount;
+        try {
+            amount = Integer.parseInt(buttonID.substring(DIPLOMATIC_AMOUNT.length()));
+        } catch (NumberFormatException e) {
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (!tile.getTileModel().isHyperlane()
+                    && !tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).isEmpty()) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + DIPLOMATIC_PLACE + amount + "|fighter|" + tile.getPosition(),
+                        "Place " + amount + " Fighter" + (amount == 1 ? "" : "s") + " In "
+                                + tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        for (String planetName : player.getPlanets()) {
+            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            if (planet != null)
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + DIPLOMATIC_PLACE + amount + "|infantry|" + planetName,
+                        "Place " + amount + " Infantry On " + planet.getRepresentation(game)));
+        }
+        if (amount > 0 && amount <= getBoonTokens(game, player, "diplomaticboon") && !buttons.isEmpty()) {
+            MessageHelper.editMessageWithButtons(
+                    event,
+                    player.getRepresentationNoPing() + ", choose where to place units with _Diplomatic Boon_.",
+                    buttons);
+        }
+    }
+
+    @ButtonHandler(DIPLOMATIC_PLACE)
+    public static void placeDiplomaticBoonUnits(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(DIPLOMATIC_PLACE.length()).split("\\|", 3);
+        if (values.length != 3) return;
+        int amount;
+        try {
+            amount = Integer.parseInt(values[0]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        Tile tile = "fighter".equals(values[1]) ? game.getTileByPosition(values[2]) : game.getTileFromPlanet(values[2]);
+        boolean eligible = tile != null
+                && (("fighter".equals(values[1])
+                                && !tile.getSpaceUnitHolder()
+                                        .getUnitKeysForPlayer(player)
+                                        .isEmpty())
+                        || ("infantry".equals(values[1]) && player.getPlanets().contains(values[2])));
+        if (!eligible || !spendBoonTokens(game, player, "diplomaticboon", amount)) return;
+        AddUnitService.addUnits(
+                event,
+                tile,
+                game,
+                player.getColor(),
+                amount + " " + values[1] + ("infantry".equals(values[1]) ? " " + values[2] : ""));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " placed " + amount + " " + values[1] + (amount == 1 ? "" : "s")
+                        + " with _Diplomatic Boon_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void offerNaturesBoon(Game game, Player player) {
+        if (!player.hasRelic("naturesboon") || getBoonTokens(game, player, "naturesboon") < 1) return;
+        List<Button> buttons = new ArrayList<>();
+        for (int amount = 1; amount <= Math.min(getBoonTokens(game, player, "naturesboon"), 12); amount++) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + NATURE_AMOUNT + amount,
+                    "Remove " + amount + " Token" + (amount == 1 ? "" : "s")));
+        }
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                        + ", you may use _Nature's Boon_ to increase a controlled planet's resource value this tactical action.",
+                buttons);
+    }
+
+    @ButtonHandler(NATURE_AMOUNT)
+    public static void chooseNaturesBoonPlanetTokens(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        int amount;
+        try {
+            amount = Integer.parseInt(buttonID.substring(NATURE_AMOUNT.length()));
+        } catch (NumberFormatException e) {
+            return;
+        }
+        List<Button> buttons = player.getPlanets().stream()
+                .map(game::getUnitHolderFromPlanet)
+                .filter(java.util.Objects::nonNull)
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + NATURE_PLANET + amount + "|" + planet.getName(),
+                        "Increase " + planet.getRepresentation(game) + " By " + amount))
+                .toList();
+        if (amount > 0 && amount <= getBoonTokens(game, player, "naturesboon") && !buttons.isEmpty()) {
+            MessageHelper.editMessageWithButtons(
+                    event, player.getRepresentationNoPing() + ", choose a planet for _Nature's Boon_.", buttons);
+        }
+    }
+
+    @ButtonHandler(NATURE_PLANET)
+    public static void resolveNaturesBoonTokens(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(NATURE_PLANET.length()).split("\\|", 2);
+        if (values.length != 2) return;
+        int amount;
+        try {
+            amount = Integer.parseInt(values[0]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        Planet planet = game.getUnitHolderFromPlanet(values[1]);
+        if (planet == null || !player.getPlanets().contains(values[1])) return;
+        List<String> attachments = new ArrayList<>();
+        int remaining = amount;
+        for (String attachment : List.of(
+                "attachment_naturesboonres3a.png",
+                "attachment_naturesboonres3b.png",
+                "attachment_naturesboonres2a.png",
+                "attachment_naturesboonres2b.png",
+                "attachment_naturesboonres1a.png",
+                "attachment_naturesboonres1b.png")) {
+            int value = attachment.contains("res3") ? 3 : attachment.contains("res2") ? 2 : 1;
+            if (remaining >= value && planet.addToken(attachment)) {
+                attachments.add(attachment);
+                remaining -= value;
+            }
+        }
+        if (remaining > 0 || !spendBoonTokens(game, player, "naturesboon", amount)) {
+            attachments.forEach(planet::removeToken);
+            return;
+        }
+        game.setStoredValue(NATURE_BONUS + player.getFaction(), values[1] + "|" + String.join(",", attachments));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " increased " + planet.getRepresentation(game)
+                        + "'s resource value by " + amount + " with _Nature's Boon_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void clearNaturesBoon(Game game, Player player) {
+        String[] values =
+                game.getStoredValue(NATURE_BONUS + player.getFaction()).split("\\|", 2);
+        if (values.length == 2) {
+            Planet planet = game.getUnitHolderFromPlanet(values[0]);
+            if (planet != null) {
+                if (values[1].matches("\\d+")) {
+                    planet.addResourcesModifier(-Integer.parseInt(values[1]));
+                } else {
+                    for (String attachment : values[1].split(",")) {
+                        if (attachment.startsWith("attachment_positiveres_naturesboon_")) {
+                            planet.removeToken(attachment);
+                            planet.addResourcesModifier(-1);
+                        } else {
+                            planet.removeToken(attachment);
+                        }
+                    }
+                }
+            }
+        }
+        game.removeStoredValue(NATURE_BONUS + player.getFaction());
+    }
+
+    public static Button getCosmicBoonTokenButton(Game game, Player player) {
+        return player.hasRelic("cosmicboon") && getBoonTokens(game, player, "cosmicboon") > 0
+                ? Buttons.green(player.factionButtonChecker() + "boonCosmic", "Use Cosmic Boon")
+                : null;
+    }
+
+    @ButtonHandler("boonCosmic")
+    public static void resolveCosmicBoonTokens(ButtonInteractionEvent event, Game game, Player player) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (!player.hasRelic("cosmicboon") || tile == null || getBoonTokens(game, player, "cosmicboon") < 1) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + ", _Cosmic Boon_ cannot be used without an active system and control token.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            if (!player.getPlanets().contains(planet.getName())) continue;
+            for (String trait : planet.getPlanetTypes()) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + COSMIC_EXPLORE + planet.getName() + "|" + trait,
+                        "Explore " + planet.getRepresentation(game) + " As " + trait));
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " has no eligible planet to explore with _Cosmic Boon_.");
+            return;
+        }
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", choose a planet in the active system to explore with _Cosmic Boon_.",
+                buttons);
+    }
+
+    @ButtonHandler(COSMIC_EXPLORE)
+    public static void exploreCosmicBoonPlanet(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(COSMIC_EXPLORE.length()).split("\\|", 2);
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        Planet planet = values.length == 2 ? game.getUnitHolderFromPlanet(values[0]) : null;
+        if (tile == null
+                || planet == null
+                || !tile.getPlanetUnitHolders().contains(planet)
+                || !player.getPlanets().contains(planet.getName())
+                || !planet.getPlanetTypes().contains(values[1])
+                || !spendBoonTokens(game, player, "cosmicboon", 1)) return;
+        ExploreService.explorePlanet(event, tile, planet.getName(), values[1], player, true, game, 1, false);
+        ButtonHelper.deleteMessage(event);
     }
 }

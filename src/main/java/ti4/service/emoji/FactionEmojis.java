@@ -154,6 +154,11 @@ public enum FactionEmojis implements TI4Emoji {
     verydith,
     veylor,
     xytheris,
+    vanguard,
+    scrapyard,
+    stoneborn,
+    morpha,
+    thurviali,
 
     // nomadfalcon
     erock,
@@ -363,6 +368,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "verydith" -> verydith;
             case "veylor" -> veylor;
             case "xytheris" -> xytheris;
+            case "vanguard" -> vanguard;
+            case "scrapyard" -> scrapyard;
+            case "stoneborn" -> stoneborn;
+            case "morpha" -> morpha;
+            case "thurviali" -> thurviali;
             case "diaspora" -> Arborec;
             case "hlr" -> L1Z1X;
             case "clade" -> Naalu;

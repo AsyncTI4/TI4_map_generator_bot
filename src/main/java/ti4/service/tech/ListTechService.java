@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -341,6 +342,9 @@ public class ListTechService {
             if (player.hasTechReady("aida") || player.hasTechReady("absol_aida")) {
                 wilds++;
             }
+            if (player.hasAbility("battle_tested_designs")) {
+                wilds++;
+            }
         } else if (player.hasAbility("analytical")) {
             wilds++;
         }
@@ -348,6 +352,7 @@ public class ListTechService {
         if (player.hasRelicReady("prophetstears") || player.hasRelicReady("absol_prophetstears")) {
             wilds++;
         }
+        wilds += ArcanumUnitHandler.getReadyRuneboundCount(game, player);
 
         // All sources of pre-requisites below can also apply via synergy.
         // - Replace all synergies that the player has with a simple "X"
@@ -356,21 +361,28 @@ public class ListTechService {
             TechnologyModel playerTech = Mapper.getTech(techID);
             if (playerTech == null) continue;
             for (TechnologyType type : playerTech.getTypes()) {
-                if (synergies.contains(type)) {
-                    requirements = requirements.replaceFirst("X", "");
-                    continue;
-                }
-                switch (type) {
-                    case BIOTIC -> requirements = requirements.replaceFirst("G", "");
-                    case WARFARE -> requirements = requirements.replaceFirst("R", "");
-                    case PROPULSION -> requirements = requirements.replaceFirst("B", "");
-                    case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
-                    case UNITUPGRADE -> {
-                        if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
-                            wilds++;
-                        }
+                int prerequisiteCount = TechnologyType.mainFour.contains(type)
+                                && game.playerHasLeaderUnlockedOrAlliance(player, "revenantvanguardcommander")
+                                && playerTech.getRequirements().isEmpty()
+                        ? 2
+                        : 1;
+                for (int i = 0; i < prerequisiteCount; i++) {
+                    if (synergies.contains(type)) {
+                        requirements = requirements.replaceFirst("X", "");
+                        continue;
                     }
-                    default -> {}
+                    switch (type) {
+                        case BIOTIC -> requirements = requirements.replaceFirst("G", "");
+                        case WARFARE -> requirements = requirements.replaceFirst("R", "");
+                        case PROPULSION -> requirements = requirements.replaceFirst("B", "");
+                        case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
+                        case UNITUPGRADE -> {
+                            if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
+                                wilds++;
+                            }
+                        }
+                        default -> {}
+                    }
                 }
             }
         }

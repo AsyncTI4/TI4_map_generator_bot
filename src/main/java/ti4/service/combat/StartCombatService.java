@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -388,6 +389,10 @@ public class StartCombatService {
                                 + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
                         AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player2));
             }
+            if ("ground".equalsIgnoreCase(spaceOrGround)) {
+                offerVanguardCommanderUnlock(player1);
+                offerVanguardCommanderUnlock(player2);
+            }
         }
 
         TextChannel textChannel = (TextChannel) channel;
@@ -450,6 +455,18 @@ public class StartCombatService {
         }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
+    }
+
+    private static void offerVanguardCommanderUnlock(Player player) {
+        Button unlockButton = VanguardLeadersHandler.getCommanderUnlockButton(player);
+        if (unlockButton == null) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + ", if you win this ground combat, press the button below to unlock _Shieldbrother Michael_:",
+                unlockButton);
     }
 
     private static void initializeCombatThread(
@@ -640,6 +657,24 @@ public class StartCombatService {
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
+            }
+        }
+
+        if (isGroundCombat) {
+            UnitHolder combatPlanet = tile.getUnitHolders().get(unitHolderName);
+            if (player1.hasUnit("ponthous_mech")
+                    && combatPlanet != null
+                    && combatPlanet.getUnitKeysForPlayer(player1).stream()
+                            .map(player1::getUnitFromUnitKey)
+                            .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
+                PonthousUnitHandler.offerDragoonsReminder(threadChannel, player1);
+            }
+            if (player2.hasUnit("ponthous_mech")
+                    && combatPlanet != null
+                    && combatPlanet.getUnitKeysForPlayer(player2).stream()
+                            .map(player2::getUnitFromUnitKey)
+                            .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
+                PonthousUnitHandler.offerDragoonsReminder(threadChannel, player2);
             }
         }
 
@@ -1557,6 +1592,8 @@ public class StartCombatService {
             String unitHolderName,
             GenericInteractionCreateEvent event) {
         List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
+        RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player1, player2, tile, unitHolderName);
+        RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player2, player1, tile, unitHolderName);
         if ("ground".equalsIgnoreCase(spaceOrGround)) {
             TwilightsFallMonumentsButtonHandler.addGreenTfMonumentButtons(buttons, game, tile, unitHolderName);
             TwilightsFallMonumentsButtonHandler.addRedTfMonumentButtons(buttons, game, tile, unitHolderName);

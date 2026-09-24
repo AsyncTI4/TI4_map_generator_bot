@@ -114,5 +114,47 @@
         "influenceModifier": 1,
         "resourcesModifier": 1,
         "source": "theodisi"
+    },
+    {
+        "id": "naturesboonres1a",
+        "name": "Nature's Boon +1",
+        "imagePath": "attachment_naturesboonres1a.png",
+        "resourcesModifier": 1,
+        "source": "theodisi"
+    },
+    {
+        "id": "naturesboonres1b",
+        "name": "Nature's Boon +1",
+        "imagePath": "attachment_naturesboonres1b.png",
+        "resourcesModifier": 1,
+        "source": "theodisi"
+    },
+    {
+        "id": "naturesboonres2a",
+        "name": "Nature's Boon +2",
+        "imagePath": "attachment_naturesboonres2a.png",
+        "resourcesModifier": 2,
+        "source": "theodisi"
+    },
+    {
+        "id": "naturesboonres2b",
+        "name": "Nature's Boon +2",
+        "imagePath": "attachment_naturesboonres2b.png",
+        "resourcesModifier": 2,
+        "source": "theodisi"
+    },
+    {
+        "id": "naturesboonres3a",
+        "name": "Nature's Boon +3",
+        "imagePath": "attachment_naturesboonres3a.png",
+        "resourcesModifier": 3,
+        "source": "theodisi"
+    },
+    {
+        "id": "naturesboonres3b",
+        "name": "Nature's Boon +3",
+        "imagePath": "attachment_naturesboonres3b.png",
+        "resourcesModifier": 3,
+        "source": "theodisi"
     }
 ]

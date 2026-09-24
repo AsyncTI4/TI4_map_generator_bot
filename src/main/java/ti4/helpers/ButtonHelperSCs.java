@@ -538,14 +538,6 @@ public final class ButtonHelperSCs {
             return;
         }
 
-        if (player.hasAbility("expeditionary_cache")) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged()
-                            + ", since **Expeditionary Cache** lets you place _Expedition Tokens_, resolving commodity washing here seems likely to be an error. Nothing has been processed. Please use a different route if that is incorrect.");
-            return;
-        }
-
         if (player.getSCs().contains(5) && !game.isHomebrewSCMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

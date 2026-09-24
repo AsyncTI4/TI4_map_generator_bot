@@ -44,10 +44,10 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -827,14 +827,6 @@ public class PlayerAreaGenerator {
     }
 
     private int theodisiTokenSupplies(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.hasAbility("expeditionary_cache")) {
-            xDeltaFromRightSide = displayTheodisiTokenSupply(
-                    "token_theodisi_kairnexpedition.png",
-                    5,
-                    KairnAbilityHandler.getAvailableExpeditionTokens(game),
-                    xDeltaFromRightSide,
-                    yDelta);
-        }
         if (player.hasAbility("sting_of_the_hive")) {
             xDeltaFromRightSide = displayTheodisiTokenSupply(
                     "token_theodisi_mine.png",
@@ -1362,6 +1354,14 @@ public class PlayerAreaGenerator {
             if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(game, player, relicID)) {
                 DrawingUtil.getAndDrawControlToken(graphics, player, x + deltaX + 10, y + 60, false, 0.5f);
             }
+            if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                    .contains(relicID)) {
+                int tokenCount = LostLegaciesRelicHandler.getBoonTokens(game, player, relicID);
+                for (int token = 0; token < tokenCount; token++) {
+                    DrawingUtil.getAndDrawControlToken(
+                            graphics, player, x + deltaX + 2 + token % 3 * 14, y + 52 + token / 3 * 13, false, 0.25f);
+                }
+            }
 
             deltaX += 48;
         }
@@ -1414,9 +1414,11 @@ public class PlayerAreaGenerator {
                         default -> -1;
                     };
             if (leaderRank1 == leaderRank2) {
-                return Mapper.getLeader(leader1.getId())
-                        .getName()
-                        .compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
+                LeaderModel leaderModel1 = Mapper.getLeader(leader1.getId());
+                LeaderModel leaderModel2 = Mapper.getLeader(leader2.getId());
+                String leaderName1 = leaderModel1 == null ? leader1.getId() : leaderModel1.getName();
+                String leaderName2 = leaderModel2 == null ? leader2.getId() : leaderModel2.getName();
+                return leaderName1.compareToIgnoreCase(leaderName2);
             }
             return leaderRank1 - leaderRank2;
         };
@@ -1481,6 +1483,12 @@ public class PlayerAreaGenerator {
             }
 
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+            if (leaderModel == null) {
+                g2.setFont(Storage.getFont14());
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, leader.getId(), x + deltaX + 7, y + 30, 120, true);
+                deltaX += 48;
+                continue;
+            }
             boolean shrink = game.isTwilightsFallMode() ? leaderModel.getTFShrinkName() : leaderModel.getShrinkName();
             String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
 

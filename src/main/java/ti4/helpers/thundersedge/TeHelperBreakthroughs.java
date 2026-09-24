@@ -11,6 +11,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -56,6 +57,7 @@ public class TeHelperBreakthroughs {
             case "dreambt" -> DreamBreakthroughHandler.postDreamBtMoveNexusButtons(event, game, player);
             case "kairnbt" -> KairnBreakthroughHandler.postInitialButtons(game, player);
             case "ardentiabt" -> ArdentiaBreakthroughHandler.startSubjugate(event, game, player);
+            case "verydithbt" -> VerydithBreakthroughHandler.verydithBTExhaust(event, game, player);
             default -> {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),

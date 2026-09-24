@@ -9,7 +9,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShie
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -236,10 +235,6 @@ class AssignHitsButtonHandlers {
                     }
                     if (assignHitsType.contains("combat")) {
                         AshenUnitHandler.offerAshfallEngineOnSustain(event, game, player, tile, holder, type);
-                    }
-                    UnitModel sustainedUnit = player.getUnitFromUnitKey(Units.getUnitKey(type, player.getColorID()));
-                    if ("spacecombat".equals(assignHitsType) && sustainedUnit != null && sustainedUnit.getIsShip()) {
-                        RevenantLeadersHandler.offerRevPonthousCommander(event, game, player, tile);
                     }
                     List<Button> systemButtons =
                             ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);

@@ -92,7 +92,7 @@
       "PROPULSION",
       "WARFARE"
     ],
-    "text": "When you gain this breakthrough, add 4 PDS to your reinforcements. If you own a PDS unit upgrade technology, flip this card over and place it in your play area. Your PDS units gain the following ability text and adjust their printed values by the indicated amounts. If they do not have those values, they gain them.",
+    "text": "If you own a PDS unit upgrade technology, flip this card over and place it in your play area. Your PDS units gain the following ability text and adjust their printed values by the indicated amounts. If they do not have those values, they gain them.",
     "source": "theodisi"
   },
   {
@@ -140,7 +140,7 @@
       "PROPULSION",
       "BIOTIC"
     ],
-    "text": "When one or more other players place a command token in a system that contains 1 or more planets you control, ready 1 planet in that system and explore it.",
+    "text": "When one or more other players place a command token in a system that contains 1 or more planets you control, ready 1 planet in that system and explore it.\nACTION: Exhaust this card and select 1 player who has passed. Place 1 of that player's command tokens in a system that contains your units and none of their command tokens.",
     "source": "theodisi"
   },
   {
@@ -165,6 +165,80 @@
       "BIOTIC"
     ],
     "text": "When you gain this breakthrough choose a side for it to start on. When you research a cybernetic or biotic technology, flip this card over. When you activate a system, apply +1 to the capacity value of 2 units until the end of that tactical action. When you use PRODUCTION, apply -1 to the combined cost of those produced units.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "vanguardbt",
+    "name": "Training Dummies",
+    "shortName": "Training\nDummies",
+    "faction": "vanguard",
+    "synergy": [
+      "BIOTIC",
+      "WARFARE"
+    ],
+    "text": "When you spend a command token to perform the secondary effect of a strategy card, you may place 1 neutral infantry into coexistence on a non-fracture planet that contains your ground forces.\nOnce per action, when you win a ground combat, gain 2 trade goods.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "scrapyardbt",
+    "name": "Compactor",
+    "shortName": "Compactor",
+    "faction": "scrapyard",
+    "synergy": [
+      "BIOTIC",
+      "WARFARE"
+    ],
+    "text": "When 1 or more of your units are destroyed, you may capture them.\nACTION: Return any number of your captured units to your reinforcements. Gain trade goods equal to half their combined cost (rounded down).",
+    "source": "theodisi"
+  },
+  {
+    "alias": "stonebornbt",
+    "name": "Refragment Dormant",
+    "shortName": "Refragment\nDormant",
+    "faction": "stoneborn",
+    "synergy": [
+      "PROPULSION",
+      "BIOTIC"
+    ],
+    "text": "During a transaction, you and the other player can include relics as part of a transaction. No “Gain” effects are triggered by this transaction.\nACTION: Exhaust this card and purge 1 relic to research a technology or explore 1 planet of each trait.\nUNLEASH: Remove 3 fragmentum tokens of different colors from your player sheet.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "stonebornbtunleashed",
+    "name": "Refragment Unleashed",
+    "shortName": "Refragment\nUnleashed",
+    "faction": "stoneborn",
+    "synergy": [
+      "PROPULSION",
+      "BIOTIC",
+      "CYBERNETIC",
+      "WARFARE"
+    ],
+    "text": "During a transaction, you and the other player can include relics as part of a transaction. No “Gain” effects are triggered by this transaction.\nACTION: Exhaust this card and purge 1 relic to research a technology and explore 1 planet you control of each trait.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "morphabt",
+    "name": "Metamorphic Transference",
+    "shortName": "Meta\nTransfer",
+    "faction": "morpha",
+    "synergy": [
+      "BIOTIC",
+      "CYBERNETIC"
+    ],
+    "text": "When you are negotiating a transaction, action cards in either of your hands and on this card can be exchanged as part of that transaction.\nTwice per action, when you win a combat, draw 1 action card and place it on this card.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "thurvialibt",
+    "name": "Neurografting",
+    "shortName": "Neuro\nGrafting",
+    "faction": "thurviali",
+    "synergy": [
+      "PROPULSION",
+      "CYBERNETIC"
+    ],
+    "text": "When your units enter coexistence with another player’s units, you may exhaust this card to research 1 technology owned by that player.\nWhen another player ends coexistence with your units you may ready this card.",
     "source": "theodisi"
   }
 ]

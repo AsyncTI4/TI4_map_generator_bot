@@ -1,5 +1,41 @@
 [
     {
+        "alias": "swarm_spawn_AFB",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "AFB",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "swarm_spawn_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "bombardment",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "swarm_spawn_SpaceCannonOffence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonOffence",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "swarm_spawn_SpaceCannonDefence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonDefence",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
         "alias": "demoralizing_environment",
         "type": "mods",
         "value": "-2",

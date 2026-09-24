@@ -338,11 +338,16 @@ public class CommanderUnlockCheckService {
                     "xytheris",
                     "oblivion",
                     "revenant",
-                    "revenantmyrr",
-                    "revenantoblivion",
                     "revenantponthous",
+                    "revenantoblivion",
+                    "revenantxytheris",
+                    "revenantvanguard",
+                    "revenantveylor",
                     "thrones",
-                    "ponthous" ->
+                    "ponthous",
+                    "scrapyard",
+                    "morpha",
+                    "thurviali" ->
                 shouldBeUnlocked =
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
         }

@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -63,8 +64,7 @@ public class MyrrLeadersHandler {
                 && !getAgentShips(activatingPlayer, tile).isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     activatingPlayer.getCorrectChannel(),
-                    activatingPlayer.getRepresentation()
-                            + ", you may exhaust Kelron Dross, the Myrr agent, in the activated system.",
+                    activatingPlayer.getRepresentation() + ", you may exhaust Kelron Dross, the Myrr agent.",
                     List.of(
                             Buttons.gray(
                                     activatingPlayer.factionButtonChecker() + AGENT_USE + activatingPlayer.getFaction()
@@ -118,7 +118,7 @@ public class MyrrLeadersHandler {
                                 + tile.getPosition() + "|" + unitKey.asyncID(),
                         "Destroy 1 " + unitKey.humanReadableName(),
                         unitKey.unitEmoji()))
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(ArrayList::new));
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -198,7 +198,7 @@ public class MyrrLeadersHandler {
                 .filter(key -> key.unitType() != UnitType.Fighter)
                 .filter(key -> {
                     UnitModel unit = player.getPriorityUnitByAsyncID(key.asyncID(), space);
-                    return unit != null && unit.getIsShip() && unit.getCost() < 4;
+                    return unit != null && unit.getIsShip() && unit.getCost() <= 4;
                 })
                 .toList();
     }
