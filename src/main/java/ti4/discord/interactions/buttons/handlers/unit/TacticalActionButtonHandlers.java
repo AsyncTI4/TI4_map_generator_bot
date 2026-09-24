@@ -142,7 +142,8 @@ class TacticalActionButtonHandlers {
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
         if (activeTile != null
                 && CommandCounterHelper.hasCC(event, player.getColor(), activeTile)
-                && !TacticalActionService.shouldSkipPlacingAbilities(game, player)) {
+                && !TacticalActionService.shouldSkipPlacingAbilities(game, player)
+                && !event.getButton().getLabel().toLowerCase().contains("ring")) {
             RemoveCommandCounterService.fromTile(player.getColor(), activeTile, game);
             player.setTacticalCC(player.getTacticalCC() + 1);
         }

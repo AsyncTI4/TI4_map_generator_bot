@@ -191,6 +191,12 @@ public final class FoWHelper {
         String label = fogged
                 ? target.getFactionNameOrColor()
                 : target.getFactionModel().getShortName();
+        if (target.getFaction().contains("franken")
+                && !fogged
+                && target.getDisplayName() != null
+                && !target.getDisplayName().isEmpty()) {
+            label = target.getDisplayName();
+        }
         return styledButton(style, buttonId, label, target.fogSafeEmoji());
     }
 

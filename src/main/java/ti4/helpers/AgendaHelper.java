@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -3094,9 +3095,18 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on top.");
-        ButtonHelper.sendMessageToRightStratThread(
-                game.getPlayer(game.getActivePlayerID()), game, "Agenda put on top.", "politics");
+        announceAgendaPlacement(game, "Agenda put on top.");
+    }
+
+    // The strat-thread fallback posts to the actions channel when no Politics thread exists (e.g. agenda-phase
+    // cards like Intrigue), which would duplicate the announcement, so only echo to the thread when it exists.
+    private static void announceAgendaPlacement(Game game, String message) {
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+        ThreadChannel politicsThread =
+                ButtonHelper.getRightStratThread(game, ButtonHelper.getStratName("politics", game));
+        if (politicsThread != null) {
+            MessageHelper.sendMessageToChannel(politicsThread, message);
+        }
     }
 
     public static void putBottom(int agendaID, Game game) {
@@ -3108,9 +3118,7 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom.");
-        ButtonHelper.sendMessageToRightStratThread(
-                game.getPlayer(game.getActivePlayerID()), game, "Agenda put on bottom.", "politics");
+        announceAgendaPlacement(game, "Agenda put on bottom.");
     }
 
     public static void putBottom(String agendaID, Game game) {

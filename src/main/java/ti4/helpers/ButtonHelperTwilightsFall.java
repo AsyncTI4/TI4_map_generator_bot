@@ -459,6 +459,17 @@ public final class ButtonHelperTwilightsFall {
                 .anyMatch(unit -> "warsun".equalsIgnoreCase(unit.getBaseType()));
     }
 
+    public static Player spliceInitiator(Game game, Player fallback) {
+        if (game.isFowMode()) {
+            Player initiator = game.getPlayerFromColorOrFaction(game.getStoredValue("spliceInitiator"));
+            if (initiator != null) {
+                return initiator;
+            }
+        }
+        Player active = game.getActivePlayer();
+        return active == null ? fallback : active;
+    }
+
     // @ButtonHandler("initiateASplice_")
     public static void initiateASplice(
             GenericInteractionCreateEvent event,
@@ -471,6 +482,7 @@ public final class ButtonHelperTwilightsFall {
             spliceType = buttonID.split("_")[1];
         }
         game.setStoredValue("spliceType", spliceType);
+        game.setStoredValue("spliceInitiator", startPlayer.getFaction());
         if (!game.getStoredValue("reverseSpliceOrder").isEmpty()) {
             game.removeStoredValue("reverseSpliceOrder");
         } else {
@@ -813,6 +825,9 @@ public final class ButtonHelperTwilightsFall {
     public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
         for (Player player : game.getRealPlayers()) {
             String factionColor = player.getFaction().replace("tf", "").replace("tknova", "");
+            if ("white".equalsIgnoreCase(factionColor)) {
+                factionColor = "lgy";
+            }
             if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
                 Player p2 = game.getPlayerFromColorOrFaction(factionColor);
                 if (p2 != null) {
@@ -989,10 +1004,7 @@ public final class ButtonHelperTwilightsFall {
                     sendPlayerSpliceOptions(game, participants.getFirst());
                 }
             } else {
-                Player activeP = game.getActivePlayer();
-                if (activeP == null) {
-                    activeP = player;
-                }
+                Player activeP = spliceInitiator(game, player);
                 if (game.isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             activeP.getCorrectChannel(), activeP.getRepresentation() + ", the splice is complete.");
@@ -1007,13 +1019,15 @@ public final class ButtonHelperTwilightsFall {
                 }
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                     Player p2 = game.getActivePlayer();
-                    if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
+                    if (p2 != null
+                            && game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
                         EndTurnService.endTurnAndUpdateMap(event, game, p2);
                     }
                     game.setStoredValue("endTurnWhenSpliceEnds", "");
                 }
                 game.removeStoredValue("Reverse Splice");
                 game.removeStoredValue("willParticipateInSplice");
+                game.removeStoredValue("spliceInitiator");
             }
             ButtonHelper.deleteMessage(event);
         }

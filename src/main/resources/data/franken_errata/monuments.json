@@ -113,5 +113,11 @@
         "itemId": "sarcosa_monument",
         "undraftable": true,
         "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "mykomentori_monument",
+        "undraftable": true,
+        "source": "monuments"
     }
 ]

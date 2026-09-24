@@ -1385,15 +1385,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "sacrifice",
-        "name": "Sacrifice",
-        "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
-        "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
-        "source": "deprecated"
-    },
-    {
         "alias": "classified_weapons_acd2",
         "name": "Classified Weapons",
         "phase": "Action",
@@ -1751,6 +1742,86 @@
         "text": "Take 2 of those trade goods and gain 1 trade good.",
         "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
         "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver1",
+        "name": "Outmaneuver",
+        "automationID": "outrun1",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver2",
+        "name": "Outmaneuver",
+        "automationID": "outrun2",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship. \"Zat would've cut us in half,\" he muttered.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver3",
+        "name": "Outmaneuver",
+        "automationID": "outrun3",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "T'esla checked her wingman, relieved to see that he had managed to dodge the flak as well. \"Close in and open fire!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver4",
+        "name": "Outmaneuver",
+        "automationID": "outrun4",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "The capital ship's massive cannons were unable to track the brigades of fighters swarming it like insects.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice1",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "Sharsiss exulted. Each puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice2",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice3",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice4",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "deprecated"
     }
 ]

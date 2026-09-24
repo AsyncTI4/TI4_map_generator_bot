@@ -508,7 +508,7 @@ public class StartCombatService {
                 amount++;
             }
         }
-        if (CombatContestSettings.isEnabledStatic() && (amount > 2 || tile.getNumberOfUnitsInSystem() > 2)) {
+        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     ButtonHelper.getCombatTileSummaryMessage(
@@ -1100,10 +1100,11 @@ public class StartCombatService {
             if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
                 KaloraLeaderHandler.offerKaloraAgentButtons(player, msg);
             }
-            if ("space".equalsIgnoreCase(type) && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, tile)) {
+            if ("space".equalsIgnoreCase(type) && OnyxxaUnitHandler.isFlagshipInOrAdjacentSystem(game, player, tile)) {
                 OnyxxaUnitHandler.offerFlagshipWinButton(player, msg);
             }
-            if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
+            if (player.hasLeader("arvaxicommander")
+                    || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiLeaderHandler.sendCombatButtons(player, otherPlayer, game, msg);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
@@ -2364,6 +2365,12 @@ public class StartCombatService {
                     factionChecker + "purgeRedCreussHero_" + tile.getPosition(),
                     "Purge Rebellion Hero",
                     FactionEmojis.Crimson));
+        }
+        if (p1.hasLeaderUnlocked("arvaxihero") && isSpaceCombat) {
+            buttons.add(ArvaxiLeaderHandler.getPurgeHeroButton(p1, tile.getPosition()));
+        }
+        if (p2.hasLeaderUnlocked("arvaxihero") && !game.isFowMode() && isSpaceCombat) {
+            buttons.add(ArvaxiLeaderHandler.getPurgeHeroButton(p2, tile.getPosition()));
         }
         if (p1.hasLeaderUnlocked("bastionhero")) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";

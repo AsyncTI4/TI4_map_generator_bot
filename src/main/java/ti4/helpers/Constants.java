@@ -552,6 +552,9 @@ public final class Constants {
     public static final String SET_FOG_FILTER = "set_fog_filter";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
+    public static final String TARGET_PLANET_PING = "target_planet";
+    public static final String TARGET_SYSTEM_PING = "target_system";
+    public static final String TARGET_PLAYER_PING = "target_player_ping";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
     public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
@@ -724,6 +727,11 @@ public final class Constants {
     public static final String PLAYER = "player";
     public static final String SO_SCORE_FROM_HAND = "so_score_hand_";
     public static final String AC_PLAY_FROM_HAND = "ac_play_from_hand_";
+    public static final String AC_PING_PICK = "acPingPick_";
+    public static final String AC_PING_PLANET = "acPingPlanet";
+    public static final String AC_PING_SYSTEM = "acPingSystem";
+    public static final String AC_PING_PLAYER = "acPingPlayer";
+    public static final String AC_PING_ROUTE = "acPingRoute_";
     public static final String SLING_RELAY = "sling_relay";
     public static final String PO_SCORING = "po_scoring_";
     public static final String PO_NO_SCORING = "po_no_scoring";
@@ -1443,6 +1451,7 @@ public final class Constants {
     public static final String START_NEW_SPLICE = "start_new_splice";
     public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
+    public static final String SKULLS = "skulls";
     public static final String FIX_COLORS = "fix_colors";
     public static final String GUILD_AGENTS = "guild_agents";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
@@ -1486,6 +1495,7 @@ public final class Constants {
     public static final String MECH_ID = "mech";
     public static final String FLAGSHIP_ID = "flagship";
     public static final String OBSERVER = "observer";
+    public static final String AMOUNT = "amount";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
     public static final String SET_GAME_LIMIT = "set_game_limit";
@@ -1659,6 +1669,7 @@ public final class Constants {
     public static final String TIGL_RANK = "tigl_rank";
     public static final String TIGL = "tigl";
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
+    public static final String TIGL_REPORT_MANUALLY = "report_manually";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
     public static final String LAZAX = "lazax";

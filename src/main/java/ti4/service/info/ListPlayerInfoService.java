@@ -534,7 +534,8 @@ public class ListPlayerInfoService {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
                         if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
-                                || uH.getUnitCount(Units.UnitType.Pds, player) > 0) {
+                                || uH.getUnitCount(Units.UnitType.Pds, player) > 0
+                                || uH.getUnitCount(Units.UnitType.Monument, player) > 0) {
                             counter++;
                         }
                         maxPlanets++;
@@ -691,7 +692,8 @@ public class ListPlayerInfoService {
                 }
                 return counter
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false)
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "monument", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;

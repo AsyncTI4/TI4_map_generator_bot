@@ -17,18 +17,6 @@
         "shortName": "Kinetic\nProbe Network",
         "faction": "xan",
         "synergy": [
-            "PROPULSION",
-            "CYBERNETIC"
-        ],
-        "text": "Once per combat round, you may use the SUSTAIN DAMAGE ability of 1 of your units that is not participating in this combat. You can only use this ability on ships during space combat and on ground forces during ground combat.",
-        "source": "balacasi"
-    },
-    {
-        "alias": "xanbt_omega",
-        "name": "Kinetic Probe Network Ω",
-        "shortName": "Kinetic\nProbe Network Ω",
-        "faction": "xan",
-        "synergy": [
             "WARFARE",
             "CYBERNETIC"
         ],
@@ -68,7 +56,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When you resolve the primary ability of a strategy card, roll a die. On a result of 1 or 10, put The Fracture into play if it is not already; if it is, move an ingress token into a system that contains your units. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
+        "text": "This breakthrough causes The Fracture to enter play without a roll, if it is not already in play. Your ships can move through systems that contain an ingress token and other players' ships. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
         "source": "balacasi"
     },
     {

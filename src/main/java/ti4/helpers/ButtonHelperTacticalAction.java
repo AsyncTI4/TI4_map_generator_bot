@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -613,6 +614,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
+        game.removeStoredValue(ArvaxiLeaderHandler.HERO_ACTIVE_KEY);
         game.removeStoredValue("tnelisCommanderTracker");
         TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
         TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
@@ -811,9 +813,8 @@ public final class ButtonHelperTacticalAction {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
                 }
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "firmament_monument")
-                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")
-                        && player != monumentOwner) {
-                    MonumentsTEButtonHandler.sendEpiphanyMessage(monumentOwner);
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")) {
+                    MonumentsTEButtonHandler.placeEpiphanyControlToken(game, monumentOwner, player);
                 }
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "obsidian_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "obsidian_monument")

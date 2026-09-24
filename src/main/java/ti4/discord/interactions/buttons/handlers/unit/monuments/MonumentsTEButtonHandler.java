@@ -25,6 +25,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.StartCombatService;
@@ -53,6 +54,9 @@ public class MonumentsTEButtonHandler {
     private static final String USE_RALNEL_MONUMENT = "useRalnelMonument";
     private static final String SELECT_RALNEL_MONUMENT_STRUCTURE = "selectRalnelMonumentStructure_";
     private static final String MOVE_RALNEL_MONUMENT_STRUCTURE = "moveRalnelMonumentStructure_";
+    private static final String EPIPHANY_CONTROL_TOKENS = "epiphanyControlTokens_";
+    private static final String USE_EPIPHANY_CONTROL_TOKEN = "useEpiphanyControlToken_";
+    private static final String SELECT_EPIPHANY_PLOT = "selectEpiphanyPlot_";
 
     // Pharus Iustitiae
     public static int getKeleresMonumentCommandTokenCount(Game game, Player player) {
@@ -335,12 +339,176 @@ public class MonumentsTEButtonHandler {
     }
 
     // Epiphany
-    public static void sendEpiphanyMessage(Player owner) {
+    public static void placeEpiphanyControlToken(Game game, Player owner, Player activatingPlayer) {
+        if (game == null
+                || owner == null
+                || activatingPlayer == null
+                || !MonumentsService.isMonumentOnBoard(game, owner, "firmament_monument")) {
+            return;
+        }
+        List<String> controlTokens = getEpiphanyControlTokens(game, owner);
+        if (controlTokens.contains(activatingPlayer.getFaction())) {
+            return;
+        }
+        controlTokens.add(activatingPlayer.getFaction());
+        setEpiphanyControlTokens(game, owner, controlTokens);
         MessageHelper.sendMessageToChannel(
                 owner.getCorrectChannel(),
-                owner.getRepresentation()
-                        + ", someone has activated the system containing _Epiphany_. You may replace 1 control token on 1 of your plots with 1 of this player's control tokens."
-                        + "\n-# You may use the normal plot buttons in your `#cards-info` thread to resolve this.");
+                owner.getRepresentationNoPing() + " placed " + activatingPlayer.getFactionEmojiOrColor()
+                        + "'s control token on _Epiphany_.");
+    }
+
+    public static Button getEpiphanyControlTokensButton(Game game, Player player) {
+        int tokenCount = getEpiphanyControlTokens(game, player).size();
+        return Buttons.gray(
+                player.factionButtonChecker() + "checkEpiphanyControlTokens",
+                "Epiphany: " + tokenCount + " Control Token" + (tokenCount == 1 ? "" : "s"),
+                FactionEmojis.Firmament);
+    }
+
+    @ButtonHandler("checkEpiphanyControlTokens")
+    public static void checkEpiphanyControlTokens(ButtonInteractionEvent event, Game game, Player player) {
+        if (!MonumentsService.hasMonument(game, player, "firmament_monument")) {
+            return;
+        }
+        List<String> controlTokens = getEpiphanyControlTokens(game, player);
+        String tokenOwners = controlTokens.isEmpty()
+                ? "none"
+                : controlTokens.stream()
+                        .map(game::getPlayerFromColorOrFaction)
+                        .filter(java.util.Objects::nonNull)
+                        .map(Player::getFactionEmojiOrColor)
+                        .collect(java.util.stream.Collectors.joining(", "));
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event, "_Epiphany_ has the following control tokens: " + tokenOwners + ".");
+    }
+
+    public static void offerEpiphanyResearchButtons(Game game, Player player, TechnologyModel technology) {
+        if (game == null
+                || player == null
+                || technology == null
+                || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
+            return;
+        }
+        List<String> controlTokens = getEpiphanyControlTokens(game, player);
+        if (controlTokens.isEmpty()) {
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        if (technology.getRequirements().isPresent()
+                && !technology.getRequirements().get().isEmpty()) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + USE_EPIPHANY_CONTROL_TOKEN + "skip|" + technology.getAlias(),
+                    "Skip 1 Prerequisite",
+                    FactionEmojis.Firmament));
+        }
+        controlTokens.stream()
+                .filter(faction -> !"firmament".equals(faction))
+                .map(game::getPlayerFromColorOrFaction)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .forEach(tokenOwner -> buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + USE_EPIPHANY_CONTROL_TOKEN + "plot|" + tokenOwner.getFaction(),
+                        "Move " + tokenOwner.getFactionEmojiOrColor() + " Token to Plot",
+                        FactionEmojis.Firmament)));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", after researching " + technology.getNameRepresentation()
+                        + ", you may remove a control token from _Epiphany_ to skip 1 prerequisite or move a non-Firmament player's control token to a plot card.",
+                buttons);
+    }
+
+    @ButtonHandler(USE_EPIPHANY_CONTROL_TOKEN)
+    public static void useEpiphanyControlToken(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.substring(USE_EPIPHANY_CONTROL_TOKEN.length()).split("\\|", 2);
+        if (parts.length != 2 || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<String> controlTokens = getEpiphanyControlTokens(game, player);
+        if ("skip".equals(parts[0])) {
+            if (controlTokens.isEmpty()) {
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
+            String removedToken = controlTokens.removeFirst();
+            setEpiphanyControlTokens(game, player, controlTokens);
+            TechnologyModel technology = ti4.image.Mapper.getTech(parts[1]);
+            Player tokenOwner = game.getPlayerFromColorOrFaction(removedToken);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " removed "
+                            + (tokenOwner == null ? removedToken : tokenOwner.getFactionEmojiOrColor())
+                            + "'s control token from _Epiphany_ to skip 1 prerequisite for "
+                            + (technology == null ? "their researched technology" : technology.getNameRepresentation())
+                            + ".");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!"plot".equals(parts[0]) || "firmament".equals(parts[1]) || !controlTokens.contains(parts[1])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<Button> buttons = player.getPlotCards().keySet().stream()
+                .filter(plot -> !player.getPuppetedFactionsForPlot(plot).contains(parts[1]))
+                .map(plot -> Buttons.gray(
+                        player.factionButtonChecker() + SELECT_EPIPHANY_PLOT + parts[1] + "|" + plot,
+                        "Move Token to " + ti4.image.Mapper.getPlot(plot).getName(),
+                        FactionEmojis.Firmament))
+                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You have no eligible plot card for that control token.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", choose the plot card to receive "
+                        + game.getPlayerFromColorOrFaction(parts[1]).getFactionEmojiOrColor() + "'s control token.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(SELECT_EPIPHANY_PLOT)
+    public static void selectEpiphanyPlot(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.substring(SELECT_EPIPHANY_PLOT.length()).split("\\|", 2);
+        if (parts.length != 2
+                || "firmament".equals(parts[0])
+                || !MonumentsService.hasMonument(game, player, "firmament_monument")
+                || !player.getPlotCards().containsKey(parts[1])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<String> controlTokens = getEpiphanyControlTokens(game, player);
+        if (!controlTokens.remove(parts[0])
+                || player.getPuppetedFactionsForPlot(parts[1]).contains(parts[0])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        setEpiphanyControlTokens(game, player, controlTokens);
+        player.setPlotCardFaction(parts[1], parts[0]);
+        Player tokenOwner = game.getPlayerFromColorOrFaction(parts[0]);
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + " moved "
+                        + (tokenOwner == null ? parts[0] : tokenOwner.getFactionEmojiOrColor())
+                        + "'s control token from _Epiphany_ to a plot card.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<String> getEpiphanyControlTokens(Game game, Player player) {
+        String storedTokens = game.getStoredValue(EPIPHANY_CONTROL_TOKENS + player.getFaction());
+        return storedTokens.isBlank() ? new ArrayList<>() : new ArrayList<>(List.of(storedTokens.split(",")));
+    }
+
+    private static void setEpiphanyControlTokens(Game game, Player player, List<String> controlTokens) {
+        if (controlTokens.isEmpty()) {
+            game.removeStoredValue(EPIPHANY_CONTROL_TOKENS + player.getFaction());
+            return;
+        }
+        game.setStoredValue(EPIPHANY_CONTROL_TOKENS + player.getFaction(), String.join(",", controlTokens));
     }
 
     // The Pelagion (Thunderdome)

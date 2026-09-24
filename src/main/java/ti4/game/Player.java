@@ -66,6 +66,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
@@ -1082,14 +1083,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("tf-swa".equals(unit.getAlias())) {
             score += 99;
         }
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
-                && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
-        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
+        if (unit.getFaction().isPresent() && unit.getIsUpgrade()) {
+            score += 4;
+        }
+        if (unit.getFaction().isPresent()) {
+            score += 3;
+        }
+        if (unit.getIsUpgrade()) {
+            score += 2;
+        }
         if (unitHolder != null
                 && ((Constants.SPACE.equals(unitHolder.getName()) && unit.getIsShip())
-                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) score++;
-        if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) {
+            score++;
+        }
+        if (unit.getSource().isTwilightFallish()
+                && unit.getIsUpgrade()
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
         }
@@ -1133,6 +1142,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         actionCards.put(id, identifier);
+        if ("tf-stasis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningStasis(game, this);
+        }
+        if ("crisis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningCrisis(game, this);
+        }
+        if ("extremeduress".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, this);
+        }
     }
 
     public void setEvent(String id) {
@@ -1485,7 +1503,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
 
-        return getCommoditiesBase() + getCommoditiesBonus();
+        int commodityValue = getCommoditiesBase();
+        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+            return commodityValue = 2 + getCommoditiesBonus();
+        }
+
+        return commodityValue + getCommoditiesBonus();
     }
 
     public int getCommoditiesBonus() {
@@ -1501,9 +1524,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
-        }
-        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
-            bonus -= 2;
         }
         if (hasTech("tf-corporateimperialism")) {
             bonus += 4;

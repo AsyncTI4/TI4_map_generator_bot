@@ -78,6 +78,52 @@ public final class NewStuffHelper {
         return allButtons;
     }
 
+    public static List<Button> paginateWithPinnedButtons(
+            List<Button> allButtons, List<Button> pinnedButtons, String prefixID, int allottedSpace, int pageNum) {
+        int capacityPerPage = allottedSpace - pinnedButtons.size();
+        if (capacityPerPage < 3) {
+            return Collections.emptyList();
+        }
+        if (allButtons.size() <= capacityPerPage) {
+            List<Button> onlyPage = new ArrayList<>(allButtons);
+            onlyPage.addAll(pinnedButtons);
+            return onlyPage;
+        }
+
+        List<List<Button>> pages = splitIntoPagesLeavingRoomForNavButtons(allButtons, capacityPerPage);
+        int maxPage = pages.size() - 1;
+        if (pageNum < 0) pageNum = 0;
+        if (pageNum > maxPage) pageNum = maxPage;
+
+        List<Button> buttonsToUse = new ArrayList<>();
+        if (pageNum > 0) {
+            String prev = "Previous Page (" + pageNum + "/" + (maxPage + 1) + ")";
+            buttonsToUse.add(Buttons.blue(prefixID + "page" + (pageNum - 1), prev, "⏪"));
+        }
+        buttonsToUse.addAll(pages.get(pageNum));
+        if (pageNum < maxPage) {
+            String next = "Next Page (" + (pageNum + 2) + "/" + (maxPage + 1) + ")";
+            buttonsToUse.add(Buttons.blue(prefixID + "page" + (pageNum + 1), next, "⏩"));
+        }
+        buttonsToUse.addAll(pinnedButtons);
+        return buttonsToUse;
+    }
+
+    private static List<List<Button>> splitIntoPagesLeavingRoomForNavButtons(List<Button> allButtons, int capacity) {
+        int total = allButtons.size();
+        int pageCount = Math.ceilDiv(total - 2, capacity - 2);
+        List<List<Button>> pages = new ArrayList<>();
+        int index = 0;
+        for (int page = 0; page < pageCount; page++) {
+            boolean hasOnlyOneNavButton = page == 0 || page == pageCount - 1;
+            int contentRoom = capacity - (hasOnlyOneNavButton ? 1 : 2);
+            int end = page == pageCount - 1 ? total : Math.min(total, index + contentRoom);
+            pages.add(new ArrayList<>(allButtons.subList(index, end)));
+            index = end;
+        }
+        return pages;
+    }
+
     public static boolean checkAndHandlePaginationChange(
             GenericInteractionCreateEvent event,
             MessageChannel channel,

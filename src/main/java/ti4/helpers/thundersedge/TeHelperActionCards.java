@@ -10,8 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -326,6 +325,8 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        var exchangeSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3");
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, exchangeSpec)) return;
 
         String planet = buttonID.split("_")[1];
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -415,6 +416,7 @@ public class TeHelperActionCards {
     @ButtonHandler("strategize")
     private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game, player);
+        buttons.addAll(OnyxxaAbilityHandler.getStrategicFluidityPrimaryButtons(game, player));
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()
@@ -430,12 +432,6 @@ public class TeHelperActionCards {
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        if (player.hasUnlockedBreakthrough("onyxxabt")) {
-            OnyxxaBreakthroughHandler.offerSCRollButton(game, player);
-        }
-        if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
-            OnyxxaLeaderHandler.offerCommanderUnlockButton(player);
-        }
         ButtonHelper.deleteMessage(event);
     }
 
