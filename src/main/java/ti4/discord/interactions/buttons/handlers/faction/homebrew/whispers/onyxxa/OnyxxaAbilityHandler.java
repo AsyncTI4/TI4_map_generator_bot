@@ -148,7 +148,7 @@ public class OnyxxaAbilityHandler {
         game.setStoredValue(SILENT_ACCORD_USED_KEY, game.getStoredValue(SILENT_ACCORD_USED_KEY) + ";" + roundMarker);
         grantPrimaryAccess(game, scNum, holder, player);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
+                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
                 player.getRepresentation() + " is using _Silent Accord_ and resolves the primary ability of **"
                         + game.getSCName(scNum) + "** instead of its secondary ability, before "
                         + holder.getRepresentationNoPing() + ".");
