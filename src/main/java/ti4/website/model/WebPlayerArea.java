@@ -313,7 +313,7 @@ public class WebPlayerArea {
         webPlayerArea.scs = player.getSCs();
         webPlayerArea.isSpeaker = player.isSpeaker();
         webPlayerArea.isTyrant = player.isTyrant();
-        webPlayerArea.neighbors = player.getNeighbouringPlayers(false).stream()
+        webPlayerArea.neighbors = player.getNeighbouringPlayers(true).stream()
                 .map(Player::getColor)
                 .toList();
 

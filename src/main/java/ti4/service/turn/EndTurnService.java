@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
@@ -118,6 +119,7 @@ public class EndTurnService {
         game.removeStoredValue("possiblyUsedRift");
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
+        FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);
         game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
         String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
         if (!fieldTestTech.isEmpty()) {

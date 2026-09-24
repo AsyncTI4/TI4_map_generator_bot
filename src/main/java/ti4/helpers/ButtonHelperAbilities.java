@@ -1106,8 +1106,9 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("addTombToken_")
     public static void addTombToken(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        var tombSpec =
-                PlanetTargetSpec.of("addTombToken").where(p -> !p.getTokenList().contains("token_tomb.png"));
+        var tombSpec = PlanetTargetSpec.of("addTombToken")
+                .where(p -> !p.getTokenList().contains("token_tomb.png"))
+                .withPageNavPrefix("addTombToken_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, tombSpec)) return;
         String planet = buttonID.split("_")[1];
         String message = player.getFactionEmoji() + " added a Tomb token to "
@@ -1163,7 +1164,8 @@ public final class ButtonHelperAbilities {
                     game,
                     player,
                     PlanetTargetSpec.of("addTombToken")
-                            .where(p -> !p.getTokenList().contains("token_tomb.png")),
+                            .where(p -> !p.getTokenList().contains("token_tomb.png"))
+                            .withPageNavPrefix("addTombToken_"),
                     buttons);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             return;

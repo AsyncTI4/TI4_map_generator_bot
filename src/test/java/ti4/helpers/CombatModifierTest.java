@@ -1,6 +1,9 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +20,7 @@ import ti4.image.PositionMapper;
 import ti4.model.FactionModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
+import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.player.PlayerColorService;
@@ -92,6 +96,86 @@ class CombatModifierTest extends BaseTi4Test {
         Set<String> expectedModifiers = Set.of("plusX_letnev_breakthrough");
 
         assertListsEqual("LetnevMods", combatModifiers, expectedModifiers);
+    }
+
+    // Classified Weapons stores "<faction>;<unit asyncId>" when its unit is chosen. The modifier used to be
+    // related to "action_cards", a type getModifiers never collects, so the chosen unit silently lost its dice.
+    @Test
+    void classifiedWeaponsGivesTheChosenUnitTwoExtraDice() {
+        Tile tile = new Tile("37", getNextPosition());
+        testGame.setTile(tile);
+        tile.addUnit("space", Units.getUnitKey(UnitType.Destroyer, bastion.getColorID()), 1);
+        tile.addUnit("space", Units.getUnitKey(UnitType.Cruiser, bastion.getColorID()), 1);
+        tile.addUnit("space", Units.getUnitKey(UnitType.Carrier, neutral.getColorID()), 1);
+        testGame.setStoredValue("classifiedWeapons", bastion.getFaction() + ";dd");
+
+        try {
+            var units = CombatRollService.getUnitsInCombat(
+                    tile, tile.getUnitHolders().get("space"), bastion, null, CombatRollType.combatround, testGame);
+            List<NamedCombatModifierModel> extraRolls = getExtraRolls(bastion, neutral, tile, units);
+            Assertions.assertTrue(
+                    extraRolls.stream().anyMatch(mod -> "classified_weapons_mod"
+                            .equals(mod.getModifier().getAlias())),
+                    "Classified Weapons modifier was not collected");
+
+            List<NamedCombatModifierModel> classifiedOnly = extraRolls.stream()
+                    .filter(mod ->
+                            "classified_weapons_mod".equals(mod.getModifier().getAlias()))
+                    .toList();
+            List<UnitModel> unitList = new ArrayList<>(units.keySet());
+            for (UnitModel unit : unitList) {
+                int extraDice = CombatModHelper.getCombinedModifierForUnit(
+                        unit,
+                        units.get(unit),
+                        classifiedOnly,
+                        bastion,
+                        neutral,
+                        testGame,
+                        unitList,
+                        CombatRollType.combatround,
+                        tile,
+                        tile.getUnitHolders().get("space"));
+                int expected = "dd".equals(unit.getAsyncId()) ? 2 : 0;
+                Assertions.assertEquals(expected, extraDice, "Extra dice for " + unit.getAsyncId());
+            }
+        } finally {
+            testGame.removeStoredValue("classifiedWeapons");
+        }
+    }
+
+    // Only the player who played the card gets the dice, even if the opponent has the same unit type.
+    @Test
+    void classifiedWeaponsIgnoresAnotherPlayersChoice() {
+        Tile tile = new Tile("38", getNextPosition());
+        testGame.setTile(tile);
+        tile.addUnit("space", Units.getUnitKey(UnitType.Destroyer, bastion.getColorID()), 1);
+        tile.addUnit("space", Units.getUnitKey(UnitType.Destroyer, neutral.getColorID()), 1);
+        testGame.setStoredValue("classifiedWeapons", neutral.getFaction() + ";dd");
+
+        try {
+            var units = CombatRollService.getUnitsInCombat(
+                    tile, tile.getUnitHolders().get("space"), bastion, null, CombatRollType.combatround, testGame);
+            Assertions.assertTrue(
+                    getExtraRolls(bastion, neutral, tile, units).stream().noneMatch(mod -> "classified_weapons_mod"
+                            .equals(mod.getModifier().getAlias())));
+        } finally {
+            testGame.removeStoredValue("classifiedWeapons");
+        }
+    }
+
+    private static List<NamedCombatModifierModel> getExtraRolls(
+            Player player, Player opponent, Tile tile, Map<UnitModel, Integer> units) {
+        var opponentUnits = CombatRollService.getUnitsInCombat(
+                tile, tile.getUnitHolders().get("space"), opponent, null, CombatRollType.combatround, testGame);
+        return CombatModHelper.getModifiers(
+                player,
+                opponent,
+                units,
+                opponentUnits,
+                tile.getTileModel(),
+                testGame,
+                CombatRollType.combatround,
+                Constants.COMBAT_EXTRA_ROLLS);
     }
 
     private static Set<String> getCombatMods(Player p1, Player p2, Tile tile, String uh, CombatRollType type) {

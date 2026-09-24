@@ -43,6 +43,12 @@ public class GameModeService {
                                 () -> game.isThundersEdge() && !game.isThundersEdgeDemo()),
                         Map.entry("Thunder's Edge Demo", (Supplier<Boolean>) game::isThundersEdgeDemo),
                         Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
+                        // isTwilightKart is deprecated. Once removed, just check isTkDestroyerCup
+                        Map.entry("Twilight Kart: Destroyer Cup", (Supplier<Boolean>)
+                                () -> game.isTwilightKart() || game.isTkDestroyerCup()),
+                        Map.entry("Twilight Kart: Nova Cup", (Supplier<Boolean>) game::isTkNovaCup),
+                        Map.entry("Twilight Discordant Stars", (Supplier<Boolean>) game::isTwilightDS),
+                        Map.entry("WhiteTF", (Supplier<Boolean>) game::isTfBr),
                         Map.entry("Age of Exploration", (Supplier<Boolean>) game::isAgeOfExplorationMode),
                         Map.entry("Facilities", (Supplier<Boolean>) game::isFacilitiesMode),
                         Map.entry("Minor Factions", (Supplier<Boolean>) game::isMinorFactionsMode),
@@ -58,6 +64,9 @@ public class GameModeService {
                         Map.entry("Rapid Mobilization", (Supplier<Boolean>) game::isRapidMobilizationMode),
                         Map.entry("Weird Wormholes", (Supplier<Boolean>) game::isWeirdWormholesMode),
                         Map.entry("Cosmic Phenomenae", (Supplier<Boolean>) game::isCosmicPhenomenaeMode),
+                        Map.entry("Cosmic Convergence", (Supplier<Boolean>) game::isCosmicConvergenceMode),
+                        Map.entry("Muaat Mania", (Supplier<Boolean>) game::isMuaatManiaMode),
+                        Map.entry("Call of the Void", (Supplier<Boolean>) game::isCallOfTheVoidMode),
                         Map.entry("Monument to the Ages", (Supplier<Boolean>) game::isMonumentToTheAgesMode),
                         Map.entry("Monuments+", (Supplier<Boolean>) game::isMonumentsMode),
                         Map.entry("Wild, Wild Galaxy", (Supplier<Boolean>) game::isWildWildGalaxyMode),
@@ -68,7 +77,9 @@ public class GameModeService {
                         Map.entry("Age of Commerce", (Supplier<Boolean>) game::isAgeOfCommerceMode),
                         Map.entry("Hidden Agenda", (Supplier<Boolean>) game::isHiddenAgendaMode),
                         Map.entry("Ordinian", (Supplier<Boolean>) game::isOrdinianC1Mode),
-                        Map.entry("Liberation", (Supplier<Boolean>) game::isLiberationC4Mode))
+                        Map.entry("Liberation", (Supplier<Boolean>) game::isLiberationC4Mode),
+                        Map.entry("Erwan's Gambit", (Supplier<Boolean>) game::isErwansGambitMode),
+                        Map.entry("No Fracture", (Supplier<Boolean>) game::isNoFractureMode))
                 .filter(entry -> entry.getValue().get())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(HashSet::new));

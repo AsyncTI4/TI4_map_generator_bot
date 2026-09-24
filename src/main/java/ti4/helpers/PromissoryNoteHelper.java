@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
@@ -92,7 +93,7 @@ public class PromissoryNoteHelper {
                         continue;
                     }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-                    sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
+                    sb.append(ownerColorTag(game, pnOwner, pn.getKey()));
                     sb.append(" `(").append(pn.getValue()).append(")`\n");
                     if (longFormat || pnOwner != player || !genericPromissoryNotes.contains(pn.getKey())) {
                         sb.append("> ").append(pnModel.getTextFormatted(game)).append('\n');
@@ -132,7 +133,7 @@ public class PromissoryNoteHelper {
                                 sb.append("✋");
                             } else {
                                 if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-                                sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
+                                sb.append(ownerColorTag(game, pnOwner, pn.getKey()));
                             }
                             sb.append(" `(")
                                     .append(pn.getValue())
@@ -145,6 +146,25 @@ public class PromissoryNoteHelper {
             }
         }
         return sb.toString();
+    }
+
+    public static boolean isFactionPromissoryNote(String pnID) {
+        PromissoryNoteModel model = Mapper.getPromissoryNote(pnID);
+        return model != null && StringUtils.isNotBlank(model.getFaction().orElse(""));
+    }
+
+    public static String ownerColorPrefix(Player owner, String pnID) {
+        return isFactionPromissoryNote(pnID) ? "" : owner.getColor() + " ";
+    }
+
+    public static String ownerEmoji(Game game, Player owner, String pnID) {
+        return game.isFowMode() && isFactionPromissoryNote(pnID) ? null : owner.fogSafeEmoji();
+    }
+
+    public static String ownerColorTag(Game game, Player owner, String pnID) {
+        return game.isFowMode() && isFactionPromissoryNote(pnID)
+                ? ""
+                : ColorEmojis.getColorEmojiWithName(owner.getColor());
     }
 
     public static void checkAndAddPNs(Game game, Player player) {
@@ -191,7 +211,8 @@ public class PromissoryNoteHelper {
             Button transact;
             if (game.isFowMode()) {
                 transact = Buttons.green(
-                        "resolvePNPlay_" + pnShortHand, "Play " + owner.getColor() + " " + promissoryNote.getName());
+                        "resolvePNPlay_" + pnShortHand,
+                        "Play " + ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
             } else {
                 transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
                         .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));

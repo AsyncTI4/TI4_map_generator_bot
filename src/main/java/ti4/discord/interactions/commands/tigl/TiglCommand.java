@@ -9,7 +9,8 @@ import ti4.helpers.Constants;
 
 public class TiglCommand implements ParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(new ChangeNickname(), new IsFractured(), new Games())
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ChangeNickname(), new IsFractured(), new Games(), new ReportManually())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

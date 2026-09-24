@@ -188,33 +188,46 @@ public class PlanetTargetService {
      *
      * @param publicLegality takes the tile as well as the holder, because the space holder has no planet to
      *                       look a tile up from.
+     * @param pageNavPrefix  prefix for this spec's page-2-and-beyond nav buttons; defaults to
+     *                       {@code buttonPrefix}. Override with {@link #withPageNavPrefix} when the resolve
+     *                       handler is registered under a longer prefix than {@code buttonPrefix} itself (for
+     *                       example a trailing {@code _} that {@code buttonPrefix} does not already end in) -
+     *                       see {@link PlanetTargetSpec#pageNavPrefix} for the full rationale.
      */
     public record UnitHolderTargetSpec(
             String buttonPrefix,
             UnitType unit,
             Ownership ownership,
             Visibility visibility,
-            BiPredicate<Tile, UnitHolder> publicLegality) {
+            BiPredicate<Tile, UnitHolder> publicLegality,
+            String pageNavPrefix) {
 
         public UnitHolderTargetSpec {
             if (ownership == null) ownership = Ownership.ANY;
             if (visibility == null) visibility = Visibility.VISIBLE_NOW;
+            if (pageNavPrefix == null) pageNavPrefix = buttonPrefix;
         }
 
         public static UnitHolderTargetSpec of(String buttonPrefix, UnitType unit) {
-            return new UnitHolderTargetSpec(buttonPrefix, unit, Ownership.ANY, Visibility.VISIBLE_NOW, null);
+            return new UnitHolderTargetSpec(buttonPrefix, unit, Ownership.ANY, Visibility.VISIBLE_NOW, null, null);
         }
 
         public UnitHolderTargetSpec excludingSelf() {
-            return new UnitHolderTargetSpec(buttonPrefix, unit, Ownership.EXCLUDE_SELF, visibility, publicLegality);
+            return new UnitHolderTargetSpec(
+                    buttonPrefix, unit, Ownership.EXCLUDE_SELF, visibility, publicLegality, pageNavPrefix);
         }
 
         public UnitHolderTargetSpec visibility(Visibility v) {
-            return new UnitHolderTargetSpec(buttonPrefix, unit, ownership, v, publicLegality);
+            return new UnitHolderTargetSpec(buttonPrefix, unit, ownership, v, publicLegality, pageNavPrefix);
         }
 
         public UnitHolderTargetSpec where(BiPredicate<Tile, UnitHolder> legality) {
-            return new UnitHolderTargetSpec(buttonPrefix, unit, ownership, visibility, legality);
+            return new UnitHolderTargetSpec(buttonPrefix, unit, ownership, visibility, legality, pageNavPrefix);
+        }
+
+        /** See {@code pageNavPrefix} above - only for a spec whose buttonPrefix isn't exclusively its own. */
+        public UnitHolderTargetSpec withPageNavPrefix(String navPrefix) {
+            return new UnitHolderTargetSpec(buttonPrefix, unit, ownership, visibility, publicLegality, navPrefix);
         }
     }
 
@@ -234,7 +247,15 @@ public class PlanetTargetService {
             return nonFogButtons;
         }
         List<Button> all = rawUnitHolderTargetButtons(game, actor, spec, nonFogButtons);
-        return NewStuffHelper.buttonPagination(all, null, spec.buttonPrefix(), 25, 0, false);
+        return NewStuffHelper.paginateWithPinnedButtons(all, blindHolderExtra(spec), spec.pageNavPrefix(), 25, 0);
+    }
+
+    private static List<Button> blindHolderExtra(UnitHolderTargetSpec spec) {
+        return List.of(BlindSelectionService.blindUnitHolderTargetButton(spec.buttonPrefix()));
+    }
+
+    private static List<Button> blindPlanetExtra(PlanetTargetSpec spec) {
+        return List.of(BlindSelectionService.blindTargetButton(spec.buttonPrefix(), true));
     }
 
     private static List<Button> rawUnitHolderTargetButtons(
@@ -258,31 +279,29 @@ public class PlanetTargetService {
             }
         }
         buttons.sort((a, b) -> a.getLabel().compareToIgnoreCase(b.getLabel()));
-        BlindSelectionService.appendBlindUnitHolderTargetButton(buttons, spec.buttonPrefix());
         return buttons;
     }
 
     /** {@link #handlePlanetPage}'s counterpart for {@link #unitHolderTargetButtons}. */
     public static boolean handleUnitHolderPage(
             ButtonInteractionEvent event, Game game, Player actor, String buttonID, UnitHolderTargetSpec spec) {
-        // See handlePlanetPage's javadoc: buttonPrefix as built can carry an FFCC_<faction>_ gate that never
-        // reaches a handler, so matching must use the same stripped form the framework already applied.
+        // See handlePlanetPage's javadoc: pageNavPrefix as built can carry an FFCC_<faction>_ gate that
+        // never reaches a handler, so matching must use the same stripped form the framework already applied.
         String ffccGate = "FFCC_" + actor.getFaction() + "_";
-        String effectivePrefix = spec.buttonPrefix().startsWith(ffccGate)
-                ? spec.buttonPrefix().substring(ffccGate.length())
-                : spec.buttonPrefix();
+        String effectivePrefix = spec.pageNavPrefix().startsWith(ffccGate)
+                ? spec.pageNavPrefix().substring(ffccGate.length())
+                : spec.pageNavPrefix();
         if (!buttonID.startsWith(effectivePrefix)) return false;
         Matcher pageMatch =
                 Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID.substring(effectivePrefix.length()));
         if (!pageMatch.find()) return false;
         int page = Integer.parseInt(pageMatch.group("page"));
-        List<Button> pageButtons = NewStuffHelper.buttonPagination(
+        List<Button> pageButtons = NewStuffHelper.paginateWithPinnedButtons(
                 rawUnitHolderTargetButtons(game, actor, spec, new ArrayList<>()),
-                null,
-                spec.buttonPrefix(),
+                blindHolderExtra(spec),
+                spec.pageNavPrefix(),
                 25,
-                page,
-                false);
+                page);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(), "Choose your target. (page " + (page + 1) + ")", pageButtons);
@@ -476,7 +495,7 @@ public class PlanetTargetService {
             return nonFogButtons;
         }
         List<Button> all = rawTargetButtons(game, actor, spec);
-        return NewStuffHelper.buttonPagination(all, null, spec.pageNavPrefix(), 25, 0, false);
+        return NewStuffHelper.paginateWithPinnedButtons(all, blindPlanetExtra(spec), spec.pageNavPrefix(), 25, 0);
     }
 
     private static List<Button> rawTargetButtons(Game game, Player actor, PlanetTargetSpec spec) {
@@ -504,8 +523,6 @@ public class PlanetTargetService {
         }
         // Sort by label so ordering carries no signal about why a planet is in the list.
         buttons.sort((a, b) -> a.getLabel().compareToIgnoreCase(b.getLabel()));
-
-        BlindSelectionService.appendBlindTargetButton(buttons, spec.buttonPrefix(), true);
         return buttons;
     }
 
@@ -553,8 +570,8 @@ public class PlanetTargetService {
      * without mocking a {@link ButtonInteractionEvent}.
      */
     public static List<Button> targetButtonsPage(Game game, Player actor, PlanetTargetSpec spec, int page) {
-        return NewStuffHelper.buttonPagination(
-                rawTargetButtons(game, actor, spec), null, spec.pageNavPrefix(), 25, page, false);
+        return NewStuffHelper.paginateWithPinnedButtons(
+                rawTargetButtons(game, actor, spec), blindPlanetExtra(spec), spec.pageNavPrefix(), 25, page);
     }
 
     /**
