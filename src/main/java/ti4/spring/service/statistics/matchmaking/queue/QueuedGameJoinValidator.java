@@ -109,7 +109,7 @@ class QueuedGameJoinValidator {
         PlayerMatchmakingData joiner = dataById.get(joiningUserId);
         if (!MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(joiner)) {
             return blockedButAddable("it is queued with the **" + MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION
-                    + "** restriction and you have not set enough active hours. Use `/user active_hours` to set them.");
+                    + "** restriction and you have not played enough to demonstrate your active hours.");
         }
         for (String otherId : others) {
             if (!MatchmakingCompatibilityService.shareEnoughActiveHours(joiner, dataById.get(otherId))) {
