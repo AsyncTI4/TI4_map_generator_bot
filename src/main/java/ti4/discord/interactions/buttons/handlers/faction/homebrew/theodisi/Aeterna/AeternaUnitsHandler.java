@@ -20,6 +20,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -29,6 +30,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 public class AeternaUnitsHandler {
     private static final String MAUSOLEUM_DESTROY = "useMausoleumAbility_";
     private static final String CHOOSE_MECH = "chooseMausoleumToDestroy_";
+    private static final String DESTROY_GROUND_FORCE = "destroyMausoleumGroundForce_";
     private static final String GRAVEYARD_COMM = "aeternaGraveyardComm_";
     private static final String GRAVEYARD_PRODUCE = "aeternaGraveyardProduce_";
     private static final String GRAVEYARD_II = "aeternaGraveyardII_";
@@ -45,8 +47,12 @@ public class AeternaUnitsHandler {
                 || tile == null
                 || holder == null
                 || !player.hasUnit("aeterna_mech")
-                || holder.getUnitCount(UnitType.Mech, player) < 1
-                || holder.getUnitCount(UnitType.Infantry, opponent) < 1) {
+                || holder.getUnitKeysForPlayer(player).stream()
+                        .map(player::getUnitFromUnitKey)
+                        .noneMatch(unit -> unit != null && "aeterna_mech".equals(unit.getId()))
+                || holder.getUnitKeysForPlayer(opponent).stream()
+                        .map(opponent::getUnitFromUnitKey)
+                        .noneMatch(unit -> unit != null && unit.getIsGroundForce())) {
             return;
         }
 
@@ -71,13 +77,16 @@ public class AeternaUnitsHandler {
         if (holder == null
                 || opponent == null
                 || opponent.equals(player)
-                || holder.getUnitCount(UnitType.Infantry, opponent) < 1) {
+                || holder.getUnitKeysForPlayer(opponent).stream()
+                        .map(opponent::getUnitFromUnitKey)
+                        .noneMatch(unit -> unit != null && unit.getIsGroundForce())) {
             return;
         }
 
         List<Button> buttons = new ArrayList<>();
         for (UnitKey unitKey : holder.getUnitKeysForPlayer(player)) {
-            if (unitKey.unitType() != UnitType.Mech) {
+            UnitModel unit = player.getUnitFromUnitKey(unitKey);
+            if (unit == null || !"aeterna_mech".equals(unit.getId())) {
                 continue;
             }
 
@@ -121,7 +130,10 @@ public class AeternaUnitsHandler {
         UnitKey mechKey = holder == null
                 ? null
                 : holder.getUnitKeysForPlayer(player).stream()
-                        .filter(unitKey -> unitKey.unitType() == UnitType.Mech)
+                        .filter(unitKey -> {
+                            UnitModel unit = player.getUnitFromUnitKey(unitKey);
+                            return unit != null && "aeterna_mech".equals(unit.getId());
+                        })
                         .filter(unitKey -> unitKey.asyncID().equals(payload[3]))
                         .findFirst()
                         .orElse(null);
@@ -132,27 +144,103 @@ public class AeternaUnitsHandler {
                 || mechKey == null
                 || state == null
                 || holder.getUnitCountForState(mechKey, state) < 1
-                || holder.getUnitCount(UnitType.Infantry, opponent) < 1) {
+                || holder.getUnitKeysForPlayer(opponent).stream()
+                        .map(opponent::getUnitFromUnitKey)
+                        .noneMatch(unit -> unit != null && unit.getIsGroundForce())) {
             return;
         }
 
         DestroyUnitService.destroyUnit(event, tile, game, new ParsedUnit(mechKey, 1, holder.getName()), true, state);
+        sendMausoleumGroundForceButtons(event, game, player, opponent, tile, holder, 2);
+        ButtonHelper.deleteMessage(event);
+    }
 
-        int infantryDestroyed = 0;
-        for (UnitKey unitKey : new ArrayList<>(holder.getUnitKeysForPlayer(opponent))) {
-            if (unitKey.unitType() != UnitType.Infantry || infantryDestroyed >= 2) {
-                continue;
-            }
-            int amount = Math.min(2 - infantryDestroyed, holder.getUnitCount(unitKey));
-            DestroyUnitService.destroyUnit(event, tile, game, new ParsedUnit(unitKey, amount, holder.getName()), true);
-            infantryDestroyed += amount;
+    @ButtonHandler(DESTROY_GROUND_FORCE)
+    public static void destroyMausoleumGroundForce(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring(DESTROY_GROUND_FORCE.length()).split("\\|", 6);
+        if (game == null || player == null || payload.length != 6 || !player.hasUnit("aeterna_mech")) {
+            return;
         }
 
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + " destroyed a Walking Mausoleum (Aeterna mech) and "
-                        + infantryDestroyed + " of " + opponent.getRepresentationNoPing() + "'s infantry.");
+        Tile tile = game.getTileByPosition(payload[0]);
+        UnitHolder holder = tile == null ? null : tile.getUnitHolderFromPlanet(payload[1]);
+        Player opponent = game.getPlayerFromColorOrFaction(payload[2]);
+        UnitState state = Units.findUnitState(payload[4]);
+        int remaining;
+        try {
+            remaining = Integer.parseInt(payload[5]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        if (holder == null || opponent == null || opponent.equals(player) || state == null || remaining < 1) {
+            return;
+        }
+        UnitKey unitKey = holder == null
+                ? null
+                : holder.getUnitKeysForPlayer(opponent).stream()
+                        .filter(key -> key.asyncID().equals(payload[3]))
+                        .findFirst()
+                        .orElse(null);
+        UnitModel unit = unitKey == null || opponent == null ? null : opponent.getUnitFromUnitKey(unitKey);
+        if (unit == null || !unit.getIsGroundForce() || holder.getUnitCountForState(unitKey, state) < 1) {
+            return;
+        }
+
+        DestroyUnitService.destroyUnit(event, tile, game, new ParsedUnit(unitKey, 1, holder.getName()), true, state);
         ButtonHelper.deleteMessage(event);
+        if (remaining > 1
+                && holder.getUnitKeysForPlayer(opponent).stream()
+                        .map(opponent::getUnitFromUnitKey)
+                        .anyMatch(model -> model != null && model.getIsGroundForce())) {
+            sendMausoleumGroundForceButtons(event, game, player, opponent, tile, holder, remaining - 1);
+            return;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getRepresentationNoPing() + " resolved _Walking Mausoleum_.");
+    }
+
+    private static void sendMausoleumGroundForceButtons(
+            ButtonInteractionEvent event,
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            UnitHolder holder,
+            int remaining) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey unitKey : holder.getUnitKeysForPlayer(opponent)) {
+            UnitModel unit = opponent.getUnitFromUnitKey(unitKey);
+            if (unit == null || !unit.getIsGroundForce()) {
+                continue;
+            }
+            for (UnitState state : holder.getNonZeroUnitStates(unitKey)) {
+                int count = holder.getUnitCountForState(unitKey, state);
+                if (count < 1) {
+                    continue;
+                }
+                String stateText =
+                        switch (state) {
+                            case dmg -> "damaged ";
+                            case glv -> "galvanized ";
+                            case dmg_glv -> "damaged galvanized ";
+                            default -> "";
+                        };
+                buttons.add(Buttons.red(
+                        player.factionButtonChecker() + DESTROY_GROUND_FORCE + tile.getPosition() + "|"
+                                + holder.getName() + "|" + opponent.getFaction() + "|" + unitKey.asyncID() + "|" + state
+                                + "|" + remaining,
+                        "Destroy 1 " + stateText + unit.getName() + " (" + count + ")",
+                        unitKey.unitEmoji()));
+            }
+        }
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + ", choose " + remaining + " opposing ground force"
+                            + (remaining == 1 ? "" : "s") + " to destroy with _Walking Mausoleum_.",
+                    buttons);
+        }
     }
 
     public static void offerGraveyardEffectsForDestroyedUnits(
