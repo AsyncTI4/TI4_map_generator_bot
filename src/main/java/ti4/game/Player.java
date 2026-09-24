@@ -66,6 +66,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
@@ -1141,6 +1142,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         actionCards.put(id, identifier);
+        if ("tf-stasis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningStasis(game, this);
+        }
+        if ("crisis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningCrisis(game, this);
+        }
+        if ("extremeduress".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, this);
+        }
     }
 
     public void setEvent(String id) {

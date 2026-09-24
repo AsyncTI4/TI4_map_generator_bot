@@ -3732,9 +3732,25 @@ public class ButtonHelper {
                     if (unitModel != null) {
                         sb.append(unitModel.getUnitEmoji()).append(' ');
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName());
-                        sb.append(getCombatProfileForTileSummary(
-                                        game, tile, unitHolder, unitModel, player, combatSummaryContext))
-                                .append('\n');
+                        if (unitHolder.getUnitCountForState(unitModel.getUnitType(), player, UnitState.dmg_glv) > 0) {
+                            sb.append(" ("
+                                    + unitHolder.getUnitCountForState(
+                                            unitModel.getUnitType(), player, UnitState.dmg_glv)
+                                    + " sustained and galvanized)");
+                        }
+                        if (unitHolder.getUnitCountForState(unitModel.getUnitType(), player, UnitState.dmg) > 0) {
+                            sb.append(" ("
+                                    + unitHolder.getUnitCountForState(unitModel.getUnitType(), player, UnitState.dmg)
+                                    + " sustained)");
+                        }
+                        if (unitHolder.getUnitCountForState(unitModel.getUnitType(), player, UnitState.glv) > 0) {
+                            sb.append(" ("
+                                    + unitHolder.getUnitCountForState(unitModel.getUnitType(), player, UnitState.glv)
+                                    + " galvanized)");
+                        }
+                        // sb.append(getCombatProfileForTileSummary(
+                        //                 game, tile, unitHolder, unitModel, player, combatSummaryContext))
+                        sb.append('\n');
                     } else {
                         sb.append(unitKey).append('\n');
                     }

@@ -1425,11 +1425,11 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         if (sendSftT || sendAlliance) {
             String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
-            message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of ";
+            message2 = p1.getRepresentationNoPing() + " sent " + text + " directly to the play area of ";
         } else {
-            message2 = p1.getRepresentation() + " sent a promissory note to the hand of ";
+            message2 = p1.getRepresentationNoPing() + " sent a promissory note to the hand of ";
         }
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentation() + ".");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentationNoPing() + ".");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2 + p2.getColorIfCanSeeStats(p1));
         }

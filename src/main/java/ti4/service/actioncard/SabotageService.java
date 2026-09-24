@@ -160,7 +160,8 @@ public class SabotageService {
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
         return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
                 .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
-                .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+                .allMatch(alias -> isActionCardNotPlayable(game, player, alias)
+                        && game.getDiscardACStatus().get(alias) != ActionCardHelper.ACStatus.garbozia);
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
