@@ -52,8 +52,8 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -2946,14 +2946,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if ("ponthous".equalsIgnoreCase(planet)
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Ponthous Ability"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
-                    getRepresentation()
-                            + ", you may exhaust the Ponthous ability and \"exhaust\" the Ponthous + or - card to ready Ponthous.",
-                    buttons);
+                    getRepresentation() + ", you may exhaust _Fractured Souls_ to ready Ponthous.",
+                    PonthousAbilityHandler.getFracturedSoulsButtons(this));
         }
     }
 

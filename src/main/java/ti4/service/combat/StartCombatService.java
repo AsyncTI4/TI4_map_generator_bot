@@ -643,6 +643,24 @@ public class StartCombatService {
             }
         }
 
+        if (isGroundCombat) {
+            UnitHolder combatPlanet = tile.getUnitHolders().get(unitHolderName);
+            if (player1.hasUnit("ponthous_mech")
+                    && combatPlanet != null
+                    && combatPlanet.getUnitKeysForPlayer(player1).stream()
+                            .map(player1::getUnitFromUnitKey)
+                            .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
+                PonthousUnitHandler.offerDragoonsReminder(threadChannel, player1);
+            }
+            if (player2.hasUnit("ponthous_mech")
+                    && combatPlanet != null
+                    && combatPlanet.getUnitKeysForPlayer(player2).stream()
+                            .map(player2::getUnitFromUnitKey)
+                            .anyMatch(unit -> unit != null && "ponthous_mech".equals(unit.getId()))) {
+                PonthousUnitHandler.offerDragoonsReminder(threadChannel, player2);
+            }
+        }
+
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             boolean thalnos = false;
