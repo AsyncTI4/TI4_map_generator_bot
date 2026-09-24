@@ -1333,15 +1333,23 @@ public final class Constants {
             List.of(VERBOSITY_VERBOSE, VERBOSITY_AVERAGE, VERBOSITY_MINIMAL);
 
     public static final List<String> CALL_OF_THE_HAUNTED_LEADERS = List.of(
-            "revenantverydithagent",
-            "revenantmyrrcommander",
-            "revenantthroneshero",
-            "revenantarcanumagent",
+            "revenantstonebornagent",
             "revenantoblivioncommander",
             "revenantkairnhero",
-            "revenantxytherisagent",
+            "revenantardentiaagent",
+            "revenantxytheriscommander",
+            "revenantthroneshero",
+            "revenantscrapyardagent",
             "revenantponthouscommander",
-            "revenantkryxoshero");
+            "revenantmyrrhero",
+            "revenantarcanumagent",
+            "revenantvanguardcommander",
+            "revenantkryxoshero",
+            "revenantverydithagent",
+            "revenantveylorcommander",
+            "revenantthurvialihero",
+            "revenantxytherisagent",
+            "revenantmyrrcommander");
 
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";

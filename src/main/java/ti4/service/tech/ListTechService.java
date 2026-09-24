@@ -358,21 +358,28 @@ public class ListTechService {
             TechnologyModel playerTech = Mapper.getTech(techID);
             if (playerTech == null) continue;
             for (TechnologyType type : playerTech.getTypes()) {
-                if (synergies.contains(type)) {
-                    requirements = requirements.replaceFirst("X", "");
-                    continue;
-                }
-                switch (type) {
-                    case BIOTIC -> requirements = requirements.replaceFirst("G", "");
-                    case WARFARE -> requirements = requirements.replaceFirst("R", "");
-                    case PROPULSION -> requirements = requirements.replaceFirst("B", "");
-                    case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
-                    case UNITUPGRADE -> {
-                        if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
-                            wilds++;
-                        }
+                int prerequisiteCount = TechnologyType.mainFour.contains(type)
+                                && game.playerHasLeaderUnlockedOrAlliance(player, "revenantvanguardcommander")
+                                && playerTech.getRequirements().isEmpty()
+                        ? 2
+                        : 1;
+                for (int i = 0; i < prerequisiteCount; i++) {
+                    if (synergies.contains(type)) {
+                        requirements = requirements.replaceFirst("X", "");
+                        continue;
                     }
-                    default -> {}
+                    switch (type) {
+                        case BIOTIC -> requirements = requirements.replaceFirst("G", "");
+                        case WARFARE -> requirements = requirements.replaceFirst("R", "");
+                        case PROPULSION -> requirements = requirements.replaceFirst("B", "");
+                        case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
+                        case UNITUPGRADE -> {
+                            if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
+                                wilds++;
+                            }
+                        }
+                        default -> {}
+                    }
                 }
             }
         }

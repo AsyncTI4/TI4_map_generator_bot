@@ -20,17 +20,25 @@ public class RevenantAbilityHandler {
     private static final String CHOOSE_SET_PREFIX = "revenantChooseLeaderSet_";
 
     private static final List<String> SET_ONE =
-            List.of("revenantverydithagent", "revenantmyrrcommander", "revenantthroneshero");
+            List.of("revenantstonebornagent", "revenantoblivioncommander", "revenantkairnhero");
     private static final List<String> SET_TWO =
-            List.of("revenantarcanumagent", "revenantoblivioncommander", "revenantkairnhero");
+            List.of("revenantardentiaagent", "revenantxytheriscommander", "revenantthroneshero");
     private static final List<String> SET_THREE =
-            List.of("revenantxytherisagent", "revenantponthouscommander", "revenantkryxoshero");
+            List.of("revenantscrapyardagent", "revenantponthouscommander", "revenantmyrrhero");
+    private static final List<String> SET_FOUR =
+            List.of("revenantarcanumagent", "revenantvanguardcommander", "revenantkryxoshero");
+    private static final List<String> SET_FIVE =
+            List.of("revenantverydithagent", "revenantveylorcommander", "revenantthurvialihero");
+    private static final List<String> RETIRED_OPTIONAL_LEADERS =
+            List.of("revenantxytherisagent", "revenantmyrrcommander");
     private static final List<String> ALL_OPTIONAL_LEADERS = new ArrayList<>();
 
     static {
         ALL_OPTIONAL_LEADERS.addAll(SET_ONE);
         ALL_OPTIONAL_LEADERS.addAll(SET_TWO);
         ALL_OPTIONAL_LEADERS.addAll(SET_THREE);
+        ALL_OPTIONAL_LEADERS.addAll(SET_FOUR);
+        ALL_OPTIONAL_LEADERS.addAll(SET_FIVE);
     }
 
     public static void offerCallOfTheHauntedButtons(Game game, Player player) {
@@ -38,13 +46,50 @@ public class RevenantAbilityHandler {
             return;
         }
 
+        player.getPromissoryNotesOwned().stream()
+                .filter(pnID -> pnID.endsWith("_an"))
+                .findFirst()
+                .ifPresent(pnID -> {
+                    if (!game.getPurgedPN().contains(pnID)) {
+                        game.setPurgedPN(pnID);
+                    }
+                    player.removePromissoryNote(pnID);
+                });
+
+        sendCallOfTheHauntedButtons(player);
+    }
+
+    public static boolean resetCallOfTheHauntedLeaders(Game game, Player player) {
+        if (game == null || player == null || !player.hasAbility(CALL_OF_THE_HAUNTED)) {
+            return false;
+        }
+        RevenantLeadersHandler.clearPantheonState(game, player);
+        for (String leaderId : ALL_OPTIONAL_LEADERS) {
+            player.removeLeader(leaderId);
+        }
+        for (String leaderId : RETIRED_OPTIONAL_LEADERS) {
+            player.removeLeader(leaderId);
+        }
+        sendCallOfTheHauntedButtons(player);
+        return true;
+    }
+
+    public static List<String> getCurrentPantheonAgentIds() {
+        return ALL_OPTIONAL_LEADERS.stream()
+                .filter(leaderId -> leaderId.endsWith("agent"))
+                .toList();
+    }
+
+    private static void sendCallOfTheHauntedButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set1", "Choose Verydith / Myrr / Thrones"));
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set2", "Choose Arcanum / Oblivion / Kairn"));
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set3", "Choose Xytheris / Ponthous / Kryxos"));
+        buttons.add(
+                Buttons.green(player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set1", "Pantheon of Exploration"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set2", "Pantheon of War"));
+        buttons.add(
+                Buttons.green(player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set3", "Pantheon of Production"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set4", "Pantheon of Wisdom"));
+        buttons.add(
+                Buttons.green(player.factionButtonChecker() + CHOOSE_SET_PREFIX + "set5", "Pantheon of the People"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -72,6 +117,8 @@ public class RevenantAbilityHandler {
                     case "set1" -> SET_ONE;
                     case "set2" -> SET_TWO;
                     case "set3" -> SET_THREE;
+                    case "set4" -> SET_FOUR;
+                    case "set5" -> SET_FIVE;
                     default -> List.of();
                 };
         if (chosenSet.isEmpty()) {
@@ -79,14 +126,6 @@ public class RevenantAbilityHandler {
                     event.getMessageChannel(), "That Revenant leader set is no longer valid.");
             ButtonHelper.deleteMessage(event);
             return;
-        }
-
-        for (String leaderId : ALL_OPTIONAL_LEADERS) {
-            if (!chosenSet.contains(leaderId)) {
-                // Call of the Haunted purges these during setup, so intentionally use the raw removal path and do not
-                // trigger effects that react to a leader being purged during play.
-                player.removeLeader(leaderId);
-            }
         }
         for (String leaderId : chosenSet) {
             player.addLeader(leaderId);

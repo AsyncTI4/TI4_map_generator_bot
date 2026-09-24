@@ -136,12 +136,6 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
         }
-        if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useRevArcanumAgent_other",
-                    "Use Revenant Arcanum Agent",
-                    FactionEmojis.revenant));
-        }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
         }
@@ -500,14 +494,17 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("revenantagent")) {
             buttons.add(RevenantLeadersHandler.getRevenantAgentButton(player));
         }
+        if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
+            buttons.add(RevenantLeadersHandler.getRevScrapyardCardsInfoButton(game, player));
+        }
+        if (player.hasUnexhaustedLeader("revenantstonebornagent")) {
+            buttons.add(RevenantLeadersHandler.getRevStratumCardsInfoButton(player));
+        }
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
-            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(game, player));
+            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(player));
         }
-        if (player.hasUnexhaustedLeader("revenantxytherisagent")) {
-            buttons.add(RevenantLeadersHandler.getRevXytherisCardsInfoButton(player));
-        }
-        if (player.hasLeaderUnlocked("revenantthroneshero")) {
-            buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
+        if (player.hasLeaderUnlocked("revenantmyrrhero")) {
+            buttons.add(RevenantLeadersHandler.getRevMyrrHeroButton(player));
         }
         if (player.hasPlanet("cineron")
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {

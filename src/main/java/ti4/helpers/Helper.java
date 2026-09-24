@@ -2583,7 +2583,7 @@ public final class Helper {
             productionValueTotal += 2;
         }
         productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
-        productionValueTotal += RevenantLeadersHandler.getRevThronesProduction(game, player, tile);
+        productionValueTotal += RevenantLeadersHandler.getRevMyrrProduction(game, player, tile);
         if (player.hasTech("thverydithy")) {
             int numberOfCCInSystem = 0;
             for (Player playerCC : game.getRealPlayers()) {

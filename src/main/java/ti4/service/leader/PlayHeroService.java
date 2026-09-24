@@ -29,7 +29,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
@@ -107,8 +106,7 @@ public class PlayHeroService {
             OblivionUnitHandler.doOblivionMechCheck(game, player);
         }
         if (removed && reason == LeaderRemovalReason.PURGED) {
-            RevenantUnitsHandler.doRevenantMechCheck(game, player);
-            RevenantTechHandler.doLazarusPodsLeaderCheck(game);
+            RevenantTechHandler.doLazarusPodsLeaderCheck(game, player);
         }
         return removed;
     }
@@ -295,6 +293,7 @@ public class PlayHeroService {
             }
             case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
             case "revenantkairnhero" -> RevenantLeadersHandler.startRevKairnHero(event, game, player);
+            case "revenantthurvialihero" -> RevenantLeadersHandler.startRevThurvialiHero(event, game, player);
             case "throneshero" -> ThronesLeadersHandler.getUnplacedThronePlanetButtons(event, game, player);
             case "kairnhero" -> KairnLeadershandler.startKairnHero(event, game, player);
             case "ponthoushero" -> PonthousLeadersHandler.startPonthousHero(event, game, player);

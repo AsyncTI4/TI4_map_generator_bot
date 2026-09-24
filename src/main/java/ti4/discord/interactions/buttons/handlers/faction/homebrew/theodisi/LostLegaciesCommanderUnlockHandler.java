@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -16,6 +17,7 @@ import ti4.image.Mapper;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
+import ti4.model.TechnologyModel;
 
 @UtilityClass
 public class LostLegaciesCommanderUnlockHandler {
@@ -151,7 +153,7 @@ public class LostLegaciesCommanderUnlockHandler {
 
                 yield otherPlayersWithUnlockedCommanders >= 2;
             }
-            case "revenantmyrr" -> {
+            case "revenantponthous" -> {
                 Set<String> qualifyingUnitTypes = new HashSet<>();
 
                 for (var entry : player.getCurrentProducedUnits().entrySet()) {
@@ -181,8 +183,8 @@ public class LostLegaciesCommanderUnlockHandler {
                 }
                 yield numberOfPlanetsWithUniqueTraits >= 3;
             }
-            case "revenantponthous" -> {
-                int sustainUnitsOnBoard = 0;
+            case "revenantxytheris" -> {
+                Set<String> unitTypesWithAbilities = new HashSet<>();
 
                 for (Tile tile : game.getTileMap().values()) {
                     if (!tile.containsPlayersUnits(player)) {
@@ -193,12 +195,11 @@ public class LostLegaciesCommanderUnlockHandler {
                         for (UnitKey unitKey :
                                 unitHolder.getUnitsByStateForPlayer(player).keySet()) {
                             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                            if (unitModel == null || !unitModel.getSustainDamage()) {
+                            if (unitModel == null || XytherisLeadersHandler.getUnitAbilityCount(unitModel) == 0) {
                                 continue;
                             }
-
-                            sustainUnitsOnBoard += unitHolder.getUnitCount(unitKey);
-                            if (sustainUnitsOnBoard >= 3) {
+                            unitTypesWithAbilities.add(unitModel.getAsyncId());
+                            if (unitTypesWithAbilities.size() >= 5) {
                                 yield true;
                             }
                         }
@@ -209,6 +210,24 @@ public class LostLegaciesCommanderUnlockHandler {
             }
             case "thrones" -> {
                 int unitsAdjacentToAnomalies = 0;
+            case "revenantvanguard" -> {
+                int noPrereqTechs = 0;
+
+                for (String tech : player.getTechs()) {
+                    TechnologyModel techM = Mapper.getTech(tech);
+                    if (techM == null || !techM.getRequirements().isEmpty()) {
+                        continue;
+                    }
+
+                    noPrereqTechs++;
+                    if (noPrereqTechs >= 2) {
+                        yield true;
+                    }
+                }
+
+                yield false;
+            }
+            case "revenantveylor" -> true;
                 for (Tile tile : game.getTileMap().values()) {
                     if (!tile.containsPlayersUnits(player)) {
                         continue;

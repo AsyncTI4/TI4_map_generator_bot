@@ -1584,6 +1584,8 @@ public class StartCombatService {
         }
 
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
+        RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player1, player2, tile, unitHolderName);
+        RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player2, player1, tile, unitHolderName);
             buttons.add(Buttons.blue(
                     "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
                     "Refresh Picture"));

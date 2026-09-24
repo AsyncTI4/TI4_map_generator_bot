@@ -557,8 +557,8 @@ public class StartTurnService {
         if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {
             startButtons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
         }
-        if (player.hasUnexhaustedLeader("revenantverydithagent")) {
-            startButtons.add(RevenantLeadersHandler.getRevVerydithAgentButton(player));
+        if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
+            startButtons.add(RevenantLeadersHandler.getRevScrapyardAgentButton(player));
         }
         if (player.hasPlanet("skarnath")
                 && !player.getExhaustedPlanetsAbilities().contains("skarnath")) {

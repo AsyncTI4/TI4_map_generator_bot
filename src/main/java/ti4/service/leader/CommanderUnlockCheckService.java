@@ -338,9 +338,11 @@ public class CommanderUnlockCheckService {
                     "xytheris",
                     "oblivion",
                     "revenant",
-                    "revenantmyrr",
-                    "revenantoblivion",
                     "revenantponthous",
+                    "revenantoblivion",
+                    "revenantxytheris",
+                    "revenantvanguard",
+                    "revenantveylor",
                     "thrones",
                     "ponthous" ->
                 shouldBeUnlocked =

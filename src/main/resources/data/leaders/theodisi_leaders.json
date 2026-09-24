@@ -392,7 +392,7 @@
     "name": "DOMI.N.O",
     "title": "Revenant of Myrr",
     "abilityName": "Production Line - Machines of War",
-    "abilityWindow": "At any time:",
+    "abilityWindow": "At any time, during an action:",
     "abilityText": "You may treat a system that contains 1 or more of your units as if it had PRODUCTION 4 until the end of this action and immediately use that PRODUCTION. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
@@ -404,7 +404,7 @@
     "name": "Koral Vel",
     "title": "Revenant of Verydith",
     "abilityWindow": "When a player would spend a command token to place a command token onto the game board:",
-    "abilityText": "You may exhaust this card to allow that player to place or spend a command token fomr their reinforcements instead, if able.",
+    "abilityText": "You may exhaust this card to allow that player to place or spend a command token from their reinforcements instead, if able.",
     "notes": "When using on another player, it gives them a tactical token to avoid suspending placement. Make sure this is exhausted AFTER the player's token is placed in the system, which is after movement has finished.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"

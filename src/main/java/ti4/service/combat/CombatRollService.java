@@ -566,7 +566,7 @@ public class CombatRollService {
         List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
-        RevenantLeadersHandler.addRevXytherisAgentModifier(tempMods, game, player, rollType);
+        RevenantLeadersHandler.addRevXytherisCommanderModifier(tempMods, game, player, rollType);
         XytherisPromissoryHandler.addSwarmSpawnModifier(tempMods, game, player, rollType);
         TwilightsFallMonumentsButtonHandler.addOrangeTfMonumentModifier(tempMods, game, player, tile, rollType);
         if (player.hasTech("beironats")) {

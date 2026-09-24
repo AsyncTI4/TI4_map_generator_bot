@@ -121,7 +121,7 @@ public class PlayerTechService {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners");
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 

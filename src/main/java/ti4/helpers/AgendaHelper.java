@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
@@ -1302,6 +1303,7 @@ public final class AgendaHelper {
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null && !losers.contains(loser)) {
                         losers.add(loser);
+                        CommanderUnlockCheckService.checkPlayer(loser, "revenantveylor");
                     }
                 }
             }
@@ -2971,6 +2973,7 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(
                     channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
         }
+        RevenantLeadersHandler.offerRevVeylorCommanderPlanets(game);
         if (game.getLaws().size() > 2 && game.getStoredValue("executiveOrder").isEmpty()) {
             for (Player p : game.getRealPlayers()) {
                 if (p.getSecretsUnscored().containsKey("dp")) {

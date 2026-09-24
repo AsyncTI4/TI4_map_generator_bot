@@ -7,6 +7,7 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -68,6 +69,10 @@ public final class CommandCounterHelper {
                         event, player, tile, ping, useTactic)) {
             return;
         }
+        if (!skipKeleresMonumentPrompt
+                && RevenantLeadersHandler.offerRevVerydithAgentPrompt(event, player, tile, ping, useTactic)) {
+            return;
+        }
         if (useTactic) {
             player.setTacticalCC(player.getTacticalCC() - 1);
         }
@@ -121,6 +126,7 @@ public final class CommandCounterHelper {
                 TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
             }
         }
+        RevenantLeadersHandler.offerRevArdentiaAgentButtons(player.getGame(), player, tile);
     }
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
