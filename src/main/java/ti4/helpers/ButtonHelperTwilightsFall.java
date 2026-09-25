@@ -1254,7 +1254,7 @@ public final class ButtonHelperTwilightsFall {
     }
 
     public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
-        List<String> cards = getDeckForSplicing(game, type, 100, true);
+        List<String> cards = getDeckForSplicing(game, type, 200, true);
         if (cards.isEmpty()) {
             String messageText = "There are no more cards in the " + type + " deck.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);

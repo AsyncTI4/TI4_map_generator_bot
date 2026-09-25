@@ -982,7 +982,7 @@ public final class ButtonHelperTacticalAction {
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')
-                        .append(player.getRepresentationUnfogged())
+                        .append(player.getRepresentationNoPing())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
                         .append(String.join(", ", mentions));
                 if (mentions.size() > 1 && totalDice > 0) {
