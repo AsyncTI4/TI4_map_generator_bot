@@ -54,8 +54,8 @@ public class ScrapyardLeaderHandler {
                 Buttons.red("deleteButtons", "Decline")));
         MessageHelper.sendMessageToChannelWithButtons(
                 target == agentOwner ? target.getCorrectChannel() : agentOwner.getCardsInfoThread(),
-                target.getRepresentationNoPing() + ", " + agentOwner.getRepresentationNoPing()
-                        + " may exhaust _Rikka \"Razor Fang\" Corvin_ to let you swap the movement and combat values "
+                agentOwner.getRepresentation()
+                        + ", you may exhaust _Rikka \"Razor Fang\" Corvin_ to let the active player swap the movement and combat values "
                         + "of 2 of your units until the end of this tactical action.",
                 buttons);
     }
