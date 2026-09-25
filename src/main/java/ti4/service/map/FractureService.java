@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
@@ -30,6 +31,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.unit.AddUnitService;
@@ -37,9 +39,26 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class FractureService {
 
+    /** Set once ingress placement has been carried out, so removing the last token cannot re-open the roll. */
+    public static final String INGRESS_PLACED = "fractureIngressPlaced";
+
     /** Is there any Fracture space on the board, whether from a tile or from a fracture token? */
     public static boolean isFractureInPlay(Game game) {
         return game.getTileMap().values().stream().anyMatch(Tile::isFracture);
+    }
+
+    /** Is there any ingress token anywhere on the board? */
+    public static boolean anyIngressOnBoard(Game game) {
+        return game.getTileMap().values().stream()
+                .anyMatch(tile -> tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS));
+    }
+
+    /**
+     * Tiles alone do not mean The Fracture is in play - in fog the GM places every token by hand, so the region can
+     * sit on the board with placement never offered, and the roll must still be available until it has been.
+     */
+    private static boolean ingressPlacementResolved(Game game) {
+        return anyIngressOnBoard(game) || "true".equals(game.getStoredValue(INGRESS_PLACED));
     }
 
     /** Positional check, for map rendering only - use {@link #isFractureInPlay} for rules. */
@@ -59,7 +78,7 @@ public class FractureService {
         if (game.isCosmicConvergenceMode()) {
             return true;
         }
-        return !game.isNoFractureMode() && !isFractureInPlay(game);
+        return !game.isNoFractureMode() && !(isFractureInPlay(game) && ingressPlacementResolved(game));
     }
 
     public static String whyFractureCannotEnterPlay(Game game) {
@@ -214,9 +233,12 @@ public class FractureService {
         return true;
     }
 
-    /** Places The Fracture if it is allowed to enter play. Returns true if the tiles were actually placed. */
+    /** Places The Fracture if it is allowed to enter play. Returns true if The Fracture is on the board afterwards. */
     public static boolean spawnFracture(GenericInteractionCreateEvent event, Game game) {
         if (!canFractureEnterPlay(game)) return false;
+        // The tiles can already be down with ingress placement never resolved (fog, or a hand-placed region).
+        // Returning true lets the caller go on to place ingress without duplicating tiles and neutral units.
+        if (isFractureInPlay(game)) return true;
         List<String> fracture = Arrays.asList(
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
@@ -332,6 +354,9 @@ public class FractureService {
                             + " to resolve it, and do not place any yourself.");
         }
 
+        // Mark placement resolved even when nothing was placed - The Fracture is in play, there simply were no
+        // legal targets. The GM panel and /map ingress_tokens are the escape hatch if it needs re-running.
+        game.setStoredValue(INGRESS_PLACED, "true");
         ThundersEdgeRulesService.alertTabletalkWithFractureRules(game);
     }
 
@@ -355,6 +380,57 @@ public class FractureService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), confirmation);
         }
 
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    /**
+     * Adds the Fracture category to the GM panel. Present for the whole game in Thunder's Edge games, so it stays
+     * re-summonable with {@code /fow gm} rather than being buried in whatever was posted at setup.
+     */
+    public static void addFractureGMButton(Game game, List<Button> buttons) {
+        if (!game.isThundersEdge()) return;
+        buttons.add(Buttons.green("gmFracture", "Fracture Activation", MiscEmojis.Ingress));
+    }
+
+    @ButtonHandler(value = "gmFracture", save = false)
+    private static void gmFracturePanel(ButtonInteractionEvent event, Game game) {
+        String state = "**The Fracture**\n" + "- region on the board: `" + isFractureInPlay(game) + "`\n"
+                + "- ingress tokens placed: `" + anyIngressOnBoard(game) + "`\n"
+                + "- placement already resolved: `" + ingressPlacementResolved(game) + "`\n"
+                + "- breakthrough roll available: `" + canFractureEnterPlay(game) + "`";
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("gmPlaceIngress_", "Place Ingress Tokens", MiscEmojis.Ingress));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), state, buttons);
+    }
+
+    // Deliberately no `save = false` - this mutates the board, and the flag picks the write lock.
+    // Deliberately no Player parameter and no factionButtonChecker() prefix - the GM need not be seated.
+    @ButtonHandler("gmPlaceIngress_")
+    private static void gmPlaceIngress(ButtonInteractionEvent event, Game game, String buttonID) {
+        String faction = buttonID.replace("gmPlaceIngress_", "");
+        if (faction.isEmpty()) {
+            List<Button> buttons = new ArrayList<>();
+            for (Player p : game.getRealPlayers()) {
+                buttons.add(Buttons.green(
+                        "gmPlaceIngress_" + p.getFaction(),
+                        StringUtils.capitalize(p.getColor()) + ", " + p.getUserName(),
+                        p.getFactionEmoji()));
+            }
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    "Whose breakthrough is placing the Ingress tokens?"
+                            + " Their synergy sets how many go down per technology type.",
+                    buttons);
+            return;
+        }
+        Player player = game.getPlayerFromColorOrFaction(faction);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find player `" + faction + "`.");
+            return;
+        }
+        spawnIngressTokens(event, game, player, player.getBreakthroughID());
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 

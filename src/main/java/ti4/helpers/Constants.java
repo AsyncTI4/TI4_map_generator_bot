@@ -114,6 +114,7 @@ public final class Constants {
     public static final String LAST_N_DAYS = "last_n_days";
     public static final String FOWGM = "fowgm";
     public static final String FRACTURE = "fracture";
+    public static final String INGRESS_TOKENS = "ingress_tokens";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
     public static final String REMOVE_ALLIANCE_MEMBER = "remove_alliance_member";
