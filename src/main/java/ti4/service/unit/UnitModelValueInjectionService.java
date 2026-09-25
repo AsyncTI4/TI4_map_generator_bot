@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
@@ -321,6 +322,38 @@ public class UnitModelValueInjectionService {
             if (player.getHonorCounter() == 8) {
                 integers.spaceCannonDieCount(3).spaceCannonHitsOn(4);
             }
+        }
+
+        if (player.hasAbility("destroyer_customrig") && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
+            integers.combatHitsOn(-2);
+        }
+
+        if (player.hasAbility("cruiser_customrig") && "cruiser".equalsIgnoreCase(unit.getBaseType())) {
+            floats.cost(-1);
+        }
+
+        if (player.hasAbility("carrier_customrig") && "carrier".equalsIgnoreCase(unit.getBaseType())) {
+            booleans.sustainDamage(true).canBeDirectHit(true);
+        }
+
+        if (player.hasAbility("dreadnought_customrig") && "dreadnought".equalsIgnoreCase(unit.getBaseType())) {
+            integers.capacityValue(1);
+        }
+
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "destroyer_customrig")
+                && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
+            integers.capacityValue(0, true);
+        }
+
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "cruiser_customrig")
+                && "cruiser".equalsIgnoreCase(unit.getBaseType())) {
+            booleans.isGroundForce(true);
+        }
+
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "dreadnought_customrig")
+                && "dreadnought".equalsIgnoreCase(unit.getBaseType())) {
+            integers.bombardDieCount(3);
+            booleans.sustainDamage(false).disablesPlanetaryShield(true);
         }
 
         return UnitValueInjection.of(integers, floats, booleans);

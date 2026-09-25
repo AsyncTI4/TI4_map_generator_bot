@@ -263,7 +263,7 @@ public class LostLegaciesCommanderUnlockHandler {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitKey unitKey : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
                         UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                        if (unitModel != null && unitModel.isNonFighterShip()) {
+                        if (unitModel != null && unitModel.getIsShip()) {
                             shipTypes.add(unitKey.unitType());
                         }
                     }

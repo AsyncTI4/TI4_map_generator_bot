@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -180,6 +181,7 @@ public class ComponentActionHelper {
                                                     && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
                                                             .isEmpty());
                                 case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
+                                case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)
@@ -192,7 +194,7 @@ public class ComponentActionHelper {
                         TI4Emoji btEmoji = bt.getFactionEmoji();
                         Button btButton = Buttons.green(
                                 factionChecker + prefix + "exhaustBT_" + bt.getAlias(),
-                                "Exhaust " + bt.getName(),
+                                ("scrapyardbt".equals(bt.getAlias()) ? "Use " : "Exhaust ") + bt.getName(),
                                 btEmoji);
                         compButtons.add(btButton);
                     }
@@ -644,6 +646,10 @@ public class ComponentActionHelper {
         compButtons.add(Buttons.red("deleteButtons", "Cancel"));
 
         return compButtons;
+    }
+
+    public static boolean shouldExhaustBreakthroughOnPress(String breakthroughID) {
+        return !"scrapyardbt".equalsIgnoreCase(breakthroughID);
     }
 
     @ButtonHandler("componentActionRes_")
@@ -1122,14 +1128,16 @@ public class ComponentActionHelper {
             }
             case "exhaustBT" -> {
                 String btID = buttonID;
-                if (!game.isTwilightsFallMode()) {
-                    BreakthroughModel btModel = Mapper.getBreakthrough(btID);
-                    p1.getBreakthroughExhausted().put(btID, true);
-                    String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
-                    MessageHelper.sendMessageToChannelWithEmbed(
-                            event.getMessageChannel(), message, btModel.getRepresentationEmbed());
-                } else {
-                    p1.exhaustTech("tf-" + btID);
+                if (shouldExhaustBreakthroughOnPress(btID)) {
+                    if (!game.isTwilightsFallMode()) {
+                        BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+                        p1.getBreakthroughExhausted().put(btID, true);
+                        String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                    } else {
+                        p1.exhaustTech("tf-" + btID);
+                    }
                 }
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 

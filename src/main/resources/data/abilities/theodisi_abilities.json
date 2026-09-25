@@ -388,6 +388,7 @@
         "window": "During the \"Commit Ground Forces\" step:",
         "windowEffect": "You may exhaust this card to commit any number of your cruisers from the space area of that system to those planets. Return them to the space area at the end of the tactical action",
         "permanentEffect": "Passive: COST -1.",
+        "notes": "This is exhausted at the same time as the other custom rigs, when you activate a system, but its effect is during the \"Commit Ground Forces\" step. The button won't appear unless you exhaust it beforehand.",
         "source": "theodisi"
     },
     {

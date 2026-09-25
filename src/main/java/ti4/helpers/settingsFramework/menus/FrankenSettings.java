@@ -52,7 +52,6 @@ public class FrankenSettings extends SettingsMenu {
             "neutral",
             "obsidian",
             "vanguard",
-            "scrapyard",
             "stoneborn",
             "morpha",
             "thurviali");
