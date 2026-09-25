@@ -3,6 +3,7 @@ package ti4.helpers.settingsFramework.menus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,21 @@ import tools.jackson.databind.JsonNode;
 @JsonIgnoreProperties("messageId")
 class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     private static final String MENU_ID = "drazFactionPriorities";
+    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
+            "lazax",
+            "admins",
+            "franken",
+            "keleresm",
+            "keleresx",
+            "miltymod",
+            "qulane",
+            "neutral",
+            "obsidian",
+            "vanguard",
+            "scrapyard",
+            "stoneborn",
+            "morpha",
+            "thurviali");
 
     private final ListSetting<FactionModel> prioritizedFactions;
     private final IntegerRangeSetting discordantStarsFactionLimits;
@@ -131,13 +147,16 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     @Override
     protected void updateTransientSettings() {
         if (parent instanceof FrankenSettings settings) {
-            prioritizedFactions.setAllValues(settings.getLegalFactionOptions());
+            Map<String, FactionModel> legalFactions = new LinkedHashMap<>(settings.getLegalFactionOptions());
+            legalFactions.keySet().removeAll(EXCLUDED_FACTIONS);
+            prioritizedFactions.setAllValues(legalFactions);
         }
     }
 
     private static IntegerRangeSetting sourceRange(String id, String name, ComponentSource source) {
         int factionCount = (int) Mapper.getFactionsValues().stream()
                 .filter(faction -> faction.getSource() == source)
+                .filter(faction -> !EXCLUDED_FACTIONS.contains(faction.getAlias()))
                 .count();
         return new IntegerRangeSetting(id, name, 0, 0, factionCount, factionCount, 0, factionCount, 1);
     }

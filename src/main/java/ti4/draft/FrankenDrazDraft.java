@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -49,6 +50,21 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
     private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
+    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
+            "lazax",
+            "admins",
+            "franken",
+            "keleresm",
+            "keleresx",
+            "miltymod",
+            "qulane",
+            "neutral",
+            "obsidian",
+            "vanguard",
+            "scrapyard",
+            "stoneborn",
+            "morpha",
+            "thurviali");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,
@@ -572,6 +588,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);
         }
+        factions.entrySet().removeIf(entry -> EXCLUDED_FACTIONS.contains(entry.getKey()));
         return new ArrayList<>(factions.values());
     }
 }

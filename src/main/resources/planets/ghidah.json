@@ -1,9 +1,9 @@
 {
-    "id": "thtiamat",
+    "id": "ghidah",
     "tileId": "th18",
-    "name": "Tiamat",
+    "name": "Ghidah",
     "aliases": [
-        "thtiamat"
+        "ghidah"
     ],
     "positionInTile": {
         "x": 193.0,
@@ -18,7 +18,7 @@
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "thtiamat",
+        "unitHolderName": "ghidah",
         "coordinateMap": {
             "control": [
                 {

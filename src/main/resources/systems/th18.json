@@ -1,9 +1,9 @@
 {
     "id": "th18",
-    "name": "Tiamat/Amarok - Thurviali",
+    "name": "Ghidah/Amarok - Thurviali",
     "aliases": [
         "th18",
-        "thtiamat",
+        "ghidah",
         "amarok"
     ],
     "imagePath": "th18_thurvialihs.png",
@@ -28,7 +28,7 @@
     ],
     "wormholes": [],
     "planets": [
-        "thtiamat",
+        "ghidah",
         "amarok"
     ],
     "source": "theodisi",
