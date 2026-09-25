@@ -31,6 +31,9 @@ public class FrankenStartingTechService {
         if ("revenant".equalsIgnoreCase(itemID)) {
             LostLegaciesStartingTechsHandler.offerRevenantStartingTechs(player.getGame(), player);
         }
+        if ("scrapyard".equalsIgnoreCase(itemID)) {
+            LostLegaciesStartingTechsHandler.gainRandomScrapyardStartTechs(player.getGame(), player);
+        }
     }
 
     public void removeStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {

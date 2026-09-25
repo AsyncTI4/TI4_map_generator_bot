@@ -43,6 +43,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -102,6 +106,9 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        ScrapyardAbilitiesHandler.resolveEndOfTacticalAction(game, player, event);
+        ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        ScrapyardTechHandler.clearHotswapping(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
         RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
@@ -805,6 +812,9 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        ScrapyardAbilitiesHandler.offerActivationRigButtons(game, player);
+        ScrapyardUnitHandler.offerFuelCellButton(game, player);
+        ScrapyardTechHandler.offerHotswapping(game, tile, player);
         LostLegaciesRelicHandler.offerNaturesBoon(game, player);
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
@@ -895,6 +905,10 @@ public final class ButtonHelperTacticalAction {
                             ButtonHelper.getBalanceButtons(monumentOwner));
                 }
             }
+        }
+        Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
+        if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
+            ScrapyardLeaderHandler.sendRikkaButtons(player, agentOwner);
         }
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);

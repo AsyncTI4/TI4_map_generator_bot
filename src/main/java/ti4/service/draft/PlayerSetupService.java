@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.O
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
@@ -527,6 +528,18 @@ public class PlayerSetupService {
         }
         if (player.hasAbility("primordial_secrets")) {
             ArcanumAbilityHandler.offerPrimordialSecretsButtons(game, player);
+        }
+        if (player.hasAbility("custom_rigs")) {
+            ScrapyardAbilitiesHandler.getScrapyardRigsButtons(game, player);
+        }
+        if ("scrapyard".equalsIgnoreCase(player.getFaction())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", use the buttons below to setup your starting fleet."
+                            + " You must place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, and 2 structures."
+                            + "\nYou do not have to pay for them.");
+            ButtonHelper.offerBuildOrRemove(player, game, player.getHomeSystemTile());
         }
         if (player.hasAbility("call_of_the_haunted")) {
             RevenantAbilityHandler.offerCallOfTheHauntedButtons(game, player);

@@ -49,6 +49,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
@@ -213,6 +215,7 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
+        ScrapyardLeaderHandler.clearCommanderModifiers(game);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
         }
@@ -262,6 +265,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             UnitHolder unitHolder,
             Tile tile) {
+        ScrapyardLeaderHandler.clearCommanderModifiers(game);
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -1592,6 +1596,10 @@ public class StartCombatService {
             String unitHolderName,
             GenericInteractionCreateEvent event) {
         List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
+        ScrapyardLeaderHandler.addCommanderButton(buttons, game, player1, tile, unitHolderName);
+        ScrapyardLeaderHandler.addCommanderButton(buttons, game, player2, tile, unitHolderName);
+        ScrapyardUnitHandler.addDregCombatButton(buttons, game, player1, player2, tile, "space".equals(spaceOrGround));
+        ScrapyardUnitHandler.addDregCombatButton(buttons, game, player2, player1, tile, "space".equals(spaceOrGround));
         RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player1, player2, tile, unitHolderName);
         RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player2, player1, tile, unitHolderName);
         if ("ground".equalsIgnoreCase(spaceOrGround)) {
@@ -1610,6 +1618,16 @@ public class StartCombatService {
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
+
+        String commanderUnitHolder = isSpaceCombat ? Constants.SPACE : null;
+        CurrentCombat currentCombat = getCurrentCombat(game);
+        if (commanderUnitHolder == null && currentCombat != null && pos.equals(currentCombat.tilePosition())) {
+            commanderUnitHolder = currentCombat.unitHolderName();
+        }
+        if (commanderUnitHolder != null && tile.getUnitHolders().containsKey(commanderUnitHolder)) {
+            ScrapyardLeaderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
+            ScrapyardLeaderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
+        }
 
         if (isSpaceCombat) {
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);

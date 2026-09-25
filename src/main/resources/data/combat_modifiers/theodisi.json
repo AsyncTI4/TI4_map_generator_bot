@@ -141,6 +141,87 @@
         ]
     },
     {
+        "alias": "scrapyard_commander_plus2_ca",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "ca",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_cv",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "cv",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_dn",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "dn",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_dd",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "dd",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_fs",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_ws",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "ws",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_ff",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "ff",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_gf",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "gf",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_mf",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "mf",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
         "alias": "verydith_flagship_plus_1_die",
         "type": "extrarolls",
         "value": "+1",

@@ -4,6 +4,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardPromissoryHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
@@ -100,6 +101,9 @@ class SendPN extends GameStateSubcommand {
         player.removePromissoryNote(id);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
         targetPlayer.setPromissoryNote(id);
+        if ("thpnscrapyard".equals(id)) {
+            ScrapyardPromissoryHandler.offerUnusedCustomRigs(game, targetPlayer);
+        }
 
         if (id.contains("dspnveld") && !targetPlayer.ownsPromissoryNote(id)) {
             PromissoryNoteHelper.resolvePNPlay(id, targetPlayer, game, event);
