@@ -50,10 +50,12 @@ public class FrankenSettings extends SettingsMenu {
             "miltymod",
             "qulane",
             "neutral",
-            "kaltrim",
-            "xin",
-            "sarcosa",
-            "obsidian");
+            "obsidian",
+            "vanguard",
+            "scrapyard",
+            "stoneborn",
+            "morpha",
+            "thurviali");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;

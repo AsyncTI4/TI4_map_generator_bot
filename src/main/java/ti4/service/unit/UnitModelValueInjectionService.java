@@ -2,9 +2,11 @@ package ti4.service.unit;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.game.Player;
@@ -295,7 +297,10 @@ public class UnitModelValueInjectionService {
         if (player.hasUnlockedBreakthrough("xytherisbt")
                 && player.hasUpgradedUnit("pds2")
                 && unit.getUnitType() == UnitType.Pds) {
-            integers.combatDieCount(1).combatHitsOn(7).capacityUsed(1);
+            integers.combatDieCount(1)
+                    .combatHitsOn(5)
+                    .spaceCannonHitsOn(5, true)
+                    .capacityUsed(1);
             booleans.isGroundForce(true)
                     .isShip(true)
                     .isPlanetOnly(false)
@@ -369,26 +374,62 @@ public class UnitModelValueInjectionService {
     }
 
     private void applyIntegerValues(UnitModel unit, IntegerValueInjection values) {
-        if (values.moveValue != null) unit.setMoveValue(unit.getMoveValue() + values.moveValue);
-        if (values.productionValue != null) unit.setProductionValue(unit.getProductionValue() + values.productionValue);
-        if (values.capacityValue != null) unit.setCapacityValue(unit.getCapacityValue() + values.capacityValue);
+        if (values.moveValue != null)
+            unit.setMoveValue(
+                    inject(unit.getMoveValue(), values.moveValue, values.overrides.contains(Value.MOVE_VALUE)));
+        if (values.productionValue != null)
+            unit.setProductionValue(inject(
+                    unit.getProductionValue(),
+                    values.productionValue,
+                    values.overrides.contains(Value.PRODUCTION_VALUE)));
+        if (values.capacityValue != null)
+            unit.setCapacityValue(inject(
+                    unit.getCapacityValue(), values.capacityValue, values.overrides.contains(Value.CAPACITY_VALUE)));
         if (values.fleetSupplyBonus != null)
-            unit.setFleetSupplyBonus(unit.getFleetSupplyBonus() + values.fleetSupplyBonus);
-        if (values.capacityUsed != null) unit.setCapacityUsed(unit.getCapacityUsed() + values.capacityUsed);
-        if (values.combatHitsOn != null) unit.setCombatHitsOn(unit.getCombatHitsOn() + values.combatHitsOn);
-        if (values.combatDieCount != null) unit.setCombatDieCount(unit.getCombatDieCount() + values.combatDieCount);
-        if (values.afbHitsOn != null) unit.setAfbHitsOn(unit.getAfbHitsOn() + values.afbHitsOn);
-        if (values.afbDieCount != null) unit.setAfbDieCount(unit.getAfbDieCount() + values.afbDieCount);
-        if (values.bombardHitsOn != null) unit.setBombardHitsOn(unit.getBombardHitsOn() + values.bombardHitsOn);
-        if (values.bombardDieCount != null) unit.setBombardDieCount(unit.getBombardDieCount() + values.bombardDieCount);
+            unit.setFleetSupplyBonus(inject(
+                    unit.getFleetSupplyBonus(),
+                    values.fleetSupplyBonus,
+                    values.overrides.contains(Value.FLEET_SUPPLY_BONUS)));
+        if (values.capacityUsed != null)
+            unit.setCapacityUsed(inject(
+                    unit.getCapacityUsed(), values.capacityUsed, values.overrides.contains(Value.CAPACITY_USED)));
+        if (values.combatHitsOn != null)
+            unit.setCombatHitsOn(inject(
+                    unit.getCombatHitsOn(), values.combatHitsOn, values.overrides.contains(Value.COMBAT_HITS_ON)));
+        if (values.combatDieCount != null)
+            unit.setCombatDieCount(inject(
+                    unit.getCombatDieCount(),
+                    values.combatDieCount,
+                    values.overrides.contains(Value.COMBAT_DIE_COUNT)));
+        if (values.afbHitsOn != null)
+            unit.setAfbHitsOn(
+                    inject(unit.getAfbHitsOn(), values.afbHitsOn, values.overrides.contains(Value.AFB_HITS_ON)));
+        if (values.afbDieCount != null)
+            unit.setAfbDieCount(
+                    inject(unit.getAfbDieCount(), values.afbDieCount, values.overrides.contains(Value.AFB_DIE_COUNT)));
+        if (values.bombardHitsOn != null)
+            unit.setBombardHitsOn(inject(
+                    unit.getBombardHitsOn(), values.bombardHitsOn, values.overrides.contains(Value.BOMBARD_HITS_ON)));
+        if (values.bombardDieCount != null)
+            unit.setBombardDieCount(inject(
+                    unit.getBombardDieCount(),
+                    values.bombardDieCount,
+                    values.overrides.contains(Value.BOMBARD_DIE_COUNT)));
         if (values.spaceCannonHitsOn != null)
-            unit.setSpaceCannonHitsOn(unit.getSpaceCannonHitsOn() + values.spaceCannonHitsOn);
+            unit.setSpaceCannonHitsOn(inject(
+                    unit.getSpaceCannonHitsOn(),
+                    values.spaceCannonHitsOn,
+                    values.overrides.contains(Value.SPACE_CANNON_HITS_ON)));
         if (values.spaceCannonDieCount != null)
-            unit.setSpaceCannonDieCount(unit.getSpaceCannonDieCount() + values.spaceCannonDieCount);
+            unit.setSpaceCannonDieCount(inject(
+                    unit.getSpaceCannonDieCount(),
+                    values.spaceCannonDieCount,
+                    values.overrides.contains(Value.SPACE_CANNON_DIE_COUNT)));
     }
 
     private void applyFloatValues(UnitModel unit, FloatValueInjection values) {
-        if (values.cost != null) unit.setCost(unit.getCost() + values.cost);
+        if (values.cost != null)
+            unit.setCost(inject(unit.getCost(), values.cost, values.overrides.contains(Value.COST)));
     }
 
     private void applyBooleanValues(UnitModel unit, BooleanValueInjection values) {
@@ -421,6 +462,31 @@ public class UnitModelValueInjectionService {
             }
         }
         return copy;
+    }
+
+    private int inject(int currentValue, int injectedValue, boolean override) {
+        return override ? injectedValue : currentValue + injectedValue;
+    }
+
+    private float inject(float currentValue, float injectedValue, boolean override) {
+        return override ? injectedValue : currentValue + injectedValue;
+    }
+
+    private enum Value {
+        MOVE_VALUE,
+        PRODUCTION_VALUE,
+        CAPACITY_VALUE,
+        FLEET_SUPPLY_BONUS,
+        CAPACITY_USED,
+        COMBAT_HITS_ON,
+        COMBAT_DIE_COUNT,
+        AFB_HITS_ON,
+        AFB_DIE_COUNT,
+        BOMBARD_HITS_ON,
+        BOMBARD_DIE_COUNT,
+        SPACE_CANNON_HITS_ON,
+        SPACE_CANNON_DIE_COUNT,
+        COST
     }
 
     public record UnitValueInjection(
@@ -461,6 +527,7 @@ public class UnitModelValueInjectionService {
     }
 
     public static final class IntegerValueInjection {
+        private final Set<Value> overrides = EnumSet.noneOf(Value.class);
         private Integer moveValue;
         private Integer productionValue;
         private Integer capacityValue;
@@ -490,9 +557,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection moveValue(int moveValue, boolean override) {
+            return moveValue(moveValue).override(Value.MOVE_VALUE, override);
+        }
+
         public IntegerValueInjection productionValue(int productionValue) {
             this.productionValue = productionValue;
             return this;
+        }
+
+        public IntegerValueInjection productionValue(int productionValue, boolean override) {
+            return productionValue(productionValue).override(Value.PRODUCTION_VALUE, override);
         }
 
         public IntegerValueInjection capacityValue(int capacityValue) {
@@ -500,9 +575,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection capacityValue(int capacityValue, boolean override) {
+            return capacityValue(capacityValue).override(Value.CAPACITY_VALUE, override);
+        }
+
         public IntegerValueInjection fleetSupplyBonus(int fleetSupplyBonus) {
             this.fleetSupplyBonus = fleetSupplyBonus;
             return this;
+        }
+
+        public IntegerValueInjection fleetSupplyBonus(int fleetSupplyBonus, boolean override) {
+            return fleetSupplyBonus(fleetSupplyBonus).override(Value.FLEET_SUPPLY_BONUS, override);
         }
 
         public IntegerValueInjection capacityUsed(int capacityUsed) {
@@ -510,9 +593,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection capacityUsed(int capacityUsed, boolean override) {
+            return capacityUsed(capacityUsed).override(Value.CAPACITY_USED, override);
+        }
+
         public IntegerValueInjection combatHitsOn(int combatHitsOn) {
             this.combatHitsOn = combatHitsOn;
             return this;
+        }
+
+        public IntegerValueInjection combatHitsOn(int combatHitsOn, boolean override) {
+            return combatHitsOn(combatHitsOn).override(Value.COMBAT_HITS_ON, override);
         }
 
         public IntegerValueInjection combatDieCount(int combatDieCount) {
@@ -520,9 +611,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection combatDieCount(int combatDieCount, boolean override) {
+            return combatDieCount(combatDieCount).override(Value.COMBAT_DIE_COUNT, override);
+        }
+
         public IntegerValueInjection afbHitsOn(int afbHitsOn) {
             this.afbHitsOn = afbHitsOn;
             return this;
+        }
+
+        public IntegerValueInjection afbHitsOn(int afbHitsOn, boolean override) {
+            return afbHitsOn(afbHitsOn).override(Value.AFB_HITS_ON, override);
         }
 
         public IntegerValueInjection afbDieCount(int afbDieCount) {
@@ -530,9 +629,17 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection afbDieCount(int afbDieCount, boolean override) {
+            return afbDieCount(afbDieCount).override(Value.AFB_DIE_COUNT, override);
+        }
+
         public IntegerValueInjection bombardHitsOn(int bombardHitsOn) {
             this.bombardHitsOn = bombardHitsOn;
             return this;
+        }
+
+        public IntegerValueInjection bombardHitsOn(int bombardHitsOn, boolean override) {
+            return bombardHitsOn(bombardHitsOn).override(Value.BOMBARD_HITS_ON, override);
         }
 
         public IntegerValueInjection bombardDieCount(int bombardDieCount) {
@@ -540,13 +647,34 @@ public class UnitModelValueInjectionService {
             return this;
         }
 
+        public IntegerValueInjection bombardDieCount(int bombardDieCount, boolean override) {
+            return bombardDieCount(bombardDieCount).override(Value.BOMBARD_DIE_COUNT, override);
+        }
+
         public IntegerValueInjection spaceCannonHitsOn(int spaceCannonHitsOn) {
             this.spaceCannonHitsOn = spaceCannonHitsOn;
             return this;
         }
 
+        public IntegerValueInjection spaceCannonHitsOn(int spaceCannonHitsOn, boolean override) {
+            return spaceCannonHitsOn(spaceCannonHitsOn).override(Value.SPACE_CANNON_HITS_ON, override);
+        }
+
         public IntegerValueInjection spaceCannonDieCount(int spaceCannonDieCount) {
             this.spaceCannonDieCount = spaceCannonDieCount;
+            return this;
+        }
+
+        public IntegerValueInjection spaceCannonDieCount(int spaceCannonDieCount, boolean override) {
+            return spaceCannonDieCount(spaceCannonDieCount).override(Value.SPACE_CANNON_DIE_COUNT, override);
+        }
+
+        private IntegerValueInjection override(Value value, boolean override) {
+            if (override) {
+                overrides.add(value);
+            } else {
+                overrides.remove(value);
+            }
             return this;
         }
 
@@ -568,6 +696,7 @@ public class UnitModelValueInjectionService {
     }
 
     public static final class FloatValueInjection {
+        private final Set<Value> overrides = EnumSet.noneOf(Value.class);
         private Float cost;
 
         private FloatValueInjection() {}
@@ -582,6 +711,16 @@ public class UnitModelValueInjectionService {
 
         public FloatValueInjection cost(float cost) {
             this.cost = cost;
+            return this;
+        }
+
+        public FloatValueInjection cost(float cost, boolean override) {
+            this.cost = cost;
+            if (override) {
+                overrides.add(Value.COST);
+            } else {
+                overrides.remove(Value.COST);
+            }
             return this;
         }
 
