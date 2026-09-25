@@ -49,7 +49,7 @@ public final class ButtonHelperStats {
 
     public static void convertComms(
             ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg, Tile tile) {
-        String message, ident = player.getRepresentation();
+        String message, ident = player.getRepresentationNoPing();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);

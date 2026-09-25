@@ -45,8 +45,6 @@ public class ReactionService {
                     text = message;
                 } else if (game.isFowMode()) {
                     text = "(You) " + message;
-                } else if (message.contains("following")) {
-                    text = player.getRepresentation(false, false) + " " + message;
                 } else {
                     text = player.getRepresentation(false, false) + " " + message;
                 }
@@ -96,10 +94,8 @@ public class ReactionService {
             text = message;
         } else if (game.isFowMode()) {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
-        } else if (message.contains("following")) {
-            text = player.getRepresentation(false, false) + " " + message;
         } else {
-            text = player.getRepresentation() + " " + message;
+            text = player.getRepresentation(false, false) + " " + message;
         }
 
         if (isNotBlank(additionalMessage)) {

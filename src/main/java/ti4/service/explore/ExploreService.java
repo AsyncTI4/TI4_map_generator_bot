@@ -550,7 +550,7 @@ public class ExploreService {
         String planetName = info[1];
         Tile tile = game.getTileFromPlanet(planetName);
         String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored the planet "
+        String messageText = player.getRepresentationNoPing() + " explored the planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                 + tileName + ":";
         if (buttonID.contains("_distantSuns")) {
@@ -1555,7 +1555,7 @@ public class ExploreService {
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             boolean isSlashForce = force && event instanceof SlashCommandInteractionEvent;
-            String messageText = player.getRepresentation() + (isSlashForce ? " force" : "") + " explored the "
+            String messageText = player.getRepresentationNoPing() + (isSlashForce ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
@@ -1563,7 +1563,7 @@ public class ExploreService {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No frontier token in given system.");
@@ -1581,14 +1581,15 @@ public class ExploreService {
             if (hasFrontierToken) {
                 space.removeToken(frontierFilename);
             }
-            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier
+            String messageText = player.getRepresentationNoPing() + " explored the " + ExploreEmojis.Frontier
                     + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");

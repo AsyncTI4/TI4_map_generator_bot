@@ -174,7 +174,7 @@ class MessageListener extends ListenerAdapter {
                 && !message.getAuthor().isBot()) {
             message.reply(
                             message.getContentRaw()
-                                    + "\n\nEchoing because normal users cant ping bothelpers intro private threads created by the bot.")
+                                    + "\n\nEchoing because normal users cant ping bothelpers into private threads created by the bot.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
