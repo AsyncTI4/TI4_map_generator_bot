@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,6 +62,13 @@ public class Tile {
 
     @JsonIgnore
     private final HashMap<String, String> fogLabel = new LinkedHashMap<>();
+
+    // Colors a fog-vision token on this tile reveals it to; null = everyone. Held on the tile (not
+    // keyed by position) so it follows the tile through moves/swaps; cleared when the token is removed.
+    // Allocated only when a restricted grant is set, since almost no tile ever has one.
+    @JsonIgnore
+    @Nullable
+    private Set<String> fowVisionGrant;
 
     public Tile(String tileID, String position) {
         this(tileID, position, (Map<String, UnitHolder>) null);
@@ -237,10 +246,25 @@ public class Tile {
         }
     }
 
+    /** Read-only view of the fog-vision recipients; empty means everyone. */
+    @JsonIgnore
+    public Set<String> getFowVisionGrant() {
+        return fowVisionGrant == null ? Collections.emptySet() : Collections.unmodifiableSet(fowVisionGrant);
+    }
+
+    /** Replaces the fog-vision recipients; null or empty means everyone (and frees the set). */
+    public void setFowVisionGrant(@Nullable Collection<String> colors) {
+        fowVisionGrant = colors == null || colors.isEmpty() ? null : new LinkedHashSet<>(colors);
+    }
+
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            return unitHolder.removeToken(tokenID);
+            boolean removed = unitHolder.removeToken(tokenID);
+            if (removed && Mapper.isFowVisionToken(tokenID) && !hasFowVisionToken()) {
+                fowVisionGrant = null; // a later token placed here starts fresh as "everyone"
+            }
+            return removed;
         }
         return false;
     }
@@ -687,10 +711,7 @@ public class Tile {
     public boolean hasFowVisionToken() {
         for (UnitHolder uh : unitHolders.values()) {
             for (String token : uh.getTokenList()) {
-                TokenModel model = Mapper.getToken(token);
-                if (model != null && Boolean.TRUE.equals(model.getIsFowVision())) {
-                    return true;
-                }
+                if (Mapper.isFowVisionToken(token)) return true;
             }
         }
         return false;

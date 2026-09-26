@@ -8,6 +8,7 @@ import static ti4.game.persistence.GamePersistenceKeys.ENDTILE;
 import static ti4.game.persistence.GamePersistenceKeys.ENDTOKENS;
 import static ti4.game.persistence.GamePersistenceKeys.ENDUNITHOLDER;
 import static ti4.game.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.game.persistence.GamePersistenceKeys.FOW_VISION_GRANT;
 import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
 import static ti4.game.persistence.GamePersistenceKeys.MAPINFO;
 import static ti4.game.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
@@ -1270,6 +1271,10 @@ class GameSaveService {
 
         writer.write(TOKENS);
         writer.write(System.lineSeparator());
+        if (!tile.getFowVisionGrant().isEmpty()) {
+            writer.write(FOW_VISION_GRANT + " " + String.join(",", tile.getFowVisionGrant()));
+            writer.write(System.lineSeparator());
+        }
 
         writer.write(ENDTOKENS);
         writer.write(System.lineSeparator());

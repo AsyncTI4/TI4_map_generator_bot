@@ -37,8 +37,7 @@ class RemoveVisionToken extends GameStateSubcommand {
                 MessageHelper.replyToMessage(event, "No tile found at position '" + position + "'");
                 continue;
             }
-            boolean removed = tile.removeToken(Constants.TOKEN_FOWVISION_PNG, Constants.SPACE);
-            game.removeStoredValue(Constants.FOW_VISION_GRANT_PREFIX + position);
+            boolean removed = tile.removeToken(Constants.TOKEN_FOWVISION_PNG, Constants.SPACE); // also clears grant
             sb.append(removed ? "Removed the fog-vision token from " : "No fog-vision token was on ")
                     .append(position)
                     .append('\n');

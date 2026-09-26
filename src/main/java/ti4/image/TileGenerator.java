@@ -65,6 +65,8 @@ public class TileGenerator {
 
     private static final int TILE_PADDING = 100;
     private static final Point TILE_POSITION_POINT = new Point(255, 295);
+    // top-left of the fog-vision token, tucked inside the hex's bottom-left edge
+    private static final Point FOW_VISION_TOKEN_POINT = new Point(75, 236);
     private static final Point LABEL_POSITION_POINT = new Point(90, 295);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
@@ -2060,6 +2062,13 @@ public class TileGenerator {
                 int sleeperX = TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2);
                 int sleeperY = TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2);
                 tileGraphics.drawImage(tokenImage, sleeperX, sleeperY, null);
+            } else if (Mapper.isFowVisionToken(tokenID)) {
+                // fixed marker: doesn't take a space-token slot, so other tokens keep their positions
+                tileGraphics.drawImage(
+                        tokenImage,
+                        TILE_PADDING + FOW_VISION_TOKEN_POINT.x,
+                        TILE_PADDING + FOW_VISION_TOKEN_POINT.y,
+                        null);
             } else {
 
                 int drawX = TILE_PADDING + x;

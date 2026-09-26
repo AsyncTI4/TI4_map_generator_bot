@@ -653,6 +653,21 @@ class LoreServiceTest extends BaseTi4Test {
                     player, game, entry("!removetoken positiveres"), systemTile, "mr", true);
             assertFalse(systemTile.getUnitHolders().get("mr").getTokenList().contains("attachment_positiveres.png"));
         }
+
+        @Test
+        void visionTokenRemovedByLoreClearsRestrictedGrant() {
+            // A restriction set by /fow add_vision_token must not carry over to a vision token
+            // placed later, so removing the token through lore has to drop it.
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!token fowvision"), systemTile, Constants.SPACE, true);
+            assertTrue(systemTile.hasFowVisionToken());
+            systemTile.setFowVisionGrant(List.of("blue"));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removetoken fowvision"), systemTile, Constants.SPACE, true);
+            assertFalse(systemTile.hasFowVisionToken());
+            assertTrue(systemTile.getFowVisionGrant().isEmpty());
+        }
     }
 
     // -----------------------------------------------------------------------
