@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,13 +65,6 @@ public class Tile {
     @JsonIgnore
     private final HashMap<String, String> fogLabel = new LinkedHashMap<>();
 
-    // Colors a fog-vision token on this tile reveals it to; null = everyone. Held on the tile (not
-    // keyed by position) so it follows the tile through moves/swaps; cleared when the token is removed.
-    // Allocated only when a restricted grant is set, since almost no tile ever has one.
-    @JsonIgnore
-    @Nullable
-    private Set<String> fowVisionGrant;
-
     public Tile(String tileID, String position) {
         this(tileID, position, (Map<String, UnitHolder>) null);
     }
@@ -111,6 +103,9 @@ public class Tile {
         space.getCcList().forEach(tileSpace::addCC);
         space.getControlList().forEach(tileSpace::addControl);
         space.getTokenList().forEach(tileSpace::addToken);
+        if (space instanceof Space oldSpace) {
+            getSpaceUnitHolder().setFowVisionGrant(oldSpace.getFowVisionGrant());
+        }
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -249,15 +244,17 @@ public class Tile {
         }
     }
 
-    /** Read-only view of the fog-vision recipients; empty means everyone. */
+    /** Read-only view of the fog-vision recipients (held on the space holder); empty means everyone. */
     @JsonIgnore
     public Set<String> getFowVisionGrant() {
-        return fowVisionGrant == null ? Collections.emptySet() : Collections.unmodifiableSet(fowVisionGrant);
+        Space space = getSpaceUnitHolder();
+        return space == null ? Collections.emptySet() : space.getFowVisionGrant();
     }
 
-    /** Replaces the fog-vision recipients; null or empty means everyone (and frees the set). */
+    /** Replaces the fog-vision recipients; null or empty means everyone. */
     public void setFowVisionGrant(@Nullable Collection<String> colors) {
-        fowVisionGrant = colors == null || colors.isEmpty() ? null : new LinkedHashSet<>(colors);
+        Space space = getSpaceUnitHolder();
+        if (space != null) space.setFowVisionGrant(colors);
     }
 
     public boolean removeToken(String tokenID, String spaceHolder) {
@@ -265,7 +262,7 @@ public class Tile {
         if (unitHolder != null) {
             boolean removed = unitHolder.removeToken(tokenID);
             if (removed && Mapper.isFowVisionToken(tokenID) && !hasFowVisionToken()) {
-                fowVisionGrant = null; // a later token placed here starts fresh as "everyone"
+                setFowVisionGrant(null); // a later token placed here starts fresh as "everyone"
             }
             return removed;
         }

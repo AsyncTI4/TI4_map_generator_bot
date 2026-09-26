@@ -92,6 +92,26 @@ class FoWVisionTokenTest extends BaseTi4Test {
     }
 
     @Test
+    void grantSurvivesTileReplacement() {
+        // FlipTileService, Muaat/Zelian heroes etc. rebuild the tile from its space holder.
+        placeToken("red");
+        Tile replacement = new Tile("20", POS, tile.getSpaceUnitHolder());
+        game.setTile(replacement);
+
+        assertTrue(replacement.hasFowVisionToken());
+        assertTrue(sees(red, POS));
+        assertFalse(sees(blue, POS));
+    }
+
+    @Test
+    void grantSurvivesUnitHolderMerge() {
+        // JSON-style construction path: Tile(tileID, position, unitHolders) -> inheritEverythingFrom.
+        placeToken("red");
+        Tile rebuilt = new Tile("19", POS, tile.getUnitHolders());
+        assertTrue(rebuilt.getFowVisionGrant().contains("red"));
+    }
+
+    @Test
     void grantFollowsTileWhenMoved() {
         placeToken("red");
         String newPos = "205";
