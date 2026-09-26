@@ -34,6 +34,7 @@ import ti4.spring.service.persistence.PlayerEntityRepository;
 public class MatchmakingRatingEventService {
 
     private static final int MAX_LIST_SIZE = 50;
+    private static final int MAX_CODE_BLOCK_LENGTH = 1900;
     private static final int INACTIVITY_MONTHS = 6;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final Duration RATINGS_CACHE_TTL = Duration.ofHours(8);
@@ -59,6 +60,91 @@ public class MatchmakingRatingEventService {
         List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
         List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games, true);
         sendMessage(event, playerRatings, games, showRating);
+    }
+
+    @Transactional(readOnly = true)
+    public void showRatingHistory(SlashCommandInteractionEvent event, String userId, String username) {
+        List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(false);
+        List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
+        List<MatchmakingRatingHistoryEntry> history =
+                TrueSkillMatchmakingRatingService.calculateRatingHistory(games, userId, true);
+        sendRatingHistory(event, username, history);
+    }
+
+    private static void sendRatingHistory(
+            SlashCommandInteractionEvent event, String username, List<MatchmakingRatingHistoryEntry> history) {
+        if (history.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No completed non-alliance games found for " + username + ".");
+            return;
+        }
+
+        MessageHelper.sendMessageToThread(
+                (MessageChannelUnion) event.getMessageChannel(),
+                "MMR history: " + username,
+                ratingHistoryBlocks(username, history));
+    }
+
+    static List<String> ratingHistoryBlocks(String username, List<MatchmakingRatingHistoryEntry> history) {
+        long firstRating = toDisplayRating(history.getFirst().startRating());
+        long currentRating = toDisplayRating(history.getLast().endRating());
+        List<String> blocks = new ArrayList<>();
+        blocks.add(String.format(
+                "__**Matchmaking rating history for %s**__\n%d games, `%d` → `%d` (`%+d`)\n",
+                username, history.size(), firstRating, currentRating, currentRating - firstRating));
+        blocks.addAll(toCodeBlocks(ratingHistoryTable(history)));
+        return blocks;
+    }
+
+    private static List<String> ratingHistoryTable(List<MatchmakingRatingHistoryEntry> history) {
+        int numberWidth = String.valueOf(history.size()).length();
+        int gameNameWidth = Math.max(
+                "Game".length(),
+                history.stream()
+                        .mapToInt(entry -> entry.gameName().length())
+                        .max()
+                        .orElse(0));
+        String rowFormat = "%" + numberWidth + "s  %-" + gameNameWidth + "s  %-10s  %-11s  %5s  %5s  %6s";
+
+        List<String> rows = new ArrayList<>();
+        rows.add(String.format(rowFormat, "#", "Game", "Ended", "Result", "Start", "End", "Change"));
+        int gameNumber = 0;
+        for (MatchmakingRatingHistoryEntry entry : history) {
+            gameNumber++;
+            long startRating = toDisplayRating(entry.startRating());
+            long endRating = toDisplayRating(entry.endRating());
+            rows.add(String.format(
+                    rowFormat,
+                    gameNumber,
+                    entry.gameName(),
+                    Instant.ofEpochMilli(entry.endedDate())
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate(),
+                    MatchmakingGame.describeRank(entry.rank()),
+                    startRating,
+                    endRating,
+                    String.format("%+d", endRating - startRating)));
+        }
+        return rows;
+    }
+
+    private static List<String> toCodeBlocks(List<String> tableRows) {
+        String header = tableRows.getFirst();
+        List<String> codeBlocks = new ArrayList<>();
+        StringBuilder rows = new StringBuilder();
+        for (String row : tableRows.subList(1, tableRows.size())) {
+            if (toCodeBlock(header, rows).length() + row.length() + 1 > MAX_CODE_BLOCK_LENGTH) {
+                codeBlocks.add(toCodeBlock(header, rows));
+                rows.setLength(0);
+            }
+            rows.append(row).append('\n');
+        }
+        codeBlocks.add(toCodeBlock(header, rows));
+        return codeBlocks;
+    }
+
+    private static String toCodeBlock(String header, StringBuilder rows) {
+        return "```\n" + header + "\n" + rows + "```\n";
     }
 
     public static long toDisplayRating(BigDecimal rating) {
