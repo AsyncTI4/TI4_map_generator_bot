@@ -279,8 +279,27 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
             addPlayer(game, "sol", true, "jord", "wellon");
         }));
 
-        assertThat(report).contains(" 25 Silver Flames.\n");
+        assertThat(report).contains(" 25 Silver Flames, 0% (0/25) win rate.\n");
         assertThat(report).contains("- **All factions**: 25/50 (50%) of players lost a home planet.");
+    }
+
+    @Test
+    void shouldGiveTheWinRateOfTheFactionThatUsedSilverFlame() {
+        // Crimson purges its own home system in every game here, and wins 10 of the 25.
+        List<Game> games = new ArrayList<>(repeatGame(10, game -> {
+            game.setStoredValue("silverFlamed", "crimson");
+            addPlayer(game, "crimson", true);
+            addPlayer(game, "sol", false, "jord", "wellon");
+        }));
+        games.addAll(repeatGame(15, game -> {
+            game.setStoredValue("silverFlamed", "crimson");
+            addPlayer(game, "crimson", false);
+            addPlayer(game, "sol", true, "jord", "wellon");
+        }));
+
+        String report = render(games);
+
+        assertThat(report).contains(" 25 Silver Flames, 40% (10/25) win rate.\n");
     }
 
     @Test

@@ -203,7 +203,6 @@ public class PlanetWinRateStatisticsService {
         accumulateStyx(game, seats, winner, stats);
     }
 
-    /** Styx sits on a Fracture tile, so it only exists once the Fracture is on the board (or someone holds it). */
     private static boolean hasStyx(Game game) {
         return everyPlanetInPlay(game).anyMatch(STYX::equals);
     }
@@ -587,7 +586,11 @@ public class PlanetWinRateStatisticsService {
         if (group.silverFlamed.getPlayers() == 0) {
             return;
         }
-        sb.append(". ").append(group.silverFlamed.getPlayers()).append(" Silver Flames.");
+        sb.append(". ")
+                .append(StringHelper.pluralize(group.silverFlamed.getPlayers(), "Silver Flame"))
+                .append(", ")
+                .append(formatWinRate(group.silverFlamed))
+                .append(" win rate.");
     }
 
     private static void appendCoexistedThrough(StringBuilder sb, PlanetHoldingStats group) {
@@ -629,8 +632,6 @@ public class PlanetWinRateStatisticsService {
             return;
         }
 
-        // A faction sits in a game at most once, so its seats at Styx tables are its games with Styx. The
-        // combined row has six seats a game, so its hold rate is counted in games instead.
         blocks.add(renderStyxLine("**All factions**", stats.gamesWithStyxHeld, stats.gamesWithStyx, stats.overallStyx));
         stats.byFactionStyx.entrySet().stream()
                 .filter(entry -> entry.getValue().gamesWithStyx() >= MINIMUM_FACTION_PLAYERS)
@@ -785,10 +786,6 @@ public class PlanetWinRateStatisticsService {
         }
     }
 
-    /**
-     * Seats split three ways: at a Styx table holding it, at a Styx table not holding it, and at a table
-     * Styx never reached.
-     */
     private static class StyxStats {
         final WinRateCount held = new WinRateCount();
 
