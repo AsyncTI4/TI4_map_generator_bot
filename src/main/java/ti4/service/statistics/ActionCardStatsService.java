@@ -109,6 +109,7 @@ public class ActionCardStatsService {
         Map<String, UnattributedPlays> unattributedPlays = new HashMap<>();
         Set<String> includedGameNames = new HashSet<>();
         ActionCardPlayerStatsService playerStats = new ActionCardPlayerStatsService();
+        ActionCardReplayStatsService replayStats = new ActionCardReplayStatsService();
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
         // changed decks mid-game), which would pollute the stats with off-deck cards.
@@ -135,7 +136,8 @@ public class ActionCardStatsService {
                         playToWinCorrelationCounts,
                         unattributedPlays,
                         includedGameNames,
-                        playerStats),
+                        playerStats,
+                        replayStats),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
@@ -149,6 +151,7 @@ public class ActionCardStatsService {
                         unattributedPlays,
                         includedGameNames,
                         playerStats,
+                        replayStats,
                         options));
     }
 
@@ -159,7 +162,8 @@ public class ActionCardStatsService {
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
             Map<String, UnattributedPlays> unattributedPlays,
             Set<String> includedGameNames,
-            ActionCardPlayerStatsService playerStats) {
+            ActionCardPlayerStatsService playerStats,
+            ActionCardReplayStatsService replayStats) {
         includedGameNames.add(game.getName());
 
         game.getDiscardActionCards()
@@ -180,6 +184,7 @@ public class ActionCardStatsService {
         // Same gate, same reason: with no player on a play there is nobody to count the cards
         // against, so a game from before tracking would report six players who played nothing.
         playerStats.accumulate(game, winner);
+        replayStats.accumulate(game);
     }
 
     // Older games recorded plays with no player at all, so they can only contribute cancels - never
@@ -277,6 +282,7 @@ public class ActionCardStatsService {
             Map<String, UnattributedPlays> unattributedPlays,
             Set<String> includedGameNames,
             ActionCardPlayerStatsService playerStats,
+            ActionCardReplayStatsService replayStats,
             ReportOptions options) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
         Map<String, Integer> playsIncludingCanceled = playToWinCorrelationCounts.entrySet().stream()
@@ -323,6 +329,7 @@ public class ActionCardStatsService {
             blocks.add(overruleTargets.toString());
         }
         playerStats.appendOverruleTo(blocks);
+        replayStats.appendTo(blocks, copiesPerName);
 
         StringBuilder playAndCancelStats = new StringBuilder();
         Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);
