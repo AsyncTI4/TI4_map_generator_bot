@@ -34,5 +34,6 @@
         "briareus"
     ],
     "source": "other",
-    "tileBack": "fracture"
+    "tileBack": "fracture",
+    "isFracture": true
 }

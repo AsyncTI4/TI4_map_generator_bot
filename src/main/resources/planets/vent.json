@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vent",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "vent",
     "tileId": "er105",
     "name": "Vent",

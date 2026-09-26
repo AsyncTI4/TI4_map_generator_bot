@@ -57,6 +57,7 @@ class Undo extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
+        targetUndoIndex--;
 
         GameManager.undo(game, targetUndoIndex);
     }

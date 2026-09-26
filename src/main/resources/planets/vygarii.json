@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vygarii",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "vygarii",
     "tileId": "er106",
     "name": "Vygar II",

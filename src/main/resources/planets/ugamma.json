@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ugamma",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "ugamma",
     "tileId": "er09",
     "name": "Ulon Gamma",

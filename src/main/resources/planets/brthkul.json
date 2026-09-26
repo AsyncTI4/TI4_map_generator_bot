@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "brthkul",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "brthkul",
     "tileId": "d24",
     "name": "Brthkul",

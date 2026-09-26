@@ -7,8 +7,10 @@
         "frac2",
         "fracleftegr"
     ],
+    "hasEgress": true,
     "imagePath": "fracture2.png",
     "shipPositionsType": "TYPE08",
     "tileBack": "fracture",
+    "isFracture": true,
     "source": "thunders_edge"
 }

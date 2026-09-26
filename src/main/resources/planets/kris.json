@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kris",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "kris",
     "tileId": "er65",
     "name": "Kris",

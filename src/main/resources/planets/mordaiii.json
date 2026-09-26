@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mordaiii",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "mordaiii",
     "tileId": "08",
     "name": "Mordai II",

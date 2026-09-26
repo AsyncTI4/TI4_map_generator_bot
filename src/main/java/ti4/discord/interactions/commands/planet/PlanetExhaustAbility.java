@@ -6,7 +6,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -15,6 +16,7 @@ import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
@@ -43,6 +45,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     public static void doAction(
             GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
         if (player == null) return;
+        planet = AliasHandler.resolvePlanet(planet);
+        if (("innersanctum".equals(planet) && !player.hasTech("thveylorg"))
+                || ("fabricatestation".equals(planet) && !player.hasTech("tharcanumpmy"))) {
+            return;
+        }
         if (exhaust) {
             player.exhaustPlanetAbility(planet);
         }
@@ -91,7 +98,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 NewStuffHelper.resolveGarboziaTE(event, game, player, "garbozia_page0");
                 output = "blank";
             }
-            case "mrte" -> {
+            case "mrte", "mc" -> {
                 channel = player.getCardsInfoThread();
                 output = player.getRepresentation()
                         + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
@@ -175,16 +182,41 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 // MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate
                 // \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
+            case "innersanctum" -> {
+                output = player.getRepresentation()
+                        + ", predict an outcome. If correct, each player who voted for that outcome draws 1 action card.";
+                buttons.addAll(
+                        AgendaRiderHelper.getAgendaButtons("Inner Sanctum", game, player.factionButtonChecker()));
+            }
             case "prism" -> {
                 output = player.getFactionEmoji() + ", please choose a technology to return.";
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
-            case "ponthous" -> {
-                if (!"setup".equals(game.getPhaseOfGame())) {
-                    output = player.getRepresentation()
-                            + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):\nDo this **AFTER** your spend window is complete.";
-                    buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
-                }
+            case "lethara" -> {
+                output = player.getRepresentation() + ", you may spend 2 influence to gain 1 CC.";
+                buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+                buttons.addAll(ButtonHelper.getGainCCButtons(player));
+                ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+            }
+            case "skarnath" -> {
+                output = player.getRepresentation()
+                        + ", you may produce 2 different ships in a system containing your ships. Their cost is reduced by 2 if a neighbor owns a unit of both types.";
+                buttons.addAll(ThronesThroneHandler.getSkarnathSystems(player, game));
+            }
+            case "gyraxis" -> {
+                PlanetModel gyraxis = Mapper.getPlanet("gyraxis");
+                output = player.getFactionEmojiOrColor() + " is using " + gyraxis.getLegendaryAbilityName()
+                        + " to add +1 to the move value of up to 1 ship in each system containing their ships.";
+                game.setStoredValue("gyraxisActive", "yes");
+            }
+            case "cineron" -> {
+                output = player.getRepresentation()
+                        + ", choose a unit to destroy and place back on the board galvanized.";
+                buttons.addAll(ThronesThroneHandler.getCineronSystems(player, game));
+            }
+            case "fabricatestation" -> {
+                ArcanumPrimordialTechHandler.offerFabricateStationProduction(event, game, player);
+                output = "blank";
             }
             case "echo" -> {
                 output =

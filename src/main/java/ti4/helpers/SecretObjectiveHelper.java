@@ -19,6 +19,7 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -139,6 +140,9 @@ public class SecretObjectiveHelper {
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                        if (fragId.startsWith("supermassive")) {
+                            ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragId);
+                        }
                         switch (fragId) {
                             case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
                                 message2.append(" " + ExploreEmojis.CFrag);
@@ -155,26 +159,28 @@ public class SecretObjectiveHelper {
                 } else {
                     String factionChecker = player.factionButtonChecker();
                     List<Button> purgeFragButtons = new ArrayList<>();
-                    if (player.getCrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL) > 0) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (player.getIrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.INDUSTRIAL) > 0) {
                         Button transact =
                                 Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (player.getHrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.HAZARDOUS) > 0) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (player.getUrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.FRONTIER) > 0) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
+                    purgeFragButtons.addAll(
+                            ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
                     Button transact2 = Buttons.green(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 
@@ -226,7 +232,9 @@ public class SecretObjectiveHelper {
                             + " if another player satisfied the requirements of the SO you just scored, you can use this button to draw an SO via your plausible deniability ability.",
                     buttons);
         }
-
+        if (game.isMuaatManiaMode()) {
+            ButtonHelper.offerMMBoon(player, game);
+        }
         if (player.hasTech("tf-yinascendant")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -325,7 +333,15 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode.");
             return;
         }
-        List<String> defaultSecrets = Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck();
+        List<String> defaultSecrets =
+                new ArrayList<>(Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck());
+        if (game.isMonumentsMode()) {
+            Mapper.getSecretObjectives().values().stream()
+                    .filter(objective -> objective.getSource() == ComponentSource.monuments)
+                    .map(SecretObjectiveModel::getAlias)
+                    .filter(objective -> !defaultSecrets.contains(objective))
+                    .forEach(defaultSecrets::add);
+        }
         List<String> currentSecrets = new ArrayList<>(defaultSecrets);
         for (Player player : game.getPlayers().values()) {
             if (player == null) {

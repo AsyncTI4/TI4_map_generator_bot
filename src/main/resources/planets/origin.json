@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "origin",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 160,
+            "y": 160
+        }
+    },
     "id": "origin",
     "tileId": "m17",
     "name": "Origin",

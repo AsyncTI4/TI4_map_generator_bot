@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "khjan",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "khjan",
     "tileId": "er07",
     "name": "Khjan",

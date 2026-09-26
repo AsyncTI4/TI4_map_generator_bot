@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "drah",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "drah",
     "tileId": "d20",
     "name": "Drah",

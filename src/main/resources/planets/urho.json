@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "urho",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "urho",
     "tileId": "er09",
     "name": "Ulon Rho",

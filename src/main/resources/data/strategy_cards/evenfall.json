@@ -1,0 +1,125 @@
+[
+    {
+        "id": "evenfall1",
+        "initiative": 1,
+        "name": "Leadership",
+        "primaryTexts": [
+            "Gain 3 command tokens",
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent",
+            "If you control the Planet Mecatol Rex you gain 2 additional command tokens and choose up to 2 players to gain 1 additional command token"
+        ],
+        "secondaryTexts": [
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
+        "colourHexCode": "#ec1c24",
+        "botSCAutomationID": "pok1leadership",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall2",
+        "initiative": 2,
+        "name": "Diplomacy",
+        "primaryTexts": [
+            "Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from their reinforcements in the chosen system. Then, ready up to 2 exhausted planets you control.",
+            "For each legendary planet you control, choose one unique player to place a command token from reinforcements in that system."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to ready up to 2 exhausted planets you control."
+        ],
+        "colourHexCode": "#f69421",
+        "botSCAutomationID": "pok2diplomacy",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall3",
+        "initiative": 3,
+        "name": "Politics",
+        "primaryTexts": [
+            "If you control the planet Mecatol Rex draw two relics and shuffle one of those relics back into the relic deck. Then draw 3 actions cards.",
+            "If you do not control the planet Mecatol Rex draw one relic and 1 action card."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 action cards."
+        ],
+        "colourHexCode": "#fff200",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall4",
+        "initiative": 4,
+        "name": "Construction",
+        "primaryTexts": [
+            "Either place 1 structure on a planet you control, or use the PRODUCTION ability of 1 of your space docks.",
+            "Place 1 structure on a planet you control.",
+            "If you control Mecatol Rex or another player’s home system place one mech and 3 infantry on Mecatol Rex and every planet you control in any home system"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to place 1 structure on a planet you control."
+        ],
+        "colourHexCode": "#39b54a",
+        "botSCAutomationID": "te4construction",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall5",
+        "initiative": 5,
+        "name": "Trade",
+        "primaryTexts": [
+            "Gain 3 trade goods",
+            "Replenish commodities",
+            "If you control Mecatol Rex choose up to 2 players to use the secondary ability of this strategy card without spending a command token",
+            "If you do not control Mecatol Rex choose any number of players to use the secondary ability of this strategy card without spending a command token"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to replenish your commodities."
+        ],
+        "colourHexCode": "#00a99d",
+        "botSCAutomationID": "pok5trade",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall6",
+        "initiative": 6,
+        "name": "Warfare",
+        "primaryTexts": [
+            "Perform a tactical action in any system without placing a command token, even if the system already has your command token in it: that system still counts as being activated. You may redistribute your command tokens before and after this action.",
+            "If at the end of this action you control Mecatol Rex or another player’s home system Place a dreadnaught, a cruiser and 2 fighters in that system"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool. Then, you may either use the PRODUCTION abilities of the units in your home system or spend 4 resources to participate in the unit upgrade splice."
+        ],
+        "colourHexCode": "#008ed4",
+        "botSCAutomationID": "te6warfare",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall7",
+        "initiative": 7,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology: for every legendary planet you control you may reduce the cost by 2 resources and ignore 1 prerequisite of any color"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "colourHexCode": "#15489f",
+        "botSCAutomationID": "pok7technology",
+        "source": "pally"
+    },
+    {
+        "id": "evenfall8",
+        "initiative": 8,
+        "name": "Imperial",
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements",
+            "Gain 1 relic if you control Mecatol Rex; otherwise draw 1 secret objective"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective"
+        ],
+        "colourHexCode": "#752b90",
+        "botSCAutomationID": "pok8imperial",
+        "source": "pally"
+    }
+]

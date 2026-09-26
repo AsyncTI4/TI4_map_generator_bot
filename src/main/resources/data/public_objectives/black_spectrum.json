@@ -9,7 +9,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_centralize_galactic",
+        "alias": "bsp_centralize_trade",
         "name": "Centralize Galactic Trade",
         "phase": "Status",
         "text": "Spend 14 trade goods.",
@@ -36,7 +36,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_found_golden",
+        "alias": "bsp_golden_age",
         "name": "Found a Golden Age",
         "phase": "Status",
         "text": "Spend 20 resources.",
@@ -45,7 +45,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_galvanize_people",
+        "alias": "bsp_galvanize",
         "name": "Galvanize the People",
         "phase": "Status",
         "text": "Spend a total of 8 tokens from your tactic and/or strategy pools.",
@@ -54,7 +54,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_hold_vast",
+        "alias": "bsp_vast_reserves",
         "name": "Hold Vast Reserves",
         "phase": "Status",
         "text": "Spend 9 influence, 9 resources, and 9 trade goods.",
@@ -63,7 +63,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_manipulate_galactic",
+        "alias": "bsp_manipulate_law",
         "name": "Manipulate Galactic Law",
         "phase": "Status",
         "text": "Spend 20 influence.",
@@ -72,7 +72,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_master_sciences",
+        "alias": "bsp_master_science",
         "name": "Master the Sciences",
         "phase": "Status",
         "text": "Control more readied planets than the combined total of 2 of your neighbors.",
@@ -81,7 +81,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_patrol_vast",
+        "alias": "bsp_vast_territories",
         "name": "Patrol Vast Territories",
         "phase": "Status",
         "text": "Have units in 5 non-Fracture systems that do not contain planets.",
@@ -90,7 +90,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_reclaim_ancient",
+        "alias": "bsp_ancient_monuments",
         "name": "Reclaim Ancient Monuments",
         "phase": "Status",
         "text": "Control 4 planets that have attachments.",
@@ -99,7 +99,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_revolutionize_warfare",
+        "alias": "bsp_revolutionize",
         "name": "Revolutionize Warfare",
         "phase": "Status",
         "text": "Have more neighbors than each 2 of your neighbors.",
@@ -108,7 +108,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_subdue_galaxy",
+        "alias": "bsp_subdue",
         "name": "Subdue the Galaxy",
         "phase": "Status",
         "text": "Control 11 planets outside of The Fracture and your home system.",
@@ -126,7 +126,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_develop_weaponry",
+        "alias": "bsp_develop",
         "name": "Develop Weaponry",
         "phase": "Status",
         "text": "Have more non-fighter ships on the game board than each of 2 of your neighbors.",
@@ -135,7 +135,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_diversify_research",
+        "alias": "bsp_diversify",
         "name": "Diversify Research",
         "phase": "Status",
         "text": "Exhaust 3 planets that each have a different trait and 1 additional planet that has a technology specialty.",
@@ -153,7 +153,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_erect_monument",
+        "alias": "bsp_monument",
         "name": "Erect a Monument",
         "phase": "Status",
         "text": "Spend 10 resources.",
@@ -171,7 +171,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_explore_deep",
+        "alias": "bsp_deep_space",
         "name": "Explore Deep Space",
         "phase": "Status",
         "text": "Have units in 3 non-Fracture systems that do not contain planets.",
@@ -180,7 +180,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_intimidate_council",
+        "alias": "bsp_intimidate",
         "name": "Intimidate Council",
         "phase": "Status",
         "text": "Have ships in 2 non-Fracture systems that are adjacent to Mecatol Rex.",
@@ -189,7 +189,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_lead_front",
+        "alias": "bsp_lead",
         "name": "Lead from the Front",
         "phase": "Status",
         "text": "Spend a total of 4 tokens from your tactic and/or strategy pools.",
@@ -207,7 +207,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_negotiate_trade",
+        "alias": "bsp_trade_routes",
         "name": "Negotiate Trade Routes",
         "phase": "Status",
         "text": "Spend 7 trade goods.",
@@ -216,7 +216,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_populate_outer",
+        "alias": "bsp_outer_rim",
         "name": "Populate the Outer Rim",
         "phase": "Status",
         "text": "Have units in 3 non-Fracture systems, other than your home system, that are on the edge of the game board and do not contain other players' units.",

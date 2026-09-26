@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -24,6 +27,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
@@ -40,24 +44,35 @@ public class AddUnitService {
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
                     event, tile, unit.uh().getName(), game);
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
-                NetrunnersAbilitiesHandler.resolveSystemBreach(game, unit.unitKey(), unit.getTotalRemoved());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
-                NetrunnersUnitsHandler.offerDeployMechWithStructure(
-                        event, game, tile, unit.unitKey(), unit.uh().getName(), unit.getTotalRemoved());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
-                NetrunnersLeadersHandler.checkCommanderUnlock(game, unit.unitKey());
-            }
             Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
             handlePostAddUnitPlayerEffects(
-                    event, game, tile, unit.unitKey(), unit.uh().getName(), player);
+                    event, game, tile, unit.unitKey(), unit.uh().getName(), player, unit.getTotalRemoved());
 
             String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
             checkFleetCapacity(tile, color, game);
         }
+    }
+
+    public static void addUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, List<RemovedUnit> removedUnits) {
+        for (RemovedUnit unit : removedUnits) {
+            unit.uh().addUnitsWithStates(unit.unitKey(), unit.states());
+
+            tile = FlipTileService.flipTileIfNeeded(tile, game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(
+                    event, tile, unit.uh().getName(), game);
+            Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, unit.unitKey(), unit.uh().getName(), player, unit.getTotalRemoved());
+        }
+        String unitList = String.join(
+                ", ",
+                removedUnits.stream()
+                        .map(unit -> unit.unitKey() + " " + unit.getTotalRemoved())
+                        .toList());
+        handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
     }
 
     public static void addUnits(
@@ -67,25 +82,21 @@ public class AddUnitService {
             String color,
             String unitList,
             List<RemovedUnit> removed) {
+        if (TwilightsFallMonumentsButtonHandler.blocksCoexistence(game, tile, unitList)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Units cannot be placed into coexistence in The Crown Of Thorns system.");
+            return;
+        }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
             tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
-                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), states.size());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
-                NetrunnersUnitsHandler.offerDeployMechWithStructure(
-                        event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), states.size());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
-                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
-            }
             Player player =
                     game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
-            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player, parsedUnit.count());
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -94,24 +105,28 @@ public class AddUnitService {
 
     public static void addUnits(
             GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+        if (TwilightsFallMonumentsButtonHandler.blocksCoexistence(game, tile, unitList)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Units cannot be placed into coexistence in The Crown Of Thorns system.");
+            return;
+        }
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
-                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), parsedUnit.count());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
-                NetrunnersUnitsHandler.offerDeployMechWithStructure(
-                        event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
-                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
-            }
             Player player =
                     game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
-            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player, parsedUnit.count());
+            MyrrLeadersHandler.resolveMyrrCommander(
+                    event, game, player, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
+            if (game.isMonumentsMode()
+                    && player != null
+                    && MonumentsService.isMonumentOnBoard(game, player, "norr_monument")
+                    && parsedUnit.unitKey().unitType() == UnitType.Monument) {
+                MonumentsButtonHandler.sendFireflyProduction(game, player, 3, 0);
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -186,10 +201,11 @@ public class AddUnitService {
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
-            if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
-                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            if (parsedUnit.unitKey() == null) {
+                continue;
             }
-            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player, parsedUnit.count());
             if (!first) {
                 unitListBuilder.append(", ");
             }
@@ -233,7 +249,8 @@ public class AddUnitService {
             Tile tile,
             Units.UnitKey unitKey,
             String location,
-            Player player) {
+            Player player,
+            int amount) {
         if (player == null) {
             return;
         }
@@ -247,8 +264,17 @@ public class AddUnitService {
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
         }
+        if (unitKey.unitType() == UnitType.Monument) {
+            MonumentsService.syncKyroReliquaryAttachment(game, player);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
-        CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau", "oblivion", "revenantponthous", "thrones");
+        if (!(event instanceof ButtonInteractionEvent buttonEvent)
+                || !buttonEvent.getComponentId().contains("place_")) {
+            MonumentsButtonHandler.offerCenotaph(game, player, tile, unitKey, location, amount);
+        }
+        CommanderUnlockCheckService.checkPlayer(
+                player, "dream", "myrr", "natau", "oblivion", "revenantxytheris", "thrones", "crystellum", "scrapyard");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "magna",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "magna",
     "tileId": "br4",
     "name": "Magna",

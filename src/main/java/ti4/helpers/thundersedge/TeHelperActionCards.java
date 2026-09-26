@@ -6,12 +6,11 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -23,6 +22,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
@@ -38,6 +38,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.planet.FlipTileService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -45,6 +47,8 @@ import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class TeHelperActionCards {
+
+    public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
 
     public static void nop() {}
 
@@ -58,7 +62,12 @@ public class TeHelperActionCards {
                 buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
-            case "crisis", "extremeduress" -> nop(); // preset
+            case "crisis" -> nop(); // preset
+            case "extremeduress" -> {
+                if (!isAutoResolvingExtremeDuress(player.getGame())) {
+                    buttons.add(Buttons.green(ffcc + "extremeDuressStart", resolve));
+                }
+            }
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
             case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
@@ -111,6 +120,74 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("extremeDuressStart")
+    private static void extremeDuressStart(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (!p2.hasUnplayedSCs()) {
+                continue;
+            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "extremeDuressTarget_" + p2.getColor(), "gray", p2));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", no other player has a readied strategy card, so there is no legal target for _Extreme Duress_ right now.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the player who will experience _Extreme Duress_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("extremeDuressTarget_")
+    private static void extremeDuressTarget(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String color = buttonID.split("_")[1];
+        Player target = game.getPlayerFromColorOrFaction(color);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find that player. Please resolve _Extreme Duress_ manually.");
+            return;
+        }
+        game.removeStoredValue("ExtremeDuress");
+        sendExtremeDuressResolutionButtons(target, player);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " played _Extreme Duress_ on " + target.getRepresentationNoPing() + ".");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void autoResolveExtremeDuress(
+            GenericInteractionCreateEvent event, Game game, Player target, Player duressPlayer) {
+        game.setStoredValue(EXTREME_DURESS_AUTO_RESOLVING, "true");
+        try {
+            ActionCardHelper.playAC(event, game, duressPlayer, "extremeduress", game.getMainGameChannel());
+        } finally {
+            game.removeStoredValue(EXTREME_DURESS_AUTO_RESOLVING);
+        }
+        sendExtremeDuressResolutionButtons(target, duressPlayer);
+    }
+
+    private static boolean isAutoResolvingExtremeDuress(Game game) {
+        return !game.getStoredValue(EXTREME_DURESS_AUTO_RESOLVING).isEmpty();
+    }
+
+    public static void sendExtremeDuressResolutionButtons(Player target, Player duressPlayer) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(
+                target.factionButtonChecker() + "concedeToED_" + duressPlayer.getFaction(),
+                "Lose Action Cards, Give Trade Goods, And Show Secrets"));
+        buttons.add(Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(), target.getRepresentation() + ", please resolve _Extreme Duress_.", buttons);
+    }
+
     @ButtonHandler("concedeToED")
     private static void concedeToED(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
@@ -142,17 +219,8 @@ public class TeHelperActionCards {
             if (p2 == player || p2.getAcCount() == 0) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(
-                        Buttons.gray(player.factionButtonChecker() + "getACFrom_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        player.factionButtonChecker() + "getACFrom_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "getACFrom_" + p2.getFaction(), "gray", p2));
         }
         String message = player.getRepresentationUnfogged()
                 + ", please tell the bot which two of your neighbors did the transaction.";
@@ -220,12 +288,17 @@ public class TeHelperActionCards {
 
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-        for (String planet : p2.getPlanets()) {
-            if (game.getUnitHolderFromPlanet(planet) != null
-                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(p2)) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
+        if (game.isFowMode()) {
+            buttons = PlanetTargetService.targetButtons(
+                    game, player, PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3"), buttons);
+        } else {
+            for (String planet : p2.getPlanets()) {
+                if (game.getUnitHolderFromPlanet(planet) != null
+                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(p2)) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
             }
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + "loseAFleetCultural", "Lose A Fleet Token"));
@@ -252,8 +325,21 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        var exchangeSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3");
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, exchangeSpec)) return;
 
         String planet = buttonID.split("_")[1];
+        Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        boolean somebodyToCoexistWith = game.getRealPlayers().stream()
+                .anyMatch(other ->
+                        other != player && other.getColor() != null && unitHolder.getUnitCount(other.getColorID()) > 0);
+        if (!somebodyToCoexistWith) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", there are no other players with units on that planet, so you cannot coexist there.");
+            return;
+        }
         game.setStoredValue("coexistFlag", "yes");
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "inf " + planet);
         game.removeStoredValue("coexistFlag");
@@ -330,6 +416,7 @@ public class TeHelperActionCards {
     @ButtonHandler("strategize")
     private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game, player);
+        buttons.addAll(OnyxxaAbilityHandler.getStrategicFluidityPrimaryButtons(game, player));
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()
@@ -345,12 +432,6 @@ public class TeHelperActionCards {
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        if (player.hasUnlockedBreakthrough("onyxxabt")) {
-            OnyxxaBreakthroughHandler.offerSCRollButton(game, player);
-        }
-        if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
-            OnyxxaLeaderHandler.offerCommanderUnlockButton(player);
-        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -399,7 +480,7 @@ public class TeHelperActionCards {
             player.setTg(player.getTg() - 2);
             String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
-            if (tile != null && tile.getPosition().contains("frac")) {
+            if (tile != null && tile.isFracture()) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
                 if (uh != null && !"mirage".equalsIgnoreCase(planet)) {
                     uh.addToken("token_relictoken.png");
@@ -485,11 +566,28 @@ public class TeHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    /**
+     * Re-derives {@link #beginPirates}' {@code emptyTile} rule for one resolved tile. A Blind Target press
+     * skips the builder's list and its predicate entirely, so this has to be re-checked at resolution.
+     */
+    public static boolean legalPirateTarget(Game game, Tile tile, String prefix) {
+        return tile != null
+                && Tile.tileHasNoPlayerShips(game).test(tile)
+                && !tile.getTileModel().isHyperlane()
+                && (!tile.isHomeSystem(game) || prefix.contains("NokarBt"));
+    }
+
     @ButtonHandler("resolvePirateContract_")
     private static void resolvePirateContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
+            if (!legalPirateTarget(game, tile, "resolvePirateContract")) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             resolvePiratesGeneric(event, game, player, tile, "dd");
 
             String message = player.getRepresentation() + " paid a pirate to post up at "
@@ -504,6 +602,12 @@ public class TeHelperActionCards {
         String regex = "resolveNokarBt_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
+            if (!legalPirateTarget(game, tile, "resolveNokarBt")) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             resolvePiratesGeneric(event, game, player, tile, "2 dd, cr");
 
             String message = player.getRepresentation() + " hired 2 neutral destroyers and a cruiser to post up at "
@@ -518,6 +622,12 @@ public class TeHelperActionCards {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
+            if (!legalPirateTarget(game, tile, "resolvePirateFleet")) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             resolvePiratesGeneric(event, game, player, tile, "cv, ca, dd, 2 ff");
 
             String message = player.getRepresentation() + " paid a fleet of pirates to post up at "

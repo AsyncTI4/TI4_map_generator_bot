@@ -29,7 +29,7 @@ class PickACFromPurged extends GameStateSubcommand {
         int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
         String acID = null;
         for (Map.Entry<String, Integer> so : game.getPurgedActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
+            if (so.getValue().equals(acIndex) && ActionCardHelper.isDiscardVisible(game, player, so.getKey())) {
                 acID = so.getKey();
             }
         }

@@ -1,6 +1,6 @@
 [
     {
-        "alias": "bsp_sarween_tools",
+        "alias": "bsp_st",
         "name": "Sarween Tools",
         "types": [
             "CYBERNETIC"
@@ -11,7 +11,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_integrated_economy",
+        "alias": "bsp_ie",
         "name": "Integrated Economy",
         "types": [
             "CYBERNETIC"
@@ -23,7 +23,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_x_89",
+        "alias": "bsp_x89c4",
         "name": "X-89 Bacterial Weapon",
         "types": [
             "BIOTIC"
@@ -35,7 +35,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_neural_motivator",
+        "alias": "bsp_nm",
         "name": "Neural Motivator",
         "types": [
             "BIOTIC"
@@ -46,7 +46,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_self_assembly",
+        "alias": "bsp_sar",
         "name": "Self-Assembly Routines",
         "types": [
             "WARFARE"
@@ -58,7 +58,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_predictive_intelligence",
+        "alias": "bsp_pi",
         "name": "Predictive Intelligence",
         "types": [
             "CYBERNETIC"
@@ -70,7 +70,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_psychoarchaeology",
+        "alias": "bsp_pa",
         "name": "Psychoarchaeology",
         "types": [
             "BIOTIC"
@@ -81,7 +81,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_scanlink_drone",
+        "alias": "bsp_sdn",
         "name": "Scanlink Drone Network",
         "types": [
             "CYBERNETIC"
@@ -92,7 +92,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_plasma_scoring",
+        "alias": "bsp_ps",
         "name": "Plasma Scoring",
         "types": [
             "WARFARE"
@@ -103,7 +103,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_dacxive_animators",
+        "alias": "bsp_dxa",
         "name": "Dacxive Animators",
         "types": [
             "BIOTIC"
@@ -115,7 +115,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_hyper_metabolism",
+        "alias": "bsp_hm",
         "name": "Hyper Metabolism",
         "types": [
             "BIOTIC"
@@ -127,7 +127,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_gravity_drive",
+        "alias": "bsp_gd",
         "name": "Gravity Drive",
         "types": [
             "PROPULSION"
@@ -139,7 +139,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_fleet_logistics",
+        "alias": "bsp_fl",
         "name": "Fleet Logistics",
         "types": [
             "PROPULSION"
@@ -151,7 +151,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_graviton_laser",
+        "alias": "bsp_gls",
         "name": "Graviton Laser System",
         "types": [
             "CYBERNETIC"
@@ -163,7 +163,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_magen_defense",
+        "alias": "bsp_md",
         "name": "Magen Defense Grid",
         "types": [
             "WARFARE"
@@ -175,7 +175,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_duranium_armor",
+        "alias": "bsp_da",
         "name": "Duranium Armor",
         "types": [
             "WARFARE"
@@ -187,7 +187,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_transit_diodes",
+        "alias": "bsp_td",
         "name": "Transit Diodes",
         "types": [
             "CYBERNETIC"
@@ -199,7 +199,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_assault_cannon",
+        "alias": "bsp_asc",
         "name": "Assault Cannon",
         "types": [
             "WARFARE"
@@ -211,7 +211,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_sling_relay",
+        "alias": "bsp_sr",
         "name": "Sling Relay",
         "types": [
             "PROPULSION"
@@ -223,18 +223,18 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_antimass_deflectors",
+        "alias": "bsp_amd",
         "name": "Antimass Deflectors",
         "types": [
             "PROPULSION"
         ],
-        "text": "Your ships can move into and through asteroid fields.\n\nWhen other players’ units use SPACE CANNON against your units, apply -1 to the result of each die roll.\n\nIf you announce a retreat, your opponent applies -2 to the result of each of their combat rolls during this combat round.",
+        "text": "Your ships can move into and through asteroid fields.\n\nWhen other players\u2019 units use SPACE CANNON against your units, apply -1 to the result of each die roll.\n\nIf you announce a retreat, your opponent applies -2 to the result of each of their combat rolls during this combat round.",
         "homebrewReplacesID": "amd",
         "initials": "AD",
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_bioplasmosis",
+        "alias": "bsp_bio",
         "name": "Bioplasmosis",
         "types": [
             "BIOTIC"
@@ -247,7 +247,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_production_biomes",
+        "alias": "bsp_pm",
         "name": "Production Biomes",
         "types": [
             "BIOTIC"
@@ -260,7 +260,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_yin_spinner",
+        "alias": "bsp_yso",
         "name": "Yin Spinner",
         "types": [
             "BIOTIC"
@@ -273,7 +273,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_instinct_training",
+        "alias": "bsp_it",
         "name": "Instinct Training",
         "types": [
             "BIOTIC"
@@ -286,7 +286,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_l4_disruptors",
+        "alias": "bsp_l4",
         "name": "L4 Disruptors",
         "types": [
             "CYBERNETIC"
@@ -299,7 +299,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_impulse_core",
+        "alias": "bsp_ic",
         "name": "Impulse Core",
         "types": [
             "CYBERNETIC"
@@ -312,7 +312,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_inheritance_systems",
+        "alias": "bsp_is",
         "name": "Inheritance Systems",
         "types": [
             "CYBERNETIC"
@@ -325,7 +325,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_e_res",
+        "alias": "bsp_ers",
         "name": "E-Res Siphons",
         "types": [
             "CYBERNETIC"
@@ -338,7 +338,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_spatial_conduit",
+        "alias": "bsp_scc",
         "name": "Spatial Conduit Cylinders",
         "types": [
             "PROPULSION"
@@ -351,7 +351,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_lazax_gate",
+        "alias": "bsp_lgf",
         "name": "Lazax Gate Folding",
         "types": [
             "PROPULSION"
@@ -364,7 +364,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_valkyrie_particle",
+        "alias": "bsp_vpw",
         "name": "Valkyrie Particle Weave",
         "types": [
             "WARFARE"
@@ -377,7 +377,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_magmus_reactor",
+        "alias": "bsp_mr",
         "name": "Magmus Reactor",
         "types": [
             "WARFARE"
@@ -390,7 +390,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_dimensional_splicer",
+        "alias": "bsp_ds",
         "name": "Dimensional Splicer",
         "types": [
             "WARFARE"
@@ -403,7 +403,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_hegemonic_trade",
+        "alias": "bsp_htp",
         "name": "Hegemonic Trade Policy",
         "types": [
             "CYBERNETIC"
@@ -416,7 +416,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_aerie_hololattice",
+        "alias": "bsp_ah",
         "name": "Aerie Hololattice",
         "types": [
             "CYBERNETIC"
@@ -426,6 +426,196 @@
         "text": "Other players cannot move ships through systems that contain your structures, unless you allow it.\n\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.\n\nAfter you activate a system, you may exhaust this card; during this tactical action, your units can move out of systems that contain both your structures and your command tokens.",
         "homebrewReplacesID": "ah",
         "initials": "AH",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_inf2",
+        "name": "Infantry II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "text": "Cost 1(x2), Combat 7\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry in your home system or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "inf2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lw2",
+        "name": "Letani Warrior II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "arborec",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 7\nPRODUCTION 2\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry on a planet you control with a structure or in a space area with a war sun or a flagship.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "lw2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_so2",
+        "name": "Spec Ops II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "sol",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 6\nAfter this unit is destroyed, roll 1 die. If the result is 5-10, capture it. At the start of your turn, you may place captured infantry in your home system or in a space area with a war sun or a flagship.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource or influence value, gain that planet readied.",
+        "homebrewReplacesID": "so2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_cl2",
+        "name": "Crimson Legionnaire II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "mahact",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 7\nAfter this unit is destroyed, capture it and gain 1 commodity or convert 1 of your commodities to a trade good. At the start of your turn, you may place captured infantry in your home system or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "cl2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sd2",
+        "name": "Space Dock II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\n\nUp to 4 fighters in this system do not count against your ships' capacity.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "sd2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ffac2",
+        "name": "Floating Factory II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "saar",
+        "baseUpgrade": "bsp_sd2",
+        "text": "Move 2, Capacity 5\nPRODUCTION 8\nThis unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.\n\nDuring your turn, you may treat this space dock and your planets in this system as if they were in your home system.",
+        "homebrewReplacesID": "ffac2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dt2",
+        "name": "Dimensional Tear II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "cabal",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PRODUCTION 8\nThis system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\n\nUp to 13 fighters in this system do not count against your ships' capacity.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "dt2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sdn2",
+        "name": "Super Dreadnought II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "l1z1x",
+        "baseUpgrade": "dn2",
+        "text": "Cost 4, Combat 4, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 4\nThis unit cannot be destroyed by \"Direct Hit\" action cards.\n\nAfter an invasion in this system, if the number of planets you gained is equal to or greater than the number of your dreadnoughts in this system, you may spend 1 token from your strategy pool to ready 1 of your technologies.",
+        "homebrewReplacesID": "sdn2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ac2",
+        "name": "Advanced Carrier II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BB",
+        "faction": "sol",
+        "baseUpgrade": "cv2",
+        "text": "Cost 3, Combat 9, Move 2, Capacity 8\nSUSTAIN DAMAGE\nApply +1 to the movement of this unit when it moves through at least 2 different systems containing your command tokens.",
+        "homebrewReplacesID": "ac2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pws2",
+        "name": "Prototype War Sun II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RRRY",
+        "faction": "muaat",
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD.\n\nDuring an action, you may assign a hit to this unit to treat 1 system other than the Mecatol Rex system that contains your flagship as if it were a supernova for the duration of that action.",
+        "homebrewReplacesID": "pws2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_helios2",
+        "name": "4X41C \"Helios\" V2",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "bastion",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\n\nThe resource value of this planet is increased by 2. Up to 4 fighters in this system do not count against your ships' capacity.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "helios2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dsceldsd",
+        "name": "Trade Port II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "celdauri",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PRODUCTION X, ANTI-FIGHTER BARRAGE 6(x2)\nThis unit's PRODUCTION value is equal to 5 more than the resource or influence value of this planet.\n\nUp to 4 fighters in this system do not count against your ships' capacity. This unit may use its ANTI-FIGHTER BARRAGE during each round of space combat.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "dsceldsd",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dsmykosd",
+        "name": "Mycelium Ring II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "mykomentori",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PLANETARY SHIELD, PRODUCTION X\nThis unit's PRODUCTION value is equal to 6 more than the resource value of this planet.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.\n\nDEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock.",
+        "homebrewReplacesID": "dsmykosd",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dscymiinf",
+        "name": "Unholy Abomination II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "cymiae",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1, Combat 4\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry in your home system, on a planet you control or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "dscymiinf",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dszeliinf",
+        "name": "Impactor II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "zelian",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 7\nBOMBARDMENT 8\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry in your home system, in an asteroid field system with your units or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "dszeliinf",
         "source": "black_spectrum"
     }
 ]

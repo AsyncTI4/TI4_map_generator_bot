@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -14,6 +15,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
@@ -22,7 +24,9 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.service.RemoveCommandCounterService;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.game.MonumentsService;
 import ti4.service.regex.RegexService;
 import ti4.service.tactical.TacticalActionOutputService;
 import ti4.service.tactical.TacticalActionService;
@@ -135,6 +139,14 @@ class TacticalActionButtonHandlers {
         if (!game.getTacticalActionDisplacement().isEmpty()) {
             TacticalActionService.reverseAllUnitMovement(event, game, player);
         }
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (activeTile != null
+                && CommandCounterHelper.hasCC(event, player.getColor(), activeTile)
+                && !TacticalActionService.shouldSkipPlacingAbilities(game, player)
+                && !event.getButton().getLabel().toLowerCase().contains("ring")) {
+            RemoveCommandCounterService.fromTile(player.getColor(), activeTile, game);
+            player.setTacticalCC(player.getTacticalCC() + 1);
+        }
         // TODO: revert all activation effects consistently, then wire this back up
         String message =
                 "Choosing a different system to activate. Please choose the ring of the map that the system you wish to activate is located in.";
@@ -207,6 +219,18 @@ class TacticalActionButtonHandlers {
                             .map(r -> r.onUnitHolder(addToHolder))
                             .toList();
                     AddUnitService.addUnits(event, game, toAdd);
+                    if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
+                        ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(
+                                game,
+                                owner,
+                                tile,
+                                removeFromHolder.getName(),
+                                addToHolder.getName(),
+                                type,
+                                removed.stream()
+                                        .mapToInt(RemovedUnit::getTotalRemoved)
+                                        .sum());
+                    }
 
                     List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
@@ -265,20 +289,37 @@ class TacticalActionButtonHandlers {
                     List<RemovedUnit> toAdd = removed.stream()
                             .map(r -> r.onUnitHolder(addToHolder))
                             .toList();
-                    AddUnitService.addUnits(event, game, toAdd);
-
-                    List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
-
                     String planetName = Mapper.getPlanet(planet).getNameNullSafe();
                     String landingMsg = player.fogSafeEmoji() + " landed " + amount + colorMsg + " "
                             + type.humanReadableName() + " on " + planetName + ".";
                     if (!removed.isEmpty()) {
+                        // Announce the landing before adding the units: addUnits can trigger CONTROLLED
+                        // lore (e.g. a troop-removing effect) that posts its own follow-up messages, and
+                        // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
+                        AddUnitService.addUnits(event, game, toAdd);
+                        if (type == UnitType.Infantry) {
+                            MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);
+                        }
+                        if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
+                            ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(
+                                    game,
+                                    owner,
+                                    tile,
+                                    removeFromHolder.getName(),
+                                    addToHolder.getName(),
+                                    type,
+                                    removed.stream()
+                                            .mapToInt(RemovedUnit::getTotalRemoved)
+                                            .sum());
+                        }
                     } else {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 "Landing failed for an unknown reason. Regenerated buttons, please ping bothelper if the problem persists.");
                     }
+
+                    List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
                     event.getMessage()
                             .editMessage(event.getMessage().getContentRaw())
                             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))

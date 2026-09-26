@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -13,22 +14,24 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AttachmentModel;
+import ti4.model.ExploreModel;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class TaAbilityHandler {
 
     private static final String PLANETARY_RECONFIGURATION = "planetary_reconfiguration";
-    private static final String EFFICIENT_GOVERNANCE = "efficient_governance";
+    private static final String PERFECT_ARCHITECTURE = "perfect_architecture";
+    private static final String PERFECT_ARCHITECTURE_RESOLVE = "taPerfectArchitecture_";
     private static final String ATTACH_DESIGN_PREFIX = "taAttachDesign_";
     private static final List<String> ATTACHABLE_DESIGNS =
-            List.of("designunify", "designtranspose", "designprestige", "designabundance");
+            List.of("designtranspose", "designprestige", "designabundance");
 
     public static void sendPlanetaryReconfigurationStatus(Player player, Game game) {
         if (player == null
@@ -40,7 +43,7 @@ public class TaAbilityHandler {
 
         Map<String, String> attachedDesigns = getAttachedDesigns(game);
         StringBuilder message =
-                new StringBuilder().append(" __Planetary Reconfiguration__").append("\n**Attached to planets:**");
+                new StringBuilder().append("__**Planetary Reconfiguration**__").append("\n__Attached to planets:__");
 
         boolean hasAttachedDesigns = false;
         for (String design : ATTACHABLE_DESIGNS) {
@@ -58,7 +61,7 @@ public class TaAbilityHandler {
             message.append("\n- None");
         }
 
-        message.append("\n**In reinforcements:**");
+        message.append("\n__In reinforcements:__");
         boolean hasUnattachedDesigns = false;
         for (String design : ATTACHABLE_DESIGNS) {
             if (attachedDesigns.containsKey(design)) {
@@ -119,6 +122,94 @@ public class TaAbilityHandler {
                 + ", you may attach 1 design from your reinforcements to "
                 + Helper.getPlanetRepresentation(planetName, game) + ".";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    public static boolean offerPerfectArchitecture(
+            GenericInteractionCreateEvent event,
+            Player player,
+            Game game,
+            Tile tile,
+            String planetName,
+            String firstCard,
+            String exploreType) {
+        if (event == null
+                || player == null
+                || game == null
+                || tile == null
+                || !player.hasAbility(PERFECT_ARCHITECTURE)) {
+            return false;
+        }
+        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        boolean hasStructure = planet != null
+                && planet.getUnitKeysForPlayer(player).stream()
+                        .map(player::getUnitFromUnitKey)
+                        .anyMatch(unit -> unit != null && unit.getIsStructure());
+        if (planet == null || (!planetHasAnyAttachment(tile, planetName) && !hasStructure)) {
+            return false;
+        }
+        String secondCard = game.drawExplore(exploreType);
+        if (secondCard == null) {
+            return false;
+        }
+        ExploreModel firstExplore = Mapper.getExplore(firstCard);
+        ExploreModel secondExplore = Mapper.getExplore(secondCard);
+        if (firstExplore == null || secondExplore == null) {
+            game.discardExplore(firstCard);
+            game.discardExplore(secondCard);
+            return true;
+        }
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the exploration card to resolve with **Perfect Architecture**.",
+                List.of(firstExplore.getRepresentationEmbed(), secondExplore.getRepresentationEmbed()),
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + PERFECT_ARCHITECTURE_RESOLVE + firstCard + "|"
+                                        + secondCard + "|" + planetName,
+                                "Resolve " + firstExplore.getName()),
+                        Buttons.green(
+                                player.factionButtonChecker() + PERFECT_ARCHITECTURE_RESOLVE + secondCard + "|"
+                                        + firstCard + "|" + planetName,
+                                "Resolve " + secondExplore.getName())));
+        return true;
+    }
+
+    @ButtonHandler(PERFECT_ARCHITECTURE_RESOLVE)
+    public static void resolvePerfectArchitectureExplore(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String[] parts =
+                buttonID.substring(PERFECT_ARCHITECTURE_RESOLVE.length()).split("\\|", 3);
+        if (event == null
+                || player == null
+                || game == null
+                || parts.length != 3
+                || !player.hasAbility(PERFECT_ARCHITECTURE)) {
+            return;
+        }
+        Tile tile = game.getTileFromPlanet(parts[2]);
+        ExploreModel explore = Mapper.getExplore(parts[0]);
+        if (tile == null || explore == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        game.discardExplore(parts[1]);
+        ExploreService.resolveExplore(
+                event,
+                parts[0],
+                tile,
+                parts[2],
+                player.getRepresentationNoPing() + " resolved _" + explore.getName()
+                        + " with **Perfect Architecture**.",
+                player,
+                game);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
+            TaLeadersHandler.resolveTaCommander(player, tile, game, parts[2]);
+        }
+        if (player.getPlanets().contains(parts[2])) {
+            offerPlanetaryReconfigurationButtons(player, game, tile, parts[2]);
+        }
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void returnPlanetaryReconfigurationDesigns(Player player, Game game, Planet planet) {
@@ -208,7 +299,7 @@ public class TaAbilityHandler {
     }
 
     public static boolean planetHasAnyDesignAttached(Tile tile, String planetName) {
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
         if (planet == null) {
             return false;
         }
@@ -222,8 +313,14 @@ public class TaAbilityHandler {
         return false;
     }
 
-    private static boolean planetHasGrandDesignAttached(Tile tile, String planetName) {
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+    public static boolean planetHasAnyAttachment(Tile tile, String planetName) {
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+        return planet != null
+                && planet.getTokenList().stream().anyMatch(token -> Mapper.getAttachmentInfo(token) != null);
+    }
+
+    public static boolean planetHasGrandDesignAttached(Tile tile, String planetName) {
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
         if (planet == null) {
             return false;
         }
@@ -245,36 +342,13 @@ public class TaAbilityHandler {
         return attachment.getName().replace(" (Design)", "");
     }
 
-    public static void resolveEfficientGovernance(Game game, String winner) {
-        if (game == null || winner == null || winner.isBlank()) {
+    public static void resolveGrandDesign(Player player, Game game, String planetName) {
+        if (game == null || player == null) {
             return;
         }
-
-        for (Player player : AgendaHelper.getWinningVoters(winner, game)) {
-            if (!player.hasAbility(EFFICIENT_GOVERNANCE)) {
-                continue;
-            }
-
-            List<Button> buttons = new ArrayList<>(Helper.getPlanetRefreshButtons(player, game));
-            buttons.add(Buttons.red("deleteButtons", "Done Readying"));
-            if (buttons != null) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " You may ready up to 2 planets due to your _Efficient Governance_ ability.",
-                        buttons);
-            }
-        }
-    }
-
-    public static void resolveGrandDesign(Player player, Game game, String planetName) {
         Tile tile = game.getTileFromPlanet(planetName);
         Planet planet = game.getPlanetsInfo().get(planetName);
-        if (game == null
-                || planet == null
-                || tile == null
-                || player == null
-                || !player.hasAbility(PLANETARY_RECONFIGURATION)) {
+        if (planet == null || tile == null || !player.hasAbility(PLANETARY_RECONFIGURATION)) {
             return;
         }
 

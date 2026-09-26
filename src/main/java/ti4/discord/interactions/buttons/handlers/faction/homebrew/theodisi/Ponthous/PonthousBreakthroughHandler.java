@@ -92,7 +92,7 @@ public class PonthousBreakthroughHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentation()
-                            + ", choose the non-fighter ship to destroy with _Self-Destruct Button_.",
+                            + ", please choose the non-fighter ship to destroy with _Self-Destruct Button_.",
                     buttons);
         }
     }
@@ -181,7 +181,7 @@ public class PonthousBreakthroughHandler {
                 ButtonHelper.deleteMessage(event);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
-                        player.getRepresentation() + ", choose the ground combat for _Self-Destruct Button_.",
+                        player.getRepresentation() + ", please choose the ground combat for _Self-Destruct Button_.",
                         targetButtons);
                 return;
             }

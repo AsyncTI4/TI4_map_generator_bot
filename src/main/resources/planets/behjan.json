@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "behjan",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "behjan",
     "tileId": "er124",
     "name": "Behjan",

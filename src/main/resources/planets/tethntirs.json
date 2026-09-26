@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tethntirs",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "tethntirs",
     "tileId": "er54",
     "name": "Tethn'Tirs",

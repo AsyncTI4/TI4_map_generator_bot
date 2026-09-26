@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tethnsekus",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "tethnsekus",
     "tileId": "er54",
     "name": "Tethn'Sekus",

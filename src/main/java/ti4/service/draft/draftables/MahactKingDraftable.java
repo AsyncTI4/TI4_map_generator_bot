@@ -1,6 +1,7 @@
 package ti4.service.draft.draftables;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -10,15 +11,16 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.draft.items.MahactKingDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MahactKingDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -32,30 +34,32 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
     public static final DraftableType TYPE = DraftableType.of("King");
 
+    public static String switchFactionSet(String faction) {
+        return faction.contains("tf") ? faction.replace("tf", "tknova") : faction.replace("tknova", "tf");
+    }
+
     public void initialize(
-            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
-
-        List<String> effBannedFactions = new ArrayList<>(bannedFactions);
-        List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
-                .filter(f -> !effBannedFactions.contains(f.getAlias()))
-                .filter(f -> sources.contains(f.getSource()))
-                .map(FactionModel::getAlias)
-                .toList());
-        List<String> randomOrder = new ArrayList<>(presetFactions);
-        Collections.shuffle(randomOrder);
-        Collections.shuffle(availableFactions);
-        randomOrder.addAll(availableFactions);
-
-        int i = 0;
+            int numFactions,
+            Collection<String> allFactions,
+            Collection<String> presetFactions,
+            Collection<String> bannedFactions,
+            String tkNovaSetupOption) {
         List<String> output = new ArrayList<>();
-        while (output.size() < numFactions) {
-            if (i >= randomOrder.size()) break;
-            String f = randomOrder.get(i);
-            i++;
-            if (output.contains(f)) continue;
-            output.add(f);
+        for (Collection<String> factions : List.of(presetFactions, allFactions)) {
+            List<String> randomOrder = new ArrayList<>(factions);
+            Collections.shuffle(randomOrder);
+            for (String f : randomOrder) {
+                if (output.size() == numFactions) {
+                    break;
+                }
+                if (bannedFactions.contains(f)
+                        || output.contains(f)
+                        || ("onePerColor".equals(tkNovaSetupOption) && output.contains(switchFactionSet(f)))) {
+                    continue;
+                }
+                output.add(f);
+            }
         }
-
         draftFactions = output;
     }
 
@@ -281,12 +285,14 @@ public class MahactKingDraftable extends SinglePickDraftable {
         if (!game.isTwilightsFallMode()) {
             game.setupTwilightsFallMode(event);
         }
-
         initialize(
                 kingSettings.getNumFactions().getVal(),
-                List.of(ComponentSource.twilights_fall),
-                kingSettings.getPriFactions().getKeys().stream().toList(),
-                kingSettings.getBanFactions().getKeys().stream().toList());
+                MahactKingDraftItem.getAllFactions(game)
+                        .map(FactionModel::getAlias)
+                        .toList(),
+                kingSettings.getPriFactions().getKeys(),
+                kingSettings.getBanFactions().getKeys(),
+                game.isTkNovaCup() ? game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option") : "");
 
         return null;
     }

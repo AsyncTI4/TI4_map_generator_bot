@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static java.util.Map.entry;
+import static java.util.Map.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -76,6 +76,31 @@ public final class Constants {
     public static final String bortId = "154000388121559040";
     public static final String dicecordId = "572698679618568193";
 
+    // Game Modes
+    public static final String BASE_GAME_MODE = "base_game_mode";
+    public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
+    public static final String TWILIGHTS_FALL_MODE = "twilights_fall_mode";
+    public static final String COMMUNITY_MODE = "community_mode";
+    public static final String ALLIANCE_MODE = "alliance_mode";
+    public static final String FOW_OPTIONS = "fow_options";
+    public static final String FOW_MODE = "fow_mode";
+    public static final String LIGHT_FOG_MODE = "light_fog_mode";
+    public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
+    public static final String RED_TAPE_MODE = "red_tape_mode";
+    public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
+    public static final String SPIN_MODE = "spin_mode";
+    public static final String ABSOL_MODE = "absol_mode";
+    public static final String PROMISES_PROMISES = "promises_promises";
+    public static final String FLAGSHIPPING = "flagshipping";
+    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
+    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
+    public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
+    public static final String TWILIGHT_DS = "twilight_ds";
+    public static final String TWILIGHT_KART = "twilight_kart";
+    public static final String TK_DESTROYER_CUP = "tk_destroyer_cup";
+    public static final String TK_NOVA_CUP = "tk_nova_cup";
+    public static final String TF_BR = "tf_br";
+
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
@@ -126,9 +151,6 @@ public final class Constants {
     public static final String ALLOW_GAME_CREATION = "allow_game_creation";
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String LAST_IMAGE_FILE_NAME = "last_image_file_name";
-    public static final String COMMUNITY_MODE = "community_mode";
-    public static final String ALLIANCE_MODE = "alliance_mode";
-    public static final String FOW_MODE = "fow_mode";
     public static final String AVERNUS = "avernus";
     public static final String BROKENPLANET1 = "brokenplanet1";
     public static final String BROKENPLANET2 = "brokenplanet2";
@@ -136,28 +158,13 @@ public final class Constants {
     public static final String BROKENPLANET4 = "brokenplanet4";
     public static final String BROKENPLANET5 = "brokenplanet5";
     public static final String BROKENPLANET6 = "brokenplanet6";
-    public static final String FOW_OPTIONS = "fow_options";
-    public static final String BASE_GAME_MODE = "base_game_mode";
-    public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
-    public static final String TWILIGHTS_FALL_MODE = "twilights_fall_mode";
-    public static final String LIGHT_FOG_MODE = "light_fog_mode";
-    public static final String CPTI_EXPLORE_MODE = "cpti_explore_mode";
-    public static final String RED_TAPE_MODE = "red_tape_mode";
-    public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
-    public static final String SPIN_MODE = "spin_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
     public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
     public static final String PENDING_MOVEMENT_STATE = "pending_movement_state";
-    public static final String ABSOL_MODE = "absol_mode";
-    public static final String PROMISES_PROMISES = "promises_promises";
-    public static final String FLAGSHIPPING = "flagshipping";
     public static final String JUST_UNITS = "just_units";
-    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
-    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
-    public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
-    public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String THUNDERSEDGE = "thundersedge";
+    public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String NOTEPAD = "notepad";
@@ -243,6 +250,7 @@ public final class Constants {
 
     public static final String TOKEN_INGRESS = "token_ingress.png";
     public static final String TOKEN_EGRESS = "token_egress.png";
+    public static final String TOKEN_FRACTURE = "token_fracture_async.png";
     public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
     public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
     public static final String TOKEN_SEVERED = "token_severed.png";
@@ -390,6 +398,7 @@ public final class Constants {
     public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
     public static final String IMPORT_MAP_JSON = "import_json";
     public static final String EXPORT_MAP_JSON = "export_json";
+    public static final String IMPORT_DECK_CONFIG = "import_deck_config";
     public static final String BLUE_TILES = "blue_tiles";
     public static final String RED_TILES = "red_tiles";
     public static final String HOME_SYSTEMS = "home_systems";
@@ -436,8 +445,8 @@ public final class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4", "mrte");
-    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec", "112");
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4", "mrte", "mc");
+    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec", "112", "8100");
 
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
@@ -456,12 +465,24 @@ public final class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
+    private static final String CINERON = "cineron";
+    private static final String SKARNATH = "skarnath";
+    private static final String LETHARA = "lethara";
+    private static final String GYRAXIS = "gyraxis";
+    private static final String LOST_STATION = "loststation";
+    private static final String ILLUSTRION = "illustrion";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
             OASIS,
             CRADLE,
             ILLUSION,
             PHANTASM,
+            CINERON,
+            SKARNATH,
+            LETHARA,
+            GYRAXIS,
+            LOST_STATION,
+            ILLUSTRION,
             AVERNUS,
             THUNDERSEDGE,
             BROKENPLANET1,
@@ -501,6 +522,9 @@ public final class Constants {
     public static final String STELLAR_CONVERTER = "stellar_converter";
     public static final String EXPEDITION_WIN_RATES = "expedition_win_rates";
     public static final String TWILIGHTS_FALL_SPLICE_WIN_RATES = "tf_splice_win_rates";
+    public static final String SLICE_TILE_WIN_RATES = "slice_tile_win_rates";
+    public static final String PLANET_WIN_RATES = "planet_win_rates";
+    public static final String SUPPORT_WIN_RATES = "support_win_rates";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
@@ -513,6 +537,7 @@ public final class Constants {
     public static final String LIZHO_TRAP_PNG = "attachment_lizhotrap.png";
     public static final String LIZHO = "lizho";
     public static final String WORLD_DESTROYED_PNG = "token_worlddestroyed.png";
+    public static final String THEODISI_WORLD_DESTROYED_PNG = "token_theodisi_worlddestroyed.png";
     public static final String TOKEN_ION_ALPHA_PNG = "token_ionalpha.png";
     public static final String TOKEN_ION_BETA_PNG = "token_ionbeta.png";
     public static final String SWAP_SYSTEMS = "swap_systems";
@@ -530,6 +555,9 @@ public final class Constants {
     public static final String SET_FOG_FILTER = "set_fog_filter";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
+    public static final String TARGET_PLANET_PING = "target_planet";
+    public static final String TARGET_SYSTEM_PING = "target_system";
+    public static final String TARGET_PLAYER_PING = "target_player_ping";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
     public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
@@ -702,6 +730,11 @@ public final class Constants {
     public static final String PLAYER = "player";
     public static final String SO_SCORE_FROM_HAND = "so_score_hand_";
     public static final String AC_PLAY_FROM_HAND = "ac_play_from_hand_";
+    public static final String AC_PING_PICK = "acPingPick_";
+    public static final String AC_PING_PLANET = "acPingPlanet";
+    public static final String AC_PING_SYSTEM = "acPingSystem";
+    public static final String AC_PING_PLAYER = "acPingPlayer";
+    public static final String AC_PING_ROUTE = "acPingRoute_";
     public static final String SLING_RELAY = "sling_relay";
     public static final String PO_SCORING = "po_scoring_";
     public static final String PO_NO_SCORING = "po_no_scoring";
@@ -759,6 +792,7 @@ public final class Constants {
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String COMMODITIES_BASE = "commodities_base";
     public static final String STASIS_INFANTRY = "stasis_infantry";
+    public static final String STASIS_FIGHTERS = "stasis_fighters";
     public static final String MARK_FOLLOWED = "mark_followed";
     public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
     public static final String FACTION = "faction";
@@ -775,6 +809,7 @@ public final class Constants {
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String AC_STATUS = "action_cards_status";
+    public static final String AC_PLAYED = "action_cards_played";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String PRODUCED_UNITS = "produced_units";
@@ -1023,6 +1058,7 @@ public final class Constants {
     public static final String SEND_FRAGMENT = "send_fragment";
     public static final String USE = "use";
     public static final String PURGE_FRAGMENTS = "purge_fragments";
+    public static final String SHOW_PURGED_FRAGMENTS = "show_purged_fragments";
     public static final String FRAGMENTS = "fragments";
     public static final String LIST_FRAGMENTS = "list_fragments";
     public static final String RELIC = "relic";
@@ -1110,7 +1146,6 @@ public final class Constants {
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
-    public static final String WINNING_PATH = "winning_path";
     public static final String TEXT_SIZE = "text_size";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
@@ -1308,6 +1343,25 @@ public final class Constants {
     public static final List<String> VERBOSITY_OPTIONS =
             List.of(VERBOSITY_VERBOSE, VERBOSITY_AVERAGE, VERBOSITY_MINIMAL);
 
+    public static final List<String> CALL_OF_THE_HAUNTED_LEADERS = List.of(
+            "revenantstonebornagent",
+            "revenantoblivioncommander",
+            "revenantkairnhero",
+            "revenantardentiaagent",
+            "revenantxytheriscommander",
+            "revenantthroneshero",
+            "revenantscrapyardagent",
+            "revenantponthouscommander",
+            "revenantmyrrhero",
+            "revenantarcanumagent",
+            "revenantvanguardcommander",
+            "revenantkryxoshero",
+            "revenantverydithagent",
+            "revenantveylorcommander",
+            "revenantthurvialihero",
+            "revenantxytherisagent",
+            "revenantmyrrcommander");
+
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
@@ -1326,7 +1380,10 @@ public final class Constants {
     public static final String CONVENTIONS_OF_WAR_ABANDONED_MODE = "conventions_of_war_abandoned_mode";
     public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
+    public static final String MONUMENTS_MODE = "monuments_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
+    public static final String COSMIC_CONVERGENCE_MODE = "cosmic_convergence_mode";
+    public static final String MUAAT_MANIA_MODE = "muaat_mania_mode";
     public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
@@ -1341,6 +1398,7 @@ public final class Constants {
     public static final String WHISPERS_DISABLED = "whispers_disabled";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
+    public static final String ERWANS_GAMBIT_MODE = "erwans_gambit_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
@@ -1396,7 +1454,9 @@ public final class Constants {
     public static final String START_NEW_SPLICE = "start_new_splice";
     public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
+    public static final String SKULLS = "skulls";
     public static final String FIX_COLORS = "fix_colors";
+    public static final String GUILD_AGENTS = "guild_agents";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
     public static final String DRAW_RANDOM_GENOME = "draw_random_genome";
     public static final String DRAW_RANDOM_BLUE_TILE = "draw_random_blue_tile";
@@ -1438,6 +1498,7 @@ public final class Constants {
     public static final String MECH_ID = "mech";
     public static final String FLAGSHIP_ID = "flagship";
     public static final String OBSERVER = "observer";
+    public static final String AMOUNT = "amount";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
     public static final String SET_GAME_LIMIT = "set_game_limit";
@@ -1461,11 +1522,13 @@ public final class Constants {
     public static final String MOD_ADJACENT_MECH = "adjacent_mech";
     public static final String MOD_OPPONENT_NON_FIGHTER_SHIP = "opponent_non_fighter_ship";
     public static final String MOD_OPPONENT_SHIP = "opponent_ship";
+    public static final String MOD_VERYDITH_FLAGSHIP = "opponent_cc_in_system";
 
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
+    public static final String MMR_HISTORY = "mmr_history";
     public static final String UPLOAD_RECENT_GAME_STATS = "upload_recent_game_stats";
 
     public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";
@@ -1512,6 +1575,7 @@ public final class Constants {
     public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
     public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
     public static final String VOX_SENTINELS_PNG = "attachment_vox_sentinels.png";
+    public static final String VERYDITH_ATTACHMENT_PNG = "attachment_verydithposresinf.png";
     public static final String EXAMPLES_ONLY = "examples_only";
     public static final String HOW_TO_MOVE_UNITS = "how_to_move_units";
     public static final String IS_ASTEROID_FIELD = "is_asteroid_field";
@@ -1609,6 +1673,7 @@ public final class Constants {
     public static final String TIGL_RANK = "tigl_rank";
     public static final String TIGL = "tigl";
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
+    public static final String TIGL_REPORT_MANUALLY = "report_manually";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
     public static final String LAZAX = "lazax";
@@ -1636,8 +1701,6 @@ public final class Constants {
     public static final String ALL = "ALL";
     public static final String COEXIST = "coexist";
 
-    public static final String TWILIGHT_KART = "twilight_kart";
-    public static final String TWILIGHT_DS = "twilight_ds";
     public static final String ABILITY_DECK_ID = "ability_deck_id";
     public static final String GENOME_DECK_ID = "genome_deck_id";
     public static final String PARADIGM_DECK_ID = "paradigm_deck_id";

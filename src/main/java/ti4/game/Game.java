@@ -42,7 +42,16 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMapsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
@@ -88,6 +97,7 @@ import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
@@ -100,6 +110,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.databind.JsonNode;
@@ -310,11 +321,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         publicObjectives1 = Mapper.getShuffledDeck("public_stage_1_objectives_pok");
         publicObjectives2 = Mapper.getShuffledDeck("public_stage_2_objectives_pok");
         setSecretObjectives(Mapper.getShuffledDeck("secret_objectives_pok"));
-        setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
+        setActionCards(Mapper.getShuffledDeck("action_cards_te"));
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
         explore = Mapper.getShuffledDeck("explores_pok");
         setRelics(Mapper.getShuffledDeck("relics_pok_te"));
         setStrategyCardSet("te");
+        setThundersEdge(true);
 
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora
@@ -369,7 +381,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Player getPlayerThatControlsPlanet(String planet) {
-        for (Player p : getRealPlayers()) {
+        return getPlayerThatControlsPlanet(planet, false);
+    }
+
+    /**
+     * @param includeDummies also consider dummy players, which control planets in some setups (e.g. the
+     *                       Unstable Planet target list is built from real players and dummies).
+     */
+    public Player getPlayerThatControlsPlanet(String planet, boolean includeDummies) {
+        for (Player p : (includeDummies ? getRealPlayersNDummies() : getRealPlayers())) {
             if (p.getPlanets().contains(planet)) {
                 return p;
             }
@@ -640,17 +660,24 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setParadigmSpliceDeckID("tf_paradigm");
         setUnitSpliceDeckID("tf_units");
 
-        // Overrides for TK mode
-        if (isTwilightKart()) {
+        // Overrides for TK modes
+        if (isTkNovaCup()) {
+            setHomebrew(true);
+            acDeck = "action_cards_tk_nova";
+            setGenomeSpliceDeckID("tk_nova_genome");
+        }
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (isTwilightKart() || isTkDestroyerCup()) {
+            setHomebrew(true);
             agendaDeck = "agendas_twilight_kart";
-            acDeck = "action_cards_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
+            acDeck = "action_cards_tk_destroyer_and_nova";
         }
 
         // Set other normal decks
         validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
         validateAndSetRelicDeck(Mapper.getDeck(relicDeck));
-        setStrategyCardSet(stratCards);
+        setStrategyCardSet(isMonumentsMode() ? "monuments_tf" : stratCards);
         validateAndSetActionCardDeck(event, Mapper.getDeck(acDeck));
         setTechnologyDeckID(techDeck);
 
@@ -740,6 +767,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         if (player.getAllianceMembers().isEmpty()) {
+            return true;
+        }
+
+        Game game = player.getGame();
+        if (game.getRealPlayers().size() == 1
+                && player.isRealPlayer()
+                && game.getRealAndEliminatedPlayers().size() > 1) {
             return true;
         }
 
@@ -938,8 +972,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Conventions of War Abandoned", isConventionsOfWarAbandonedMode());
         gameModes.put("Rapid Mobilization", isRapidMobilizationMode());
         gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
+        gameModes.put(SourceEmojis.Monuments + "Monuments+", isMonumentsMode());
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
+        gameModes.put("Cosmic Convergence", isCosmicConvergenceMode());
+        gameModes.put("Muaat Mania", isMuaatManiaMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
@@ -947,6 +984,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
 
         gameModes.put("Liberation", isLiberationC4Mode());
+        gameModes.put("Erwan's Gambit", isErwansGambitMode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
 
@@ -962,11 +1000,24 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put(SourceEmojis.DiscordantStars + " Twilight DiscordantStars", isTwilightDS());
         gameModes.put("BlueReverie", isBlueReverieMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
+
+        // Twilight Kart Cups
+        List<String> tkCups = new ArrayList<>();
+        // isTwilightKart is deprecated. once removed, just check for isTkDestroyerCup
+        if (isTwilightKart() || isTkDestroyerCup()) {
+            tkCups.add("Destroyer Cup");
+        }
+        if (isTkNovaCup()) {
+            tkCups.add("Nova Cup " + SourceEmojis.TkNovaCup);
+        }
+        gameModes.put(
+                SourceEmojis.TwilightKart + " Twilight Kart (" + String.join(" & ", tkCups) + ")", !tkCups.isEmpty());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
@@ -1077,8 +1128,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    public TextChannel getSavedChannel() {
+    public MessageChannel getSavedChannel() {
         try {
+            if ("thread".equalsIgnoreCase(getStoredValue("savedChannelType"))) {
+                return JdaService.jda.getThreadChannelById(getSavedChannelID());
+            }
             return JdaService.jda.getTextChannelById(getSavedChannelID());
         } catch (Exception e) {
             return getMainGameChannel();
@@ -1429,6 +1483,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
+        ExtensionRefitLLButtonHandler.clearExtensionRefit(this);
+        AncientMapsLLButtonHandler.clearAncientMaps(this);
+        MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
+        RaisedMoraleLLButtonHandler.clearRaisedMorale(this);
+        PonthousPromissoryHandler.clearThunderbirdPrototype(this);
+        PonthousTechHandler.clearThunderbirdProtocol(this);
+        KryxosBreakthroughHandler.clearPrototypeInnovators(this);
+        TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(this);
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
@@ -1675,9 +1737,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private void addPublicObjectiveToDeck(String id) {
-        PublicObjectiveModel obj = Mapper.getPublicObjective(id);
-        if (obj == null) return;
-        if (obj.getPoints() == 1) {
+        if (Mapper.getPublicObjective(id) == null) return;
+        if (isStage1PublicObjective(id)) {
             publicObjectives1.add(id);
             Collections.shuffle(publicObjectives1);
         } else {
@@ -1730,18 +1791,21 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (id.isEmpty()) return false;
 
         revealedPublicObjectives.remove(id);
-        Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
-        Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
-        if (po1.contains(id)) {
+        if (isStage1PublicObjective(id)) {
             publicObjectives1Peeked.remove(id);
             publicObjectives1.add(id);
             Collections.shuffle(publicObjectives1);
-        } else if (po2.contains(id)) {
+        } else {
             publicObjectives2Peeked.remove(id);
             publicObjectives2.add(id);
             Collections.shuffle(publicObjectives2);
         }
         return true;
+    }
+
+    private boolean isStage1PublicObjective(String id) {
+        DeckModel stage1Deck = Mapper.getDeck(getStage1PublicDeckID());
+        return stage1Deck != null && stage1Deck.getCardIDs().contains(id);
     }
 
     public boolean unrevealPublicObjective(Integer idNumber) {
@@ -1758,9 +1822,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (publicObjective == null) return false;
 
         revealedPublicObjectives.remove(id);
-        if (publicObjective.getPoints() == 1) {
+        if (isStage1PublicObjective(id)) {
             unrevealPublicObjective(id, publicObjectives1Peekable, publicObjectives1Peeked);
-        } else if (publicObjective.getPoints() == 2) {
+        } else {
             unrevealPublicObjective(id, publicObjectives2Peekable, publicObjectives2Peeked);
         }
         return true;
@@ -1960,7 +2024,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean removeCustomPO(String id) {
-        if (!id.isEmpty()) {
+        if (!id.isEmpty() && customPublicVP.containsKey(id)) {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
             customPublicVP.remove(id);
@@ -2159,6 +2223,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     }
                 }
             }
+            MonumentsTEButtonHandler.offerKeleresMonumentCommandToken(this);
             return true;
         }
         return false;
@@ -2644,8 +2709,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 .map(ac -> Mapper.getActionCard(ac).getName())
                 .collect(Collectors.joining("\n"));
         Collections.shuffle(getActionCards());
-        acsToShuffle.forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
-        acsToShuffle.forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
+        acsToShuffle.forEach(this::removeFromDiscard); // clear out the shuffled back cards
         String msg = "# " + getPing()
                 + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         if (!isFowMode()) {
@@ -2950,7 +3014,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             getActionCards().remove(id);
-            setDiscardActionCard(id, null);
+            setDiscardActionCard(id, null, false);
             return id;
         }
 
@@ -2983,11 +3047,37 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public String drawSecretObjective(String userID) {
+        return drawSecretObjective(userID, 1);
+    }
+
+    public String drawSecretObjective(String userID, int type) {
         if (getSecretObjectives().isEmpty()) {
             return null;
         }
         String id = getSecretObjectives().getFirst();
         Player player = getPlayer(userID);
+
+        if (isErwansGambitMode() && "mentak".equalsIgnoreCase(player.getFaction())) {
+            List<SecretObjectiveModel> heistObbies =
+                    new ArrayList<>(Mapper.getSecretObjectives().values());
+            Collections.shuffle(heistObbies);
+            for (SecretObjectiveModel so : heistObbies) {
+                if (player.getSecrets().containsKey(so.getAlias())
+                        || getSoToPoList().contains(so.getAlias())) {
+                    continue;
+                }
+                if (so.getSource() != ComponentSource.erwans_gambit) {
+                    continue;
+                }
+                if (so.getPoints() != type) {
+                    continue;
+                }
+                id = so.getAlias();
+                player.setSecret(id);
+                checkSOLimit(player);
+                return id;
+            }
+        }
         if (player != null) {
             removeSOFromGame(id);
             player.setSecret(id);
@@ -3044,7 +3134,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return false;
     }
 
-    private void setDiscardActionCard(String id, ACStatus status) {
+    private void setDiscardActionCard(String id, ACStatus status, boolean played) {
         Collection<Integer> values = getDiscardActionCards().values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -3052,13 +3142,30 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         getDiscardActionCards().put(id, identifier);
         if (status != null) getDiscardACStatus().put(id, status);
+        if (played) {
+            getPlayedActionCards().add(id);
+        } else {
+            getPlayedActionCards().remove(id);
+        }
     }
 
-    private void setPurgedActionCard(String id) {
-        setDiscardActionCard(id, ACStatus.purged);
+    private void setPurgedActionCard(String id, boolean played) {
+        setDiscardActionCard(id, ACStatus.purged, played);
+    }
+
+    /** Removes a card from the discard pile and every piece of bookkeeping that hangs off it. */
+    private void removeFromDiscard(String acID) {
+        getDiscardActionCards().remove(acID);
+        getDiscardACStatus().remove(acID);
+        getPlayedActionCards().remove(acID);
     }
 
     public boolean discardActionCard(String userID, Integer acIDNumber) {
+        return discardActionCard(userID, acIDNumber, false);
+    }
+
+    /** @param played whether the card is leaving the hand because it was played, rather than discarded. */
+    public boolean discardActionCard(String userID, Integer acIDNumber, boolean played) {
         Player player = getPlayer(userID);
         if (player == null) {
             return false;
@@ -3074,13 +3181,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
-            setDiscardActionCard(acID, status);
+            setDiscardActionCard(acID, status, played);
             return true;
         }
         return false;
     }
 
     public boolean purgedActionCard(String userID, Integer acIDNumber) {
+        return purgedActionCard(userID, acIDNumber, false);
+    }
+
+    /** @param played whether the card is leaving the hand because it was played, rather than purged from hand. */
+    public boolean purgedActionCard(String userID, Integer acIDNumber, boolean played) {
         Player player = getPlayer(userID);
         if (player == null) {
             return false;
@@ -3103,7 +3215,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
-            setPurgedActionCard(acID);
+            setPurgedActionCard(acID, played);
             return true;
         }
         return false;
@@ -3133,8 +3245,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
-            getDiscardActionCards().remove(acID);
-            getDiscardACStatus().remove(acID);
+            removeFromDiscard(acID);
             player.setActionCard(acID);
             return true;
         }
@@ -3155,8 +3266,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
-            getDiscardActionCards().remove(acID);
-            getDiscardACStatus().remove(acID);
+            removeFromDiscard(acID);
             player.setActionCard(acID);
             return true;
         }
@@ -3172,8 +3282,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
-            getDiscardActionCards().remove(acID);
-            getDiscardACStatus().remove(acID);
+            removeFromDiscard(acID);
             getActionCards().add(acID);
             Collections.shuffle(getActionCards());
             return true;
@@ -3280,6 +3389,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            if (Mapper.getSecretObjective(soID).getSource() == ComponentSource.erwans_gambit) {
+                return true;
+            }
             getSecretObjectives().add(soID);
             Collections.shuffle(getSecretObjectives());
             return true;
@@ -3336,6 +3448,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
+        setMonumentsMode(sources.getMonuments().isVal());
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
@@ -3365,6 +3478,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         GameSetupSettings gameSetupSettings = draftSettings.getGameSetupSettings();
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
+        setMonumentsMode(sources.getMonuments().isVal());
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
@@ -3433,6 +3547,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
         }
 
+        MonumentsService.applyMonuments(this);
+
         return success;
     }
 
@@ -3477,8 +3593,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void resetActionCardDeck(DeckModel deck) {
         setAcDeckID(deck.getAlias());
         setActionCards(deck.getNewShuffledDeck());
+        removeOverruleIfPurged();
         getDiscardActionCards().clear();
         getDiscardACStatus().clear();
+        getPlayedActionCards().clear();
         for (Player player : players.values()) {
             player.getActionCards().clear();
         }
@@ -3518,7 +3636,31 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
+        removeOverruleIfPurged();
         return true;
+    }
+
+    public void removeOverruleIfPurged() {
+        if (isOverrulePurged()) {
+            getActionCards().removeIf("overrule"::equals);
+        }
+    }
+
+    public boolean isOverrulePurged() {
+        return "true".equals(getStoredValue("removeOverrule"));
+    }
+
+    public void addTeACs() {
+        List<String> oldDeck =
+                new ArrayList<>(Mapper.getDeck("action_cards_pok").getNewShuffledDeck());
+        List<String> newDeck = new ArrayList<>(Mapper.getDeck("action_cards_te").getNewShuffledDeck());
+        for (String ac : oldDeck) {
+            newDeck.remove(ac);
+        }
+        for (String acID : newDeck) {
+            getActionCards().add(acID);
+        }
+        Collections.shuffle(getActionCards());
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {
@@ -3684,7 +3826,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void setPurgedActionCards(List<String> purgedActionCardList) {
-        purgedActionCardList.forEach(ac -> setDiscardActionCard(ac, ACStatus.purged));
+        purgedActionCardList.forEach(ac -> setDiscardActionCard(ac, ACStatus.purged, false));
     }
 
     public String getPing() {
@@ -3974,6 +4116,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("triad", new Planet("triad", new Point(0, 0)));
         planets.put("grove", new Planet("grove", new Point(0, 0)));
         planets.put("aurelionstation", new Planet("aurelionstation", new Point(0, 0)));
+        planets.put("innersanctum", new Planet("innersanctum", new Point(0, 0)));
+        planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
+        planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
+        planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4145,8 +4291,22 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
+            if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null
+                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
+                        && pnOwner.hasLeaderUnlocked(leaderID)) {
+                    return true;
+                }
+                continue;
+            }
+            if (pnID.contains("_an")) {
+                Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null
+                        && "revenant".equalsIgnoreCase(pnOwner.getFaction())
+                        && !"revenantcommander".equalsIgnoreCase(leaderID)) {
+                    continue;
+                }
                 if (pnOwner != null
                         && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
                         && pnOwner.hasLeaderUnlocked(leaderID)) {
@@ -4166,7 +4326,62 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
+        // Grant access to the selected commander whose faction token is in the Revenant lich debt pool.
+        Player lichPoolOwner = getRevenantCommanderOwner(player);
+        if (!"revenantcommander".equalsIgnoreCase(leaderID) && lichPoolOwner != null) {
+            for (Player otherPlayer : getRealPlayersNDummies()) {
+                if (otherPlayer.equals(lichPoolOwner)) continue;
+
+                Leader commander = getRevenantLichCommander(lichPoolOwner, otherPlayer);
+                if (lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") > 0
+                        && commander != null
+                        && commander.getId().equalsIgnoreCase(leaderID)) {
+                    return true;
+                }
+            }
+        }
+
         return false;
+    }
+
+    public Player getRevenantCommanderOwner(Player player) {
+        if (player == null) {
+            return null;
+        }
+        if (player.hasLeaderUnlocked("revenantcommander")) {
+            return player;
+        }
+        for (String pnID : player.getPromissoryNotesInPlayArea()) {
+            if (!pnID.contains("_an")) {
+                continue;
+            }
+            Player pnOwner = getPNOwner(pnID);
+            if (pnOwner != null
+                    && "revenant".equalsIgnoreCase(pnOwner.getFaction())
+                    && pnOwner.hasLeaderUnlocked("revenantcommander")) {
+                return pnOwner;
+            }
+        }
+        return null;
+    }
+
+    public Leader getRevenantLichCommander(Player lichPoolOwner, Player target) {
+        if (lichPoolOwner == null || target == null) {
+            return null;
+        }
+        String[] selection = getStoredValue("revenantLichCommander_" + lichPoolOwner.getFaction())
+                .split("\\|", 2);
+        if (selection.length == 2 && target.getFaction().equalsIgnoreCase(selection[0])) {
+            Leader selectedCommander = target.getLeaderByID(selection[1]).orElse(null);
+            if (selectedCommander != null && Constants.COMMANDER.equals(selectedCommander.getType())) {
+                return selectedCommander;
+            }
+        }
+        return target.getLeaders().stream()
+                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                .filter(leader -> leader.getId().contains(target.getFaction()))
+                .findFirst()
+                .orElse(null);
     }
 
     public List<Leader> playerUnlockedLeadersOrAlliance(Player player) {
@@ -4174,7 +4389,20 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
+            if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
+                Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null && !pnOwner.equals(player)) {
+                    for (Leader playerLeader : pnOwner.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())
+                                || !playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        leaders.add(playerLeader);
+                    }
+                }
+                continue;
+            }
+            if (pnID.contains("_an")) {
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
                     for (Leader playerLeader : pnOwner.getLeaders()) {
@@ -4182,6 +4410,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                             continue;
                         }
                         if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        if ("revenant".equalsIgnoreCase(pnOwner.getFaction())
+                                && !"revenantcommander".equalsIgnoreCase(playerLeader.getId())) {
                             continue;
                         }
                         leaders.add(playerLeader);
@@ -4213,10 +4445,32 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
             }
         }
+
+        // Add the selected commander whose faction token is in this debt pool.
+        Player lichPoolOwner = getRevenantCommanderOwner(player);
+        if (lichPoolOwner != null) {
+            for (Player otherPlayer : getRealPlayers()) {
+                if (otherPlayer.equals(lichPoolOwner)
+                        || lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                    continue;
+                }
+
+                Leader commander = getRevenantLichCommander(lichPoolOwner, otherPlayer);
+                if (commander != null) {
+                    leaders.add(getUnlockedLeaderCopy(commander));
+                }
+            }
+        }
+
         leaders = leaders.stream()
                 .filter(leader -> leader != null && !leader.isLocked())
                 .collect(Collectors.toList());
         return leaders;
+    }
+
+    public Leader getUnlockedLeaderCopy(Leader leader) {
+        return new Leader(
+                leader.getId(), leader.getType(), leader.getTgCount(), leader.isExhausted(), false, leader.isActive());
     }
 
     public void incrementMapImageGenerationCount() {
@@ -4679,9 +4933,19 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
+                || isUnchartedSpaceStuff()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
+                || isTwilightKart()
+                || isTkDestroyerCup()
+                || isTkNovaCup()
+                || isTfBr()
+                || isTwilightDS()
+                || isMuaatManiaMode()
+                || isCosmicConvergenceMode()
+                || isLiberationC4Mode()
+                || isErwansGambitMode()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()

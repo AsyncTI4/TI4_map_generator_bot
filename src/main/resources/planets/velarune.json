@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "velarune",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "velarune",
     "tileId": "ba4",
     "name": "Velarune",

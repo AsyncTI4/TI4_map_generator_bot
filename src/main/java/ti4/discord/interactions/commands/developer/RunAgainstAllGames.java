@@ -1,230 +1,180 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
+import ti4.game.helper.GameHelper;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.helpers.AliasHandler;
-import ti4.image.Mapper;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
-import ti4.model.Source.ComponentSource;
 
 class RunAgainstAllGames extends Subcommand {
 
-    // The 5 removed Eronous factions and their component ids; the models no longer exist, so ids are hardcoded here.
-    private static final Set<String> ERONOUS_FACTIONS = Set.of("canto", "eidolon", "shadows", "mechi", "saera");
-    private static final Map<String, String> ERONOUS_HOME_TILES =
-            Map.of("canto", "as01", "eidolon", "as02", "shadows", "as03", "mechi", "as04", "saera", "as05");
-    private static final Set<String> ERONOUS_PLANETS = Set.of(
-            "thyolcian", "voyd", "etyr", "ecconv", "tyriaprime", "akredrite", "meccna", "gaia", "gensis", "aeva");
-    private static final Set<String> ERONOUS_TECHS = Set.of(
-            "cantoy",
-            "cantor",
-            "eidolonff",
-            "eidolonb",
-            "shadowssd",
-            "shadowsy",
-            "mechig",
-            "mechiy",
-            "saeracr",
-            "saeray");
-    private static final Set<String> ERONOUS_PNS = Set.of("cantopn", "eidolonpn", "shadowspn", "mechipn", "saerapn");
-    private static final Set<String> ERONOUS_LEADERS = Set.of(
-            "cantoagent",
-            "cantocommander",
-            "cantohero",
-            "eidolonagent",
-            "eidoloncommander",
-            "eidolonhero",
-            "shadowsagent",
-            "shadowscommander",
-            "shadowshero",
-            "mechiagent",
-            "mechicommander",
-            "mechihero",
-            "saeraagentprosperity",
-            "saeraagentwarning",
-            "saeraagentprotection",
-            "saeracommander",
-            "saerahero");
-    private static final Set<String> ERONOUS_ABILITIES = Set.of(
-            "enslave",
-            "dominate",
-            "seamless_integration",
-            "void_tap",
-            "dark_weaver",
-            "abyssal_propagation",
-            "creeping_shades",
-            "silent_growth",
-            "tomb_worlds",
-            "protocols",
-            "machine_cult",
-            "protocol_distribution",
-            "protocol_command",
-            "protocol_excavation",
-            "protocol_espionage",
-            "protocol_conflict",
-            "angelic_hosts",
-            "guidance",
-            "celestial_being");
-    private static final Set<String> ERONOUS_UNITS = Set.of(
-            "canto_flagship",
-            "canto_mech",
-            "eidolon_flagship",
-            "eidolon_mech",
-            "eidolon_fighter",
-            "eidolon_fighter2",
-            "shadows_flagship",
-            "shadows_mech",
-            "shadows_spacedock",
-            "shadows_spacedock2",
-            "mechi_flagship",
-            "mechi_mech",
-            "saera_flagship",
-            "saera_mech",
-            "saera_cruiser",
-            "saera_cruiser2");
+    private static final String DRY_RUN_OPTION = "dry_run";
+    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 8, 1);
+    /**
+     * Older games stored every Council Keleres as a bare "keleres", which no faction file answers
+     * to - faction_alias maps it to keleres_dont_use_this. Every statistic that reads a faction
+     * model drops those players, so retype them as the flavour their home system says they were.
+     */
+    private static final String LEGACY_KELERES_FACTION = "keleres";
+
+    /**
+     * What a player nothing in their game can place becomes. The handful this catches are all
+     * unfinished or fog games that no statistic reads, so the flavour is a label rather than a
+     * finding - each one is listed in the report so the guess stays visible.
+     */
+    private static final String DEFAULT_KELERES_FACTION = "keleresm";
+
+    /**
+     * The Keleres-only home systems. Nobody else sits on these, so one of them anywhere on a board
+     * names the flavour even when the player it belonged to cannot be placed any other way.
+     */
+    private static final Map<String, String> KELERES_FACTION_BY_KELERES_TILE =
+            Map.of("92new", "keleresx", "93new", "keleresa", "94new", "keleresm");
+
+    /**
+     * The same three home systems as the base factions wear them. Keleres predates the re-skinned
+     * 92new/93new/94new tiles, so the older games this command exists for seat Keleres on 02, 14 and
+     * 58 instead - which are also Mentak's, Xxcha's and Argent's, so these only count when the tile
+     * is the legacy Keleres player's own.
+     */
+    private static final Map<String, String> KELERES_FACTION_BY_OWN_TILE = Map.ofEntries(
+            Map.entry("92new", "keleresx"),
+            Map.entry("93new", "keleresa"),
+            Map.entry("94new", "keleresm"),
+            Map.entry("14", "keleresx"),
+            Map.entry("58", "keleresa"),
+            Map.entry("02", "keleresm"),
+            Map.entry("2", "keleresm"));
+
+    /**
+     * The faction each flavour borrows its home system from. Keleres never shares a table with that
+     * faction, so a home system of theirs in a game without them can only be the Keleres player's.
+     */
+    private static final Map<String, String> BORROWED_FROM =
+            Map.of("keleresx", "xxcha", "keleresa", "argent", "keleresm", "mentak");
+
+    private static final Map<String, String> KELERES_FACTION_BY_HOME_PLANET = Map.ofEntries(
+            Map.entry("archonrenk", "keleresx"),
+            Map.entry("archontauk", "keleresx"),
+            Map.entry("valkk", "keleresa"),
+            Map.entry("ylirk", "keleresa"),
+            Map.entry("avark", "keleresa"),
+            Map.entry("mollprimusk", "keleresm"),
+            Map.entry("archonren", "keleresx"),
+            Map.entry("archontau", "keleresx"),
+            Map.entry("valk", "keleresa"),
+            Map.entry("ylir", "keleresa"),
+            Map.entry("avar", "keleresa"),
+            Map.entry("mollprimus", "keleresm"));
 
     RunAgainstAllGames() {
-        super("run_against_all_games", "Runs this custom code against all games.");
+        super("run_against_all_games", "Retypes legacy 'keleres' players as keleresm, keleresa or keleresx.");
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, DRY_RUN_OPTION, "Report what would change without saving anything."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
+        boolean dryRun = event.getOption(DRY_RUN_OPTION, false, OptionMapping::getAsBoolean);
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Adding TE ACs to all TE games that started after " + PLAYER_TRACKING_START_DATE
+                        + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
-        Set<String> changedGames = new HashSet<>();
+        List<String> changedGames = new ArrayList<>();
+        int[] migratedTargets = {0};
+
         ConsumeGameUtility.consumeAllGames(
                 game -> {
-                    boolean changed = removeEronousFactions(game);
-                    if (changed) {
-                        changedGames.add(game.getName());
-                        GameManager.save(game, "Removed Eronous factions from game state.");
+                    if (!startedAfterPlayerTracking(game) || game.isHasEnded()) {
+                        return;
+                    }
+                    int migrated = migrateLegacyTargets(game, dryRun);
+                    if (migrated == 0) {
+                        return;
+                    }
+                    migratedTargets[0] += migrated;
+                    changedGames.add(game.getName() + " ");
+                    if (!dryRun) {
+                        GameManager.save(game, "Added TE ACs.");
                     }
                 },
-                ExecutionLockType.WRITE);
+                dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
-        BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()
-                + " games: " + String.join(", ", changedGames));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                (dryRun ? "[DRY RUN] Would remove " : "Removed ") + "convert " + migratedTargets[0]
+                        + " leftover legacy targets"
+                        + " across " + changedGames.size() + " games out of " + GameManager.getGameCount() + " games: "
+                        + String.join(", ", changedGames));
     }
 
-    static boolean removeEronousFactions(Game game) {
-        boolean changed = false;
-
-        // Swap any player playing a removed Eronous faction to a random official faction
-        for (Player player : game.getPlayers().values()) {
-            String oldFaction = player.getFaction();
-            if (oldFaction == null || !ERONOUS_FACTIONS.contains(oldFaction)) continue;
-            changed = true;
-
-            FactionModel replacement = pickReplacementFaction(game);
-            if (replacement == null) {
-                BotLogger.warning("removeEronousFactions: no replacement faction available in game " + game.getName()
-                        + " for player " + player.getUserName());
-                continue;
-            }
-
-            Tile oldHomeTile = null;
-            String oldHomeTileId = ERONOUS_HOME_TILES.get(oldFaction);
-            for (Tile tile : game.getTileMap().values()) {
-                if (oldHomeTileId.equals(tile.getTileID())) {
-                    oldHomeTile = tile;
-                    break;
-                }
-            }
-
-            player.setFaction(game, replacement.getAlias());
-            player.setFactionEmoji(null);
-            player.setFactionTechs(new ArrayList<>(replacement.getFactionTech()));
-            player.setUnitsOwned(new HashSet<>(replacement.getUnits()));
-
-            Set<String> ownedNotes = new HashSet<>(player.getPromissoryNotesOwned());
-            ownedNotes.removeAll(ERONOUS_PNS);
-            ownedNotes.addAll(replacement.getPromissoryNotes());
-            player.setPromissoryNotesOwned(ownedNotes);
-
-            if (oldHomeTile != null) {
-                String newHomeTileId = AliasHandler.resolveTile(replacement.getHomeSystem());
-                Tile newHomeTile = new Tile(newHomeTileId, oldHomeTile.getPosition(), oldHomeTile.getSpaceUnitHolder());
-                game.setTile(newHomeTile);
-                for (String planet : replacement.getHomePlanets()) {
-                    String planetId = AliasHandler.resolvePlanet(planet.toLowerCase());
-                    if (!player.getPlanets().contains(planetId)) {
-                        player.getPlanets().add(planetId);
-                    }
-                }
-            }
-            player.setCommoditiesBase(replacement.getCommodities());
-            int commoditiesTotal = player.getCommoditiesTotal();
-            if (player.getCommodities() > commoditiesTotal) {
-                player.setCommodities(commoditiesTotal);
-            }
-
-            BotLogger.info("removeEronousFactions: in game " + game.getName() + ", swapped " + player.getUserName()
-                    + " from " + oldFaction + " to " + replacement.getAlias());
-        }
-
-        // Scrub stray Eronous component ids from every player (covers franken drafts and traded PNs)
-        for (Player player : game.getPlayers().values()) {
-            changed |= player.getLeaders().removeIf(leader -> ERONOUS_LEADERS.contains(leader.getId()));
-            changed |= player.getAbilities().removeAll(ERONOUS_ABILITIES);
-            changed |= player.getExhaustedAbilities().removeAll(ERONOUS_ABILITIES);
-            // direct list ops on purpose: removeTech() side effects can NPE on ids with no model
-            changed |= player.getTechs().removeAll(ERONOUS_TECHS);
-            changed |= player.getExhaustedTechs().removeAll(ERONOUS_TECHS);
-            changed |= player.getPurgedTechs().removeAll(ERONOUS_TECHS);
-            changed |= player.getFactionTechs().removeAll(ERONOUS_TECHS);
-            changed |= player.getUnitsOwned().removeAll(ERONOUS_UNITS);
-            changed |= player.getPromissoryNotesOwned().removeAll(ERONOUS_PNS);
-            changed |= player.getPromissoryNotesInPlayArea().removeAll(ERONOUS_PNS);
-            for (String pn : ERONOUS_PNS) {
-                if (player.getPromissoryNotes().containsKey(pn)) {
-                    player.removePromissoryNote(pn);
-                    changed = true;
-                }
-            }
-            changed |= player.getPlanets().removeAll(ERONOUS_PLANETS);
-            changed |= player.getExhaustedPlanets().removeAll(ERONOUS_PLANETS);
-            changed |= player.getExhaustedPlanetsAbilities().removeAll(ERONOUS_PLANETS);
-        }
-
-        changed |= game.getPurgedPN().removeAll(ERONOUS_PNS);
-
-        // Remove any Eronous home system tiles left on the map (e.g. from an abandoned setup)
-        for (Tile tile : new ArrayList<>(game.getTileMap().values())) {
-            if (ERONOUS_HOME_TILES.containsValue(tile.getTileID())) {
-                game.removeTile(tile.getPosition());
-                changed = true;
-            }
-        }
-
-        return changed;
+    /**
+     * The tile the player is anchored to. Safe to read the base home systems from, unlike a sweep of
+     * the whole board, because this one is theirs.
+     */
+    static String factionFromTheirOwnHomeTile(Game game, Player player) {
+        return Stream.of(player.getHomeSystemPosition(), player.getPlayerStatsAnchorPosition())
+                .filter(position -> StringUtils.isNotBlank(position) && !"null".equalsIgnoreCase(position))
+                .map(game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .map(tile -> KELERES_FACTION_BY_OWN_TILE.get(tile.getTileID()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 
-    private static FactionModel pickReplacementFaction(Game game) {
-        List<FactionModel> pool = Mapper.getFactionsValues().stream()
-                .filter(f -> f.getSource().isOfficial())
-                .filter(f -> game.isTwilightsFallMode() == (f.getSource() == ComponentSource.twilights_fall))
-                .filter(f -> !"neutral".equals(f.getAlias()) && !"keleres".equals(f.getAlias()))
-                .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
-                .filter(f -> game.getTile(AliasHandler.resolveTile(f.getHomeSystem())) == null)
-                .collect(Collectors.toCollection(ArrayList::new));
-        if (pool.isEmpty()) return null;
-        Collections.shuffle(pool);
-        return pool.getFirst();
+    @SuppressWarnings("deprecation")
+    private static int migrateLegacyTargets(Game game, boolean dryRun) {
+        if (dryRun) {
+            if (!"action_cards_te".equalsIgnoreCase(game.getAcDeckID())) {
+                return 0;
+            }
+            // Counting instead of converting - a dry run must not touch the game.
+            int acCount = game.getActionCards().size()
+                    + game.getPurgedActionCards().size()
+                    + game.getDiscardActionCards().size();
+            for (Player player : game.getRealPlayers()) {
+                acCount += player.getActionCards().size();
+            }
+            if (acCount < 130) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+        int pending = migrateLegacyTargets(game, true);
+        if (pending == 0) {
+            return 0;
+        }
+        game.addTeACs();
+        return pending;
+    }
+
+    static boolean startedAfterPlayerTracking(Game game) {
+        if (StringUtils.isBlank(game.getCreationDate())) {
+            return false;
+        }
+        try {
+            return GameHelper.getCreationDateAsLocalDate(game).isAfter(PLAYER_TRACKING_START_DATE);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
 }

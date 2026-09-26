@@ -375,7 +375,7 @@ public final class TeHelperAbilities {
                 if (!player.unitBelongsToPlayer(uk)) continue;
 
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock, UnitType.Monument).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
                 if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 

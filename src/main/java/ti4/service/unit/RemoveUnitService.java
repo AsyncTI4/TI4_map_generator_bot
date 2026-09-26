@@ -10,7 +10,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -22,6 +24,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.service.agenda.MonumentsAgendaService;
+import ti4.service.game.MonumentsService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 
 @UtilityClass
@@ -79,7 +83,9 @@ public class RemoveUnitService {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
-            if (uk.unitType() == UnitType.Pds || uk.unitType() == UnitType.Spacedock) {
+            if (uk.unitType() == UnitType.Pds
+                    || uk.unitType() == UnitType.Spacedock
+                    || uk.unitType() == UnitType.Monument) {
                 continue;
             }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
@@ -174,6 +180,9 @@ public class RemoveUnitService {
             ParsedUnit parsedUnit,
             UnitState preferredState) {
         List<UnitHolder> unitHoldersToRemoveFrom = getUnitHoldersToRemoveFrom(tile, parsedUnit);
+        Player unitOwner = game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+        boolean removingPelagion = parsedUnit.unitKey().unitType() == UnitType.Monument
+                && MonumentsTEButtonHandler.isPelagionMonument(game, unitOwner, tile);
 
         if (unitHoldersToRemoveFrom.isEmpty()) {
             handleEmptyUnitHolders(event, tile, parsedUnit);
@@ -198,7 +207,21 @@ public class RemoveUnitService {
         }
 
         if (toRemoveCount > 0 && event != null) {
-            MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Did not find enough " + parsedUnit.unitKey().getColor() + " units to remove, " + toRemoveCount
+                            + " missing.");
+        }
+
+        for (RemovedUnit removedUnit : allUnitsRemoved) {
+            if (removedUnit.unitKey().unitType() == UnitType.Monument) {
+                MonumentsAgendaService.resolveCathedralOfIxthRemoval(
+                        game, removedUnit.getPlayer(game), removedUnit.uh().getName());
+                if (removingPelagion && removedUnit.uh() instanceof Planet) {
+                    MonumentsTEButtonHandler.offerPelagionThunderdome(
+                            game, unitOwner, tile, removedUnit.uh().getName());
+                }
+            }
         }
 
         allUnitsRemoved.stream()
@@ -206,6 +229,18 @@ public class RemoveUnitService {
                 .map(removedUnit -> removedUnit.getPlayer(game))
                 .distinct()
                 .forEach(player -> ThronesUnitHandler.syncAurelionStation(game, player));
+
+        allUnitsRemoved.stream()
+                .filter(removedUnit -> removedUnit.unitKey().unitType() == UnitType.Monument)
+                .map(removedUnit -> removedUnit.getPlayer(game))
+                .filter(Objects::nonNull)
+                .distinct()
+                .forEach(player -> MonumentsService.syncKyroReliquaryAttachment(game, player));
+
+        if (allUnitsRemoved.stream()
+                .anyMatch(removedUnit -> removedUnit.unitKey().unitType() == UnitType.Monument)) {
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
         tile.getUnitHolders()
                 .values()

@@ -1,0 +1,36 @@
+{
+    "id": "mnemosyne",
+    "tileId": "ef10",
+    "name": "Mnemosyne",
+    "aliases": [
+        "mnemosyne"
+    ],
+    "resources": 0,
+    "influence": 0,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "techSpecialties": [
+        "PROPULSION",
+        "BIOTIC",
+        "WARFARE",
+        "CYBERNETIC"
+    ],
+    "legendaryAbilityName": "Innovative Flux",
+    "legendaryAbilityText": "You may exhaust this card when you pass to purge 1 technology you own. When you do, gain 1 technology with the same number of prerequisites.",
+    "planetLayout": {
+        "unitHolderName": "mnemosyne",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170.0,
+            "y": 150.0
+        },
+        "extraIcons": 1
+    },
+    "positionInTile": {
+        "x": 172.0,
+        "y": 150.0
+    },
+    "contrastColor": "orange",
+    "source": "expanded_fracture"
+}

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "verdis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "verdis",
     "tileId": "er88",
     "name": "Verdis",

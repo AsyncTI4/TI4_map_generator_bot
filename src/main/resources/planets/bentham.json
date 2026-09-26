@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bentham",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 205,
+            "y": 210
+        }
+    },
     "id": "bentham",
     "tileId": "c02",
     "name": "Bentham",

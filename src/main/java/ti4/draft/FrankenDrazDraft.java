@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -24,11 +25,13 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
+import ti4.draft.items.MonumentDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
+import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -37,12 +40,29 @@ import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyService;
 
 public class FrankenDrazDraft extends FrankenDraft {
     public static final String UNLIMITED_KEPT_COMPONENTS_KEY = "frankenDrazUnlimitedKeptComponents";
-    public static final String FACTION_LIMIT_KEY = "frankenDrazFactionLimit";
-
+    public static final String PRIORITY_FACTIONS_KEY = "frankenDrazPriorityFactions";
+    public static final String DISCORDANT_STARS_FACTION_LIMITS_KEY = "frankenDrazDiscordantStarsFactionLimits";
+    public static final String BLUE_REVERIE_FACTION_LIMITS_KEY = "frankenDrazBlueReverieFactionLimits";
+    public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
+    private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
+    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
+            "lazax",
+            "admins",
+            "franken",
+            "keleresm",
+            "keleresx",
+            "miltymod",
+            "qulane",
+            "neutral",
+            "obsidian",
+            "stoneborn",
+            "morpha",
+            "thurviali");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,
@@ -56,7 +76,8 @@ public class FrankenDrazDraft extends FrankenDraft {
             DraftCategory.PN,
             DraftCategory.HOMESYSTEM,
             DraftCategory.STARTINGTECH,
-            DraftCategory.STARTINGFLEET);
+            DraftCategory.STARTINGFLEET,
+            DraftCategory.MONUMENT);
 
     public FrankenDrazDraft(Game owner) {
         super(owner);
@@ -64,8 +85,9 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
-            case FACTION -> getFactionLimit(getOwner());
+            case FACTION -> getFactionDraftLimit();
             case BLUETILE -> 3;
             case REDTILE -> 2;
             case DRAFTORDER -> 1;
@@ -73,8 +95,14 @@ public class FrankenDrazDraft extends FrankenDraft {
         };
     }
 
+    private int getFactionDraftLimit() {
+        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.FACTION);
+        return configuredLimit.isEmpty() ? DEFAULT_FACTION_LIMIT : Integer.parseInt(configuredLimit);
+    }
+
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         int limit =
                 switch (category) {
                     case ABILITY -> 4;
@@ -82,6 +110,7 @@ public class FrankenDrazDraft extends FrankenDraft {
                     case REDTILE -> 2;
                     case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
                     case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+                    case MONUMENT -> getMonumentKeptLimit();
                     case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
                     case FACTION, UNIT, PLOT, MAHACTKING -> 0;
                 };
@@ -95,12 +124,13 @@ public class FrankenDrazDraft extends FrankenDraft {
         return "true".equals(game.getStoredValue(UNLIMITED_KEPT_COMPONENTS_KEY));
     }
 
-    public static int getFactionLimit(Game game) {
-        String storedLimit = game.getStoredValue(FACTION_LIMIT_KEY);
-        if (!storedLimit.isEmpty()) {
-            return Integer.parseInt(storedLimit);
-        }
-        return DEFAULT_FACTION_LIMIT;
+    public static int getDefaultMonumentLimit() {
+        return DEFAULT_MONUMENT_LIMIT;
+    }
+
+    private int getMonumentKeptLimit() {
+        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.MONUMENT);
+        return configuredLimit.isEmpty() ? DEFAULT_MONUMENT_LIMIT : Integer.parseInt(configuredLimit);
     }
 
     @Override
@@ -122,7 +152,32 @@ public class FrankenDrazDraft extends FrankenDraft {
     public List<DraftBag> generateBags(Game game) {
         Map<DraftCategory, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
-        allDraftableItems.put(DraftCategory.FACTION, FactionDraftItem.buildAllDraftableItems(allDraftableFactions));
+        List<DraftItem> factionItems = FactionDraftItem.buildAllDraftableItems(allDraftableFactions);
+        int factionPoolSize = game.getRealPlayers().size() * getFactionDraftLimit();
+        Map<ComponentSource, int[]> sourceLimits = new HashMap<>();
+        for (Map.Entry<ComponentSource, String> entry : Map.of(
+                        ComponentSource.ds, DISCORDANT_STARS_FACTION_LIMITS_KEY,
+                        ComponentSource.blue_reverie, BLUE_REVERIE_FACTION_LIMITS_KEY,
+                        ComponentSource.theodisi, LOST_LEGACIES_FACTION_LIMITS_KEY)
+                .entrySet()) {
+            String[] limits = game.getStoredValue(entry.getValue()).split("\\|", 2);
+            if (limits.length == 2) {
+                sourceLimits.put(entry.getKey(), new int[] {Integer.parseInt(limits[0]), Integer.parseInt(limits[1])});
+            }
+        }
+        List<String> factionAliases =
+                factionItems.stream().map(DraftItem::getItemId).toList();
+        List<String> priorityFactions =
+                List.of(PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue(PRIORITY_FACTIONS_KEY)));
+        List<FactionModel> selectedFactions = MiltyService.createFactionDraft(
+                        factionPoolSize, new ArrayList<>(factionAliases), priorityFactions, sourceLimits)
+                .stream()
+                .map(Mapper::getFaction)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        List<DraftItem> selectedFactionItems = FactionDraftItem.buildAllItems(selectedFactions);
+        Collections.shuffle(selectedFactionItems);
+        allDraftableItems.put(DraftCategory.FACTION, selectedFactionItems);
         allDraftableItems.put(DraftCategory.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
@@ -207,6 +262,21 @@ public class FrankenDrazDraft extends FrankenDraft {
                     }
                 }
             }
+            if (game.isMonumentsMode()) {
+                List<String> draftedFactions = hand.Contents.stream()
+                        .filter(FactionDraftItem.class::isInstance)
+                        .map(DraftItem::getItemId)
+                        .toList();
+                for (DraftItem monument : MonumentDraftItem.buildAllItems(game)) {
+                    if (Boolean.TRUE.equals(monument.getErrata().getUndraftable())) {
+                        continue;
+                    }
+                    if (draftedFactions.contains(
+                            Mapper.getUnit(monument.getItemId()).getFaction().orElse(null))) {
+                        expanded.putIfAbsent(monument.getAlias(), monument);
+                    }
+                }
+            }
             hand.Contents.clear();
             hand.Contents.addAll(expanded.values());
         }
@@ -215,7 +285,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     public void sendPostDraftComponentButtons(Player player) {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded. Home systems and starting fleet must be added manually, as well as any additional or optional components added via these components. Category buttons are present for your convenience.",
+                "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded.\n\nHome systems and starting fleet adds/swaps must be handled manually, however the mantis/random map build will give you buttons to select your hs and starting fleet. Category buttons are present for your convenience.",
                 getPostDraftCategoryButtons(player));
     }
 
@@ -352,6 +422,9 @@ public class FrankenDrazDraft extends FrankenDraft {
     private List<Button> getPostDraftCategoryButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         for (DraftCategory category : POST_DRAFT_COMPONENT_CATEGORIES) {
+            if (category == DraftCategory.MONUMENT && !player.getGame().isMonumentsMode()) {
+                continue;
+            }
             String buttonID = player.factionButtonChecker() + "frankenDrazCategory;" + category.name();
             buttons.add(Buttons.gray(buttonID, categoryLabel(category), category.emoji(player.getGame())));
         }
@@ -493,24 +566,27 @@ public class FrankenDrazDraft extends FrankenDraft {
                 || hand.getCategoryCount(DraftCategory.FLAGSHIP) > 0
                 || hand.getCategoryCount(DraftCategory.PN) > 0
                 || hand.getCategoryCount(DraftCategory.STARTINGTECH) > 0
-                || hand.getCategoryCount(DraftCategory.BREAKTHROUGH) > 0;
+                || hand.getCategoryCount(DraftCategory.BREAKTHROUGH) > 0
+                || hand.getCategoryCount(DraftCategory.MONUMENT) > 0;
     }
 
-    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         Map<String, FactionModel> factions = new LinkedHashMap<>();
         for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);
         }
+        // Frankendraz includes DS and BR by default; the Frankendraft menu excludes either
+        // source by adding its factions to bannedFactions when its disable toggle is selected.
         for (FactionModel faction : getAllFrankenLegalFactions(null)) {
             if (faction.getSource() == ComponentSource.ds || faction.getSource() == ComponentSource.blue_reverie) {
                 factions.put(faction.getAlias(), faction);
             }
         }
-
         String[] bannedFactions = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);
         }
+        factions.entrySet().removeIf(entry -> EXCLUDED_FACTIONS.contains(entry.getKey()));
         return new ArrayList<>(factions.values());
     }
 }

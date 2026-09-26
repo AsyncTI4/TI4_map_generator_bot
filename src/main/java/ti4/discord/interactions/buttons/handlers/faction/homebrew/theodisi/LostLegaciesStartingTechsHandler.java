@@ -1,7 +1,9 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -37,7 +39,7 @@ public class LostLegaciesStartingTechsHandler {
 
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " press this button to choose your starting technology.",
+                player.getRepresentationUnfogged() + " press this button to get your starting technology.",
                 Buttons.green(
                         player.factionButtonChecker() + "getLostLegaciesStartingTechOptions", "Get Starting Tech"));
         return true;
@@ -59,6 +61,7 @@ public class LostLegaciesStartingTechsHandler {
             case "arcanum" -> offerArcanumStartingTechs(game, player);
             case "aeterna" -> offerAeternaStartingTechs(game, player);
             case "revenant" -> offerRevenantStartingTechs(game, player);
+            case "scrapyard" -> gainRandomScrapyardStartTechs(game, player);
             default -> {}
         }
     }
@@ -68,31 +71,48 @@ public class LostLegaciesStartingTechsHandler {
             return false;
         }
         return switch (faction.toLowerCase()) {
-            case "arcanum", "aeterna", "revenant" -> true;
+            case "arcanum", "aeterna", "revenant", "scrapyard" -> true;
             default -> false;
         };
     }
 
-    private static void offerArcanumStartingTechs(Game game, Player player) {
+    public static void offerArcanumStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
         sendTechPrompt(
                 player,
                 techs,
                 player.getRepresentationUnfogged()
-                        + " choose your first starting technology. You must choose **2 technologies in the same color with no prerequisites**.",
+                        + " choose your first non-faction starting technology. You must choose **2 technologies in the same color with no prerequisites**.",
                 false);
         sendTechPrompt(
                 player,
                 techs,
                 player.getRepresentationUnfogged()
-                        + " choose your second starting technology. It must have the **same color** as your first choice and have no prerequisites.",
+                        + " choose your second non-faction starting technology. It must have the **same color** as your first choice and have no prerequisites.",
                 false);
     }
 
-    private static void offerAeternaStartingTechs(Game game, Player player) {
+    public static void offerAeternaStartingTechs(Game game, Player player) {
+        List<TechnologyModel> techs = eligibleTechnologies(game, player, 1);
+        sendTechPrompt(
+                player,
+                techs,
+                player.getRepresentationUnfogged()
+                        + " choose your first non-faction starting technology. You must choose **2 technologies in different colors with 1 total prerequisite**. Choose one zero-prerequisite technology and one one-prerequisite technology.",
+                false);
+        sendTechPrompt(
+                player,
+                techs,
+                player.getRepresentationUnfogged()
+                        + " choose your second non-faction starting technology. It must have a **different color** from your first choice, and the two choices must have **1 total prerequisite**.",
+                false);
+    }
+
+    public static void offerRevenantStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
-        String rule = "You may choose up to **2 technologies with no prerequisites owned by no other player**. "
-                + "All zero-prerequisite technologies are listed, so verify that no other player owns your choice.";
+        String rule =
+                "You may choose up to **2 non-faction technologies with no prerequisites owned by no other player**. "
+                        + "All zero-prerequisite technologies are listed, so verify that no other player owns your choice.";
         sendTechPrompt(
                 player,
                 techs,
@@ -107,20 +127,23 @@ public class LostLegaciesStartingTechsHandler {
                 true);
     }
 
-    private static void offerRevenantStartingTechs(Game game, Player player) {
-        List<TechnologyModel> techs = eligibleTechnologies(game, player, 1);
-        sendTechPrompt(
-                player,
-                techs,
-                player.getRepresentationUnfogged()
-                        + " choose your first starting technology. You must choose **2 technologies in different colors with 1 total prerequisite**. Choose one zero-prerequisite technology and one one-prerequisite technology.",
-                false);
-        sendTechPrompt(
-                player,
-                techs,
-                player.getRepresentationUnfogged()
-                        + " choose your second starting technology. It must have a **different color** from your first choice, and the two choices must have **1 total prerequisite**.",
-                false);
+    public static void gainRandomScrapyardStartTechs(Game game, Player player) {
+        List<TechnologyModel> randomTechs = new ArrayList<>(eligibleTechnologies(game, player, 0));
+        Collections.shuffle(randomTechs);
+        randomTechs = randomTechs.stream().limit(3).toList();
+
+        for (TechnologyModel tech : randomTechs) {
+            player.addTech(tech.getAlias());
+        }
+        if (!randomTechs.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " gained starting technologies: "
+                            + randomTechs.stream()
+                                    .map(tech -> tech.getRepresentation(false))
+                                    .collect(Collectors.joining(", "))
+                            + ".");
+        }
     }
 
     private static List<TechnologyModel> eligibleTechnologies(Game game, Player player, int maxPrerequisites) {

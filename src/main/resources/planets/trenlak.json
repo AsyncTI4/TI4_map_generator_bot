@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "trenlak",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 130,
+            "y": 86
+        }
+    },
     "id": "trenlak",
     "tileId": "13",
     "name": "Tren'lak",

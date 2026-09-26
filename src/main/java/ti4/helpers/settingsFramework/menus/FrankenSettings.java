@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.franken.ban.BanService;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
@@ -31,6 +32,8 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.franken.FrankenDraftStartService;
+import ti4.service.franken.FrankenUnitService;
+import ti4.service.game.MonumentsService;
 import tools.jackson.databind.JsonNode;
 
 @Getter
@@ -47,18 +50,22 @@ public class FrankenSettings extends SettingsMenu {
             "miltymod",
             "qulane",
             "neutral",
-            "kaltrim",
-            "xin",
-            "sarcosa",
-            "obsidian");
+            "obsidian",
+            "stoneborn",
+            "morpha",
+            "thurviali");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;
+    private final BooleanSetting combineDuplicateUnitTypes;
     private final BooleanSetting banAllDsFactions;
     private final BooleanSetting banAllBrFactions;
     private final ListSetting<FactionModel> bannedFactions;
     private final ListSetting<FrankenBanList> banLists;
     private final FrankenHomebrewSettings homebrewSettings;
+    private final FrankenDrazFactionPrioritySettings factionPrioritySettings;
+
+    private final FrankenDeckSettings deckSettings;
 
     @JsonIgnore
     private final FrankenDraftLimitSettings draftLimitSettings;
@@ -71,10 +78,12 @@ public class FrankenSettings extends SettingsMenu {
         this.game = game;
 
         draftMode = new ChoiceSetting<>("DraftMode", "Draft Mode", STANDARD_DRAFT);
-        draftMode.setAllValues(draftModeOptions());
+        draftMode.setAllValues(draftModeOptions(game));
         draftMode.setShow(FrankenSettings::draftModeLabel);
 
         force = new BooleanSetting("Force", "Force overwrite existing player setups", false);
+        combineDuplicateUnitTypes =
+                new BooleanSetting("CombineDuplicateUnitTypes", "Combine duplicate unit types", false);
         banAllDsFactions = new BooleanSetting("BanAllDS", "DS Factions", true);
         banAllBrFactions = new BooleanSetting("BanAllBR", "BR Factions", true);
 
@@ -109,6 +118,7 @@ public class FrankenSettings extends SettingsMenu {
         if (isMenuJson(json, MENU_ID)) {
             draftMode.initialize(json.get("draftMode"));
             force.initialize(json.get("force"));
+            combineDuplicateUnitTypes.initialize(json.get("combineDuplicateUnitTypes"));
             banAllDsFactions.initialize(json.get("banAllDsFactions"));
             banAllBrFactions.initialize(json.get("banAllBrFactions"));
             bannedFactions.initialize(json.get("bannedFactions"));
@@ -116,6 +126,8 @@ public class FrankenSettings extends SettingsMenu {
         }
 
         homebrewSettings = new FrankenHomebrewSettings(game, json, this);
+        factionPrioritySettings = new FrankenDrazFactionPrioritySettings(json, this);
+        deckSettings = new FrankenDeckSettings(game, json, this);
         draftLimitSettings = new FrankenDraftLimitSettings(game, json, this);
 
         if (json != null && json.has("messageId")) {
@@ -125,7 +137,7 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        List<SettingInterface> settings = new ArrayList<>(List.of(draftMode, force));
+        List<SettingInterface> settings = new ArrayList<>(List.of(draftMode, force, combineDuplicateUnitTypes));
         if (isFrankendrazMode()) {
             settings.add(banAllDsFactions);
             settings.add(banAllBrFactions);
@@ -139,7 +151,11 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected List<SettingsMenu> categories() {
-        return List.of(homebrewSettings, draftLimitSettings);
+        List<SettingsMenu> categories = new ArrayList<>(List.of(homebrewSettings, deckSettings, draftLimitSettings));
+        if (isFrankendrazMode()) {
+            categories.add(factionPrioritySettings);
+        }
+        return categories;
     }
 
     @Override
@@ -169,9 +185,13 @@ public class FrankenSettings extends SettingsMenu {
             syncFrankendrazDsBrState(lastSettingTouched);
         }
         String summary = super.menuSummaryString(lastSettingTouched) + frankenNotes();
+        persistSettings();
+        return summary;
+    }
+
+    void persistSettings() {
         game.setFrankenSettings(this);
         game.setFrankenSettingsJson(json());
-        return summary;
     }
 
     @Override
@@ -179,8 +199,10 @@ public class FrankenSettings extends SettingsMenu {
         String err = super.resetSettings();
         if (err != null) return err;
         homebrewSettings.resetSettings();
+        deckSettings.resetSettings();
         draftLimitSettings.resetSettings();
         if (isFrankendrazMode()) {
+            factionPrioritySettings.resetSettings();
             banAllDsFactions.setVal(true);
             banAllBrFactions.setVal(true);
             homebrewSettings.getDiscoStars().setVal(true);
@@ -190,12 +212,18 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private String startDraft(GenericInteractionCreateEvent event) {
-        applyHomebrewSettings();
         String validationError = FrankenDraftStartService.validateStartFrankenDraft(game, force.isVal());
         if (validationError != null) {
             return validationError;
         }
+        applyHomebrewSettings();
+        game.setStoredValue(
+                FrankenUnitService.COMBINE_DUPLICATE_UNIT_TYPES,
+                Boolean.toString(combineDuplicateUnitTypes.isVal() && !game.isTwilightsFallMode()));
+        deckSettings.applyDecks(game, event);
+        MonumentsService.applyMonuments(game);
         applyBanSettings();
+        applyPriorityFactionSettings();
         return FrankenDraftStartService.startFrankenDraft(event, game, force.isVal(), selectedDraftMode());
     }
 
@@ -212,6 +240,45 @@ public class FrankenSettings extends SettingsMenu {
         }
     }
 
+    private void applyPriorityFactionSettings() {
+        game.removeStoredValue(FrankenDrazDraft.PRIORITY_FACTIONS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.DISCORDANT_STARS_FACTION_LIMITS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.BLUE_REVERIE_FACTION_LIMITS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.LOST_LEGACIES_FACTION_LIMITS_KEY);
+        if (isFrankendrazMode()
+                && !factionPrioritySettings.getPrioritizedFactions().getKeys().isEmpty()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.PRIORITY_FACTIONS_KEY,
+                    String.join(
+                            Constants.FIN_SEPARATOR,
+                            factionPrioritySettings.getPrioritizedFactions().getKeys()));
+        }
+        if (isFrankendrazMode() && isEffectiveDiscordantStarsEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.DISCORDANT_STARS_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getDiscordantStarsFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings
+                                    .getDiscordantStarsFactionLimits()
+                                    .getValHigh());
+        }
+        if (isFrankendrazMode() && isEffectiveBlueReverieEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.BLUE_REVERIE_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getBlueReverieFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings
+                                    .getBlueReverieFactionLimits()
+                                    .getValHigh());
+        }
+        if (isFrankendrazMode() && isLostLegaciesEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.LOST_LEGACIES_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getLostLegaciesFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings
+                                    .getLostLegaciesFactionLimits()
+                                    .getValHigh());
+        }
+    }
+
     private void applySourceFactionBans(BanService banService, ComponentSource source, boolean enabled) {
         if (!enabled) return;
         Mapper.getFactionsValues().stream()
@@ -222,11 +289,7 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
-        bannedFactions.setAllValues(legalFactionOptions(
-                game.isThundersEdge(),
-                isEffectiveDiscordantStarsEnabled(),
-                isEffectiveBlueReverieEnabled(),
-                isLostLegaciesEnabled()));
+        bannedFactions.setAllValues(getLegalFactionOptions());
     }
 
     void applyHomebrewSettings() {
@@ -236,6 +299,7 @@ public class FrankenSettings extends SettingsMenu {
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));
+        game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
     }
 
     private FrankenDraftMode selectedDraftMode() {
@@ -264,6 +328,10 @@ public class FrankenSettings extends SettingsMenu {
 
     public boolean isLostLegaciesEnabled() {
         return homebrewSettings.getLostLegacies().isVal();
+    }
+
+    boolean isMonumentsEnabled() {
+        return homebrewSettings.getMonuments().isVal();
     }
 
     void syncFrankendrazDsBrState(String lastSettingTouched) {
@@ -377,10 +445,16 @@ public class FrankenSettings extends SettingsMenu {
                         || componentId.startsWith(prefix + "."));
     }
 
-    private static Map<String, String> draftModeOptions() {
+    private static Map<String, String> draftModeOptions(Game game) {
         Map<String, String> options = new LinkedHashMap<>();
         options.put(STANDARD_DRAFT, STANDARD_DRAFT);
         for (FrankenDraftMode mode : FrankenDraftMode.values()) {
+            // Outside FoW, Inaugural Splice is only ever triggered automatically as a follow-up to the
+            // Twilight's Fall milty/nucleus draft (ButtonHelperTwilightsFall.startInauguralSplice) - picking
+            // it as an opening draft would deal a bag with no factions/tiles/home systems. In FoW the milty
+            // and nucleus drafts aren't offered at all (the `/fow setup` wizard covers what they'd draft), so
+            // the splice on its own is a legitimate standalone choice there.
+            if (mode == FrankenDraftMode.INAUGURALSPLICE && !game.isFowMode()) continue;
             options.put(mode.toString(), mode.toString());
         }
         return options;
@@ -399,6 +473,14 @@ public class FrankenSettings extends SettingsMenu {
         return Mapper.getFactionsValues().stream()
                 .filter(faction -> isLegalFrankenFaction(faction, teEnabled, dsEnabled, brEnabled, lostLegaciesEnabled))
                 .collect(Collectors.toMap(FactionModel::getAlias, faction -> faction));
+    }
+
+    Map<String, FactionModel> getLegalFactionOptions() {
+        return legalFactionOptions(
+                game.isThundersEdge(),
+                isEffectiveDiscordantStarsEnabled(),
+                isEffectiveBlueReverieEnabled(),
+                isLostLegaciesEnabled());
     }
 
     private static boolean isLegalFrankenFaction(

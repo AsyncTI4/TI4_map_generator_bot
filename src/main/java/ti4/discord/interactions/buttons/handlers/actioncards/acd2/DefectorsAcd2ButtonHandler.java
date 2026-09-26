@@ -304,11 +304,9 @@ class DefectorsAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player target : targets) {
             String label = game.isFowMode() ? target.getColor() : StringUtils.capitalize(target.getFaction());
-            Button button =
-                    Buttons.blue(player.factionButtonChecker() + "defectorsTarget_" + target.getFaction(), label);
-            if (!game.isFowMode()) {
-                button = button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji()));
-            }
+            Button button = Buttons.blue(
+                            player.factionButtonChecker() + "defectorsTarget_" + target.getFaction(), label)
+                    .withEmoji(Emoji.fromFormatted(target.fogSafeEmoji()));
             buttons.add(button);
         }
         return buttons;
@@ -518,7 +516,10 @@ class DefectorsAcd2ButtonHandler {
 
     private static List<String> getDefectorsCornerPositions(Game game) {
         List<String> positions = new ArrayList<>(List.of("tl", "tr", "bl", "br"));
-        positions.addAll(Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
+        positions.addAll(Stream.of(
+                        "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7", "frac8", "frac9", "frac10",
+                        "frac11", "frac12", "frac13", "frac14", "frac15", "frac16", "frac17", "frac18", "frac19",
+                        "frac20", "frac21", "frac22", "frac23", "frac24", "frac25")
                 .filter(pos -> game.getTileByPosition(pos) != null)
                 .toList());
         positions.removeIf(pos -> game.getTileByPosition(pos) == null);

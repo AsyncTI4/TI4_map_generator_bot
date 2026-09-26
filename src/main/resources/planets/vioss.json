@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vioss",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "vioss",
     "tileId": "d108",
     "name": "Vioss",

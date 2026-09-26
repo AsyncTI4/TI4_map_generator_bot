@@ -1,7 +1,6 @@
 package ti4.logging;
 
-import static ti4.discord.utility.DiscordErrorUtility.isDiscordServerError;
-import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
+import static ti4.discord.utility.DiscordErrorUtility.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,6 +132,10 @@ public class BotLogger {
      */
     public static void error(@Nonnull String message) {
         logToChannel(null, message, null, LogSeverity.Error);
+    }
+
+    public static void spammyerror(@Nonnull String message) {
+        logToChannel(null, message, null, LogSeverity.SpammyError);
     }
 
     public static void critical(@Nonnull String message) {

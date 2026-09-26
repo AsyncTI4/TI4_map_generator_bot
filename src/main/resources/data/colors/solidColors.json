@@ -6,7 +6,7 @@
         "aliases": ["lgy", "lightgrey", "white", "W"],
         "textColor": "black",
         "primaryColor": { "red": 206, "green": 206, "blue": 206 },
-        "hue": "GRAY"
+        "colorCategories": ["WHITE"]
     },
     {
         "alias": "red",
@@ -14,7 +14,7 @@
         "aliases": ["red"],
         "textColor": "white",
         "primaryColor": { "red": 240, "green": 6, "blue": 6 },
-        "hue": "RED"
+        "colorCategories": ["RED"]
     },
     {
         "alias": "org",
@@ -22,7 +22,7 @@
         "aliases": ["orange", "E", "org"],
         "textColor": "black",
         "primaryColor": { "red": 240, "green": 180, "blue": 6 },
-        "hue": "ORANGE"
+        "colorCategories": ["ORANGE"]
     },
     {
         "alias": "ylw",
@@ -30,7 +30,7 @@
         "aliases": ["yellow", "Y", "ylw"],
         "textColor": "black",
         "primaryColor": { "red": 245, "green": 245, "blue": 6 },
-        "hue": "YELLOW"
+        "colorCategories": ["YELLOW"]
     },
     {
         "alias": "grn",
@@ -38,7 +38,7 @@
         "aliases": ["green", "grn"],
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 175, "blue": 50 },
-        "hue": "GREEN"
+        "colorCategories": ["GREEN"]
     },
     {
         "alias": "blu",
@@ -46,7 +46,7 @@
         "aliases": ["blue", "blu"],
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 75, "blue": 203 },
-        "hue": "BLUE"
+        "colorCategories": ["BLUE"]
     },
     {
         "alias": "ppl",
@@ -54,7 +54,7 @@
         "aliases": ["purple", "P", "ppl"],
         "textColor": "white",
         "primaryColor": { "red": 146, "green": 6, "blue": 186 },
-        "hue": "PURPLE"
+        "colorCategories": ["PURPLE"]
     },
     {
         "alias": "pnk",
@@ -62,7 +62,7 @@
         "aliases": ["pink", "K", "pnk"],
         "textColor": "black",
         "primaryColor": { "red": 240, "green": 138, "blue": 240 },
-        "hue": "PINK"
+        "colorCategories": ["PINK"]
     },
     {
         "alias": "blk",
@@ -70,7 +70,7 @@
         "aliases": ["black", "blk"],
         "textColor": "white",
         "primaryColor": { "red": 50, "green": 50, "blue": 50 },
-        "hue": "GRAY"
+        "colorCategories": ["BLACK"]
     },
     {
         "alias": "ptr",
@@ -78,7 +78,7 @@
         "aliases": ["ptr"],
         "textColor": "white",
         "primaryColor": { "red": 66, "green": 140, "blue": 140 },
-        "hue": "BLUE"
+        "colorCategories": ["BLUE"]
     },
     {
         "alias": "rst",
@@ -86,7 +86,7 @@
         "aliases": ["rst"],
         "textColor": "white",
         "primaryColor": { "red": 140, "green": 66, "blue": 72 },
-        "hue": "RED"
+        "colorCategories": ["RED"]
     },
     {
         "alias": "bwn",
@@ -94,7 +94,7 @@
         "aliases": ["bwn"],
         "textColor": "white",
         "primaryColor": { "red": 150, "green": 80, "blue": 42 },
-        "hue": "ORANGE"
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "gry",
@@ -102,7 +102,7 @@
         "aliases": ["gray", "grey", "gry"],
         "textColor": "white",
         "primaryColor": { "red": 110, "green": 122, "blue": 150 },
-        "hue": "GRAY"
+        "colorCategories": ["BLACK"]
     },
     {
         "alias": "tan",
@@ -110,7 +110,7 @@
         "aliases": ["tan"],
         "textColor": "black",
         "primaryColor": { "red": 172, "green": 160, "blue": 116 },
-        "hue": "ORANGE"
+        "colorCategories": ["BROWN"]
     },
     {
         "alias": "frs",
@@ -118,7 +118,7 @@
         "aliases": ["frs"],
         "textColor": "white",
         "primaryColor": { "red": 90, "green": 150, "blue": 100 },
-        "hue": "GREEN"
+        "colorCategories": ["GREEN"]
     },
     {
         "alias": "plm",
@@ -126,7 +126,7 @@
         "aliases": ["plm"],
         "textColor": "white",
         "primaryColor": { "red": 150, "green": 90, "blue": 140 },
-        "hue": "PURPLE"
+        "colorCategories": ["PURPLE"]
     },
     {
         "alias": "tea",
@@ -134,7 +134,7 @@
         "aliases": ["tea"],
         "textColor": "black",
         "primaryColor": { "red": 0, "green": 235, "blue": 255 },
-        "hue": "BLUE"
+        "colorCategories": ["BLUE"]
     },
     {
         "alias": "rse",
@@ -142,7 +142,7 @@
         "aliases": ["rse"],
         "textColor": "black",
         "primaryColor": { "red": 217, "green": 165, "blue": 229 },
-        "hue": "PINK"
+        "colorCategories": ["PINK"]
     },
     {
         "alias": "lme",
@@ -150,7 +150,7 @@
         "aliases": ["lme"],
         "textColor": "black",
         "primaryColor": { "red": 177, "green": 229, "blue": 165 },
-        "hue": "GREEN"
+        "colorCategories": ["GREEN"]
     },
     {
         "alias": "lvn",
@@ -158,7 +158,7 @@
         "aliases": ["lvn"],
         "textColor": "black",
         "primaryColor": { "red": 169, "green": 167, "blue": 231 },
-        "hue": "PURPLE"
+        "colorCategories": ["PURPLE"]
     },
     {
         "alias": "spr",
@@ -166,7 +166,7 @@
         "aliases": ["spr"],
         "textColor": "black",
         "primaryColor": { "red": 219, "green": 231, "blue": 167 },
-        "hue": "YELLOW"
+        "colorCategories": ["YELLOW"]
     },
     {
         "alias": "pch",
@@ -174,7 +174,7 @@
         "aliases": ["pch"],
         "textColor": "black",
         "primaryColor": { "red": 232, "green": 184, "blue": 167 },
-        "hue": "ORANGE"
+        "colorCategories": ["PINK"]
     },
     {
         "alias": "eth",
@@ -182,7 +182,7 @@
         "aliases": ["eth"],
         "textColor": "black",
         "primaryColor": { "red": 35, "green": 104, "blue": 200 },
-        "hue": "BLUE"
+        "colorCategories": ["BLUE"]
     },
     {
         "alias": "rby",
@@ -190,7 +190,7 @@
         "aliases": ["rby"],
         "textColor": "black",
         "primaryColor": { "red": 212, "green": 43, "blue": 75 },
-        "hue": "RED"
+        "colorCategories": ["RED"]
     },
     {
         "alias": "jad",
@@ -198,7 +198,7 @@
         "aliases": ["jad"],
         "textColor": "black",
         "primaryColor": { "red": 35, "green": 200, "blue": 49 },
-        "hue": "GREEN"
+        "colorCategories": ["GREEN"]
     },
     {
         "alias": "azr",
@@ -206,7 +206,7 @@
         "aliases": ["azure", "azr"],
         "textColor": "black",
         "primaryColor": { "red": 139, "green": 190, "blue": 241 },
-        "hue": "BLUE"
+        "colorCategories": ["BLUE"]
     },
     {
         "alias": "cnb",
@@ -214,7 +214,7 @@
         "aliases": ["cinnabar", "cnb"],
         "textColor": "black",
         "primaryColor": { "red": 241, "green": 156, "blue": 139 },
-        "hue": "RED"
+        "colorCategories": ["RED"]
     },
     {
         "alias": "vdg",
@@ -222,7 +222,7 @@
         "aliases": ["verdigris", "vdg"],
         "textColor": "black",
         "primaryColor": { "red": 109, "green": 211, "blue": 206 },
-        "hue": "GREEN"
+        "colorCategories": ["GREEN"]
     },
     {
         "alias": "beg",
@@ -230,6 +230,6 @@
         "aliases": ["beg", "beige"],
         "textColor": "black",
         "primaryColor": { "red": 189, "green": 197, "blue": 133 },
-        "hue": "YELLOW"
+        "colorCategories": ["BROWN"]
     }
 ]

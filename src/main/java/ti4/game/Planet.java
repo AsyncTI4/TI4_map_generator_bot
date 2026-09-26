@@ -237,10 +237,6 @@ public class Planet extends UnitHolder {
                 resourcesModifier += originalRes;
                 influenceModifier += originalInf;
             }
-            if ("designunify".equalsIgnoreCase(attachment.getAlias())) {
-                resourcesModifier += originalInf;
-                influenceModifier += originalRes;
-            }
             if ("worldshapernegative".equalsIgnoreCase(attachment.getAlias())) {
                 if (originalRes > 0) {
                     resourcesModifier -= 1;
@@ -288,6 +284,10 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public int getResources() {
         return resourcesOriginal + resourcesModifier;
+    }
+
+    public void addResourcesModifier(int modifier) {
+        resourcesModifier += modifier;
     }
 
     @JsonIgnore

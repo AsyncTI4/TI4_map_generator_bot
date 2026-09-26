@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "arretze",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 209,
+            "y": 80
+        }
+    },
     "id": "arretze",
     "tileId": "16",
     "name": "Arretze",

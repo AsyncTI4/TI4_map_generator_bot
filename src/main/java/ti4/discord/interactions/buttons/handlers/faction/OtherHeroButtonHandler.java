@@ -16,7 +16,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -125,22 +124,14 @@ class OtherHeroButtonHandler {
     @ButtonHandler("purgeVaylerianHero")
     public static void purgeVaylerianHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         PurgeHeroService.purgeHeroPreamble(event, player, game, "vaylerianhero", "Dyln Harthuul, the Vaylerian hero");
-        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-            player.setTacticalCC(player.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
-            game.setStoredValue("vaylerianHeroActive", "true");
+        game.setStoredValue("vaylerianHeroActive", "true");
+
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), "Use buttons to remove a command token from the game board.", buttons);
         }
-        List<Tile> gloryTiles = ButtonHelperAgents.getGloryTokenTiles(game);
-        for (int i = 0; i < gloryTiles.size(); i++) {
-            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
-            if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        "Use buttons to remove a command token from the game board.",
-                        buttons);
-            }
-        }
-        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+        buttons = ButtonHelper.getGainCCButtons(player);
         String message2 =
                 player.getRepresentationUnfogged() + ", you may gain 1 command token. Your current command tokens are "
                         + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";

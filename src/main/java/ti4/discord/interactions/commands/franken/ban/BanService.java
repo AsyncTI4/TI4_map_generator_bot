@@ -98,6 +98,10 @@ public class BanService implements IBanService {
         });
 
         BAN_APPLIERS.put(Constants.UNIT_ID, (game, unitId) -> {
+            if (game.isTwilightsFallMode()) {
+                appendStoredValue(game, "bannedUnits", unitId);
+                return "Successfully banned " + unitId + ".\n";
+            }
             if (isBlank(unitId) || Mapper.getUnit(unitId) == null) return "";
             String[] parts = unitId.split("_");
             if (parts.length < 2) return "";
@@ -105,6 +109,7 @@ public class BanService implements IBanService {
                 return BAN_APPLIERS.get(Constants.MECH_ID).apply(game, parts[0]);
             if (Constants.FLAGSHIP_ID.equalsIgnoreCase(parts[1]))
                 return BAN_APPLIERS.get(Constants.FLAGSHIP_ID).apply(game, parts[0]);
+
             return "";
         });
     }

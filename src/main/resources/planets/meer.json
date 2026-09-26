@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "meer",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 201,
+            "y": 207
+        }
+    },
     "id": "meer",
     "tileId": "37",
     "name": "Meer",

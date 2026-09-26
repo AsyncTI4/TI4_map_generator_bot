@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cealdri",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "cealdri",
     "tileId": "73",
     "name": "Cealdri",

@@ -38,19 +38,38 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyAppropriationsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -94,6 +113,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.TokenPlanetService;
@@ -105,6 +125,31 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public final class Helper {
+    private static final int TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET = 65;
+
+    private static final List<Point> TOKEN_PLANET_POSITIONS = List.of(
+            new Point(87, 79),
+            new Point(258, 79),
+            new Point(87, 221),
+            new Point(258, 221),
+            new Point(172, 79),
+            new Point(172, 221));
+
+    private static final List<Point> TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS = List.of(
+            new Point(87, 221),
+            new Point(258, 221),
+            new Point(87, 79),
+            new Point(258, 79),
+            new Point(172, 221),
+            new Point(172, 79));
+
+    private static final List<Point> TWO_PLANET_OR_WORMHOLE_TOKEN_PLANET_POSITIONS = List.of(
+            new Point(Constants.TOKEN_PLANET_POSITION),
+            new Point(78, 178),
+            new Point(258, 221),
+            new Point(87, 221),
+            new Point(172, 79),
+            new Point(172, 221));
 
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
@@ -227,6 +272,12 @@ public final class Helper {
                     game.drawSecretObjective(player.getUserID());
                     message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
+                if (player.hasAbility("multitasking")) {
+                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+                }
+                if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
+                }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -263,6 +314,9 @@ public final class Helper {
         if (hs != null) {
             for (Planet planet : hs.getPlanetUnitHolders()) {
                 if (planet.isSpaceStation()) {
+                    continue;
+                }
+                if (player.hasAbility("traces_of_ruin") && ThronesAbilityHandler.isThronePlanet(planet.getName())) {
                     continue;
                 }
                 if (!player.getPlanetsForScoring(false).contains(planet)) {
@@ -529,9 +583,117 @@ public final class Helper {
         return tokenPath;
     }
 
+    private static Point getTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
+        Point defaultPosition = getDefaultTokenPlanetPosition(tile, tokenOrPlanetID);
+        List<String> tokenPlanets = tile.getPlanetUnitHolders().stream()
+                .map(UnitHolder::getName)
+                .filter(Constants.TOKEN_PLANETS::contains)
+                .sorted()
+                .toList();
+
+        if (tokenPlanets.size() <= 1) {
+            return defaultPosition;
+        }
+
+        String tokenPlanetID = getTokenPlanetID(tokenOrPlanetID);
+        if (tokenPlanetID == null) {
+            return defaultPosition;
+        }
+
+        if (Constants.THUNDERSEDGE.equalsIgnoreCase(tokenPlanetID)) {
+            return new Point(Constants.SPACE_CENTER_POSITION);
+        }
+
+        List<String> slottedTokenPlanets = tokenPlanets.stream()
+                .filter(tokenPlanet -> !Constants.THUNDERSEDGE.equalsIgnoreCase(tokenPlanet))
+                .toList();
+
+        int index = slottedTokenPlanets.indexOf(tokenPlanetID);
+        if (index < 0) {
+            return defaultPosition;
+        }
+
+        int printedPlanetCount = tile.getTileModel().getNumPlanets();
+        boolean usesTwoPlanetOrWormholeSlots = printedPlanetCount != 3
+                && (printedPlanetCount == 2
+                        || printedPlanetCount > 0 && tile.getTileModel().hasWormhole());
+        List<Point> positions = printedPlanetCount == 3
+                ? TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS
+                : usesTwoPlanetOrWormholeSlots ? TWO_PLANET_OR_WORMHOLE_TOKEN_PLANET_POSITIONS : TOKEN_PLANET_POSITIONS;
+        Point position = printedPlanetCount == 3 && index < 3 ? getTripleSystemTokenPlanetPosition(tile, index) : null;
+        if (position == null) {
+            if (index < positions.size()) {
+                position = positions.get(index);
+            } else {
+                double theta = (2 * Math.PI * index) / slottedTokenPlanets.size();
+                int x = Constants.SPACE_CENTER_POSITION.x + (int) Math.round(85 * Math.cos(theta));
+                int y = Constants.SPACE_CENTER_POSITION.y + (int) Math.round(70 * Math.sin(theta));
+                position = new Point(x, y);
+            }
+        }
+
+        return new Point(position);
+    }
+
+    @Nullable
+    private static Point getTripleSystemTokenPlanetPosition(Tile tile, int index) {
+        List<Point> planetPositions = tile.getTileModel().getPlanets().stream()
+                .map(Mapper::getPlanet)
+                .filter(Objects::nonNull)
+                .map(PlanetModel::getPlanetLayout)
+                .filter(Objects::nonNull)
+                .map(planetLayout -> planetLayout.getCenterPosition())
+                .filter(Objects::nonNull)
+                .toList();
+        if (planetPositions.size() != 3) {
+            return null;
+        }
+
+        double centerX =
+                planetPositions.stream().mapToInt(point -> point.x).average().orElseThrow();
+        double centerY =
+                planetPositions.stream().mapToInt(point -> point.y).average().orElseThrow();
+        Point firstPlanet = planetPositions.get(index);
+        Point secondPlanet = planetPositions.get((index + 1) % planetPositions.size());
+        double midpointX = (firstPlanet.x + secondPlanet.x) / 2.0;
+        double midpointY = (firstPlanet.y + secondPlanet.y) / 2.0;
+        double deltaX = midpointX - centerX;
+        double deltaY = midpointY - centerY;
+        double distance = Math.hypot(deltaX, deltaY);
+        if (distance == 0) {
+            return new Point((int) Math.round(midpointX), (int) Math.round(midpointY));
+        }
+        return new Point((int) Math.round(midpointX + deltaX * TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET / distance), (int)
+                Math.round(midpointY + deltaY * TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET / distance));
+    }
+
+    private static Point getDefaultTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
+        if (Strings.CI.contains(tokenOrPlanetID, Constants.THUNDERSEDGE)) {
+            return new Point(Constants.SPACE_CENTER_POSITION);
+        }
+
+        Point position = new Point(Constants.TOKEN_PLANET_POSITION);
+        if (tile.getTileModel().getNumPlanets() == 3) {
+            position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        }
+        return position;
+    }
+
+    private static String getTokenPlanetID(String tokenOrPlanetID) {
+        if (tokenOrPlanetID == null) {
+            return null;
+        }
+
+        TokenModel token = Mapper.getToken(tokenOrPlanetID);
+        if (token != null && token.getTokenPlanetName() != null) {
+            return token.getTokenPlanetName();
+        }
+        return Mapper.getTokenKey(tokenOrPlanetID);
+    }
+
     public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
         TokenModel token = Mapper.getToken(tokenID);
-        PlanetModel planet = token == null ? null : Mapper.getPlanet(token.getTokenPlanetName());
+        PlanetModel planet = token == null ? Mapper.getPlanet(tokenID) : Mapper.getPlanet(token.getTokenPlanetName());
         Integer planetX = null;
         Integer planetY = null;
         if (planet != null
@@ -541,40 +703,26 @@ public final class Helper {
             planetY = planet.getPlanetLayout().getCenterPosition().y;
         }
 
-        String tokenPath = token == null ? null : token.getImagePath();
-        BufferedImage tokenImage = ImageHelper.read(ResourceHelper.getInstance().getAttachmentFile(tokenPath));
+        String tokenPath = token == null ? Mapper.getTokenID(tokenID) : token.getImagePath();
+        BufferedImage tokenImage = ImageHelper.read(
+                tokenPath == null ? null : ResourceHelper.getInstance().getAttachmentFile(tokenPath));
         Integer imageX = null;
         Integer imageY = null;
         if (tokenImage != null) {
-            imageX = (tokenImage.getWidth() / 2);
-            imageY = (tokenImage.getHeight() / 2);
+            imageX = tokenImage.getWidth() / 2;
+            imageY = tokenImage.getHeight() / 2;
         }
 
-        Point initial = new Point(Constants.TOKEN_PLANET_POSITION);
-        if (tokenID.toLowerCase().contains("thundersedge")) {
-            initial = new Point(Constants.SPACE_CENTER_POSITION);
-        }
-        if (tile.getTileModel().getNumPlanets() == 3) {
-            initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        Point tokenPlanetPosition = getTokenPlanetPosition(tile, tokenID);
+        if (imageX != null && imageY != null && planetX != null && planetY != null) {
+            return new Point(tokenPlanetPosition.x - imageX + planetX, tokenPlanetPosition.y - imageY + planetY);
         }
 
-        if (imageX != null && planetX != null) {
-            return new Point(initial.x - imageX + planetX, initial.y - imageY + planetY);
-        }
-
-        return initial;
+        return tokenPlanetPosition;
     }
 
     public static Point getTokenPlanetCenterOfImage(Tile tile, String tokenID) {
-
-        Point initial = new Point(Constants.TOKEN_PLANET_POSITION);
-        if (tokenID.toLowerCase().contains("thundersedge")) {
-            initial = new Point(Constants.SPACE_CENTER_POSITION);
-        }
-        if (tile.getTileModel().getNumPlanets() == 3) {
-            initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
-        }
-        return initial;
+        return getTokenPlanetPosition(tile, tokenID);
     }
 
     public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
@@ -901,12 +1049,26 @@ public final class Helper {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         // Helper.getPlanetInfluence(planet, game);
         if ("inf".equalsIgnoreCase(whatIsItFor)) {
+            boolean countResourcesAsInfluence = WildlifePreservationLLButtonHandler.isActive(game, player);
             planets = planets.stream()
-                    .sorted((p1, p2) -> Integer.compare(getPlanetInfluence(p2, game), getPlanetInfluence(p1, game)))
+                    .sorted((p1, p2) -> Integer.compare(
+                            countResourcesAsInfluence
+                                    ? Math.max(getPlanetResources(p2, game), getPlanetInfluence(p2, game))
+                                    : getPlanetInfluence(p2, game),
+                            countResourcesAsInfluence
+                                    ? Math.max(getPlanetResources(p1, game), getPlanetInfluence(p1, game))
+                                    : getPlanetInfluence(p1, game)))
                     .collect(Collectors.toList());
         } else {
+            boolean countInfluenceAsResources = EmergencyAppropriationsLLButtonHandler.isActive(game, player);
             planets = planets.stream()
-                    .sorted((p1, p2) -> Integer.compare(getPlanetResources(p2, game), getPlanetResources(p1, game)))
+                    .sorted((p1, p2) -> Integer.compare(
+                            countInfluenceAsResources
+                                    ? Math.max(getPlanetResources(p2, game), getPlanetInfluence(p2, game))
+                                    : getPlanetResources(p2, game),
+                            countInfluenceAsResources
+                                    ? Math.max(getPlanetResources(p1, game), getPlanetInfluence(p1, game))
+                                    : getPlanetResources(p1, game)))
                     .collect(Collectors.toList());
         }
         for (String planet : planets) {
@@ -970,11 +1132,55 @@ public final class Helper {
 
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
+        UnitModel unitModel = "monument".equalsIgnoreCase(unit) ? player.getUnitByBaseType("monument") : null;
+        boolean placingSarcosaMonument = unitModel != null && "sarcosa_monument".equals(unitModel.getId());
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
+        if (placingSarcosaMonument) {
+            for (Tile tile : game.getTileMap().values()) {
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    if (!planets.contains(planet.getName())) {
+                        planets.add(planet.getName());
+                    }
+                }
+            }
+        }
         player.resetProducedUnits();
         for (String planet : planets) {
             Planet uh = game.getUnitHolderFromPlanet(planet);
             if (uh == null) continue; // custodia, ghoti, etc.
+
+            if (unitModel != null) {
+                List<String> planetTypes = new ArrayList<>(uh.getPlanetTypes());
+                Tile tile = game.getTileFromPlanet(planet);
+                if (tile != null && tile.isSupernova()) {
+                    planetTypes.add("SUPERNOVA");
+                }
+                if (tile != null && tile.equals(player.getHomeSystemTile())) {
+                    planetTypes.add("HOME_PLANET");
+                }
+                if (!uh.getTechSpecialities().isEmpty()) {
+                    planetTypes.add("TECH_SPECIALTY");
+                }
+                if (uh.isLegendary()) {
+                    planetTypes.add("LEGENDARY");
+                }
+                if (tile != null && tile.isMecatol(game)) {
+                    planetTypes.add("MECATOL_REX");
+                }
+                if (uh.getPlanetModel() != null
+                        && uh.getPlanetModel().getPlanetTypes().stream()
+                                .anyMatch(type -> "lightning".equalsIgnoreCase(type.toString()))) {
+                    planetTypes.add("LIGHTNING");
+                }
+                if (!unitModel.canBePlacedOnPlanetTypes(planetTypes)) {
+                    continue;
+                }
+                if (placingSarcosaMonument
+                        && !player.getPlanetsAllianceMode().contains(planet)
+                        && !MonumentsBRButtonHandler.canPlaceSarcosaMonument(game, player, tile, uh)) {
+                    continue;
+                }
+            }
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
@@ -1179,6 +1385,14 @@ public final class Helper {
                             .append(" vote")
                             .append(count == 1 ? "" : "s")
                             .append(".\n");
+                case "letnevMonument" ->
+                    msg.append("Used **Palatine Obelisk** for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
+                case "muaatMonument" ->
+                    msg.append("Used _Glory Furnace_ for ").append(count).append(" votes.\n");
                 case "representative" -> msg.append("Got 1 vote for _Representative Government_.\n");
                 case "distinguished" -> msg.append("Used _Distinguished Councilor_ for 5 votes.\n");
                 case "absolRexControlRepresentative" ->
@@ -1190,7 +1404,7 @@ public final class Helper {
         }
         // Dreaming Throne Commander
         if (votes > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
-            int count = DreamButtonHandler.getDreamCommanderVoteCount(game, player);
+            int count = DreamLeadersHandler.getDreamCommanderVoteCount(game, player);
             if (count > 0) {
                 votes += count;
                 if (!justVoteTotal) {
@@ -1276,6 +1490,9 @@ public final class Helper {
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
             }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
+                player.removeSpentThing(thing);
+            }
             if (thing.contains("_")) {
                 continue;
             }
@@ -1286,6 +1503,8 @@ public final class Helper {
             }
         }
         game.setStoredValue("resetSpend", "no");
+        PriorityRequisitionLLButtonHandler.clear(game, player);
+        SharedResourcesLLButtonHandler.clear(game, player);
     }
 
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
@@ -1296,6 +1515,10 @@ public final class Helper {
         if (resOrInfOrBoth.contains("tech")) {
             resOrInfOrBoth = resOrInfOrBoth.replace("tech", "");
         }
+        boolean countInfluenceAsResources =
+                "res".equalsIgnoreCase(resOrInfOrBoth) && EmergencyAppropriationsLLButtonHandler.isActive(game, player);
+        boolean countResourcesAsInfluence =
+                "inf".equalsIgnoreCase(resOrInfOrBoth) && WildlifePreservationLLButtonHandler.isActive(game, player);
         int tg = player.getSpentTgsThisWindow();
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
@@ -1324,6 +1547,35 @@ public final class Helper {
                     found = true;
                 }
             }
+            if (thing.startsWith("usurpersLease_")) {
+                int additionalInfluence = Integer.parseInt(thing.substring("usurpersLease_".length()));
+                msg.append("> Used _The Usurper's Lease_ for ")
+                        .append(additionalInfluence)
+                        .append(" additional influence.\n");
+                inf += additionalInfluence;
+                found = true;
+            }
+            if (thing.startsWith("naturesboon_")) {
+                String planetName = thing.substring("naturesboon_".length());
+                Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName));
+                if (planet != null) {
+                    msg.append("> Used _Nature's Boon_ for ")
+                            .append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game))
+                            .append('\n');
+                    if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
+                        inf += planet.getResources();
+                    } else if ("both".equalsIgnoreCase(resOrInfOrBoth)) {
+                        res += planet.getInfluence();
+                        inf += planet.getResources();
+                    } else {
+                        res += planet.getInfluence();
+                    }
+                }
+                found = true;
+            }
+            if (thing.startsWith("blacktfCapturedInfantry_")) {
+                found = true;
+            }
             if (!found
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
@@ -1332,7 +1584,9 @@ public final class Helper {
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
+                    && !thing.contains("netrunnersAgentDiscount")
                     && !thing.contains("aida")
+                    && !thing.contains("arcanumRunebound")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
                     && !thing.contains("Agent")) {
@@ -1356,6 +1610,8 @@ public final class Helper {
                     } else {
                         planetsSpent.add(thing);
                     }
+                    Planet resourceDonor = SharedResourcesLLButtonHandler.getResourceDonor(game, player, thing);
+                    int resourceValue = resourceDonor == null ? planet.getResources() : resourceDonor.getResources();
                     Tile t = game.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem(game)) {
                         if (planet.getResources() > bestRes) {
@@ -1377,14 +1633,23 @@ public final class Helper {
                                     .append('\n');
                             res += planet.getMaxResInf();
                         } else {
-                            if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
+                            if (countInfluenceAsResources) {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                        .append(" (using its higher value due to _Emergency Appropriations_)\n");
+                                resourceValue = planet.getMaxResInf();
+                            } else if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
                                         .append('\n');
                             } else {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game))
-                                        .append('\n');
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game));
+                                if (resourceDonor != null) {
+                                    msg.append(" (counting as ")
+                                            .append(resourceValue)
+                                            .append(" resources due to _Shared Resources_)");
+                                }
+                                msg.append('\n');
                             }
-                            res += planet.getResources();
+                            res += resourceValue;
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
@@ -1396,9 +1661,15 @@ public final class Helper {
                                     .append('\n');
                             inf += planet.getMaxResInf();
                         } else {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
-                                    .append('\n');
-                            inf += planet.getInfluence();
+                            if (countResourcesAsInfluence) {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                        .append(" (using its higher value due to _Wildlife Preservation_)\n");
+                                inf += planet.getMaxResInf();
+                            } else {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
+                                        .append('\n');
+                                inf += planet.getInfluence();
+                            }
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
@@ -1421,7 +1692,7 @@ public final class Helper {
                             res += planet.getMaxResInf();
                         } else {
                             inf += planet.getInfluence();
-                            res += planet.getResources();
+                            res += resourceValue;
                         }
                     }
                 }
@@ -1445,7 +1716,18 @@ public final class Helper {
                             .append('\n');
                     res += 1;
                 }
-                if (thing.contains("boon")) {
+                if (thing.startsWith("netrunnersAgentDiscount_")) {
+                    int discount = Integer.parseInt(thing.substring("netrunnersAgentDiscount_".length()));
+                    msg.append("> Used Zor No-ahn, the Netrunners agent, for a ")
+                            .append(discount)
+                            .append(" cost discount.\n");
+                    if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
+                        inf += discount;
+                    } else {
+                        res += discount;
+                    }
+                }
+                if ("boon".equals(thing)) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
                     res += 1;
                 }
@@ -1496,7 +1778,12 @@ public final class Helper {
                     }
                     msg.append(".\n");
                 }
-                if (thing.contains("commander") || thing.contains("Gledge Agent")) {
+                if (thing.contains("arcanumRunebound")) {
+                    msg.append("> Damaged _Rune-Bound Sentinel_ to ignore a prerequisite on a technology.\n");
+                }
+                if (thing.startsWith("netrunnersAgentDiscount_")) {
+                    // Already included above as a cost discount.
+                } else if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append('\n');
                 } else if (thing.contains("winnuagent")) {
                     msg.append("> Used Winnu agent for 2 resources").append('\n');
@@ -1515,6 +1802,14 @@ public final class Helper {
                     msg.append("> ").append(thing).append('\n');
                 }
             }
+        }
+        int priorityRequisitionDiscount = PriorityRequisitionLLButtonHandler.getDiscount(game, player);
+        if (priorityRequisitionDiscount > 0
+                && ("res".equalsIgnoreCase(resOrInfOrBoth) || "both".equalsIgnoreCase(resOrInfOrBoth))) {
+            res += priorityRequisitionDiscount;
+            msg.append("> Used _Priority Requisition_ for a ")
+                    .append(priorityRequisitionDiscount)
+                    .append(" resource discount.\n");
         }
         res += tg + keleresAgent;
         inf += tg + keleresAgent;
@@ -1546,6 +1841,13 @@ public final class Helper {
                 msg.append("> Released units with a total resource value of ")
                         .append(discount)
                         .append('\n');
+            }
+            int blacktfInfantry = TwilightsFallMonumentsButtonHandler.getBlacktfCapturedInfantrySpent(game, player);
+            if (blacktfInfantry > 0) {
+                res += blacktfInfantry;
+                msg.append("> Spent ")
+                        .append(blacktfInfantry)
+                        .append(" captured infantry with **The Flesh Cathedral**\n");
             }
             msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
@@ -1651,24 +1953,6 @@ public final class Helper {
                 && !player.getCurrentProducedUnits().isEmpty()
                 && player.getCurrentProducedUnits().keySet().stream()
                         .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]));
-        String siphonDiscountMessage = "";
-        if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
-            siphonDiscountMessage = NetrunnersFactionTechsHandler.getSiphonDiscountMessage(game, player);
-        }
-        if (player.hasAbility("control_network")) {
-            String controlNetworkMessage =
-                    NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
-            if (!controlNetworkMessage.isEmpty()) {
-                msg.append(controlNetworkMessage);
-                if (player.hasUnlockedBreakthrough("arcanumbtback")) {
-                    msg.append("\n-1 from Power Word: Wish");
-                }
-                if (remoteWorkforceBuild) {
-                    msg.append("\n-1 from Remote Workforce");
-                }
-                return msg.toString();
-            }
-        }
         if (unitCount <= 1) {
             msg.append("For a cost of ")
                     .append(cost)
@@ -1752,13 +2036,43 @@ public final class Helper {
                         .append(".");
             }
         }
-        if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+        if (ArcanumBreakthroughHandler.hasPowerWordWishProductionDiscount(game, player)) {
             msg.append("\n-1 from Power Word: Wish");
         }
         if (remoteWorkforceBuild) {
             msg.append("\n-1 from Remote Workforce");
         }
-        msg.append(siphonDiscountMessage);
+        if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
+            msg.append("\n-1 from Echo of the Anvil");
+        }
+        if (player.hasPlanet("skarnath")
+                && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+            int neighborDiscount =
+                    ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+            if (neighborDiscount > 0) {
+                msg.append("\n-")
+                        .append(neighborDiscount)
+                        .append(" from matching neighboring player")
+                        .append(neighborDiscount > 1 ? "s" : "");
+            }
+        }
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
+                Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
+
+                boolean productionIsInMonumentSystem = monumentTile != null
+                        && !producedUnits.isEmpty()
+                        && producedUnits.keySet().stream().anyMatch(producedUnit -> {
+                            String[] parts = producedUnit.split("_", 3);
+                            return parts.length == 3
+                                    && monumentTile.getPosition().equals(parts[1]);
+                        });
+
+                if (productionIsInMonumentSystem) {
+                    msg.append("\n-2 from Zha'Ren Foundry");
+                }
+            }
+        }
         return msg.toString();
     }
 
@@ -1767,6 +2081,11 @@ public final class Helper {
 
         for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
             String unit = entry.getKey();
+            int amount = entry.getValue()
+                    - MonumentsDSButtonHandler.getFlorzenStasisFightersInProduction(game, player, unit);
+            if (amount < 1) {
+                continue;
+            }
             String tilePos = unit.split("_")[1];
             String planetOrSpace = unit.split("_")[2];
             if ("space".equalsIgnoreCase(planetOrSpace)) {
@@ -1777,17 +2096,19 @@ public final class Helper {
             Tile tile = game.getTileByPosition(tilePos);
             String un = unit.split("_")[0];
             RemoveUnitService.removeUnits(
-                    event,
-                    tile,
-                    game,
-                    player.getColor(),
-                    entry.getValue() + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
+                    event, tile, game, player.getColor(), amount + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
         }
 
+        MonumentsDSButtonHandler.resetFlorzenStasisFighters(game, player);
         player.resetProducedUnits();
     }
 
     public static int getProductionValueOfUnitHolder(Player player, Game game, Tile tile, UnitHolder uH) {
+        return getProductionValueOfUnitHolder(player, game, tile, uH, false);
+    }
+
+    public static int getProductionValueOfUnitHolder(
+            Player player, Game game, Tile tile, UnitHolder uH, boolean unitsOnly) {
         int productionValueTotal = 0;
         boolean cosmicSuper = false;
         if (game.isCosmicPhenomenaeMode()) {
@@ -1814,6 +2135,28 @@ public final class Helper {
                 }
                 UnitModel unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
                 int productionValue = unitModel.getProductionValue();
+                if ("monument".equals(unitModel.getAsyncId())) {
+                    if (MonumentsService.isMonumentOnBoard(game, player, "cheiran_monument")
+                            && tile == MonumentsService.getPlayerMonumentTile(game, player)
+                            && uH == MonumentsService.getPlayerMonumentPlanet(game, player)) {
+                        int structures = tile.getUnitHolders().values().stream()
+                                .mapToInt(holder ->
+                                        holder.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure))
+                                .sum();
+
+                        for (String adjacentPosition :
+                                FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                            Tile adjacentTile = game.getTileByPosition(adjacentPosition);
+                            if (adjacentTile != null) {
+                                structures += adjacentTile.getUnitHolders().values().stream()
+                                        .mapToInt(holder -> holder.countPlayersUnitsWithModelCondition(
+                                                player, UnitModel::getIsStructure))
+                                        .sum();
+                            }
+                        }
+                        productionValue = structures;
+                    }
+                }
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
                     productionValueTotal += player.getFleetCC();
                 }
@@ -1870,6 +2213,9 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
             }
+        }
+        if (unitsOnly) {
+            return productionValueTotal;
         }
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
@@ -2101,11 +2447,25 @@ public final class Helper {
                 productionValueTotal++;
             }
         }
+        if (player.getPlanets().contains(uH.getName())
+                && uH.getName()
+                        .equals(game.getStoredValue(
+                                LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction()))) {
+            productionValueTotal += 3;
+        }
+        if (player.hasTech("thvanguardy")
+                && tile.getPosition().equals(game.getStoredValue("vanguardReinforce" + player.getFaction()))) {
+            productionValueTotal += 3;
+        }
 
         return productionValueTotal;
     }
 
     public static int getProductionValue(Player player, Game game, Tile tile, boolean singleDock) {
+        return getProductionValue(player, game, tile, singleDock, false);
+    }
+
+    public static int getProductionValue(Player player, Game game, Tile tile, boolean singleDock, boolean ignoreScar) {
         boolean cosmicSuper = false;
         if (game.isCosmicPhenomenaeMode()) {
             for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
@@ -2116,7 +2476,10 @@ public final class Helper {
                 }
             }
         }
-        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
+        if (tile.isScar(game)
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")
+                && !ignoreScar) {
             return 0;
         }
         if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
@@ -2125,8 +2488,7 @@ public final class Helper {
         if (game.isTwilightsFallMode()) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-
+                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                         Tile t2 = game.getTileByPosition(tilePos);
                         for (UnitHolder uH : t2.getUnitHolders().values()) {
                             if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -2217,11 +2579,30 @@ public final class Helper {
         if (ArcanumTechHandler.hasSigilOfTransmutation(game, player, tile)) {
             productionValueTotal += 3;
         }
-        boolean hasExactlyOneShipInSystem =
-                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, unit -> unit.getIsShip()) == 1;
+        boolean hasExactlyOneShipInSystem = tile.getSpaceUnitHolder()
+                        .countPlayersUnitsWithModelCondition(
+                                player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                == 1;
         if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
             productionValueTotal += 2;
         }
+        productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
+        productionValueTotal += RevenantLeadersHandler.getRevMyrrProduction(game, player, tile);
+        if (player.hasTech("thverydithy")) {
+            int numberOfCCInSystem = 0;
+            for (Player playerCC : game.getRealPlayers()) {
+                if (tile.hasPlayerCC(playerCC)) {
+                    numberOfCCInSystem++;
+                }
+            }
+            productionValueTotal += numberOfCCInSystem;
+        }
+        if (game.isMonumentsMode()
+                && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
+                && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
+            productionValueTotal *= 2;
+        }
+
         return productionValueTotal;
     }
 
@@ -2253,7 +2634,9 @@ public final class Helper {
                     }
                 }
                 totalUnits += entry.getValue();
-                if (player.hasUnit("tf-valefarprime") && removedUnit.getUnitType() == UnitType.Mech) {
+                if (player.hasUnit("tf-valefarprime")
+                        && (removedUnit.getUnitType() == UnitType.Mech
+                                || (game.isMonumentsMode() && "pinktf_monument".equals(removedUnit.getId())))) {
                     cost -= entry.getValue();
                 }
             }
@@ -2270,11 +2653,15 @@ public final class Helper {
         }
         totalUnits += numInf + numFF;
         if (wantCost) {
-            if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
-                cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
-            }
-            if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+            if (ArcanumBreakthroughHandler.hasPowerWordWishProductionDiscount(game, player)) {
                 cost = Math.max(0, cost - 1);
+            }
+            if (player.hasPlanet("skarnath")
+                    && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+                int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, producedUnits);
+                if (neighborDiscount > 0) {
+                    cost = Math.max(0, cost - neighborDiscount);
+                }
             }
             String remoteWorkforcePosition =
                     game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
@@ -2285,6 +2672,26 @@ public final class Helper {
                     && producedUnits.keySet().stream()
                             .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]))) {
                 cost = Math.max(0, cost - 1);
+            }
+            if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
+                cost = Math.max(0, cost - 1);
+            }
+            if (game.isMonumentsMode()) {
+                if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
+                    Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
+
+                    boolean productionIsInMonumentSystem = monumentTile != null
+                            && !producedUnits.isEmpty()
+                            && producedUnits.keySet().stream().anyMatch(producedUnit -> {
+                                String[] parts = producedUnit.split("_", 3);
+                                return parts.length == 3
+                                        && monumentTile.getPosition().equals(parts[1]);
+                            });
+
+                    if (productionIsInMonumentSystem) {
+                        cost = Math.max(0, cost - 2);
+                    }
+                }
             }
             return cost;
         } else {
@@ -2348,6 +2755,7 @@ public final class Helper {
         player.resetProducedUnits();
         boolean asn = warfareNOtherstuff.contains("asn");
         warfareNOtherstuff = warfareNOtherstuff.replace("asn", "");
+        ArcanumBreakthroughHandler.setPowerWordWishProductionContext(game, player, warfareNOtherstuff);
         int resourcelimit = 100;
         String planetInteg = "";
         if (warfareNOtherstuff.contains("integrated")) {
@@ -2360,6 +2768,11 @@ public final class Helper {
         boolean regulated =
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        boolean hasRallyingCryProduction = player.hasAbility("rallying_cry")
+                && tile.getSpaceUnitHolder()
+                                .countPlayersUnitsWithModelCondition(
+                                        player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                        == 1;
         String tp = tile.getPosition();
         String remaining;
         String checker = player.factionButtonChecker();
@@ -2368,7 +2781,9 @@ public final class Helper {
         }
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
-                if (player.hasWarsunTech() && resourcelimit > 9) {
+                if (player.hasWarsunTech()
+                        && resourcelimit > 9
+                        && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
                     remaining = " ("
                             + ButtonHelperFactionSpecific.remainingUnitsOfType(
                                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))
@@ -2480,8 +2895,16 @@ public final class Helper {
                 player.factionButtonChecker() + placePrefix + "_fighter_" + tp,
                 "Produce 1 Fighter",
                 UnitEmojis.fighter));
+        if ("place".equalsIgnoreCase(placePrefix)) {
+            Button florzenStasisFighterButton =
+                    MonumentsDSButtonHandler.getFlorzenStasisFighterButton(game, player, tile);
+            if (florzenStasisFighterButton != null) {
+                unitButtons.add(florzenStasisFighterButton);
+            }
+        }
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
+                && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
                 && unitHolders.size() < 4
                 && !regulated
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)
@@ -2496,7 +2919,7 @@ public final class Helper {
         }
         boolean greenMechd = false;
         boolean ironMechSpaceAdded = false;
-        if (player.hasTech("tf-desperados")) {
+        if (player.hasTech("tf-desperados") && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "desperadoDestroyer_" + tile.getPosition(),
                     "Place Desperado Destroyer",
@@ -2509,6 +2932,7 @@ public final class Helper {
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)
                 && !"muaatagent".equalsIgnoreCase(warfareNOtherstuff)
                 && !warfareNOtherstuff.contains("integrated")
+                && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
                 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
@@ -2584,7 +3008,8 @@ public final class Helper {
                                         game,
                                         tile,
                                         tile.getUnitHolders().get("space"))
-                                == 0) {
+                                == 0
+                        && !hasRallyingCryProduction) {
                     continue;
                 }
 
@@ -2619,6 +3044,7 @@ public final class Helper {
                 unitButtons.add(inf1Button);
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                         && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
+                        && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
                         && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                         && !regulated
                         && unitHolders.size() < 4
@@ -2642,7 +3068,7 @@ public final class Helper {
                             "Produce Mech on " + getPlanetRepresentation(pp, game),
                             UnitEmojis.mech);
                 }
-                if (resourcelimit > 1 && !greenMechd) {
+                if (resourcelimit > 1 && !greenMechd && !game.isBaseGameMode()) {
                     unitButtons.add(mfButton);
                 }
                 if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {
@@ -2687,17 +3113,26 @@ public final class Helper {
                 unitButtons.add(mfButton);
             }
         }
+        if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)
+                && game.isMonumentsMode()
+                && player.getUnitByBaseType("monument") != null) {
+            unitButtons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "monument", placePrefix).stream()
+                    .filter(button -> tile.getPlanetUnitHolders().stream()
+                            .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
+                    .toList());
+            unitButtons.addAll(MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, player).stream()
+                    .filter(button -> button.getCustomId().endsWith("placePanopticon_" + tile.getPosition()))
+                    .toList());
+        }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "crystellumcommander")) {
+                unitButtons.addAll(
+                        CrystellumLeadersHandler.getCrystellumCommanderFighterButtons(player, tile, game, placePrefix));
+            }
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));
-        }
-        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
-                && NetrunnersUnitsHandler.empBlocksGroundForceProduction(game, player, tile)) {
-            unitButtons = new ArrayList<>(unitButtons.stream()
-                    .filter(button -> !NetrunnersUnitsHandler.isGroundForceProductionButton(button))
-                    .toList());
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Buttons.red(
@@ -2894,14 +3329,12 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                ccCount += TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player_);
+                ccCount += MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player_);
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }
-            } else if (player_.hasAbility("primacy")
-                    || player_.hasAbility("edict")
-                    || player_.hasAbility("edict_y")
-                    || player_.hasAbility("imperia")
-                    || player_.hasAbility("imperia_y")) {
+            } else if (player_.hasAbility("edict") || player_.hasAbility("imperia")) {
                 for (String color_ : player_.getMahactCC()) {
                     ColorModel ccColor = Mapper.getColor(color_);
                     if (player.getColor().equalsIgnoreCase(ccColor.getName())) {
@@ -3526,6 +3959,11 @@ public final class Helper {
                                 + "Press **End Game** only after done giving titles.",
                         titleButton);
             }
+            return true;
+        }
+        if (game.getRealPlayers().size() == 1
+                && player.isRealPlayer()
+                && game.getRealAndEliminatedPlayers().size() > 1) {
             return true;
         }
         return false;

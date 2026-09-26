@@ -108,7 +108,7 @@ public final class DiceHelper {
                 sb.append('\n');
             }
         }
-        sb.append(String.format("Total: %d hits", countSuccesses(dice)));
+        sb.append(CombatMessageHelper.displayHitResults(countSuccesses(dice)).strip());
         return sb.toString();
     }
 }

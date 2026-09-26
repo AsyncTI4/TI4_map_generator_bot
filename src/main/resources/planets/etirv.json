@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "etirv",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "etirv",
     "tileId": "d107",
     "name": "Etir V",

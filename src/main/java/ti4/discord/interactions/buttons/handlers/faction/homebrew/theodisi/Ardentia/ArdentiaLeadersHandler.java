@@ -18,45 +18,13 @@ import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ArdentiaLeadersHandler {
-    private static final String AGENT_TARGET = "ardentiaAgentTarget_";
     private static final String AGENT_PAYMENT_DONE = "ardentiaAgentPaymentDone_";
     private static final String ARDENTIA_HERO_TARGET = "ardentiaHeroTarget_";
     private static final String ARDENTIA_HERO_REMOVE = "ardentiaHeroRemoveCC_";
 
     // Agent
-    public static void startArdentiaAgentStep1(Game game, Player player) {
-        if (game == null || player == null) {
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (Player target : game.getRealPlayers()) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + AGENT_TARGET + target.getFaction(),
-                    target.getFactionNameOrColor(),
-                    target.getFactionEmojiOrColor()));
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
-                player.getRepresentation()
-                        + ", please select the player that will spend 1 influence to gain 1 command token:",
-                buttons);
-    }
-
-    @ButtonHandler(AGENT_TARGET)
-    public static void startArdentiaAgentStep2(
-            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        if (event == null || player == null || game == null) {
-            return;
-        }
-        ButtonHelper.deleteMessage(event);
-
-        String targetFaction = buttonID.replace(AGENT_TARGET, "");
-        Player targetPlayer = game.getPlayerFromColorOrFaction(targetFaction);
-
-        if (targetPlayer == null) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Could not find selected player.");
+    public static void startArdentiaAgentStep1(Game game, Player targetPlayer) {
+        if (game == null || targetPlayer == null) {
             return;
         }
 
@@ -64,8 +32,8 @@ public class ArdentiaLeadersHandler {
         buttons.add(Buttons.red(targetPlayer.factionButtonChecker() + AGENT_PAYMENT_DONE, "Done"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-                targetPlayer.getCardsInfoThread(),
-                targetPlayer.getRepresentation() + ", please use the buttons below to spend 1 influence:",
+                game.getActionsChannel(),
+                targetPlayer.getRepresentation() + ", please choose how to spend 1 influence.",
                 buttons);
     }
 
@@ -78,12 +46,14 @@ public class ArdentiaLeadersHandler {
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), "Use these buttons to gain 1 CC:", ButtonHelper.getGainCCButtons(player));
+                game.getActionsChannel(),
+                "Please choose where to gain 1 command token.",
+                ButtonHelper.getGainCCButtons(player));
 
         if (player.hasAbility("seize_command")) {
             MessageHelper.sendMessageToChannelWithButton(
-                    player.getCardsInfoThread(),
-                    "You main use _Seize Command_:",
+                    game.getActionsChannel(),
+                    "You may use **Seize Command**.",
                     ArdentiaAbilityHandler.getSeizeCommandButton(player));
         }
     }
@@ -108,7 +78,7 @@ public class ArdentiaLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", you may remove a CC from a system containing another player's CC to gain 1 CC and 1 TG per other player's CC removed:",
+                        + ", you may remove another player's command token from a system to gain 1 command token and 1 trade good for each other player's command token removed.",
                 targets);
     }
 
@@ -141,8 +111,8 @@ public class ArdentiaLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose which of " + target.getRepresentationNoPing()
-                        + "'s command token to return to reinforcements:",
+                        + ", please choose which of " + target.getRepresentationNoPing()
+                        + "'s command tokens to return to reinforcements.",
                 tileButtons);
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -176,13 +146,18 @@ public class ArdentiaLeadersHandler {
         }
         if (!tilePos.hasPlayerCC(target)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Selected player does not have a CC in that system.");
+                    event.getMessageChannel(), "The selected player does not have a command token in that system.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         String ccId = Mapper.getCCID(target.getColor());
         tilePos.removeCC(ccId);
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(),
+                target.getRepresentationUnfogged() + ", your command token in "
+                        + tilePos.getRepresentationForButtons(game, target)
+                        + " was returned to your reinforcements by _Echo of Subjugation_.");
         String tgGain = player.gainTG(1, true);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
 
@@ -191,7 +166,8 @@ public class ArdentiaLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Please gain 1 CC from removing " + target.getRepresentationNoPing() + "'s CC from the chosen system.",
+                "Please choose where to gain 1 command token for removing " + target.getRepresentationNoPing()
+                        + "'s command token from the chosen system.",
                 ButtonHelper.getGainCCButtons(player));
 
         ButtonHelper.deleteMessage(event);

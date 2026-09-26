@@ -322,7 +322,11 @@ public final class WebTileUnitData {
                 "ocean5",
                 "triad",
                 "grove",
-                "aurelionstation");
+                "aurelionstation",
+                "innersanctum",
+                "fabricatestation",
+                "seraphdatacenter",
+                "mobilemountain");
 
         Map<String, Planet> planetsInfo = game.getPlanetsInfo();
 

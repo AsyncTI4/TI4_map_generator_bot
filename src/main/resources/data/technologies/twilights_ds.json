@@ -65,7 +65,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control.",
+        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control. If you choose to pick up a card from the discard with this ability, discard 1 action card.",
         "source": "twilight_ds",
         "faction": "cymiae"
     },
@@ -415,7 +415,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When you spend a command token to resolve the secondary ability of the \"Calamatis\" strategy card, you may resolve the primary ability of Warfare instead. (the token lift one)",
+        "text": "When you spend a command token to resolve the secondary ability of the \"Calamitas\" strategy card, you may instead remove 1 of your command tokens from the game board, then gain 1 command token and redistribute any number of command tokens on your command sheet.",
         "source": "twilight_ds",
         "faction": "kortali"
     },

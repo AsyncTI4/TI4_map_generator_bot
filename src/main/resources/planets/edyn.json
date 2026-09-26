@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "edyn",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 93,
+            "y": 140
+        }
+    },
     "id": "edyn",
     "tileId": "d03",
     "name": "Edyn",

@@ -21,6 +21,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 
@@ -29,7 +30,11 @@ public class KairnAbilityHandler {
     private static final String COLONY_OUTPOSTS = "colony_outposts";
     private static final String USE_COLONY_OUTPOSTS = "useColonyOutposts";
     private static final String SELECT_COLONY_OUTPOSTS_PLANET = "selectColonyOutpostsPlanet_";
+    private static final String SHARED_DISCOVERIES = "shared_discoveries";
+    private static final String USE_SHARED_DISCOVERIES = "useSharedDiscoveries";
+    private static final String USE_SHARED_DISCOVERIES_PROMPT = "useSharedDiscoveriesPrompt";
 
+    // Colony Outposts
     public static Button offerColonyOutposts(Player player) {
         return Buttons.green(
                 player.factionButtonChecker() + USE_COLONY_OUTPOSTS, "Use Colony Outposts", FactionEmojis.kairn);
@@ -77,7 +82,7 @@ public class KairnAbilityHandler {
         }
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose an exploration deck of a planet you explored:",
+                player.getRepresentation() + ", please choose an exploration deck of a planet you explored.",
                 buttons);
     }
 
@@ -98,7 +103,7 @@ public class KairnAbilityHandler {
         Planet planet = game.getPlanetsInfo().get(planetName);
         String exploredPlanets = game.getStoredValue(player.getFaction() + "planetsExplored");
         if (!player.hasAbility(COLONY_OUTPOSTS)
-                || player.getStrategicCC() < 1
+                || (player.getStrategicCC() < 1 && player.getFleetCC() < 1 && player.getTacticalCC() < 1)
                 || !player.getUserID().equals(game.getActivePlayerID())
                 || game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
                         .isEmpty()
@@ -116,10 +121,13 @@ public class KairnAbilityHandler {
             return;
         }
 
-        player.setStrategicCC(player.getStrategicCC() - 1);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", please remove 1 command token from any pool.",
+                ButtonHelper.getLoseCCButtons(player));
         List<String> revealedCards = new ArrayList<>();
         StringBuilder message = new StringBuilder(player.getRepresentation())
-                .append(" spent 1 strategy token for _Colony Outposts_ and revealed from the ")
+                .append(" spent 1 command token for **Colony Outposts** and revealed from the ")
                 .append(trait)
                 .append(" exploration deck for ")
                 .append(Helper.getPlanetRepresentation(planetName, game))
@@ -183,5 +191,102 @@ public class KairnAbilityHandler {
             }
         }
         return false;
+    }
+
+    // Shared Discoveries
+    public static Button getSharedDiscoveriesButton(Player player) {
+        return Buttons.gray(
+                player.factionButtonChecker() + USE_SHARED_DISCOVERIES, "Use Shared Discoveries", FactionEmojis.kairn);
+    }
+
+    public static void offerSharedDiscoveries(Game game, Player player) {
+        if (game == null
+                || player == null
+                || !player.hasAbility(SHARED_DISCOVERIES)
+                || player.getCommodities() < 1
+                || getSharedDiscoveriesExploreButtons(game, player).isEmpty()) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", you may spend 1 commodity to use **Shared Discoveries** to explore a planet in the active system as any trait.",
+                List.of(
+                        Buttons.gray(
+                                player.factionButtonChecker() + USE_SHARED_DISCOVERIES_PROMPT,
+                                "Use Shared Discoveries",
+                                FactionEmojis.kairn),
+                        Buttons.red("deleteButtons", "Decline")));
+    }
+
+    @ButtonHandler(USE_SHARED_DISCOVERIES)
+    @ButtonHandler(USE_SHARED_DISCOVERIES_PROMPT)
+    public static void getSharedDiscoveriesPlanets(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        boolean isPrompt = buttonID.startsWith(USE_SHARED_DISCOVERIES_PROMPT);
+        Player activePlayer = game == null ? null : game.getPlayer(game.getActivePlayerID());
+        if (player == null
+                || !player.hasAbility(SHARED_DISCOVERIES)
+                || player.getCommodities() < 1
+                || activePlayer == null) {
+            if (isPrompt) {
+                ButtonHelper.deleteMessage(event);
+            } else {
+                ButtonHelper.deleteTheOneButton(event);
+            }
+            return;
+        }
+        List<Button> exploreButtons = getSharedDiscoveriesExploreButtons(game, activePlayer);
+        if (exploreButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "The active player controls no planets in the active system to explore.");
+            if (isPrompt) {
+                ButtonHelper.deleteMessage(event);
+            } else {
+                ButtonHelper.deleteTheOneButton(event);
+            }
+            return;
+        }
+
+        player.setCommodities(player.getCommodities() - 1);
+        MessageHelper.sendMessageToChannelWithButtons(
+                activePlayer.getCorrectChannel(),
+                player.getRepresentationNoPing() + " spent 1 commodity to use **Shared Discoveries**. "
+                        + activePlayer.getRepresentation()
+                        + ", choose a planet in the active system and the trait to explore it as.",
+                exploreButtons);
+        if (isPrompt) {
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    private static List<Button> getSharedDiscoveriesExploreButtons(Game game, Player player) {
+        Tile activeSystem = game == null ? null : game.getTileByPosition(game.getActiveSystem());
+        if (activeSystem == null || player == null) {
+            return List.of();
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+            if (!player.getPlanets().contains(planet.getName())) {
+                continue;
+            }
+            for (String trait : List.of("cultural", "hazardous", "industrial")) {
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "movedNExplored_filler_" + planet.getName() + "_" + trait,
+                        "Explore " + Helper.getPlanetRepresentation(planet.getName(), game) + " As "
+                                + StringUtils.capitalize(trait),
+                        ExploreEmojis.getTraitEmoji(trait)));
+            }
+        }
+        return buttons;
+    }
+
+    public static boolean canOfferSharedDiscoveriesCardsInfoButton(Game game, Player player) {
+        Player activePlayer = game == null ? null : game.getPlayer(game.getActivePlayerID());
+        return player != null
+                && player.hasAbility(SHARED_DISCOVERIES)
+                && activePlayer != null
+                && activePlayer != player;
     }
 }

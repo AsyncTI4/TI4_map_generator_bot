@@ -360,7 +360,7 @@
     {
         "alias": "initiative",
         "factionName": "The Keleres Initiative",
-        "homeSystem": "02",
+        "homeSystem": "94new",
         "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
         "commodities": 4,
         "factionTech": [
@@ -372,7 +372,7 @@
             "sdn"
         ],
         "homePlanets": [
-            "mollprimus"
+            "mollprimusk"
         ],
         "abilities": [
             "winnaran_archive_access",

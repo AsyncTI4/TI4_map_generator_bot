@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "arche",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "arche",
     "tileId": "d08",
     "name": "Arche",

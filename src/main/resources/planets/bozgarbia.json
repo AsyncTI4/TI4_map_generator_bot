@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bozgarbia",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "bozgarbia",
     "tileId": "sig01",
     "name": "Bozgarbia",

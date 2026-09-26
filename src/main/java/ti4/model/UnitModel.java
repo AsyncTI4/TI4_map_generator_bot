@@ -2,10 +2,12 @@ package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -23,7 +25,6 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -42,6 +43,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String faction;
     private Boolean isUpgrade;
     private List<String> eligiblePlanetTypes;
+    private List<String> ineligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
     private String basicProduction;
@@ -99,10 +101,30 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                                 "INDUSTRIAL",
                                 "TECH_SPECIALTY",
                                 "LEGENDARY",
+                                "LIGHTNING",
+                                "SUPERNOVA",
+                                "HOME_PLANET",
                                 "MECATOL_REX",
                                 "EMPTY_NONANOMALY",
                                 "EMPTY"))
-                        .containsAll(getEligiblePlanetTypes());
+                        .containsAll(getEligiblePlanetTypes().stream()
+                                .map(String::toUpperCase)
+                                .toList())
+                && new HashSet<>(List.of(
+                                "CULTURAL",
+                                "HAZARDOUS",
+                                "INDUSTRIAL",
+                                "TECH_SPECIALTY",
+                                "LEGENDARY",
+                                "LIGHTNING",
+                                "SUPERNOVA",
+                                "HOME_PLANET",
+                                "MECATOL_REX",
+                                "EMPTY_NONANOMALY",
+                                "EMPTY"))
+                        .containsAll(getIneligiblePlanetTypes().stream()
+                                .map(String::toUpperCase)
+                                .toList());
     }
 
     public String getAlias() {
@@ -119,8 +141,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return color + getImageFileSuffix();
     }
 
-    private TI4Emoji getFactionEmoji() {
-        return FactionEmojis.getFactionIcon(getFaction().orElse(""));
+    private String getFactionEmoji() {
+        FactionModel factionModel = Mapper.getFaction(getFaction().orElse(""));
+        if (factionModel != null) {
+            return factionModel.getFactionEmoji();
+        }
+        return "";
     }
 
     public UnitType getUnitType() {
@@ -133,10 +159,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getUnitRepresentation() {
-        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
-        TI4Emoji unitEmoji = getUnitEmoji();
-
-        String unitString = unitEmoji + " " + name + factionEmoji;
+        String unitString = getUnitEmoji() + " " + name + getFactionEmoji();
         if (getAbility().isPresent()) {
             unitString += ": " + getAbility().get();
         }
@@ -148,14 +171,18 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
-        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
+        String factionEmoji = getFaction().isEmpty()
+                ? ""
+                : Mapper.getFaction(getFaction().get()).getFactionEmoji();
         TI4Emoji unitEmoji = getUnitEmoji();
 
         EmbedBuilder eb = new EmbedBuilder();
 
         String name = this.name;
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
-        if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
+        if (getSubtitle().isPresent()) {
+            eb.setDescription("-# " + getSubtitle().get() + " " + getPlanetPlacementRestrictions());
+        }
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
@@ -178,12 +205,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation(UnitState state) {
-        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
-        TI4Emoji unitEmoji = getUnitEmoji();
         String name = this.name == null ? "" : this.name;
         String stateStr =
                 (state == null || state == UnitState.none) ? "" : (state.stateEmoji() + " " + state.humanDescr());
-        return stateStr + " " + factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
+        return stateStr + " " + getFactionEmoji() + " " + getUnitEmoji() + " _" + name + "_ " + getSourceEmoji();
     }
 
     private String getSourceEmoji() {
@@ -647,25 +672,57 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
-    private List<String> getEligiblePlanetTypes() {
+    public List<String> getEligiblePlanetTypes() {
         return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
     }
 
-    private TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
+    public List<String> getIneligiblePlanetTypes() {
+        return Optional.ofNullable(ineligiblePlanetTypes).orElse(Collections.emptyList());
+    }
+
+    public boolean canBePlacedOnPlanetTypes(Collection<String> planetTypes) {
+        if (planetTypes == null) {
+            return false;
+        }
+        List<String> normalizedTypes = planetTypes.stream()
+                .filter(Objects::nonNull)
+                .map(String::toUpperCase)
+                .toList();
+        return (getEligiblePlanetTypes().isEmpty()
+                        || getEligiblePlanetTypes().stream()
+                                .map(String::toUpperCase)
+                                .anyMatch(normalizedTypes::contains))
+                && getIneligiblePlanetTypes().stream().map(String::toUpperCase).noneMatch(normalizedTypes::contains);
+    }
+
+    private String getMonumentPlanetTypeEmoji(String planetType) {
         return switch (planetType.toLowerCase()) {
-            case "cultural", "industrial", "hazardous" -> ExploreEmojis.getTraitEmoji(planetType);
-            case "legendary" -> MiscEmojis.LegendaryPlanet;
-            case "empty_nonanomaly" -> MiscEmojis.EmptySystem;
-            case "tech_specialty" -> TechEmojis.NonUnitTechSkip;
-            case "mecatol_rex" -> PlanetEmojis.Mecatol;
-            default -> TI4Emoji.getRandomGoodDog();
+            case "cultural", "industrial", "hazardous" ->
+                ExploreEmojis.getTraitEmoji(planetType).toString();
+            case "legendary" -> MiscEmojis.LegendaryPlanet.toString();
+            case "lightning" -> PlanetEmojis.Lightning.toString();
+            case "supernova" -> MiscEmojis.Supernova.toString();
+            case "home_planet" -> getFactionEmoji();
+            case "empty", "empty_nonanomaly" -> ExploreEmojis.Frontier.toString();
+            case "tech_specialty" -> TechEmojis.NonUnitTechSkip.toString();
+            case "mecatol_rex" -> PlanetEmojis.Mecatol.toString();
+            default -> TI4Emoji.getRandomGoodDog().toString();
         };
     }
 
-    private String getEligiblePlanetEmojis() {
+    private String getPlanetPlacementRestrictions() {
         StringBuilder sb = new StringBuilder();
         for (String type : getEligiblePlanetTypes()) {
             sb.append(getMonumentPlanetTypeEmoji(type));
+        }
+        if (!getIneligiblePlanetTypes().isEmpty()) {
+            if (!sb.isEmpty()) {
+                sb.append(" · ");
+            }
+            sb.append("Not: ");
+            for (String type : getIneligiblePlanetTypes()) {
+                sb.append(getMonumentPlanetTypeEmoji(type));
+            }
         }
         return sb.toString();
     }

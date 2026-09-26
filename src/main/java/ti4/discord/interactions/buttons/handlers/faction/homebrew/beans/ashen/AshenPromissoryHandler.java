@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class AshenPromissoryHandler {
@@ -79,12 +80,15 @@ public class AshenPromissoryHandler {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, owner, false);
 
+        AddUnitService.addUnits(event, owner.getNomboxTile(), game, owner.getColor(), "1 infantry");
+
         int remainingHits = Math.max(0, hits - 1);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + " used _From the Ashes_ to prevent 1 unit from being destroyed"
                         + " during ground combat, then returned the note to "
-                        + owner.getRepresentationNoPing() + ".");
+                        + owner.getRepresentationNoPing() + "."
+                        + "\n-# The Ashen Legion player also captured 1 infantry from the supply.");
 
         if (remainingHits < 1) {
             ButtonHelper.deleteMessage(event);

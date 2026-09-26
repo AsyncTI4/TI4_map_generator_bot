@@ -87,6 +87,12 @@ public class SecretObjectiveInfoService {
             Button discardB = Buttons.blue("get_so_discard_buttons", "Discard A Secret Objective");
             buttons.add(discardB);
         }
+        if (player.hasAbility("safe_harbor")) {
+            buttons.add(Buttons.green("drawHeistObj_1", "Draw 1 VP Heist Objective"));
+            buttons.add(Buttons.green("drawHeistObj_2", "Draw 2 VP Heist Objective"));
+            buttons.add(Buttons.gray("revealHeistObj", "Reveal Heist Objective"));
+            buttons.add(Buttons.red("removeHeistObj", "Remove Revealed Heist Objective"));
+        }
 
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
@@ -145,6 +151,9 @@ public class SecretObjectiveInfoService {
                             .append(Helper.leftpad("" + so.getValue(), 3))
                             .append(")`\n> ")
                             .append(soModel.getText());
+                    if (soModel.getPoints() > 1) {
+                        sb.append(" (").append(soModel.getPoints()).append(" VP)");
+                    }
                     index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
@@ -188,6 +197,9 @@ public class SecretObjectiveInfoService {
     private static String getSecretObjectiveRepresentation(String soID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        if (so == null) {
+            return "Unknown Secret Objective: " + soID;
+        }
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();

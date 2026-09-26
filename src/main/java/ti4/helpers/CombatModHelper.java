@@ -7,12 +7,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -34,6 +39,7 @@ import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.MonumentsService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -161,7 +167,10 @@ public class CombatModHelper {
                             unitsByQuantity,
                             game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
-                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
+                String relicName = "specialized_augmentations".equals(relic)
+                        ? relicModel.getSimpleRepresentation(false)
+                        : relicModel.getSimpleRepresentation();
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicName));
             }
         }
 
@@ -218,7 +227,7 @@ public class CombatModHelper {
             if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
                 for (String fs : ValefarZService.getFlagshipAbilitys(game, player)) {
                     UnitModel fsUnit = Mapper.getUnit(fs);
-                    if (fsUnit == unit) continue;
+                    if (fsUnit == null || fsUnit == unit) continue;
                     Optional<CombatModifierModel> relevantMod2 = combatModifiers.values().stream()
                             .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, fsUnit.getAlias()))
                             .findFirst();
@@ -419,8 +428,7 @@ public class CombatModHelper {
                 meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile)
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
-            case "fracture_combat" ->
-                meetsCondition = tile != null && tile.getPosition().contains("frac");
+            case "fracture_combat" -> meetsCondition = tile != null && tile.isFracture();
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
@@ -459,8 +467,18 @@ public class CombatModHelper {
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
+                        && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, activePlayer)
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
+                }
+            }
+            case Constants.MOD_VERYDITH_FLAGSHIP -> {
+                List<Player> eligiblePlayers = game.getRealPlayersExcludingThis(player);
+                for (Player otherPlayer : eligiblePlayers) {
+                    String ccID = Mapper.getCCID(otherPlayer.getColor());
+                    if (tile.hasCC(ccID) && ButtonHelper.doesPlayerHaveFSHere("verydith_flagship", player, tile)) {
+                        meetsCondition = true;
+                    }
                 }
             }
             case "nebula_cosmic_defender" -> {
@@ -471,6 +489,7 @@ public class CombatModHelper {
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
+                        && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, activePlayer)
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
@@ -500,6 +519,10 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "arvaxihero" -> meetsCondition = ArvaxiLeaderHandler.isHeroActiveForCombat(game, player, tile);
+            case "zephyrion_flagship_bounty" ->
+                meetsCondition = opponentUnitsByQuantity != null
+                        && ZephyrionBountyHandler.hasBountyOnAnyUnit(game, opponent, opponentUnitsByQuantity.keySet());
             case "tnelisopponentfs" -> {
                 if (ButtonHelper.doesPlayerHaveFSHere("tnelis_flagship", opponent, tile)
                         && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
@@ -563,6 +586,9 @@ public class CombatModHelper {
                             }
                         }
                     }
+                }
+                if (game.isErwansGambitMode() && !"letnev".equalsIgnoreCase(player.getFaction())) {
+                    meetsCondition = false;
                 }
             }
             case "opponent_has_sftt" -> {
@@ -698,6 +724,28 @@ public class CombatModHelper {
                             "sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
             }
+            case "active_player" -> meetsCondition = game.getActivePlayer() == player;
+            case "rhodun_monument_combat" -> {
+                boolean opponentHasUnitUpgrade = opponent != null
+                        && opponent.getTechs().stream()
+                                .map(Mapper::getTech)
+                                .filter(Objects::nonNull)
+                                .anyMatch(TechnologyModel::isUnitUpgrade);
+
+                meetsCondition = opponentHasUnitUpgrade
+                        && MonumentsService.isMonumentOnBoard(game, player, "rhodun_monument")
+                        && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "rhodun_monument", tile);
+            }
+            case "rhodun_monumentback_combat" -> {
+                boolean opponentHasUnitsInFracture = opponent != null
+                        && game.getTileMap().values().stream()
+                                .anyMatch(fractureTile ->
+                                        fractureTile.isFracture() && fractureTile.containsPlayersUnits(opponent));
+
+                meetsCondition = opponentHasUnitsInFracture
+                        && MonumentsService.isMonumentOnBoard(game, player, "rhodun_monumentback")
+                        && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "rhodun_monumentback", tile);
+            }
             default -> meetsCondition = true;
         }
         return meetsCondition;
@@ -795,7 +843,7 @@ public class CombatModHelper {
                 case Constants.MOD_DESTROYERS ->
                     scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP ->
-                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
+                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem, true);
                 case Constants.MOD_OPPONENT_SHIP ->
                     scalingCount += ButtonHelper.checkNumberShips(opponent, activeSystem);
                 case "combat_round" -> {
@@ -832,7 +880,7 @@ public class CombatModHelper {
                 }
                 case "adjacent_anomaly" -> {
                     for (String pos :
-                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         if (tile.isAnomaly(game, player)) {
                             scalingCount += 1;
@@ -844,6 +892,28 @@ public class CombatModHelper {
                         scalingCount = 0;
                     } else {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                    }
+                }
+                case "carried_gf_in_space_area" -> { // Doesn't actually track carried units, assumes flagship cap
+                    // is filled first
+                    UnitModel uM = Mapper.getUnit("xytheris_flagship");
+                    int numberOfCarryableUnitsInSystem = (activeSystem
+                            .getSpaceUnitHolder()
+                            .countPlayersUnitsWithModelCondition(player, UnitModel::getIsGroundForce));
+                    if (!"space".equalsIgnoreCase(unitHolder.getName())
+                            || !player.ownsUnit("xytheris_flagship")
+                            || game.getActivePlayer() != player) {
+                        scalingCount = 0;
+                    } else if (numberOfCarryableUnitsInSystem >= uM.getCapacityValue()) {
+                        scalingCount = uM.getCapacityValue()
+                                + (XytherisLeadersHandler.getMyrixAgentBonus(
+                                        game,
+                                        player,
+                                        activeSystem,
+                                        unitHolder,
+                                        Units.getUnitKey(uM.getUnitType(), player.getColor())));
+                    } else {
+                        scalingCount = numberOfCarryableUnitsInSystem;
                     }
                 }
                 case "carriers_in_system" ->
@@ -920,6 +990,9 @@ public class CombatModHelper {
                                 .map(Mapper::getTech)
                                 .filter(TechnologyModel::isUnitUpgrade)
                                 .count();
+                        if ("neutral".equalsIgnoreCase(opponent.getFaction())) {
+                            scalingCount = 0;
+                        }
                     }
                 }
                 case Constants.MOD_OPPONENT_FACTION_TECH -> {

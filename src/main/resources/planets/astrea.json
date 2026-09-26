@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "astrea",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 225,
+            "y": 205
+        }
+    },
     "id": "astrea",
     "tileId": "mp01",
     "name": "Astrea",

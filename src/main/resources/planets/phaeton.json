@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "phaeton",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 95
+        }
+    },
     "id": "phaeton",
     "tileId": "s08",
     "name": "Phaeton",

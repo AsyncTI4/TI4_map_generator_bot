@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "erissiha",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "erissiha",
     "tileId": "er61",
     "name": "Erissiha",

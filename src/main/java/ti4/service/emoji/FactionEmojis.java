@@ -47,7 +47,6 @@ public enum FactionEmojis implements TI4Emoji {
     Neutral,
 
     // Twilight's Fall
-
     redtf,
     greentf,
     blacktf,
@@ -56,6 +55,19 @@ public enum FactionEmojis implements TI4Emoji {
     yellowtf,
     bluetf,
     orangetf,
+
+    // Twilight Kart
+    redtknova,
+    orangetknova,
+    yellowtknova,
+    greentknova,
+    bluetknova,
+    purpletknova,
+    pinktknova,
+    blacktknova,
+
+    // BR TF
+    whitetf,
 
     // Discordant Stars
     augers,
@@ -142,6 +154,11 @@ public enum FactionEmojis implements TI4Emoji {
     verydith,
     veylor,
     xytheris,
+    vanguard,
+    scrapyard,
+    stoneborn,
+    morpha,
+    thurviali,
 
     // nomadfalcon
     erock,
@@ -351,6 +368,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "verydith" -> verydith;
             case "veylor" -> veylor;
             case "xytheris" -> xytheris;
+            case "vanguard" -> vanguard;
+            case "scrapyard" -> scrapyard;
+            case "stoneborn" -> stoneborn;
+            case "morpha" -> morpha;
+            case "thurviali" -> thurviali;
             case "diaspora" -> Arborec;
             case "hlr" -> L1Z1X;
             case "clade" -> Naalu;
@@ -362,14 +384,27 @@ public enum FactionEmojis implements TI4Emoji {
             case "initiative" -> Keleres;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
+
             case "redtf" -> redtf;
-            case "greentf" -> greentf;
-            case "blacktf" -> blacktf;
-            case "pinktf" -> pinktf;
-            case "purpletf" -> purpletf;
-            case "yellowtf" -> yellowtf;
-            case "bluetf" -> bluetf;
             case "orangetf" -> orangetf;
+            case "yellowtf" -> yellowtf;
+            case "greentf" -> greentf;
+            case "bluetf" -> bluetf;
+            case "purpletf" -> purpletf;
+            case "pinktf" -> pinktf;
+            case "blacktf" -> blacktf;
+
+            case "redtknova" -> redtknova;
+            case "orangetknova" -> orangetknova;
+            case "yellowtknova" -> yellowtknova;
+            case "greentknova" -> greentknova;
+            case "bluetknova" -> bluetknova;
+            case "purpletknova" -> purpletknova;
+            case "pinktknova" -> pinktknova;
+            case "blacktknova" -> blacktknova;
+
+            case "whitetf" -> whitetf;
+
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;
             case "franken3" -> Franken3;

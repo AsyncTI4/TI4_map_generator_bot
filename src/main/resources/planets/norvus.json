@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "norvus",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "norvus",
     "tileId": "d26",
     "name": "Norvus",

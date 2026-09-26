@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.service.combat.CombatRollType;
 
 @Data
@@ -31,9 +32,15 @@ public class CombatModifierModel implements ModelInterface {
     private Boolean singleUnitMod = false;
     private Boolean applyEachForQuantity = false;
     private Boolean applyToOpponent = false;
+    private Integer maxDice;
 
     public boolean isValid() {
-        return type != null && value != null && persistenceType != null && related != null && forCombatAbility != null;
+        return type != null
+                && value != null
+                && persistenceType != null
+                && related != null
+                && forCombatAbility != null
+                && (maxDice == null || maxDice > 0);
     }
 
     public boolean isRelevantTo(String relatedType, String relatedAlias) {
@@ -106,8 +113,15 @@ public class CombatModifierModel implements ModelInterface {
             if ("_ship_no_ff".equals(scope)) {
                 isInScope = unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType());
             }
+            if ("_upgraded_ship_".equals(scope)) {
+                isInScope = unit.getIsShip()
+                        && unit.getRequiredTechId().map(player::hasTech).orElse(false);
+            }
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();
+            }
+            if ("_flagship_or_mech_".equals(scope)) {
+                isInScope = unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech;
             }
             if ("classifiedWeapons".equals(scope)) {
                 String storedValue = game.getStoredValue("classifiedWeapons");

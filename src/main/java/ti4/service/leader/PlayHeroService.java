@@ -8,19 +8,32 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
@@ -83,9 +96,20 @@ public class PlayHeroService {
         rememberFrankenFirmamentHero(player, leader);
         LeaderRemovalReason reason = LeaderRemovalReason.fromHeroId(leader.getId());
         boolean removed = player.removeLeader(leader);
+        if (removed && reason != LeaderRemovalReason.ATTACHED && player.hasAbility("commanding_presence")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", **Commanding Presence** allows you to gain 1 command token after purging "
+                            + Helper.getLeaderFullRepresentation(leader) + ".",
+                    ButtonHelper.getGainCCButtons(player));
+        }
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+        }
+        if (removed && reason == LeaderRemovalReason.PURGED) {
+            RevenantTechHandler.doLazarusPodsLeaderCheck(game, player);
         }
         return removed;
     }
@@ -106,6 +130,14 @@ public class PlayHeroService {
     }
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
+        if ("oblivionhero".equals(playerLeader.getId()) && !OblivionLeadersHandler.canStartOblivionHero(game)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation()
+                            + ", Frontiersman Nothi, the Oblivion hero, cannot be played because there are not enough unused red-backed and blue-backed tiles or legal edge positions.");
+            return;
+        }
+
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         if (!GameEventDraft.stage(
                 game, new GameSubEvent.LeaderPlayed(player.getFaction(), "HERO", playerLeader.getId()))) {
@@ -181,6 +213,9 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "scrapyardhero" ->
+                ScrapyardLeaderHandler.resolveScrapyardHero(
+                        event instanceof ButtonInteractionEvent buttonEvent ? buttonEvent : null, game, player);
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
@@ -245,9 +280,10 @@ public class PlayHeroService {
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
-            case "dreamhero" -> DreamButtonHandler.postDreamHeroButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
-            case "netrunnershero" -> NetrunnersLeadersHandler.startRevolution(game, player);
+            case "crystellumhero" -> CrystellumLeadersHandler.startCrystellumHero(event, game, player);
+            case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
+            case "netrunnershero" -> NetrunnersLeadersHandler.offerHeroTechSelection(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
@@ -263,6 +299,16 @@ public class PlayHeroService {
             }
             case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
             case "revenantkairnhero" -> RevenantLeadersHandler.startRevKairnHero(event, game, player);
+            case "revenantthurvialihero" -> RevenantLeadersHandler.startRevThurvialiHero(event, game, player);
+            case "throneshero" -> ThronesLeadersHandler.getUnplacedThronePlanetButtons(event, game, player);
+            case "kairnhero" -> KairnLeadershandler.startKairnHero(event, game, player);
+            case "ponthoushero" -> PonthousLeadersHandler.startPonthousHero(event, game, player);
+            case "arcanumhero" -> ArcanumLeadersHandler.startArcanumHero(event, game, player);
+            case "kryxoshero" -> KryxosLeadersHandler.startKryxosHero(event, game, player);
+            case "myrrhero" -> MyrrLeadersHandler.startMyrrHero(event, game, player);
+            case "oblivionhero" -> OblivionLeadersHandler.startOblivionHero(event, game, player);
+            case "verydithhero" -> VerydithLeadersHandler.startVerydithHero(event, game, player);
+            case "vanguardhero" -> VanguardLeadersHandler.startHero(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -436,22 +482,14 @@ public class PlayHeroService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" -> {
-                if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-                    player.setTacticalCC(player.getTacticalCC() - 1);
-                    CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
-                    game.setStoredValue("vaylerianHeroActive", "true");
-                }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
                 if (!removeCCs.isEmpty()) {
-                    for (int x = 0;
-                            x < ButtonHelperAgents.getGloryTokenTiles(game).size();
-                            x++) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCorrectChannel(),
-                                "Use buttons to remove 1 of your command tokens from the game board.",
-                                removeCCs);
-                    }
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            "Use buttons to remove 1 of your command tokens from the game board.",
+                            removeCCs);
                 }
+                game.setStoredValue("vaylerianHeroActive", "true");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), player.getFactionEmoji() + " may gain 1 command token.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
@@ -614,15 +652,32 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji()
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
-                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                    if (p2.getSoScored() < player.getSoScored()) {
-                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, game);
+                if (game.isFowMode()) {
+                    // One prompt, not one per opponent: the fog list is built from what this player knows
+                    // rather than from any particular opponent's holdings, so a per-opponent loop would post
+                    // identical panels and name who is behind on secret objectives into the bargain.
+                    boolean anyBehind = game.getRealPlayersExcludingThis(player).stream()
+                            .anyMatch(p2 -> p2.getSoScored() < player.getSoScored());
+                    if (anyBehind) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
-                                player.getRepresentationUnfogged() + " you have scored more secret objectives than "
-                                        + p2.getRepresentation()
-                                        + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
-                                shrineButtons);
+                                player.getRepresentationUnfogged()
+                                        + ", you have scored more secret objectives than at least one other player,"
+                                        + " and so here are buttons to look at a shrine. You can decline to gain 2 CC"
+                                        + " instead, using the CC buttons above.",
+                                ButtonHelperHeroes.getShrineButtons(null, player, game));
+                    }
+                } else {
+                    for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                        if (p2.getSoScored() < player.getSoScored()) {
+                            List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, player, game);
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCorrectChannel(),
+                                    player.getRepresentationUnfogged() + " you have scored more secret objectives than "
+                                            + p2.getRepresentation()
+                                            + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
+                                    shrineButtons);
+                        }
                     }
                 }
             }

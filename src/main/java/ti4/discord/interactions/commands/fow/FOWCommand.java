@@ -17,13 +17,17 @@ public class FOWCommand implements ParentCommand {
                     new CheckChannels(),
                     new PingActivePlayer(),
                     new PingSystem(),
+                    new TargetPlanetPing(),
+                    new TargetSystemPing(),
+                    new TargetPlayerPing(),
                     new Whisper(),
                     new Announce(),
                     new FOWOptions(),
                     new ShowGameAsPlayer(),
                     new PrivateCommunicationsCheck(),
                     new GMCommand(),
-                    new CreateFoWGameButton())
+                    new CreateFoWGameButton(),
+                    new SetupWizard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

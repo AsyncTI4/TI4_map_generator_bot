@@ -19,9 +19,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.components.selections.SelectMenu;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -179,6 +183,15 @@ public class MessageHelper {
         splitAndSent(messageText, channel, embeds, buttons);
     }
 
+    public static void sendMessageToChannelWithEmbedsAndButtons(
+            @Nonnull MessageChannel channel,
+            @Nullable String messageText,
+            @Nullable List<MessageEmbed> embeds,
+            @Nullable List<Button> buttons,
+            @Nullable Consumer<Message> restAction) {
+        splitAndSentWithAction(messageText, channel, restAction, embeds, buttons);
+    }
+
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
             if (button.getCustomId() != null
@@ -247,7 +260,23 @@ public class MessageHelper {
             List<MessageEmbed> embeds,
             List<Button> buttons,
             boolean saboable) {
+        sendMessageToChannelWithEmbedsAndFactionReact(
+                channel, messageText, game, player, embeds, buttons, saboable, null);
+    }
+
+    public static void sendMessageToChannelWithEmbedsAndFactionReact(
+            MessageChannel channel,
+            String messageText,
+            Game game,
+            Player player,
+            List<MessageEmbed> embeds,
+            List<Button> buttons,
+            boolean saboable,
+            @Nullable Consumer<Message> andThen) {
         Consumer<Message> addFactionReact = (message) -> {
+            if (andThen != null) {
+                andThen.accept(message);
+            }
             if (saboable) {
                 GameMessageManager.add(
                         game.getName(),
@@ -478,6 +507,66 @@ public class MessageHelper {
                 .setComponents(rows)
                 .setFiles(files)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    /** How many buttons fit on a single message: max action rows x max buttons per row. */
+    private static int maxButtonsInOneMessage() {
+        return Message.MAX_COMPONENT_COUNT * ActionRow.getMaxAllowed(Component.Type.BUTTON);
+    }
+
+    /**
+     * Posts a button list, or rewrites the message the clicked button lives on. Use this for any refreshable
+     * list of buttons: send fresh when opening it (the click came from a different message), edit in place on
+     * every subsequent refresh, so repeatedly toggling something doesn't leave a trail of stale copies.
+     *
+     * <p>Not to be confused with {@code NewStuffHelper.sendOrEditButtons}, which decides implicitly (it edits
+     * only when the new text is byte-identical to the old), replaces components without rewriting the text,
+     * and keeps only the first action row. This one takes an explicit flag and does rewrite the text.
+     *
+     * <p>Editing can't span messages, so a list too large for one message falls back to a fresh send (which
+     * paginates) rather than silently losing the overflow.
+     */
+    public static void postOrEditWithButtons(
+            ButtonInteractionEvent event, String message, List<Button> buttons, boolean editInPlace) {
+        if (editInPlace && buttons.size() <= maxButtonsInOneMessage()) {
+            editMessageWithButtons(event, message, buttons);
+        } else {
+            sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        }
+    }
+
+    /**
+     * Posts {@code options} as one or more string-select menus, splitting on Discord's per-menu option cap.
+     * Callers build the {@link SelectOption}s themselves - those already carry label, value, emoji and
+     * description, so no mapper callbacks are needed here.
+     *
+     * <p>Every page reuses {@code menuId}: Discord only requires component ids to be unique within a single
+     * message, and the handler registry prefix-matches, so all pages route to the same handler.
+     *
+     * <p>When the options span multiple pages each prompt gains an "(A - M)" style suffix so the pages can be
+     * told apart; a single page is left unsuffixed.
+     */
+    public static void sendPagedSelectMenus(
+            MessageChannel channel, String menuId, List<SelectOption> options, String prompt) {
+        if (channel == null || options.isEmpty()) return;
+        List<List<SelectOption>> pages = ListUtils.partition(options, SelectMenu.OPTIONS_MAX_AMOUNT);
+        for (List<SelectOption> page : pages) {
+            StringSelectMenu menu = StringSelectMenu.create(menuId)
+                    .addOptions(page)
+                    .setRequiredRange(1, 1)
+                    .build();
+            String pagePrompt = prompt + (pages.size() > 1 ? pageRangeLabel(page) : "");
+            channel.sendMessage(pagePrompt)
+                    .addComponents(ActionRow.of(menu))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    /** " (A - M)" style suffix describing the range of labels on one select-menu page. */
+    private static String pageRangeLabel(List<SelectOption> page) {
+        String first = page.getFirst().getLabel();
+        String last = page.getLast().getLabel();
+        return first.equals(last) ? " (" + first + ")" : " (" + first + " - " + last + ")";
     }
 
     private static void replyToMessage(
@@ -922,6 +1011,43 @@ public class MessageHelper {
     }
 
     /**
+     * Packs blocks into as few messages as possible without ever splitting one across two of them.
+     * A block is whatever the caller does not want broken up - a heading with its notes, or a list
+     * item with the bullets nested under it, which Discord renders as a list of their own if they
+     * arrive in a message without the line they hang off.
+     * <p>
+     * A block longer than maxLength on its own cannot be kept whole, and is split by
+     * {@link #splitLargeText(String, int)} as a last resort.
+     *
+     * @param blocks text blocks to pack, in the order they should appear
+     * @param maxLength maximum length of each returned message, any positive integer
+     */
+    public static List<String> packBlocksIntoMessages(List<String> blocks, int maxLength) {
+        List<String> messages = new ArrayList<>();
+        if (blocks == null || blocks.isEmpty()) return messages;
+        StringBuilder message = new StringBuilder();
+        for (String block : blocks) {
+            if (block == null || block.isEmpty()) continue;
+            if (message.length() + block.length() > maxLength && message.length() > 0) {
+                messages.add(message.toString());
+                message.setLength(0);
+            }
+            if (block.length() > maxLength) {
+                // splitLargeText can trail an empty part, and Discord rejects an empty message.
+                for (String part : splitLargeText(block, maxLength)) {
+                    if (!part.isEmpty()) messages.add(part);
+                }
+                continue;
+            }
+            message.append(block);
+        }
+        if (message.length() > 0) {
+            messages.add(message.toString());
+        }
+        return messages;
+    }
+
+    /**
      * @message Message to send - can be large or null/empty
      * @embeds List of MessageEmbed - will truncate after the first 5
      * @buttons List of Button - can be large or null/empty
@@ -1106,6 +1232,37 @@ public class MessageHelper {
                     .queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
             sendMessageToChannel(channel, messageToSend);
+        }
+    }
+
+    /**
+     * Sends blocks to a thread, packed into as few messages as possible without splitting a block
+     * across two of them. Use this over the String overload whenever the text has units - such as
+     * a bullet and the bullets nested under it - that have to arrive in the same message.
+     */
+    public static void sendMessageToThread(MessageChannelUnion channel, String threadName, List<String> blocks) {
+        if (channel == null || threadName == null || threadName.isEmpty()) return;
+        List<String> messages = packBlocksIntoMessages(blocks, 2000);
+        if (messages.isEmpty()) return;
+        if (channel instanceof TextChannel) {
+            channel.asTextChannel()
+                    .createThreadChannel(threadName)
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                    .queueAfter(
+                            500,
+                            TimeUnit.MILLISECONDS,
+                            t -> messages.forEach(message -> sendMessageToChannel(t, message)));
+        } else if (channel instanceof ThreadChannel) {
+            messages.forEach(message -> sendMessageToChannel(channel, message));
+        }
+    }
+
+    public static void sendMessageToThread(MessageChannel channel, String threadName, List<String> blocks) {
+        if (channel instanceof MessageChannelUnion union) {
+            sendMessageToThread(union, threadName, blocks);
+        } else {
+            sendMessageToChannel(channel, "Something went wrong trying to send this to a thread! Sorry!");
+            packBlocksIntoMessages(blocks, 2000).forEach(message -> sendMessageToChannel(channel, message));
         }
     }
 

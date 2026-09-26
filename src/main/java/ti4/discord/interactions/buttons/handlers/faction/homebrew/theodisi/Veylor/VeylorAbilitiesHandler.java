@@ -1,11 +1,13 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -13,6 +15,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -27,6 +30,9 @@ public class VeylorAbilitiesHandler {
 
     // Tight Scheduling
     public static void offerTightScheduling(Game game) {
+        if (!VeylorLeadersHandler.isVeylorAgendaPhase(game)) {
+            return;
+        }
         for (Player player : game.getRealPlayers()) {
             if (!player.hasAbility(TIGHT_SCHEDULING)
                     || !game.getStoredValue(TIGHT_SCHEDULING_AGENDAS + player.getFaction())
@@ -53,7 +59,7 @@ public class VeylorAbilitiesHandler {
             game.setStoredValue(TIGHT_SCHEDULING_AGENDAS + player.getFaction(), String.join(",", agendaIds));
             MessageHelper.sendMessageEmbedsToCardsInfoThread(
                     player,
-                    player.getRepresentationUnfogged() + ", you drew these agendas with _Tight Scheduling_:",
+                    player.getRepresentationUnfogged() + ", you drew these agendas with **Tight Scheduling**.",
                     agendaEmbeds);
         }
     }
@@ -86,7 +92,8 @@ public class VeylorAbilitiesHandler {
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", choose the next agenda to reveal with _Tight Scheduling_:",
+                    player.getRepresentationUnfogged()
+                            + ", please choose the next agenda to reveal with **Tight Scheduling**.\n-# Wait a few seconds before revealing it to ensure it resolves correctly.",
                     buttons);
 
             return true;
@@ -97,10 +104,6 @@ public class VeylorAbilitiesHandler {
     @ButtonHandler(TIGHT_SCHEDULING_REVEAL)
     public static void revealWithTightScheduling(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasAbility(TIGHT_SCHEDULING)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
 
         String[] parts = buttonID.replace(TIGHT_SCHEDULING_REVEAL, "").split(";", 2);
         if (parts.length != 2) {
@@ -157,11 +160,41 @@ public class VeylorAbilitiesHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + ", place your remaining **Tight Scheduling** agendas on the bottom in any order.",
+                            + ", please place your remaining **Tight Scheduling** agendas on the bottom in any order.",
                     buttons);
             return true;
         }
         return false;
+    }
+
+    public static void returnUnassignedTightSchedulingAgendas(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            String key = TIGHT_SCHEDULING_AGENDAS + player.getFaction();
+            String storedAgendas = game.getStoredValue(key);
+            if (!player.hasAbility(TIGHT_SCHEDULING) || storedAgendas.isEmpty()) {
+                continue;
+            }
+
+            List<String> agendaIds = new ArrayList<>(List.of(storedAgendas.split(",")));
+            Collections.shuffle(agendaIds);
+            List<String> agendasNotReturned = new ArrayList<>();
+            for (String agendaId : agendaIds) {
+                Integer uniqueId = game.getSentAgendas().get(agendaId);
+                if (uniqueId == null || !game.putAgendaBottom(uniqueId)) {
+                    agendasNotReturned.add(agendaId);
+                }
+            }
+
+            if (agendasNotReturned.isEmpty()) {
+                game.removeStoredValue(key);
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", so as not to disrupt the next agenda phase, the remaining unassigned agendas you drew with **Tight Scheduling** have been placed on the bottom of the agenda deck in a random order.");
+            } else {
+                game.setStoredValue(key, String.join(",", agendasNotReturned));
+            }
+        }
     }
 
     @ButtonHandler(TIGHT_SCHEDULING_BOTTOM)
@@ -188,6 +221,27 @@ public class VeylorAbilitiesHandler {
         } else {
             game.setStoredValue(key, String.join(",", agendas));
             ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
+    // Lobbyist Dues
+    public static void resolveLobbyistDues(GenericInteractionCreateEvent event, Game game, String winner) {
+        for (Player player : AgendaHelper.getLosers(winner, game)) {
+            if (player.hasAbility("lobbyist_dues")) {
+                int commoditiesGained =
+                        AgendaHelper.getWinningVoters(winner, game).size();
+
+                if (commoditiesGained == 0) {
+                    continue;
+                }
+
+                ButtonHelperStats.gainComms(event, game, player, commoditiesGained, false);
+
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you gained " + commoditiesGained
+                                + " commodities from **Lobbyist Dues**.");
+            }
         }
     }
 }

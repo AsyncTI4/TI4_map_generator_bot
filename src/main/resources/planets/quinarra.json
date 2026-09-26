@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "quinarra",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "quinarra",
     "tileId": "13",
     "name": "Quinarra",

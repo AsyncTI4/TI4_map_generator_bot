@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cantris",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "cantris",
     "tileId": "er115",
     "name": "Cantris",

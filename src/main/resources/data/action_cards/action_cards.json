@@ -6,6 +6,7 @@
         "window": "At the start of the agenda phase",
         "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
         "automationID": "abs",
+        "notes": "In async, this card should be played during the status homework phase, right after you allocate command tokens.",
         "flavorText": "The images depicted a race that Rin had never seen before. Curious. Could it be that this was a race that was exterminated by the Lazax?",
         "source": "base"
     },
@@ -505,7 +506,7 @@
         "phase": "Action",
         "window": "After your opponent declares a retreat during a space combat",
         "text": "Your opponent cannot retreat during this round of space combat.",
-        "flavorText": "The space before the fleeing ship shimmered and warped, revealing the bow of the Y'sia Yssrila bearing down on its position. There would be no escape today.",
+        "flavorText": "The space before the fleeing ship shimmered and warped, revealing the bow of the Y'sia Y'ssrila bearing down on its position. There would be no escape today.",
         "source": "base"
     },
     {
@@ -1034,7 +1035,7 @@
         "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
-        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
+        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muaat reject your proposal.\"",
         "source": "base"
     },
     {
@@ -1056,7 +1057,7 @@
         "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
-        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
+        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muaat reject your proposal.\"",
         "source": "base"
     },
     {
@@ -1067,7 +1068,7 @@
         "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
-        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
+        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muaat reject your proposal.\"",
         "source": "base"
     },
     {

@@ -1,0 +1,26 @@
+{
+    "id": "gammairridius",
+    "tileId": null,
+    "name": "Gamma Irridius",
+    "shortName": "Gam Irr",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "gamma irridius",
+        "gammairridius",
+        "irridius",
+        "idius",
+        "gi"
+    ],
+    "positionInTile": null,
+    "resources": 3,
+    "influence": 3,
+    "factionHomeworld": null,
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Spawning Pool",
+    "legendaryAbilityText": "ACTION: You may exhaust this card to produce 1 ship in a system that contains a Hallucination Token and no other player’s ships",
+    "unitPositions": null,
+    "flavourText": "*I didn't think we'd get this far, addict-*",
+    "source": "gamma"
+}

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "thigel",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 95
+        }
+    },
     "id": "thigel",
     "tileId": "s01",
     "name": "Thigel",

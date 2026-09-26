@@ -18,8 +18,15 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -66,6 +73,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
@@ -93,10 +101,17 @@ public class StartPhaseService {
                 LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
-                Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
-                List<Button> buttons = List.of(flipAgenda);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        event.getMessageChannel(), "Please flip agenda now", buttons);
+                RelitigateLLButtonHandler.clearAgendaPhaseState(game);
+                if (RelitigateLLButtonHandler.offerPreassignedRelitigate(event, game, event.getMessageChannel())) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Agenda reveal is waiting for a preset _Relitigate_ to resolve.");
+                } else {
+                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                    List<Button> buttons = List.of(flipAgenda);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(), "Please flip the agenda.", buttons);
+                }
             }
             case "publicObj" ->
                 ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
@@ -223,17 +238,21 @@ public class StartPhaseService {
         // Phase-end lore must fire before the round number increments below, so "end of round N"
         // round gates see the round they close; the matching phase-START fires after setPhaseOfGame.
         LoreService.showPhaseEndLore(game, "strategy");
-        for (Player player2 : game.getRealPlayers()) {
-            if (game.getStoredValue("SpecialSession") != null
-                    && game.getStoredValue("SpecialSession").contains(player2.getFaction())
-                    && player2.getPlayableActionCards().contains("special_session")) {
-                ActionCardHelper.playAC(event, game, player2, "special session", game.getMainGameChannel());
-                return;
-            }
-        }
+        // for (Player player2 : game.getRealPlayers()) {
+        //     if (game.getStoredValue("SpecialSession") != null
+        //             && game.getStoredValue("SpecialSession").contains(player2.getFaction())
+        //             && player2.getPlayableActionCards().contains("special_session")) {
+        //         ActionCardHelper.playAC(event, game, player2, "special session", game.getMainGameChannel());
+        //         return;
+        //     }
+        // }
+        game.removeStoredValue("veylorBtExtraAgenda");
 
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";
+            ButtonHelperActionCards.checkForAssigningCrisis(game, player2);
+            ButtonHelperActionCards.checkForAssigningStasis(game, player2);
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, player2);
             if (player2.getPromissoryNotesInPlayArea().contains(id)) {
                 player2.removePromissoryNote(id);
                 Player nomad = game.getPNOwner(id);
@@ -282,7 +301,24 @@ public class StartPhaseService {
                 VeiledHeartService.checkForAssigningTelepathic(game, p2);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
+        // In FoW, this may be triggered from the GM room (the `/fow setup` wizard's Start Game button) -
+        // route to the public game channel there instead of leaking into the GM's own channel. Non-fog
+        // callers all already fire from the main channel, so event.getMessageChannel() stays unchanged.
+        MessageHelper.sendMessageToChannel(
+                game.isFowMode() ? game.getMainGameChannel() : event.getMessageChannel(), "Started Round " + round);
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasAbility("allure_of_darkness")) {
+                continue;
+            }
+            List<Button> buttons = RevenantLeadersHandler.offerLichTokenChoices(player, game);
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", due to **Allure of Darkness**, please choose the player on whom to place the _Lich_ token.",
+                        buttons);
+            }
+        }
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
         }
@@ -356,6 +392,24 @@ public class StartPhaseService {
                 ButtonHelperHeroes.checkForMykoHero(game, "zealotshero", player2);
                 game.setStoredValue("zealotsHeroTechs", "");
                 game.setStoredValue("zealotsHeroPurged", "true");
+            }
+            if (player2.hasAbility("tight_scheduling")
+                    && !game.getStoredValue("tightSchedulingAgendas_" + player2.getFaction())
+                            .isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        player2.getRepresentation()
+                                + " **REMINDER**: please finish resolving _Tight Scheduling_. Buttons are in your cards info thread.");
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player2, "kairncommander")) {
+                var commanderButtons = KairnLeadershandler.offerSerelVennButtons(player2, game);
+                if (!commanderButtons.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(),
+                            player2.getRepresentation()
+                                    + ", due to Serel Venn, the Kairn commander, you may explore 1 non-home, non-legendary planet as any trait.",
+                            commanderButtons);
+                }
             }
         }
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {
@@ -504,7 +558,8 @@ public class StartPhaseService {
                     "Exhausted all cultural planets of those who voted \"Against\" on _Representative Government_.");
         }
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
+            // See the "Started Round" send above - same GM-room leak, same fix.
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player firstSCPicker;
         if (!game.hasAnyPriorityTrackMode()) {
@@ -606,6 +661,7 @@ public class StartPhaseService {
         }
 
         for (Player player2 : game.getRealPlayers()) {
+            ArcanumPromissoryHandler.offerScrollOfAscension(game, player2);
             if (player2.getActionCards() != null
                     && player2.getPlayableActionCards().contains("summit")) {
                 MessageHelper.sendMessageToChannel(
@@ -859,11 +915,39 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
         }
+
+        if (game.isMonumentsMode()
+                && (player.hasUnit("winnu_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "winnu_monument"))
+                && !MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation()
+                            + ", you may spend resources to place trade goods on _The Imperial Vault_."
+                            + "\n-# Each 3 resources spent places 1 trade good on the monument.",
+                    List.of(
+                            Buttons.green(
+                                    player.factionButtonChecker() + "winnuMonumentSpendResources",
+                                    "Spend Resources for Imperial Vault",
+                                    UnitEmojis.Monument),
+                            Buttons.red("deleteButtons", "Decline")));
+        } else if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "winnu_monument")) {
+            int gainedTg = MonumentsService.getWinnuMonumentTradeGoodCount(game, player);
+            player.setTg(player.getTg() + gainedTg);
+            MonumentsService.setWinnuMonumentTradeGoodCount(game, player, 0);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " gained " + gainedTg + " trade good" + (gainedTg == 1 ? "" : "s")
+                            + " from _The Imperial Vault_."
+                            + " Their trade goods are now " + player.getTg() + ".");
+        }
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
         StatusHelper.commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusHomework");
+        VeylorAbilitiesHandler.returnUnassignedTightSchedulingAgendas(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusHomework** Phase for Round " + game.getRound() + " started.", true);
         // first do cleanup if necessary
@@ -892,8 +976,9 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(game, player);
         }
+        MyrrAbilitiesHandler.offerFactoryLeaseProduction(game);
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
-            DreamButtonHandler.offerTheWakingButtons(game);
+            DreamAbilitiesHandler.offerTheWakingButtons(game);
         }
 
         Button yssarilPolicy = null;
@@ -1140,6 +1225,19 @@ public class StartPhaseService {
                             + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
             game.setStoredValue("postedSurvey", "yes");
         }
+
+        if (game.getRound() == 1
+                && !game.isFowMode()
+                && game.getStoredValue("offeredOverrulePurge").isEmpty()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("purgeOverrule", "Purge Overrule"));
+            buttons.add(Buttons.gray("deleteButtons", "Keep Overrule"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getTableTalkChannel(),
+                    "If the table agrees, you can use this button to purge _Overrule_.",
+                    buttons);
+            game.setStoredValue("offeredOverrulePurge", "yes");
+        }
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
@@ -1147,12 +1245,13 @@ public class StartPhaseService {
         game.setStoredValue("willRevolution", "");
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        for (Player player : game.getRealPlayers()) {
+            MonumentsBRButtonHandler.offerArmageddonProject(game, player);
+        }
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "action"));
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);
-            ButtonHelperActionCards.checkForAssigningCrisis(game, p2);
-            ButtonHelperActionCards.checkForAssigningStasis(game, p2);
+
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
             if (game.getStoredValue("Play Naalu PN") != null
                     && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {

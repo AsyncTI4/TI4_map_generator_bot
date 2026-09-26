@@ -31,6 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -49,6 +51,7 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.MapGenerator.HorizontalAlign;
+import ti4.image.MapGenerator.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
@@ -1787,7 +1790,7 @@ public class TileGenerator {
                     if (unitHolder instanceof Planet planetHolder) {
                         scale = planetHolder.getRadius() / 65.0f;
                     }
-                    if (tile.getPosition().contains("frac")) {
+                    if (tile.isFracture()) {
                         tokenPath = tile.getTokenPath("token_worlddestroyed_frac.png");
                     }
                     scale *= 1.55f;
@@ -1853,6 +1856,12 @@ public class TileGenerator {
                             TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
                             TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2),
                             null);
+                } else if (tokenPath.contains("token_theodisi_kairnexpedition")) {
+                    tokenImage = ImageHelper.readScaled(tokenPath, 0.5f);
+                    int tokenX = TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2);
+                    int tokenY = TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2);
+                    tileGraphics.drawImage(tokenImage, tokenX, tokenY, null);
+                    rectangles.add(new Rectangle(tokenX, tokenY, tokenImage.getWidth(), tokenImage.getHeight()));
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
                     if (unitHolder instanceof Planet planetHolder) {
@@ -2096,6 +2105,7 @@ public class TileGenerator {
                     drawY -= (tokenImage.getHeight() / 2);
                 }
                 tileGraphics.drawImage(tokenImage, drawX, drawY, null);
+                drawTheodisiTokenCount(tileGraphics, tokenPath, game, tile, drawX, drawY, tokenImage);
 
                 // add icons to wormholes for agendas
                 boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon")
@@ -2145,6 +2155,35 @@ public class TileGenerator {
                 }
             }
         }
+    }
+
+    private static void drawTheodisiTokenCount(
+            Graphics tileGraphics,
+            String tokenPath,
+            Game game,
+            Tile tile,
+            int drawX,
+            int drawY,
+            BufferedImage tokenImage) {
+        int count = tokenPath.contains("token_theodisi_mine")
+                ? XytherisAbilityHandler.getStingOfTheHiveMineCount(game, tile)
+                : tokenPath.contains("token_theodisi_oblivionreflection")
+                        ? OblivionAbilityHandler.getReflectionCount(game, tile)
+                        : 0;
+        if (count < 2) {
+            return;
+        }
+        tileGraphics.setFont(Storage.getFont24());
+        DrawingUtil.superDrawString(
+                tileGraphics,
+                Integer.toString(count),
+                drawX + tokenImage.getWidth() / 2,
+                drawY + tokenImage.getHeight() / 2,
+                Color.WHITE,
+                HorizontalAlign.Center,
+                VerticalAlign.Center,
+                stroke4,
+                Color.BLACK);
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {

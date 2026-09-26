@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sayensbeach",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 168,
+            "y": 146
+        }
+    },
     "id": "sayensbeach",
     "tileId": "s05",
     "name": "Sayen's Beach",

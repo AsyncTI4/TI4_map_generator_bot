@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sierpen",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 85
+        }
+    },
     "id": "sierpen",
     "tileId": "d116",
     "name": "Sierpen",

@@ -1,5 +1,6 @@
 package ti4.service.statistics;
 
+import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
@@ -15,6 +16,10 @@ public class FactionStatisticsHelper {
 
     private static boolean isObsidianOrFirmament(String faction) {
         return OBSIDIAN_ALIAS.equals(faction) || FIRMAMENT_ALIAS.equals(faction);
+    }
+
+    public static List<String> getStatisticsFactionKeys(String faction) {
+        return isObsidianOrFirmament(faction) ? List.of(faction, OBSIDIAN_FIRMAMENT_FACTION_LABEL) : List.of(faction);
     }
 
     public static void incrementFactionsIntValue(Map<String, Integer> map, String faction) {

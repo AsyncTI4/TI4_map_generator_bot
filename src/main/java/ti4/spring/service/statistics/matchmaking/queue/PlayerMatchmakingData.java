@@ -10,7 +10,7 @@ record PlayerMatchmakingData(
         List<String> restrictions,
         List<String> avoidList,
         Rating rating,
-        Set<Integer> activeHourBuckets,
+        Set<Integer> activeHours,
         int completedGames,
         Set<String> roleNames,
         Duration queueWait,

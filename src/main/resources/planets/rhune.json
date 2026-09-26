@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rhune",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "rhune",
     "tileId": "d01",
     "name": "Rhune",

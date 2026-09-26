@@ -3,16 +3,12 @@ package ti4.service.draft;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.label.Label;
-import net.dv8tion.jda.api.components.textinput.TextInput;
-import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.interactions.modals.ModalMapping;
-import net.dv8tion.jda.api.modals.Modal;
 import ti4.discord.interactions.commands.game.WeirdGameSetup;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -20,53 +16,18 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
-import ti4.logging.BotLogger;
-import ti4.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
-import ti4.service.map.AddTileListService;
-import ti4.service.map.MapStringMapper;
 import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class BaseGameMiniMiltyService {
-    private static final String MAP_STRING_FIELD = "mapString";
     private static final int BLUE_TILES_PER_SLICE = 3;
     private static final int RED_TILES_PER_SLICE = 2;
-
-    public static Modal buildMapStringModal(Game game, String navId, String currentMapString) {
-        TextInput.Builder mapString = TextInput.create(MAP_STRING_FIELD, TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Paste the map string here.")
-                .setRequired(true);
-        if (currentMapString != null && !currentMapString.isBlank()) {
-            mapString.setValue(currentMapString.substring(0, Math.min(currentMapString.length(), 4000)));
-        }
-        return Modal.create("jmfA_" + navId + "_customMapString", "Add Map String for " + game.getName())
-                .addComponents(Label.of("Enter Map String", mapString.build()))
-                .build();
-    }
-
-    public static String applyMapStringFromModal(ModalInteractionEvent event, BaseGameMiniMiltySettings settings) {
-        ModalMapping mapping = event.getValue(MAP_STRING_FIELD);
-        if (mapping == null) {
-            return "No map string provided.";
-        }
-        String mapString = mapping.getAsString().trim();
-        if (mapString.isEmpty()) {
-            settings.setCustomMapString(null);
-            return null;
-        }
-        if (MapStringMapper.getMappedTilesToPosition(mapString, settings.getGame())
-                .isEmpty()) {
-            return "Could not map the provided map string to tile positions.";
-        }
-        settings.setCustomMapString(mapString);
-        return null;
-    }
 
     public static String startFromSettings(GenericInteractionCreateEvent event, BaseGameMiniMiltySettings settings) {
         Game game = settings.getGame();
@@ -93,12 +54,18 @@ public class BaseGameMiniMiltyService {
         draftManager.resetForNewDraft();
         draftManager.setPlayers(settings.getPlayerUserIds());
 
+        Set<String> bannedFactions =
+                new HashSet<>(settings.getFactionSettings().getBanFactions().getKeys());
+        List<String> prioritizedFactions = settings.getFactionSettings().getPriFactions().getKeys().stream()
+                .filter(faction -> !bannedFactions.contains(faction))
+                .toList();
+
         FactionDraftable factionDraftable = new FactionDraftable();
         factionDraftable.initialize(
                 settings.getFactionSettings().getNumFactions().getVal(),
                 settings.getFactionSources(),
-                new ArrayList<>(settings.getFactionSettings().getPriFactions().getKeys()),
-                new ArrayList<>(settings.getFactionSettings().getBanFactions().getKeys()));
+                prioritizedFactions,
+                new ArrayList<>(bannedFactions));
         draftManager.addDraftable(factionDraftable);
 
         SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
@@ -129,38 +96,8 @@ public class BaseGameMiniMiltyService {
             return "No standard map template is available for this player count.";
         }
 
-        if (settings.hasCustomMapString()) {
-            return applyCustomMapString(game, settings, template);
-        }
-
         PartialMapService.placeFromTemplate(template, game);
         return applyRandomBaseGameTiles(game, template);
-    }
-
-    private static String applyCustomMapString(
-            Game game, BaseGameMiniMiltySettings settings, MapTemplateModel template) {
-        Map<String, String> mappedTiles =
-                new HashMap<>(MapStringMapper.getMappedTilesToPosition(settings.getCustomMapString(), game));
-        if (mappedTiles.isEmpty()) {
-            return "Could not map the stored custom map string to tile positions.";
-        }
-
-        for (Integer homePosition : template.getSortedHomeSystemLocations()) {
-            mappedTiles.remove(homePosition.toString());
-        }
-
-        try {
-            AddTileListService.addTileMapToGame(game, mappedTiles);
-            PartialMapService.placeFromTemplate(template, game);
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Could not apply base game Mini-Milty custom map string", e);
-            return "Could not apply the custom map string. Check the map string and try again.";
-        }
-
-        if (MapTemplateHelper.getPlayerHomeSystemLocation(1, game.getMapTemplateID()) == null) {
-            return "The selected map template does not define valid home system locations.";
-        }
-        return null;
     }
 
     private static String applyRandomBaseGameTiles(Game game, MapTemplateModel template) {

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "meranna",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 80,
+            "y": 140
+        }
+    },
     "id": "meranna",
     "tileId": "er86",
     "name": "Meranna",

@@ -29,20 +29,39 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -83,6 +102,7 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
@@ -149,6 +169,31 @@ public class CombatRollService {
         return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, false);
     }
 
+    public static int secondHalfOfSelectedSpaceCannonRoll(
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile targetTile,
+            UnitModel selectedUnit,
+            UnitHolder sourceUnitHolder,
+            Player targetPlayer) {
+        if (selectedUnit == null || sourceUnitHolder == null || targetPlayer == null) {
+            return 0;
+        }
+        Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits = new HashMap<>();
+        selectedUnits.put(new ImmutablePair<>(selectedUnit, sourceUnitHolder), 1);
+        return secondHalfOfCombatRoll(
+                player,
+                game,
+                event,
+                targetTile,
+                Constants.SPACE,
+                CombatRollType.SpaceCannonOffence,
+                false,
+                selectedUnits,
+                targetPlayer);
+    }
+
     public static UnitModel getMetaliAFBUnit(Player player) {
         UnitModel metaliFakeUnit = new UnitModel();
         metaliFakeUnit.setAfbDieCount(3);
@@ -197,6 +242,19 @@ public class CombatRollService {
             String unitHolderName,
             CombatRollType rollType,
             boolean automated) {
+        return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, automated, null, null);
+    }
+
+    private static int secondHalfOfCombatRoll(
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            String unitHolderName,
+            CombatRollType rollType,
+            boolean automated,
+            Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits,
+            Player targetPlayer) {
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
@@ -213,10 +271,16 @@ public class CombatRollService {
                             + ".");
             return 0;
         }
-        Player opponent = null;
+        if (XytherisLeadersHandler.offerHeroUnitAbilityRoll(event, game, player, tile, combatOnHolder, rollType)) {
+            return 0;
+        }
+        Player opponent = targetPlayer;
 
         Map<Pair<UnitModel, UnitHolder>, Integer> playerUnitsByQuantity =
                 getUnitsInCombatByHolder(tile, combatOnHolder, player, event, rollType, game);
+        if (selectedUnits != null) {
+            playerUnitsByQuantity = new HashMap<>(selectedUnits);
+        }
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
             playerUnitsByQuantity.put(new ImmutablePair<>(getMetaliAFBUnit(player), combatOnHolder), 1);
         }
@@ -264,6 +328,8 @@ public class CombatRollService {
                 }
             }
         }
+        playerUnitsByQuantity = MassHypnosisLLButtonHandler.splitHypnotizedShipForRoll(
+                game, player, tile, combatOnHolder, rollType, playerUnitsByQuantity);
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
                 && !game.getStoredValue("bombardmentTarget" + player.getFaction())
@@ -371,6 +437,42 @@ public class CombatRollService {
             playerUnitsByQuantity = adjustedUnits;
         }
 
+        StringBuilder unitUpgradeRollNote = new StringBuilder();
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "kryxoscommander")) {
+            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new HashMap<>();
+
+            for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnitsByQuantity.entrySet()) {
+                UnitModel unit = entry.getKey().getLeft();
+                UnitHolder holder = entry.getKey().getRight();
+
+                // Only the actual upgraded unit model receives the bonus.
+                if (unit.getUpgradesFromUnitId().isEmpty()) {
+                    adjustedUnits.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                    continue;
+                }
+
+                UnitModelValueInjectionService.IntegerValueInjection bonus =
+                        UnitModelValueInjectionService.IntegerValueInjection.create();
+
+                switch (rollType) {
+                    case combatround -> bonus.combatHitsOn(-1);
+                    case AFB -> bonus.afbHitsOn(-1);
+                    case bombardment -> bonus.bombardHitsOn(-1);
+                    case SpaceCannonOffence, SpaceCannonDefence -> bonus.spaceCannonHitsOn(-1);
+                }
+
+                UnitModel upgradedUnit = UnitModelValueInjectionService.injectValues(unit, bonus);
+
+                adjustedUnits.merge(new ImmutablePair<>(upgradedUnit, holder), entry.getValue(), Integer::sum);
+            }
+
+            playerUnitsByQuantity = adjustedUnits;
+            unitUpgradeRollNote.append(
+                    "> Seraxis Thule, the Kryxos commander: Unit upgrades receive +1 to their rolls.\n");
+        }
+
+        KryxosBreakthroughHandler.refreshPrototypeInnovators(game, player, tile, playerUnitsByQuantity, rollType);
+
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
             if (!Constants.SPACE.equalsIgnoreCase(unitHolderName)) {
@@ -394,10 +496,6 @@ public class CombatRollService {
             if (opponent == null) {
                 opponent = player;
             }
-        }
-        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
-                && NetrunnersUnitsHandler.resolveEmpSpaceCannonBlock(event, game, player, tile, rollType)) {
-            return 0;
         }
         Map<UnitModel, Integer> opponentUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
@@ -471,14 +569,19 @@ public class CombatRollService {
         List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
-        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
-            tempMods.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
-                    game, player, tile, combatOnHolder, rollType));
-        }
+        RevenantLeadersHandler.addRevXytherisCommanderModifier(tempMods, game, player, rollType);
+        ScrapyardLeaderHandler.addCommanderModifier(tempMods, game, player, tile, combatOnHolder, rollType);
+        XytherisPromissoryHandler.addSwarmSpawnModifier(tempMods, game, player, rollType);
+        TwilightsFallMonumentsButtonHandler.addOrangeTfMonumentModifier(tempMods, game, player, tile, rollType);
         if (player.hasTech("beironats")) {
             extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
                     game, player, opponent, tile, combatOnHolder, rollType));
         }
+        if (player.ownsUnit("arcanum_flagship")) {
+            extraRolls.addAll(
+                    ArcanumUnitHandler.getAstralCodexExtraRollModifier(player, tile, combatOnHolder, rollType));
+        }
+        extraRolls.addAll(FracturedRealityAcd2ButtonHandler.consumeCombatExtraRoll(game, player, rollType));
 
         CombatRollResult rollResult = rollForUnitsWithResult(
                 playerUnitsByQuantity,
@@ -494,21 +597,45 @@ public class CombatRollService {
                 combatOnHolder);
         String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         String message = combatSummary + rollResult.message();
-        if (!powerWordWishCombatNote.isEmpty()) {
+        StringBuilder rollNotes =
+                new StringBuilder().append(powerWordWishCombatNote).append(unitUpgradeRollNote);
+
+        if (!rollNotes.isEmpty()) {
             String modifierHeader = "With modifiers: \n";
             int modifierHeaderIndex = message.indexOf(modifierHeader);
             if (modifierHeaderIndex >= 0) {
                 int insertIndex = modifierHeaderIndex + modifierHeader.length();
-                message = message.substring(0, insertIndex) + powerWordWishCombatNote + message.substring(insertIndex);
+                message = message.substring(0, insertIndex) + rollNotes + message.substring(insertIndex);
             } else {
-                message = combatSummary + modifierHeader + powerWordWishCombatNote + rollResult.message();
+                message = combatSummary + modifierHeader + rollNotes + rollResult.message();
             }
         }
         CombatRollPayload.RollHeader rollHeader =
                 buildRollHeader(game, player, opponent, tile, combatOnHolder, rollType, combatSummary);
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
+        RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        int massHypnosisHits =
+                MassHypnosisLLButtonHandler.getRedirectedHits(game, player, tile, combatOnHolder, rollType, payload);
+
+        if (massHypnosisHits > 0) {
+            h = Math.max(0, h - massHypnosisHits);
+            message = message.replaceFirst(
+                    "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
+            if (payload.total() != null) {
+                CombatRollPayload.RollTotal total = payload.total();
+                payload = new CombatRollPayload(
+                        payload.header(),
+                        payload.notes(),
+                        payload.modifiers(),
+                        payload.unitRolls(),
+                        new CombatRollPayload.RollTotal(total.diceRolled(), h, total.misses(), total.maximumHits()));
+            }
+            message += "\n_Mass Hypnosis_ redirected " + massHypnosisHits + " hit" + (massHypnosisHits == 1 ? "" : "s")
+                    + " to its owner's ships.";
+        }
+        XytherisAbilityHandler.beginStingOfTheHiveRoll(game, player, tile, rollType, h);
         int round;
         String combatName =
                 "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
@@ -550,10 +677,12 @@ public class CombatRollService {
         if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
-        if (player.hasBreakthrough("ashenbt")) {
-            message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
-        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        XytherisPromissoryHandler.resolveSwarmSpawnAfterRoll(event, game, player, rollType);
+        if (massHypnosisHits > 0 && !game.isFowMode()) {
+            CombatRollService.sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
+        }
+        ThronesUnitHandler.offerGholaAfterRoll(event, game, player, opponent, tile, combatOnHolder, rollType, payload);
         if (rollType == CombatRollType.combatround
                 && Constants.SPACE.equalsIgnoreCase(unitHolderName)
                 && opponent != player) {
@@ -625,17 +754,17 @@ public class CombatRollService {
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                                         "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                                MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
+                                        buttons, game, opponent, tile, combatOnHolder.getName());
 
                                 buttons.add(Buttons.gray(
                                         opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_"
                                                 + h,
                                         "Cancel a Hit"));
+                                TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                                        buttons, game, opponent, tile, "ground", h);
                                 AshenPromissoryHandler.addFromTheAshesButton(
                                         buttons, game, opponent, player, tile, combatOnHolder, h);
-                                if (opponent.hasUnit("crystellum_mech")) {
-                                    CrystellumUnitHandler.offerRefractumButtonIfRelevant(
-                                            buttons, opponent, game, tile, combatOnHolder, h);
-                                }
                                 if (round2 == 1 && opponent.hasTech("threvenantr")) {
                                     RevenantTechHandler.addEternalAegisButton(
                                             buttons, game, opponent, player, tile, combatOnHolder, h);
@@ -653,9 +782,13 @@ public class CombatRollService {
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                                         "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                                MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
+                                        buttons, game, player, tile, combatOnHolder.getName());
                                 buttons.add(Buttons.gray(
                                         player.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_1",
                                         "Cancel a Hit"));
+                                TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                                        buttons, game, player, tile, "ground", 1);
                                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             }
                         } else {
@@ -709,17 +842,6 @@ public class CombatRollService {
                                     opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
 
-                        } else if (opponent.hasAbility("refraction")) {
-                            buttons.add(Buttons.green(
-                                    factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                                    "Auto-assign Hit" + (h == 1 ? "" : "s")));
-                            buttons.add(Buttons.red(
-                                    "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
-                                    "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                            buttons.add(Buttons.gray(
-                                    factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
-                                    "Cancel a Hit"));
-                            CrystellumAbilityHandler.addRefractionButtonIfRelevant(buttons, opponent, game, tile, h);
                         } else {
                             buttons.add(Buttons.green(
                                     factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
@@ -730,6 +852,9 @@ public class CombatRollService {
                             buttons.add(Buttons.gray(
                                     factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Cancel a Hit"));
+                            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                                    buttons, game, opponent, tile, "space", h);
+                            VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, opponent, tile, h);
                         }
 
                         if (round2 == 1 && opponent.hasTech("threvenantr")) {
@@ -745,10 +870,6 @@ public class CombatRollService {
                             RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
                             msg2 += "\nReminder: You have the _" + relicModel.getName()
                                     + "_ relic, you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
-                        }
-                        if (opponent.hasUnlockedBreakthrough("crystellumbt") && round2 == 1) {
-                            msg2 +=
-                                    "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
                         }
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                     } else {
@@ -777,6 +898,15 @@ public class CombatRollService {
                     buttons.add(Buttons.gray(
                             opponent.factionButtonChecker() + "cancelAFBHits_" + tile.getPosition() + "_" + h,
                             "Cancel a Hit"));
+                    TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                            buttons, game, opponent, tile, "afb", h);
+                }
+                List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
+                        game, player, tile, rollType, opponent, h);
+                if (!stingOfTheHiveButtons.isEmpty()) {
+                    buttons.addAll(stingOfTheHiveButtons);
+                    msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
+                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
@@ -834,7 +964,7 @@ public class CombatRollService {
         if ((!game.isFowMode() || isFoWPrivateChannelRoll(player, event))
                 && rollType == CombatRollType.SpaceCannonOffence
                 && h > 0
-                && opponent != player) {
+                && (opponent != player || targetPlayer != null)) {
             MessageChannel channel =
                     isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
             String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered "
@@ -857,10 +987,35 @@ public class CombatRollService {
                     "Manually Assign Hit" + (h == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
                     factionChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                    buttons, game, opponent, tile, "pds", h);
+            List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
+                    game, player, tile, rollType, opponent, h);
+            if (!stingOfTheHiveButtons.isEmpty()) {
+                buttons.addAll(stingOfTheHiveButtons);
+            }
             String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
                     + (h == 1 ? "the hit" : "hits") + "."
                     + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
+            if (!stingOfTheHiveButtons.isEmpty()) {
+                msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
+                        + " to decide whether to cancel hits and place mine tokens before assigning hits.";
+            }
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
+        }
+
+        if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
+            List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
+                    game, player, tile, rollType, opponent, h);
+            if (!stingOfTheHiveButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + ", you may use **Sting of the Hive** to cancel any number of these SPACE CANNON DEFENCE hits and place that many mine tokens.\n-# "
+                                + opponent.getRepresentationNoPing()
+                                + " should wait to assign hits until you have decided:",
+                        stingOfTheHiveButtons);
+            }
         }
 
         if (rollType == CombatRollType.AFB && player.hasUnlockedBreakthrough("vyserixbt")) {
@@ -873,12 +1028,23 @@ public class CombatRollService {
                 && !player.hasLeaderUnlocked("xytheriscommander")) {
             UnlockLeaderService.unlockLeader("xytheriscommander", game, player);
         }
+        if (rollType != CombatRollType.combatround && h >= 1 && player.hasTech("thxytherisr")) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", you may use _Biomechanical Nutrients_:",
+                    XytherisTechHandler.getBiomechanicalButton(event, game, player, h));
+        }
 
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
+            if (h >= 3) {
+                CommanderUnlockCheckService.checkPlayer(player, "ashen");
+            }
+            if (AshenBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
+                return h;
+            }
             if (h > 0) {
-                if (!AshenLeadersHandler.offerHeroBombardmentAssignButtons(event, game, player, h, bombardPlanet)
-                        && !game.isFowMode()) {
+                if (!game.isFowMode()) {
                     List<Button> buttons = new ArrayList<>();
 
                     buttons.add(Buttons.red(
@@ -891,11 +1057,23 @@ public class CombatRollService {
                         if (!bombardPlanet.isEmpty()
                                 && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                             if (p2.isRealPlayer()) {
+                                List<Button> targetButtons = new ArrayList<>(buttons);
+                                List<Button> stingOfTheHiveButtons =
+                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
+                                                game, player, tile, rollType, p2, h);
+                                if (!stingOfTheHiveButtons.isEmpty()) {
+                                    targetButtons.addAll(stingOfTheHiveButtons);
+                                }
+                                String assignmentMessage = p2.getRepresentation()
+                                        + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".";
+                                if (!stingOfTheHiveButtons.isEmpty()) {
+                                    assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
+                                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
+                                }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                                        p2.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                                + (h == 1 ? "" : "s") + ".",
-                                        buttons);
+                                        assignmentMessage,
+                                        targetButtons);
                             } else {
                                 List<Button> buttons2 = new ArrayList<>();
                                 buttons2.add(Buttons.green(
@@ -903,10 +1081,22 @@ public class CombatRollService {
                                                 + game.getUnitHolderFromPlanet(bombardPlanet)
                                                         .getName() + "_" + h,
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                List<Button> stingOfTheHiveButtons =
+                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
+                                                game, player, tile, rollType, p2, h);
+                                if (!stingOfTheHiveButtons.isEmpty()) {
+                                    buttons2.addAll(stingOfTheHiveButtons);
+                                }
+                                String assignmentMessage =
+                                        player.getRepresentation() + ", please assign the BOMBARDMENT hit"
+                                                + (h == 1 ? "" : "s") + " for the dummy player.";
+                                if (!stingOfTheHiveButtons.isEmpty()) {
+                                    assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
+                                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
+                                }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
-                                        player.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                                + (h == 1 ? "" : "s") + " for the dummy player.",
+                                        assignmentMessage,
                                         buttons2);
                             }
                         }
@@ -968,6 +1158,9 @@ public class CombatRollService {
 
             String cancelID = opponent.factionButtonChecker() + "cancelSpaceHits_" + tile.getPosition() + "_" + hits;
             buttons.add(Buttons.gray(cancelID, "Cancel a Hit"));
+            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                    buttons, game, opponent, tile, "space", hits);
+            VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, opponent, tile, hits);
         }
 
         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign ";
@@ -977,12 +1170,6 @@ public class CombatRollService {
             RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
             msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
             msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
-        }
-        String combatRoundKey = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + "space";
-        String combatRoundValue = game.getStoredValue(combatRoundKey);
-        if (opponent.hasUnlockedBreakthrough("crystellumbt") && "1".equals(combatRoundValue)) {
-            msg2 +=
-                    "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
     }
@@ -1052,6 +1239,17 @@ public class CombatRollService {
         payloadBuilder.addModifierDisplays(
                 uniqueList, playerUnitsFlat, player, opponent, game, rollType, activeSystem, unitHolder);
 
+        List<NamedCombatModifierModel> cappedDiceModifiers = mods.stream()
+                .filter(modifier -> modifier.getModifier().getMaxDice() != null)
+                .toList();
+        List<NamedCombatModifierModel> appliedMods = mods.stream()
+                .filter(modifier -> modifier.getModifier().getMaxDice() == null)
+                .toList();
+        Map<NamedCombatModifierModel, Integer> cappedDiceRemaining = new IdentityHashMap<>();
+        for (NamedCombatModifierModel modifier : cappedDiceModifiers) {
+            cappedDiceRemaining.put(modifier, modifier.getModifier().getMaxDice());
+        }
+
         // Actually roll for each unit
         int totalHits = 0;
         int letnevBTBoost = 0;
@@ -1107,6 +1305,11 @@ public class CombatRollService {
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
         StringBuilder resultBuilder = new StringBuilder(result);
+        boolean xytherisHeroBonus =
+                XytherisLeadersHandler.hasHeroUnitAbilityRollBonus(game, player, activeSystem, unitHolder, rollType);
+        if (xytherisHeroBonus) {
+            resultBuilder.append("Applied +4 to all dice with _Call of the Queen - The Endless Swarm_.\n");
+        }
         boolean metaliVoidCounted = false;
         String highestValueSingleUnitKey = "highestValueSingleUnit" + player.getFaction();
         String storedHighestValueUnit = game.getStoredValue(highestValueSingleUnitKey);
@@ -1177,11 +1380,38 @@ public class CombatRollService {
             }
         }
         MergeResult mergeResult = mergeAndDetectDivergence(
-                playerUnits, mods, rollType, player, opponent, game, playerUnitsList, activeSystem);
+                playerUnits, appliedMods, rollType, player, opponent, game, playerUnitsList, activeSystem);
         playerUnits = mergeResult.units();
         Set<String> divergingModels = mergeResult.divergingModels();
         Set<String> consumedBestMods = new HashSet<>();
-        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnits.entrySet()) {
+        game.removeStoredValue("warFundingRolls" + player.getFaction());
+        List<Map.Entry<Pair<UnitModel, UnitHolder>, Integer>> rollingUnits = new ArrayList<>(playerUnits.entrySet());
+        if (!cappedDiceModifiers.isEmpty()) {
+            rollingUnits.sort(Comparator.comparingInt(entry -> {
+                UnitModel unit = entry.getKey().getLeft();
+                int hitsOn = unit.getCombatDieHitsOnForAbility(rollType, player);
+                if (rollType == CombatRollType.combatround) {
+                    hitsOn = CombatStatsService.getCombatRoundProfile(true, unit, player, activeSystem, opponent, false)
+                            .hitsOn();
+                }
+                int modifier = CombatModHelper.getCombinedModifierForUnit(
+                        unit,
+                        entry.getValue(),
+                        appliedMods,
+                        player,
+                        opponent,
+                        game,
+                        playerUnitsList,
+                        rollType,
+                        activeSystem,
+                        entry.getKey().getRight());
+                if (xytherisHeroBonus) {
+                    modifier += 4;
+                }
+                return hitsOn - modifier;
+            }));
+        }
+        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : rollingUnits) {
             UnitModel unitModel = entry.getKey().getLeft();
             UnitHolder perUnitHolder = entry.getKey().getRight();
             int numOfUnit = entry.getValue();
@@ -1191,7 +1421,7 @@ public class CombatRollService {
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(
                     unitModel,
                     numOfUnit,
-                    mods,
+                    appliedMods,
                     player,
                     opponent,
                     game,
@@ -1199,6 +1429,9 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     perUnitHolder);
+            if (xytherisHeroBonus) {
+                modifierToHit += 4;
+            }
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());
@@ -1299,18 +1532,88 @@ public class CombatRollService {
                                         : RollSegmentType.GRAVLEASH_REST;
                             default -> RollSegmentType.PRIMARY;
                         };
-                List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                List<Die> resultRolls;
+                int[] cappedModifiersByDie = new int[numRolls];
+                if (cappedDiceModifiers.isEmpty()) {
+                    resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                } else {
+                    for (NamedCombatModifierModel cappedModifier : cappedDiceModifiers) {
+                        int remainingDice = cappedDiceRemaining.getOrDefault(cappedModifier, 0);
+                        if (remainingDice < 1
+                                || !cappedModifier
+                                        .getModifier()
+                                        .isInScopeForUnit(unitModel, playerUnitsList, rollType, game, player)) {
+                            continue;
+                        }
+                        int diceToModify = Math.min(remainingDice, numRolls);
+                        int cappedModifierValue = CombatModHelper.getCombinedModifierForUnit(
+                                unitModel,
+                                numOfUnit,
+                                List.of(cappedModifier),
+                                player,
+                                opponent,
+                                game,
+                                playerUnitsList,
+                                rollType,
+                                activeSystem,
+                                perUnitHolder);
+                        for (int dieIndex = 0; dieIndex < diceToModify; dieIndex++) {
+                            cappedModifiersByDie[dieIndex] += cappedModifierValue;
+                        }
+                        cappedDiceRemaining.put(cappedModifier, remainingDice - diceToModify);
+                    }
+                    resultRolls = new ArrayList<>();
+                    for (int cappedModifier : cappedModifiersByDie) {
+                        resultRolls.addAll(DiceHelper.rollDice(Math.max(1, toHit - modifierToHit - cappedModifier), 1));
+                    }
+                }
                 int mult = 1;
 
-                player.setExpectedHitsTimes10(
-                        player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
-                chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls * mult);
-                chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls * mult);
+                if (cappedDiceModifiers.isEmpty()) {
+                    player.setExpectedHitsTimes10(
+                            player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
+                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls * mult);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls * mult);
+                } else {
+                    for (Die die : resultRolls) {
+                        player.setExpectedHitsTimes10(
+                                player.getExpectedHitsTimes10() + (mult * (11 - die.getThreshold())));
+                        chanceOfAllHits *= (11 - die.getThreshold()) / 10.0;
+                        chanceOfAllMiss *= (die.getThreshold() - 1) / 10.0;
+                    }
+                }
                 maximumHits += numRolls * mult;
                 if (usesX89c4) {
                     mult = 2;
                 }
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                if ("kryxos_mech3".equals(unitModel.getId()) && numOfUnit > 0) {
+                    int[] hitsPerMech = new int[numOfUnit];
+                    int nativeRollCount = numOfUnit * numRollsPerUnit;
+                    for (int dieIndex = 0; dieIndex < resultRolls.size(); dieIndex++) {
+                        int mechIndex = dieIndex < nativeRollCount
+                                ? dieIndex / numRollsPerUnit
+                                : (dieIndex - nativeRollCount) % numOfUnit;
+                        if (mechIndex < numOfUnit && resultRolls.get(dieIndex).isSuccess()) {
+                            hitsPerMech[mechIndex]++;
+                        }
+                    }
+                    List<Integer> hitsByMech = new ArrayList<>();
+                    for (int hits : hitsPerMech) {
+                        if (hits > 0) {
+                            hitsByMech.add(hits);
+                        }
+                    }
+                    KryxosUnitHandler.offerWarspawnJuggernautHitButtons(
+                            event, game, player, activeSystem, perUnitHolder, hitsByMech);
+                }
+                if (rollType == CombatRollType.combatround && numRolls != hitRolls) {
+                    String key = "warFundingRolls" + player.getFaction();
+                    game.setStoredValue(
+                            key,
+                            game.getStoredValue(key) + ";" + (numRolls - hitRolls) + "_" + (toHit - modifierToHit) + "_"
+                                    + unitModel.getBaseType());
+                }
                 if (unitModel.getUnitType() == UnitType.Flagship
                         && ValefarZService.hasFlagshipAbility(game, player, "jolnar_flagship")) {
                     chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
@@ -1525,6 +1828,17 @@ public class CombatRollService {
                 String holderLabel = divergingModels.contains(unitModel.getId()) && perUnitHolder instanceof Planet p
                         ? "on **" + Helper.getPlanetRepresentationNoResInf(p.getName(), game) + "**"
                         : "";
+                List<Integer> modifiersByDie = List.of();
+                if (!cappedDiceModifiers.isEmpty()) {
+                    int displayModifierToHit = modifierToHit;
+                    modifiersByDie = new ArrayList<>(java.util.Arrays.stream(cappedModifiersByDie)
+                            .map(cappedModifier -> displayModifierToHit + cappedModifier)
+                            .boxed()
+                            .toList());
+                    while (modifiersByDie.size() < resultRolls.size()) {
+                        modifiersByDie.add(displayModifierToHit);
+                    }
+                }
                 String unitRoll = CombatMessageHelper.displayUnitRoll(
                         unitModel,
                         toHit,
@@ -1534,7 +1848,8 @@ public class CombatRollService {
                         extraRollsForUnit,
                         resultRolls,
                         hitRolls,
-                        holderLabel);
+                        holderLabel,
+                        modifiersByDie);
                 resultBuilder.append(unitRoll);
                 payloadBuilder.addUnitRoll(
                         unitModel,
@@ -1546,7 +1861,8 @@ public class CombatRollService {
                         segmentType,
                         resultRolls,
                         hitRolls,
-                        DieRollSource.PRIMARY);
+                        DieRollSource.PRIMARY,
+                        modifiersByDie);
                 List<DiceHelper.Die> resultRolls2 = new ArrayList<>();
                 int numMisses = numRolls - hitRolls;
                 if (player.ownsUnit("tf-justicerrail") && rollType == CombatRollType.SpaceCannonOffence) {
@@ -2111,6 +2427,7 @@ public class CombatRollService {
                         modifier.getAlias(),
                         namedModifier.getName(),
                         modifier.getValue(),
+                        modifier.getMaxDice(),
                         modifier.getType(),
                         modifier.getScope(),
                         resolveScopeDisplay(modifier, units),
@@ -2129,6 +2446,32 @@ public class CombatRollService {
                 List<DiceHelper.Die> resultRolls,
                 int hits,
                 DieRollSource source) {
+            addUnitRoll(
+                    unitModel,
+                    toHit,
+                    modifier,
+                    unitQuantity,
+                    numRollsPerUnit,
+                    extraRolls,
+                    segmentType,
+                    resultRolls,
+                    hits,
+                    source,
+                    List.of());
+        }
+
+        void addUnitRoll(
+                UnitModel unitModel,
+                int toHit,
+                int modifier,
+                int unitQuantity,
+                int numRollsPerUnit,
+                int extraRolls,
+                RollSegmentType segmentType,
+                List<DiceHelper.Die> resultRolls,
+                int hits,
+                DieRollSource source,
+                List<Integer> modifiersByDie) {
             diceRolled += resultRolls.size();
             unitRolls.add(new CombatRollPayload.UnitRoll(
                     unitModel.getId(),
@@ -2143,6 +2486,7 @@ public class CombatRollService {
                     toHit,
                     modifier,
                     toHit - modifier,
+                    modifiersByDie,
                     segmentType,
                     toDieRolls(resultRolls, source),
                     hits));
@@ -2485,7 +2829,9 @@ public class CombatRollService {
                 continue;
             }
             Tile adjTile = game.getTileByPosition(adjacentTilePosition);
-            if (TeHelperUnits.affectedByQuietus(game, player, adjTile) || adjTile.isScar(game)) {
+            if (TeHelperUnits.affectedByQuietus(game, player, adjTile)
+                    || adjTile.isScar(game)
+                    || ButtonHelper.isTileSmothered(game, adjTile, player)) {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
@@ -2639,11 +2985,6 @@ public class CombatRollService {
         }
         XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.SpaceCannonOffence)
                 .ifPresent(unit -> output.putIfAbsent(unit, 1));
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander")) {
-            NetrunnersLeadersHandler.getCommanderSpaceCannonUnits(game, player, tile)
-                    .forEach((model, count) ->
-                            output.merge(new ImmutablePair<>(model, spaceHolder), count, Integer::sum));
-        }
         UnitModel sigilCannon = ArcanumTechHandler.getSigilOfTransmutationSpaceCannon(game, player, tile);
         if (sigilCannon != null) {
             output.put(new ImmutablePair<>(sigilCannon, spaceHolder), 1);
@@ -2652,6 +2993,11 @@ public class CombatRollService {
         Map<UnitModel, Integer> flatOutput = new HashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
+
+        for (UnitModel riggedExplosivesCannon :
+                RiggedExplosivesLLButtonHandler.getRiggedExplosivesCannons(game, player, tile)) {
+            unitsOnTile.put(new ImmutablePair<>(riggedExplosivesCannon, spaceHolder), 1);
+        }
 
         return output;
     }
@@ -2686,6 +3032,13 @@ public class CombatRollService {
         Map<Pair<UnitModel, UnitHolder>, Integer> merged = new LinkedHashMap<>();
         for (Map.Entry<String, List<Pair<UnitModel, UnitHolder>>> modelEntry : modelKeys.entrySet()) {
             List<Pair<UnitModel, UnitHolder>> keys = modelEntry.getValue();
+            if (keys.stream().anyMatch(key -> MassHypnosisLLButtonHandler.isHypnotizedRollModel(key.getLeft()))) {
+                divergingModels.add(modelEntry.getKey());
+                for (Pair<UnitModel, UnitHolder> key : keys) {
+                    merged.put(key, countByIdentity.get(key));
+                }
+                continue;
+            }
             if (keys.size() == 1) {
                 Pair<UnitModel, UnitHolder> k = keys.get(0);
                 merged.put(k, countByIdentity.get(k));

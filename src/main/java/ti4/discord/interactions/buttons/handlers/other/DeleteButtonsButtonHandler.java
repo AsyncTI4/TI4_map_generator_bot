@@ -10,9 +10,18 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyAppropriationsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -42,6 +51,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -173,6 +183,14 @@ class DeleteButtonsButtonHandler {
             }
             ButtonHelper.checkFleetInEveryTile(player, game);
         }
+        if ("Done Gaining Command Tokens".equalsIgnoreCase(buttonLabel) && "leadership".equalsIgnoreCase(buttonID)) {
+            MonumentsDSButtonHandler.offerFreeSystemsMonumentPromissoryReveal(game, player);
+        }
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && buttonID.startsWith("florzenMonument_")) {
+            MonumentsDSButtonHandler.resolveFlorzenStasisProduction(game, player, buttonID);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                 || "Done Producing Units".equalsIgnoreCase(buttonLabel))) {
             Tile tile = null;
@@ -184,6 +202,10 @@ class DeleteButtonsButtonHandler {
                         "currentActionSummary" + player.getFaction(),
                         game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in "
                                 + tile.getRepresentationForButtons() + ".");
+                if (MyrrBreakthroughHandler.usedUnitProduction(buttonID)) {
+                    game.setStoredValue(
+                            MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID + "|" + pos);
+                }
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                     && player.hasAbility("amalgamation")
@@ -191,7 +213,26 @@ class DeleteButtonsButtonHandler {
                 editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             }
             ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+            if ("skarnathBuild".equalsIgnoreCase(buttonID)) {
+                ThronesThroneHandler.clearSkarnathDiscount(game, player);
+            }
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+                CommanderUnlockCheckService.checkPlayer(player, "revenantponthous");
+                RevenantLeadersHandler.offerRevPonthousCommander(game, player, tile);
+                if (game.isMonumentsMode()) {
+                    if (MonumentsService.isMonumentOnBoard(game, player, "sol_monument")) {
+                        MonumentsButtonHandler.offerCenotaphAfterProduction(game, player);
+                    }
+                    if (MonumentsService.isMonumentOnBoard(game, player, "axis_monument")
+                            && MonumentsDSButtonHandler.producedNonFighterShipInMonumentSystem(game, player)) {
+                        player.gainTG(1, true);
+
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation()
+                                        + ", gained 1 trade good due to producing at least 1 non-fighter ship in the system containing _Anvil of Atlas_.");
+                    }
+                }
                 event.getChannel().getHistory().retrievePast(2).queue(messageHistory -> {
                     Message previousMessage = messageHistory.get(1);
                     if (previousMessage.getContentRaw().contains("You have available to you")) {
@@ -399,13 +440,19 @@ class DeleteButtonsButtonHandler {
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
-                CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
             }
         }
         if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "myrrBt".equalsIgnoreCase(buttonID)) {
             game.removeStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
         }
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "lazarusPods".equalsIgnoreCase(buttonID)) {
+            RevenantTechHandler.clearLazarusProduction(game, player);
+        }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
+            EmergencyAppropriationsLLButtonHandler.clear(game, player);
+            PriorityRequisitionLLButtonHandler.clear(game, player);
+            SharedResourcesLLButtonHandler.clear(game, player);
+            WildlifePreservationLLButtonHandler.clear(game, player);
             if (player.hasTech("asn")
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
@@ -416,16 +463,18 @@ class DeleteButtonsButtonHandler {
                             || buttonID.contains("ministerBuild"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
+            String myrrProduction =
+                    game.getStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
+            String[] myrrProductionContext = myrrProduction.split("\\|", 2);
             if (player.hasReadyBreakthrough("myrrbt")
-                    && !game.getStoredValue("producedUnitCostFor" + player.getFaction())
-                            .isEmpty()) {
-                MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player);
+                    && myrrProductionContext.length == 2
+                    && buttonID.equals(myrrProductionContext[0])) {
+                MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player, myrrProductionContext[1]);
             }
+            game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
+            ArcanumBreakthroughHandler.clearPowerWordWishProductionContext(game, player, buttonID);
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
-            if (player.hasAbility("control_network")) {
-                NetrunnersAbilitiesHandler.cleanupControlNetworkProduction(game, player);
-            }
             if (player.hasAbility("amalgamation")) {
                 game.removeStoredValue("amalgAmount");
             }

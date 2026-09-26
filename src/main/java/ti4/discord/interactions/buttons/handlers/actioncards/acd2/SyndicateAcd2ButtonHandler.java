@@ -15,6 +15,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
@@ -97,10 +98,12 @@ class SyndicateAcd2ButtonHandler {
         ActionCardHelper.sendActionCardInfo(game, target);
         ButtonHelper.checkACLimit(game, target);
 
-        String targetDisplay = game.isFowMode() ? "another player" : target.getFactionEmojiOrColor();
+        String targetDisplay = FoWHelper.factionEmojiOrAnon(game, target, "another player");
+        String cardDisplay = Mapper.getActionCard(cardId).getNameRepresentation(game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " gave an action card to " + targetDisplay + " via _Syndicate_.");
+                player.getRepresentationUnfogged() + " gave " + cardDisplay + " to " + targetDisplay
+                        + " via _Syndicate_.");
 
         game.setStoredValue(SYNDICATE_CARDS_KEY, String.join(",", revealedCards));
         game.setStoredValue(SYNDICATE_PLAYERS_KEY, String.join(",", remainingPlayers));
@@ -127,7 +130,7 @@ class SyndicateAcd2ButtonHandler {
                         Mapper.getActionCard(cardId).getName()))
                 .toList();
 
-        String targetDisplay = game.isFowMode() ? target.getColor() : target.getFactionEmojiOrColor();
+        String targetDisplay = FoWHelper.factionEmojiOrAnon(game, target, target.getColor());
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which action card to give to " + targetDisplay

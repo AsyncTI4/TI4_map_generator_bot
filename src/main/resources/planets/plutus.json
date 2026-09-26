@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "plutus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "plutus",
     "tileId": "er110",
     "name": "Plutus",

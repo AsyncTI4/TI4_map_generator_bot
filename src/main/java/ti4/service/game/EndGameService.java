@@ -34,6 +34,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.fow.setup.FowSetupWizardService;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.statistics.game.WinningPathPersistenceService;
@@ -205,6 +206,10 @@ public class EndGameService {
 
         GameMessageManager.remove(List.of(game.getName()));
 
+        if (game.isFowMode()) {
+            FowSetupWizardService.clearStateOnGameEnd(game);
+        }
+
         if (!game.getRealPlayers().isEmpty() && !game.isFowMode() && !game.islandMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
         }
@@ -276,6 +281,7 @@ public class EndGameService {
                 MessageHelper.sendMessageToChannel(t, gameEndText);
                 sendFeedbackMessage(t, game);
                 sendRoundSummariesToThread(t, game);
+                TiglReportService.handleTiglReporting(game, t);
             });
         }
     }

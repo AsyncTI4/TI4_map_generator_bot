@@ -25,11 +25,15 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TransactionGenerator;
@@ -197,6 +201,9 @@ public class TransactionHelper {
                             ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, furtherDetail, game);
                             CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
                         }
+                        case "MonumentUnits" ->
+                            MonumentsButtonHandler.resolveHacanMonumentUnitTrade(
+                                    event, game, sender, receiver, furtherDetail);
                         case "dmz" ->
                             ButtonHelper.resolveDMZTrade(
                                     sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
@@ -265,7 +272,9 @@ public class TransactionHelper {
                 int amountToTransact = 1;
                 boolean isGeneralized =
                         List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
-                if ("frags".equalsIgnoreCase(thingToTransact) || isGeneralized) {
+                boolean isSupermassiveFragment =
+                        "frags".equalsIgnoreCase(thingToTransact) && furtherDetail.startsWith("supermassive");
+                if (("frags".equalsIgnoreCase(thingToTransact) && !isSupermassiveFragment) || isGeneralized) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                 }
@@ -399,10 +408,39 @@ public class TransactionHelper {
                             }
                         }
                     }
-                    case "Frags" ->
-                        trans.repeat(ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
+                    case "Frags" -> {
+                        if (isSupermassiveFragment) {
+                            var fragment = Mapper.getExplore(furtherDetail);
+                            trans.append(ExploreEmojis.getFragEmoji(fragment.getType()));
+                            if (!hidePrivateCardText) {
+                                trans.append(" _").append(fragment.getName()).append("_");
+                            }
+                        } else {
+                            trans.repeat(
+                                    ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
+                        }
+                    }
                     case "Technology" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
+                    case "MonumentUnits" -> {
+                        String[] unitDetails = furtherDetail.split("\\|", 4);
+                        Tile tile = unitDetails.length == 4 ? game.getTileByPosition(unitDetails[0]) : null;
+                        UnitKey unitKey = tile == null
+                                ? null
+                                : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).stream()
+                                        .filter(key -> key.asyncID().equals(unitDetails[1]))
+                                        .findFirst()
+                                        .orElse(null);
+                        if (unitKey == null) {
+                            trans.append("Mowshir Freeport unit");
+                        } else {
+                            trans.append(unitKey.unitEmoji())
+                                    .append(' ')
+                                    .append(unitKey.humanReadableName())
+                                    .append(" in ")
+                                    .append(tile.getRepresentationForButtons(game, player));
+                        }
+                    }
                     case "Planets", "AlliancePlanets", "dmz" ->
                         trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "Relics" ->
@@ -737,6 +775,10 @@ public class TransactionHelper {
             requestOrOffer = "request";
         }
         switch (thingToTrans) {
+            case "MonumentUnits" -> {
+                message += " Please choose units to offer with **Mowshir Freeport**.";
+                stuffToTransButtons.addAll(MonumentsButtonHandler.getHacanMonumentUnitTradeButtons(game, p1, p2));
+            }
             case "TGs" -> {
                 message += " Please choose the number of trade goods you wish to " + requestOrOffer + ".";
                 for (int x = 1; x < p1.getTg() + 1 && x < 21; x++) {
@@ -968,22 +1010,24 @@ public class TransactionHelper {
             case "Frags" -> {
                 message += " Please choose the number of relic fragments you wish to " + requestOrOffer + ".";
                 String prefix = "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction();
-                for (int x = 1; x <= p1.getCrf(); x++) {
+                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.CULTURAL); x++) {
                     stuffToTransButtons.add(
                             Buttons.blue(prefix + "_CRF" + x, "Cultural Fragments (x" + x + ")", ExploreEmojis.CFrag));
                 }
-                for (int x = 1; x <= p1.getIrf(); x++) {
+                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL); x++) {
                     stuffToTransButtons.add(Buttons.green(
                             prefix + "_IRF" + x, "Industrial Fragments (x" + x + ")", ExploreEmojis.IFrag));
                 }
-                for (int x = 1; x <= p1.getHrf(); x++) {
+                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS); x++) {
                     stuffToTransButtons.add(
                             Buttons.red(prefix + "_HRF" + x, "Hazardous Fragments (x" + x + ")", ExploreEmojis.HFrag));
                 }
-                for (int x = 1; x <= p1.getUrf(); x++) {
+                for (int x = 1; x <= ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER); x++) {
                     stuffToTransButtons.add(
                             Buttons.gray(prefix + "_URF" + x, "Unknown Fragments (x" + x + ")", ExploreEmojis.UFrag));
                 }
+                List<Button> supermassiveButtons = getSupermassiveFragmentTransactionButtons(p1, prefix + "_");
+                stuffToTransButtons.addAll(supermassiveButtons);
             }
             case "Relics" -> {
                 message += " Click the relics you wish to " + requestOrOffer + ".";
@@ -992,6 +1036,7 @@ public class TransactionHelper {
                 boolean blackmarket =
                         List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
                 blackmarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
+                blackmarket |= MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2);
                 for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
@@ -1170,7 +1215,8 @@ public class TransactionHelper {
             }
         } else {
             String itemS = "sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail;
-            if (!player.getTransactionItems().contains(itemS) || !itemS.contains("dmz")) {
+            if (!player.getTransactionItems().contains(itemS)
+                    || (!itemS.contains("dmz") && !"MonumentUnits".equals(item))) {
                 player.addTransactionItem(itemS);
             }
         }
@@ -1512,7 +1558,7 @@ public class TransactionHelper {
                     if (game.isFowMode()) {
                         transact = Buttons.green(
                                 factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
-                                owner.getColor() + " " + promissoryNote.getName());
+                                PromissoryNoteHelper.ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
                     } else {
                         transact = Buttons.green(
                                 factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
@@ -1559,24 +1605,28 @@ public class TransactionHelper {
             case "Frags" -> {
                 String message = "Please choose the amount of relic fragments you wish to send";
 
-                if (p1.getCrf() > 0) {
-                    for (int x = 1; x < p1.getCrf() + 1; x++) {
+                int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.CULTURAL);
+                int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL);
+                int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS);
+                int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER);
+                if (culturalFragments > 0) {
+                    for (int x = 1; x < culturalFragments + 1; x++) {
                         Button transact = Buttons.blue(
                                 factionChecker + "send_Frags_" + p2.getFaction() + "_CRF" + x,
                                 "Cultural Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
                 }
-                if (p1.getIrf() > 0) {
-                    for (int x = 1; x < p1.getIrf() + 1; x++) {
+                if (industrialFragments > 0) {
+                    for (int x = 1; x < industrialFragments + 1; x++) {
                         Button transact = Buttons.green(
                                 factionChecker + "send_Frags_" + p2.getFaction() + "_IRF" + x,
                                 "Industrial Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
                 }
-                if (p1.getHrf() > 0) {
-                    for (int x = 1; x < p1.getHrf() + 1; x++) {
+                if (hazardousFragments > 0) {
+                    for (int x = 1; x < hazardousFragments + 1; x++) {
                         Button transact = Buttons.red(
                                 factionChecker + "send_Frags_" + p2.getFaction() + "_HRF" + x,
                                 "Hazardous Fragments (" + x + ")");
@@ -1584,14 +1634,17 @@ public class TransactionHelper {
                     }
                 }
 
-                if (p1.getUrf() > 0) {
-                    for (int x = 1; x < p1.getUrf() + 1; x++) {
+                if (frontierFragments > 0) {
+                    for (int x = 1; x < frontierFragments + 1; x++) {
                         Button transact = Buttons.gray(
                                 factionChecker + "send_Frags_" + p2.getFaction() + "_URF" + x,
                                 "Frontier Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
                 }
+                List<Button> supermassiveButtons = getSupermassiveFragmentTransactionButtons(
+                        p1, factionChecker + "send_Frags_" + p2.getFaction() + "_");
+                stuffToTransButtons.addAll(supermassiveButtons);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
             }
             case "Relics" -> {
@@ -1833,18 +1886,33 @@ public class TransactionHelper {
                 if (game.isFowMode()) MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
             }
             case "Frags" -> {
-                String fragType = amountToTrans.substring(0, 3).toUpperCase();
-                int fragNum = Integer.parseInt(amountToTrans.charAt(3) + "");
-                String trait =
-                        switch (fragType) {
-                            case "CRF" -> "cultural";
-                            case "HRF" -> "hazardous";
-                            case "IRF" -> "industrial";
-                            case "URF" -> "frontier";
-                            default -> "";
-                        };
-                RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game);
-                message2 = "";
+                if (amountToTrans.startsWith("supermassive")) {
+                    if (!p1.getFragments().contains(amountToTrans) || Mapper.getExplore(amountToTrans) == null) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                "That Supermassive fragment is no longer available to send.");
+                        return;
+                    }
+                    p1.removeFragment(amountToTrans);
+                    p2.addFragment(amountToTrans);
+                    message2 = ident + " sent "
+                            + ExploreEmojis.getFragEmoji(
+                                    Mapper.getExplore(amountToTrans).getType()) + " _"
+                            + Mapper.getExplore(amountToTrans).getName() + "_ to " + ident2 + ".";
+                } else {
+                    String fragType = amountToTrans.substring(0, 3).toUpperCase();
+                    int fragNum = Integer.parseInt(amountToTrans.charAt(3) + "");
+                    String trait =
+                            switch (fragType) {
+                                case "CRF" -> "cultural";
+                                case "HRF" -> "hazardous";
+                                case "IRF" -> "industrial";
+                                case "URF" -> "frontier";
+                                default -> "";
+                            };
+                    RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game, false);
+                    message2 = "";
+                }
             }
             case "Technology" -> {
                 p2.addTech(amountToTrans);
@@ -1853,7 +1921,14 @@ public class TransactionHelper {
                         p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
             }
-            case "Relics" -> SendRelicService.handleSendRelic(event, game, p1, p2, amountToTrans);
+            case "Relics" ->
+                SendRelicService.handleSendRelic(
+                        event,
+                        game,
+                        p1,
+                        p2,
+                        amountToTrans,
+                        !MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2));
         }
         Button button =
                 Buttons.gray(factionChecker + "transactWith_" + p2.getColor(), "Send something else to player?");
@@ -2028,7 +2103,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
         }
-        if (((blackMarket || graft) && !p1.getActualRelics().isEmpty())
+        if (((blackMarket || graft || MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2))
+                        && !p1.getActualRelics().isEmpty())
                 || !p1.getTradableRelics().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_Relics_" + p1.getFaction() + "_" + p2.getFaction(), "Relics"));
@@ -2045,6 +2121,11 @@ public class TransactionHelper {
                 .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
+        }
+        if (MonumentsButtonHandler.canTradeUnitsWithHacanMonument(game, p1)) {
+            stuffToTransButtons.add(Buttons.green(
+                    "newTransact_MonumentUnits_" + p1.getFaction() + "_" + p2.getFaction(),
+                    "Units (Mowshir Freeport)"));
         }
         if (game.isAgeOfCommerceMode()) {
             stuffToTransButtons.add(
@@ -2084,6 +2165,7 @@ public class TransactionHelper {
                     Buttons.red("getNewTransaction_" + p2.getFaction() + "_" + p1.getFaction(), "Offer More"));
             stuffToTransButtons.add(Buttons.gray("sendOffer_" + p1.getFaction(), "Send the Offer"));
         }
+        stuffToTransButtons.add(Buttons.red("deleteButtons", "Delete This Transaction"));
 
         return stuffToTransButtons;
     }
@@ -2105,6 +2187,24 @@ public class TransactionHelper {
         }
 
         return buttons;
+    }
+
+    private static List<Button> getSupermassiveFragmentTransactionButtons(Player player, String buttonPrefix) {
+        return player.getFragments().stream()
+                .filter(fragmentId -> fragmentId.startsWith("supermassive"))
+                .map(Mapper::getExplore)
+                .filter(fragment -> fragment != null)
+                .map(fragment -> switch (fragment.getType().toLowerCase()) {
+                    case "cultural" ->
+                        Buttons.blue(buttonPrefix + fragment.getAlias(), fragment.getName(), ExploreEmojis.CFrag);
+                    case "industrial" ->
+                        Buttons.green(buttonPrefix + fragment.getAlias(), fragment.getName(), ExploreEmojis.IFrag);
+                    case "hazardous" ->
+                        Buttons.red(buttonPrefix + fragment.getAlias(), fragment.getName(), ExploreEmojis.HFrag);
+                    default ->
+                        Buttons.gray(buttonPrefix + fragment.getAlias(), fragment.getName(), ExploreEmojis.UFrag);
+                })
+                .toList();
     }
 
     @ButtonHandler("startReturnPNInPlayArea_")

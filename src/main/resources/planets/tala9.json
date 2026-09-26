@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tala9",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 228,
+            "y": 222
+        }
+    },
     "id": "tala9",
     "tileId": "ba3",
     "name": "Tala 9",

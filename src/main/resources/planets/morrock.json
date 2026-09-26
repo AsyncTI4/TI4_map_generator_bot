@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "morrock",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "morrock",
     "tileId": "er98",
     "name": "Mor Rock",

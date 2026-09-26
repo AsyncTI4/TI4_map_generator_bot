@@ -124,7 +124,7 @@
         "faction": "pharadn",
         "capacityUsed": 1,
         "cost": 2,
-        "combatHitsOn": 6,
+        "combatHitsOn": 5,
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,

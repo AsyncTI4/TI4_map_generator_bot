@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "suprima",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "suprima",
     "tileId": "er04",
     "name": "Su'Prima",

@@ -1,5 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import ti4.draft.items.MahactKingDraftItem;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
-import ti4.model.Source.ComponentSource;
 import tools.jackson.databind.JsonNode;
 
 @Getter
@@ -27,10 +28,14 @@ public class MahactKingDraftableSettings extends SettingsMenu {
     private final ListSetting<FactionModel> banFactions;
     private final ListSetting<FactionModel> priFactions;
 
+    @JsonIgnore
+    private final Game game;
+
     private static final String MENU_ID = "dsMahactKing";
 
     public MahactKingDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
         super(MENU_ID, "Mahact King Settings", "Control mahact king draft options.", parent);
+        this.game = game;
 
         int players = parent.getPlayerUserIds().size();
         numFactions = new IntegerSetting("#Kings", "Number of Kings", players, 2, 24, 1);
@@ -75,10 +80,8 @@ public class MahactKingDraftableSettings extends SettingsMenu {
 
     @Override
     protected void updateTransientSettings() {
-        List<ComponentSource> sources = List.of(ComponentSource.twilights_fall);
-        Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
-                .filter(model -> sources.contains(model.getSource()))
-                .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
+        Map<String, FactionModel> allFactions = MahactKingDraftItem.getAllFactions(game)
+                .collect(Collectors.toMap(FactionModel::getAlias, Function.identity()));
         banFactions.setAllValues(allFactions);
         priFactions.setAllValues(allFactions);
     }

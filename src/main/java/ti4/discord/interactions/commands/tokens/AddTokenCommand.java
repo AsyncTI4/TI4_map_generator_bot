@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -62,11 +64,24 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");
                 return;
             }
+            if ("token_theodisi_mine.png".equals(tokenFileName)) {
+                if (!XytherisAbilityHandler.addMine(game, tile)) {
+                    MessageHelper.sendMessageToChannel(channel, "No mine tokens remain.");
+                }
+                return;
+            }
+            if ("token_theodisi_oblivionreflection.png".equals(tokenFileName)) {
+                if (!OblivionAbilityHandler.addReflection(game, tile)) {
+                    MessageHelper.sendMessageToChannel(channel, "No reflection tokens remain.");
+                }
+                return;
+            }
             addToken(
                     event,
                     tile,
                     tokenFileName,
-                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName),
+                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName)
+                            || "token_theodisi_kairnexpedition.png".equals(tokenFileName),
                     game);
         }
     }

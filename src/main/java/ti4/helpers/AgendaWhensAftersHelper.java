@@ -71,6 +71,11 @@ public final class AgendaWhensAftersHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
+            List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
+            List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
+            if (!game.getStoredValue("executiveOrder").isEmpty() && whens.isEmpty() && afters.isEmpty()) {
+                game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
+            }
             if ((!game.getStoredValue("passOnAllWhensNAfters" + player.getFaction())
                                     .isEmpty()
                             || player.isNpc())
@@ -336,6 +341,12 @@ public final class AgendaWhensAftersHelper {
                 && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             names.add("Tarrock Ability");
         }
+        String sanctum = "innersanctum";
+        if (player.hasTech("thveylorg")
+                && player.getPlanets().contains(sanctum)
+                && !player.getExhaustedPlanetsAbilities().contains(sanctum)) {
+            names.add("Inner Sanctum Ability");
+        }
 
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             names.add("Keleres Hero");
@@ -346,6 +357,10 @@ public final class AgendaWhensAftersHelper {
 
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
+        }
+
+        if (player.hasTechReady("thveylory")) {
+            names.add("Kleptocratic Politics");
         }
         return names;
     }
@@ -388,6 +403,12 @@ public final class AgendaWhensAftersHelper {
                 && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             buttons.add(Buttons.red("queueAfter_planet_" + planet, "Tarrock Ability"));
         }
+        String sanctum = "innersanctum";
+        if (player.hasTech("thveylorg")
+                && player.getPlanets().contains(sanctum)
+                && !player.getExhaustedPlanetsAbilities().contains(sanctum)) {
+            buttons.add(Buttons.red("queueAfter_planet_" + sanctum, "Use Inner Sanctum Ability"));
+        }
 
         if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
             buttons.add(Buttons.red("queueAfter_leader_Atokera Commander", "Atokera Commander Ability"));
@@ -399,6 +420,10 @@ public final class AgendaWhensAftersHelper {
 
         if (player.hasTechReady("dsedyng")) {
             buttons.add(Buttons.red("queueAfter_tech_dsedyng", "Unity Algorithm"));
+        }
+
+        if (player.hasTechReady("thveylory")) {
+            buttons.add(Buttons.red("queueAfter_tech_thveylory", "Kleptocratic Politics"));
         }
         CryypterHelper.addVotCRiderQueueButtons(player, buttons);
 
@@ -577,17 +602,30 @@ public final class AgendaWhensAftersHelper {
                                 }
                             }
                             case "pn" -> PromissoryNoteHelper.resolvePNPlay(after, player, game, event);
-                            case "planet" -> PlanetExhaustAbility.doAction(event, player, "tarrock", game, true);
+                            case "planet" -> PlanetExhaustAbility.doAction(event, player, after, game, true);
                             case "tech" -> {
-                                player.exhaustTech("dsedyng");
-                                riderButtons = AgendaRiderHelper.getAgendaButtons(
-                                        "Edyn Unity Algorithm", game, player.factionButtonChecker());
-                                MessageHelper.sendMessageToChannelWithFactionReact(
-                                        player.getCorrectChannel(),
-                                        player.getRepresentation() + ", please choose your target.",
-                                        game,
-                                        player,
-                                        riderButtons);
+                                if ("dsedyng".equalsIgnoreCase(after)) {
+                                    player.exhaustTech("dsedyng");
+                                    riderButtons = AgendaRiderHelper.getAgendaButtons(
+                                            "Edyn Unity Algorithm", game, player.factionButtonChecker());
+                                    MessageHelper.sendMessageToChannelWithFactionReact(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation() + ", please choose your target.",
+                                            game,
+                                            player,
+                                            riderButtons);
+                                } else if ("thveylory".equalsIgnoreCase(after)) {
+                                    player.exhaustTech("thveylory");
+                                    riderButtons = AgendaRiderHelper.getAgendaButtons(
+                                            "Veylor Kleptocratic Politics", game, player.factionButtonChecker());
+                                    MessageHelper.sendMessageToChannelWithFactionReact(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation()
+                                                    + ", please choose your target for _Kleptocratic Politics_.",
+                                            game,
+                                            player,
+                                            riderButtons);
+                                }
                             }
                             case "leader" -> {
                                 if (after.toLowerCase().contains("keleres")) {
@@ -993,6 +1031,14 @@ public final class AgendaWhensAftersHelper {
                             "Use Tarrock Ability",
                             player.getFactionEmoji()));
                 }
+                if (player.hasTech("thveylorg")
+                        && player.getPlanets().contains("innersanctum")
+                        && !player.getExhaustedPlanetsAbilities().contains("innersanctum")) {
+                    afterButtons.add(Buttons.green(
+                            factionChecker + "planetAbilityExhaust_innersanctum",
+                            "Use Inner Sanctum Ability",
+                            player.getFactionEmoji()));
+                }
             }
         }
 
@@ -1044,6 +1090,12 @@ public final class AgendaWhensAftersHelper {
             if (p1.hasTechReady("dsedyng")) {
                 afterButtons.add(Buttons.gray(
                         factionChecker + "play_after_Edyn Unity Algorithm", "Use Unity Algorithm", FactionEmojis.edyn));
+            }
+            if (p1.hasTechReady("thveylory")) {
+                afterButtons.add(Buttons.gray(
+                        factionChecker + "play_after_Veylor Kleptocratic Politics",
+                        "Use Kleptocratic Politics",
+                        FactionEmojis.veylor));
             }
             if (game.getCurrentAgendaInfo().contains("Player")
                     && IsPlayerElectedService.isPlayerElected(game, p1, "committee")) {
@@ -1113,6 +1165,9 @@ public final class AgendaWhensAftersHelper {
 
             if (riderName.contains("Unity Algorithm")) {
                 player.exhaustTech("dsedyng");
+            }
+            if (riderName.contains("Kleptocratic Politics")) {
+                player.exhaustTech("thveylory");
             }
             if ("conspirators".equalsIgnoreCase(riderName)) {
                 game.setStoredValue("conspiratorsFaction", player.getFaction());

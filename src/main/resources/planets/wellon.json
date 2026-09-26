@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "wellon",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 151
+        }
+    },
     "id": "wellon",
     "tileId": "19",
     "name": "Wellon",

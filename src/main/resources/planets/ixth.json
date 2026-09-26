@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ixth",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171,
+            "y": 130
+        }
+    },
     "id": "ixth",
     "tileId": "52",
     "name": "Ixth",

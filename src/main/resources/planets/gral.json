@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "gral",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 204,
+            "y": 207
+        }
+    },
     "id": "gral",
     "tileId": "34",
     "name": "Gral",

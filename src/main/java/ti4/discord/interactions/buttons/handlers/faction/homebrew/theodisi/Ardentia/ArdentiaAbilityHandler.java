@@ -68,7 +68,7 @@ public class ArdentiaAbilityHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + ", you may use the buttons below to use _Seize Command_. This will add that player's control token to your **Seize Command** debt pool.\n\n**REMINDER**: This is _INSTEAD OF_ gaining 1 of your purchased command tokens.",
+                        + ", please choose a player for **Seize Command**. This adds that player's control token to your **Seize Command** debt pool.\n-# This is instead of gaining 1 of your purchased command tokens.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -142,7 +142,7 @@ public class ArdentiaAbilityHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose whose command token you are returning from your **Seize Command** debt pool.",
+                        + ", please choose whose command token to return from your **Seize Command** debt pool.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }

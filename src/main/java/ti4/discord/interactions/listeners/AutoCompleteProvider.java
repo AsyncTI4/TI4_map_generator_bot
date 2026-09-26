@@ -34,6 +34,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -182,16 +183,15 @@ class AutoCompleteProvider {
                 Map<String, String> values = new HashMap<>() {
                     {
                         put("RED", "Reds");
-                        put("GRAY", "Grays");
-                        // put("GRAY", "Greys");// TODO duplicate keys
-                        // put("GRAY", "Blacks");
                         put("ORANGE", "Oranges");
-                        // put("ORANGE", "Browns");
+                        put("BROWN", "Browns");
                         put("YELLOW", "Yellows");
                         put("GREEN", "Greens");
                         put("BLUE", "Blues");
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
+                        put("WHITE", "Whites");
+                        put("BLACK", "Blacks");
                         put("MULTI", "Multi-Colours");
                         put(Constants.ALL, "ALL COLOURS");
                     }
@@ -352,9 +352,7 @@ class AutoCompleteProvider {
                         .filter(unit -> (unit.getId() + " " + unit.getName())
                                 .toLowerCase()
                                 .contains(enteredValue))
-                        .filter(model -> model.getSource() != ComponentSource.miltymod
-                                && model.getSource() != ComponentSource.project_pi
-                                && model.getSource() != ComponentSource.asteroid)
+                        .filter(model -> !model.getSource().isHiddenFromSearch())
                         .limit(25)
                         .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() + ")", unit.getId()))
                         .collect(Collectors.toList());
@@ -456,7 +454,11 @@ class AutoCompleteProvider {
             }
             case Constants.SCENARIO -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)");
+                var tokens = List.of(
+                        "ordinian (codex 1)",
+                        "liberation (codex 4)",
+                        "erwan's gambit (homebrew)",
+                        "muaat mania (homebrew)");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -482,10 +484,12 @@ class AutoCompleteProvider {
                         "ordinian",
                         "te",
                         "tf",
-                        "twilightkart",
                         "twilightds",
                         "tedemo",
-                        "noswap");
+                        "noswap",
+                        Constants.TWILIGHT_KART,
+                        Constants.TK_DESTROYER_CUP,
+                        Constants.TK_NOVA_CUP);
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -732,12 +736,16 @@ class AutoCompleteProvider {
                 List<String> relicDeck =
                         Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
                 List<String> tableRelics = new ArrayList<>(relicDeck);
-                for (Player player : game.getRealPlayers()) {
-                    for (String relic : player.getRelics()) {
-                        if (Mapper.getRelic(relic) != null
-                                && Mapper.getRelic(relic).isFakeRelic()
-                                && !tableRelics.contains(relic)) {
-                            tableRelics.add(relic);
+                boolean fogRestricted = game.isFowMode()
+                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+                if (!fogRestricted) {
+                    for (Player player : game.getRealPlayers()) {
+                        for (String relic : player.getRelics()) {
+                            if (Mapper.getRelic(relic) != null
+                                    && Mapper.getRelic(relic).isFakeRelic()
+                                    && !tableRelics.contains(relic)) {
+                                tableRelics.add(relic);
+                            }
                         }
                     }
                 }
@@ -860,10 +868,15 @@ class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, TechnologyModel> techs = Mapper.getTechs().entrySet().stream()
-                        .filter(entry ->
-                                game != null && game.getTechnologyDeck().contains(entry.getKey()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                boolean fogRestricted = game != null
+                        && game.isFowMode()
+                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+                Map<String, TechnologyModel> techs = fogRestricted
+                        ? Mapper.getTechs()
+                        : Mapper.getTechs().entrySet().stream()
+                                .filter(entry ->
+                                        game != null && game.getTechnologyDeck().contains(entry.getKey()))
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
                 List<Command.Choice> options = techs.entrySet().stream()
                         .filter(value ->
@@ -881,22 +894,28 @@ class AutoCompleteProvider {
 
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Set<BreakthroughModel> btSet = game.getPlayers().values().stream()
-                        .flatMap(p -> p.getBreakthroughIDs().stream())
-                        .map(Mapper::getBreakthrough)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
 
-                boolean addAllOpt = false;
-                for (Player p : game.getPlayers().values()) {
-                    if (p.getBreakthroughIDs().size() > 1) {
-                        addAllOpt = true;
-                        break;
-                    }
-                }
-                if (Constants.FRANKEN.equals(event.getName())) {
+                boolean fogRestricted = game.isFowMode()
+                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+                Set<BreakthroughModel> btSet;
+                boolean addAllOpt;
+                if (Constants.FRANKEN.equals(event.getName()) || fogRestricted) {
                     btSet = new HashSet<>(Mapper.getBreakthroughs().values());
                     addAllOpt = false;
+                } else {
+                    btSet = game.getPlayers().values().stream()
+                            .flatMap(p -> p.getBreakthroughIDs().stream())
+                            .map(Mapper::getBreakthrough)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toSet());
+
+                    addAllOpt = false;
+                    for (Player p : game.getPlayers().values()) {
+                        if (p.getBreakthroughIDs().size() > 1) {
+                            addAllOpt = true;
+                            break;
+                        }
+                    }
                 }
                 if (Constants.BREAKTHROUGH_SET_TG.equalsIgnoreCase(subcommandName)) {
                     addAllOpt = false;
@@ -1343,8 +1362,11 @@ class AutoCompleteProvider {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Game game = GameManager.getManagedGame(gameName).getGame();
+                Player viewer = game.getPlayer(event.getUser().getId());
+                boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
                 Map<String, Integer> discardActionCardIDs = game.getDiscardActionCards();
                 List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
+                        .filter(entry -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, entry.getKey()))
                         .map(entry -> Map.entry(Mapper.getActionCard(entry.getKey()), entry.getValue()))
                         .filter(entry -> entry.getKey().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -1475,6 +1497,7 @@ class AutoCompleteProvider {
                         List<Command.Choice> options = Mapper.getTechs().values().stream()
                                 .filter(entry -> entry.getFaction().isPresent())
                                 .filter(entry -> entry.search(enteredValue))
+                                .filter(model -> !model.getSource().isHiddenFromSearch())
                                 .limit(25)
                                 .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
                                 .collect(Collectors.toList());

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "azle",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "azle",
     "tileId": "d06",
     "name": "Azle",

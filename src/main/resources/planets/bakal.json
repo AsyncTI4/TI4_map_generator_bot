@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bakal",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 90
+        }
+    },
     "id": "bakal",
     "tileId": "71",
     "name": "Bakal",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "andokxull",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "andokxull",
     "tileId": "m03",
     "name": "Andok Xull",

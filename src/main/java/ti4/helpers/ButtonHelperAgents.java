@@ -20,7 +20,12 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
@@ -34,6 +39,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAgents;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -49,6 +55,9 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -397,6 +406,15 @@ public final class ButtonHelperAgents {
                 return;
             }
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
+        } else if ("monument".equalsIgnoreCase(thing)) {
+            if (!MonumentsService.readyMonument(game, player, detail)) {
+                return;
+            }
+            UnitModel monument = Mapper.getUnit(detail);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready "
+                            + (monument == null ? detail : monument.getName() + " Monument") + ".");
         } else {
             if ("planet".equalsIgnoreCase(thing)) {
                 player.removeExhaustedAbility(detail);
@@ -536,7 +554,7 @@ public final class ButtonHelperAgents {
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
         }
-        if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
+        if (tileDestination != null && tileDestination.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
@@ -601,6 +619,7 @@ public final class ButtonHelperAgents {
         if (agent.contains("_")) {
             agent = agent.substring(0, agent.indexOf('_'));
         }
+        // Leader playerLeader = player.getLeaderByIdPreferReadied(agent).orElse(null);
         Leader playerLeader = player.getLeader(agent).orElse(null);
         if (playerLeader == null) {
             return;
@@ -1163,13 +1182,22 @@ public final class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(channel, exhaustText);
 
                 List<Button> buttons = new ArrayList<>();
-                for (String planet : p2.getPlanets()) {
-                    if (game.getUnitHolderFromPlanet(planet) != null
-                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
-                            && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                        buttons.add(Buttons.gray(
-                                player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                                Helper.getPlanetRepresentation(planet, game)));
+                if (game.isFowMode()) {
+                    buttons = PlanetTargetService.targetButtons(
+                            game,
+                            player,
+                            PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
+                                    .where(p -> !p.isHomePlanet(game)),
+                            buttons);
+                } else {
+                    for (String planet : p2.getPlanets()) {
+                        if (game.getUnitHolderFromPlanet(planet) != null
+                                && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                                && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
+                            buttons.add(Buttons.gray(
+                                    player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                    Helper.getPlanetRepresentation(planet, game)));
+                        }
                     }
                 }
                 String msg = player.getRepresentation()
@@ -1554,8 +1582,60 @@ public final class ButtonHelperAgents {
             TeHelperAgents.postRalNelAgentStep1(game, player);
         }
         if ("ardentiaagent".equalsIgnoreCase(agent)) {
-            ArdentiaLeadersHandler.startArdentiaAgentStep1(game, player);
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Ardentia Agent target.");
+                return;
+            }
+            ArdentiaLeadersHandler.startArdentiaAgentStep1(game, target);
         }
+        if ("kryxosagent".equalsIgnoreCase(agent)) {
+            if (!rest.contains("_")) {
+                MessageHelper.sendMessageToChannel(
+                        channel, "Kryxos Agent needs a player target before it can resolve.");
+                return;
+            }
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Kryxos Agent target.");
+                return;
+            }
+            KryxosLeadersHandler.startKryxosAgent(game, target);
+        }
+        if ("aeternaagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Aeterna Agent target.");
+                return;
+            }
+            AeternaLeadersHandler.startAeternaAgent(game, target);
+        }
+        if ("veyloragent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Veylor Agent target.");
+                return;
+            }
+            VeylorLeadersHandler.startVeylorAgent(game, target);
+        }
+        if ("taagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Ta Agent target.");
+                return;
+            }
+            TaLeadersHandler.resolveTaAgentTarget(game, target);
+        }
+        if ("vanguardagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Vanguard Agent target.");
+                return;
+            }
+            VanguardLeadersHandler.resolveVanguardAgentTarget(game, target);
+        }
+
+        TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
@@ -1741,7 +1821,8 @@ public final class ButtonHelperAgents {
         boolean present = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
-                    || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
+                    || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+                    || uH.getUnitCount(UnitType.Monument, player.getColor()) > 0) {
                 return true;
             }
             if (player.hasAbility("byssus")
@@ -1781,7 +1862,7 @@ public final class ButtonHelperAgents {
                     MessageHelper.sendMessageToChannel(
                             event.getChannel(),
                             "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                    if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+                    AgendaHelper.listVoteCountIfUnfogged(game);
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -1827,7 +1908,7 @@ public final class ButtonHelperAgents {
                     MessageHelper.sendMessageToChannel(
                             event.getChannel(),
                             "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                    if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+                    AgendaHelper.listVoteCountIfUnfogged(game);
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -2199,11 +2280,8 @@ public final class ButtonHelperAgents {
                 + "Yudri Sukhov, the Vaden" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && vaden != player) {
-            msg = player.getFactionEmojiOrColor() + " has finished resolving";
-            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(
+                game, player, msg, vaden, player.getFactionEmojiOrColor() + " has finished resolving");
     }
 
     private static void resolveKortaliAgentStep2(Player bentor, Game game, String buttonID) {
@@ -2224,10 +2302,7 @@ public final class ButtonHelperAgents {
                 + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Queen Lucreia, the Kortali" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, bentor, msg);
     }
 
     private static void resolveZealotsAgentStep2(Player zealots, Game game, String buttonID) {
@@ -2290,10 +2365,7 @@ public final class ButtonHelperAgents {
                 + "Sal Sparrow, the Nokar" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent. "
                 + "A transaction may be done with transaction buttons.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, bentor, msg);
     }
 
     private static void resolveZelianAgentStep2(
@@ -2321,10 +2393,7 @@ public final class ButtonHelperAgents {
                 + tile.getRepresentationForButtons(game, player)
                 + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Zelian A, the Zelian" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, bentor, msg);
 
         if (event instanceof ButtonInteractionEvent event2) {
             if (event2.getButton().getLabel().contains("Yourself")) {
@@ -2347,15 +2416,13 @@ public final class ButtonHelperAgents {
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to "
                 + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox, the Kyro"
                 + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+        int commoditiesTotal = player.getCommoditiesTotal();
+        player.setCommodities(player.getCommodities() + commoditiesTotal);
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         cabalAgentInitiation(game, player);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && kyro != player) {
-            MessageHelper.sendMessageToChannel(kyro.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, kyro, msg);
 
-        int infAmount = player.getCommoditiesTotal() - 1;
+        int infAmount = commoditiesTotal - 1;
         List<Button> buttons = new ArrayList<>(
                 Helper.getPlanetPlaceUnitButtons(kyro, game, infAmount + "gf", "placeOneNDone_skipbuild"));
         String message = kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infAmount
@@ -2429,7 +2496,7 @@ public final class ButtonHelperAgents {
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
@@ -2463,11 +2530,8 @@ public final class ButtonHelperAgents {
                 + "C.O.O. Mgur, the Bentor" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            msg = player.getRepresentation() + " has finished resolving.";
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(
+                game, player, msg, bentor, player.getRepresentation() + " has finished resolving.");
     }
 
     private static void fogAllianceAgentStep1(Game game, Player player) {
@@ -2513,6 +2577,7 @@ public final class ButtonHelperAgents {
             if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) continue;
 
             if ((tile.isAsteroidField()
+                            && !tile.isZelianAsteroidField()
                             && !player.getTechs().contains("amd")
                             && !player.getTechs().contains("wavelength")
                             && !player.getRelics().contains("circletofthevoid"))
@@ -2721,7 +2786,7 @@ public final class ButtonHelperAgents {
         return buttons;
     }
 
-    private static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
+    public static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
         List<Button> buttons = new ArrayList<>();
         Tile tile = game.getTileByPosition(pos);
         String placePrefix = "placeOneNDone_skipbuild";

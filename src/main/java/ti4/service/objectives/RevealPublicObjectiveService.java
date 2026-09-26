@@ -165,7 +165,8 @@ public class RevealPublicObjectiveService {
         if (po == null) {
             Map<String, String> sos = Mapper.getSecretObjectivesJustNames();
             for (Map.Entry<String, String> entry : sos.entrySet()) {
-                if (entry.getValue().equalsIgnoreCase(objective.getKey())) {
+                if (entry.getValue().equalsIgnoreCase(objective.getKey())
+                        && Mapper.getSecretObjective(entry.getKey()).getSource().isOfficial()) {
                     po = Mapper.getSecretObjective(entry.getKey());
                 }
             }
@@ -194,6 +195,12 @@ public class RevealPublicObjectiveService {
 
     private String handleStage1Revealed(
             Game game, GenericInteractionCreateEvent event, Map.Entry<String, Integer> objective) {
+        if (objective == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "No unrevealed stage 1 public objectives remain.");
+            return null;
+        }
+
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(

@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -20,6 +22,7 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -62,9 +65,21 @@ public class StatusCleanupService {
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeAllCC();
+                Player wsdamage = null;
+                if (game.isMuaatManiaMode()) {
+                    for (Player p : game.getRealPlayers()) {
+                        if (!p.getTechs().contains("ws")
+                                && unitHolder.getDamagedUnitCount(UnitType.Warsun, p.getColorID()) > 0) {
+                            wsdamage = p;
+                        }
+                    }
+                }
                 unitHolder.removeAllUnitDamage();
                 if (unitHolder.getTokenList().contains(Constants.TOKEN_SEVERED)) {
                     unitHolder.removeToken(Constants.TOKEN_SEVERED);
+                }
+                if (wsdamage != null) {
+                    unitHolder.addDamagedUnit(Mapper.getUnitKey("ws", wsdamage.getColorID()), 1);
                 }
             }
         }
@@ -92,6 +107,8 @@ public class StatusCleanupService {
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
 
+            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
+            NetrunnersFactionTechsHandler.clearDataMining(game, player);
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {
@@ -178,6 +195,14 @@ public class StatusCleanupService {
             ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
         }
         game.clearAllEmptyStoredValues();
+        if (game.isErwansGambitMode()) {
+            Player mentak = game.getPlayerFromColorOrFaction("mentak");
+            if (mentak != null && mentak.isRealPlayer()) {
+                String msg = mentak.getRepresentation()
+                        + ", reminder to draw and reveal 1 heist objective if you have not done so already.";
+                MessageHelper.sendMessageToChannel(mentak.getCardsInfoThread(), msg);
+            }
+        }
     }
 
     public static void returnEndStatusPNs(Game game) {

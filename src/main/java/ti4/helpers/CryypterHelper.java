@@ -1,7 +1,9 @@
 package ti4.helpers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -408,18 +410,29 @@ public final class CryypterHelper {
                     List<Planet> eligiblePlanets = new ArrayList<>();
                     List<Button> buttons = new ArrayList<>();
 
+                    // In fog, drop systems the chooser could not know about and label by system rather
+                    // than by planet: the target is a system, so naming the planets was disclosing several
+                    // counter-winners' holdings for no mechanical benefit. The eligibility rule itself is
+                    // unchanged, so a fog chooser sees a subset of the same systems.
+                    Set<String> knownPositions =
+                            game.isFowMode() ? FoWHelper.getKnownTilePositions(game, envoyPlayer) : null;
+                    Set<String> offeredPositions = new HashSet<>();
                     for (Player counterPlayer : counterWinners) {
                         List<String> planets = counterPlayer.getPlanets();
                         for (String planetID : planets) {
                             Planet p = game.getUnitHolderFromPlanet(planetID);
-                            if (!p.isHomePlanet()) {
-                                PlanetModel tempPlanet = Mapper.getPlanet(planetID);
-                                String tilePos =
-                                        game.getTile(tempPlanet.getTileId()).getPosition();
-                                buttons.add(Buttons.gray(
-                                        "creussEnvoyType_" + tilePos,
-                                        Helper.getPlanetRepresentation(p.getName(), game)));
-                            }
+                            if (p == null || p.isHomePlanet()) continue;
+                            PlanetModel tempPlanet = Mapper.getPlanet(planetID);
+                            Tile tile = game.getTile(tempPlanet.getTileId());
+                            if (tile == null) continue;
+                            String tilePos = tile.getPosition();
+                            if (knownPositions != null && !knownPositions.contains(tilePos)) continue;
+                            if (knownPositions != null && !offeredPositions.add(tilePos)) continue;
+                            buttons.add(Buttons.gray(
+                                    "creussEnvoyType_" + tilePos,
+                                    knownPositions == null
+                                            ? Helper.getPlanetRepresentation(p.getName(), game)
+                                            : tile.getRepresentationForButtons(game, envoyPlayer)));
                         }
                     }
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
@@ -537,6 +550,10 @@ public final class CryypterHelper {
     }
 
     @ButtonHandler("handleNaazEnvoy_")
+    @SuppressFBWarnings(
+            value = "LSC_LITERAL_STRING_COMPARISON",
+            justification =
+                    "The detector incorrectly reports the compiler-generated comparisons for this string switch.")
     public static void handleNaazEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         envoyExhaustCheck(game, player, "naazenvoy");
         String[] fields = buttonID.split("_");

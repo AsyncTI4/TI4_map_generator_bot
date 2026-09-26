@@ -2,6 +2,7 @@ package ti4.service.game;
 
 import java.util.ArrayList;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.game.Game;
@@ -14,10 +15,15 @@ import ti4.model.DeckModel;
 public class SetDeckService {
 
     public static boolean setDeck(SlashCommandInteractionEvent event, Game game, String deckType, DeckModel deckModel) {
+        boolean resetDeck = event.getOption("reset_deck", Boolean.FALSE, OptionMapping::getAsBoolean);
+        return setDeck(event, game, deckType, deckModel, resetDeck);
+    }
+
+    public static boolean setDeck(
+            GenericInteractionCreateEvent event, Game game, String deckType, DeckModel deckModel, boolean resetDeck) {
         if (deckModel == null) {
             return false;
         }
-        boolean resetDeck = event.getOption("reset_deck", Boolean.FALSE, OptionMapping::getAsBoolean);
         return switch (deckType) {
             case Constants.AC_DECK -> {
                 if (resetDeck) {

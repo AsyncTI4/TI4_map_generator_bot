@@ -5,6 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -20,6 +22,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -77,23 +81,36 @@ public class SettlementsAcd2ButtonHandler {
     public static void resolveSettlementsPlaceOn(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String payload = buttonID.replace("settlementsPlaceOn_", "");
+        // remaining leads both shapes this payload can take - "<remaining>_<planet>" for a real target and
+        // "<remaining>page<N>" for a nav press - so it has to be read before telling which one this is.
+        Matcher leadingDigits = Pattern.compile("^(\\d+)").matcher(payload);
+        if (!leadingDigits.find()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int remaining = Integer.parseInt(leadingDigits.group(1));
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, placeOnSpec(game, player, remaining)))
+            return;
+
         int separator = payload.indexOf('_');
         if (separator < 0) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        int remaining;
-        try {
-            remaining = Integer.parseInt(payload.substring(0, separator));
-        } catch (NumberFormatException e) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
         String planet = payload.substring(separator + 1);
         Tile tile = game.getTileFromPlanet(planet);
+        Planet uH = game.getUnitHolderFromPlanet(planet);
         ButtonHelper.deleteMessage(event);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlements_.");
+        // Non-home and "controlled by a voter for the winning outcome" are both builder filters, so both
+        // have to be re-checked here - a blind-typed target never passed through the fog list, and the fog
+        // list itself can't apply the second one without disclosing who voted for what.
+        Player controller = game.getPlayerThatControlsPlanet(planet, true);
+        if (tile == null
+                || uH == null
+                || uH.isHomePlanet(game)
+                || controller == null
+                || !votersFor(game, game.getStoredValue(winnerKey(player))).contains(controller)) {
+            PlanetTargetService.fizzle(player);
             return;
         }
 
@@ -113,9 +130,30 @@ public class SettlementsAcd2ButtonHandler {
         }
     }
 
+    /** {@code remaining} is embedded in the button prefix itself, so each count needs its own spec instance. */
+    private static PlanetTargetSpec placeOnSpec(Game game, Player player, int remaining) {
+        return PlanetTargetSpec.of(player.factionButtonChecker() + "settlementsPlaceOn_" + remaining)
+                .where(p -> !p.isHomePlanet(game));
+    }
+
     private static void sendPlacementButtons(Player player, Game game, int remaining) {
         String outcome = game.getStoredValue(winnerKey(player));
         Set<String> planets = new LinkedHashSet<>();
+        if (game.isFowMode()) {
+            // This list unions the holdings of every voter for the outcome, so it discloses several players'
+            // planets at once. In fog, offer the planets this player knows about; "was controlled by a voter"
+            // is checked when the placement resolves.
+            List<Button> fogButtons = PlanetTargetService.targetButtons(
+                    game, player, placeOnSpec(game, player, remaining), new ArrayList<>());
+            fogButtons.add(Buttons.red("deleteButtons", "Done"));
+            String fogRemaining = remaining == 1 ? "your last infantry" : "an infantry (" + remaining + " remaining)";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", choose where to place " + fogRemaining
+                            + " into coexistence for _Settlements_.",
+                    fogButtons);
+            return;
+        }
         for (Player voter : votersFor(game, outcome)) {
             for (String planet : voter.getPlanets()) {
                 Planet uH = game.getUnitHolderFromPlanet(planet);

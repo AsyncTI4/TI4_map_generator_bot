@@ -33,7 +33,7 @@ public class VerydithPromissoryHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + ", you just played a strategy card while you have _Pact Renewed_ in hand. Use the buttons below to play it or decline.",
+                        + ", you just played a strategy card while you have _Pact Renewed_ in hand. You may play it or decline.",
                 buttons);
     }
 
@@ -50,7 +50,7 @@ public class VerydithPromissoryHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
                 player.getRepresentation()
-                        + ", you may use these buttons to perform the secondary ability of the strategy card you played _Pact Renewed_ for.\n**REMINDER**: You do not spend a command token when doing this.",
+                        + ", please choose the secondary ability to perform with _Pact Renewed_.\n-# You do not spend a command token when doing this.",
                 ButtonHelperHeroes.getSecondaryButtons(game));
     }
 

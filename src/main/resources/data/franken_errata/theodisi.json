@@ -44,14 +44,6 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "expeditionary_cache",
-        "additionalComponents": [
-            "ABILITY:shared_discoveries"
-        ],
-        "source": "theodisi"
-    },
-    {
-        "itemCategory": "ABILITY",
-        "itemId": "shared_discoveries",
         "undraftable": true,
         "source": "theodisi"
     },
@@ -129,18 +121,6 @@
     },
     {
         "itemCategory": "ABILITY",
-        "itemId": "cycle_of_reclamation",
-        "additionalComponents": [
-            "ABILITY:new_moon_phase",
-            "ABILITY:waning_moon_phase",
-            "ABILITY:full_moon_phase",
-            "ABILITY:waxing_moon_phase",
-            "ABILITY:lunar_eclipse_phase"
-        ],
-        "source": "theodisi"
-    },
-    {
-        "itemCategory": "ABILITY",
         "itemId": "new_moon_phase",
         "undraftable": true,
         "source": "theodisi"
@@ -185,7 +165,7 @@
     },
     {
         "itemCategory": "STARTINGTECH",
-        "itemId": "aeterna",
+        "itemId": "revenant",
         "alternateText": "Choose up to 2 technologies with 0 prerequisites owned by no other player.",
         "source": "theodisi"
     },
@@ -197,7 +177,7 @@
     },
     {
         "itemCategory": "STARTINGTECH",
-        "itemId": "revenant",
+        "itemId": "aeterna",
         "alternateText": "Choose 2 technologies in different colors with 1 total prerequisite.",
         "source": "theodisi"
     },
@@ -212,6 +192,26 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "allure_of_darkness",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "scrapyard",
+        "alternateText": "During setup, place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, & 2 structures in your home system. THIS IS NOT AUTOMATED. Use `/modify_units` to set them yourself.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "custom_rigs",
+        "additionalComponents": [
+            "ABILITY:drive_decoherence"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "drive_decoherence",
         "undraftable": true,
         "source": "theodisi"
     }

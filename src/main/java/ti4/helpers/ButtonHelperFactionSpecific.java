@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -31,6 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -68,6 +73,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -119,13 +126,24 @@ public final class ButtonHelperFactionSpecific {
         if (!activePlayerFaction.equalsIgnoreCase(player.getFaction())) {
             Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
             List<Button> buttons2 = new ArrayList<>();
-            for (String planet : p2.getPlanets()) {
-                if (game.getUnitHolderFromPlanet(planet) != null
-                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
-                        && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                    buttons2.add(Buttons.gray(
-                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                            Helper.getPlanetRepresentation(planet, game)));
+            if (game.isFowMode()) {
+                // "Has units on it" is hidden state and cannot narrow the fog list; non-home is a public map
+                // fact and still can. A planet with nobody to coexist with comes to nothing at resolution.
+                buttons2 = PlanetTargetService.targetButtons(
+                        game,
+                        player,
+                        PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
+                                .where(p -> !p.isHomePlanet(game)),
+                        buttons2);
+            } else {
+                for (String planet : p2.getPlanets()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                            && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
+                        buttons2.add(Buttons.gray(
+                                player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)));
+                    }
                 }
             }
             String msg = player.getRepresentation() + " please choose the planet of theirs that you will coexist on.";
@@ -570,6 +588,7 @@ public final class ButtonHelperFactionSpecific {
                         player.getRepresentation() + " has lost the _Thwart_ Dishonor card.");
             }
         }
+        MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
         if (player.getDishonorCounter() > 4) {
             if (!player.hasAbility("deceive")) {
                 player.addAbility("deceive");
@@ -663,6 +682,9 @@ public final class ButtonHelperFactionSpecific {
                         + "_ secret objective for 0 VP (but they get to put a Plot card into play).");
         int poIndex = game.addCustomPO("(Plotted) " + soM.getName(), 0);
         game.scorePublicObjective(player.getUserID(), poIndex);
+        if (player.hasUnlockedBreakthrough("revenantbt")) {
+            RevenantBreakthroughHandler.gainAttachedAgent(game, player);
+        }
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         ActionCardHelper.sendPlotCardInfo(game, player);
         ButtonHelper.deleteMessage(event);
@@ -815,16 +837,8 @@ public final class ButtonHelperFactionSpecific {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos,
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(
+                    FoWHelper.fogSafeTargetButton("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, "gray", p2));
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -1075,8 +1089,11 @@ public final class ButtonHelperFactionSpecific {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByName("construction").orElse(null);
         int scNum = scModel.getInitiative();
-        boolean construction =
-                scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction");
+        boolean construction = scModel.usesAutomationForSCID("pok4construction")
+                || scModel.usesAutomationForSCID("te4construction")
+                || (game.isMonumentsMode()
+                        && (scModel.usesAutomationForSCID("monuments4construction")
+                                || scModel.usesAutomationForSCID("monumentstf4")));
         if (!used
                 && construction
                 && !player.getFollowedSCs().contains(scNum)
@@ -1112,7 +1129,7 @@ public final class ButtonHelperFactionSpecific {
 
         String location = player.hasAbility("primacy") ? "Primacy ability" : "fleet pool";
         if (!player.getMahactCC().contains(color)) {
-            player.addMahactCC(color);
+            MahactTokenService.addMahactToken(game, player, color);
             Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -1239,21 +1256,16 @@ public final class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(pos);
         CommandCounterHelper.addCC(event, p2, tile);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you _Stymie_'d the system: "
-                            + tile.getRepresentationForButtons(game, player) + ".");
-            MessageHelper.sendMessageToChannel(
-                    p2.getCorrectChannel(),
-                    p2.getRepresentationUnfogged() + ", you were _Stymie_'d in system: "
-                            + tile.getRepresentationForButtons(game, p2) + ".");
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " has _Stymie_'d " + p2.getRepresentationUnfogged()
-                            + " in the system: " + tile.getRepresentationForButtons(game, player) + ".");
-        }
+        FoWHelper.notifyActorAndAffectedElsePublic(
+                game,
+                player,
+                player.getRepresentationUnfogged() + ", you _Stymie_'d the system: "
+                        + tile.getRepresentationForButtons(game, player) + ".",
+                p2,
+                p2.getRepresentationUnfogged() + ", you were _Stymie_'d in system: "
+                        + tile.getRepresentationForButtons(game, p2) + ".",
+                player.getRepresentationUnfogged() + " has _Stymie_'d " + p2.getRepresentationUnfogged()
+                        + " in the system: " + tile.getRepresentationForButtons(game, player) + ".");
     }
 
     public static void offerASNButtonsStep1(Game game, Player player, String warfareOrTactical) {
@@ -1689,14 +1701,39 @@ public final class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    /** {@code origPlanet} is embedded in the prefix itself, so each origin needs its own spec instance. */
+    private static PlanetTargetSpec raghsCallSpec(Game game, String origPlanet) {
+        return PlanetTargetSpec.of("raghsCallStepTwo_" + origPlanet)
+                .where(p -> !"triad".equalsIgnoreCase(p.getName())
+                        && !p.isSpaceStation(game)
+                        && !p.getName().equalsIgnoreCase(origPlanet));
+    }
+
     @ButtonHandler("raghsCallStepOne_")
     public static void resolveRaghsCallStepOne(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
-        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
         List<Button> buttons = new ArrayList<>();
+        // Resolve the note's owner BEFORE playing it. resolvePNPlay dereferences that owner, so with the
+        // note not in play this threw an NPE instead of coming to nothing.
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
+        if (saar == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
+        if (game.isFowMode()) {
+            // The note was traded consensually, but playing it is unilateral - listing every planet its
+            // owner holds is not part of the bargain. Offer the planets this player already knows about.
+            buttons = PlanetTargetService.targetButtons(game, player, raghsCallSpec(game, origPlanet), buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", please choose which planet to relocate the Saar ground forces to.",
+                    buttons);
+            return;
+        }
         for (String planet : saar.getPlanetsAllianceMode()) {
             if ("triad".equalsIgnoreCase(planet)
                     || game.getUnitHolderFromPlanet(planet) == null
@@ -1758,10 +1795,7 @@ public final class ButtonHelperFactionSpecific {
         player.setTg(oldTg + 2);
         String message = player.getRepresentation() + " gained 2 trade goods due to " + FactionEmojis.Hacan
                 + "_Production Biomes_ (" + oldTg + "->" + player.getTg() + ").";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, hacan, message);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 2);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1792,16 +1826,7 @@ public final class ButtonHelperFactionSpecific {
             if (p2 == hacan) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("productionBiomes_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "productionBiomes_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton("productionBiomes_" + p2.getFaction(), "gray", p2));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 hacan.getCorrectChannel(),
@@ -1843,33 +1868,15 @@ public final class ButtonHelperFactionSpecific {
                 continue;
             }
             if (p2.getSCs().size() > 1) {
-                if (game.isFowMode()) {
-                    buttons.add(Buttons.gray("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, p2.getColor()));
-                } else {
-                    Button button = Buttons.gray(
-                            "selectBeforeSwapSCs_" + p2.getFaction() + "_" + type,
-                            p2.getFactionModel().getShortName());
-                    String factionEmojiString = p2.getFactionEmoji();
-                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                    buttons.add(button);
-                }
+                buttons.add(FoWHelper.fogSafeTargetButton(
+                        "selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, "gray", p2));
             } else {
-                if (game.isFowMode()) {
-                    buttons.add(Buttons.gray(
-                            "swapSCs_" + p2.getFaction() + "_" + type + "_"
-                                    + p2.getSCs().toArray()[0] + "_"
-                                    + hacan.getSCs().toArray()[0],
-                            p2.getColor()));
-                } else {
-                    Button button = Buttons.gray(
-                            "swapSCs_" + p2.getFaction() + "_" + type + "_"
-                                    + p2.getSCs().toArray()[0] + "_"
-                                    + hacan.getSCs().toArray()[0],
-                            p2.getFactionModel().getShortName());
-                    String factionEmojiString = p2.getFactionEmoji();
-                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                    buttons.add(button);
-                }
+                buttons.add(FoWHelper.fogSafeTargetButton(
+                        "swapSCs_" + p2.getFaction() + "_" + type + "_"
+                                + p2.getSCs().toArray()[0] + "_"
+                                + hacan.getSCs().toArray()[0],
+                        "gray",
+                        p2));
             }
         }
         return buttons;
@@ -1937,11 +1944,43 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("raghsCallStepTwo_")
     public static void resolveRaghsCallStepTwo(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        // origPlanet leads both shapes this id can take - "<origPlanet>_<newPlanet>" for a real target and
+        // "<origPlanet>page<N>" for a nav press - so it has to be read before telling which one this is.
+        String afterPrefix = buttonID.replace("raghsCallStepTwo_", "");
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(afterPrefix);
+        String origPlanetForSpec = pageMatch.find()
+                ? afterPrefix.substring(0, pageMatch.start())
+                : afterPrefix.split("_")[0];
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, raghsCallSpec(game, origPlanetForSpec)))
+            return;
+
         String origPlanet = buttonID.split("_")[1];
         String newPlanet = buttonID.split("_")[2];
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, game);
+        // newPlanet is now blind-typed-reachable, so it need not be on the map, and it must still satisfy
+        // the builder's rules. Bail before removing anything from the origin planet - the units would
+        // otherwise be destroyed on the way to a destination that does not exist.
+        Planet destination = ButtonHelper.getUnitHolderFromPlanetName(newPlanet, game);
+        // Whose planet it is, is hidden state, so it cannot narrow the fog list - it is checked here. The
+        // non-fog builder already restricts to saar.getPlanetsAllianceMode(), so this changes nothing there.
+        boolean saarOrAlly = saar != null && saar.getPlanetsAllianceMode().contains(newPlanet);
+        // Match whichever builder produced this button: the fog spec filters on isSpaceStation(game), the
+        // non-fog loop on isSpaceStation(). They differ - the game-arg overload also counts a Gledge Core
+        // planet in Twilight DS - so using one unconditionally would fizzle a destination the other offered.
+        boolean spaceStation = destination != null
+                && (game.isFowMode() ? destination.isSpaceStation(game) : destination.isSpaceStation());
+        if (saar == null
+                || oriPlanet == null
+                || destination == null
+                || !saarOrAlly
+                || spaceStation
+                || "triad".equalsIgnoreCase(newPlanet)
+                || newPlanet.equalsIgnoreCase(origPlanet)) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
@@ -2138,8 +2177,7 @@ public final class ButtonHelperFactionSpecific {
         return false;
     }
 
-    private static void releaseAllUnits(
-            Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
+    public static void releaseAllUnits(Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             List<UnitKey> unitKeys = new ArrayList<>(units.keySet());
@@ -2153,7 +2191,7 @@ public final class ButtonHelperFactionSpecific {
                             cabal.getCorrectChannel(),
                             cabal.getRepresentationUnfogged() + " released " + amount + " "
                                     + blockader.getFactionEmojiOrColor() + " " + unit
-                                    + " from prison due to a blockade.");
+                                    + " from prison.");
                     if (cabal != blockader) {
                         MessageHelper.sendMessageToChannel(
                                 blockader.getCorrectChannel(),
@@ -2592,11 +2630,20 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter) {
+        return gainOrConvertCommButtons(player, deleteAfter, null);
+    }
+
+    public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         String ffcc = player.factionButtonChecker();
         if (deleteAfter) {
-            buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
-            buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 Commodity", MiscEmojis.comm));
+            String extra = "";
+            if (tile != null) {
+                extra = "_" + tile.getPosition();
+            }
+            buttons.add(Buttons.green(
+                    ffcc + "convertComms_1" + extra, "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1" + extra, "Gain 1 Commodity", MiscEmojis.comm));
         } else {
             buttons.add(
                     Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
@@ -3397,10 +3444,10 @@ public final class ButtonHelperFactionSpecific {
         }
     }
 
-    public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static List<Button> getUnitButtonsForVortex(Player player, Game game) {
         List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Couldn't find any Dimensional Tears.");
             return Collections.emptyList();
         }
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.getFirst().getPosition(), player, false);
@@ -3496,7 +3543,7 @@ public final class ButtonHelperFactionSpecific {
                     && isNotBlank(planetReal.getOriginalPlanetType())
                     && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             boolean fracture = game.getTileFromPlanet(planet) != null
-                    && game.getTileFromPlanet(planet).getPosition().contains("frac");
+                    && game.getTileFromPlanet(planet).isFracture();
             if (oneOfThree || fracture || extraAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Buttons.green("terraformPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
@@ -4561,6 +4608,12 @@ public final class ButtonHelperFactionSpecific {
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
             message += " Drew a second secret objective due to **Plausible Deniability**.";
+        }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         ReactionService.addReaction(event, game, player, message);

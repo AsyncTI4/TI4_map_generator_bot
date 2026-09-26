@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "dwuuit",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "dwuuit",
     "tileId": "er55",
     "name": "Dwuuit",

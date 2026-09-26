@@ -1,6 +1,6 @@
 [
     {
-        "alias": "bsp_adapt_new",
+        "alias": "bsp_ans",
         "name": "Adapt New Strategies",
         "phase": "Status",
         "text": "Own 2 faction technologies and control 2 planets, each with a technology specialty matching the prerequisite color of any of those technologies. A \"Valefar Assimilator\" technology counts only if it is currently copying another faction's technology.",
@@ -9,7 +9,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_become_gatekeeper",
+        "alias": "bsp_btgk",
         "name": "Become the Gatekeeper",
         "phase": "Status",
         "text": "Have 1 or more ships in a system that contains an alpha wormhole and 1 or more ships in a different system that contains a beta wormhole.",
@@ -18,7 +18,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_establish_hegemony",
+        "alias": "bsp_eh",
         "name": "Establish Hegemony",
         "phase": "Status",
         "text": "Control planets outside of your home system that have a combined influence value of at least 12.",
@@ -27,7 +27,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_foster_cohesion",
+        "alias": "bsp_fc",
         "name": "Foster Cohesion",
         "phase": "Status",
         "text": "Be neighbors with all other players and have at least 2 neighbors that are not neighbors with each other.",
@@ -36,7 +36,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_fuel_war",
+        "alias": "bsp_fwm",
         "name": "Fuel the War Machine",
         "phase": "Status",
         "text": "Have 3 space docks in systems not adjacent to each other.",
@@ -45,7 +45,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_gather_mighty",
+        "alias": "bsp_gamf",
         "name": "Gather a Mighty Fleet",
         "phase": "Status",
         "text": "Have dreadnoughts in 5 systems other than your home system.",
@@ -54,7 +54,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_hoard_raw",
+        "alias": "bsp_hrm",
         "name": "Hoard Raw Materials",
         "phase": "Status",
         "text": "Control planets outside of your home system that have a combined resource value of at least 12.",
@@ -63,7 +63,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_learn_secrets",
+        "alias": "bsp_lsc",
         "name": "Learn the Secrets of the Cosmos",
         "phase": "Status",
         "text": "Have 1 or more ships in 3 systems that are each adjacent to a different anomaly.",
@@ -72,7 +72,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_master_laws",
+        "alias": "bsp_mlp",
         "name": "Master the Laws of Physics",
         "phase": "Status",
         "text": "Own 4 technologies of the same color and control a planet that has a technology specialty of that color.",
@@ -81,7 +81,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_mechanize_military",
+        "alias": "bsp_mtm",
         "name": "Mechanize The Military",
         "phase": "Status",
         "text": "Have mechs on planets in 4 systems other than your home system.",
@@ -90,7 +90,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_seize_icon",
+        "alias": "bsp_sai",
         "name": "Seize an Icon",
         "phase": "Status",
         "text": "Control 2 legendary planets outside of your home system.",
@@ -99,7 +99,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_strengthen_bonds",
+        "alias": "bsp_sb",
         "name": "Strengthen Bonds",
         "phase": "Status",
         "text": "Have promissory notes in your play area from at least 2 different players.",
@@ -108,7 +108,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_threaten_enemies",
+        "alias": "bsp_te",
         "name": "Threaten Enemies",
         "phase": "Status",
         "text": "Have 3 or more non-fighter ships in a system that is adjacent to another player's home system.",
@@ -117,7 +117,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_dictate_policy",
+        "alias": "bsp_dp",
         "name": "Dictate Policy",
         "phase": "Agenda",
         "text": "A \"For\" outcome of a law is resolved and it is the third or later law in play.",
@@ -126,7 +126,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_brave_void",
+        "alias": "bsp_btv",
         "name": "Brave the Void",
         "phase": "Action",
         "text": "Win a space combat in an anomaly against a player and have 3 or more ground forces in the space area of the active system.",
@@ -135,7 +135,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_demonstrate_your",
+        "alias": "bsp_dyp",
         "name": "Demonstrate Your Power",
         "phase": "Action",
         "text": "Win a space combat against a player and have 5 or more non-fighter ships in the active system.",
@@ -144,7 +144,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_spark_rebellion",
+        "alias": "bsp_sar",
         "name": "Spark a Rebellion",
         "phase": "Action",
         "text": "Win a combat against a player who has the most victory points and more than you.",
@@ -153,7 +153,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_unveil_flagship",
+        "alias": "bsp_uf",
         "name": "Unveil Flagship",
         "phase": "Action",
         "text": "Win a space combat against a player and have your flagship and 3 or more fighters in the active system.",

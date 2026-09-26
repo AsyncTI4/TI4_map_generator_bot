@@ -12,9 +12,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -25,6 +26,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -93,9 +95,6 @@ public class AddPlanetService {
                     "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
         }
-        if ("ponthous".equalsIgnoreCase(planet)) {
-            PonthousAbilityHandler.resetFracturedSouls(game, player);
-        }
         if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
@@ -106,7 +105,10 @@ public class AddPlanetService {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
-
+        if (player.ownsUnit("kairn_flagship") && ButtonHelper.doesPlayerHaveFSHere("kairn_flagship", player, tile)) {
+            player.gainCommodities(1);
+            ButtonHelperStats.afterGainCommsChecks(game, player, 1);
+        }
         int shrineCount = 0;
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
@@ -131,6 +133,9 @@ public class AddPlanetService {
                         + player.getRepresentation() + " scored \"_" + kalt + "_\".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
+                if (game.isMonumentsMode()) {
+                    MonumentsBRButtonHandler.offerKaltrimMonumentDeploy(game, player);
+                }
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -171,6 +176,9 @@ public class AddPlanetService {
                 if (!player.hasAbility("blood_ties")) {
                     MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
                 }
+                if (game.isMuaatManiaMode()) {
+                    ButtonHelper.offerMMBoon(player, game);
+                }
             }
         }
         boolean alreadyOwned = false;
@@ -188,6 +196,19 @@ public class AddPlanetService {
                     }
                     if (player_.hasAbility("planetary_reconfiguration")) {
                         TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
+                    }
+                    if (player_.hasTech("pa")
+                            && !player_.getExhaustedPlanets().contains(planet)
+                            && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                            && ButtonHelper.checkForTechSkips(game, planet)
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                        player_.exhaustPlanet(planet);
+                        MessageHelper.sendMessageToChannel(
+                                player_.getCorrectChannel(),
+                                player_.getRepresentation() + " Your " + Helper.getPlanetRepresentation(planet, game)
+                                        + " was auto exhausted due to your **Psychoarchaeology** technology to gain 1tg.");
+                        player_.gainTG(1, true);
+                        ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
@@ -253,6 +274,19 @@ public class AddPlanetService {
                                         .replace("_", ""));
                             }
                         }
+                    }
+                    if (player.hasRelic("taraniscrest")) {
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                player_.dummyPlayerSpoof() + "exchangeProgramPart3_" + planet,
+                                "Place Enemy into Coexistence"));
+                        buttons.add(Buttons.red("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " you can place a " + player_.getFactionEmoji()
+                                        + " infantry into coexistence on "
+                                        + Mapper.getPlanet(planet).getName() + " due to the Taranis Crest relic.",
+                                buttons);
                     }
                     if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
@@ -340,7 +374,9 @@ public class AddPlanetService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
-
+        if (!alreadyOwned && player.hasLeader("tacommander")) {
+            CommanderUnlockCheckService.checkPlayer(player, "ta");
+        }
         if (game.isMinorFactionsMode()
                 && tile != null
                 && unitHolder.getTokenList().contains("attachment_threetraits.png")
@@ -397,12 +433,15 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
+        }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")
                 && alreadyOwned
                 && !setup
                 && tile != null
-                && tile.getPosition().startsWith("frac")) {
+                && tile.isFracture()) {
             OnyxxaLeaderHandler.onGainFracturePlanet(event, player, game, previousOwner);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
@@ -445,7 +484,7 @@ public class AddPlanetService {
                         || game.getActivePlayerID() != null && !"".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasUnlockedBreakthrough("zealotsbt")
                 && tile != null
-                && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
+                && (tile.isFracture() || unitHolder.isLegendary())
                 && !doubleCheck
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
@@ -663,7 +702,7 @@ public class AddPlanetService {
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
-        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
+        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet) && !game.isMuaatManiaMode()) {
             String marrow = "A Song Like Marrow";
             Integer id = game.getRevealedPublicObjectives().getOrDefault(marrow, null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);

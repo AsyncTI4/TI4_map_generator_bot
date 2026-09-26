@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kyd",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "kyd",
     "tileId": "d18",
     "name": "Kyd",

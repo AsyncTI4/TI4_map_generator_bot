@@ -450,7 +450,7 @@
         "id": "pi_l1z1x_mech",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Anihilator",
+        "name": "Annihilator",
         "source": "project_pi",
         "faction": "l1z1x",
         "capacityUsed": 1,
@@ -462,7 +462,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "While not participating in ground combat, this unit can use it's BOMBARDMENT ability on planets in its system as if it were a ship.",
+        "ability": "While not participating in ground combat, this unit can use its BOMBARDMENT ability on planets in its system as if it were a ship.",
         "homebrewReplacesID": "l1z1x_mech"
     },
     {

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "merjae",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "merjae",
     "tileId": "er97",
     "name": "Merjae",

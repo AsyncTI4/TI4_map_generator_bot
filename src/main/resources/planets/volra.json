@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "volra",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "volra",
     "tileId": "er59",
     "name": "Volra",

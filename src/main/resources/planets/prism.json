@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "prism",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "prism",
     "tileId": "d103",
     "name": "Prism",

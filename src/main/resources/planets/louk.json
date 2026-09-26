@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "louk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "louk",
     "tileId": "d16",
     "name": "Louk",

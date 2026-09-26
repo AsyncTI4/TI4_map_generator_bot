@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -26,10 +27,10 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
+import ti4.draft.items.MonumentDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
@@ -37,7 +38,6 @@ import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.DraftErrataModel;
-import ti4.model.FactionModel;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
@@ -45,6 +45,7 @@ import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenAbilityService;
 import ti4.service.franken.FrankenBreakthroughService;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.franken.FrankenFactionService;
 import ti4.service.franken.FrankenFactionTechService;
 import ti4.service.franken.FrankenHomeService;
 import ti4.service.franken.FrankenLeaderService;
@@ -71,6 +72,12 @@ public class FrankenButtonHandler {
     }
 
     public static void resolveFrankenItemAdd(ButtonInteractionEvent event, Player player, DraftItem item) {
+        if (item.getItemCategory() == DraftCategory.MONUMENT
+                && !MonumentDraftItem.isAvailable(player.getGame(), item.getItemId())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That Monument is not available in this Franken draft.");
+            return;
+        }
         applyFrankenItemToPlayer(event, player, item);
         // Handle Errata
         if (!player.getGame().isTwilightsFallMode()) {
@@ -86,6 +93,10 @@ public class FrankenButtonHandler {
                         new StringBuilder("Added the following optional swaps to their respective categories:");
                 for (DraftErrataModel i : item.getErrata().getOptionalSwaps()) {
                     DraftItem addl = DraftItem.generate(i.getItemCategory(), i.getItemId());
+                    if (addl.getItemCategory() == DraftCategory.MONUMENT
+                            && !MonumentDraftItem.isAvailable(player.getGame(), addl.getItemId())) {
+                        continue;
+                    }
                     player.getDraftHand().Contents.add(addl);
                     msg.append("\n> ").append(addl.getTitle(player.getGame()));
                 }
@@ -154,9 +165,15 @@ public class FrankenButtonHandler {
         player.setStoredValue(key, "y");
 
         Container c = player.getRepresentationContainer();
-        MessageV2Builder tabletalk = new MessageV2Builder(game.getTableTalkChannel(), true);
-        tabletalk.append(c);
-        tabletalk.send();
+        if (game.isFowMode()) {
+            // FoW games have no table talk channel,
+            // and collected for the GMs in the activity-log thread.
+            sendFactionSummary(player.getCorrectChannel(), c, true);
+            GMService.postToActivityThread(game, c);
+        } else {
+            TextChannel tabletalk = game.getTableTalkChannel();
+            sendFactionSummary(tabletalk == null ? game.getMainGameChannel() : tabletalk, c, true);
+        }
 
         FrankenDraftBagService.updateFinishedBuildingMessage(game);
         ButtonHelper.deleteMessage(event);
@@ -175,7 +192,18 @@ public class FrankenButtonHandler {
         builder.send();
     }
 
+    private static void sendFactionSummary(MessageChannel channel, Container container, boolean pin) {
+        if (channel == null) return;
+        MessageV2Builder builder = new MessageV2Builder(channel, pin);
+        builder.append(container);
+        builder.send();
+    }
+
     private static void applyFrankenItemToPlayer(ButtonInteractionEvent event, Player player, DraftItem item) {
+        if (item.getItemCategory() == DraftCategory.MONUMENT
+                && !MonumentDraftItem.isAvailable(player.getGame(), item.getItemId())) {
+            return;
+        }
         String alias = item.getAlias();
         boolean alreadyHas = player.getStoredList("appliedFrankenItems").contains(alias);
         player.addToStoredList("appliedFrankenItems", alias);
@@ -183,18 +211,13 @@ public class FrankenButtonHandler {
 
         String itemID = item.getItemId();
         switch (item.getItemCategory()) {
+            case MAHACTKING -> FrankenFactionService.setFaction(event, player, itemID);
             case ABILITY -> FrankenAbilityService.addAbilities(event, player, List.of(itemID));
             case TECH -> FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
             case BREAKTHROUGH -> FrankenBreakthroughService.addBreakthrough(event, player, itemID);
-            case MAHACTKING -> {
-                FactionModel faction = Mapper.getFaction(itemID);
-                player.setFaction(itemID);
-                List<String> units = List.of(itemID + "_flagship", itemID + "_mech", "tf_warsun");
-                FrankenUnitService.addUnits(event, player, units, false);
-                FrankenStatsService.setStartingComms(event, player, faction.getCommodities());
-            }
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP, UNIT -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+            case MONUMENT -> FrankenUnitService.addUnits(event, player, List.of(itemID), true);
             case COMMODITIES -> FrankenStatsService.addStartingComms(event, player, item);
             case PN -> FrankenPromissoryService.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> FrankenStartingTechService.addStartingTech(event, player, itemID);
@@ -212,11 +235,13 @@ public class FrankenButtonHandler {
 
         String itemID = item.getItemId();
         switch (item.getItemCategory()) {
+            case MAHACTKING -> FrankenFactionService.unsetFaction(event, player, itemID);
             case ABILITY -> FrankenAbilityService.removeAbilities(event, player, List.of(itemID));
             case TECH -> FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
             case BREAKTHROUGH -> FrankenBreakthroughService.removeBreakthrough(event, player, itemID);
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.removeLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP, UNIT -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
+            case MONUMENT -> FrankenUnitService.removeMonuments(event, player, List.of(itemID));
             case COMMODITIES -> FrankenStatsService.removeStartingComms(event, player, item);
             case PN -> FrankenPromissoryService.removePromissoryNotes(event, player, List.of(itemID));
             case STARTINGTECH -> FrankenStartingTechService.removeStartingTech(event, player, itemID);

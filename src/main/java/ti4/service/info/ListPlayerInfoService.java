@@ -26,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -102,6 +103,7 @@ public class ListPlayerInfoService {
             case "eap" -> 4; // 4 PDS
             case "faa" -> 4; // 4 cultural
             case "fc" -> (game.getRealPlayers().size() - 1); // neighbors
+            case "dagw" -> 1;
 
             // Omega Phase objectives
             case "corner_omegaphase" -> 4;
@@ -532,7 +534,8 @@ public class ListPlayerInfoService {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
                         if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
-                                || uH.getUnitCount(Units.UnitType.Pds, player) > 0) {
+                                || uH.getUnitCount(Units.UnitType.Pds, player) > 0
+                                || uH.getUnitCount(Units.UnitType.Monument, player) > 0) {
                             counter++;
                         }
                         maxPlanets++;
@@ -689,7 +692,8 @@ public class ListPlayerInfoService {
                 }
                 return counter
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false)
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "monument", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
@@ -717,7 +721,7 @@ public class ListPlayerInfoService {
                 int x = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                        x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, tile));
+                        x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, tile, false));
                     }
                 }
                 return x;
@@ -1033,6 +1037,38 @@ public class ListPlayerInfoService {
             }
             case "fc" -> {
                 return player.getNeighbourCount(); // neighbors
+            }
+            case "dagw" -> {
+                if (!game.isMonumentsMode()) {
+                    return 0;
+                }
+                for (Tile tile : game.getTileMap().values()) {
+                    for (UnitHolder holder : tile.getUnitHolders().values()) {
+                        if (holder.getUnitCount(Units.UnitType.Monument, player) < 1) {
+                            continue;
+                        }
+
+                        int spaceGroundForces = tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).stream()
+                                .filter(unitKey -> {
+                                    UnitModel unit = player.getUnitFromUnitKey(unitKey);
+                                    return unit != null && unit.getIsGroundForce();
+                                })
+                                .mapToInt(tile.getSpaceUnitHolder()::getUnitCount)
+                                .sum();
+                        int holderGroundForces = holder.getUnitKeysForPlayer(player).stream()
+                                .filter(unitKey -> {
+                                    UnitModel unit = player.getUnitFromUnitKey(unitKey);
+                                    return unit != null && unit.getIsGroundForce();
+                                })
+                                .mapToInt(holder::getUnitCount)
+                                .sum();
+
+                        if (spaceGroundForces >= 3 || holderGroundForces >= 3) {
+                            return 1;
+                        }
+                    }
+                }
+                return 0;
             }
         }
         return 0;

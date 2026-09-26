@@ -13,6 +13,7 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -28,7 +29,13 @@ class TombRaidersAcd2ButtonHandler {
             String cardId = game.drawExplore(type);
             ExploreModel card = Mapper.getExplore(cardId);
             String cardType = card.getResolution();
-            sb.append("\nRevealed _")
+            sb.append("\n- ");
+            if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
+                sb.append(ExploreEmojis.getFragEmoji(type)).append(" ");
+            } else {
+                sb.append("❌ ");
+            }
+            sb.append("Revealed _")
                     .append(card.getName())
                     .append("_ from the top of the ")
                     .append(type)

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,6 +17,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
@@ -30,6 +32,7 @@ public class ArcanumBreakthroughHandler {
     private static final String USE_POWER_WORD_WISH = "usePowerWordWish";
     private static final String WISH_SELECT = "powerWordWishSelect_";
     private static final String WISH_UNIT = "powerWordWishUnit_";
+    private static final String PRODUCTION_DISCOUNT_KEY = "powerWordWishProduction_";
     private static final String MOVE = "move";
     private static final String COMBAT = "combat";
     private static final String CAPACITY = "capacity";
@@ -96,6 +99,39 @@ public class ArcanumBreakthroughHandler {
     }
 
     // Effects
+    public static void setPowerWordWishProductionContext(Game game, Player player, String productionContext) {
+        if (game == null || player == null) {
+            return;
+        }
+        if (productionContext == null) {
+            clearPowerWordWishProductionContext(game, player, null);
+            return;
+        }
+
+        boolean usesProductionAbility = MyrrBreakthroughHandler.usedUnitProduction(productionContext);
+        game.setStoredValue(
+                PRODUCTION_DISCOUNT_KEY + player.getFaction(),
+                player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK) && usesProductionAbility ? productionContext : "");
+    }
+
+    public static boolean hasPowerWordWishProductionDiscount(Game game, Player player) {
+        return game != null
+                && player != null
+                && player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK)
+                && MyrrBreakthroughHandler.usedUnitProduction(
+                        game.getStoredValue(PRODUCTION_DISCOUNT_KEY + player.getFaction()));
+    }
+
+    public static void clearPowerWordWishProductionContext(Game game, Player player, String productionContext) {
+        if (game != null
+                && player != null
+                && (productionContext == null
+                        || productionContext.equals(
+                                game.getStoredValue(PRODUCTION_DISCOUNT_KEY + player.getFaction())))) {
+            game.removeStoredValue(PRODUCTION_DISCOUNT_KEY + player.getFaction());
+        }
+    }
+
     public static void offerPowerWordWish(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null) return;
 
@@ -124,7 +160,7 @@ public class ArcanumBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", select the individual units receiving _Power Word: Wish_.",
+                player.getRepresentation() + ", please choose the individual units receiving _Power Word: Wish_.",
                 List.of(
                         Buttons.green(player.factionButtonChecker() + WISH_SELECT + MOVE, "Choose 1 Unit: +1 Move"),
                         Buttons.green(
@@ -243,6 +279,38 @@ public class ArcanumBreakthroughHandler {
         }
     }
 
+    public static void movePowerWordWishUnitsWithinActiveSystem(
+            Game game, Player player, Tile tile, String fromHolder, String toHolder, UnitType unitType, int amount) {
+        if (game == null || tile == null || amount <= 0 || !hasPowerWordWish(player)) {
+            return;
+        }
+
+        String source = tile.getPosition() + ";" + fromHolder + ";" + unitType;
+        String destination = tile.getPosition() + ";" + toHolder + ";" + unitType;
+        List<String> modes =
+                player.hasUnlockedBreakthrough(POWER_WORD_WISH_FRONT) ? List.of(MOVE, COMBAT) : List.of(CAPACITY);
+        for (String mode : modes) {
+            List<String> selections = getSelections(game, player, mode);
+            int moved = 0;
+            List<String> updatedSelections = new ArrayList<>();
+            for (String selection : selections) {
+                if (moved < amount && source.equals(selection)) {
+                    updatedSelections.add(destination);
+                    moved++;
+                } else {
+                    updatedSelections.add(selection);
+                }
+            }
+            game.setStoredValue(selectionKey(player, mode), String.join(",", updatedSelections));
+        }
+    }
+
+    public static boolean hasPowerWordWish(Player player) {
+        return player != null
+                && (player.hasUnlockedBreakthrough(POWER_WORD_WISH_FRONT)
+                        || player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK));
+    }
+
     public static int getPowerWordWishCapacityBonus(Game game, Player player, Tile tile) {
         if (!player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK) || tile == null) return 0;
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -302,7 +370,7 @@ public class ArcanumBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
-                player.getRepresentation() + ", choose " + requiredSelections(mode) + " individual "
+                player.getRepresentation() + ", please choose " + requiredSelections(mode) + " individual "
                         + (CAPACITY.equals(mode) ? "ship" : "unit") + (requiredSelections(mode) == 1 ? "" : "s")
                         + " for _Power Word: Wish_.",
                 buttons);
@@ -315,9 +383,9 @@ public class ArcanumBreakthroughHandler {
 
     private static boolean isEligible(String mode, UnitModel unit) {
         return switch (mode) {
-            case MOVE -> unit.getMoveValue() > 0;
-            case COMBAT -> unit.getCombatDieCount() != 0;
-            case CAPACITY -> unit.getIsShip();
+            case MOVE -> unit.getIsShip() && unit.getMoveValue() > 0;
+            case COMBAT -> unit.getIsShip() && unit.getCombatDieCount() > 0;
+            case CAPACITY -> unit.getIsShip() && unit.getCapacityValue() > 0;
             default -> false;
         };
     }

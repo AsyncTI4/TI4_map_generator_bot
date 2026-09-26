@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ll",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "ll",
     "tileId": "fin2",
     "name": "Lecatol Lex",

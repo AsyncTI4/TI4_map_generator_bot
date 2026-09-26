@@ -250,7 +250,7 @@ public class MiltyService {
      * - Per-source constraints cap/guarantee the remaining slots per expansion.
      * - If constraints is null/empty, falls back to the original unconstrained shuffle.
      */
-    static List<String> createFactionDraft(
+    public static List<String> createFactionDraft(
             int factionCount,
             List<String> factions,
             List<String> firstFactions,

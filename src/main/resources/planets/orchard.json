@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "orchard",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "orchard",
     "tileId": "er60",
     "name": "Orchard",

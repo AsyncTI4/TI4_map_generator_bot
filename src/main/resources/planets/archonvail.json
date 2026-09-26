@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "archonvail",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 168,
+            "y": 152
+        }
+    },
     "id": "archonvail",
     "tileId": "59",
     "name": "Archon Vail",

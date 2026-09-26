@@ -191,6 +191,7 @@ class Stats extends GameStateSubcommand {
 
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
+            int oldCommodities = player.getCommodities();
             PlayerStatsService.setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
             if (player.hasAbility("military_industrial_complex")
                     && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "semlore",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 169,
+            "y": 148
+        }
+    },
     "id": "semlore",
     "tileId": "62",
     "name": "Sem-Lore",

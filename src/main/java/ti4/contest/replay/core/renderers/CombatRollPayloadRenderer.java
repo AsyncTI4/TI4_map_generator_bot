@@ -48,15 +48,39 @@ public class CombatRollPayloadRenderer {
         message.append("With modifiers: \n");
         for (ModifierDisplay modifier : modifiers) {
             if (StringUtils.isNotBlank(modifier.sourceName())) {
-                message.append(modifier.sourceName().replace("Optional[", "")).append("\n");
+                if (modifier.maxDice() != null) {
+                    String plusPrefix = modifier.value() < 0 ? "" : "+";
+                    message.append(plusPrefix)
+                            .append(modifier.value())
+                            .append(" to up to ")
+                            .append(modifier.maxDice())
+                            .append(modifier.maxDice() == 1 ? " die" : " dice")
+                            .append(" from ")
+                            .append(modifier.sourceName().replace("Optional[", ""))
+                            .append("\n");
+                } else {
+                    message.append(modifier.sourceName().replace("Optional[", ""))
+                            .append("\n");
+                }
             } else {
                 String plusPrefix = modifier.value() < 0 ? "" : "+";
                 String scope = StringUtils.defaultIfBlank(modifier.scopeDisplay(), "all");
-                message.append(plusPrefix)
-                        .append(modifier.value())
-                        .append(" for ")
-                        .append(scope)
-                        .append("\n");
+                if (modifier.maxDice() != null) {
+                    message.append(plusPrefix)
+                            .append(modifier.value())
+                            .append(" to up to ")
+                            .append(modifier.maxDice())
+                            .append(modifier.maxDice() == 1 ? " die" : " dice")
+                            .append(" for ")
+                            .append(scope)
+                            .append("\n");
+                } else {
+                    message.append(plusPrefix)
+                            .append(modifier.value())
+                            .append(" for ")
+                            .append(scope)
+                            .append("\n");
+                }
             }
         }
     }
@@ -119,8 +143,9 @@ public class CombatRollPayloadRenderer {
             }
         }
 
-        String unitTypeHitsInfo = "hits on **" + unitRoll.printedHitsOn() + "**";
-        if (unitRoll.modifier() != 0) {
+        boolean hasVariableModifiers = hasVariableModifiers(unitRoll);
+        String unitTypeHitsInfo = getUnitTypeHitsInfo(unitRoll);
+        if (!hasVariableModifiers && unitRoll.modifier() != 0) {
             String modifier =
                     unitRoll.modifier() > 0 ? "+" + unitRoll.modifier() : Integer.toString(unitRoll.modifier());
             if (unitRoll.effectiveThreshold() <= 1) {
@@ -152,6 +177,39 @@ public class CombatRollPayloadRenderer {
                 hitsSuffix,
                 nice,
                 winnuSigma);
+    }
+
+    private String getUnitTypeHitsInfo(UnitRoll unitRoll) {
+        List<Integer> modifiersByDie = unitRoll.modifiersByDie();
+        if (!hasVariableModifiers(unitRoll)) {
+            return "hits on **" + unitRoll.printedHitsOn() + "**";
+        }
+
+        List<String> groups = new java.util.ArrayList<>();
+        int groupStart = 0;
+        while (groupStart < modifiersByDie.size()) {
+            int groupModifier = modifiersByDie.get(groupStart);
+            int groupEnd = groupStart + 1;
+            while (groupEnd < modifiersByDie.size() && modifiersByDie.get(groupEnd) == groupModifier) {
+                groupEnd++;
+            }
+            int groupDice = groupEnd - groupStart;
+            String diceLabel = groupStart == 0
+                    ? "first " + groupDice + (groupDice == 1 ? " die" : " dice")
+                    : "remaining " + groupDice + (groupDice == 1 ? " die" : " dice");
+            String modifierLabel = groupModifier > 0 ? "+" + groupModifier : Integer.toString(groupModifier);
+            int threshold = Math.max(1, unitRoll.printedHitsOn() - groupModifier);
+            String hitLabel = threshold <= 1 ? "always hits" : "hits on **" + threshold + "**";
+            groups.add(hitLabel + " for " + diceLabel + " (" + modifierLabel + " mods)");
+            groupStart = groupEnd;
+        }
+        return String.join("; ", groups);
+    }
+
+    private boolean hasVariableModifiers(UnitRoll unitRoll) {
+        return !unitRoll.modifiersByDie().isEmpty()
+                && unitRoll.modifiersByDie().size() == unitRoll.dice().size()
+                && unitRoll.modifiersByDie().stream().anyMatch(modifier -> modifier != unitRoll.modifier());
     }
 
     private String renderDice(UnitRoll unitRoll) {

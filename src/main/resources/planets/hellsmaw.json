@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hellsmaw",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "hellsmaw",
     "tileId": "er03",
     "name": "Hell's Maw",

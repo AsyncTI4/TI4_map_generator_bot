@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "regnem",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 220,
+            "y": 235
+        }
+    },
     "id": "regnem",
     "tileId": "d116",
     "name": "Regnem",

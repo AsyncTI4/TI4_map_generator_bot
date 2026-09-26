@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lliot",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "lliot",
     "tileId": "d114",
     "name": "Lliot",

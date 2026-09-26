@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "resculon",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 203,
+            "y": 207
+        }
+    },
     "id": "resculon",
     "tileId": "33",
     "name": "Resculon",

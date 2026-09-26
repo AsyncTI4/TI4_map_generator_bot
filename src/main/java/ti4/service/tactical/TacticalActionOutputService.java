@@ -13,8 +13,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
@@ -22,6 +26,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
@@ -33,6 +38,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.relic.AlluringThroneService;
 
 @UtilityClass
 public class TacticalActionOutputService {
@@ -226,6 +232,8 @@ public class TacticalActionOutputService {
         summary.append(String.join("\n", lines));
         String powerWordWishMoveNote = ArcanumBreakthroughHandler.getPowerWordWishMoveNote(game, player, tile);
         if (!powerWordWishMoveNote.isEmpty()) summary.append('\n').append(powerWordWishMoveNote);
+        String resonanceDriveMoveNote = CrystellumTechHandler.getResonanceDriveMoveNote(game, player);
+        if (!resonanceDriveMoveNote.isEmpty()) summary.append('\n').append(resonanceDriveMoveNote);
         String extraSummary = buildShortSummary(game, Set.of(tile.getPosition()));
         if (extraSummary != null && inclSummary) summary.append('\n').append(extraSummary);
         return summary.toString();
@@ -269,6 +277,9 @@ public class TacticalActionOutputService {
 
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
+        boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                || (unit.unitType() == UnitType.Flagship
+                        && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile));
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
             output.append(" (distance exceeds move value (")
                     .append(distance)
@@ -282,6 +293,15 @@ public class TacticalActionOutputService {
             } else {
                 if (!game.isTwilightsFallMode()) {
                     output.append(", __does not have _Gravity Drive___)");
+                }
+            }
+            String cyclotronTilePosition = game.getStoredValue("dihmohnCyclotron_" + player.getFaction());
+            if (!cyclotronTilePosition.isEmpty()) {
+                Tile cyclotronTile = game.getTileByPosition(cyclotronTilePosition);
+                if (cyclotronTile != null) {
+                    output.append(" (ships moved from ")
+                            .append(cyclotronTile.getRepresentation())
+                            .append(" have +1 move from _Flotilla Cyclotron_)");
                 }
             }
             if (player.hasUnit("tk-voidcarver")) {
@@ -308,26 +328,37 @@ public class TacticalActionOutputService {
                 output.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
             }
             if (riftDistance < distance) {
-                // maxBonus += distance - riftDistance; // Don't automatically count rifts, allow the GM to verify
-                output.append(" (gravity rifts along a path could add +")
-                        .append(distance - riftDistance)
-                        .append(" movement if used)");
-                if (player.hasRelic("circletofthevoid")) {
-                    output.append(" (Does not roll for rifts due to circlet of the void)");
-                }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "thronescommander")) {
+                if (ignoresAnomalies) {
                     output.append(
-                            " (Gravity rift move effects are optional due to _Veythros_ the Thrones of Ruin commander. If you do ignore rift, you do not get the +1 to move.)");
+                            ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                                    ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
+                                    : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
+                } else {
+                    // Don't automatically count rifts, allowing the player to verify the chosen path.
+                    output.append(" (gravity rifts along a path could add +")
+                            .append(distance - riftDistance)
+                            .append(" movement if used)");
+                    if (player.hasRelic("circletofthevoid")) {
+                        output.append(" (does not roll for rifts due to Circlet of the Void)");
+                    }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "thronescommander")) {
+                        output.append(
+                                " (gravity-rift movement effects are optional due to _Veythros, the Thrones of Ruin commander_; if you ignore the rift, you do not get the +1 movement)");
+                    }
+                    game.setStoredValue("possiblyUsedRift", "yes");
                 }
-                game.setStoredValue("possiblyUsedRift", "yes");
             }
-            if (player.hasTech("bedreamneg")) {
-                output.append(
-                        " starting system containing a nexus token gives +1 to move value with Non-Euclidean Geometries.");
+            if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
+                output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (player.hasTech("becrystrd")) {
-                output.append(" (has _Resonance Drive_ for +1 to each ship at capacity. This is not automated.");
+            if (player.hasPlanet("gyraxis")
+                    && player.getExhaustedPlanetsAbilities().contains("gyraxis")
+                    && "yes".contains(game.getStoredValue("gyraxisActive"))) {
+                output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")) {
+            output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
@@ -335,7 +366,7 @@ public class TacticalActionOutputService {
         if (distance > 90 && player.hasAbility("sundered")) {
             output.append(" (__Warning__: has **Sundered**, and so cannot use wormholes)");
         }
-        if (riftDistance < distance) {
+        if (riftDistance < distance && !ignoresAnomalies) {
             game.setStoredValue("possiblyUsedRift", "yes");
         }
         if (player.hasAbility("celestial_guides")) {
@@ -361,11 +392,15 @@ public class TacticalActionOutputService {
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
         if (tile.isNebula(game)
-                && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
+                && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
-                && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)) {
+                && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                && !(unit.unitType() == UnitType.Flagship
+                        && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile))
+                && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;
@@ -394,18 +429,18 @@ public class TacticalActionOutputService {
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
-        if (player.hasTech("bedreamneg") && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+        if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
             bonusMoveValue++;
         }
-        if (game.isCallOfTheVoidMode() && activeSystem.getPosition().contains("frac")) {
-            bonusMoveValue++;
-        }
-
-        if (player.hasUnlockedBreakthrough("cabalbt") && tile.getPosition().contains("frac")) {
+        if (game.isCallOfTheVoidMode() && activeSystem.isFracture()) {
             bonusMoveValue++;
         }
 
-        if (player.hasTech("tf-planesplitter") && tile.getPosition().contains("frac")) {
+        if (player.hasUnlockedBreakthrough("cabalbt") && tile.isFracture()) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasTech("tf-planesplitter") && tile.isFracture()) {
             bonusMoveValue++;
         }
 
@@ -431,7 +466,6 @@ public class TacticalActionOutputService {
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
-
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;
@@ -442,6 +476,10 @@ public class TacticalActionOutputService {
                     break;
                 }
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")
+                && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
+            bonusMoveValue += 1;
         }
 
         return baseMoveValue + bonusMoveValue;
