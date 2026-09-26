@@ -67,6 +67,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
@@ -7188,6 +7189,7 @@ public class ButtonHelper {
                 if (unitModel == null) continue;
                 if (combat) {
                     unitModel = PonthousUnitHandler.injectTemporaryFighterSustain(game, player, tile, unitModel);
+                    unitModel = VanguardUnitHandler.injectBulwarkSustain(game, player, tile, unitKey, unitModel);
                 }
                 if (unitModel.getUnitType() == UnitType.Infantry
                         && spaceCombatish
@@ -7210,7 +7212,8 @@ public class ButtonHelper {
                 // All sustain damage buttons for all states
                 boolean canDamage = !"courageouscombat".equalsIgnoreCase(type)
                         && !"assaultcannoncombat".equalsIgnoreCase(type)
-                        && unitCanSustainDamage(game, player, tile, unitModel);
+                        && (unitCanSustainDamage(game, player, tile, unitModel)
+                                || VanguardUnitHandler.hasBulwarkSustain(game, player, tile, unitKey));
                 for (UnitState state : UnitState.values()) {
                     if (state.isDamaged() || !canDamage) continue;
                     int max = Math.min(oneButtonPerUnit ? 1 : 2, unitHolder.getUnitCountForState(unitKey, state));
@@ -7218,6 +7221,9 @@ public class ButtonHelper {
                         int temporarySustains =
                                 PonthousUnitHandler.getTemporaryFighterSustainRemaining(game, player, tile);
                         if (temporarySustains > 0) max = Math.min(max, temporarySustains);
+                    }
+                    if (VanguardUnitHandler.hasBulwarkSustain(game, player, tile, unitKey)) {
+                        max = Math.min(max, VanguardUnitHandler.getBulwarkSustainCount(game, player, tile, unitKey));
                     }
                     for (int x = 1; x <= max; x++) {
                         buttons.add(buildAssignHitButton(player, tile, unitHolder, state, unitKey, x, true));

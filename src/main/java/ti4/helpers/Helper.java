@@ -2453,6 +2453,10 @@ public final class Helper {
                                 LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction()))) {
             productionValueTotal += 3;
         }
+        if (player.hasTech("thvanguardy")
+                && tile.getPosition().equals(game.getStoredValue("vanguardReinforce" + player.getFaction()))) {
+            productionValueTotal += 3;
+        }
 
         return productionValueTotal;
     }

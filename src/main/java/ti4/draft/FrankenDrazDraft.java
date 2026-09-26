@@ -60,8 +60,6 @@ public class FrankenDrazDraft extends FrankenDraft {
             "qulane",
             "neutral",
             "obsidian",
-            "vanguard",
-            "scrapyard",
             "stoneborn",
             "morpha",
             "thurviali");

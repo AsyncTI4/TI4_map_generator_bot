@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLea
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
@@ -1624,6 +1625,14 @@ public final class ButtonHelperAgents {
                 return;
             }
             TaLeadersHandler.resolveTaAgentTarget(game, target);
+        }
+        if ("vanguardagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Vanguard Agent target.");
+                return;
+            }
+            VanguardLeadersHandler.resolveVanguardAgentTarget(game, target);
         }
 
         TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);

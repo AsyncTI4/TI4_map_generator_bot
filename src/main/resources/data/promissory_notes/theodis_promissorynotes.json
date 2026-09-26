@@ -157,6 +157,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
+        "notes": "This is not automated. Use the cancel hits button during combat.",
         "text": "Before you assign hits to your ships during a space combat, place this card face up in your play area. Cancel up to 2 hits. At the start of the Iron Keep player's turn, return this card to the Iron Keep player."
     },
     {

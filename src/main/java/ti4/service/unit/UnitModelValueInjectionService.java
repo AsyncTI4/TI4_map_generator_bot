@@ -356,6 +356,10 @@ public class UnitModelValueInjectionService {
             booleans.sustainDamage(false).disablesPlanetaryShield(true);
         }
 
+        if (player.hasAbility("shielded_transports") && unit.getSustainDamage() && unit.isNonFighterShip()) {
+            integers.capacityValue(1);
+        }
+
         return UnitValueInjection.of(integers, floats, booleans);
     }
 

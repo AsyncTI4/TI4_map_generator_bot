@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -88,6 +89,7 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
+        VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
         if (BorrowedTimeLLButtonHandler.skipTurnIfNecessary(event, game, player)) {
             return;

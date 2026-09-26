@@ -687,7 +687,8 @@ public class ComponentActionHelper {
                             "ardentiaagent",
                             "aeternaagent",
                             "veyloragent",
-                            "taagent");
+                            "taagent",
+                            "vanguardagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";

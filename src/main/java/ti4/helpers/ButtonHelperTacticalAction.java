@@ -49,6 +49,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrap
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
@@ -309,6 +311,7 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        game.removeStoredValue("vanguardReinforce" + player.getFaction());
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
@@ -614,6 +617,8 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static void resetStoredValuesForTacticalAction(Game game) {
+        VanguardUnitHandler.clearBulwarkSustain(game);
+        VanguardBreakthroughHandler.clearTrainingDummiesState(game);
         game.setNaaluAgent(false);
         game.setWarfareAction(false);
         game.setL1Hero(false);
@@ -812,6 +817,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        VanguardUnitHandler.offerBulwarkButton(game, player);
         ScrapyardAbilitiesHandler.offerActivationRigButtons(game, player);
         ScrapyardUnitHandler.offerFuelCellButton(game, player);
         ScrapyardTechHandler.offerHotswapping(game, tile, player);

@@ -114,7 +114,6 @@ public class FrankenDraft extends BagDraft {
         "qulane",
         "neutral",
         "obsidian",
-        "vanguard",
         "stoneborn",
         "morpha",
         "thurviali"
