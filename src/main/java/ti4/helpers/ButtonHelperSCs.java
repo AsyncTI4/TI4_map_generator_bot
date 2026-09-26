@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Administra
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
@@ -1775,6 +1776,7 @@ public final class ButtonHelperSCs {
 
         strategicCC--;
         player.setStrategicCC(strategicCC);
+        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
         if (scNum != -1 && player.hasAbility("strategic_fluidity")) {
             OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
         }

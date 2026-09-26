@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisPromissoryHandler;
@@ -853,6 +854,7 @@ public class CombatRollService {
                                     "Cancel a Hit"));
                             TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                     buttons, game, opponent, tile, "space", h);
+                            VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, opponent, tile, h);
                         }
 
                         if (round2 == 1 && opponent.hasTech("threvenantr")) {
@@ -1158,6 +1160,7 @@ public class CombatRollService {
             buttons.add(Buttons.gray(cancelID, "Cancel a Hit"));
             TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                     buttons, game, opponent, tile, "space", hits);
+            VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, opponent, tile, hits);
         }
 
         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign ";

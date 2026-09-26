@@ -27,6 +27,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -621,6 +622,7 @@ public final class ButtonHelperModifyUnits {
         }
         int ashenAshfallSustains = 0;
         boolean sustainedShip = false;
+        boolean sustainedFlagbearer = false;
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
                 + " in the following way:\n");
         if (justSummarizing) {
@@ -628,8 +630,12 @@ public final class ButtonHelperModifyUnits {
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int oldGloryFighterSustains = PonthousUnitHandler.getTemporaryFighterSustainRemaining(game, player, tile);
+        int bulwarkSustains = units.keySet().stream()
+                .mapToInt(unitKey -> VanguardUnitHandler.getBulwarkSustainCount(game, player, tile, unitKey))
+                .sum();
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence)
-                + oldGloryFighterSustains;
+                + oldGloryFighterSustains
+                + bulwarkSustains;
         boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
         boolean opponentCanDirectHit = opponentCanDirectHit(game, player, tile, spaceCannonOffence);
 
@@ -684,6 +690,9 @@ public final class ButtonHelperModifyUnits {
                         tile.addUnitDamage("space", unitKey, min);
                         CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         sustainedShip = true;
+                        if ("vanguard_flagship".equals(unitModel.getId())) {
+                            sustainedFlagbearer = true;
+                        }
                         if ("ashen_dreadnought2".equals(unitModel.getId()) && !spaceCannonOffence) {
                             ashenAshfallSustains += min;
                         }
@@ -706,9 +715,12 @@ public final class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 boolean oldGloryFighter = unitKey.unitType() == UnitType.Fighter && oldGloryFighterSustains > 0;
+                int bulwarkShipSustains = VanguardUnitHandler.getBulwarkSustainCount(game, player, tile, unitKey);
+                boolean bulwarkShip = bulwarkShipSustains > 0;
                 if (unitModel == null
                         || (!unitModel.getSustainDamage()
                                 && !oldGloryFighter
+                                && !bulwarkShip
                                 && (metailUsed || unitModel.getUnitType() == UnitType.Fighter))
                         || ((!unitModel.getIsShip()
                                         && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
@@ -732,6 +744,8 @@ public final class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue() - damagedUnits;
                 if (oldGloryFighter) {
                     totalUnits = Math.min(totalUnits, oldGloryFighterSustains);
+                } else if (bulwarkShip) {
+                    totalUnits = Math.min(totalUnits, bulwarkShipSustains);
                 } else if (!unitModel.getSustainDamage() && !metailUsed && totalUnits > 0) {
                     totalUnits = 1;
                     metailUsed = true;
@@ -761,9 +775,24 @@ public final class ButtonHelperModifyUnits {
                         if (unitModel.getIsShip()) {
                             sustainedShip = true;
                         }
+                        if ("vanguard_flagship".equals(unitModel.getId())) {
+                            sustainedFlagbearer = true;
+                        }
                         if (oldGloryFighter) {
                             PonthousUnitHandler.consumeTemporaryFighterSustain(game, player, tile, min);
                             oldGloryFighterSustains -= min;
+                        }
+                        if ("vanguard_flagship".equals(unitModel.getId())
+                                && event instanceof ButtonInteractionEvent buttonEvent) {
+                            VanguardUnitHandler.recordSpaceCombatHitAssignment(
+                                    game,
+                                    player,
+                                    tile,
+                                    min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1));
+                            VanguardUnitHandler.offerFlagbearerAfterSustain(buttonEvent, game, player, tile);
+                            LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
+                            ButtonHelper.deleteMessage(buttonEvent);
+                            return msg.toString();
                         }
                         for (int x = 0; x < min; x++) {
                             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
@@ -913,6 +942,9 @@ public final class ButtonHelperModifyUnits {
                         tile.addUnitDamage("space", unitKey, min);
                         CommanderUnlockCheckService.checkPlayer(player, "ponthous");
                         sustainedShip = true;
+                        if ("vanguard_flagship".equals(unitModel.getId())) {
+                            sustainedFlagbearer = true;
+                        }
                         handleLetnevCommanderCheck(player, game, event, min);
                         msg.append("> Sustained ")
                                 .append(min)
@@ -1037,6 +1069,9 @@ public final class ButtonHelperModifyUnits {
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
+            if (sustainedFlagbearer) {
+                VanguardUnitHandler.offerFlagbearerAfterSustain(bevent, game, player, tile);
+            }
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return msg.toString();

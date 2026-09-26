@@ -33,7 +33,6 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
             "qulane",
             "neutral",
             "obsidian",
-            "vanguard",
             "stoneborn",
             "morpha",
             "thurviali");

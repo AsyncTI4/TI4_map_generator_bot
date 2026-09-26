@@ -52,6 +52,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
@@ -369,6 +371,7 @@ public class StartCombatService {
         PonthousUnitHandler.clearOldGlorySustain(game);
         PonthousPromissoryHandler.clearThunderbirdPrototype(game);
         PonthousTechHandler.clearThunderbirdProtocol(game);
+        VanguardLeadersHandler.clearCommanderState(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -396,6 +399,8 @@ public class StartCombatService {
             if ("ground".equalsIgnoreCase(spaceOrGround)) {
                 offerVanguardCommanderUnlock(player1);
                 offerVanguardCommanderUnlock(player2);
+                VanguardBreakthroughHandler.offerTrainingDummiesGroundCombatReward(player1);
+                VanguardBreakthroughHandler.offerTrainingDummiesGroundCombatReward(player2);
             }
         }
 
@@ -1049,6 +1054,24 @@ public class StartCombatService {
                 }
 
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+            }
+            if (player.hasTech("thvanguardy")
+                    && game.getStoredValue("vanguardReinforce" + player.getFaction())
+                            .isEmpty()
+                    && !game.getActiveSystem().isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationNoPing()
+                                + ", if you win this combat, you must use _Reinforce_ to give the active system PRODUCTION 3 until the end of this action.",
+                        List.of(
+                                Buttons.green(
+                                        player.factionButtonChecker() + "useVanguardReinforce",
+                                        "Use Reinforce (On Win)",
+                                        FactionEmojis.vanguard),
+                                Buttons.red("deleteButtons", "Decline")));
+            }
+            if (!"space".equalsIgnoreCase(type) && player.hasAbility("enhanced_fundamentals") && player.getTg() >= 2) {
+                VanguardAbilitiesHandler.sendFundamentalsButton(player);
             }
             int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
             if ("space".equalsIgnoreCase(type) && player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {

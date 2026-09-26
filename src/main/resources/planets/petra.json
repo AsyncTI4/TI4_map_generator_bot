@@ -16,7 +16,7 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Petra - Dormant",
-    "legendaryAbilityText": "UNLEASH: Remove 3 Fragmentum Tokens of the same from your player sheet. When you pass you may exhaust this card to explore 1 planet you control.",
+    "legendaryAbilityText": "UNLEASH: Remove 2 Fragmentum Tokens of different colors from your player sheet. When you pass you may exhaust this card to explore 1 planet you control.",
     "unitPositions": {
         "unitHolderName": "petra",
         "coordinateMap": {
