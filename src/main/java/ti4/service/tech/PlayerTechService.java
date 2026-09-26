@@ -638,7 +638,7 @@ public class PlayerTechService {
                     AddUnitService.addUnits(event, game.getMecatolTile(), game, player.getColor(), "inf mr");
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
+                            player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Lazax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, game, player);
                 } else {
                     MessageHelper.sendMessageToChannel(
