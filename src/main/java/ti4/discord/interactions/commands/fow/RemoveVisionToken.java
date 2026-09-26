@@ -23,24 +23,28 @@ class RemoveVisionToken extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        if (game.isFowMode() && !game.getPlayersWithGMRole().contains(getPlayer())) {
+            MessageHelper.replyToMessage(event, "You are not GM in this game.");
+            return;
+        }
         List<String> positions =
                 Helper.getListFromCSV(event.getOption(Constants.POSITION).getAsString());
 
         StringBuilder sb = new StringBuilder();
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
-                MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
+                MessageHelper.replyToMessage(event, "Tile position `" + position + "` is invalid.");
                 continue;
             }
             Tile tile = game.getTileByPosition(position);
             if (tile == null) {
-                MessageHelper.replyToMessage(event, "No tile found at position '" + position + "'");
+                MessageHelper.replyToMessage(event, "No tile was found at position `" + position + "`.");
                 continue;
             }
             boolean removed = tile.removeToken(Constants.TOKEN_FOWVISION_PNG, Constants.SPACE); // also clears grant
-            sb.append(removed ? "Removed the fog-vision token from " : "No fog-vision token was on ")
+            sb.append(removed ? "Removed the fog-vision token from " : "There was no fog-vision token in ")
                     .append(position)
-                    .append('\n');
+                    .append(".\n");
         }
         if (!sb.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

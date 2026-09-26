@@ -37,6 +37,10 @@ class AddVisionToken extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        if (game.isFowMode() && !game.getPlayersWithGMRole().contains(getPlayer())) {
+            MessageHelper.replyToMessage(event, "You are not GM in this game.");
+            return;
+        }
         List<String> positions =
                 Helper.getListFromCSV(event.getOption(Constants.POSITION).getAsString());
 
@@ -51,7 +55,7 @@ class AddVisionToken extends GameStateSubcommand {
                 MessageHelper.replyToMessage(
                         event,
                         "Could not match every entry in `" + targetOption
-                                + "` to a player faction/color. No vision token placed.");
+                                + "` to a player's faction or color, so no fog-vision token was placed.");
                 return;
             }
             targets.forEach(p -> newColors.add(p.getColor()));
@@ -60,12 +64,12 @@ class AddVisionToken extends GameStateSubcommand {
         StringBuilder sb = new StringBuilder();
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
-                MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
+                MessageHelper.replyToMessage(event, "Tile position `" + position + "` is invalid.");
                 continue;
             }
             Tile tile = game.getTileByPosition(position);
             if (tile == null) {
-                MessageHelper.replyToMessage(event, "No tile found at position '" + position + "'");
+                MessageHelper.replyToMessage(event, "No tile was found at position `" + position + "`.");
                 continue;
             }
 
@@ -81,11 +85,11 @@ class AddVisionToken extends GameStateSubcommand {
 
             tile.addToken(Constants.TOKEN_FOWVISION_PNG, Constants.SPACE);
             tile.setFowVisionGrant(colors);
-            sb.append("Placed a fog-vision token on ")
+            sb.append("Placed a fog-vision token in ")
                     .append(position)
-                    .append(" - revealed to ")
+                    .append(", revealing it to ")
                     .append(colors.isEmpty() ? "everyone" : String.join(", ", colors))
-                    .append('\n');
+                    .append(".\n");
         }
         if (!sb.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
