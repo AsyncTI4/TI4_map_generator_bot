@@ -236,7 +236,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         Emoji emoji = getLeaderEmoji().asEmoji();
         if (emoji instanceof CustomEmoji customEmoji) {
-            eb.setThumbnail(customEmoji.getImageUrl());
+            eb.setThumbnail(customEmoji.getImageUrl(), name);
         }
 
         // DESCRIPTION
