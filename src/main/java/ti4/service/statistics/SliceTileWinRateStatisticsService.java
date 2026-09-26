@@ -19,12 +19,14 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.service.map.FractureService;
 
 @UtilityClass
 public class SliceTileWinRateStatisticsService {
@@ -124,6 +126,7 @@ public class SliceTileWinRateStatisticsService {
         appendOverallSection(sb, stats);
         appendBestAndWorstByFactionSection(sb, stats);
         appendSpecialTileSection(sb, stats);
+        appendIngressSection(sb, stats);
 
         return sb.toString();
     }
@@ -133,6 +136,11 @@ public class SliceTileWinRateStatisticsService {
                 .map(Player::getFaction)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+
+        boolean fractureInPlay = FractureService.isFractureInPlay(game);
+        if (fractureInPlay) {
+            stats.ingressGames++;
+        }
 
         for (Player player : game.getRealAndEliminatedPlayers()) {
             String faction = player.getFaction();
@@ -150,10 +158,14 @@ public class SliceTileWinRateStatisticsService {
                         .record(isWinner);
             }
 
+            boolean ingressInSlice = false;
             for (String position : slicePositions) {
                 Tile tile = game.getTileByPosition(position);
                 if (tile == null) {
                     continue;
+                }
+                if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+                    ingressInSlice = true;
                 }
                 String tileId = tile.getTileID();
                 if (isNotASystem(tileId)) {
@@ -172,6 +184,17 @@ public class SliceTileWinRateStatisticsService {
                             .computeIfAbsent(factionKey, _ -> new HashMap<>())
                             .computeIfAbsent(tileId, _ -> new WinRateCount())
                             .record(isWinner);
+                }
+            }
+
+            if (fractureInPlay) {
+                (ingressInSlice ? stats.ingressWith : stats.ingressWithout).record(isWinner);
+                if (ingressInSlice) {
+                    for (String factionKey : factionKeys) {
+                        stats.factionIngress
+                                .computeIfAbsent(factionKey, _ -> new WinRateCount())
+                                .record(isWinner);
+                    }
                 }
             }
         }
@@ -314,6 +337,44 @@ public class SliceTileWinRateStatisticsService {
         }
     }
 
+    private static void appendIngressSection(StringBuilder sb, SliceTileWinRateStats stats) {
+        sb.append("\n### Ingress tokens in slice (Fracture games)\n");
+        if (stats.ingressGames == 0) {
+            sb.append("- No analyzed games had the Fracture in play.\n");
+            return;
+        }
+        sb.append("_Win rate when a player had an ingress token in their slice, among games where the"
+                + " Fracture was in play._\n");
+        sb.append("Fracture games analyzed: ").append(stats.ingressGames).append('\n');
+        sb.append("* With an ingress token in slice: ")
+                .append(stats.ingressWith)
+                .append('\n');
+        sb.append("* Without an ingress token in slice: ")
+                .append(stats.ingressWithout)
+                .append('\n');
+
+        List<Entry<String, WinRateCount>> ranked = stats.factionIngress.entrySet().stream()
+                .sorted(BY_WIN_RATE_DESC)
+                .toList();
+        if (!ranked.isEmpty()) {
+            sb.append("_By faction, win rate with an ingress token in slice,"
+                    + " against the faction's overall win rate:_\n");
+            ranked.forEach(entry -> {
+                WinRateCount ingress = entry.getValue();
+                WinRateCount base = stats.factionRecords.get(entry.getKey());
+                sb.append("  * ")
+                        .append(factionLabel(entry.getKey()))
+                        .append(" - ")
+                        .append(ingress);
+                if (base != null && base.total > 0) {
+                    long diff = Math.round((ingress.winRate() - base.winRate()) * 100);
+                    sb.append(", ").append(diff >= 0 ? "+" : "").append(diff).append("% vs base");
+                }
+                sb.append('\n');
+            });
+        }
+    }
+
     private static void appendTileLine(StringBuilder sb, String indent, Entry<String, WinRateCount> entry) {
         WinRateCount count = entry.getValue();
         sb.append(indent)
@@ -360,9 +421,16 @@ public class SliceTileWinRateStatisticsService {
         /** Entropic Scar and Legendary tiles that actually turned up, so we only report real data. */
         final Set<String> specialTileIds = new HashSet<>();
 
+        /** Ingress-token-in-slice records, gathered only from games where the Fracture was in play. */
+        final WinRateCount ingressWith = new WinRateCount();
+
+        final WinRateCount ingressWithout = new WinRateCount();
+        final Map<String, WinRateCount> factionIngress = new HashMap<>();
+
         int sliceCount;
         int excludedGames;
         int skippedNonSystemTiles;
+        int ingressGames;
     }
 
     private static class WinRateCount {
