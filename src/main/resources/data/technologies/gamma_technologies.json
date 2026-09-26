@@ -7,8 +7,8 @@
         ],
         "requirements": "GGG",
         "faction": "diaspora",
-         "source": "gamma",
-        "text": "After another player moves ships into a systems that contains 1 or more of your planets, you may return any number of captured infantry on planet cards in that system to produce those units on those planets without spending resources."
+         "source": "WIPgamma",
+        "text": "After another player moves ships into a system that contains 1 or more of your planets, you may return any number of captured infantry on planet cards in that system to produce those infantry units on those planets without spending resources."
     },
     {
         "alias": "ggdiacr",
@@ -19,30 +19,30 @@
         "requirements": "RYG",
         "faction": "diaspora",
         "baseUpgrade": "cr2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "text": "Cost 2 Combat 6 Move 2 Capacity 3"
     },
     {
-        "alias": "gghlry",
+        "alias": "ggh4l1ry",
         "name": "Subnet Logistics",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "YY",
-        "faction": "hlr",
-        "source": "gamma",
-        "text": "At the start of the strategy phase choose a non-fighter ship unit upgrade technology you own and place this card on top of that card. Matching units you control and neutral units gain +1 combat. During your tactical actions while Subnet Logistics is on top of a Unit Upgrade technology, you may pay influence equal to the cost of that unit to replace another player's matching unit with a neutral of the same type."
+        "faction": "h4l1r",
+        "source": "WIPgamma",
+        "text": "At the start of the strategy phase choose a non-fighter ship unit upgrade technology you own and place this card on top of that card. Matching units you control and matching neutral units apply +1 to combat rolls.\nDuring your tactical actions while Subnet Logistics is on top of a Unit Upgrade technology, you may pay influence equal to the cost of that unit to replace another player's matching unit with a neutral of the same type."
     },
     {
-        "alias": "gghlrg",
+        "alias": "ggh4l1rg",
         "name": "Data Hollow",
         "types": [
             "BIOTIC"
         ],
         "requirements": "GG",
-        "faction": "hlr",
-        "source": "gamma",
-        "text": "At the start of the strategy phase, choose a non-fighter ship unit upgrade technology you own and place this card on tip of that card. Matching units you control and neutral units gain +1 movement. While Data Hollow is on top of a unit upgrade technology, you may replace your matching ships with a matching neutral unit of the same type at the end of your tactical actions. Gain a commodity or convert 1 commodity to a trade goods a number of times equal to this unit's cost."
+        "faction": "h4l1r",
+        "source": "WIPgamma",
+        "text": "At the start of the strategy phase, choose a non-fighter ship unit upgrade technology you own and place this card on top of that card. Matching units you control and matching neutral units gain +1 movement.\nWhile Data Hollow is on top of a unit upgrade technology, you may replace your matching ships with a matching neutral unit of the same type at the end of your tactical actions. Gain a commodity or convert 1 commodity to a trade goods a number of times equal to this unit's cost."
     },
     {
         "alias": "ggcladeg",
@@ -52,8 +52,8 @@
         ],
         "requirements": "GGG",
         "faction": "clade",
-        "source": "gamma",
-        "text": "At the end of your turn, you may exhaust this card to ready 1 legendary planet you control, and its legendary planet ability card. "
+        "source": "WIPgamma",
+        "text": "At the end of your turn, you may exhaust this card to ready 1 legendary planet you control, and its legendary planet ability card."
     },
     {
         "alias": "ggcladedd",
@@ -64,8 +64,8 @@
         "requirements": "RR",
         "baseUpgrade": "dd2",
         "faction": "clade",
-        "source": "gamma",
-        "text": "During space combat, when your opponent plays an action card, you may remove this unit to cancel that action card. "
+        "source": "WIPgamma",
+        "text": "During space combat, when your opponent plays an action card, you may remove this unit to cancel that action card."
     },
     {
         "alias": "ggarchws",
@@ -76,8 +76,8 @@
         "requirements": "YRRR",
         "faction": "archon",
         "baseUpgrade": "ws",
-        "source": "gamma",
-        "text": "Other players' units in this system lose PLANETARY SHIELD. You may use this unit's SPACE CANNON ability after each round of combat in this system. You may use this units BOMBARDMENT and SPACE CANNON ability in systems that are adjacent to this unit."
+        "source": "WIPgamma",
+        "text": "Other players' units in this system lose PLANETARY SHIELD.\nYou may use this unit's SPACE CANNON ability after each round of combat in this system. You may use this unit's BOMBARDMENT and SPACE CANNON ability in systems that are adjacent to this unit."
     },
     {
         "alias": "ggarchy",
@@ -87,8 +87,8 @@
         ],
         "requirements": "YY",
         "faction": "archon",
-        "source": "gamma",
-        "text": "When another player assigns a hit produced by your SPACE CANNON rolls to a non-fighter ship, they must destroy 1 fighter in the active system, if able."
+        "source": "WIPgamma",
+        "text": "When another player cancels a hit produced by your SPACE CANNON rolls, they must destroy 1 of their fighters in the active system, if able."
     },
     {
         "alias": "ggmoyinm",
@@ -98,8 +98,8 @@
         ],
         "requirements": "BYR",
         "faction": "moyin",
-        "source": "gamma",
-        "text": "When this unit would be destroyed, you may instead place it on a different planet in a different system you control."
+        "source": "WIPgamma",
+        "text": "When this unit would be destroyed, you may instead place it on a planet you control in a different system."
     },
     {
         "alias": "ggmoying",
@@ -109,7 +109,7 @@
         ],
         "requirements": "GG",
         "faction": "moyin",
-        "source": "gamma",
+        "source": "WIPgamma",
         "text": "At the end of your turn, you may exhaust this card to ready 1 planet you control that contains 1 or more of your mechs."
     },
     {
@@ -120,7 +120,7 @@
         ],
         "requirements": "R",
         "faction": "veilstrike",
-        "source": "gamma",
+        "source": "WIPgamma",
         "text": "At the start of invasion, you may exhaust this card to destroy one structure on a planet in the active system."
     },
     {
@@ -131,8 +131,8 @@
         ],
         "requirements": "G",
         "faction": "veilstrike",
-        "source": "gamma",
-        "text": "At the end of a combat, repair all your units that particpated in that combat."
+        "source": "WIPgamma",
+        "text": "At the end of combat, repair all your units that participated in that combat."
     },
     {
         "alias": "ggconr",
@@ -142,8 +142,8 @@
         ],
         "requirements": "RR",
         "faction": "convocation",
-        "source": "gamma",
-        "text": "You may exhaust this card at the start of space combat involving one or more of your units. when your units use ANTI-FIGHTER BARAGE during this combat, each hit produced in excess of your opponent's fighters must be assigned to a non-fighter ship.'"
+        "source": "WIPgamma",
+        "text": "You may exhaust this card at the start of a space combat involving one or more of your units. When your units use ANTI-FIGHTER BARRAGE during this combat, each hit produced in excess of your opponent's fighters must be assigned to a non-fighter ship."
     },
     {
         "alias": "ggconinf",
@@ -154,22 +154,22 @@
         "requirements": "GG",
         "faction": "convocation",
         "baseUpgrade": "inf2",
-        "source": "gamma",
-        "text": "During the ANTI-FIGHTER BARRAGE step of a space combat in this system, this unit may use its ANTI-FIGHTER BARRAGE as if it was particpating in combat. After this unit is destroyed, roll 1 die. if the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control that is in a system that contrains one of your command tokens."
+        "source": "WIPgamma",
+        "text": "During the ANTI-FIGHTER BARRAGE step of a space combat in this system, this unit may use its ANTI-FIGHTER BARRAGE as if it was participating in combat.\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control in a system that contains one of your command tokens."
     },
     {
-        "alias": "ggarar",
-        "name": "Web Sensor Threading",
+        "alias": "ggwear",
+        "name": "Sublight Lattice",
         "types": [
             "WARFARE"
         ],
-        "requirements": "RR",
+        "requirements": "R",
         "faction": "weaveway",
         "source": "gamma",
-        "text": "After another player moves ships into a nebula that contains 1 or more of your ships, you may exhaust this card to look at thier action cards and choose 1 to take."
+        "text": "When any player activates a system that contains 1 or more of your space docks and no other player's ships, place 2 fighters from your reinforcements into that system's space area for each of those space docks."
     },
     {
-        "alias": "ggarasd",
+        "alias": "ggweasd",
         "name": "Weft Coccon II",
         "types": [
             "UNITUPGRADE"
@@ -178,7 +178,7 @@
         "faction": "weaveway",
         "baseUpgrade": "sd2",
         "source": "gamma",
-        "text": "CAPACITY: 5 PRODUCTION: 7** This unit is placed in the space area instead of on a planet. This unit can retreat as if it were a ship with MOVE 1. If this unit is blockaded, it is destroyed."
+        "text": "This system is a nebula. Place a weft cocoon token beneath this unit as a reminder.\nUp to 3 fighters in this system do not count against your ship's capacity."
     },
     {
         "alias": "gginitr",
@@ -188,8 +188,8 @@
         ],
         "requirements": "R",
         "faction": "initiative",
-        "source": "gamma",
-        "text": "ACTION: Exhaust this card to take up to 2 trade goods or commodities from 1 of your neighbors. That player must also reveal 1 of their unrevealed secret objectives and place it face up in their play area, if able."
+        "source": "WIPgamma",
+        "text": "At the start of your turn, exhaust this card and choose a neighbor. That player must also reveal 1 of their unrevealed secret objectives and place it face up in their play area, if able. If they cannot, gain 2 commodities."
     },
     {
         "alias": "gginitpds",
@@ -200,8 +200,53 @@
         "requirements": "RY",
         "faction": "initiative",
         "baseUpgrade": "pds2",
-        "source": "gamma",
-        "text": "SPACE CANNON 4 PLANETARY SHIELD** When this unit's SPACE CANNON destroys a player's ship, that player must reveal 1 of their unrevealed secret objectives and place it face up in their play area. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system"
+        "source": "WIPgamma",
+        "text": "SPACE CANNON 4 PLANETARY SHIELD** When this unit's SPACE CANNON destroys a player's ship, that player must reveal 1 of their unrevealed secret objectives and place it face up in their play area.You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system"
           
+    },   
+    {
+        "alias": "gggrayr",
+        "name": "Reavic Statismesh",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "gray",
+        "source": "gamma",
+        "text": "Planets with a trait that contain one or more of your structures are treated as if they had all 3 traits (Cultural, Hazardous, and Industrial).\nWhen you would perform the secondary ability of any strategy card, you may exhaust this card to place 1 structure on a planet you control instead."
+    },
+    {
+        "alias": "gggrayd",
+        "name": "Velite Rapax II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "gray",
+        "baseUpgrade": "dr2",
+        "source": "gamma",
+        "text": "This unit cannot be destroyed by 'Direct Hit' action cards.\nDEPLOY: After you win a space combat, you may produce 1 dreadnought in the active system."
+    },    
+    {
+        "alias": "ggindustg",
+        "name": "Industry Bribes",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "industries",
+        "source": "gamma",
+        "text": "Each planet you exhaust to cast votes that contains 1 or more of your units with PRODUCTION, provides additional votes equal to its resource value.\nWhen an outcome you voted for or predicted is resolved, you may exhaust this card and place 1 mech from your reinforcements on a planet you control. "
+    },
+    {
+        "alias": "ggindusty",
+        "name": "Safework Bypass",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "industries",
+        "source": "gamma",
+        "text": "At the end of your turn exhaust this card to choose any number of planets that contain your structures. You may remove any number of your ground forces on those planets, and place them on 1 or more of those planets."
     }
 ]

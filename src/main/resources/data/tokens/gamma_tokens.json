@@ -7,7 +7,7 @@
             "hallucination",
             "hallucination1"
         ],
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "id": "hallucination2",
@@ -16,7 +16,7 @@
         "aliasList": [
             "hallucination2"
         ],
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "id": "hallucination3",
@@ -25,7 +25,7 @@
         "aliasList": [
             "hallucination3"
         ],
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "id": "hallucination4",
@@ -34,7 +34,7 @@
         "aliasList": [
             "hallucination4"
         ],
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "id": "hallucination5",
@@ -43,7 +43,7 @@
         "aliasList": [
             "hallucination5"
         ],
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "id": "hallucination_back",
@@ -53,7 +53,7 @@
             "hallucinationback",
             "hallucinationhidden"
         ],
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "id": "weaveway_spacedock_marker",
@@ -68,39 +68,48 @@
     {
         "id": "weaveway_back",
         "imagePath": "token_gg_weaveway_back.png",
-        "spaceOrPlanet": "space",
+        "spaceOrPlanet": "planet",
         "aliasList": [
             "weavewayback"
         ],
         "source": "gamma"
     },
     {
-        "id": "weaveway_node1",
+        "id": "ggpnaraf",
         "imagePath": "token_gg_weaveway_node1.png",
-        "spaceOrPlanet": "space",
+        "spaceOrPlanet": "planet",
         "aliasList": [
             "weavewaynode1",
-            "weavewayanchor1"
+            "ggpnaraf"
         ],
         "source": "gamma"
     },
     {
-        "id": "weaveway_node2",
+        "id": "ggpnaras",
         "imagePath": "token_gg_weaveway_node2.png",
-        "spaceOrPlanet": "space",
+        "spaceOrPlanet": "planet",
         "aliasList": [
             "weavewaynode2",
-            "weavewayanchor2"
+            "ggpnaras"
         ],
         "source": "gamma"
     },
     {
-        "id": "weaveway_node3",
+        "id": "ggpnarah",
         "imagePath": "token_gg_weaveway_node3.png",
-        "spaceOrPlanet": "space",
+        "spaceOrPlanet": "planet",
         "aliasList": [
             "weavewaynode3",
-            "weavewayanchor3"
+            "ggpnarah"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "gray_arc",
+        "imagePath": "",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "grayarc"
         ],
         "source": "gamma"
     }

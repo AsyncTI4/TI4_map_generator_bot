@@ -4,13 +4,13 @@
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Clarion",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "veilstrike",
         "moveValue": 1,
-        "capacityValue": 3,
+        "capacityValue": 5,
         "capacityUsed": 1,
         "cost": 8,
-        "combatHitsOn": 5,
+        "combatHitsOn": 7,
         "combatDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
@@ -22,7 +22,7 @@
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Armored Core",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "veilstrike",
         "capacityUsed": 1,
         "cost": 2,
@@ -30,14 +30,14 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When this unit becomes damaged during ground combat, it immediately makes an additional combat roll."
+        "ability": "When this unit becomes damaged during Ground Combat, it immediately makes an additional combat roll."
     },
     {
         "id": "moyin_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Plupipotent",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "moyin",
         "moveValue": 1,
         "capacityValue": 4,
@@ -48,7 +48,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After you win a combat in which this unit participated, you may ready 1 of your agents of genomes."
+        "ability": "After you win a combat in which this unit participated, you may ready 1 of your agents or genomes."
     },
     {
         "id": "moyin_mech",
@@ -56,14 +56,15 @@
         "asyncId": "mf",
         "name": "Awakened Hulk I",
         "upgradesToUnitId": "moyin_mech2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "moyin",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
+        "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When this unit would be destroyed, you may instead place it damed on a planet you control in your home system."
+        "ability": "When this unit would be destroyed, you may instead place it damaged on a planet you control in your home system."
     },
 
     {
@@ -73,7 +74,7 @@
         "name": "Awakened Hulk II",
         "requiredTechId": "ggmoyinm",
         "upgradesFromUnitId": "moyin_mech",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "moyin",
         "capacityUsed": 1,
         "cost": 2,
@@ -81,7 +82,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When this unit would be destroyed, you may instead place it on a different planet in a different system you control."
+        "ability": "When this unit would be destroyed, you may instead place it on a planet you control in a different system."
     },
     {
         "id": "weaveway_flagship",
@@ -90,15 +91,16 @@
         "name": "Dark Lattice",
         "source": "gamma",
         "faction": "weaveway",
-        "moveValue": 8,
-        "capacityValue": 8,
+        "moveValue": 1,
+        "capacityValue": 3,
         "capacityUsed": 1,
         "cost": 8,
-        "combatHitsOn": 8,
+        "combatHitsOn": 7,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "ability": "When you spend resources to produce this unit, you may remove any number of your fighters from the gameboard. For each fighter removed, reduce the resources spent by 1."
        
     },
     {
@@ -114,14 +116,14 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit is adjacent to Weaveway systems. During the commit Ground Forces step: You can commit this unit from a planet in an adjacent system that does not contain 1 of your command tokens."
+        "ability": "If this system contains an anomaly, apply +1 to the result of this unit's combat rolls."
     },
     {
         "id": "clade_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Ioran",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "clade",
         "moveValue": 1,
         "capacityValue": 3,
@@ -132,14 +134,14 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit moves, you may move up to 1 Hallucination Token with it."
+        "ability": "When this unit moves, you may move up to 1 Hallucination token with it."
     },
     {
         "id": "clade_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Psylotus",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "clade",
         "capacityUsed": 1,
         "cost": 2,
@@ -147,7 +149,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During combat, your opponent's Mechs have no ability text."
+        "ability": "Other player's ground forces in this system have no ability text.\nOther players cannot deploy units in this system"
     },
     {
         "id": "clade_destroyer",
@@ -155,7 +157,7 @@
         "asyncId": "dd",
         "name": "Neurotoxic Dart I",
         "upgradesToUnitId": "clade_destroyer2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "clade",
         "moveValue": 2,
         "capacityUsed": 1,
@@ -165,7 +167,7 @@
         "afbHitsOn": 9,
         "bombardDieCount": 2,
         "isShip": true,
-        "ability": "During space combat, while you are not the active player, when your pponent plays an action card, you may remove this unit to cancel that action card."
+        "ability": "During space combat, while you are not the active player, when your opponent plays an action card, you may remove this unit to cancel that action card."
     },
     {
         "id": "clade_destroyer2",
@@ -174,7 +176,7 @@
         "name": "Neurotoxic Dart II",
         "upgradesFromUnitId": "clade_destroyer",
         "requiredTechId": "ggcladedd",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "clade",
         "moveValue": 3,
         "capacityUsed": 1,
@@ -187,12 +189,12 @@
         "ability": "During space combat, when your opponent plays an action card, you may remove this unit to cancel that action card."
     },
     {
-        "id": "hlr_flagship",
+        "id": "h4l1r_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Cortex Prime",
-        "source": "gamma",
-        "faction": "hlr",
+        "source": "WIPgamma",
+        "faction": "h4l1r",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
@@ -205,12 +207,12 @@
         "ability": "At the start of bombardment in this system, choose 1 planet and roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units."
     },
     {
-        "id": "hlr_mech",
+        "id": "h4l1r_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Encephalon Exosuit",
-        "source": "gamma",
-        "faction": "hlr",
+        "source": "WIPgamma",
+        "faction": "h4l1r",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
@@ -225,13 +227,13 @@
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Vano Panopticon",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "archon",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
         "cost": 8,
-        "combatHitsOn": 5,
+        "combatHitsOn": 7,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
@@ -243,7 +245,7 @@
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Liberator",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "archon",
         "capacityUsed": 1,
         "cost": 2,
@@ -251,7 +253,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After you gain control of this planet from another player, ready this planet."
+        "ability": "DEPLOY: When a decree is violated during a tactical action, if the active system is adjacent to one of your units, you may place 1 mech on a planet you control."
     },
     {
         "id": "archon_warsun",
@@ -259,7 +261,7 @@
         "asyncId": "ws",
         "name": "Sentinel I",
         "upgradesToUnitId": "archon_warsun2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "archon",
         "moveValue": 1,
         "capacityValue": 6,
@@ -273,7 +275,7 @@
         "disablesPlanetaryShield": true,
         "cost": 12,
         "isShip": true,
-        "ability": "Other players' units in this system lose planetary SHIELD. You may use this unit's SPACE CANNON abilit after each round of combat in this system"
+        "ability": "Other players' units in this system lose PLANETARY SHIELD.\nYou may use this unit's SPACE CANNON ability after each round of combat in this system."
     },
     {
         "id": "archon_warsun2",
@@ -282,7 +284,7 @@
         "name": "Sentinel II",
         "upgradesFromUnitId": "archon_warsun",
         "requiredTechId": "ggarchws",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "archon",
         "moveValue": 2,
         "capacityValue": 6,
@@ -298,7 +300,7 @@
         "spaceCannonHitsOn": 3,
         "spaceCannonDieCount": 2,
         "isShip": true,
-        "ability": "Other players' units in this system lose PLANETARY SHIELD. You may use this unit's SPACE CANNON ability after each round of combat in this system. You may use this unit's BOMBARDMENT and SPACE CANNON ability in systems that are adjacent to this unit. "
+        "ability": "Other players' units in this system lose PLANETARY SHIELD.\nYou may use this unit's SPACE CANNON ability after each round of combat in this system. You may use this unit's BOMBARDMENT and SPACE CANNON ability in systems that are adjacent to this unit. "
     },
     {
         "id": "weaveway_spacedock",
@@ -309,10 +311,9 @@
         "source": "gamma",
         "faction": "weaveway",
         "productionValue": "5",
-        "basicProduction": "res",
-        "capacityValue": 3,
+        "basicProduction": "value",
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can retreat as if it were a ship with move 1. If this unit is blockaded, it is destroyed."
+        "ability": "This system is a nebula. Place a weft cocoon token beneath this unit as a reminder. Up to 3 fighters in this system do not count against your ship's capacity."
     },
     {
         "id": "weaveway_spacedock2",
@@ -320,21 +321,20 @@
         "asyncId": "sd",
         "name": "Weft Coccon II",
         "upgradesFromUnitId": "weaveway_spacedock",
-        "requiredTechId": "ggarasd",
+        "requiredTechId": "ggweasd",
         "source": "gamma",
         "faction": "weaveway",
         "productionValue": "7",
         "basicProduction": "value",
-        "capacityValue": 5,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can retreat as if it were a ship with MOVE 1. If this unit is blockaded, it is destroyed."
+        "ability": "This system is a nebula. Place a weft cocoon token beneath this unit as a reminder. Up to 3 fighters in this system do not count against your ship's capacity."
     },
     {
         "id": "convocation_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Reckoning of Tyrants",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "convocation",
         "moveValue": 2,
         "capacityValue": 3,
@@ -352,7 +352,7 @@
         "asyncId": "gf",
         "name": "Midnight Talon I",
         "upgradesToUnitId": "convocation_infantry2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "convocation",
         "capacityUsed": 1,
         "cost": 0.5,
@@ -370,7 +370,7 @@
         "name": "Midnight Talon II",
         "upgradesFromUnitId": "convocation_infantry",
         "requiredTechId": "ggconinf",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "convocation",
         "capacityUsed": 1,
         "cost": 0.5,
@@ -379,14 +379,14 @@
         "afbHitsOn": 6,
         "afbDieCount": 1,
         "isGroundForce": true,
-        "ability": "During the ANTI-FIGHTER BARRAGE step of a space combat in this system, this unit may use its ANTI-FIGHTER BARRAGE as if it was participating in combat. After this unit is destroyed, roll 1 die. if the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control that is in a system that contains one of your command tokens."
+        "ability": "During the ANTI-FIGHTER BARRAGE step of a space combat in this system, this unit may use its ANTI-FIGHTER BARRAGE as if it was participating in combat.\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control in a system that contains one of your command tokens."
     },
     {
         "id": "convocation_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Midnight Sentinel",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "convocation",
         "capacityUsed": 1,
         "cost": 2,
@@ -402,7 +402,7 @@
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Duha Menaimon",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "diaspora",
         "moveValue": 1,
         "capacityValue": 6,
@@ -413,14 +413,14 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When you produce this unit, you may return captured infantry to reduce this units cost by 1 for each infantry returned."
+        "ability": "When you produce this unit, you may return captured infantry to reduce this unit's cost by 1 for each infantry returned."
     },
     {
         "id": "diaspora_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Letani Dryad",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "diaspora",
         "capacityUsed": 1,
         "cost": 2,
@@ -436,7 +436,7 @@
         "asyncId": "ca",
         "name": "Letani Node I",
         "upgradesToUnitId": "diaspora_cruiser2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "diaspora",
         "moveValue": 1,
         "capacityValue": 2,
@@ -453,7 +453,7 @@
         "name": "Letani Node II",
         "upgradesFromUnitId": "diaspora_cruiser",
         "requiredTechId": "ggdiacr",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "diaspora",
         "moveValue": 2,
         "capacityValue": 3,
@@ -462,12 +462,13 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isShip": true
-    },{
+    },
+    {
         "id": "initiative_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "Dunkirk",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "initiative",
         "moveValue": 1,
         "capacityValue": 3,
@@ -485,7 +486,7 @@
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Pathfinder",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "initiative",
         "capacityUsed": 1,
         "cost": 2,
@@ -493,7 +494,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During combat against an opponent who has at least 1 unscored secret objective face up in their play area, apply +2 to the results of this units combat rolls."
+        "ability": "During combat against an opponent who has at least 1 unscored secret objective face up in their play area, apply +2 to the results of this unit's combat rolls. "
     },
     {
         "id": "initiative_pds",
@@ -501,7 +502,7 @@
         "asyncId": "pd",
         "name": "Council Citadel I",
         "upgradesToUnitId": "initiative_pds2",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "initiative",
         "spaceCannonHitsOn": 6,
         "spaceCannonDieCount": 1,
@@ -516,13 +517,121 @@
         "name": "Council Citadel II",
         "upgradesFromUnitId": "initiative_pds",
         "requiredTechId": "gginitpds",
-        "source": "gamma",
+        "source": "WIPgamma",
         "faction": "initiative",
         "spaceCannonHitsOn": 4,
         "spaceCannonDieCount": 1,
         "planetaryShield": true,
         "isStructure": true,
         "deepSpaceCannon": true,
-        "ability": "When this unit's SPACE CANNON destroys a player's ship, that player must reveal 1 of their unrevealed secret objectives and place it face up in their play area. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
+        "ability": "When this unit's SPACE CANNON destroys a player's ship, that player must reveal 1 of their unrevealed secret objectives and place it face up in their play area.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system"
+    },
+    {
+        "id": "gray_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Arch Solvitor",
+        "source": "gamma",
+        "faction": "gray",
+        "moveValue": 1,
+        "capacityValue": 2,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 9,
+        "combatDieCount": 1,
+        "bombardHitsOn":5,
+        "bombardDieCount":1,
+        "afbHitsOn": 5,
+        "afbDieCount": 1,
+        "spaceCannonDieCount":1,
+        "spaceCannonHitsOn":5,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "At the start of a space combat in this system or an adjacent system, you may choose 1 ship in the active system; that ship rolls 1 additional die until the end of combat. "
+    },
+    {
+        "id": "gray_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Pallid Golem",
+        "source": "gamma",
+        "faction": "gray",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "isGroundForce": true,
+        "ability": "Once per turn, after a player activates this system, you may remove 1 mech in the active system with 4 infantry from their reinforcements. "
+    },
+    {
+        "id": "gray_dreadnought",
+        "baseType": "dreadnought",
+        "asyncId": "dr",
+        "name": "Velite Rapax I",
+        "upgradesToUnitId": "gray_dreadnought2",
+        "source": "gamma",
+        "faction": "gray",
+        "moveValue": 1,
+        "capacityUsed": 1,
+        "cost": 4,
+        "combatHitsOn": 5,
+        "combatDieCount": 1,
+        "bombardHitsOn": 4,
+        "bombardDieCount": 1,
+        "isShip": true,
+        "ability": "During space combat, while you are not the active player, when your pponent plays an action card, you may remove this unit to cancel that action card."
+    },
+    {
+        "id": "gray_dreadnought2",
+        "baseType": "dreadnought",
+        "asyncId": "dr",
+        "name": "Velite Rapax II",
+        "upgradesFromUnitId": "gray_dreadnought",
+        "requiredTechId": "gggraydr",
+        "source": "gamma",
+        "faction": "gray",
+        "moveValue": 2,
+        "capacityUsed": 1,
+        "cost": 3,
+        "combatHitsOn": 5,
+        "combatDieCount": 1,
+        "bombardHitsOn": 4,
+        "bombardDieCount": 1,
+        "isShip": true,
+        "ability": "During space combat, when your opponent plays an action card, you may remove this unit to cancel that action card."
+    },
+   
+    {
+        "id": "industries_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Kaizen",
+        "source": "gamma",
+        "faction": "industries",
+        "moveValue": 1,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "When you use the PRODUCTION ability of 1 or more units in this system, you may place any of those produced units in the space area of adjacent systems that do not contain another player's ships."
+    },
+    {
+        "id": "industries_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Foreman",
+        "source": "gamma",
+        "faction": "industries",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "isGroundForce": true,
+        "ability": "When 1 or more of your units on this planet uses PRODUCTION, you may cause this unit to become damaged to reduce the combined cost of the produced units by 1."
     }
 ]

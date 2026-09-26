@@ -41,17 +41,17 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
-        "alias": "hlr",
+        "alias": "h4l1r",
         "factionName": "The H4L1R infocrypt Subnet",
         "homeSystem": "06",
         "startingFleet": "1 dd, 1 cv, 2 ff, 4 inf n, sd n",
         "commodities": 2,
         "factionTech": [
-            "gghlrg",
-            "gghlry"
+            "ggh4l1rg",
+            "ggh4l1ry"
         ],
       "startingTech": [
 
@@ -65,12 +65,12 @@
           "legacy_systems"
         ],
         "leaders": [
-            "hlragent",
-            "hlrcommander",
-            "hlrhero"
+            "h4l1ragent",
+            "h4l1rcommander",
+            "h4l1rhero"
         ],
         "promissoryNotes": [
-            "ggpnhlr"
+            "ggpnh4l1r"
         ],
         "units": [
             "fighter",
@@ -78,14 +78,14 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "hlr_flagship",
+            "h4l1r_flagship",
             "infantry",
-            "hlr_mech",
+            "h4l1r_mech",
             "pds",
             "spacedock"
         ],
         "complexity": "Hard",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "alias": "clade",
@@ -130,7 +130,7 @@
             "spacedock"
         ],
         "complexity": "Hard",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "alias": "archon",
@@ -176,7 +176,7 @@
             "archon_warsun"
         ],
         "complexity": "Hard",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "alias": "moyin",
@@ -220,7 +220,7 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "alias": "veilstrike",
@@ -265,7 +265,7 @@
             "spacedock"
         ],
         "complexity": "low",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "alias": "convocation",
@@ -310,29 +310,29 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "gamma"
+        "source": "WIPgamma"
     },
     {
         "alias": "weaveway",
-        "factionName": "The Araenean Weaveway",
+        "factionName": "The Weaveway",
         "homeSystem": "56",
         "startingFleet": "2 cr, 1 cv, 4 inf d, sd",
         "commodities": 2,
         "factionTech": [
-            "ggarasd",
-            "ggarar"
+            "ggweasd",
+            "ggwear"
         ],
-        "startingTech": [
+        "startingTechOptions": [
+            "amd",
             "st",
-            "aida"
+            "pa"
         ],
         "homePlanets": [
             "thedark"
         ],
         "abilities": [
           "hyperdimensional",
-          "threads_out_of_the_dark",
-          "the_weaveway"
+          "threads_out_of_the_dark"
         ],
         "leaders": [
             "weavewayagent",
@@ -340,7 +340,9 @@
             "weavewayhero"
         ],
         "promissoryNotes": [
-            "ggpnara"
+            "ggpnaraf",
+            "ggpnaras",
+            "ggpnarah"
         ],
         "units": [
             "fighter",
@@ -397,6 +399,96 @@
             "infantry",
             "initiative_mech",
             "initiative_pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "WIPgamma"
+    },
+    {
+        "alias": "gray",
+        "factionName": "The Gray Company",
+        "homeSystem": "10",
+        "startingFleet": "1 dr, 1 cr, 1 cv, 3 ff, 3 inf d, sd d",
+        "commodities": 3,
+        "factionTech": [
+            "gggrayr",
+            "gggraypds"
+        ],
+        "startingTechOptions": [
+            "amd",
+            "aida",
+            "sdn"
+        ],
+        "homePlanets": [
+            "arcprime",
+            "wrenterra"
+        ],
+        "abilities": [
+            "bounties",
+            "dogs_of_war"
+        ],
+        "leaders": [
+            "grayagent",
+            "graycommander",
+            "grayhero"
+        ],
+        "promissoryNotes": [
+            "ggpngray"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "gray_dreadnought",
+            "gray_flagship",
+            "infantry",
+            "gray_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "gamma"
+    },
+    {
+        "alias": "industries",
+        "factionName": "Jord Industries",
+        "homeSystem": "01",
+        "startingFleet": "2 cr, 1 dd, 3 ff, 3 inf d, sd d",
+        "commodities": 3,
+        "factionTech": [
+            "ggindustg",
+            "ggindustry"
+        ],
+        "startingTechOptions": [],
+        "startingTechAmount": 2,
+        
+        "homePlanets": [
+            "jord"
+        ],
+        "abilities": [
+            "rapid_industrialization",
+            "corporate_sanctions"
+            
+        ],
+        "leaders": [
+            "industriesagent",
+            "industriescommander",
+            "industrieshero"
+        ],
+        "promissoryNotes": [
+            "ggpnindust"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "industries_flagship",
+            "infantry",
+            "industries_mech",
+            "pds",
             "spacedock"
         ],
         "complexity": "Low",
