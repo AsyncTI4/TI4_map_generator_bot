@@ -1061,7 +1061,7 @@ public class StartCombatService {
                     && !game.getActiveSystem().isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        player.getRepresentationNoPing()
+                        player.getRepresentation()
                                 + ", if you win this combat, you must use _Reinforce_ to give the active system PRODUCTION 3 until the end of this action.",
                         List.of(
                                 Buttons.green(

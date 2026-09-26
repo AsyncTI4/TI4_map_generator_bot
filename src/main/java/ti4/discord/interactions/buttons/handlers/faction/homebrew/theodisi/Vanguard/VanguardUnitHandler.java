@@ -195,7 +195,7 @@ public class VanguardUnitHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing()
+                player.getRepresentation()
                         + ", the Flagbearer used SUSTAIN DAMAGE. You may destroy it to cancel up to 4 additional hits.",
                 List.of(
                         Buttons.gray(

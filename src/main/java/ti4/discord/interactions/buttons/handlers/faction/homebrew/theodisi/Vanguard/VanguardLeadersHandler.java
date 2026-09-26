@@ -198,7 +198,7 @@ public class VanguardLeadersHandler {
                     Buttons.red(killer.factionButtonChecker() + "deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     killer.getCorrectChannel(),
-                    killer.getRepresentationNoPing() + ", you destroyed " + destroyedModel.getName()
+                    killer.getRepresentation() + ", you destroyed " + destroyedModel.getName()
                             + " in combat. You may pay " + (int) Math.ceil(destroyedModel.getCost())
                             + " influence to place 1 " + replacement.getName()
                             + " in that system with **Shieldbrother Michael**.",
@@ -303,7 +303,7 @@ public class VanguardLeadersHandler {
         paymentButtons.add(Buttons.green(player.factionButtonChecker() + FINISH_HERO_PAYMENT, "Done Spending"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing()
+                player.getRepresentation()
                         + ", spend any amount of resources or influence for _Final Aegis - Last Line_, then press Done Spending.",
                 paymentButtons);
     }

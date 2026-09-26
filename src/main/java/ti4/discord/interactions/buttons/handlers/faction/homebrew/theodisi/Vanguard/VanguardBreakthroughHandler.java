@@ -33,7 +33,7 @@ public class VanguardBreakthroughHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationNoPing()
+                player.getRepresentation()
                         + ", if you win this ground combat, you may gain 2 trade goods due to _Training Dummies_.",
                 List.of(
                         Buttons.green(
@@ -101,7 +101,7 @@ public class VanguardBreakthroughHandler {
     }
 
     private static String getTrainingDummiesInfantryMessage(Player player) {
-        return player.getRepresentationNoPing()
+        return player.getRepresentation()
                 + ", you spent a strategy token. You may place 1 neutral infantry into coexistence on a non-fracture planet containing your ground forces due to _Training Dummies_.";
     }
 
@@ -139,7 +139,7 @@ public class VanguardBreakthroughHandler {
         game.removeStoredValue("coexistFlag");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed 1 neutral infantry on " + planet.getRepresentation(game)
+                player.getRepresentation() + " placed 1 neutral infantry on " + planet.getRepresentation(game)
                         + " due to _Training Dummies_.");
         ButtonHelper.deleteMessage(event);
     }
