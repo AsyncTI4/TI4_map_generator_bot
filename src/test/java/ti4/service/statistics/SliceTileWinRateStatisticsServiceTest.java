@@ -160,7 +160,8 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
                 .forEach(tileId -> assertTrue(
                         report.contains("`100%` (3/3) " + tileId + " ("), "expected a row for tile " + tileId));
         // Every tile has the same sample, so none is sparse relative to the others.
-        assertFalse(report.contains("(sparse)"), report);
+        // Match the row marker, not the legend line that explains it.
+        assertFalse(report.contains("_(sparse)_"), report);
     }
 
     @Test
