@@ -12,6 +12,8 @@ public class FOWCommand implements ParentCommand {
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new AddFogTile(),
                     new RemoveFogTile(),
+                    new AddVisionToken(),
+                    new RemoveVisionToken(),
                     new CheckChannels(),
                     new PingActivePlayer(),
                     new PingSystem(),

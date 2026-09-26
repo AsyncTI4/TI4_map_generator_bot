@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
+import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
@@ -101,6 +103,9 @@ public class Tile {
         space.getCcList().forEach(tileSpace::addCC);
         space.getControlList().forEach(tileSpace::addControl);
         space.getTokenList().forEach(tileSpace::addToken);
+        if (space instanceof Space oldSpace) {
+            getSpaceUnitHolder().setFowVisionGrant(oldSpace.getFowVisionGrant());
+        }
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -239,10 +244,27 @@ public class Tile {
         }
     }
 
+    /** Read-only view of the fog-vision recipients (held on the space holder); empty means everyone. */
+    @JsonIgnore
+    public Set<String> getFowVisionGrant() {
+        Space space = getSpaceUnitHolder();
+        return space == null ? Collections.emptySet() : space.getFowVisionGrant();
+    }
+
+    /** Replaces the fog-vision recipients; null or empty means everyone. */
+    public void setFowVisionGrant(@Nullable Collection<String> colors) {
+        Space space = getSpaceUnitHolder();
+        if (space != null) space.setFowVisionGrant(colors);
+    }
+
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            return unitHolder.removeToken(tokenID);
+            boolean removed = unitHolder.removeToken(tokenID);
+            if (removed && Mapper.isFowVisionToken(tokenID) && !hasFowVisionToken()) {
+                setFowVisionGrant(null); // a later token placed here starts fresh as "everyone"
+            }
+            return removed;
         }
         return false;
     }
@@ -721,6 +743,21 @@ public class Tile {
                         }
                     }
                 }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True if this tile carries a fog-vision token (a token whose {@link TokenModel} has
+     * {@code isFowVision}). Deliberately independent of {@link #isAnomaly()} — a fog-vision
+     * marker is not an anomaly and must not gain anomaly movement/combat/ability behaviour.
+     */
+    @JsonIgnore
+    public boolean hasFowVisionToken() {
+        for (UnitHolder uh : unitHolders.values()) {
+            for (String token : uh.getTokenList()) {
+                if (Mapper.isFowVisionToken(token)) return true;
             }
         }
         return false;

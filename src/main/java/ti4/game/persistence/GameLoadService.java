@@ -249,6 +249,9 @@ class GameLoadService {
                 if (ENDTOKENS.equals(data)) {
                     break;
                 }
+                if (tile != null && data.startsWith(FOW_VISION_GRANT + " ")) {
+                    tile.setFowVisionGrant(Helper.getListFromCSV(data.substring(FOW_VISION_GRANT.length() + 1)));
+                }
             }
         }
         return tileMap;
