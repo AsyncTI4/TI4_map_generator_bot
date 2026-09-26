@@ -1,0 +1,37 @@
+[
+    {
+        "id": "pharadn_tomb_token",
+        "name": "Pharadn Tomb Token",
+        "imagePath": "token_tomb.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine1",
+        "name": "Kaltrim Shring 1",
+        "imagePath": "token_kaltrimshrine1.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine2",
+        "name": "Kaltrim Shring 2",
+        "imagePath": "token_kaltrimshrine2.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine3",
+        "name": "Kaltrim Shring 3",
+        "imagePath": "token_kaltrimshrine3.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine4",
+        "name": "Kaltrim Shring 4",
+        "imagePath": "token_kaltrimshrine4.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    }
+]
