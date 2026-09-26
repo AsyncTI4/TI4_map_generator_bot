@@ -224,6 +224,35 @@ class PlanetWinRateStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void shouldGiveDeepwroughtItsHomeCoexistenceRateAndWinRate() {
+        Game coexisting = newGame("1");
+        coexisting.setTile(new Tile("95", "101"));
+        Player deepwrought = addPlayer(coexisting, "deepwrought", true);
+        addPlayer(coexisting, "sol", false, "jord", "ikatena");
+        // Sol took Ikatena, but the Deepwrought is still standing on it.
+        putInfantryOn(coexisting, "ikatena", deepwrought);
+        Game holdingItsHome = newGame("2");
+        holdingItsHome.setTile(new Tile("95", "101"));
+        addPlayer(holdingItsHome, "deepwrought", false, "ikatena");
+        addPlayer(holdingItsHome, "sol", true, "jord", "wellon");
+
+        String report = render(List.of(coexisting, holdingItsHome));
+
+        assertThat(report).contains("### Win rate by planets coexisted on\n");
+        assertThat(report)
+                .contains("coexisted on their home planet in 1 of 2 games (50%), 100% (1/1) win rate when they did\n");
+    }
+
+    @Test
+    void shouldLeaveOutTheHomeCoexistenceLineWhenDeepwroughtIsNotInTheSample() {
+        Game game = newGame("1");
+        addPlayer(game, "sol", true, "jord", "wellon");
+        addPlayer(game, "letnev", false, "arcprime", "wrenterra");
+
+        assertThat(render(List.of(game))).doesNotContain("coexisted on their home planet");
+    }
+
+    @Test
     void shouldCollectEveryCoexistenceAtOrAboveFiveIntoOneBand() {
         Game game = newGame("1");
         // Wellon on 19, Vefut II on 20, Abyz on 38, Arinam and Meer both on 37.
