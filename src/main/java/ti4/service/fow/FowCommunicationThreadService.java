@@ -116,12 +116,6 @@ public class FowCommunicationThreadService {
         return future;
     }
 
-    /**
-     * The comm thread this pair of players may currently talk in, if managed comms is on and one
-     * exists. Threads whose name is marked as severed are skipped - the players have lost comms, so
-     * nothing should be posted there. Only live threads are searched; comm threads auto-archive after a
-     * week, so one that is in use is effectively always active.
-     */
     public static Optional<ThreadChannel> findOpenCommThread(Game game, Player p1, Player p2) {
         if (!isActive(game) || p1 == null || p2 == null || game.getMainGameChannel() == null) {
             return Optional.empty();
@@ -142,9 +136,7 @@ public class FowCommunicationThreadService {
         return (p1.equals(a) && p2.equals(b)) || (p1.equals(b) && p2.equals(a));
     }
 
-    // TODO: three places now re-derive a comm thread's player pair from THREAD_NAME_PATTERN -
-    // findPlayersCommThreads, isThreadForPair, and DeleteFOWCommThreads. Worth collapsing onto one
-    // helper.
+    // TODO: pair parsing duplicated in findPlayersCommThreads, isThreadForPair, DeleteFOWCommThreads.
     private static Map<ThreadChannel, Player> findPlayersCommThreads(
             Game game, List<ThreadChannel> threads, Player player) {
         Map<ThreadChannel, Player> threadMap = new HashMap<>();

@@ -36,14 +36,6 @@ public final class TransactionGenerator {
         return drawTransactableStuffImage(p1, p2, null);
     }
 
-    /**
-     * Draws the side-by-side "what can these two trade" summary.
-     *
-     * @param viewer whose perspective to draw from, or null to draw everything. Under fog, a player
-     *               this viewer can't see the sheet of is anonymised: their faction icon becomes a
-     *               color chip, their name becomes their color, and every count on their side is
-     *               masked. The color bars stay - colors aren't secret under fog.
-     */
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2, Player viewer) {
         boolean seeP1 = canSeeSheet(p1, viewer);
         boolean seeP2 = canSeeSheet(p2, viewer);
@@ -102,7 +94,7 @@ public final class TransactionGenerator {
         x += emojiSize + 5;
         drawEmojiWithCenteredCount(g2, CardEmojis.PN, p1.getPromissoryNotes().size(), seeP1, x, y);
         drawEmojiWithCenteredCount(g2, CardEmojis.PN, p2.getPromissoryNotes().size(), seeP2, width - x - emojiSize, y);
-        // ACs - only consult a player's abilities and techs if this viewer may read their sheet
+        // ACs
         if ((seeP1 && (p1.hasAbility("arbiters") || p1.hasTech("tf-guildships")))
                 || (seeP2 && (p2.hasAbility("arbiters") || p2.hasTech("tf-guildships")))) {
             x += emojiSize + 5;
@@ -135,13 +127,11 @@ public final class TransactionGenerator {
         return img;
     }
 
-    /** Null viewer, or a non-fog game, means everything is on show. */
     private static boolean canSeeSheet(Player target, Player viewer) {
         Game game = target.getGame();
         return viewer == null || !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, target, viewer);
     }
 
-    /** The player's faction icon, or a plain color chip when the viewer isn't allowed to see them. */
     private static void drawIdentityIcon(Graphics2D g2, Player player, boolean canSeeSheet, int x, int y) {
         if (canSeeSheet) {
             g2.drawImage(DrawingUtil.getPlayerFactionIconImageScaled(player, 40, 40), x, y, null);
@@ -151,13 +141,11 @@ public final class TransactionGenerator {
     }
 
     private static String identityName(Player player, boolean canSeeSheet) {
-        // A hidden sheet only happens under fog, where getFactionNameOrColor is the player's color.
         return canSeeSheet
                 ? player.bannerName()
                 : player.getFactionNameOrColor().toUpperCase();
     }
 
-    /** Draws a count, or a "?" in its place when the viewer isn't allowed to read that player's sheet. */
     private static void drawEmojiWithCenteredCount(
             Graphics2D g2, TI4Emoji emoji, int amount, boolean canSeeSheet, int x, int y) {
         if (canSeeSheet) {
