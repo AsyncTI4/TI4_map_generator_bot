@@ -730,7 +730,7 @@
         "id": "saarcommander",
         "faction": "saar",
         "type": "commander",
-        "name": "Rowl Sarrig",
+        "name": "Rowl Sarring",
         "title": "Relay Engineer",
         "abilityWindow": "When you produce fighters or infantry:",
         "abilityText": "You may place each of those units at any of your space docks that are not blockaded.",
