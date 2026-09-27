@@ -27,6 +27,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
@@ -139,6 +140,7 @@ public final class ButtonHelperModifyUnits {
             if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
             UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
             if (unitModel == null) continue;
+            if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)) continue;
 
             if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics")) {
                 continue;
@@ -179,6 +181,7 @@ public final class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
+                if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)) continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
@@ -206,6 +209,7 @@ public final class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
+                if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)) continue;
                 if ("warsun".equalsIgnoreCase(unitModel.getBaseType())
                         && ButtonHelper.isLawInPlay(game, "schematics")) {
                     continue;
@@ -663,6 +667,7 @@ public final class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null
+                        || ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
                         || !unitModel.getSustainDamage()
                         || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
                 if ("warsun".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "schematics"))
@@ -718,6 +723,7 @@ public final class ButtonHelperModifyUnits {
                 int bulwarkShipSustains = VanguardUnitHandler.getBulwarkSustainCount(game, player, tile, unitKey);
                 boolean bulwarkShip = bulwarkShipSustains > 0;
                 if (unitModel == null
+                        || ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
                         || (!unitModel.getSustainDamage()
                                 && !oldGloryFighter
                                 && !bulwarkShip
@@ -898,7 +904,7 @@ public final class ButtonHelperModifyUnits {
                         ? Math.min(effectiveUnits, (hits + 1) / 2)
                         : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
-                        && player.getUnitsOwned().contains("naaz_mech_space")
+                        && player.hasUnit("naaz_mech_space")
                         && "mech".equalsIgnoreCase(unitName)
                         && min > 0) {
                     hits -= min;
@@ -1976,8 +1982,11 @@ public final class ButtonHelperModifyUnits {
     @ButtonHandler("place_")
     public static void genericPlaceUnit(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("place_", "");
-        String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf('_'));
-        String planetName = unitNPlanet.replace(unitLong + "_", "");
+        boolean placingParturitionMonument = unitNPlanet.startsWith("parturitionMonument_");
+        String unitLong = placingParturitionMonument ? "monument" : unitNPlanet.substring(0, unitNPlanet.indexOf('_'));
+        String planetName = placingParturitionMonument
+                ? unitNPlanet.substring("parturitionMonument_".length())
+                : unitNPlanet.replace(unitLong + "_", "");
         String unitID = AliasHandler.resolveUnit(unitLong.replace("2", ""));
         UnitKey unitKey = Mapper.getUnitKey(unitID, player.getColorID());
         if (!RevenantTechHandler.canProduceLazarusUnit(event, game, player, unitLong, planetName)) {
@@ -2043,11 +2052,12 @@ public final class ButtonHelperModifyUnits {
                             + ", this is a __friendly__ reminder that you cannot produce _Reverb_ (Tyris mechs). Please undo this production.");
         }
         if ("sd".equalsIgnoreCase(unitID)) {
-            if (player.hasUnit("absol_saar_spacedock")
-                    || player.hasUnit("saar_spacedock")
-                    || player.hasTech("ffac2")
-                    || player.hasUnit("tf-floatingfactory")
-                    || player.hasTech("absol_ffac2")) {
+            if (!player.hasAbility("radiant_grafting_parturition")
+                    && (player.hasUnit("absol_saar_spacedock")
+                            || player.hasUnit("saar_spacedock")
+                            || player.hasTech("ffac2")
+                            || player.hasUnit("tf-floatingfactory")
+                            || player.hasTech("absol_ffac2"))) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";
@@ -2070,7 +2080,8 @@ public final class ButtonHelperModifyUnits {
                         replace);
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
-            if (player.hasAnyUnit("mirveda_pds", "mirveda_pds2")) {
+            if (!player.hasAbility("radiant_grafting_parturition")
+                    && player.hasAnyUnit("mirveda_pds", "mirveda_pds2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";

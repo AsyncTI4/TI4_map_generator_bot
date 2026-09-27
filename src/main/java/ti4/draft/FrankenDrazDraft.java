@@ -61,8 +61,7 @@ public class FrankenDrazDraft extends FrankenDraft {
             "neutral",
             "obsidian",
             "stoneborn",
-            "morpha",
-            "thurviali");
+            "morpha");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,

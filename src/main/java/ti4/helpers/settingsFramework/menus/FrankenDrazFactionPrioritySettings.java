@@ -34,8 +34,7 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
             "neutral",
             "obsidian",
             "stoneborn",
-            "morpha",
-            "thurviali");
+            "morpha");
 
     private final ListSetting<FactionModel> prioritizedFactions;
     private final IntegerRangeSetting discordantStarsFactionLimits;

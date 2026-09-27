@@ -20,6 +20,10 @@ import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class LostLegaciesStartingTechsHandler {
+    private static final String GET_THURVIALI_STARTING_TECHS = "getThurvialiStartingTechs";
+    private static final String SELECT_THURVIALI_STARTING_TECH_PLAYER = "selectThurvialiStartingTechPlayer_";
+    private static final String THURVIALI_STARTING_TECH = "thurvialiStartingTech_";
+
     public static boolean offerStartingTechButtons(Game game, Player player, String startingTechFaction) {
         if (game == null || player == null) {
             return false;
@@ -35,6 +39,11 @@ public class LostLegaciesStartingTechsHandler {
 
         if (!isSupportedFaction(factionToCheck)) {
             return false;
+        }
+
+        if ("thurviali".equalsIgnoreCase(factionToCheck)) {
+            offerThurvialiStartingTechs(game, player);
+            return true;
         }
 
         MessageHelper.sendMessageToChannelWithButton(
@@ -62,6 +71,7 @@ public class LostLegaciesStartingTechsHandler {
             case "aeterna" -> offerAeternaStartingTechs(game, player);
             case "revenant" -> offerRevenantStartingTechs(game, player);
             case "scrapyard" -> gainRandomScrapyardStartTechs(game, player);
+            case "thurviali" -> offerThurvialiStartingTechs(game, player);
             default -> {}
         }
     }
@@ -71,9 +81,93 @@ public class LostLegaciesStartingTechsHandler {
             return false;
         }
         return switch (faction.toLowerCase()) {
-            case "arcanum", "aeterna", "revenant", "scrapyard" -> true;
+            case "arcanum", "aeterna", "revenant", "scrapyard", "thurviali" -> true;
             default -> false;
         };
+    }
+
+    public static void offerThurvialiStartingTechs(Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+        game.setStoredValue(THURVIALI_STARTING_TECH + player.getFaction(), "yes");
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + " gain the starting technologies of another player. **Wait until every other player has chosen their starting technologies before doing this.**",
+                Buttons.green(
+                        player.factionButtonChecker() + GET_THURVIALI_STARTING_TECHS, "Gain Starting Technologies"));
+    }
+
+    @ButtonHandler(GET_THURVIALI_STARTING_TECHS)
+    public static void offerThurvialiStartingTechPlayerButtons(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null
+                || player == null
+                || (!"thurviali".equals(player.getFaction())
+                        && game.getStoredValue(THURVIALI_STARTING_TECH + player.getFaction())
+                                .isEmpty())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<Button> buttons = game.getRealPlayers().stream()
+                .filter(other -> other != player)
+                .filter(other -> !other.getTechs().isEmpty())
+                .map(other -> Buttons.green(
+                        player.factionButtonChecker() + SELECT_THURVIALI_STARTING_TECH_PLAYER + other.getFaction(),
+                        "Gain " + other.getColor() + " Starting Technologies",
+                        other.getFactionEmojiOrColor()))
+                .toList();
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " choose the player whose starting technologies you will gain.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(SELECT_THURVIALI_STARTING_TECH_PLAYER)
+    public static void gainThurvialiStartingTechnologies(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null
+                || player == null
+                || (!"thurviali".equals(player.getFaction())
+                        && game.getStoredValue(THURVIALI_STARTING_TECH + player.getFaction())
+                                .isEmpty())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        Player target =
+                game.getPlayerFromColorOrFaction(buttonID.substring(SELECT_THURVIALI_STARTING_TECH_PLAYER.length()));
+        if (target == null || target == player) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<TechnologyModel> gainedTechs = target.getTechs().stream()
+                .filter(tech -> !player.hasTech(tech))
+                .map(Mapper::getTech)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        gainedTechs.forEach(tech -> player.addTech(tech.getAlias()));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " gained "
+                        + (gainedTechs.isEmpty()
+                                ? "no new technologies"
+                                : gainedTechs.stream()
+                                        .map(tech -> tech.getRepresentation(false))
+                                        .collect(java.util.stream.Collectors.joining(", ")))
+                        + " from " + target.getRepresentationNoPing() + "'s starting technologies.");
+        game.removeStoredValue(THURVIALI_STARTING_TECH + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void clearThurvialiStartingTech(Game game, Player player) {
+        if (game != null && player != null) {
+            game.removeStoredValue(THURVIALI_STARTING_TECH + player.getFaction());
+        }
     }
 
     public static void offerArcanumStartingTechs(Game game, Player player) {

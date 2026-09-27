@@ -49,6 +49,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrap
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -108,6 +110,7 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        ThurvialiUnitHandler.destroyBlockadedFlightStructures(event, game, player);
         ScrapyardAbilitiesHandler.resolveEndOfTacticalAction(game, player, event);
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         ScrapyardTechHandler.clearHotswapping(game);
@@ -159,10 +162,15 @@ public final class ButtonHelperTacticalAction {
                                 + " agent to place 1 space dock for 2 trade goods or 2 commodities",
                         buttons);
             }
-            if (player.hasAbility("miniaturization") || player.hasUnit("tk-keshnu")) {
+            if (player.hasAbility("miniaturization")
+                    || player.hasUnit("tk-keshnu")
+                    || player.hasAbility("radiant_grafting_flight")) {
                 String msg = player.getRepresentation()
                         + ", you may use _Miniaturization_ to land any of your structures in the space area onto planets you control in this system.";
-                if (player.hasUnit("tk-keshnu")) {
+                if (player.hasAbility("radiant_grafting_flight")) {
+                    msg = player.getRepresentation()
+                            + ", you may use _Radiant Grafting: Flight_ to land any of your structures in space areas onto planets you control in their respective systems.";
+                } else if (player.hasUnit("tk-keshnu")) {
                     msg = player.getRepresentation() + ", you may land any of your " + UnitEmojis.pds + " "
                             + FactionEmojis.Ralnel + " _Kesh Nu_ units onto planets you control in this system.";
                 }
@@ -817,6 +825,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        ThurvialiLeadersHandler.offerMendingLightButtons(game, tile);
         VanguardUnitHandler.offerBulwarkButton(game, player);
         ScrapyardAbilitiesHandler.offerActivationRigButtons(game, player);
         ScrapyardUnitHandler.offerFuelCellButton(game, player);
@@ -1353,7 +1362,12 @@ public final class ButtonHelperTacticalAction {
                         continue;
                     }
                 }
-                if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.unitType()))) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                boolean isFlightStructure =
+                        player.hasAbility("radiant_grafting_flight") && unitModel != null && unitModel.getIsStructure();
+                if (unitHolder instanceof Planet
+                        && !movableFromPlanets.contains(unitKey.unitType())
+                        && !isFlightStructure) continue;
 
                 List<Integer> states = unitHolder.getUnitsByState().get(unitKey);
                 for (UnitState state : UnitState.values()) {

@@ -412,6 +412,7 @@
     {
         "id": "radiant_grafting_flight",
         "name": "Radiant Grafting: Flight",
+        "shortName": "Flight",
         "faction": "thurviali",
         "window": "At the end of your tactical actions:",
         "windowEffect": "You may place your structures that are in space areas onto planets you control in their respective systems. Blockaded structures in the space area of a system are destroyed.",
@@ -421,6 +422,7 @@
     {
         "id": "radiant_grafting_claws",
         "name": "Radiant Grafting: Claws",
+        "shortName": "Claws",
         "faction": "thurviali",
         "permanentEffect": "Your structures are treated as ground forces and gain a COMBAT value of 6 if they do not have it, and they participate in combats that occur where they are placed.",
         "source": "theodisi"
@@ -428,6 +430,7 @@
     {
         "id": "radiant_grafting_parturition",
         "name": "Radiant Grafting: Parturition",
+        "shortName": "Parturition",
         "faction": "thurviali",
         "permanentEffect": "Your PDS and Space Docks gain a COST value of 4 and may be produced by your units with PRODUCTION and placed on any planets you control in that unit’s system.",
         "source": "theodisi"
@@ -435,6 +438,7 @@
     {
         "id": "radiant_grafting_scales",
         "name": "Radiant Grafting: Scales",
+        "shortName": "Scales",
         "faction": "thurviali",
         "permanentEffect": "Your structures gain SUSTAIN DAMAGE if they do not have it. Your structures may use their SUSTAIN DAMAGE ability to cancel a hit that is produced against your ships in their system or ground forces on their planet.",
         "source": "theodisi"
@@ -442,6 +446,7 @@
     {
         "id": "radiant_grafting_phalanges",
         "name": "Radiant Grafting: Phalanges",
+        "shortName": "Phalanges",
         "faction": "thurviali",
         "permanentEffect": "Your mechs gain PRODUCTION 1 and SPACE CANNON 9 and are treated as structures for all purposes.",
         "source": "theodisi"

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -79,11 +81,15 @@ public final class PdsCoverageHelper {
                         }
 
                         Units.UnitKey unitKey = unitEntry.getKey();
-                        if (game.getPlayerByColorID(unitKey.colorID()).orElse(null) != player) {
+                        Player unitOwner =
+                                game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+                        boolean borrowed =
+                                ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitKey);
+                        if (unitOwner != player && !borrowed) {
                             continue;
                         }
 
-                        UnitModel model = player.getUnitFromUnitKey(unitKey);
+                        UnitModel model = unitOwner == null ? null : unitOwner.getUnitFromUnitKey(unitKey);
                         if (model == null
                                 || ("xxcha_mech".equalsIgnoreCase(model.getId())
                                         && ButtonHelper.isLawInPlay(game, "articles_war"))) {
@@ -94,8 +100,11 @@ public final class PdsCoverageHelper {
                             continue;
                         }
                         if ((model.getUnitType() == UnitType.Pds
-                                && player.hasAbility("miniaturization")
-                                && "space".equalsIgnoreCase(unitHolder.getName()))) {
+                                        && unitOwner.hasAbility("miniaturization")
+                                        && "space".equalsIgnoreCase(unitHolder.getName()))
+                                || (!borrowed
+                                        && ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(
+                                                player, unitHolder, model))) {
                             continue;
                         }
 
@@ -105,12 +114,12 @@ public final class PdsCoverageHelper {
                         }
 
                         // Check if PDS can shoot (deep space cannon or same tile)
-                        if (model.getDeepSpaceCannon(player) || sameTile) {
-                            for (int i = model.getSpaceCannonDieCount(player) * unitEntry.getValue(); i > 0; i--) {
-                                diceCount.add(model.getSpaceCannonHitsOn(player) - mod - tempMod);
+                        if (model.getDeepSpaceCannon(unitOwner) || sameTile) {
+                            for (int i = model.getSpaceCannonDieCount(unitOwner) * unitEntry.getValue(); i > 0; i--) {
+                                diceCount.add(model.getSpaceCannonHitsOn(unitOwner) - mod - tempMod);
                             }
                         } else if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
-                            diceCountMirveda.add(model.getSpaceCannonHitsOn(player) - mod - tempMod);
+                            diceCountMirveda.add(model.getSpaceCannonHitsOn(unitOwner) - mod - tempMod);
                         }
                     }
 

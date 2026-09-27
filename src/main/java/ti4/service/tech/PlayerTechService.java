@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -289,6 +290,14 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "ththurvialig" -> {
+                ThurvialiTechHandler.resolveRestructuring(game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "ththurvialib" -> {
+                ThurvialiTechHandler.resolveMutualism(game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             case "tharcanumbg" -> {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);

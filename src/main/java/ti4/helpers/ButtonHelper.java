@@ -67,6 +67,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -4643,6 +4645,7 @@ public class ButtonHelper {
             if (!(player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")
                     || player.hasAbility("miniaturization")
+                    || player.hasAbility("radiant_grafting_flight")
                     || player.hasUnit("tf-floatingfactory")
                     || player.hasTech("ffac2")
                     || player.hasTech("absol_ffac2"))) {
@@ -4652,6 +4655,7 @@ public class ButtonHelper {
         if (spaceHolder.getUnitCount(UnitType.Pds, player) > 0) {
             if (!(player.hasAnyUnit("mirveda_pds", "mirveda_pds2", "tk-keshnu")
                     || player.hasAbility("miniaturization")
+                    || player.hasAbility("radiant_grafting_flight")
                     || (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")))) {
                 structuresViolated = true;
             }
@@ -7212,6 +7216,7 @@ public class ButtonHelper {
                 // All sustain damage buttons for all states
                 boolean canDamage = !"courageouscombat".equalsIgnoreCase(type)
                         && !"assaultcannoncombat".equalsIgnoreCase(type)
+                        && !ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
                         && (unitCanSustainDamage(game, player, tile, unitModel)
                                 || VanguardUnitHandler.hasBulwarkSustain(game, player, tile, unitKey));
                 for (UnitState state : UnitState.values()) {
@@ -7257,7 +7262,7 @@ public class ButtonHelper {
                 || ("warsun".equalsIgnoreCase(unitBaseType) && !isLawInPlay(game, "schematics"))
                 || ("mech".equalsIgnoreCase(unitBaseType)
                         && !game.getLaws().containsKey("articles_war")
-                        && player.getUnitsOwned().contains("nomad_mech"))
+                        && player.hasUnit("nomad_mech"))
                 || ("mech".equalsIgnoreCase(unitBaseType)
                         && (player.ownsUnit("purpletf_mech")
                                 || player.hasUnit("naaz_voltron")
@@ -8375,6 +8380,20 @@ public class ButtonHelper {
                         }
                     }
                 }
+            }
+        }
+        for (Player coexistingPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(coexistingPlayer)
+                    || !ThurvialiTechHandler.hasCoexistingSpaceCannonCoverage(game, coexistingPlayer, activeTile)) {
+                continue;
+            }
+            if (coexistingPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(coexistingPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)) {
+                    playersWithPds2.add(coexistingPlayer);
+                }
+            } else {
+                playersWithPds2.add(coexistingPlayer);
             }
         }
         for (Player hiveEchoPlayer : game.getRealPlayers()) {
