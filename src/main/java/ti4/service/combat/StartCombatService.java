@@ -52,6 +52,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
@@ -1661,7 +1662,10 @@ public class StartCombatService {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
         }
-
+        if (isGroundCombat) {
+            ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
+            ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);
+        }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(
                     "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,

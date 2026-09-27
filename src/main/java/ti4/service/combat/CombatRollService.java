@@ -50,6 +50,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
@@ -278,8 +280,22 @@ public class CombatRollService {
 
         Map<Pair<UnitModel, UnitHolder>, Integer> playerUnitsByQuantity =
                 getUnitsInCombatByHolder(tile, combatOnHolder, player, event, rollType, game);
+        if (rollType != CombatRollType.combatround) {
+            playerUnitsByQuantity
+                    .entrySet()
+                    .removeIf(entry -> ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(
+                            player, entry.getKey().getRight(), entry.getKey().getLeft()));
+        }
         if (selectedUnits != null) {
             playerUnitsByQuantity = new HashMap<>(selectedUnits);
+            if (rollType != CombatRollType.combatround) {
+                playerUnitsByQuantity
+                        .entrySet()
+                        .removeIf(entry -> ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(
+                                player,
+                                entry.getKey().getRight(),
+                                entry.getKey().getLeft()));
+            }
         }
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
             playerUnitsByQuantity.put(new ImmutablePair<>(getMetaliAFBUnit(player), combatOnHolder), 1);
@@ -2766,6 +2782,16 @@ public class CombatRollService {
                         new ImmutablePair<>(player.getPriorityUnitByAsyncID(entry.getKey(), null), entry.getValue()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
+        for (Map.Entry<UnitKey, Integer> unitEntry : planet.getUnits().entrySet()) {
+            Player structureOwner =
+                    game.getPlayerByColorID(unitEntry.getKey().colorID()).orElse(null);
+            UnitModel structure = structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
+            if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, planet, unitEntry.getKey())
+                    && structure != null) {
+                unitsOnPlanet.merge(structure, unitEntry.getValue(), Integer::sum);
+            }
+        }
+
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
@@ -2819,6 +2845,16 @@ public class CombatRollService {
                 if (model != null)
                     unitsOnTile.merge(new ImmutablePair<>(model, unitHolder), entry.getValue(), Integer::sum);
             }
+            for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
+                Player structureOwner =
+                        game.getPlayerByColorID(unitEntry.getKey().colorID()).orElse(null);
+                UnitModel structure =
+                        structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
+                if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
+                        && structure != null) {
+                    unitsOnTile.merge(new ImmutablePair<>(structure, unitHolder), unitEntry.getValue(), Integer::sum);
+                }
+            }
         }
 
         Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
@@ -2843,6 +2879,19 @@ public class CombatRollService {
                     if (model != null)
                         unitsOnAdjacentTiles.merge(
                                 new ImmutablePair<>(model, unitHolder), entry.getValue(), Integer::sum);
+                }
+                for (Map.Entry<UnitKey, Integer> unitEntry :
+                        unitHolder.getUnits().entrySet()) {
+                    Player structureOwner = game.getPlayerByColorID(
+                                    unitEntry.getKey().colorID())
+                            .orElse(null);
+                    UnitModel structure =
+                            structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
+                    if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
+                            && structure != null) {
+                        unitsOnAdjacentTiles.merge(
+                                new ImmutablePair<>(structure, unitHolder), unitEntry.getValue(), Integer::sum);
+                    }
                 }
                 if (unitHolder instanceof Planet planet) {
                     if (player.hasUnlockedBreakthrough("aeternabt")) {

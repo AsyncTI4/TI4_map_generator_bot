@@ -10,6 +10,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
@@ -170,6 +171,28 @@ public class UnitModelValueInjectionService {
             } else {
                 injectedUnit.setAbility(baseAbility);
             }
+        }
+        if ("thurviali_mech".equals(unit.getId())) {
+            if (injectedUnit == unit) {
+                injectedUnit = copyUnit(unit);
+            }
+            String baseAbility = unit.getAbility().orElse("");
+            int copiedAbilityStart = baseAbility.indexOf("\n\n**");
+            if (copiedAbilityStart >= 0) {
+                baseAbility = baseAbility.substring(0, copiedAbilityStart);
+            }
+            String copiedAbilityText = ThurvialiUnitHandler.getCoexistingMechOwners(player.getGame(), player).stream()
+                    .flatMap(owner -> owner.getUnitsOwned().stream())
+                    .map(Mapper::getUnit)
+                    .filter(Objects::nonNull)
+                    .filter(other -> other.getUnitType() == UnitType.Mech)
+                    .filter(other -> other.getAbility().isPresent())
+                    .map(other ->
+                            "**" + other.getName() + "**: " + other.getAbility().orElse(""))
+                    .distinct()
+                    .collect(java.util.stream.Collectors.joining("\n"));
+            String ability = copiedAbilityText.isBlank() ? baseAbility : baseAbility + "\n\n" + copiedAbilityText;
+            injectedUnit.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
         }
         return injectedUnit;
     }
@@ -347,7 +370,7 @@ public class UnitModelValueInjectionService {
 
         if (ScrapyardAbilitiesHandler.isRigActive(player, "cruiser_customrig")
                 && "cruiser".equalsIgnoreCase(unit.getBaseType())) {
-            booleans.isGroundForce(true);
+            booleans.isGroundForce(true).isSpaceOnly(false);
         }
 
         if (ScrapyardAbilitiesHandler.isRigActive(player, "dreadnought_customrig")
@@ -358,6 +381,48 @@ public class UnitModelValueInjectionService {
 
         if (player.hasAbility("shielded_transports") && unit.getSustainDamage() && unit.isNonFighterShip()) {
             integers.capacityValue(1);
+        }
+
+        if (player.hasAbility("radiant_grafting_flight") && unit.getIsStructure()) {
+            if (unit.getMoveValue() < 1) {
+                integers.moveValue(1, true);
+            }
+            booleans.isShip(true).isPlanetOnly(false).isSpaceOnly(false);
+            if (player.hasAbility("radiant_grafting_scales")) {
+                booleans.canBeDirectHit(true);
+            }
+        }
+
+        if (player.hasAbility("radiant_grafting_claws") && unit.getIsStructure()) {
+            if (unit.getCombatDieCount() < 1) {
+                integers.combatDieCount(1, true);
+            }
+            if (unit.getCombatHitsOn() == 0 || unit.getCombatHitsOn() > 6) {
+                integers.combatHitsOn(6, true);
+            }
+            booleans.isGroundForce(true);
+        }
+
+        if (player.hasAbility("radiant_grafting_parturition") && unit.getUnitType() == UnitType.Spacedock
+                || unit.getUnitType() == UnitType.Pds) {
+            floats.cost(4, true);
+        }
+
+        if (player.hasAbility("radiant_grafting_scales") && unit.getIsStructure()) {
+            booleans.sustainDamage(true);
+        }
+
+        if (player.hasAbility("radiant_grafting_phalanges") && unit.getUnitType() == UnitType.Mech) {
+            if (unit.getProductionValue() < 1) {
+                integers.productionValue(1, true);
+            }
+            if (unit.getSpaceCannonDieCount() < 1) {
+                integers.spaceCannonDieCount(1, true);
+            }
+            if (unit.getSpaceCannonHitsOn() == 0 || unit.getSpaceCannonHitsOn() > 9) {
+                integers.spaceCannonHitsOn(9, true);
+            }
+            booleans.isStructure(true);
         }
 
         return UnitValueInjection.of(integers, floats, booleans);

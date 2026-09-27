@@ -55,6 +55,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
@@ -970,11 +972,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
             return ValefarZService.hasFlagshipAbility(game, this, unitID);
         }
-        return getUnitsOwned().contains(unitID);
+        return ownsUnit(unitID);
     }
 
     public boolean ownsUnit(String unitID) {
-        return getUnitsOwned().contains(unitID);
+        if (getUnitsOwned().contains(unitID)) {
+            return true;
+        }
+        UnitModel unit = Mapper.getUnit(unitID);
+        return unit != null
+                && unit.getUnitType() == UnitType.Mech
+                && ThurvialiUnitHandler.hasCopiedMechAbility(game, this, unitID);
     }
 
     public boolean removeOwnedUnitByID(String unitID) {
@@ -2300,6 +2308,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         Game game = this.game;
 
         getFollowedSCs().add(sc);
+        if (game != null) {
+            ThurvialiAbilityHandler.offerCelestialEnvoys(game, this, sc);
+        }
         if (editSCFollow) {
             game.setStoredValue(
                     "followedSC" + sc + "_" + game.getRound(),

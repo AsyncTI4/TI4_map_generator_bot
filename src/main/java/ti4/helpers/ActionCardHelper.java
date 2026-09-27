@@ -827,10 +827,12 @@ public class ActionCardHelper {
         MonumentsButtonHandler.gainKVDTradeGoods(game, player, actionCardTitle);
 
         if (actionCardIsCancelable) {
-            Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
-            if (empy != null
-                    && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
-                    && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+            for (Player empy : game.getRealPlayers()) {
+                if (!empy.hasUnit("empyrean_mech")
+                        || !ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
+                        || ButtonHelper.isLawInPlay(game, "articles_war")) {
+                    continue;
+                }
                 Button empyButton = Buttons.gray(
                         "sabotage_empy_" + actionCardTitle + "_" + player.getFaction(),
                         "Cancel " + actionCardTitle + " With Watcher",

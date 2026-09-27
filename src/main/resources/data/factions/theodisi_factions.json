@@ -757,7 +757,7 @@
         "alias": "thurviali",
         "factionName": "The Radiant Thurviali",
         "homeSystem": "th18",
-        "startingFleet": "1 cv, 2 cr, 4 ff, 2 inf t, 1 inf a, 1 mf a, 1 sd t, 1 pds a",
+        "startingFleet": "1 cv, 2 cr, 4 ff, 2 inf g, 1 inf a, 1 mf a, 1 sd g, 1 pds a",
         "commodities": 4,
         "factionTech": [
             "ththurvialig",

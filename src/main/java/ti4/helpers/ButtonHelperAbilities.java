@@ -17,6 +17,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -2181,6 +2183,7 @@ public final class ButtonHelperAbilities {
         if (player.getPlanets().contains(planet) && enemyPlayer.isPresent()) {
             AddPlanetService.addPlanet(enemyPlayer.get(), planet, game);
         }
+        ThurvialiBreakthroughHandler.offerNeurografting(event, game, player, unitHolder);
         oceanBoundCheck(game);
         if (player.hasAbility("raider_coves")) {
             player.gainTG(2, true);
@@ -2290,6 +2293,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
+        ThurvialiAbilityHandler.checkRadiantGrafting(game);
     }
 
     @ButtonHandler("startCombatOn_")

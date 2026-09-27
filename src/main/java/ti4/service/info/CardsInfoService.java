@@ -25,6 +25,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
@@ -515,6 +517,13 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("verydithagent")) {
             buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("thurvialiagent")) {
+            buttons.add(ThurvialiLeadersHandler.getHopeCardsInfoButton(player));
+        }
+        Button doubleDragonsDeploy = ThurvialiUnitHandler.getDoubleDragonsDeployButton(game, player);
+        if (doubleDragonsDeploy != null) {
+            buttons.add(doubleDragonsDeploy);
         }
         Button diplomaticBoonButton = LostLegaciesRelicHandler.getDiplomaticBoonCardsInfoButton(game, player);
         if (diplomaticBoonButton != null) buttons.add(diplomaticBoonButton);

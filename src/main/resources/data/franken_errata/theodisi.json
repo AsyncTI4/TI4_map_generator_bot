@@ -214,5 +214,29 @@
         "itemId": "drive_decoherence",
         "undraftable": true,
         "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "radiant_grafting",
+        "optionalSwaps": [
+            "ABILITY:celestial_envoys"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "thurviali_mech",
+        "optionalSwaps": [
+            "ABILITY:celestial_envoys"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "thurvialibt",
+        "optionalSwaps": [
+            "ABILITY:celestial_envoys"
+        ],
+        "source": "theodisi"
     }
 ]
