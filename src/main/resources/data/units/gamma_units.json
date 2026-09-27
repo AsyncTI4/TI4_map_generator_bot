@@ -618,7 +618,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When you use the PRODUCTION ability of 1 or more units in this system, you may place any of those produced units in the space area of adjacent systems that do not contain another player's ships."
+        "ability": "After you activate this system, when you use the PRODUCTION ability of 1 or more units in this system you may place any of those produced units in the space area of adjacent systems that do not contain another player's ships. "
     },
     {
         "id": "industries_mech",

@@ -454,7 +454,7 @@
         "alias": "industries",
         "factionName": "Jord Industries",
         "homeSystem": "01",
-        "startingFleet": "2 cr, 1 dd, 3 ff, 3 inf d, sd d",
+        "startingFleet": "2 cr, 1 dd, 3 ff, 2 inf d, 1 mf d, sd d",
         "commodities": 3,
         "factionTech": [
             "ggindustg",
