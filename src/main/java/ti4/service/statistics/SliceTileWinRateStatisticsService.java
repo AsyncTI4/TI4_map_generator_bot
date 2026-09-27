@@ -326,9 +326,7 @@ public class SliceTileWinRateStatisticsService {
 
             List<Entry<String, WinRateCount>> ranked = rankedByWinRate(wellSampled);
             sb.append("  - Best:\n");
-            ranked.stream()
-                    .limit(TOP_BOTTOM_COUNT)
-                    .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
+            ranked.stream().limit(TOP_BOTTOM_COUNT).forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
 
             // Take the tail without letting it overlap the best list.
             int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
