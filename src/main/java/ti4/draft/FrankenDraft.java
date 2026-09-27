@@ -115,8 +115,7 @@ public class FrankenDraft extends BagDraft {
         "neutral",
         "obsidian",
         "stoneborn",
-        "morpha",
-        "thurviali"
+        "morpha"
     };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {

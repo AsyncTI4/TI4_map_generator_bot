@@ -52,8 +52,7 @@ public class FrankenSettings extends SettingsMenu {
             "neutral",
             "obsidian",
             "stoneborn",
-            "morpha",
-            "thurviali");
+            "morpha");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;
