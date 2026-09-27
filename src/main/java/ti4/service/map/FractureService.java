@@ -80,7 +80,14 @@ public class FractureService {
         }
 
         int result = new Die(0).getResult();
-        if ("cabalbt".equals(bt)) {
+        if ("onyxxabt".equals(bt)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation(false, false)
+                            + " has _Styx and Stones_ so The Fracture enters automatically!"
+                            + " Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.");
+            if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
+        } else if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
                     + " has _Al'Raith Ix Ianovar_ so The Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";

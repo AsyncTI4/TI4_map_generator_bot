@@ -1,5 +1,7 @@
 package ti4.service.statistics;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,21 +21,32 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
+import ti4.service.map.FractureService;
 
 @UtilityClass
 public class SliceTileWinRateStatisticsService {
 
     private static final String ENTROPIC_SCAR_TILE_ID = "114";
 
+    private static final String CREUSS_GATE_TILE_ID = "17";
+
+    static final String HOME_SYSTEM_KEY = "home";
+
+    private static final String HOME_SYSTEM_LABEL = "A home system";
+
     private static final int TOP_BOTTOM_COUNT = 3;
 
-    private static final int MINIMUM_OCCURRENCES = 10;
+    private static final String SPARSE_MARKER = " _(sparse)_";
+
+    static final double SPARSE_FRACTION_OF_MEDIAN = 0.5;
 
     static final Map<String, List<String>> SLICE_POSITIONS_BY_HOME = Map.of(
             "301", List.of("318", "302", "201", "101"),
@@ -46,6 +59,11 @@ public class SliceTileWinRateStatisticsService {
     private static final Comparator<Entry<String, WinRateCount>> BY_WIN_RATE_DESC = Comparator.comparingDouble(
                     (Entry<String, WinRateCount> entry) -> entry.getValue().winRate())
             .thenComparingInt(entry -> entry.getValue().total)
+            .reversed()
+            .thenComparing(entry -> tileName(entry.getKey()));
+
+    private static final Comparator<Entry<String, WinRateCount>> BY_APPEARANCES_DESC = Comparator.comparingInt(
+                    (Entry<String, WinRateCount> entry) -> entry.getValue().total)
             .reversed()
             .thenComparing(entry -> tileName(entry.getKey()));
 
@@ -104,10 +122,10 @@ public class SliceTileWinRateStatisticsService {
         sb.append("_A slice is the systems adjacent to a player's home, plus the ring-1 system"
                 + " adjacent to `000` nearest to them._\n");
         sb.append("_6-player, 10-victory-point Thunder's Edge games with winners: no Twilight's Fall, non-fog,"
-                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout._\n");
-        sb.append("_Only tiles with at least ")
-                .append(MINIMUM_OCCURRENCES)
-                .append(" appearances in a given bucket are shown._\n");
+                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout with no"
+                + " hyperlanes in any slice._\n");
+        sb.append("_Every tile is shown. Rows marked (sparse) have fewer than half the median sample"
+                + " of their section, and are left out of each faction's best, worst and most common lists._\n");
         sb.append("Games analyzed: ")
                 .append(gameCount)
                 .append(" | Slices analyzed: ")
@@ -124,6 +142,7 @@ public class SliceTileWinRateStatisticsService {
         appendOverallSection(sb, stats);
         appendBestAndWorstByFactionSection(sb, stats);
         appendSpecialTileSection(sb, stats);
+        appendIngressSection(sb, stats);
 
         return sb.toString();
     }
@@ -133,6 +152,11 @@ public class SliceTileWinRateStatisticsService {
                 .map(Player::getFaction)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+
+        boolean fractureInPlay = FractureService.isFractureInPlay(game);
+        if (fractureInPlay) {
+            stats.ingressGames++;
+        }
 
         for (Player player : game.getRealAndEliminatedPlayers()) {
             String faction = player.getFaction();
@@ -150,10 +174,14 @@ public class SliceTileWinRateStatisticsService {
                         .record(isWinner);
             }
 
+            boolean ingressInSlice = false;
             for (String position : slicePositions) {
                 Tile tile = game.getTileByPosition(position);
                 if (tile == null) {
                     continue;
+                }
+                if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+                    ingressInSlice = true;
                 }
                 String tileId = tile.getTileID();
                 if (isNotASystem(tileId)) {
@@ -161,17 +189,30 @@ public class SliceTileWinRateStatisticsService {
                     continue;
                 }
 
+                boolean homeSystem = isHomeSystemTile(tileId);
+                String statsKey = homeSystem ? HOME_SYSTEM_KEY : tileId;
                 stats.overallTiles
-                        .computeIfAbsent(tileId, _ -> new WinRateCount())
+                        .computeIfAbsent(statsKey, _ -> new WinRateCount())
                         .record(isWinner);
-                if (isSpecialTile(tileId)) {
+                if (!homeSystem && isSpecialTile(tileId)) {
                     stats.specialTileIds.add(tileId);
                 }
                 for (String factionKey : factionKeys) {
                     stats.factionTiles
                             .computeIfAbsent(factionKey, _ -> new HashMap<>())
-                            .computeIfAbsent(tileId, _ -> new WinRateCount())
+                            .computeIfAbsent(statsKey, _ -> new WinRateCount())
                             .record(isWinner);
+                }
+            }
+
+            if (fractureInPlay) {
+                (ingressInSlice ? stats.ingressWith : stats.ingressWithout).record(isWinner);
+                if (ingressInSlice) {
+                    for (String factionKey : factionKeys) {
+                        stats.factionIngress
+                                .computeIfAbsent(factionKey, _ -> new WinRateCount())
+                                .record(isWinner);
+                    }
                 }
             }
         }
@@ -203,12 +244,26 @@ public class SliceTileWinRateStatisticsService {
                 return false;
             }
             for (String position : slicePositions) {
-                if (game.getTileByPosition(position) == null) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null || isHyperlane(tile)) {
                     return false;
                 }
             }
         }
         return homes.size() == SLICE_POSITIONS_BY_HOME.size();
+    }
+
+    private static boolean isHyperlane(Tile tile) {
+        TileModel tileModel = tile.getTileModel();
+        return tileModel != null && tileModel.isHyperlane();
+    }
+
+    static boolean isHomeSystemTile(String tileId) {
+        if (CREUSS_GATE_TILE_ID.equals(tileId)) {
+            return false;
+        }
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        return tileModel != null && tileModel.getTileBack() == TileBack.GREEN;
     }
 
     private static boolean isSpecialTile(String tileId) {
@@ -226,49 +281,72 @@ public class SliceTileWinRateStatisticsService {
         });
     }
 
-    private static List<Entry<String, WinRateCount>> wellSampled(Map<String, WinRateCount> tiles) {
-        return tiles.entrySet().stream()
-                .filter(entry -> entry.getValue().total >= MINIMUM_OCCURRENCES)
-                .sorted(BY_WIN_RATE_DESC)
-                .toList();
+    private static List<Entry<String, WinRateCount>> rankedByWinRate(Map<String, WinRateCount> tiles) {
+        return tiles.entrySet().stream().sorted(BY_WIN_RATE_DESC).toList();
+    }
+
+    private static double sparseThreshold(Collection<WinRateCount> counts) {
+        return median(counts.stream().mapToInt(count -> count.total).toArray()) * SPARSE_FRACTION_OF_MEDIAN;
+    }
+
+    static double median(int... totals) {
+        if (totals.length == 0) {
+            return 0;
+        }
+        int[] sorted = totals.clone();
+        Arrays.sort(sorted);
+        int mid = sorted.length / 2;
+        return sorted.length % 2 == 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2.0;
     }
 
     private static void appendOverallSection(StringBuilder sb, SliceTileWinRateStats stats) {
         sb.append("\n### Slice tile win rates, all factions\n");
-        List<Entry<String, WinRateCount>> ranked = wellSampled(stats.overallTiles);
+        List<Entry<String, WinRateCount>> ranked = rankedByWinRate(stats.overallTiles);
         if (ranked.isEmpty()) {
-            sb.append("- No tile appeared in at least ")
-                    .append(MINIMUM_OCCURRENCES)
-                    .append(" slices.\n");
+            sb.append("- No tile appeared in any slice.\n");
             return;
         }
-        ranked.forEach(entry -> appendTileLine(sb, "* ", entry));
+        double sparseBelow = sparseThreshold(stats.overallTiles.values());
+        ranked.forEach(entry -> appendTileLine(sb, "* ", entry, sparseBelow));
     }
 
     private static void appendBestAndWorstByFactionSection(StringBuilder sb, SliceTileWinRateStats stats) {
-        sb.append("\n### Best and worst slice tiles by faction\n");
+        sb.append("\n### Best, worst and most common slice tiles by faction\n");
+        double sparseBelow = sparseThreshold(stats.factionTiles.values().stream()
+                .flatMap(tiles -> tiles.values().stream())
+                .toList());
         stats.factionTiles.entrySet().stream().sorted(Entry.comparingByKey()).forEach(factionEntry -> {
-            List<Entry<String, WinRateCount>> ranked = wellSampled(factionEntry.getValue());
-            if (ranked.isEmpty()) {
-                return;
-            }
-
             sb.append("- ")
                     .append(factionLabel(factionEntry.getKey()))
                     .append(" - overall ")
                     .append(stats.factionRecords.get(factionEntry.getKey()))
                     .append('\n');
 
+            Map<String, WinRateCount> wellSampled = factionEntry.getValue().entrySet().stream()
+                    .filter(entry -> entry.getValue().total >= sparseBelow)
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+            if (wellSampled.isEmpty()) {
+                sb.append("  - No tiles with a non-sparse sample yet.\n");
+                return;
+            }
+
+            List<Entry<String, WinRateCount>> ranked = rankedByWinRate(wellSampled);
             sb.append("  - Best:\n");
-            ranked.stream().limit(TOP_BOTTOM_COUNT).forEach(entry -> appendTileLine(sb, "    * ", entry));
+            ranked.stream().limit(TOP_BOTTOM_COUNT).forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
 
             // Take the tail without letting it overlap the best list.
             int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
             if (worstFrom < ranked.size()) {
                 sb.append("  - Worst:\n");
                 List<Entry<String, WinRateCount>> worst = ranked.subList(worstFrom, ranked.size());
-                worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry));
+                worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
             }
+
+            sb.append("  - Most common:\n");
+            wellSampled.entrySet().stream()
+                    .sorted(BY_APPEARANCES_DESC)
+                    .limit(TOP_BOTTOM_COUNT)
+                    .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
         });
     }
 
@@ -283,20 +361,18 @@ public class SliceTileWinRateStatisticsService {
         }
         sb.append("_That faction's win rate when the tile was in their slice._\n");
 
-        boolean anyReported = false;
+        double sparseBelow = sparseThreshold(stats.factionTiles.values().stream()
+                .flatMap(tiles -> specialTileIds.stream().map(tiles::get).filter(Objects::nonNull))
+                .toList());
         for (Entry<String, Map<String, WinRateCount>> factionEntry : stats.factionTiles.entrySet().stream()
                 .sorted(Entry.comparingByKey())
                 .toList()) {
             List<String> present = specialTileIds.stream()
-                    .filter(tileId -> {
-                        WinRateCount count = factionEntry.getValue().get(tileId);
-                        return count != null && count.total >= MINIMUM_OCCURRENCES;
-                    })
+                    .filter(tileId -> factionEntry.getValue().get(tileId) != null)
                     .toList();
             if (present.isEmpty()) {
                 continue;
             }
-            anyReported = true;
             sb.append("- ")
                     .append(factionLabel(factionEntry.getKey()))
                     .append(" - overall ")
@@ -304,17 +380,55 @@ public class SliceTileWinRateStatisticsService {
                     .append('\n');
             for (String tileId : present) {
                 appendTileLine(
-                        sb, "  * ", Map.entry(tileId, factionEntry.getValue().get(tileId)));
+                        sb, "  * ", Map.entry(tileId, factionEntry.getValue().get(tileId)), sparseBelow);
             }
-        }
-        if (!anyReported) {
-            sb.append("- No faction held an Entropic Scar or Legendary tile in at least ")
-                    .append(MINIMUM_OCCURRENCES)
-                    .append(" slices.\n");
         }
     }
 
-    private static void appendTileLine(StringBuilder sb, String indent, Entry<String, WinRateCount> entry) {
+    private static void appendIngressSection(StringBuilder sb, SliceTileWinRateStats stats) {
+        sb.append("\n### Ingress tokens in slice (Fracture games)\n");
+        if (stats.ingressGames == 0) {
+            sb.append("- No analyzed games had the Fracture in play.\n");
+            return;
+        }
+        sb.append("_Win rate when a player had an ingress token in their slice, among games where the"
+                + " Fracture was in play._\n");
+        sb.append("Fracture games analyzed: ").append(stats.ingressGames).append('\n');
+        sb.append("* With an ingress token in slice: ")
+                .append(stats.ingressWith)
+                .append('\n');
+        sb.append("* Without an ingress token in slice: ")
+                .append(stats.ingressWithout)
+                .append('\n');
+
+        List<Entry<String, WinRateCount>> ranked = stats.factionIngress.entrySet().stream()
+                .sorted(BY_WIN_RATE_DESC)
+                .toList();
+        if (!ranked.isEmpty()) {
+            sb.append("_By faction, win rate with an ingress token in slice,"
+                    + " against the faction's overall win rate:_\n");
+            double sparseBelow = sparseThreshold(stats.factionIngress.values());
+            ranked.forEach(entry -> {
+                WinRateCount ingress = entry.getValue();
+                WinRateCount base = stats.factionRecords.get(entry.getKey());
+                sb.append("  * ")
+                        .append(factionLabel(entry.getKey()))
+                        .append(" - ")
+                        .append(ingress);
+                if (base != null && base.total > 0) {
+                    long diff = Math.round((ingress.winRate() - base.winRate()) * 100);
+                    sb.append(", ").append(diff >= 0 ? "+" : "").append(diff).append("% vs base");
+                }
+                if (ingress.total < sparseBelow) {
+                    sb.append(SPARSE_MARKER);
+                }
+                sb.append('\n');
+            });
+        }
+    }
+
+    private static void appendTileLine(
+            StringBuilder sb, String indent, Entry<String, WinRateCount> entry, double sparseBelow) {
         WinRateCount count = entry.getValue();
         sb.append(indent)
                 .append('`')
@@ -324,8 +438,11 @@ public class SliceTileWinRateStatisticsService {
                 .append('/')
                 .append(count.total)
                 .append(") ")
-                .append(tileLabel(entry.getKey()))
-                .append('\n');
+                .append(tileLabel(entry.getKey()));
+        if (count.total < sparseBelow) {
+            sb.append(SPARSE_MARKER);
+        }
+        sb.append('\n');
     }
 
     /**
@@ -333,12 +450,18 @@ public class SliceTileWinRateStatisticsService {
      * would blow up String.compareTo mid-sort.
      */
     private static String tileName(String tileId) {
+        if (HOME_SYSTEM_KEY.equals(tileId)) {
+            return HOME_SYSTEM_LABEL;
+        }
         TileModel tileModel = TileHelper.getTileById(tileId);
         String name = tileModel == null ? null : tileModel.getNameNullSafe();
         return StringUtils.isBlank(name) ? tileId : name;
     }
 
     private static String tileLabel(String tileId) {
+        if (HOME_SYSTEM_KEY.equals(tileId)) {
+            return HOME_SYSTEM_LABEL;
+        }
         return tileId + " (" + tileName(tileId) + ")";
     }
 
@@ -360,9 +483,16 @@ public class SliceTileWinRateStatisticsService {
         /** Entropic Scar and Legendary tiles that actually turned up, so we only report real data. */
         final Set<String> specialTileIds = new HashSet<>();
 
+        /** Ingress-token-in-slice records, gathered only from games where the Fracture was in play. */
+        final WinRateCount ingressWith = new WinRateCount();
+
+        final WinRateCount ingressWithout = new WinRateCount();
+        final Map<String, WinRateCount> factionIngress = new HashMap<>();
+
         int sliceCount;
         int excludedGames;
         int skippedNonSystemTiles;
+        int ingressGames;
     }
 
     private static class WinRateCount {

@@ -32,6 +32,8 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.franken.FrankenDraftStartService;
+import ti4.service.franken.FrankenUnitService;
+import ti4.service.game.MonumentsService;
 import tools.jackson.databind.JsonNode;
 
 @Getter
@@ -48,13 +50,13 @@ public class FrankenSettings extends SettingsMenu {
             "miltymod",
             "qulane",
             "neutral",
-            "kaltrim",
-            "xin",
-            "sarcosa",
-            "obsidian");
+            "obsidian",
+            "stoneborn",
+            "morpha");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;
+    private final BooleanSetting combineDuplicateUnitTypes;
     private final BooleanSetting banAllDsFactions;
     private final BooleanSetting banAllBrFactions;
     private final ListSetting<FactionModel> bannedFactions;
@@ -79,6 +81,8 @@ public class FrankenSettings extends SettingsMenu {
         draftMode.setShow(FrankenSettings::draftModeLabel);
 
         force = new BooleanSetting("Force", "Force overwrite existing player setups", false);
+        combineDuplicateUnitTypes =
+                new BooleanSetting("CombineDuplicateUnitTypes", "Combine duplicate unit types", false);
         banAllDsFactions = new BooleanSetting("BanAllDS", "DS Factions", true);
         banAllBrFactions = new BooleanSetting("BanAllBR", "BR Factions", true);
 
@@ -113,6 +117,7 @@ public class FrankenSettings extends SettingsMenu {
         if (isMenuJson(json, MENU_ID)) {
             draftMode.initialize(json.get("draftMode"));
             force.initialize(json.get("force"));
+            combineDuplicateUnitTypes.initialize(json.get("combineDuplicateUnitTypes"));
             banAllDsFactions.initialize(json.get("banAllDsFactions"));
             banAllBrFactions.initialize(json.get("banAllBrFactions"));
             bannedFactions.initialize(json.get("bannedFactions"));
@@ -131,7 +136,7 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        List<SettingInterface> settings = new ArrayList<>(List.of(draftMode, force));
+        List<SettingInterface> settings = new ArrayList<>(List.of(draftMode, force, combineDuplicateUnitTypes));
         if (isFrankendrazMode()) {
             settings.add(banAllDsFactions);
             settings.add(banAllBrFactions);
@@ -211,7 +216,11 @@ public class FrankenSettings extends SettingsMenu {
             return validationError;
         }
         applyHomebrewSettings();
+        game.setStoredValue(
+                FrankenUnitService.COMBINE_DUPLICATE_UNIT_TYPES,
+                Boolean.toString(combineDuplicateUnitTypes.isVal() && !game.isTwilightsFallMode()));
         deckSettings.applyDecks(game, event);
+        MonumentsService.applyMonuments(game);
         applyBanSettings();
         applyPriorityFactionSettings();
         return FrankenDraftStartService.startFrankenDraft(event, game, force.isVal(), selectedDraftMode());
@@ -289,6 +298,7 @@ public class FrankenSettings extends SettingsMenu {
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));
+        game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
     }
 
     private FrankenDraftMode selectedDraftMode() {
@@ -317,6 +327,10 @@ public class FrankenSettings extends SettingsMenu {
 
     public boolean isLostLegaciesEnabled() {
         return homebrewSettings.getLostLegacies().isVal();
+    }
+
+    boolean isMonumentsEnabled() {
+        return homebrewSettings.getMonuments().isVal();
     }
 
     void syncFrankendrazDsBrState(String lastSettingTouched) {

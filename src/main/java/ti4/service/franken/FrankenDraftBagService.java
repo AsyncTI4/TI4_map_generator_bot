@@ -79,6 +79,7 @@ public class FrankenDraftBagService {
             DraftCategory.PN,
             DraftCategory.STARTINGTECH,
             DraftCategory.UNIT,
+            DraftCategory.MONUMENT,
             DraftCategory.MAHACTKING);
 
     public static final List<DraftCategory> TFcomponentCategories = List.of(

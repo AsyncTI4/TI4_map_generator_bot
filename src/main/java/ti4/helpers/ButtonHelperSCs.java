@@ -20,8 +20,13 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Administra
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -48,6 +53,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -221,6 +227,25 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player);
         String message = player.getRepresentationUnfogged() + ", please choose the planets you wish to ready.";
 
+        if (game.isMonumentsMode()) {
+            if (scModel != null
+                    && scModel.usesAutomationForSCID("pok2diplomacy")
+                    && game.getPlayedSCs().contains(scModel.getInitiative())
+                    && MonumentsService.isMonumentOnBoard(game, player, "olradin_monument")) {
+                Planet monumentPlanet = MonumentsService.getPlayerMonumentPlanet(game, player);
+                if (monumentPlanet != null) {
+                    player.refreshPlanet(monumentPlanet.getName());
+
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " readied "
+                                    + monumentPlanet.getRepresentation(game)
+                                    + " due to _Diplomatic Enclave_.");
+                }
+            }
+        }
+
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
@@ -343,9 +368,6 @@ public final class ButtonHelperSCs {
     @ButtonHandler("sc_follow_trade")
     public static void followTrade(Game game, Player player, ButtonInteractionEvent event) {
         boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
-        if (used) {
-            return;
-        }
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
@@ -359,6 +381,14 @@ public final class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
         }
         int scNum = scModel.getInitiative();
+        if ((used || player.getFollowedSCs().contains(scNum))
+                && OnyxxaAbilityHandler.trySpendForStrategicFluidity(game, player, event, scNum)) {
+            return;
+        }
+        if (used) {
+            return;
+        }
+        OnyxxaAbilityHandler.checkSilentAccord(game, player, event, scNum);
 
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Trade**");
@@ -495,6 +525,7 @@ public final class ButtonHelperSCs {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
+        ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
     }
 
     @ButtonHandler("sc_refresh_and_wash")
@@ -505,14 +536,6 @@ public final class ButtonHelperSCs {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
-            return;
-        }
-
-        if (player.hasAbility("expeditionary_cache")) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged()
-                            + ", since **Expeditionary Cache** lets you place _Expedition Tokens_, resolving commodity washing here seems likely to be an error. Nothing has been processed. Please use a different route if that is incorrect.");
             return;
         }
 
@@ -625,6 +648,9 @@ public final class ButtonHelperSCs {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, commoditiesTotal);
+        if (commoditiesTotal > 0) {
+            ButtonHelperStats.offerBountyBrokerageAfterTradeWash(game, player);
+        }
     }
 
     @ButtonHandler("anarchy7Build_")
@@ -1077,6 +1103,59 @@ public final class ButtonHelperSCs {
                 }
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             } else {
+                if (game.isMonumentsMode() && "monument".equalsIgnoreCase(unit) && player.hasUnit("sarcosa_monument")) {
+                    List<Button> buttons = MonumentsBRButtonHandler.getSarcosaMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "You have no eligible planet on which to place Raider Stronghold.");
+                        return;
+                    }
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            player.getRepresentationNoPing()
+                                    + ", choose a planet adjacent to your or neutral units on which to place _Raider Stronghold_.",
+                            buttons);
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("bastion_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "bastion_monument"))) {
+                    List<Button> buttons = MonumentsTEButtonHandler.getSDCPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "You have no system with your ships and exactly one non-legendary planet in which to place _Seraph Data Center_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Seraph Data Center_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeSeraphDataCenter_", 0));
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && player.hasUnit("empyrean_monument")) {
+                    List<Button> buttons = MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "You have no empty non-Fracture, non-supernova system in which to place The Panopticon.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the empty system in which to place _The Panopticon_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placePanopticon_", 0));
+                    return;
+                }
                 if (game.isMonumentsMode()
                         && "monument".equalsIgnoreCase(unit)
                         && player.hasUnit("purpletf_monument")) {
@@ -1625,7 +1704,9 @@ public final class ButtonHelperSCs {
                 setStatus = false;
             }
         }
-        if (player != null && player.getSCs().contains(scNum) && !player.hasAbility("detachment")) {
+        if (player != null
+                && player.getSCs().contains(scNum)
+                && !OnyxxaAbilityHandler.isDetachmentCard(game, player, scNum)) {
             String message = player.getRepresentation()
                     + " you currently hold this strategy card and therefore should not be spending a command token here."
                     + "\nYou may override this protection by running `/player stats strategy_cc:-1`.";
@@ -1633,9 +1714,14 @@ public final class ButtonHelperSCs {
             return;
         }
         boolean used = addUsedSCPlayer(messageID, game, player);
+        if ((used || player.getFollowedSCs().contains(scNum))
+                && OnyxxaAbilityHandler.trySpendForStrategicFluidity(game, player, event, scNum)) {
+            return;
+        }
         if (!used
                 && !player.getFollowedSCs().contains(scNum)
                 && game.getPlayedSCs().contains(scNum)) {
+            OnyxxaAbilityHandler.checkSilentAccord(game, player, event, scNum);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByInitiative(scNum).orElse(null);
             boolean followsDiplomacyForFree = player.hasAbility("diplomatic_immunity")
@@ -1690,6 +1776,10 @@ public final class ButtonHelperSCs {
 
         strategicCC--;
         player.setStrategicCC(strategicCC);
+        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+        if (scNum != -1 && player.hasAbility("strategic_fluidity")) {
+            OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
+        }
         return msgStart + " 1 command token has been spent from strategy pool.";
     }
 

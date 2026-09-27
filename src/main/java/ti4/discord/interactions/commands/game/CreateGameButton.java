@@ -61,7 +61,7 @@ class CreateGameButton extends Subcommand {
         buttons.add(Buttons.red("leaveGameList", "Leave Game"));
         buttons.add(Buttons.gray("editPlayers~MDL", "Add Players"));
         buttons.add(Buttons.gray("removePlayers~MDL", "Remove Players"));
-        buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
+        buttons.add(Buttons.gray("addSillyName~MDL", "Set Game Name"));
 
         String message = CreateGameButtonHandler.generateMemberListMessage(members, gameFunName)
                 + "\n\nPlease hit this button after confirming that the members are the correct ones.";

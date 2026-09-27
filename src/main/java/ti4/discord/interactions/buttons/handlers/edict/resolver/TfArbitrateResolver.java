@@ -25,9 +25,9 @@ public class TfArbitrateResolver implements EdictResolver {
             Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome", MiscEmojis.tf_genome));
 
     public void handle(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = gamePing(
-                game,
-                "-# You must get permission from " + player.getRepresentation() + " in order to resolve this edict.");
+        String resolverRep = game.isFowMode() ? "the player resolving it" : player.getRepresentation();
+        String msg =
+                gamePing(game, "-# You must get permission from " + resolverRep + " in order to resolve this edict.");
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
     }
 }

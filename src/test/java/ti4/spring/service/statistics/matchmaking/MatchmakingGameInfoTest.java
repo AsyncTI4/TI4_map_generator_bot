@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 class MatchmakingGameInfoTest {
 
     private static final double TOLERANCE = 1.0e-9;
-    private static final double EXPECTED_DRAW_PROBABILITY = 0.5;
-    private static final double EXPECTED_DYNAMICS_FACTOR_DIVISOR = 50.0;
+    private static final double EXPECTED_DRAW_PROBABILITY = 0.05;
+    private static final double EXPECTED_DYNAMICS_FACTOR_DIVISOR = 25.0;
 
     @Test
     void keepsTheJskillsDefaultsForTheDistributionParameters() {
@@ -24,12 +24,12 @@ class MatchmakingGameInfoTest {
     }
 
     @Test
-    void tunesTheDrawProbabilityAboveTheJskillsDefault() {
+    void tunesTheDrawProbabilityBelowTheJskillsDefault() {
         GameInfo matchmaking = MatchmakingGameInfo.create();
 
         assertThat(matchmaking.getDrawProbability()).isEqualTo(EXPECTED_DRAW_PROBABILITY, within(TOLERANCE));
         assertThat(matchmaking.getDrawProbability())
-                .isGreaterThan(GameInfo.getDefaultGameInfo().getDrawProbability());
+                .isLessThan(GameInfo.getDefaultGameInfo().getDrawProbability());
     }
 
     @Test

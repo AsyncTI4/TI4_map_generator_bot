@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -587,6 +588,7 @@ public final class ButtonHelperFactionSpecific {
                         player.getRepresentation() + " has lost the _Thwart_ Dishonor card.");
             }
         }
+        MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
         if (player.getDishonorCounter() > 4) {
             if (!player.hasAbility("deceive")) {
                 player.addAbility("deceive");
@@ -2628,11 +2630,20 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter) {
+        return gainOrConvertCommButtons(player, deleteAfter, null);
+    }
+
+    public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         String ffcc = player.factionButtonChecker();
         if (deleteAfter) {
-            buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
-            buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 Commodity", MiscEmojis.comm));
+            String extra = "";
+            if (tile != null) {
+                extra = "_" + tile.getPosition();
+            }
+            buttons.add(Buttons.green(
+                    ffcc + "convertComms_1" + extra, "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1" + extra, "Gain 1 Commodity", MiscEmojis.comm));
         } else {
             buttons.add(
                     Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -26,6 +25,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatStatsService;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 
@@ -33,19 +33,17 @@ import ti4.service.unit.ParsedUnit;
 public class PonthousAbilityHandler {
     private static final String USE_PONTHOUS = "usePonthousLegendaryAbility_";
     private static final String PONTHOUS = "ponthous";
-    private static final String PONTHOUS_BOTH = "attachment_ponthousboth.png";
-    private static final String PONTHOUS_RES = "attachment_positiveres3.png";
-    private static final String PONTHOUS_INF = "attachment_positiveinf3.png";
     private static final String LAST_STAND = "last_stand";
     private static final String USE_LAST_STAND = "useLastStand_";
     private static final String DECLINE_LAST_STAND = "declineLastStand_";
     private static final String RESOLVE_LAST_STAND = "resolveLastStand_";
 
     // Ponthous LPC
-    public static List<Button> offerFracturedSouls(Player player) {
+    public static List<Button> getFracturedSoulsButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red(player.factionButtonChecker() + USE_PONTHOUS + "res", "Ponthous +"));
-        buttons.add(Buttons.red(player.factionButtonChecker() + USE_PONTHOUS + "inf", "Ponthous -"));
+        buttons.add(
+                Buttons.green(player.factionButtonChecker() + USE_PONTHOUS, "Ready Ponthous", FactionEmojis.ponthous));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         return buttons;
     }
@@ -57,28 +55,18 @@ public class PonthousAbilityHandler {
                 || player == null
                 || !player.getPlanets().contains(PONTHOUS)
                 || !player.getExhaustedPlanets().contains(PONTHOUS)
-                || !player.getExhaustedPlanetsAbilities().contains(PONTHOUS)) {
+                || player.getExhaustedPlanetsAbilities().contains(PONTHOUS)) {
             return;
         }
 
-        String resOrInf = buttonID.replace(USE_PONTHOUS, "");
-
-        if ("res".equals(resOrInf)) {
-            setPonthousAttachment(game, PONTHOUS_RES);
-        } else if ("inf".equals(resOrInf)) {
-            setPonthousAttachment(game, PONTHOUS_INF);
-        } else {
-            return;
-        }
+        player.exhaustPlanetAbility(PONTHOUS);
 
         player.refreshPlanet(PONTHOUS);
-        ButtonHelper.deleteMessage(event);
-    }
 
-    public static void resetFracturedSouls(Game game, Player player) {
-        if (player.hasPlanet(PONTHOUS)) {
-            setPonthousAttachment(game, PONTHOUS_BOTH);
-        }
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " exhausted _Fractured Souls_ to ready Ponthous.");
+        ButtonHelper.deleteMessage(event);
     }
 
     // Last Stand
@@ -281,16 +269,5 @@ public class PonthousAbilityHandler {
                             + ", because _Last Stand_ destroyed all opposing participating units.");
         }
         ButtonHelper.deleteMessage(event);
-    }
-
-    private static void setPonthousAttachment(Game game, String attachment) {
-        Planet ponthous = game.getPlanetsInfo().get(PONTHOUS);
-        if (ponthous == null) {
-            return;
-        }
-        ponthous.removeToken(PONTHOUS_BOTH);
-        ponthous.removeToken(PONTHOUS_RES);
-        ponthous.removeToken(PONTHOUS_INF);
-        ponthous.addToken(attachment);
     }
 }

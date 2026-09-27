@@ -1,13 +1,18 @@
 package ti4.draft;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
+import ti4.game.Player;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class FrankenItemTest extends BaseTi4Test {
@@ -30,6 +35,76 @@ class FrankenItemTest extends BaseTi4Test {
         Assertions.assertEquals(8, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
         Assertions.assertEquals(14, draft.getBagSize());
         Assertions.assertEquals(14, game.getFrankenBagSize());
+    }
+
+    @Test
+    void monumentItemsRequireMonumentsModeAndHonorLimits() {
+        Game game = new Game();
+        FrankenDraft draft = new FrankenDraft(game);
+        FrankenDrazDraft drazDraft = new FrankenDrazDraft(game);
+        game.setBagDraft(draft);
+
+        assertFalse(ti4.draft.items.MonumentDraftItem.isAvailable(game, "arborec_monument"));
+        assertFalse(ti4.draft.items.MonumentDraftItem.isAvailable(game, "sarcosa_monument"));
+        assertEquals(0, FrankenDraft.getItemLimitForCategory(DraftCategory.MONUMENT, game));
+
+        game.setMonumentsMode(true);
+        assertTrue(ti4.draft.items.MonumentDraftItem.isAvailable(game, "arborec_monument"));
+        assertFalse(ti4.draft.items.MonumentDraftItem.isAvailable(game, "obsidian_monument"));
+        assertFalse(ti4.draft.items.MonumentDraftItem.isAvailable(game, "rhodun_monumentback"));
+        assertEquals(2, draft.getItemLimitForCategory(DraftCategory.MONUMENT));
+        assertEquals(2, draft.getKeptItemLimitForCategory(DraftCategory.MONUMENT));
+        assertEquals(2, drazDraft.getKeptItemLimitForCategory(DraftCategory.MONUMENT));
+        game.setStoredValue("frankenLimit" + DraftCategory.MONUMENT, "1");
+        assertEquals(1, FrankenDraft.getItemLimitForCategory(DraftCategory.MONUMENT, game));
+        assertEquals(1, draft.getKeptItemLimitForCategory(DraftCategory.MONUMENT));
+        assertEquals(1, drazDraft.getKeptItemLimitForCategory(DraftCategory.MONUMENT));
+        assertEquals(
+                DraftCategory.MONUMENT,
+                DraftItem.generateFromAlias("MONUMENT:arborec_monument").getItemCategory());
+    }
+
+    @Test
+    void monumentOptionalSwapsRemainAttachedToTheirExistingErrata() {
+        assertEquals(
+                List.of("MONUMENT:titans_monument"),
+                Mapper.getFrankenErrata("ABILITY:terragenesis").getOptionalSwaps().stream()
+                        .filter(item -> "MONUMENT:titans_monument".equals(item.getAlias()))
+                        .map(item -> item.getAlias())
+                        .toList());
+        assertEquals(
+                List.of("MONUMENT:firmament_monument"),
+                Mapper.getFrankenErrata("BREAKTHROUGH:firmamentbt").getOptionalSwaps().stream()
+                        .filter(item -> "MONUMENT:firmament_monument".equals(item.getAlias()))
+                        .map(item -> item.getAlias())
+                        .toList());
+    }
+
+    @Test
+    void frankenDrazOnlyAddsMonumentsForDraftedFactions() {
+        Game game = new Game();
+        game.setMonumentsMode(true);
+        FrankenDrazDraft draft = new FrankenDrazDraft(game);
+        game.setBagDraft(draft);
+        Player player = game.addPlayer("user", "user");
+        player.setFaction("arborec");
+        player.setColor("red");
+        player.getDraftHand().Contents.add(new FactionDraftItem("arborec"));
+
+        assertTrue(ti4.draft.items.MonumentDraftItem.isAvailable(game, "arborec_monument"));
+        assertTrue(new FactionDraftItem("arborec")
+                .getComponents(game)
+                .contains(DraftItem.generate(DraftCategory.MONUMENT, "arborec_monument")));
+
+        draft.expandFactionPackages(game);
+
+        assertTrue(
+                player.getDraftHand().Contents.contains(DraftItem.generate(DraftCategory.MONUMENT, "arborec_monument")),
+                () -> player.getDraftHand().Contents.toString());
+        assertFalse(
+                player.getDraftHand().Contents.contains(DraftItem.generate(DraftCategory.MONUMENT, "nekro_monument")));
+        assertFalse(
+                player.getDraftHand().Contents.contains(DraftItem.generate(DraftCategory.MONUMENT, "titans_monument")));
     }
 
     @Test

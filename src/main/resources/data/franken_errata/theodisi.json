@@ -44,14 +44,6 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "expeditionary_cache",
-        "additionalComponents": [
-            "ABILITY:shared_discoveries"
-        ],
-        "source": "theodisi"
-    },
-    {
-        "itemCategory": "ABILITY",
-        "itemId": "shared_discoveries",
         "undraftable": true,
         "source": "theodisi"
     },
@@ -173,7 +165,7 @@
     },
     {
         "itemCategory": "STARTINGTECH",
-        "itemId": "aeterna",
+        "itemId": "revenant",
         "alternateText": "Choose up to 2 technologies with 0 prerequisites owned by no other player.",
         "source": "theodisi"
     },
@@ -185,7 +177,7 @@
     },
     {
         "itemCategory": "STARTINGTECH",
-        "itemId": "revenant",
+        "itemId": "aeterna",
         "alternateText": "Choose 2 technologies in different colors with 1 total prerequisite.",
         "source": "theodisi"
     },
@@ -204,17 +196,47 @@
         "source": "theodisi"
     },
     {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "scrapyard",
+        "alternateText": "During setup, place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, & 2 structures in your home system. THIS IS NOT AUTOMATED. Use `/modify_units` to set them yourself.",
+        "source": "theodisi"
+    },
+    {
         "itemCategory": "ABILITY",
-        "itemId": "call_of_the_haunted",
+        "itemId": "custom_rigs",
         "additionalComponents": [
-            "PN:thpnrevenant"
+            "ABILITY:drive_decoherence"
         ],
         "source": "theodisi"
     },
     {
-        "itemCategory": "PN",
-        "itemId": "thpnrevenant",
+        "itemCategory": "ABILITY",
+        "itemId": "drive_decoherence",
         "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "radiant_grafting",
+        "optionalSwaps": [
+            "ABILITY:celestial_envoys"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "thurviali_mech",
+        "optionalSwaps": [
+            "ABILITY:celestial_envoys"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "thurvialibt",
+        "optionalSwaps": [
+            "ABILITY:celestial_envoys"
+        ],
         "source": "theodisi"
     }
 ]

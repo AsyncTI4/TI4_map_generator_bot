@@ -281,6 +281,7 @@ public class EndGameService {
                 MessageHelper.sendMessageToChannel(t, gameEndText);
                 sendFeedbackMessage(t, game);
                 sendRoundSummariesToThread(t, game);
+                TiglReportService.handleTiglReporting(game, t);
             });
         }
     }

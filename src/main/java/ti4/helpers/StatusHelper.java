@@ -17,8 +17,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -165,6 +167,7 @@ public final class StatusHelper {
         game.setPhaseOfGame("statusScoring");
         VeylorAbilitiesHandler.returnUnassignedTightSchedulingAgendas(game);
         VerydithPromissoryHandler.returnPactRenewedAtStartOfStatus(game);
+        RevenantPromissoryHandler.returnRebrithAtStartOfStatus(game);
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
@@ -509,6 +512,7 @@ public final class StatusHelper {
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
             NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
+        MonumentsPoKButtonHandler.sendSpireOfIxthButtons(game);
 
         for (Player player : game.getRealPlayers()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());

@@ -49,6 +49,9 @@ public class MatchmakingQueueSearch {
     @Column(name = "tigl_ranks")
     private String tiglRanks;
 
+    @Column(name = "exempt_user_ids")
+    private String exemptUserIds;
+
     @Column(name = "created_at")
     private Instant createdAt;
 }

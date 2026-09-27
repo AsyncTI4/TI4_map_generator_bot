@@ -1,0 +1,9 @@
+[
+    {
+        "id": "kyro_reliquary",
+        "name": "Kyro Reliquary",
+        "imagePath": "attachment_kyro_monument.png",
+        "isLegendary": true,
+        "source": "monuments"
+    }
+]

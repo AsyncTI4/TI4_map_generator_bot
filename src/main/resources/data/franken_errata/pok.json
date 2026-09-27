@@ -185,7 +185,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {
@@ -194,7 +196,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {
@@ -203,7 +207,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {
@@ -212,7 +218,9 @@
         "additionalComponents": [
             "ABILITY:primacy"
         ],
-        "alwaysAddToPool": true,
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
         "source": "franken"
     },
     {
@@ -382,7 +390,8 @@
             "ABILITY:coalescence"
         ],
         "optionalSwaps": [
-            "BREAKTHROUGH:titansbt"
+            "BREAKTHROUGH:titansbt",
+            "MONUMENT:titans_monument"
         ],
         "source": "pok"
     },
@@ -423,7 +432,8 @@
             "ABILITY:devour"
         ],
         "optionalSwaps": [
-            "HERO:cabalhero"
+            "HERO:cabalhero",
+            "MONUMENT:cabal_monument"
         ],
         "source": "pok"
     },
@@ -435,7 +445,8 @@
         ],
         "optionalSwaps": [
             "TECH:vtx",
-            "AGENT:cabalagent"
+            "AGENT:cabalagent",
+            "MONUMENT:cabal_monument"
         ],
         "alternateText": "[Franken only] When you research a unit upgrade technology, you may return 1 captured unit of that type to ignore all of the technology's prerequisites. If you do not have the Amalgamation ability, you may only have one captured unit of each non-fighter ship type in your play area.",
         "source": "pok"

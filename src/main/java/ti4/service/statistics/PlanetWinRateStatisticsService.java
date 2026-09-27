@@ -27,6 +27,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -45,6 +46,8 @@ public class PlanetWinRateStatisticsService {
 
     /** The factions that coexist by design, and so the only ones the coexistence section reports. */
     private static final List<String> COEXISTING_FACTIONS = List.of(COEXISTING_FACTION, "titans");
+
+    private static final String STYX = "styx";
 
     private static final int BAND_SIZE = 2;
     private static final int OPEN_ENDED_BAND_START = 11;
@@ -75,6 +78,11 @@ public class PlanetWinRateStatisticsService {
                             entry.getValue().averageCoexistedPlanets())
                     .reversed()
                     .thenComparing(Entry::getKey);
+
+    private static final Comparator<Entry<String, StyxStats>> BY_STYX_CONTROL_RATE_DESC = Comparator.comparingDouble(
+                    (Entry<String, StyxStats> entry) -> entry.getValue().controlRate())
+            .reversed()
+            .thenComparing(Entry::getKey);
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         boolean pokOnly = event.getOption(POK_ONLY_OPTION, false, OptionMapping::getAsBoolean);
@@ -168,8 +176,8 @@ public class PlanetWinRateStatisticsService {
             // A home system is kept only by holding or coexisting on every planet in it.
             boolean lostAHomePlanet = homePlanets.stream()
                     .anyMatch(planet -> !controlledPlanets.contains(planet) && !coexistedOn.contains(planet));
-            boolean coexistedThroughALoss =
-                    !lostAHomePlanet && homePlanets.stream().anyMatch(coexistedOn::contains);
+            boolean coexistedOnTheirHome = homePlanets.stream().anyMatch(coexistedOn::contains);
+            boolean coexistedThroughALoss = !lostAHomePlanet && coexistedOnTheirHome;
 
             SeatOutcome outcome = new SeatOutcome(
                     isWinner,
@@ -177,6 +185,7 @@ public class PlanetWinRateStatisticsService {
                     coexistedOn.size(),
                     lostAHomePlanet,
                     coexistedThroughALoss,
+                    coexistedOnTheirHome,
                     wasSilverFlamed(game, faction));
             stats.overall.record(outcome);
             for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
@@ -190,6 +199,35 @@ public class PlanetWinRateStatisticsService {
                     .forEach(planet -> stats.byPlanet
                             .computeIfAbsent(planet, _ -> new WinRateCount())
                             .record(isWinner));
+        }
+
+        accumulateStyx(game, seats, winner, stats);
+    }
+
+    private static boolean hasStyx(Game game) {
+        return everyPlanetInPlay(game).anyMatch(STYX::equals);
+    }
+
+    private static void accumulateStyx(Game game, List<PlayerHome> seats, Player winner, PlanetWinRateStats stats) {
+        boolean styxInGame = hasStyx(game);
+        boolean anyoneHeldStyx = false;
+        for (PlayerHome seat : seats) {
+            String faction = seat.player().getFaction();
+            boolean heldStyx = seat.player().getPlanets().contains(STYX);
+            boolean isWinner = faction.equals(winner.getFaction());
+            anyoneHeldStyx |= heldStyx;
+            stats.overallStyx.record(styxInGame, heldStyx, isWinner);
+            for (String factionKey : FactionStatisticsHelper.getStatisticsFactionKeys(faction)) {
+                stats.byFactionStyx
+                        .computeIfAbsent(factionKey, _ -> new StyxStats())
+                        .record(styxInGame, heldStyx, isWinner);
+            }
+        }
+        if (styxInGame) {
+            stats.gamesWithStyx++;
+            if (anyoneHeldStyx) {
+                stats.gamesWithStyxHeld++;
+            }
         }
     }
 
@@ -296,6 +334,7 @@ public class PlanetWinRateStatisticsService {
             int coexistedPlanets,
             boolean lostHome,
             boolean coexistedThroughALoss,
+            boolean coexistedOnTheirHome,
             boolean silverFlamed) {}
 
     private static List<String> buildReport(PlanetWinRateStats stats) {
@@ -336,6 +375,9 @@ public class PlanetWinRateStatisticsService {
         }
         appendHomePlanetsLostSection(blocks, stats);
         appendPerPlanetSection(blocks, stats);
+        if (!stats.pokOnly) {
+            appendStyxSection(blocks, stats);
+        }
 
         return blocks;
     }
@@ -345,8 +387,8 @@ public class PlanetWinRateStatisticsService {
             return;
         }
         header.append("Dropped ")
-                .append(stats.gamesWithLaterPlanets)
-                .append(" game(s) that were not flagged as Thunder's Edge but had planets from it in play.\n");
+                .append(StringHelper.pluralize(stats.gamesWithLaterPlanets, "game"))
+                .append(" not flagged as Thunder's Edge that had planets from it in play.\n");
     }
 
     private static void appendSkippedPlayersSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -355,8 +397,8 @@ public class PlanetWinRateStatisticsService {
         }
         StringBuilder sb = new StringBuilder("### Skipped players\n");
         sb.append("_")
-                .append(stats.playersWithoutAKnownHome)
-                .append(" player(s) had no home planets on file for their faction and no home system on the board, so"
+                .append(StringHelper.pluralize(stats.playersWithoutAKnownHome, "player"))
+                .append(" had no home planets on file for their faction and no home system on the board, so"
                         + " they are in none of the numbers above or below. Each row names a game to look at._\n");
 
         List<Entry<String, Integer>> byFaction = stats.skippedPlayersByFaction.entrySet().stream()
@@ -365,14 +407,14 @@ public class PlanetWinRateStatisticsService {
         byFaction.stream().limit(SKIPPED_FACTIONS_LISTED).forEach(entry -> sb.append("- `")
                 .append(entry.getKey())
                 .append("` - ")
-                .append(entry.getValue())
-                .append(" player(s), e.g. game `")
+                .append(StringHelper.pluralize(entry.getValue(), "player"))
+                .append(", e.g. game `")
                 .append(stats.skippedGameNames.get(entry.getKey()))
                 .append("`\n"));
         if (byFaction.size() > SKIPPED_FACTIONS_LISTED) {
             sb.append("- and ")
-                    .append(byFaction.size() - SKIPPED_FACTIONS_LISTED)
-                    .append(" more faction(s)\n");
+                    .append(StringHelper.pluralize(byFaction.size() - SKIPPED_FACTIONS_LISTED, "more faction"))
+                    .append('\n');
         }
         blocks.add(sb.toString());
     }
@@ -461,9 +503,21 @@ public class PlanetWinRateStatisticsService {
                 .toList();
         if (reported.isEmpty()) {
             blocks.add("- Neither faction appeared in the sample.\n");
+        } else {
+            reported.forEach(entry -> blocks.add(renderCoexistGroup(factionLabel(entry.getKey()), entry.getValue())));
+        }
+        appendHomeCoexistenceLine(blocks, stats);
+    }
+
+    private static void appendHomeCoexistenceLine(List<String> blocks, PlanetWinRateStats stats) {
+        PlanetHoldingStats group = stats.byFaction.get(COEXISTING_FACTION);
+        if (group == null || group.players == 0) {
             return;
         }
-        reported.forEach(entry -> blocks.add(renderCoexistGroup(factionLabel(entry.getKey()), entry.getValue())));
+        blocks.add("- " + factionLabel(COEXISTING_FACTION) + ": coexisted on their home planet in "
+                + group.coexistedOnTheirHome.getPlayers() + " of " + StringHelper.pluralize(group.players, "game")
+                + " (" + ActionCardStatsService.formatPercent(group.homeCoexistenceRate()) + "), "
+                + formatWinRate(group.coexistedOnTheirHome) + " win rate when they did\n");
     }
 
     private static String renderCoexistGroup(String label, PlanetHoldingStats group) {
@@ -546,7 +600,11 @@ public class PlanetWinRateStatisticsService {
         if (group.silverFlamed.getPlayers() == 0) {
             return;
         }
-        sb.append(". ").append(group.silverFlamed.getPlayers()).append(" Silver Flames.");
+        sb.append(". ")
+                .append(StringHelper.pluralize(group.silverFlamed.getPlayers(), "Silver Flame"))
+                .append(", ")
+                .append(formatWinRate(group.silverFlamed))
+                .append(" win rate.");
     }
 
     private static void appendCoexistedThrough(StringBuilder sb, PlanetHoldingStats group) {
@@ -569,6 +627,47 @@ public class PlanetWinRateStatisticsService {
                 .append(" (")
                 .append(ActionCardStatsService.formatPercent(group.homeLossRate()))
                 .append(')');
+    }
+
+    private static void appendStyxSection(List<String> blocks, PlanetWinRateStats stats) {
+        StringBuilder header = new StringBuilder("### Styx\n");
+        header.append("_Each row reads: how often Styx was held at the end of the games it was in, then the win rate"
+                + " when held, when not held with Styx in the game, with Styx in the game, and without Styx._\n");
+        header.append("Styx was in play in ")
+                .append(stats.gamesWithStyx)
+                .append(" of ")
+                .append(StringHelper.pluralize(stats.games, "game"))
+                .append(" (")
+                .append(ActionCardStatsService.formatPercent(
+                        stats.games == 0 ? 0 : stats.gamesWithStyx / (double) stats.games))
+                .append(").\n");
+        blocks.add(header.toString());
+        if (stats.gamesWithStyx == 0) {
+            return;
+        }
+
+        blocks.add(renderStyxLine("**All factions**", stats.gamesWithStyxHeld, stats.gamesWithStyx, stats.overallStyx));
+        stats.byFactionStyx.entrySet().stream()
+                .filter(entry -> entry.getValue().gamesWithStyx() >= MINIMUM_FACTION_PLAYERS)
+                .sorted(BY_STYX_CONTROL_RATE_DESC)
+                .forEach(entry -> blocks.add(renderStyxLine(
+                        factionLabel(entry.getKey()),
+                        entry.getValue().held.getPlayers(),
+                        entry.getValue().gamesWithStyx(),
+                        entry.getValue())));
+    }
+
+    private static String renderStyxLine(String label, int heldGames, int styxGames, StyxStats group) {
+        return "- " + label + ": held in " + heldGames + " of " + StringHelper.pluralize(styxGames, "game")
+                + " with Styx (" + ActionCardStatsService.formatPercent(heldGames / (double) styxGames)
+                + "). Win rate: " + formatWinRate(group.held) + " when held, " + formatWinRate(group.notHeld)
+                + " when not held, " + formatWinRate(group.inGame()) + " with Styx in the game, "
+                + formatWinRate(group.absent) + " without Styx\n";
+    }
+
+    private static String formatWinRate(WinRateCount count) {
+        return ActionCardStatsService.formatPercent(count.getWinRate()) + " (" + count.getWins() + '/'
+                + count.getPlayers() + ')';
     }
 
     private static void appendPerPlanetSection(List<String> blocks, PlanetWinRateStats stats) {
@@ -624,6 +723,12 @@ public class PlanetWinRateStatisticsService {
 
         final Map<String, String> skippedGameNames = new HashMap<>();
 
+        final StyxStats overallStyx = new StyxStats();
+
+        final Map<String, StyxStats> byFactionStyx = new HashMap<>();
+
+        int gamesWithStyx;
+        int gamesWithStyxHeld;
         int games;
         int gamesWithLaterPlanets;
         int playersWithoutAKnownHome;
@@ -635,6 +740,8 @@ public class PlanetWinRateStatisticsService {
         final WinRateCount lostAHomePlanet = new WinRateCount();
 
         final WinRateCount heldEveryHomePlanet = new WinRateCount();
+
+        final WinRateCount coexistedOnTheirHome = new WinRateCount();
 
         final WinRateCount silverFlamed = new WinRateCount();
 
@@ -655,6 +762,9 @@ public class PlanetWinRateStatisticsService {
             coexistedPlanetsAtTheirRealCounts += outcome.coexistedPlanets();
             if (outcome.coexistedThroughALoss()) {
                 coexistedThroughLosses++;
+            }
+            if (outcome.coexistedOnTheirHome()) {
+                coexistedOnTheirHome.record(outcome.isWinner());
             }
             playersByBand
                     .computeIfAbsent(bandStartFor(outcome.nonHomePlanets()), _ -> new WinRateCount())
@@ -690,8 +800,40 @@ public class PlanetWinRateStatisticsService {
             return players == 0 ? 0 : (double) nonHomePlanetsAtTheirRealCounts / players;
         }
 
+        double homeCoexistenceRate() {
+            return players == 0 ? 0 : (double) coexistedOnTheirHome.getPlayers() / players;
+        }
+
         double homeLossRate() {
             return players == 0 ? 0 : (double) lostAHomePlanet.getPlayers() / players;
+        }
+    }
+
+    private static class StyxStats {
+        final WinRateCount held = new WinRateCount();
+
+        final WinRateCount notHeld = new WinRateCount();
+
+        final WinRateCount absent = new WinRateCount();
+
+        void record(boolean styxInGame, boolean heldStyx, boolean isWinner) {
+            (!styxInGame ? absent : heldStyx ? held : notHeld).record(isWinner);
+        }
+
+        WinRateCount inGame() {
+            WinRateCount inGame = new WinRateCount();
+            inGame.players = held.players + notHeld.players;
+            inGame.wins = held.wins + notHeld.wins;
+            return inGame;
+        }
+
+        int gamesWithStyx() {
+            return held.getPlayers() + notHeld.getPlayers();
+        }
+
+        double controlRate() {
+            int games = gamesWithStyx();
+            return games == 0 ? 0 : (double) held.getPlayers() / games;
         }
     }
 

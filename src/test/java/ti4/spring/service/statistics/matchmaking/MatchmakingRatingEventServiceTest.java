@@ -10,6 +10,9 @@ import java.util.Comparator;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import ti4.spring.service.persistence.GameEntity;
+import ti4.spring.service.persistence.PlayerEntity;
+import ti4.spring.service.persistence.UserEntity;
 
 class MatchmakingRatingEventServiceTest {
 
@@ -20,6 +23,8 @@ class MatchmakingRatingEventServiceTest {
     private static final int MANY_GAMES = 1000;
     private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_QUALIFYING_GAMES = BigDecimal.valueOf(0.7);
     private static final BigDecimal TIED_PLAYER_RATING_TOLERANCE_AT_MANY_GAMES = BigDecimal.valueOf(0.05);
+    private static final int VICTORY_POINT_GOAL = 10;
+    private static final String SHARED_DISPLAY_NAME = "Tazingo";
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
@@ -118,6 +123,78 @@ class MatchmakingRatingEventServiceTest {
 
         assertThat(findRatingForUser(ratings, "p4").recentRatingDelta()).isPositive();
         assertThat(findRatingForUser(ratings, "p0").recentRatingDelta()).isNegative();
+    }
+
+    @Test
+    void usersWhoShareADisplayNameAreRatedAsSeparatePlayers() {
+        UserEntity tazingo = new UserEntity("tazing0", SHARED_DISPLAY_NAME);
+        UserEntity otherTazingo = new UserEntity("taz", SHARED_DISPLAY_NAME);
+        List<PlayerEntity> players = new ArrayList<>();
+        for (int i = 0; i < GAMES_TO_QUALIFY; i++) {
+            List<UserEntity> finishingOrder = new ArrayList<>();
+            finishingOrder.add(tazingo);
+            finishingOrder.addAll(fillerUsers(4));
+            finishingOrder.add(otherTazingo);
+            players.addAll(buildPlayerEntities("shared" + i, finishingOrder));
+        }
+
+        List<MatchmakingRating> ratings =
+                TrueSkillMatchmakingRatingService.calculateRatings(MatchmakingGame.getMatchmakingGames(players), false);
+
+        assertThat(ratings)
+                .filteredOn(rating -> SHARED_DISPLAY_NAME.equals(rating.username()))
+                .extracting(MatchmakingRating::userId)
+                .containsExactlyInAnyOrder("tazing0", "taz");
+        assertThat(findRatingForUser(ratings, "tazing0").rating())
+                .isGreaterThan(findRatingForUser(ratings, "taz").rating());
+    }
+
+    @Test
+    void doesNotPoolTheGamesOfUsersWhoShareADisplayName() {
+        // Two games each: pooled by name they would clear the three-game minimum, kept apart neither does.
+        UserEntity tazingo = new UserEntity("tazing0", SHARED_DISPLAY_NAME);
+        UserEntity otherTazingo = new UserEntity("taz", SHARED_DISPLAY_NAME);
+        List<PlayerEntity> players = new ArrayList<>();
+        for (int i = 0; i < GAMES_TO_QUALIFY - 1; i++) {
+            List<UserEntity> tazingoGame = new ArrayList<>(List.of(tazingo));
+            tazingoGame.addAll(fillerUsers(5));
+            players.addAll(buildPlayerEntities("tazing0-game" + i, tazingoGame));
+
+            List<UserEntity> otherTazingoGame = new ArrayList<>(List.of(otherTazingo));
+            otherTazingoGame.addAll(fillerUsers(5));
+            players.addAll(buildPlayerEntities("taz-game" + i, otherTazingoGame));
+        }
+
+        List<MatchmakingRating> ratings =
+                TrueSkillMatchmakingRatingService.calculateRatings(MatchmakingGame.getMatchmakingGames(players), false);
+
+        assertThat(ratings).isNotEmpty();
+        assertThat(ratings).noneMatch(rating -> SHARED_DISPLAY_NAME.equals(rating.username()));
+    }
+
+    private static List<UserEntity> fillerUsers(int count) {
+        List<UserEntity> users = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            users.add(new UserEntity("filler" + i, "Filler " + i));
+        }
+        return users;
+    }
+
+    private static List<PlayerEntity> buildPlayerEntities(String gameName, List<UserEntity> usersInFinishingOrder) {
+        GameEntity game = new GameEntity();
+        game.setGameName(gameName);
+        game.setEndedEpochMilliseconds(GAME_ENDED_EPOCH_MILLIS);
+        game.setVictoryPointGoal(VICTORY_POINT_GOAL);
+        List<PlayerEntity> players = new ArrayList<>();
+        for (int place = 0; place < usersInFinishingOrder.size(); place++) {
+            PlayerEntity player = new PlayerEntity();
+            player.setGame(game);
+            player.setUser(usersInFinishingOrder.get(place));
+            player.setWinner(place == 0);
+            player.setScore(VICTORY_POINT_GOAL - place);
+            players.add(player);
+        }
+        return players;
     }
 
     private static List<MatchmakingRating> sortedByRating(List<MatchmakingRating> ratings) {

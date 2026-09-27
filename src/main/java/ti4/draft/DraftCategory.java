@@ -31,6 +31,7 @@ public enum DraftCategory {
     DRAFTORDER,
     MAHACTKING,
     UNIT,
+    MONUMENT,
     PLOT;
 
     public String title(Game game) {
@@ -55,6 +56,7 @@ public enum DraftCategory {
                     case DRAFTORDER -> "Drafting Orders";
                     case MAHACTKING -> "Mahact Kings";
                     case UNIT -> "Units";
+                    case MONUMENT -> "Monuments";
                     case BREAKTHROUGH -> "Breakthroughs";
                     case PLOT -> "Plot cards";
                 }
@@ -81,6 +83,7 @@ public enum DraftCategory {
             case DRAFTORDER -> MiltyDraftEmojis.positionUnpicked;
             case MAHACTKING -> FactionEmojis.Mahact;
             case UNIT -> TechEmojis.UnitUpgradeTech;
+            case MONUMENT -> UnitEmojis.Monument;
             case BREAKTHROUGH -> TechEmojis.SynergyAll;
             case PLOT -> FactionEmojis.Firmament;
         };

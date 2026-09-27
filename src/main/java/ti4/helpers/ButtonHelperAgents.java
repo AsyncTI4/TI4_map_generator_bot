@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLea
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
@@ -38,6 +39,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAgents;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -617,6 +619,7 @@ public final class ButtonHelperAgents {
         if (agent.contains("_")) {
             agent = agent.substring(0, agent.indexOf('_'));
         }
+        // Leader playerLeader = player.getLeaderByIdPreferReadied(agent).orElse(null);
         Leader playerLeader = player.getLeader(agent).orElse(null);
         if (playerLeader == null) {
             return;
@@ -1623,6 +1626,16 @@ public final class ButtonHelperAgents {
             }
             TaLeadersHandler.resolveTaAgentTarget(game, target);
         }
+        if ("vanguardagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Vanguard Agent target.");
+                return;
+            }
+            VanguardLeadersHandler.resolveVanguardAgentTarget(game, target);
+        }
+
+        TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
@@ -1808,7 +1821,8 @@ public final class ButtonHelperAgents {
         boolean present = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
-                    || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
+                    || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+                    || uH.getUnitCount(UnitType.Monument, player.getColor()) > 0) {
                 return true;
             }
             if (player.hasAbility("byssus")
@@ -2563,6 +2577,7 @@ public final class ButtonHelperAgents {
             if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) continue;
 
             if ((tile.isAsteroidField()
+                            && !tile.isZelianAsteroidField()
                             && !player.getTechs().contains("amd")
                             && !player.getTechs().contains("wavelength")
                             && !player.getRelics().contains("circletofthevoid"))
@@ -2771,7 +2786,7 @@ public final class ButtonHelperAgents {
         return buttons;
     }
 
-    private static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
+    public static List<Button> getYinAgentButtons(Player player, Game game, String pos) {
         List<Button> buttons = new ArrayList<>();
         Tile tile = game.getTileByPosition(pos);
         String placePrefix = "placeOneNDone_skipbuild";

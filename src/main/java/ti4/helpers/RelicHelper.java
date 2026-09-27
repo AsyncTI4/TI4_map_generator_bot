@@ -11,8 +11,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
@@ -131,6 +133,7 @@ public class RelicHelper {
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
+        WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
@@ -323,12 +326,12 @@ public class RelicHelper {
             return;
         }
 
-        String p1 = sender.getRepresentation();
-        String p2 = receiver.getRepresentation();
+        String p1 = sender.getRepresentationNoPing();
+        String p2 = receiver.getRepresentationNoPing();
         String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment"
                 + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() && !(event instanceof ButtonInteractionEvent)) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor", "kairn");

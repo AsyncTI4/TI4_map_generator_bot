@@ -183,6 +183,15 @@ public class MessageHelper {
         splitAndSent(messageText, channel, embeds, buttons);
     }
 
+    public static void sendMessageToChannelWithEmbedsAndButtons(
+            @Nonnull MessageChannel channel,
+            @Nullable String messageText,
+            @Nullable List<MessageEmbed> embeds,
+            @Nullable List<Button> buttons,
+            @Nullable Consumer<Message> restAction) {
+        splitAndSentWithAction(messageText, channel, restAction, embeds, buttons);
+    }
+
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
             if (button.getCustomId() != null
@@ -251,7 +260,23 @@ public class MessageHelper {
             List<MessageEmbed> embeds,
             List<Button> buttons,
             boolean saboable) {
+        sendMessageToChannelWithEmbedsAndFactionReact(
+                channel, messageText, game, player, embeds, buttons, saboable, null);
+    }
+
+    public static void sendMessageToChannelWithEmbedsAndFactionReact(
+            MessageChannel channel,
+            String messageText,
+            Game game,
+            Player player,
+            List<MessageEmbed> embeds,
+            List<Button> buttons,
+            boolean saboable,
+            @Nullable Consumer<Message> andThen) {
         Consumer<Message> addFactionReact = (message) -> {
+            if (andThen != null) {
+                andThen.accept(message);
+            }
             if (saboable) {
                 GameMessageManager.add(
                         game.getName(),

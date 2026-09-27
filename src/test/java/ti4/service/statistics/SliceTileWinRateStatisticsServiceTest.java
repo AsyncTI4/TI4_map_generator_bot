@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +36,10 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
     private static final int FIRST_TILE_ID = 19;
     private static final int TILES_PER_SLICE = 4;
 
-    /** Mirrors SliceTileWinRateStatisticsService.MINIMUM_OCCURRENCES. */
-    private static final int MINIMUM_OCCURRENCES = 10;
+    /** How many times the standard board is repeated in most tests. */
+    private static final int GAMES = 10;
 
-    /** The same board repeated, so per-tile counts clear the sample threshold. */
+    /** The same board repeated, so every tile gets the same sample. */
     private static List<Game> repeatGame(
             int count, String winningFaction, Map<String, String> tileOverridesByPosition) {
         return IntStream.rangeClosed(1, count)
@@ -115,7 +116,7 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
 
     @Test
     void buildReportRanksTilesAndBreaksDownByFaction() {
-        String report = SliceTileWinRateStatisticsService.buildReport(repeatGame(MINIMUM_OCCURRENCES, "sol", Map.of()));
+        String report = SliceTileWinRateStatisticsService.buildReport(repeatGame(GAMES, "sol", Map.of()));
 
         assertTrue(report.contains("Games analyzed: 10"), report);
         assertTrue(report.contains("Slices analyzed: 60"), report);
@@ -129,7 +130,8 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
                 .forEach(tileId -> assertTrue(
                         report.contains("`  0%` (0/10) " + tileId + " ("), "expected 0% for tile " + tileId));
 
-        assertTrue(report.contains("Best and worst slice tiles by faction"), report);
+        assertTrue(report.contains("Best, worst and most common slice tiles by faction"), report);
+        assertTrue(report.contains("  - Most common:\n"), report);
         assertTrue(report.contains("Entropic Scar and Legendary tiles by faction"), report);
         assertTrue(
                 report.contains("No Entropic Scar or Legendary tile appeared in any slice."),
@@ -139,7 +141,7 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
     @Test
     void buildReportBreaksOutEntropicScarAndLegendaryTilesPerFaction() {
         // Entropic Scar and Primor sit in Sol's slice every game, and Sol never wins.
-        List<Game> games = repeatGame(MINIMUM_OCCURRENCES, "letnev", Map.of("318", "114", "302", "65"));
+        List<Game> games = repeatGame(GAMES, "letnev", Map.of("318", "114", "302", "65"));
 
         String report = SliceTileWinRateStatisticsService.buildReport(games);
 
@@ -148,37 +150,90 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
         assertFalse(report.contains("without"), "the without metric was dropped");
     }
 
-    /** A tile has to clear MINIMUM_OCCURRENCES in a bucket before it earns a row. */
+    /** There is no fixed minimum sample: a tile seen only a few times still gets a row. */
     @Test
-    void buildReportSuppressesTilesBelowTheSampleThreshold() {
-        String justUnder =
-                SliceTileWinRateStatisticsService.buildReport(repeatGame(MINIMUM_OCCURRENCES - 1, "sol", Map.of()));
-        assertTrue(justUnder.contains("Games analyzed: 9"), justUnder);
-        assertTrue(justUnder.contains("No tile appeared in at least 10 slices."), justUnder);
-        sliceTileIdsFor("301")
-                .forEach(tileId ->
-                        assertFalse(justUnder.contains(tileId + " ("), "tile " + tileId + " is under-sampled"));
-        assertTrue(
-                justUnder.contains("No faction held an Entropic Scar or Legendary tile in at least 10 slices.")
-                        || justUnder.contains("No Entropic Scar or Legendary tile appeared in any slice."),
-                justUnder);
+    void buildReportShowsTilesWithSmallSamples() {
+        String report = SliceTileWinRateStatisticsService.buildReport(repeatGame(3, "sol", Map.of()));
 
-        String atThreshold =
-                SliceTileWinRateStatisticsService.buildReport(repeatGame(MINIMUM_OCCURRENCES, "sol", Map.of()));
-        assertTrue(atThreshold.contains("`100%` (10/10) 19 ("), "exactly 10 occurrences should qualify");
+        assertTrue(report.contains("Games analyzed: 3"), report);
+        sliceTileIdsFor("301")
+                .forEach(tileId -> assertTrue(
+                        report.contains("`100%` (3/3) " + tileId + " ("), "expected a row for tile " + tileId));
+        // Every tile has the same sample, so none is sparse relative to the others.
+        // Match the row marker, not the legend line that explains it.
+        assertFalse(report.contains("_(sparse)_"), report);
     }
 
-    /** Special-tile rows are held to the same threshold as everything else. */
     @Test
-    void buildReportSuppressesUnderSampledSpecialTiles() {
-        List<Game> games = repeatGame(MINIMUM_OCCURRENCES - 1, "letnev", Map.of("318", "114", "302", "65"));
+    void buildReportShowsSpecialTilesWithSmallSamples() {
+        List<Game> games = repeatGame(3, "letnev", Map.of("318", "114", "302", "65"));
 
         String report = SliceTileWinRateStatisticsService.buildReport(games);
 
-        assertFalse(report.contains("114 (" + tileName("114") + ")"), "under-sampled Entropic Scar row");
-        assertFalse(report.contains("65 (" + tileName("65") + ")"), "under-sampled Primor row");
-        assertTrue(
-                report.contains("No faction held an Entropic Scar or Legendary tile in at least 10 slices."), report);
+        assertTrue(report.contains("`  0%` (0/3) 114 (" + tileName("114") + ")"), "Entropic Scar line for Sol");
+        assertTrue(report.contains("`  0%` (0/3) 65 (" + tileName("65") + ")"), "Primor line for Sol");
+    }
+
+    /** A row is sparse when its sample is under half the median sample of its section. */
+    @Test
+    void buildReportMarksRowsBelowHalfTheMedianAsSparse() {
+        // Primor replaces Sol's first slice tile in 2 of 10 games: Primor is seen twice, that tile 8 times,
+        // and every other tile 10 times, so the median is 10 and anything under 5 is sparse.
+        String displaced = sliceTileIdsFor("301").getFirst();
+        List<Game> games = new ArrayList<>();
+        IntStream.rangeClosed(1, 8).forEach(i -> games.add(createStandardSliceGame("a" + i, "sol", Map.of())));
+        IntStream.rangeClosed(1, 2)
+                .forEach(i -> games.add(createStandardSliceGame("b" + i, "sol", Map.of("318", "65"))));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(games);
+
+        assertTrue(report.contains("`100%` (2/2) 65 (" + tileName("65") + ") _(sparse)_\n"), report);
+        assertTrue(report.contains("`100%` (8/8) " + displaced + " (" + tileName(displaced) + ")\n"), report);
+
+        // The sparse tile is listed overall, but it can't top Sol's best or most common lists.
+        assertFalse(report.contains("    * `100%` (2/2) 65 ("), report);
+        assertTrue(report.contains("    * `100%` (8/8) " + displaced + " ("), report);
+    }
+
+    @Test
+    void medianHandlesOddEvenAndEmptyInputs() {
+        assertEquals(20.0, SliceTileWinRateStatisticsService.median(30, 10, 20));
+        assertEquals(25.0, SliceTileWinRateStatisticsService.median(10, 20, 30, 40));
+        assertEquals(0.0, SliceTileWinRateStatisticsService.median());
+    }
+
+    /** Home systems in a slice (Creuss hero swaps) are pooled into a single row. */
+    @Test
+    void buildReportGroupsHomeSystemsIntoOneRow() {
+        // Jord and Muaat sit in Sol's slice every game, and Sol always wins.
+        List<Game> games = repeatGame(GAMES, "sol", Map.of("318", "01", "302", "04"));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(games);
+
+        assertTrue(report.contains("* `100%` (20/20) A home system\n"), report);
+        assertFalse(report.contains(" 01 ("), "Jord should not get its own row");
+        assertFalse(report.contains(" 04 ("), "Muaat should not get its own row");
+    }
+
+    @Test
+    void homeSystemDetectionUsesTheGreenTileBackButSkipsTheCreussGate() {
+        assertTrue(SliceTileWinRateStatisticsService.isHomeSystemTile("01"), "Jord");
+        assertTrue(SliceTileWinRateStatisticsService.isHomeSystemTile("94"), "The Sorrow");
+        assertFalse(SliceTileWinRateStatisticsService.isHomeSystemTile("17"), "Creuss Gate");
+        assertFalse(SliceTileWinRateStatisticsService.isHomeSystemTile("19"), "Wellon");
+    }
+
+    /** A hyperlane in any slice means a non-standard map, so the whole game is skipped. */
+    @Test
+    void buildReportSkipsGamesWithAHyperlaneInASlice() {
+        Game game = createStandardSliceGame("1", "sol", Map.of("318", "83a"));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(List.of(game));
+
+        assertEquals(
+                "No standard 6-player competitive games were available for slice analysis."
+                        + " (1 skipped for a non-standard map layout.)",
+                report);
     }
     /**
      * TileModel.getName() is null for placeholder art (0g, 0b, 0r, -1, fog covers), which used to reach the
@@ -186,7 +241,7 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
      */
     @Test
     void buildReportIgnoresBlankAndPlaceholderTilesInSlices() {
-        List<Game> games = repeatGame(MINIMUM_OCCURRENCES, "sol", Map.of("318", "0g", "302", "-1", "201", "0border"));
+        List<Game> games = repeatGame(GAMES, "sol", Map.of("318", "0g", "302", "-1", "201", "0border"));
 
         String report = SliceTileWinRateStatisticsService.buildReport(games);
 

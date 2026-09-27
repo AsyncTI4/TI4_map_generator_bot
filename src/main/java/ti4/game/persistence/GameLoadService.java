@@ -249,6 +249,9 @@ class GameLoadService {
                 if (ENDTOKENS.equals(data)) {
                     break;
                 }
+                if (tile != null && data.startsWith(FOW_VISION_GRANT + " ")) {
+                    tile.setFowVisionGrant(Helper.getListFromCSV(data.substring(FOW_VISION_GRANT.length() + 1)));
+                }
             }
         }
         return tileMap;
@@ -576,6 +579,7 @@ class GameLoadService {
                 case Constants.TWILIGHT_KART -> game.setTwilightKart(parseBooleanOrDefault(info, false));
                 case Constants.TK_DESTROYER_CUP -> game.setTkDestroyerCup(parseBooleanOrDefault(info, false));
                 case Constants.TK_NOVA_CUP -> game.setTkNovaCup(parseBooleanOrDefault(info, false));
+                case Constants.TF_BR -> game.setTfBr(parseBooleanOrDefault(info, false));
                 case Constants.TWILIGHT_DS -> game.setTwilightDS(parseBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(parseBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(parseBooleanOrDefault(info, false));
@@ -935,6 +939,7 @@ class GameLoadService {
                     player.setCommoditiesBase(Math.max(0, Integer.parseInt(tokenizer.nextToken())));
                 case Constants.COMMODITIES -> player.loadCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STASIS_FIGHTERS -> player.setStasisFighters(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AUTO_SABO_PASS_MEDIAN ->
                     player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CAPTURE -> {

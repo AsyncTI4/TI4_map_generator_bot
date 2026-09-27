@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -315,6 +316,7 @@ public class ButtonHelperExplore {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         OblivionUnitHandler.doOblivionMechCheck(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        ArcanumLeadersHandler.offerArcanumCommanderTechPurge(game, player, event, fragmentsToPurge.size());
         if (!game.isFowMode() && event.getMessageChannel() instanceof ThreadChannel) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         }

@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -193,13 +192,6 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = player.getFactionEmoji() + ", please choose a technology to return.";
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
-            case "ponthous" -> {
-                if (!"setup".equals(game.getPhaseOfGame())) {
-                    output = player.getRepresentation()
-                            + ", you exhausted Ponthous, and may now use _Fractured Souls_. Please tell the bot if you would like to ready it as a 3/0 (+) or a 0/3 (-):\nDo this **AFTER** your spend window is complete.";
-                    buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
-                }
-            }
             case "lethara" -> {
                 output = player.getRepresentation() + ", you may spend 2 influence to gain 1 CC.";
                 buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
@@ -208,7 +200,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "skarnath" -> {
                 output = player.getRepresentation()
-                        + ", you may produce 2 different units in a system containing your ships. Their cost is reduced by the number of neighbors that own a unit of both types.";
+                        + ", you may produce 2 different ships in a system containing your ships. Their cost is reduced by 2 if a neighbor owns a unit of both types.";
                 buttons.addAll(ThronesThroneHandler.getSkarnathSystems(player, game));
             }
             case "gyraxis" -> {

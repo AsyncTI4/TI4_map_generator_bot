@@ -61,13 +61,11 @@ public class RevenantTechHandler {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, displayedButtons);
     }
 
-    public static void doLazarusPodsLeaderCheck(Game game) {
-        if (game == null) {
+    public static void doLazarusPodsLeaderCheck(Game game, Player player) {
+        if (game == null || player == null || !player.hasTech(LAZARUS_PODS)) {
             return;
         }
-        for (Player player : game.getRealPlayers()) {
-            getProduceShipsInSystemsWithShipsButtons(game, player);
-        }
+        getProduceShipsInSystemsWithShipsButtons(game, player);
     }
 
     @ButtonHandler(SELECT_LAZARUS_SYSTEM)

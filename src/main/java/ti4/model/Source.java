@@ -27,6 +27,7 @@ public class Source {
         codex4,
         thunders_edge,
         twilights_fall,
+        tf_br,
 
         // big homebrew
         ds,
@@ -164,7 +165,7 @@ public class Source {
 
         public boolean isTwilightFallish() {
             return switch (this) {
-                case twilights_fall, tk_destroyer_cup, tk_nova_cup, twilight_ds -> true;
+                case twilights_fall, tf_br, tk_destroyer_cup, tk_nova_cup, twilight_ds -> true;
                 default -> false;
             };
         }
@@ -172,7 +173,7 @@ public class Source {
         public boolean isHiddenFromSearch() {
             return switch (this) {
                 case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
-                case keleresplus, project_pi, asteroid -> true;
+                case keleresplus, project_pi, asteroid, newdawn -> true;
                 case pbd100, pbd500, pbd1000 -> true;
                 default -> false;
             };
@@ -184,28 +185,32 @@ public class Source {
             return !isOfficial();
         }
 
+        public TI4Emoji getRawEmoji() {
+            return switch (this) {
+                case absol -> SourceEmojis.Absol;
+                case ds -> SourceEmojis.DiscordantStars;
+                case uncharted_space -> SourceEmojis.UnchartedSpace;
+                case blue_reverie -> SourceEmojis.DiscordantStars;
+                case eronous, riftset -> SourceEmojis.Eronous;
+                case admins -> FactionEmojis.AdminsFaction;
+                case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
+                case keleresplus -> SourceEmojis.KeleresPlus;
+                case project_pi -> SourceEmojis.ProjectPi;
+                case flagshipping -> SourceEmojis.Flagshipping;
+                case promises_promises -> SourceEmojis.PromisesPromises;
+                case miltymod -> SourceEmojis.MiltyMod;
+                case lazax -> FactionEmojis.Lazax;
+                case salliance -> SourceEmojis.StrategicAlliance;
+                case monuments -> SourceEmojis.Monuments;
+                case tk_destroyer_cup -> SourceEmojis.TwilightKart;
+                case tk_nova_cup -> SourceEmojis.TkNovaCup;
+                case twilight_ds -> SourceEmojis.DiscordantStars;
+                default -> null;
+            };
+        }
+
         public String emoji() {
-            TI4Emoji emoji =
-                    switch (this) {
-                        case absol -> SourceEmojis.Absol;
-                        case ds -> SourceEmojis.DiscordantStars;
-                        case uncharted_space -> SourceEmojis.UnchartedSpace;
-                        case blue_reverie -> SourceEmojis.DiscordantStars;
-                        case eronous, riftset -> SourceEmojis.Eronous;
-                        case admins -> FactionEmojis.AdminsFaction;
-                        case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
-                        case keleresplus -> SourceEmojis.KeleresPlus;
-                        case project_pi -> SourceEmojis.ProjectPi;
-                        case flagshipping -> SourceEmojis.Flagshipping;
-                        case promises_promises -> SourceEmojis.PromisesPromises;
-                        case miltymod -> SourceEmojis.MiltyMod;
-                        case lazax -> FactionEmojis.Lazax;
-                        case salliance -> SourceEmojis.StrategicAlliance;
-                        case monuments -> SourceEmojis.Monuments;
-                        case tk_destroyer_cup, tk_nova_cup -> SourceEmojis.TwilightKart;
-                        case twilight_ds -> SourceEmojis.DiscordantStars;
-                        default -> null;
-                    };
+            TI4Emoji emoji = getRawEmoji();
             return emoji == null ? "" : emoji.toString();
         }
 

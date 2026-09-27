@@ -11,28 +11,19 @@ public class MatchmakingOptions {
 
     public static final String BASE_ONLY_EXPANSION_OPTION = "Base only";
     public static final String POK_ONLY_EXPANSION_OPTION = "Prophecy of Kings only";
-    public static final String TE_ONLY_EXPANSION_OPTION = "Thunder's Edge only";
     public static final String POK_AND_TE_EXPANSION_OPTION = "Prophecy of Kings and Thunder's Edge";
-    public static final String DISCORDANT_STARS_EXPANSION_OPTION = "Discordant Stars (Homebrew)";
     public static final String TWILIGHTS_FALL_EXPANSION_OPTION = "Twilight's Fall";
-    public static final String FRANKEN_EXPANSION_OPTION = "Franken (Homebrew)";
     public static final List<String> EXPANSION_OPTIONS = List.of(
             BASE_ONLY_EXPANSION_OPTION,
             POK_ONLY_EXPANSION_OPTION,
-            TE_ONLY_EXPANSION_OPTION,
             POK_AND_TE_EXPANSION_OPTION,
-            DISCORDANT_STARS_EXPANSION_OPTION,
-            TWILIGHTS_FALL_EXPANSION_OPTION,
-            FRANKEN_EXPANSION_OPTION);
+            TWILIGHTS_FALL_EXPANSION_OPTION);
 
     private static final Map<String, String> EXPANSION_SHORT_NAMES = Map.of(
             BASE_ONLY_EXPANSION_OPTION, "base game",
             POK_ONLY_EXPANSION_OPTION, "PoK",
-            TE_ONLY_EXPANSION_OPTION, "TE",
             POK_AND_TE_EXPANSION_OPTION, "PoK + TE",
-            DISCORDANT_STARS_EXPANSION_OPTION, "DS",
-            TWILIGHTS_FALL_EXPANSION_OPTION, "TF",
-            FRANKEN_EXPANSION_OPTION, "Franken");
+            TWILIGHTS_FALL_EXPANSION_OPTION, "TF");
 
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");

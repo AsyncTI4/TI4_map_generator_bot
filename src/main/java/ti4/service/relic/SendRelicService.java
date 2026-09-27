@@ -15,6 +15,16 @@ public class SendRelicService {
 
     public static void handleSendRelic(
             GenericInteractionCreateEvent event, Game game, Player player1, Player player2, String relicID) {
+        handleSendRelic(event, game, player1, player2, relicID, true);
+    }
+
+    public static void handleSendRelic(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player1,
+            Player player2,
+            String relicID,
+            boolean resolveGainEffects) {
         boolean exhausted = player1.getExhaustedRelics().contains(relicID);
         if ("thetriad".equals(relicID)) {
             exhausted = player1.getExhaustedPlanets().contains("triad");
@@ -26,7 +36,9 @@ public class SendRelicService {
 
         // Remove points etc from p1, then resolve effects for p2
         RelicHelper.resolveRelicLossEffects(game, player1, relicID);
-        RelicHelper.resolveRelicEffects(event, game, player2, relicID);
+        if (resolveGainEffects) {
+            RelicHelper.resolveRelicEffects(event, game, player2, relicID);
+        }
 
         // Additionally exhaust the relic after gaining, if applicable
         if (exhausted && !"thetriad".equals(relicID)) player2.addExhaustedRelic(relicID);

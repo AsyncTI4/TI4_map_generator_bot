@@ -17,7 +17,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -36,6 +38,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.twilight_kart.TkHelperStarflare;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
@@ -43,6 +46,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -199,6 +203,8 @@ public class TacticalActionService {
                 return false;
             }
         }
+
+        TkHelperStarflare.onTacticalMove(game, tile);
 
         return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
     }
@@ -424,6 +430,7 @@ public class TacticalActionService {
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
                 out.add(Buttons.green(
@@ -464,6 +471,11 @@ public class TacticalActionService {
             if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
         }
         ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "celdauri_monument")) {
+                buttons.addAll(MonumentsDSButtonHandler.getCeldauriMonumentCommitButtons(game, player, tile));
+            }
+        }
 
         return buttons;
     }
@@ -509,6 +521,7 @@ public class TacticalActionService {
                 || player.hasUnit("tf-morphwing");
         boolean hierarch = player.hasUnit("tk-hierarch") && space.getUnitCount(UnitType.Cruiser, player) > 0;
         if (naaluFS || belkoFF || hierarch) committable.add(UnitType.Fighter);
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "cruiser_customrig")) committable.add(UnitType.Cruiser);
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             committable.add(UnitType.Pds);
         }

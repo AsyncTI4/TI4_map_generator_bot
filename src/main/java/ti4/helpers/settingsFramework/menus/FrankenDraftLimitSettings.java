@@ -50,6 +50,7 @@ class FrankenDraftLimitSettings extends SettingsMenu {
             DraftCategory.DRAFTORDER,
             DraftCategory.MAHACTKING,
             DraftCategory.UNIT,
+            DraftCategory.MONUMENT,
             DraftCategory.PLOT);
 
     @JsonIgnore
@@ -183,12 +184,21 @@ class FrankenDraftLimitSettings extends SettingsMenu {
             case DRAFTORDER -> "Draft Order";
             case MAHACTKING -> "Mahact Kings";
             case UNIT -> "Units";
+            case MONUMENT -> "Monuments";
             case PLOT -> "Plot Cards";
         };
     }
 
-    private static boolean shouldShowCategory(DraftCategory category, int defaultLimit) {
-        return defaultLimit > 0 && category != DraftCategory.DRAFTORDER;
+    private boolean shouldShowCategory(DraftCategory category, int defaultLimit) {
+        if (FrankenDraftMode.FRANKENDRAZ
+                        .toString()
+                        .equals(parentSettings.getDraftMode().getValue())
+                && category == DraftCategory.MONUMENT) {
+            return false;
+        }
+        return defaultLimit > 0
+                && category != DraftCategory.DRAFTORDER
+                && (category != DraftCategory.MONUMENT || parentSettings.isMonumentsEnabled());
     }
 
     private final class FrankenLimitSetting extends IntegerSetting {

@@ -31,6 +31,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -74,6 +76,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
@@ -521,6 +524,23 @@ public class ExploreService {
                 }
             }
         }
+        if (game.isMonumentsMode()) {
+            Player monumentPlayer = MonumentsService.getMonumentOwner(game, "bentor_monument");
+            if (monumentPlayer != null
+                    && !MonumentsService.isMonumentOnBoard(game, monumentPlayer, "bentor_monument")
+                    && player != monumentPlayer
+                    && MonumentsDSButtonHandler.isPlanetNotAdjacentToHomeSystem(game, exploredPlanet, player)
+                    && Mapper.getUnit("bentor_monument").canBePlacedOnPlanetTypes(exploredPlanet.getPlanetTypes())
+                    && !exploredPlanet.getUnitKeys().isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        monumentPlayer.getCardsInfoThread(),
+                        monumentPlayer.getRepresentation()
+                                + ", " + player.getRepresentationNoPing() + " has explored "
+                                + exploredPlanet.getRepresentation(game)
+                                + " and as such, you may choose to deploy _Tucc Academy_ to that planet and explore it.",
+                        MonumentsDSButtonHandler.getTuccAcademyButton(monumentPlayer, player, exploredPlanet));
+            }
+        }
     }
 
     public static void resolveExplore(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -530,7 +550,7 @@ public class ExploreService {
         String planetName = info[1];
         Tile tile = game.getTileFromPlanet(planetName);
         String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored the planet "
+        String messageText = player.getRepresentationNoPing() + " explored the planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                 + tileName + ":";
         if (buttonID.contains("_distantSuns")) {
@@ -1331,6 +1351,10 @@ public class ExploreService {
                     "mutagenfrontier" -> {
                 game.purgeExplore(ogID);
                 player.addRelic(cardID);
+                if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                        .contains(cardID)) {
+                    LostLegaciesRelicHandler.initializeBoon(game, player, cardID, tile, planetID);
+                }
                 message =
                         new StringBuilder("Card has been added to play area.\nAdded as a relic (not actually a relic)");
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
@@ -1522,13 +1546,16 @@ public class ExploreService {
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename) || force) {
-            if (space.getTokenList().contains(frontierFilename) && !force) {
+        boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
+        boolean hasGhotiAnchorpointFrontier =
+                MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile);
+        if (hasFrontierToken || hasGhotiAnchorpointFrontier || force) {
+            if (hasFrontierToken && !force) {
                 space.removeToken(frontierFilename);
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             boolean isSlashForce = force && event instanceof SlashCommandInteractionEvent;
-            String messageText = player.getRepresentation() + (isSlashForce ? " force" : "") + " explored the "
+            String messageText = player.getRepresentationNoPing() + (isSlashForce ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
@@ -1536,7 +1563,7 @@ public class ExploreService {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No frontier token in given system.");
@@ -1547,16 +1574,22 @@ public class ExploreService {
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename)) {
-            space.removeToken(frontierFilename);
-            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier
+        boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
+        boolean hasGhotiAnchorpointFrontier =
+                MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile);
+        if (hasFrontierToken || hasGhotiAnchorpointFrontier) {
+            if (hasFrontierToken) {
+                space.removeToken(frontierFilename);
+            }
+            String messageText = player.getRepresentationNoPing() + " explored the " + ExploreEmojis.Frontier
                     + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");

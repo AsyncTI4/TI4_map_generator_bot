@@ -1,0 +1,27 @@
+package ti4.discord.interactions.commands.ll;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import ti4.discord.interactions.commands.ParentCommand;
+import ti4.discord.interactions.commands.Subcommand;
+
+public class LostLegaciesCommand implements ParentCommand {
+    private final Map<String, Subcommand> subcommands =
+            Stream.of(new RevLeaderFix()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
+    @Override
+    public String getName() {
+        return "ll";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Lost Legacies Commands";
+    }
+
+    @Override
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
+    }
+}

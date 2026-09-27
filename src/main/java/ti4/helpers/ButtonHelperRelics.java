@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -31,6 +32,14 @@ public class ButtonHelperRelics {
             List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);
             buttons.add(pdsButton);
+            if (game.isMonumentsMode()
+                    && p2.getUnitByBaseType("monument") != null
+                    && (!Helper.getPlanetPlaceUnitButtons(p2, game, "monument", "placeOneNDone_dontskip")
+                                    .isEmpty()
+                            || !MonumentsPoKButtonHandler.getPanopticonPlacementButtons(game, p2)
+                                    .isEmpty())) {
+                buttons.add(Buttons.green("jrStructure_monument", "Place 1 Monument", UnitEmojis.Monument));
+            }
             buttons.add(tgButton);
             String msg = p2.getRepresentationUnfogged() + ", please choose which structure to build.";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);

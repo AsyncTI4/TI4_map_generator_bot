@@ -26,6 +26,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
@@ -294,6 +295,15 @@ public class TacticalActionOutputService {
                     output.append(", __does not have _Gravity Drive___)");
                 }
             }
+            String cyclotronTilePosition = game.getStoredValue("dihmohnCyclotron_" + player.getFaction());
+            if (!cyclotronTilePosition.isEmpty()) {
+                Tile cyclotronTile = game.getTileByPosition(cyclotronTilePosition);
+                if (cyclotronTile != null) {
+                    output.append(" (ships moved from ")
+                            .append(cyclotronTile.getRepresentation())
+                            .append(" have +1 move from _Flotilla Cyclotron_)");
+                }
+            }
             if (player.hasUnit("tk-voidcarver")) {
                 maxBonus++;
                 output.append(" (has _Voidcarver_ for +1 movement for one other ship moving from the same system)");
@@ -341,18 +351,14 @@ public class TacticalActionOutputService {
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (unit.unitType() == UnitType.Destroyer) {
-                if (player.ownsUnit("ponthous_destroyer2")) {
-                    output.append("**REMINDER**: Renegade II can only transport ground forces.");
-                } else if (player.ownsUnit("ponthous_destroyer")) {
-                    output.append("**REMINDER**: Renegade I can only transport infantry.");
-                }
-            }
             if (player.hasPlanet("gyraxis")
                     && player.getExhaustedPlanetsAbilities().contains("gyraxis")
                     && "yes".contains(game.getStoredValue("gyraxisActive"))) {
                 output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")) {
+            output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
@@ -460,7 +466,6 @@ public class TacticalActionOutputService {
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
-
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;
@@ -471,6 +476,10 @@ public class TacticalActionOutputService {
                     break;
                 }
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")
+                && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
+            bonusMoveValue += 1;
         }
 
         return baseMoveValue + bonusMoveValue;

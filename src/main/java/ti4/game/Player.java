@@ -52,10 +52,13 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
 import ti4.draft.DraftBag;
@@ -65,6 +68,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
@@ -110,6 +114,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
+import ti4.service.franken.FrankenUnitService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -968,11 +973,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
             return ValefarZService.hasFlagshipAbility(game, this, unitID);
         }
-        return getUnitsOwned().contains(unitID);
+        return ownsUnit(unitID);
     }
 
     public boolean ownsUnit(String unitID) {
-        return getUnitsOwned().contains(unitID);
+        if (getUnitsOwned().contains(unitID)) {
+            return true;
+        }
+        UnitModel unit = Mapper.getUnit(unitID);
+        return unit != null
+                && unit.getUnitType() == UnitType.Mech
+                && ThurvialiUnitHandler.hasCopiedMechAbility(game, this, unitID);
     }
 
     public boolean removeOwnedUnitByID(String unitID) {
@@ -994,11 +1005,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public List<UnitModel> getUnitModels() {
-        return getUnitsOwned().stream()
+        var units = getUnitsOwned().stream()
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
-                .map(this::injectPlayerUnitValues)
                 .toList();
+        if (FrankenUnitService.isDuplicateUnitCombiningEnabled(this)) {
+            units = new ArrayList<>(units.stream()
+                    .collect(Collectors.toMap(
+                            UnitModel::getAsyncId,
+                            Function.identity(),
+                            (first, second) -> getUnitModelPriority(first, null) >= getUnitModelPriority(second, null)
+                                    ? first
+                                    : second,
+                            LinkedHashMap::new))
+                    .values());
+        }
+        return units.stream().map(this::injectPlayerUnitValues).toList();
     }
 
     public UnitModel getUnitByBaseType(String unitType) {
@@ -1012,12 +1034,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public List<UnitModel> getUnitsByAsyncID(String asyncID) {
-        return getUnitsOwned().stream()
+        var units = getUnitsOwned().stream()
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
-                .map(this::injectPlayerUnitValues)
                 .toList();
+        if (FrankenUnitService.isDuplicateUnitCombiningEnabled(this) && !units.isEmpty()) {
+            units = new ArrayList<>(units);
+            units.sort((first, second) -> getUnitModelPriority(second, null) - getUnitModelPriority(first, null));
+            return List.of(injectPlayerUnitValues(units.getFirst()));
+        }
+        return units.stream().map(this::injectPlayerUnitValues).toList();
     }
 
     private UnitModel injectPlayerUnitValues(UnitModel unit) {
@@ -1025,17 +1052,32 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public UnitModel getPriorityUnitByAsyncID(String asyncID, UnitHolder unitHolder) {
-        List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
+        if (!FrankenUnitService.isDuplicateUnitCombiningEnabled(this)) {
+            List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
+            if (allUnits.isEmpty()) {
+                return null;
+            }
+            if (allUnits.size() == 1) {
+                return allUnits.getFirst();
+            }
+            allUnits.sort((d1, d2) -> getUnitModelPriority(d2, unitHolder) - getUnitModelPriority(d1, unitHolder));
+            return allUnits.getFirst();
+        }
+        List<UnitModel> allUnits = getUnitsOwned().stream()
+                .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
+                .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         if (allUnits.isEmpty()) {
             return null;
         }
         if (allUnits.size() == 1) {
-            return allUnits.getFirst();
+            return injectPlayerUnitValues(allUnits.getFirst());
         }
         allUnits.sort((d1, d2) -> getUnitModelPriority(d2, unitHolder) - getUnitModelPriority(d1, unitHolder));
 
-        return allUnits.getFirst();
+        return injectPlayerUnitValues(allUnits.getFirst());
     }
 
     private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
@@ -1050,14 +1092,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("tf-swa".equals(unit.getAlias())) {
             score += 99;
         }
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
-                && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
-        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
+        if (unit.getFaction().isPresent() && unit.getIsUpgrade()) {
+            score += 4;
+        }
+        if (unit.getFaction().isPresent()) {
+            score += 3;
+        }
+        if (unit.getIsUpgrade()) {
+            score += 2;
+        }
         if (unitHolder != null
                 && ((Constants.SPACE.equals(unitHolder.getName()) && unit.getIsShip())
-                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) score++;
-        if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) {
+            score++;
+        }
+        if (unit.getSource().isTwilightFallish()
+                && unit.getIsUpgrade()
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
         }
@@ -1101,6 +1151,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         actionCards.put(id, identifier);
+        if ("tf-stasis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningStasis(game, this);
+        }
+        if ("crisis".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningCrisis(game, this);
+        }
+        if ("extremeduress".equals(id)) {
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, this);
+        }
     }
 
     public void setEvent(String id) {
@@ -1453,7 +1512,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
 
-        return getCommoditiesBase() + getCommoditiesBonus();
+        int commodityValue = getCommoditiesBase();
+        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+            return commodityValue = 2 + getCommoditiesBonus();
+        }
+
+        return commodityValue + getCommoditiesBonus();
     }
 
     public int getCommoditiesBonus() {
@@ -1469,9 +1533,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
-        }
-        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
-            bonus -= 2;
         }
         if (hasTech("tf-corporateimperialism")) {
             bonus += 4;
@@ -1533,6 +1594,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     }
                 }
             }
+        }
+        if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
+            bonus++;
         }
 
         return bonus;
@@ -1920,6 +1984,55 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return AFKService.userIsAFK(getUserID());
     }
 
+    /**
+     * Gets a readied leader with the specified ID.
+     * If none is found, gets a suitable alternative instead.
+     * If no suitable alternative is found either, returns an empty Optional
+     * (For example, a suitable alternative could be a yssaril agent
+     * or an exhausted leader with the specified ID.)
+     * @param leaderId ID (Alias) of the leader to search for
+     * @return The found leader with that ID (or suitable alternative)
+     */
+    public Optional<Leader> getLeaderByIdPreferReadied(String leaderId) {
+        Leader exhaustedFallbackLeader = null;
+        for (Leader leader : leaders) {
+            if (leader.getId().equalsIgnoreCase(leaderId)) {
+                if (!leader.isExhausted()) {
+                    return Optional.of(leader);
+                }
+                if (exhaustedFallbackLeader == null) {
+                    exhaustedFallbackLeader = leader;
+                }
+            }
+        }
+
+        if (leaderId.contains("keleresagent")
+                && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
+            // Return Dummy agent so that the Optional has some readied agent
+            return Optional.of(new Leader("keleresagent", "agent"));
+        }
+        if (leaderId.contains("agent")) {
+            for (Leader leader : leaders) {
+                if ("yssarilagent".equals(leader.getId())) {
+                    if (!leader.isExhausted()) {
+                        return Optional.of(leader);
+                    }
+                    if (exhaustedFallbackLeader == null) {
+                        exhaustedFallbackLeader = leader;
+                    }
+                }
+            }
+        }
+
+        return Optional.ofNullable(exhaustedFallbackLeader);
+    }
+
+    // public boolean hasUnexhaustedLeader(String leaderId) {
+    //     return getLeaderByIdPreferReadied(leaderId)
+    //             .filter(Predicate.not(Leader::isExhausted))
+    //             .isPresent();
+    // }
+
     public boolean hasUnexhaustedLeader(String leaderId) {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
@@ -2196,6 +2309,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         Game game = this.game;
 
         getFollowedSCs().add(sc);
+        if (game != null) {
+            ThurvialiAbilityHandler.offerCelestialEnvoys(game, this, sc);
+        }
         if (editSCFollow) {
             game.setStoredValue(
                     "followedSC" + sc + "_" + game.getRound(),
@@ -2679,7 +2795,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         if (techModel.isUnitUpgrade()) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-            if (unitModel != null) {
+            if (unitModel != null && !FrankenUnitService.researchMatchingUnitUpgrades(this, techID)) {
                 // Remove all non-faction-upgrade matching units
                 String asyncId = unitModel.getAsyncId();
                 List<UnitModel> unitsToRemove = getUnitsByAsyncID(asyncId).stream()
@@ -2784,9 +2900,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedTechs().add(tech);
 
             if (game != null) {
-                if (game.playerHasLeaderUnlockedOrAlliance(this, "arcanumcommander")) {
-                    ArcanumLeadersHandler.offerArcanumTechExhaustCommanderButtons(this);
-                }
                 if (hasUnexhaustedLeader("revenantagent")) {
                     RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
                 }
@@ -2865,14 +2978,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if ("ponthous".equalsIgnoreCase(planet)
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Ponthous Ability"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
-                    getRepresentation()
-                            + ", you may exhaust the Ponthous ability and \"exhaust\" the Ponthous + or - card to ready Ponthous.",
-                    buttons);
+                    getRepresentation() + ", you may exhaust _Fractured Souls_ to ready Ponthous.",
+                    PonthousAbilityHandler.getFracturedSoulsButtons(this));
         }
     }
 

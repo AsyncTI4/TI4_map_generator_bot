@@ -7,9 +7,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -39,6 +41,7 @@ public class PassService {
         player.setPassed(true);
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
+        RevenantLeadersHandler.offerRevArcanumAgentButtons(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
@@ -127,6 +130,7 @@ public class PassService {
                         buttons);
             }
         }
+        MonumentsDSButtonHandler.offerKolumeMonumentButton(game, player);
 
         if (game.hasAnyPriorityTrackMode()) {
             PriorityTrackHelper.AssignPlayerToPriority(game, player, null);

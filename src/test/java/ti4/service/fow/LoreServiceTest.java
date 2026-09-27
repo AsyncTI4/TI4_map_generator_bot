@@ -453,6 +453,20 @@ class LoreServiceTest extends BaseTi4Test {
                     .getTokenList()
                     .contains("token_gravityrift.png"));
         }
+
+        @Test
+        void attachmentNameResolvesToImageFilenameNotBareModelId() {
+            // Regression: "positiveres" is an attachment id (Mapper.getAttachmentInfo), not a
+            // generic token — Mapper.getTokenID alone can't resolve it, so it used to be stored as
+            // the bare, un-renderable "positiveres" string. The resource-modifier stat still
+            // applied either way (getAttachmentInfo accepts both the bare id and the image
+            // filename), which is exactly why this was invisible until the token silently never
+            // appeared on the rendered map image.
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!token positiveres"), systemTile, "mr", true);
+            var tokens = systemTile.getUnitHolders().get("mr").getTokenList();
+            assertTrue(tokens.contains("attachment_positiveres.png"), "resolved image filename must be stored");
+            assertFalse(tokens.contains("positiveres"), "bare attachment id must not be stored");
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -627,6 +641,32 @@ class LoreServiceTest extends BaseTi4Test {
                     player, game, entry("!removetoken gravityrift"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
             assertTrue(descs.get(0).contains("nothing removed"));
+        }
+
+        @Test
+        void removesAttachmentAddedByShortName() {
+            // Add and remove must resolve "positiveres" to the same stored id (attachment
+            // resolution takes priority over generic-token resolution on both sides) or removal
+            // silently no-ops against a token that was actually stored under a different string.
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!token positiveres"), systemTile, "mr", true);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removetoken positiveres"), systemTile, "mr", true);
+            assertFalse(systemTile.getUnitHolders().get("mr").getTokenList().contains("attachment_positiveres.png"));
+        }
+
+        @Test
+        void visionTokenRemovedByLoreClearsRestrictedGrant() {
+            // A restriction set by /fow add_vision_token must not carry over to a vision token
+            // placed later, so removing the token through lore has to drop it.
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!token fowvision"), systemTile, Constants.SPACE, true);
+            assertTrue(systemTile.hasFowVisionToken());
+            systemTile.setFowVisionGrant(List.of("blue"));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removetoken fowvision"), systemTile, Constants.SPACE, true);
+            assertFalse(systemTile.hasFowVisionToken());
+            assertTrue(systemTile.getFowVisionGrant().isEmpty());
         }
     }
 

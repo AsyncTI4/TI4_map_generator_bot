@@ -47,6 +47,14 @@
         "description": "New Stuff"
     },
     {
+        "source": "tf_br",
+        "name": "Twilight's Fall: Blue Reverie",
+        "canal": "community",
+        "subcanal": "lol homebrew",
+        "credits": "TacticBlue",
+        "description": "Twilight's Fall Mahact King"
+    },
+    {
         "source": "codex1",
         "name": "Twilight Codex\nVolume I: Ordinian",
         "canal": "official",

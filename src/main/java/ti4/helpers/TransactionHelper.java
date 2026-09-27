@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -1311,6 +1312,7 @@ public class TransactionHelper {
                 boolean blackmarket =
                         List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
                 blackmarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
+                blackmarket |= MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2);
                 for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
@@ -1854,7 +1856,7 @@ public class TransactionHelper {
                     if (game.isFowMode()) {
                         transact = Buttons.green(
                                 factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
-                                owner.getColor() + " " + promissoryNote.getName());
+                                PromissoryNoteHelper.ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
                     } else {
                         transact = Buttons.green(
                                 factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
@@ -2217,7 +2219,14 @@ public class TransactionHelper {
                         p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
             }
-            case "Relics" -> SendRelicService.handleSendRelic(event, game, p1, p2, amountToTrans);
+            case "Relics" ->
+                SendRelicService.handleSendRelic(
+                        event,
+                        game,
+                        p1,
+                        p2,
+                        amountToTrans,
+                        !MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2));
         }
         Button button =
                 Buttons.gray(factionChecker + "transactWith_" + p2.getColor(), "Send something else to player?");
@@ -2401,7 +2410,8 @@ public class TransactionHelper {
                     Buttons.green("newTransact_Frags_" + p1.getColor() + "_" + p2.getColor(), "Fragments"));
         }
         if (seeP1
-                && (((blackMarket || graft) && !p1.getActualRelics().isEmpty())
+                && (((blackMarket || graft || MonumentsPoKButtonHandler.canTradeRelicsWithNaazMonument(game, p1, p2))
+                                && !p1.getActualRelics().isEmpty())
                         || !p1.getTradableRelics().isEmpty())) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_Relics_" + p1.getColor() + "_" + p2.getColor(), "Relics"));

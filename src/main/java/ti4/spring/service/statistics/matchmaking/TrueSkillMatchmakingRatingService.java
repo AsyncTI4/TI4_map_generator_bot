@@ -23,7 +23,7 @@ class TrueSkillMatchmakingRatingService {
 
     private static final FactorGraphTrueSkillCalculator CALCULATOR = new FactorGraphTrueSkillCalculator();
 
-    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
+    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.7;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
 
@@ -73,6 +73,54 @@ class TrueSkillMatchmakingRatingService {
                 lastGameEndedDateByUserId,
                 recentRatingsByUserId,
                 useConservativeRating);
+    }
+
+    static List<MatchmakingRatingHistoryEntry> calculateRatingHistory(
+            List<MatchmakingGame> games, String userId, boolean useConservativeRating) {
+        games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
+
+        GameInfo gameInfo = MatchmakingGameInfo.create();
+        Map<String, Player<String>> userIdToTrueSkillPlayer = new HashMap<>();
+        Map<IPlayer, Rating> trueSkillPlayerToRating = new HashMap<>();
+        List<MatchmakingRatingHistoryEntry> history = new ArrayList<>();
+
+        for (MatchmakingGame game : games) {
+            List<MatchmakingPlayer> gamePlayers = game.players();
+            var teams = new ArrayList<ITeam>();
+            int[] ranks = new int[gamePlayers.size()];
+            for (int i = 0; i < gamePlayers.size(); i++) {
+                MatchmakingPlayer gamePlayer = gamePlayers.get(i);
+                var trueSkillPlayer = userIdToTrueSkillPlayer.computeIfAbsent(
+                        gamePlayer.userId(), _ -> new Player<>(gamePlayer.userId()));
+                Rating rating =
+                        trueSkillPlayerToRating.computeIfAbsent(trueSkillPlayer, _ -> gameInfo.getDefaultRating());
+                var team = new Team();
+                team.addPlayer(trueSkillPlayer, rating);
+                teams.add(team);
+                ranks[i] = gamePlayer.rank();
+            }
+
+            MatchmakingPlayer trackedPlayer = gamePlayers.stream()
+                    .filter(gamePlayer -> gamePlayer.userId().equals(userId))
+                    .findFirst()
+                    .orElse(null);
+            Rating startRating =
+                    trackedPlayer == null ? null : trueSkillPlayerToRating.get(userIdToTrueSkillPlayer.get(userId));
+
+            Map<IPlayer, Rating> newRatings = CALCULATOR.calculateNewRatings(gameInfo, teams, ranks);
+            trueSkillPlayerToRating.putAll(newRatings);
+
+            if (trackedPlayer != null) {
+                Rating endRating = trueSkillPlayerToRating.get(userIdToTrueSkillPlayer.get(userId));
+                history.add(new MatchmakingRatingHistoryEntry(
+                        game.name(),
+                        game.endedDate(),
+                        trackedPlayer.rank(),
+                        BigDecimal.valueOf(ratingValue(startRating, useConservativeRating)),
+                        BigDecimal.valueOf(ratingValue(endRating, useConservativeRating))));
+            }
+        }
+        return history;
     }
 
     private static void recordRecentRatings(

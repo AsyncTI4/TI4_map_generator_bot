@@ -8,7 +8,12 @@ import ti4.discord.interactions.commands.Subcommand;
 
 public class MonumentsCommand implements ParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(new MonumentReady(), new MonumentExhaust())
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new MonumentReady(),
+                    new MonumentExhaust(),
+                    new BelkoseaToken(BelkoseaToken.Action.ADD),
+                    new BelkoseaToken(BelkoseaToken.Action.REMOVE),
+                    new BelkoseaToken(BelkoseaToken.Action.MOVE))
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

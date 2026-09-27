@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
@@ -661,11 +662,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // Overrides for TK modes
         if (isTkNovaCup()) {
+            setHomebrew(true);
             acDeck = "action_cards_tk_nova";
             setGenomeSpliceDeckID("tk_nova_genome");
         }
         // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
         if (isTwilightKart() || isTkDestroyerCup()) {
+            setHomebrew(true);
             agendaDeck = "agendas_twilight_kart";
             setUnitSpliceDeckID("twilight_kart_units");
             acDeck = "action_cards_tk_destroyer_and_nova";
@@ -1011,7 +1014,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             tkCups.add("Destroyer Cup");
         }
         if (isTkNovaCup()) {
-            tkCups.add("Nova Cup");
+            tkCups.add("Nova Cup " + SourceEmojis.TkNovaCup);
         }
         gameModes.put(
                 SourceEmojis.TwilightKart + " Twilight Kart (" + String.join(" & ", tkCups) + ")", !tkCups.isEmpty());
@@ -2220,6 +2223,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     }
                 }
             }
+            MonumentsTEButtonHandler.offerKeleresMonumentCommandToken(this);
             return true;
         }
         return false;
@@ -3637,9 +3641,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void removeOverruleIfPurged() {
-        if ("true".equals(getStoredValue("removeOverrule"))) {
+        if (isOverrulePurged()) {
             getActionCards().removeIf("overrule"::equals);
         }
+    }
+
+    public boolean isOverrulePurged() {
+        return "true".equals(getStoredValue("removeOverrule"));
     }
 
     public void addTeACs() {
@@ -4110,6 +4118,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("aurelionstation", new Planet("aurelionstation", new Point(0, 0)));
         planets.put("innersanctum", new Planet("innersanctum", new Point(0, 0)));
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
+        planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
+        planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4281,18 +4291,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if ("thpnrevenant".equals(pnID)) {
-                Player pnOwner = getPNOwner(pnID);
-                Leader commander = getRevenantPantheonCommander(pnOwner);
-                if (pnOwner != null
-                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
-                        && commander != null
-                        && commander.getId().equalsIgnoreCase(leaderID)
-                        && !commander.isLocked()) {
-                    return true;
-                }
-                continue;
-            }
             if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null
@@ -4367,17 +4365,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    public Leader getRevenantPantheonCommander(Player revenantPlayer) {
-        if (revenantPlayer == null || !"revenant".equalsIgnoreCase(revenantPlayer.getFaction())) {
-            return null;
-        }
-        return revenantPlayer.getLeaders().stream()
-                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                .filter(leader -> Constants.CALL_OF_THE_HAUNTED_LEADERS.contains(leader.getId()))
-                .findFirst()
-                .orElse(null);
-    }
-
     public Leader getRevenantLichCommander(Player lichPoolOwner, Player target) {
         if (lichPoolOwner == null || target == null) {
             return null;
@@ -4402,14 +4389,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if ("thpnrevenant".equals(pnID)) {
-                Player pnOwner = getPNOwner(pnID);
-                Leader commander = getRevenantPantheonCommander(pnOwner);
-                if (pnOwner != null && !pnOwner.equals(player) && commander != null && !commander.isLocked()) {
-                    leaders.add(commander);
-                }
-                continue;
-            }
             if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
@@ -4954,9 +4933,19 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
+                || isUnchartedSpaceStuff()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
+                || isTwilightKart()
+                || isTkDestroyerCup()
+                || isTkNovaCup()
+                || isTfBr()
+                || isTwilightDS()
+                || isMuaatManiaMode()
+                || isCosmicConvergenceMode()
+                || isLiberationC4Mode()
+                || isErwansGambitMode()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
@@ -23,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -101,6 +103,8 @@ public class EndTurnService {
         AeternaUnitsHandler.clearCryptActionState(game);
         AeternaUnitsHandler.clearGraveyardActionState(game);
         RevenantLeadersHandler.clearPurpleLeaderActionState(game);
+        MonumentsDSButtonHandler.clearForbiddenLibraryActionState(game, player);
+        MonumentsDSButtonHandler.clearMirrorforgeActionState(game, player);
         if (player.hasAbility("phantom_energy")) {
             TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
@@ -115,6 +119,7 @@ public class EndTurnService {
         game.removeStoredValue("possiblyUsedRift");
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
+        FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);
         game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
         String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
         if (!fieldTestTech.isEmpty()) {

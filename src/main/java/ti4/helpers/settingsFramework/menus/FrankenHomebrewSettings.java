@@ -19,6 +19,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting eronous;
     private final BooleanSetting lostLegacies;
+    private final BooleanSetting monuments;
 
     FrankenHomebrewSettings(Game game, JsonNode json, SettingsMenu parent) {
         super(
@@ -32,14 +33,17 @@ class FrankenHomebrewSettings extends SettingsMenu {
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
+        monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
 
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
         eronous.setEmoji(SourceEmojis.Eronous);
+        monuments.setEmoji(SourceEmojis.Monuments);
         discoStars.setExtraInfo("Adds Discordant Stars faions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
+        monuments.setExtraInfo("Adds Monuments+ cards and enables Monument drafting.");
 
         if (json != null && json.has("homebrewSettings")) json = json.get("homebrewSettings");
         if (json != null
@@ -50,6 +54,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
             unchartedSpace.initialize(json.get("unchartedSpace"));
             eronous.initialize(json.get("eronous"));
             lostLegacies.initialize(json.get("lostLegacies"));
+            monuments.initialize(json.get("monuments"));
         }
     }
 
@@ -63,7 +68,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        return new ArrayList<>(List.of(discoStars, blueReverie, unchartedSpace, eronous, lostLegacies));
+        return new ArrayList<>(List.of(discoStars, blueReverie, unchartedSpace, eronous, lostLegacies, monuments));
     }
 
     @Override

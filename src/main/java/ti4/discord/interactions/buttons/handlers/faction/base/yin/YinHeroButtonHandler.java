@@ -40,7 +40,8 @@ class YinHeroButtonHandler {
                     PlanetTargetSpec.of(player.factionButtonChecker() + "yinHeroPlanet")
                             .where(p -> !p.isSpaceStation(game)
                                     && game.getTileFromPlanet(p.getName()) != null
-                                    && !game.getTileFromPlanet(p.getName()).isHomeSystem(game)),
+                                    && !game.getTileFromPlanet(p.getName()).isHomeSystem(game))
+                            .withPageNavPrefix(player.factionButtonChecker() + "yinHeroPlanet_"),
                     new ArrayList<>());
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(), "Please choose which planet to invade.", fogButtons);
@@ -110,7 +111,8 @@ class YinHeroButtonHandler {
         var spec = PlanetTargetSpec.of(player.factionButtonChecker() + "yinHeroPlanet")
                 .where(p -> !p.isSpaceStation(game)
                         && game.getTileFromPlanet(p.getName()) != null
-                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game));
+                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game))
+                .withPageNavPrefix(player.factionButtonChecker() + "yinHeroPlanet_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         String planet = buttonID.replace("yinHeroPlanet_", "");
         if ("lockedmallice".equalsIgnoreCase(planet)) {

@@ -44,10 +44,12 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -398,6 +400,7 @@ public class PlayerAreaGenerator {
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
         xDeltaBottom = monument(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = techGenSynthesis(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = florzenStasisFighters(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = speakerToken(player, xDeltaBottom, yPlayAreaSecondRow);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
@@ -824,14 +827,6 @@ public class PlayerAreaGenerator {
     }
 
     private int theodisiTokenSupplies(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.hasAbility("expeditionary_cache")) {
-            xDeltaFromRightSide = displayTheodisiTokenSupply(
-                    "token_theodisi_kairnexpedition.png",
-                    5,
-                    KairnAbilityHandler.getAvailableExpeditionTokens(game),
-                    xDeltaFromRightSide,
-                    yDelta);
-        }
         if (player.hasAbility("sting_of_the_hive")) {
             xDeltaFromRightSide = displayTheodisiTokenSupply(
                     "token_theodisi_mine.png",
@@ -873,22 +868,37 @@ public class PlayerAreaGenerator {
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
         boolean hasAuraVault = game.isMonumentsMode() && player.hasUnit("yellowtf_monument");
+        boolean hasPharusIustitiae = game.isMonumentsMode()
+                && (player.hasUnit("keleres_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument"));
         boolean hasHonorOrPathTokens = player.getDishonorCounter() > 0
                 || player.getHonorCounter() > 0
                 || player.getPathTokenCounter() > 0
                 || player.getSteelbalanceCounter() > 0
                 || player.getStarbalanceCounter() > 0
                 || game.isVeiledHeartMode();
-        if (!hasHonorOrPathTokens && !hasAuraVault) {
+        if (!hasHonorOrPathTokens && !hasAuraVault && !hasPharusIustitiae) {
             return xDeltaFromRightSide;
         }
         if (!hasHonorOrPathTokens) {
-            DrawingUtil.superDrawStringCenteredDefault(
-                    graphics,
-                    "Aura Tokens: "
-                            + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
-                    mapWidth - xDeltaFromRightSide - 300,
-                    yDelta + 50);
+            int tokenOffset = 50;
+            if (hasAuraVault) {
+                DrawingUtil.superDrawStringCenteredDefault(
+                        graphics,
+                        "Aura Tokens: "
+                                + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(
+                                        game, player),
+                        mapWidth - xDeltaFromRightSide - 300,
+                        yDelta + tokenOffset);
+                tokenOffset += 50;
+            }
+            if (hasPharusIustitiae) {
+                DrawingUtil.superDrawStringCenteredDefault(
+                        graphics,
+                        "Pharus Tokens: " + MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player),
+                        mapWidth - xDeltaFromRightSide - 300,
+                        yDelta + tokenOffset);
+            }
             return xDeltaFromRightSide + 200;
         }
         if (game.isVeiledHeartMode()) {
@@ -939,6 +949,13 @@ public class PlayerAreaGenerator {
                             + TwilightsFallMonumentsButtonHandler.getYellowTfMonumentCommandTokenCount(game, player),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 150);
+        }
+        if (hasPharusIustitiae) {
+            DrawingUtil.superDrawStringCenteredDefault(
+                    graphics,
+                    "Pharus Tokens: " + MonumentsTEButtonHandler.getKeleresMonumentCommandTokenCount(game, player),
+                    mapWidth - xDeltaFromRightSide - 300,
+                    yDelta + (hasAuraVault ? 200 : 150));
         }
         return xDeltaFromRightSide + 200;
     }
@@ -1334,6 +1351,17 @@ public class PlayerAreaGenerator {
             } catch (Exception e) {
                 BotLogger.error(new LogOrigin(player), "Bad file: " + relicFileName, e);
             }
+            if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(game, player, relicID)) {
+                DrawingUtil.getAndDrawControlToken(graphics, player, x + deltaX + 10, y + 60, false, 0.5f);
+            }
+            if (List.of("economicboon", "naturesboon", "diplomaticboon", "cosmicboon")
+                    .contains(relicID)) {
+                int tokenCount = LostLegaciesRelicHandler.getBoonTokens(game, player, relicID);
+                for (int token = 0; token < tokenCount; token++) {
+                    DrawingUtil.getAndDrawControlToken(
+                            graphics, player, x + deltaX + 2 + token % 3 * 14, y + 52 + token / 3 * 13, false, 0.25f);
+                }
+            }
 
             deltaX += 48;
         }
@@ -1386,9 +1414,11 @@ public class PlayerAreaGenerator {
                         default -> -1;
                     };
             if (leaderRank1 == leaderRank2) {
-                return Mapper.getLeader(leader1.getId())
-                        .getName()
-                        .compareToIgnoreCase(Mapper.getLeader(leader2.getId()).getName());
+                LeaderModel leaderModel1 = Mapper.getLeader(leader1.getId());
+                LeaderModel leaderModel2 = Mapper.getLeader(leader2.getId());
+                String leaderName1 = leaderModel1 == null ? leader1.getId() : leaderModel1.getName();
+                String leaderName2 = leaderModel2 == null ? leader2.getId() : leaderModel2.getName();
+                return leaderName1.compareToIgnoreCase(leaderName2);
             }
             return leaderRank1 - leaderRank2;
         };
@@ -1453,6 +1483,12 @@ public class PlayerAreaGenerator {
             }
 
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+            if (leaderModel == null) {
+                g2.setFont(Storage.getFont14());
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, leader.getId(), x + deltaX + 7, y + 30, 120, true);
+                deltaX += 48;
+                continue;
+            }
             boolean shrink = game.isTwilightsFallMode() ? leaderModel.getTFShrinkName() : leaderModel.getShrinkName();
             String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
 
@@ -2069,6 +2105,9 @@ public class PlayerAreaGenerator {
         Point dreadnoughtPoint = new Point(284, 54);
         Point flagshipPoint = new Point(335, 47);
         Point warSunPoint = new Point(393, 56);
+        Point pdsPoint = new Point(340, 112);
+        Point spacedockPoint = new Point(395, 112);
+        Point monumentPoint = new Point(235, 120);
 
         String faction = player.getFaction();
         if (faction != null) {
@@ -2095,7 +2134,7 @@ public class PlayerAreaGenerator {
 
         BufferedImage image = null;
 
-        List<UnitType> order = List.of(
+        List<UnitType> order = new ArrayList<>(List.of(
                 UnitType.Mech,
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -2104,7 +2143,10 @@ public class PlayerAreaGenerator {
                 UnitType.Flagship,
                 UnitType.Warsun,
                 UnitType.Fighter,
-                UnitType.Infantry);
+                UnitType.Infantry));
+        if (game.isMonumentsMode()) {
+            order.addAll(List.of(UnitType.Pds, UnitType.Spacedock, UnitType.Monument));
+        }
 
         Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::unitType));
         for (UnitType orderKey : order) {
@@ -2167,6 +2209,9 @@ public class PlayerAreaGenerator {
                     case Flagship -> position.translate(flagshipPoint.x, flagshipPoint.y);
                     case Warsun -> position.translate(warSunPoint.x, warSunPoint.y);
                     case Mech -> position.translate(mechPoint.x, mechPoint.y);
+                    case Pds -> position.translate(pdsPoint.x, pdsPoint.y);
+                    case Spacedock -> position.translate(spacedockPoint.x, spacedockPoint.y);
+                    case Monument -> position.translate(monumentPoint.x, monumentPoint.y);
                     default -> {}
                 }
                 // Load voltron data
@@ -3190,6 +3235,38 @@ public class PlayerAreaGenerator {
                 152,
                 "Gen Synthesis - " + infantryIITech.getName(),
                 genSynthesisInfantry + " infantry to revive.");
+
+        return xDeltaFromRightSide;
+    }
+
+    private int florzenStasisFighters(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
+        int stasisFighters = player.getStasisFighters();
+        if (stasisFighters < 1) {
+            return xDeltaFromRightSide;
+        }
+
+        xDeltaFromRightSide += 48;
+        int x = mapWidth - xDeltaFromRightSide;
+        BufferedImage fighter = ImageHelper.readScaled(getUnitPath(Mapper.getUnitKey("ff", player.getColor())), 36, 36);
+        graphics.drawImage(fighter, x + 4, yPlayAreaSecondRow + 10, null);
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont16());
+        DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, "Corsairs' Cove", x + 7, yPlayAreaSecondRow + 116, 100);
+
+        boolean shrinkText = stasisFighters >= 20;
+        DrawingUtil.drawCenteredString(
+                graphics,
+                Integer.toString(stasisFighters),
+                new Rectangle(x + (shrinkText ? 2 : 4), yPlayAreaSecondRow + (shrinkText ? 123 : 121), 42, 30),
+                shrinkText ? Storage.getFont30() : Storage.getFont36());
+        drawRectWithOverlay(
+                graphics,
+                x + 2,
+                yPlayAreaSecondRow - 2,
+                44,
+                152,
+                "Corsairs' Cove",
+                stasisFighters + " fighters in stasis.");
 
         return xDeltaFromRightSide;
     }

@@ -28,11 +28,19 @@ public class KairnTechHandler {
     private static final String READY_LENS = "kairnReadyLens_";
     private static final String DECLINE_READY_LENS = "kairnDeclineReadyLens_";
     private static final String FRAGMENT_WINDOW = "kairnLensFragment_";
+    private static final String USED_LENS = "kairnLensUsed_";
 
     public static void clearSurveyorsLensFragmentWindows(Game game) {
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue(FRAGMENT_WINDOW + player.getFaction());
+            game.removeStoredValue(USED_LENS + player.getFaction());
         }
+    }
+
+    public static boolean hasUsedSurveyorsLens(Game game, Player player) {
+        return game != null
+                && player != null
+                && !game.getStoredValue(USED_LENS + player.getFaction()).isEmpty();
     }
 
     private static final Set<String> EXPLORATION_TRAITS =
@@ -46,7 +54,10 @@ public class KairnTechHandler {
 
     @ButtonHandler(EXHAUST_LENS)
     public static void resolveLensExhaust(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null || player == null || !player.hasTechReady(SURVEYORS_LENS)) {
+        if (game == null
+                || player == null
+                || !player.hasTechReady(SURVEYORS_LENS)
+                || hasUsedSurveyorsLens(game, player)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -93,6 +104,7 @@ public class KairnTechHandler {
         Tile tile = game.getTileFromPlanet(planetName);
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         if (!player.hasTechReady(SURVEYORS_LENS)
+                || hasUsedSurveyorsLens(game, player)
                 || tile == null
                 || planet == null
                 || !tile.getPosition().equals(game.getActiveSystem())) {
@@ -110,6 +122,7 @@ public class KairnTechHandler {
         }
 
         player.exhaustTech(SURVEYORS_LENS);
+        game.setStoredValue(USED_LENS + player.getFaction(), "used");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose how to explore " + planet.getRepresentation(game)

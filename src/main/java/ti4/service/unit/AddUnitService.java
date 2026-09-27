@@ -55,6 +55,27 @@ public class AddUnitService {
     }
 
     public static void addUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, List<RemovedUnit> removedUnits) {
+        for (RemovedUnit unit : removedUnits) {
+            unit.uh().addUnitsWithStates(unit.unitKey(), unit.states());
+
+            tile = FlipTileService.flipTileIfNeeded(tile, game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(
+                    event, tile, unit.uh().getName(), game);
+            Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, unit.unitKey(), unit.uh().getName(), player, unit.getTotalRemoved());
+        }
+        String unitList = String.join(
+                ", ",
+                removedUnits.stream()
+                        .map(unit -> unit.unitKey() + " " + unit.getTotalRemoved())
+                        .toList());
+        handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
+    }
+
+    public static void addUnits(
             GenericInteractionCreateEvent event,
             Tile tile,
             Game game,
@@ -243,13 +264,26 @@ public class AddUnitService {
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
         }
+        if (unitKey.unitType() == UnitType.Monument) {
+            MonumentsService.syncKyroReliquaryAttachment(game, player);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
         if (!(event instanceof ButtonInteractionEvent buttonEvent)
                 || !buttonEvent.getComponentId().contains("place_")) {
             MonumentsButtonHandler.offerCenotaph(game, player, tile, unitKey, location, amount);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones", "crystellum");
+                player,
+                "dream",
+                "myrr",
+                "natau",
+                "oblivion",
+                "revenantxytheris",
+                "thrones",
+                "crystellum",
+                "scrapyard",
+                "thurviali");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

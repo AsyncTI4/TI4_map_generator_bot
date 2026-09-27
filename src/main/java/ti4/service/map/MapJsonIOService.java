@@ -71,6 +71,8 @@ public class MapJsonIOService {
                 t.setTileID(tile.getTileID());
 
                 // tokens
+                // NOTE: a fog-vision token's recipient grant (Space#getFowVisionGrant) is not exported, so a
+                // restricted vision token round-trips as "visible to everyone". Export/import is GM-only in FoW.
                 if (includeTokens
                         && tile.getSpaceUnitHolder() != null
                         && !tile.getSpaceUnitHolder().getTokenList().isEmpty()) {
@@ -276,6 +278,8 @@ public class MapJsonIOService {
                     continue;
                 }
             }
+            // NOTE: no fog-vision grant is imported (see export), so an imported fog-vision token reveals the
+            // system to everyone. To re-restrict: /fow remove_vision_token, then /fow add_vision_token with targets.
             tile.getSpaceUnitHolder().addToken(tokenFileName);
         }
     }

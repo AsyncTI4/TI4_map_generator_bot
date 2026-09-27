@@ -138,6 +138,7 @@
         "productionValue": "1",
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "This unit is placed in the space area of a non-Fracture, non-supernova system that does not contain planets, instead of on a planet.\nIf this unit is blockaded, destroy it."
     },
     {
@@ -204,7 +205,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool."
+        "ability": "At the start of the status phase, the Mahact player may place 1 command token in this system into their fleet pool if it is their own token, or if it does not already have 1 of that player's tokens."
     },
     {
         "id": "mentak_monument",
@@ -430,6 +431,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "This unit is a space station and placed in the space area of a system that contains your ships and exactly 1 non-legendary planet. Take its matching space station card while you control it.\nWhen you lose control of this space station, destroy it and produce 2 hits against ships in this system."
     },
     {
@@ -479,7 +481,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "After a player activates this system, you may replace 1 control token on one of your plots with 1 of that player's control tokens."
+        "ability": "When a player activates this system, place their control token on this card if it does not have one. When you research a technology, you may remove a control token from this card to skip 1 prerequisite, or move a non-Firmament player's control token to a plot card."
     },
     {
         "id": "obsidian_monument",
@@ -909,6 +911,7 @@
         "name": "Reliquat Unleashed",
         "subtitle": "Rhodun Monument",
         "source": "monuments",
+        "faction": "zealots",
         "eligiblePlanetTypes": [
             "TECH_SPECIALTY"
         ],
@@ -1043,6 +1046,23 @@
         "id": "roh'dhna_monument",
         "baseType": "monument",
         "asyncId": "monument",
+        "name": "Zha'Ren Foundry (Legacy)",
+        "subtitle": "Roh'Dhna Monument (Legacy)",
+        "source": "monuments",
+        "faction": "rohdhna",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL"
+        ],
+        "spaceCannonHitsOn": 7,
+        "spaceCannonDieCount": 2,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you produce any number of units in this system, reduce the combined cost of those units by 2."
+    },
+    {
+        "id": "rohdhna_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
         "name": "Zha'Ren Foundry",
         "subtitle": "Roh'Dhna Monument",
         "source": "monuments",
@@ -1164,11 +1184,9 @@
         "eligiblePlanetTypes": [
             "CULTURAL"
         ],
-        "productionValue": "+1",
-        "basicProduction": "struct",
         "isStructure": true,
         "isMonument": true,
-        "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system."
+        "ability": "This unit's PRODUCTION value is equal to the number of structures you control in or adjacent to this system.\n\nPRODUCTION X"
     },
     {
         "id": "kyro_monument",
@@ -1183,6 +1201,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "notes": "The game will not see this as a planet with a tech specialty. Just resolve manually. It basically is just allowing it to be affected by things like Bio-Stims.",
         "ability": "This planet counts as a legendary planet with an attachment and a technology specialty of no type.\nWhen this unit is destroyed, you must place it on a planet you control in this or an adjacent system, if able. If you do, draw a relic."
     },
     {
@@ -1283,7 +1302,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "At the end of the strategy phase, choose and place 1 control token on a super weapon card in your play area. This card has the text abilities of each super weapon card in your play area that has 1 of your control tokens."
+        "ability": "At the end of the strategy phase, choose and place 1 control token on a superweapon card in a play area. This card has the text abilities of each superweapon card in a play area that has 1 of your control tokens."
     },
     {
         "id": "kaltrim_monument",
@@ -1334,6 +1353,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "notes": "Use the button BEFORE assigning hits.",
         "ability": "When 1 or more of your infantry would be destroyed, you may exhaust this card to place those units on this planet instead."
     },
     {
@@ -1371,6 +1391,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
+        "isPlanetOnly": false,
         "ability": "If you have more Honor than Dishonor, flip this card.\nAfter a player wins a combat in this system, they may draw a secret objective.\nIf your Dishonor is 8, move this unit to the space area; it cannot be destroyed."
     },
     {
@@ -1380,6 +1401,7 @@
         "name": "The People's Temple",
         "subtitle": "Toldar Monument",
         "source": "monuments",
+        "faction": "toldar",
         "eligiblePlanetTypes": [
             "CULTURAL",
             "LEGENDARY"
@@ -1419,5 +1441,27 @@
         "isStructure": true,
         "isMonument": true,
         "ability": "When a player activates this system, gain 1 balance token or flip 1 balance token on your faction sheet.\nThis unit may also be placed on a legendary planet."
+    },
+    {
+        "id": "whitetf_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Alabaster Edifice",
+        "subtitle": "Arcane Monument",
+        "source": "monuments",
+        "faction": "whitetf",
+        "eligiblePlanetTypes": [
+            "LIGHTNING",
+            "CULTURAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 2,
+        "planetaryShield": true,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you draw a relic, gain 1 trade good and produce 1 unit on this planet."
     }
 ]

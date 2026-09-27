@@ -88,6 +88,7 @@ public class WebPlayerArea {
 
     // Units and combat
     private int stasisInfantry;
+    private int stasisFighters;
     private int actualHits;
     private int expectedHitsTimes10;
     private Set<String> unitsOwned;
@@ -255,6 +256,7 @@ public class WebPlayerArea {
 
         // Units and combat
         webPlayerArea.stasisInfantry = player.getStasisInfantry();
+        webPlayerArea.stasisFighters = player.getStasisFighters();
         webPlayerArea.actualHits = player.getActualHits();
         webPlayerArea.expectedHitsTimes10 = player.getExpectedHitsTimes10();
         webPlayerArea.unitsOwned = player.getUnitsOwned();
@@ -311,7 +313,7 @@ public class WebPlayerArea {
         webPlayerArea.scs = player.getSCs();
         webPlayerArea.isSpeaker = player.isSpeaker();
         webPlayerArea.isTyrant = player.isTyrant();
-        webPlayerArea.neighbors = player.getNeighbouringPlayers(false).stream()
+        webPlayerArea.neighbors = player.getNeighbouringPlayers(true).stream()
                 .map(Player::getColor)
                 .toList();
 
@@ -466,7 +468,7 @@ public class WebPlayerArea {
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                fillUnits(unitMapCount, unitHolder);
+                fillUnits(unitMapCount, unitHolder, false);
             }
         }
 
@@ -474,7 +476,7 @@ public class WebPlayerArea {
         for (Player gamePlayer : game.getPlayers().values()) {
             UnitHolder nombox = gamePlayer.getNomboxTile().getSpaceUnitHolder();
             if (nombox != null) {
-                fillUnits(unitMapCount, nombox);
+                fillUnits(unitMapCount, nombox, true);
             }
         }
 
@@ -542,10 +544,12 @@ public class WebPlayerArea {
         return webPlayerArea;
     }
 
-    private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder) {
+    private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean isCaptured) {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
             if (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter) {
-                unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
+                if (!isCaptured) {
+                    unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
+                }
                 continue;
             }
 

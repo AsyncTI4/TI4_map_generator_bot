@@ -128,6 +128,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (uncharted != null) {
             game.setUnchartedSpaceStuff(uncharted);
             if (uncharted) {
+                game.setHomebrew(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
                 if (game.isAbsolMode()) {

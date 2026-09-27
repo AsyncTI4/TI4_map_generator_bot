@@ -54,7 +54,6 @@ public class MonumentsButtonHandler {
     private static final String USE_QANOJ = "useQanojShieldArray";
     private static final String USE_YIN_MONUMENT = "useYinMonument";
     private static final String SELECT_YIN_MONUMENT_DESTINATION = "selectYinMonumentDestination_";
-
     // Sector KVD-14
     public static void gainKVDTradeGoods(Game game, Player acPlayer, String actionCardTitle) {
         if (!game.isMonumentsMode()) {

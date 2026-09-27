@@ -286,6 +286,10 @@ public class Planet extends UnitHolder {
         return resourcesOriginal + resourcesModifier;
     }
 
+    public void addResourcesModifier(int modifier) {
+        resourcesModifier += modifier;
+    }
+
     @JsonIgnore
     public int getInfluence() {
         return influenceOriginal + influenceModifier;

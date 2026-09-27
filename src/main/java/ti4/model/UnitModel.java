@@ -25,7 +25,6 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -142,8 +141,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return color + getImageFileSuffix();
     }
 
-    private TI4Emoji getFactionEmoji() {
-        return FactionEmojis.getFactionIcon(getFaction().orElse(""));
+    private String getFactionEmoji() {
+        FactionModel factionModel = Mapper.getFaction(getFaction().orElse(""));
+        if (factionModel != null) {
+            return factionModel.getFactionEmoji();
+        }
+        return "";
     }
 
     public UnitType getUnitType() {
@@ -156,10 +159,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getUnitRepresentation() {
-        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
-        TI4Emoji unitEmoji = getUnitEmoji();
-
-        String unitString = unitEmoji + " " + name + factionEmoji;
+        String unitString = getUnitEmoji() + " " + name + getFactionEmoji();
         if (getAbility().isPresent()) {
             unitString += ": " + getAbility().get();
         }
@@ -171,7 +171,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
-        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
+        String factionEmoji = getFaction().isEmpty()
+                ? ""
+                : Mapper.getFaction(getFaction().get()).getFactionEmoji();
         TI4Emoji unitEmoji = getUnitEmoji();
 
         EmbedBuilder eb = new EmbedBuilder();
@@ -203,12 +205,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation(UnitState state) {
-        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
-        TI4Emoji unitEmoji = getUnitEmoji();
         String name = this.name == null ? "" : this.name;
         String stateStr =
                 (state == null || state == UnitState.none) ? "" : (state.stateEmoji() + " " + state.humanDescr());
-        return stateStr + " " + factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
+        return stateStr + " " + getFactionEmoji() + " " + getUnitEmoji() + " _" + name + "_ " + getSourceEmoji();
     }
 
     private String getSourceEmoji() {
@@ -695,17 +695,18 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 && getIneligiblePlanetTypes().stream().map(String::toUpperCase).noneMatch(normalizedTypes::contains);
     }
 
-    private TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
+    private String getMonumentPlanetTypeEmoji(String planetType) {
         return switch (planetType.toLowerCase()) {
-            case "cultural", "industrial", "hazardous" -> ExploreEmojis.getTraitEmoji(planetType);
-            case "legendary" -> MiscEmojis.LegendaryPlanet;
-            case "lightning" -> PlanetEmojis.Lightning;
-            case "supernova" -> MiscEmojis.Supernova;
+            case "cultural", "industrial", "hazardous" ->
+                ExploreEmojis.getTraitEmoji(planetType).toString();
+            case "legendary" -> MiscEmojis.LegendaryPlanet.toString();
+            case "lightning" -> PlanetEmojis.Lightning.toString();
+            case "supernova" -> MiscEmojis.Supernova.toString();
             case "home_planet" -> getFactionEmoji();
-            case "empty", "empty_nonanomaly" -> ExploreEmojis.Frontier;
-            case "tech_specialty" -> TechEmojis.NonUnitTechSkip;
-            case "mecatol_rex" -> PlanetEmojis.Mecatol;
-            default -> TI4Emoji.getRandomGoodDog();
+            case "empty", "empty_nonanomaly" -> ExploreEmojis.Frontier.toString();
+            case "tech_specialty" -> TechEmojis.NonUnitTechSkip.toString();
+            case "mecatol_rex" -> PlanetEmojis.Mecatol.toString();
+            default -> TI4Emoji.getRandomGoodDog().toString();
         };
     }
 
