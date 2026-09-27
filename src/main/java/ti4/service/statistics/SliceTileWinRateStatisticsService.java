@@ -28,6 +28,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.service.map.FractureService;
 
 @UtilityClass
@@ -35,15 +36,16 @@ public class SliceTileWinRateStatisticsService {
 
     private static final String ENTROPIC_SCAR_TILE_ID = "114";
 
+    private static final String CREUSS_GATE_TILE_ID = "17";
+
+    static final String HOME_SYSTEM_KEY = "home";
+
+    private static final String HOME_SYSTEM_LABEL = "A home system";
+
     private static final int TOP_BOTTOM_COUNT = 3;
 
-    /** Appended to rows whose sample is under half the median sample of their section. */
     private static final String SPARSE_MARKER = " _(sparse)_";
 
-    /**
-     * A row is sparse when its sample is below this fraction of its section's median sample. Sparse rows
-     * are still listed, but they are kept out of each faction's best, worst and most common rankings.
-     */
     static final double SPARSE_FRACTION_OF_MEDIAN = 0.5;
 
     static final Map<String, List<String>> SLICE_POSITIONS_BY_HOME = Map.of(
@@ -187,16 +189,18 @@ public class SliceTileWinRateStatisticsService {
                     continue;
                 }
 
+                boolean homeSystem = isHomeSystemTile(tileId);
+                String statsKey = homeSystem ? HOME_SYSTEM_KEY : tileId;
                 stats.overallTiles
-                        .computeIfAbsent(tileId, _ -> new WinRateCount())
+                        .computeIfAbsent(statsKey, _ -> new WinRateCount())
                         .record(isWinner);
-                if (isSpecialTile(tileId)) {
+                if (!homeSystem && isSpecialTile(tileId)) {
                     stats.specialTileIds.add(tileId);
                 }
                 for (String factionKey : factionKeys) {
                     stats.factionTiles
                             .computeIfAbsent(factionKey, _ -> new HashMap<>())
-                            .computeIfAbsent(tileId, _ -> new WinRateCount())
+                            .computeIfAbsent(statsKey, _ -> new WinRateCount())
                             .record(isWinner);
                 }
             }
@@ -249,10 +253,17 @@ public class SliceTileWinRateStatisticsService {
         return homes.size() == SLICE_POSITIONS_BY_HOME.size();
     }
 
-    /** A hyperlane in a slice position means the map isn't a standard 6-player board. */
     private static boolean isHyperlane(Tile tile) {
         TileModel tileModel = tile.getTileModel();
         return tileModel != null && tileModel.isHyperlane();
+    }
+
+    static boolean isHomeSystemTile(String tileId) {
+        if (CREUSS_GATE_TILE_ID.equals(tileId)) {
+            return false;
+        }
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        return tileModel != null && tileModel.getTileBack() == TileBack.GREEN;
     }
 
     private static boolean isSpecialTile(String tileId) {
@@ -274,10 +285,6 @@ public class SliceTileWinRateStatisticsService {
         return tiles.entrySet().stream().sorted(BY_WIN_RATE_DESC).toList();
     }
 
-    /**
-     * Rows below this sample size are marked sparse: half the median sample of the section. It moves
-     * with the data instead of being a fixed cutoff.
-     */
     private static double sparseThreshold(Collection<WinRateCount> counts) {
         return median(counts.stream().mapToInt(count -> count.total).toArray()) * SPARSE_FRACTION_OF_MEDIAN;
     }
@@ -315,7 +322,6 @@ public class SliceTileWinRateStatisticsService {
                     .append(stats.factionRecords.get(factionEntry.getKey()))
                     .append('\n');
 
-            // Sparse tiles still appear in the other sections, but they don't compete for these rankings.
             Map<String, WinRateCount> wellSampled = factionEntry.getValue().entrySet().stream()
                     .filter(entry -> entry.getValue().total >= sparseBelow)
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
@@ -444,12 +450,18 @@ public class SliceTileWinRateStatisticsService {
      * would blow up String.compareTo mid-sort.
      */
     private static String tileName(String tileId) {
+        if (HOME_SYSTEM_KEY.equals(tileId)) {
+            return HOME_SYSTEM_LABEL;
+        }
         TileModel tileModel = TileHelper.getTileById(tileId);
         String name = tileModel == null ? null : tileModel.getNameNullSafe();
         return StringUtils.isBlank(name) ? tileId : name;
     }
 
     private static String tileLabel(String tileId) {
+        if (HOME_SYSTEM_KEY.equals(tileId)) {
+            return HOME_SYSTEM_LABEL;
+        }
         return tileId + " (" + tileName(tileId) + ")";
     }
 

@@ -202,6 +202,27 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
         assertEquals(0.0, SliceTileWinRateStatisticsService.median());
     }
 
+    /** Home systems in a slice (Creuss hero swaps) are pooled into a single row. */
+    @Test
+    void buildReportGroupsHomeSystemsIntoOneRow() {
+        // Jord and Muaat sit in Sol's slice every game, and Sol always wins.
+        List<Game> games = repeatGame(GAMES, "sol", Map.of("318", "01", "302", "04"));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(games);
+
+        assertTrue(report.contains("* `100%` (20/20) A home system\n"), report);
+        assertFalse(report.contains(" 01 ("), "Jord should not get its own row");
+        assertFalse(report.contains(" 04 ("), "Muaat should not get its own row");
+    }
+
+    @Test
+    void homeSystemDetectionUsesTheGreenTileBackButSkipsTheCreussGate() {
+        assertTrue(SliceTileWinRateStatisticsService.isHomeSystemTile("01"), "Jord");
+        assertTrue(SliceTileWinRateStatisticsService.isHomeSystemTile("94"), "The Sorrow");
+        assertFalse(SliceTileWinRateStatisticsService.isHomeSystemTile("17"), "Creuss Gate");
+        assertFalse(SliceTileWinRateStatisticsService.isHomeSystemTile("19"), "Wellon");
+    }
+
     /** A hyperlane in any slice means a non-standard map, so the whole game is skipped. */
     @Test
     void buildReportSkipsGamesWithAHyperlaneInASlice() {
