@@ -406,6 +406,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return transactionItemsWithPlayer;
     }
 
+    // TODO: loose match - "ing"+faction hits sending and receiving, and faction ids that end another id.
     public void clearTransactionItemsWithPlayer(Player player) {
         List<String> newTransactionItems = new ArrayList<>();
         for (String item : getTransactionItems()) {
