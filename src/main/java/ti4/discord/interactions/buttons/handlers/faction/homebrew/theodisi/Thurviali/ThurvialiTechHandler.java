@@ -21,6 +21,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 
@@ -174,8 +175,12 @@ public class ThurvialiTechHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        List<String> candidatePlanets = PlanetTargetService.knownPlanetIds(game, player, java.util.Set.of()).stream()
+                .filter(owner.getPlanets()::contains)
+                .sorted()
+                .toList();
         List<Button> buttons = new ArrayList<>();
-        for (String planetName : owner.getPlanets()) {
+        for (String planetName : candidatePlanets) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
             if (planet == null || !unit.canBePlacedOnPlanetTypes(planet.getPlanetTypes())) {
                 continue;

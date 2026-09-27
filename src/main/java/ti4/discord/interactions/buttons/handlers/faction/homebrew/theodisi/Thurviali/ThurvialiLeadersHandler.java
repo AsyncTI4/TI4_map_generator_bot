@@ -23,6 +23,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
@@ -650,12 +651,15 @@ public class ThurvialiLeadersHandler {
     }
 
     private static List<Button> getHopeSourceButtons(Game game, Player mover, Player destinationOwner) {
+        List<String> planetNames = mover.getPlanets().stream()
+                .filter(planetName -> {
+                    Planet planet = game.getUnitHolderFromPlanet(planetName);
+                    return planet != null && planet.getUnitCount(UnitType.Infantry, mover) >= 1;
+                })
+                .sorted()
+                .toList();
         List<Button> buttons = new ArrayList<>();
-        for (String planetName : mover.getPlanets()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
-            if (planet == null || planet.getUnitCount(UnitType.Infantry, mover) < 1) {
-                continue;
-            }
+        for (String planetName : planetNames) {
             buttons.add(Buttons.green(
                     mover.factionButtonChecker() + SELECT_HOPE_SOURCE + destinationOwner.getFaction() + "|"
                             + planetName,
@@ -667,8 +671,12 @@ public class ThurvialiLeadersHandler {
 
     private static List<Button> getHopeDestinationButtons(
             Game game, Player destinationOwner, Player mover, Planet source) {
+        List<String> candidatePlanets = PlanetTargetService.knownPlanetIds(game, mover, java.util.Set.of()).stream()
+                .filter(destinationOwner.getPlanets()::contains)
+                .sorted()
+                .toList();
         List<Button> buttons = new ArrayList<>();
-        for (String planetName : destinationOwner.getPlanets()) {
+        for (String planetName : candidatePlanets) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
             Tile tile = planet == null ? null : game.getTileFromPlanet(planetName);
             if (planet == null
