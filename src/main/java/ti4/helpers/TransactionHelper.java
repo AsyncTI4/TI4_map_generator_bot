@@ -114,6 +114,10 @@ public class TransactionHelper {
         return canSeeSheet ? ButtonHelperExplore.getNormalFragmentCount(p1, trait) : BLIND_FRAGMENT_BUTTONS;
     }
 
+    static int secretRequestPickerLimit(Player holder, boolean canSeeSheet) {
+        return canSeeSheet ? holder.getSecretsUnscored().size() : BLIND_SECRET_BUTTONS;
+    }
+
     private static boolean isHiddenFrom(Game game, Player player, Player viewer) {
         return viewer != null && game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
     }
@@ -1259,8 +1263,7 @@ public class TransactionHelper {
                             " Since unscored secret objectives are private info, you will have to discuss with other other player to explain which unscored secret objectives you wish to transact;";
                     message += " these buttons will just make sure that the player is offered buttons to send them.";
 
-                    // TODO: sized off p2, while every sibling request picker sizes off p1 (the player asked).
-                    int limit = seeP1 ? p2.getSecretsUnscored().size() : BLIND_SECRET_BUTTONS;
+                    int limit = secretRequestPickerLimit(p1, seeP1);
                     String prefix = "offerToTransact_SOs_" + p1.getColor() + "_" + p2.getColor() + "_generic";
                     for (int x = 1; x < limit + 1; x++) {
                         stuffToTransButtons.add(

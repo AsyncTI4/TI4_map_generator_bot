@@ -148,6 +148,27 @@ class TransactionHelperFogTest extends BaseTi4Test {
         assertThat(TransactionHelper.findUncoverableItems(red, blue, false)).isEmpty();
     }
 
+    // ---- secret objective request picker ------------------------------------------------------
+
+    @Test
+    void secretRequestPicker_isSizedByTheHolderNotTheRequester() {
+        // Regression: the picker used the requester's own count, so a requester with no secrets
+        // got no buttons even when the holder had some.
+        blue.setSecret("mine");
+        blue.setSecret("mtm");
+
+        assertThat(TransactionHelper.secretRequestPickerLimit(blue, true)).isEqualTo(2);
+        assertThat(red.getSecretsUnscored()).isEmpty();
+    }
+
+    @Test
+    void secretRequestPicker_whenBlind_ignoresTheHoldersCount() {
+        blue.setSecret("mine");
+
+        assertThat(TransactionHelper.secretRequestPickerLimit(blue, false))
+                .isEqualTo(TransactionHelper.secretRequestPickerLimit(red, false));
+    }
+
     // ---- observer summary -------------------------------------------------------------------
 
     @Test
