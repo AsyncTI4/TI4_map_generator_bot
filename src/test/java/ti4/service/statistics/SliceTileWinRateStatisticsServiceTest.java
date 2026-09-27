@@ -189,13 +189,30 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
 
         assertTrue(report.contains("`100%` (2/2) 65 (" + tileName("65") + ") _(sparse)_\n"), report);
         assertTrue(report.contains("`100%` (8/8) " + displaced + " (" + tileName(displaced) + ")\n"), report);
+
+        // The sparse tile is listed overall, but it can't top Sol's best or most common lists.
+        assertFalse(report.contains("    * `100%` (2/2) 65 ("), report);
+        assertTrue(report.contains("    * `100%` (8/8) " + displaced + " ("), report);
     }
 
     @Test
-    void halfMedianHandlesOddEvenAndEmptyInputs() {
-        assertEquals(10.0, SliceTileWinRateStatisticsService.halfMedian(30, 10, 20));
-        assertEquals(12.5, SliceTileWinRateStatisticsService.halfMedian(10, 20, 30, 40));
-        assertEquals(0.0, SliceTileWinRateStatisticsService.halfMedian());
+    void medianHandlesOddEvenAndEmptyInputs() {
+        assertEquals(20.0, SliceTileWinRateStatisticsService.median(30, 10, 20));
+        assertEquals(25.0, SliceTileWinRateStatisticsService.median(10, 20, 30, 40));
+        assertEquals(0.0, SliceTileWinRateStatisticsService.median());
+    }
+
+    /** A hyperlane in any slice means a non-standard map, so the whole game is skipped. */
+    @Test
+    void buildReportSkipsGamesWithAHyperlaneInASlice() {
+        Game game = createStandardSliceGame("1", "sol", Map.of("318", "83a"));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(List.of(game));
+
+        assertEquals(
+                "No standard 6-player competitive games were available for slice analysis."
+                        + " (1 skipped for a non-standard map layout.)",
+                report);
     }
     /**
      * TileModel.getName() is null for placeholder art (0g, 0b, 0r, -1, fog covers), which used to reach the

@@ -40,6 +40,12 @@ public class SliceTileWinRateStatisticsService {
     /** Appended to rows whose sample is under half the median sample of their section. */
     private static final String SPARSE_MARKER = " _(sparse)_";
 
+    /**
+     * A row is sparse when its sample is below this fraction of its section's median sample. Sparse rows
+     * are still listed, but they are kept out of each faction's best, worst and most common rankings.
+     */
+    static final double SPARSE_FRACTION_OF_MEDIAN = 0.5;
+
     static final Map<String, List<String>> SLICE_POSITIONS_BY_HOME = Map.of(
             "301", List.of("318", "302", "201", "101"),
             "304", List.of("303", "305", "203", "102"),
@@ -114,9 +120,10 @@ public class SliceTileWinRateStatisticsService {
         sb.append("_A slice is the systems adjacent to a player's home, plus the ring-1 system"
                 + " adjacent to `000` nearest to them._\n");
         sb.append("_6-player, 10-victory-point Thunder's Edge games with winners: no Twilight's Fall, non-fog,"
-                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout._\n");
+                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout with no"
+                + " hyperlanes in any slice._\n");
         sb.append("_Every tile is shown. Rows marked (sparse) have fewer than half the median sample"
-                + " of their section._\n");
+                + " of their section, and are left out of each faction's best, worst and most common lists._\n");
         sb.append("Games analyzed: ")
                 .append(gameCount)
                 .append(" | Slices analyzed: ")
@@ -233,12 +240,19 @@ public class SliceTileWinRateStatisticsService {
                 return false;
             }
             for (String position : slicePositions) {
-                if (game.getTileByPosition(position) == null) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null || isHyperlane(tile)) {
                     return false;
                 }
             }
         }
         return homes.size() == SLICE_POSITIONS_BY_HOME.size();
+    }
+
+    /** A hyperlane in a slice position means the map isn't a standard 6-player board. */
+    private static boolean isHyperlane(Tile tile) {
+        TileModel tileModel = tile.getTileModel();
+        return tileModel != null && tileModel.isHyperlane();
     }
 
     private static boolean isSpecialTile(String tileId) {
@@ -265,18 +279,17 @@ public class SliceTileWinRateStatisticsService {
      * with the data instead of being a fixed cutoff.
      */
     private static double sparseThreshold(Collection<WinRateCount> counts) {
-        return halfMedian(counts.stream().mapToInt(count -> count.total).toArray());
+        return median(counts.stream().mapToInt(count -> count.total).toArray()) * SPARSE_FRACTION_OF_MEDIAN;
     }
 
-    static double halfMedian(int... totals) {
+    static double median(int... totals) {
         if (totals.length == 0) {
             return 0;
         }
         int[] sorted = totals.clone();
         Arrays.sort(sorted);
         int mid = sorted.length / 2;
-        double median = sorted.length % 2 == 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2.0;
-        return median / 2.0;
+        return sorted.length % 2 == 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2.0;
     }
 
     private static void appendOverallSection(StringBuilder sb, SliceTileWinRateStats stats) {
@@ -302,24 +315,31 @@ public class SliceTileWinRateStatisticsService {
                     .append(stats.factionRecords.get(factionEntry.getKey()))
                     .append('\n');
 
-            List<Entry<String, WinRateCount>> ranked = rankedByWinRate(factionEntry.getValue());
-            if (!ranked.isEmpty()) {
-                sb.append("  - Best:\n");
-                ranked.stream()
-                        .limit(TOP_BOTTOM_COUNT)
-                        .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
+            // Sparse tiles still appear in the other sections, but they don't compete for these rankings.
+            Map<String, WinRateCount> wellSampled = factionEntry.getValue().entrySet().stream()
+                    .filter(entry -> entry.getValue().total >= sparseBelow)
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+            if (wellSampled.isEmpty()) {
+                sb.append("  - No tiles with a non-sparse sample yet.\n");
+                return;
+            }
 
-                // Take the tail without letting it overlap the best list.
-                int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
-                if (worstFrom < ranked.size()) {
-                    sb.append("  - Worst:\n");
-                    List<Entry<String, WinRateCount>> worst = ranked.subList(worstFrom, ranked.size());
-                    worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
-                }
+            List<Entry<String, WinRateCount>> ranked = rankedByWinRate(wellSampled);
+            sb.append("  - Best:\n");
+            ranked.stream()
+                    .limit(TOP_BOTTOM_COUNT)
+                    .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
+
+            // Take the tail without letting it overlap the best list.
+            int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
+            if (worstFrom < ranked.size()) {
+                sb.append("  - Worst:\n");
+                List<Entry<String, WinRateCount>> worst = ranked.subList(worstFrom, ranked.size());
+                worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
             }
 
             sb.append("  - Most common:\n");
-            factionEntry.getValue().entrySet().stream()
+            wellSampled.entrySet().stream()
                     .sorted(BY_APPEARANCES_DESC)
                     .limit(TOP_BOTTOM_COUNT)
                     .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
