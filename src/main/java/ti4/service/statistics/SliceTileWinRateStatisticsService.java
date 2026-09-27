@@ -28,6 +28,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.service.map.FractureService;
 
 @UtilityClass
@@ -35,10 +36,17 @@ public class SliceTileWinRateStatisticsService {
 
     private static final String ENTROPIC_SCAR_TILE_ID = "114";
 
+    private static final String CREUSS_GATE_TILE_ID = "17";
+
+    static final String HOME_SYSTEM_KEY = "home";
+
+    private static final String HOME_SYSTEM_LABEL = "A home system";
+
     private static final int TOP_BOTTOM_COUNT = 3;
 
-    /** Appended to rows whose sample is under half the median sample of their section. */
     private static final String SPARSE_MARKER = " _(sparse)_";
+
+    static final double SPARSE_FRACTION_OF_MEDIAN = 0.5;
 
     static final Map<String, List<String>> SLICE_POSITIONS_BY_HOME = Map.of(
             "301", List.of("318", "302", "201", "101"),
@@ -114,9 +122,10 @@ public class SliceTileWinRateStatisticsService {
         sb.append("_A slice is the systems adjacent to a player's home, plus the ring-1 system"
                 + " adjacent to `000` nearest to them._\n");
         sb.append("_6-player, 10-victory-point Thunder's Edge games with winners: no Twilight's Fall, non-fog,"
-                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout._\n");
+                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout with no"
+                + " hyperlanes in any slice._\n");
         sb.append("_Every tile is shown. Rows marked (sparse) have fewer than half the median sample"
-                + " of their section._\n");
+                + " of their section, and are left out of each faction's best, worst and most common lists._\n");
         sb.append("Games analyzed: ")
                 .append(gameCount)
                 .append(" | Slices analyzed: ")
@@ -180,16 +189,18 @@ public class SliceTileWinRateStatisticsService {
                     continue;
                 }
 
+                boolean homeSystem = isHomeSystemTile(tileId);
+                String statsKey = homeSystem ? HOME_SYSTEM_KEY : tileId;
                 stats.overallTiles
-                        .computeIfAbsent(tileId, _ -> new WinRateCount())
+                        .computeIfAbsent(statsKey, _ -> new WinRateCount())
                         .record(isWinner);
-                if (isSpecialTile(tileId)) {
+                if (!homeSystem && isSpecialTile(tileId)) {
                     stats.specialTileIds.add(tileId);
                 }
                 for (String factionKey : factionKeys) {
                     stats.factionTiles
                             .computeIfAbsent(factionKey, _ -> new HashMap<>())
-                            .computeIfAbsent(tileId, _ -> new WinRateCount())
+                            .computeIfAbsent(statsKey, _ -> new WinRateCount())
                             .record(isWinner);
                 }
             }
@@ -233,12 +244,26 @@ public class SliceTileWinRateStatisticsService {
                 return false;
             }
             for (String position : slicePositions) {
-                if (game.getTileByPosition(position) == null) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null || isHyperlane(tile)) {
                     return false;
                 }
             }
         }
         return homes.size() == SLICE_POSITIONS_BY_HOME.size();
+    }
+
+    private static boolean isHyperlane(Tile tile) {
+        TileModel tileModel = tile.getTileModel();
+        return tileModel != null && tileModel.isHyperlane();
+    }
+
+    static boolean isHomeSystemTile(String tileId) {
+        if (CREUSS_GATE_TILE_ID.equals(tileId)) {
+            return false;
+        }
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        return tileModel != null && tileModel.getTileBack() == TileBack.GREEN;
     }
 
     private static boolean isSpecialTile(String tileId) {
@@ -260,23 +285,18 @@ public class SliceTileWinRateStatisticsService {
         return tiles.entrySet().stream().sorted(BY_WIN_RATE_DESC).toList();
     }
 
-    /**
-     * Rows below this sample size are marked sparse: half the median sample of the section. It moves
-     * with the data instead of being a fixed cutoff.
-     */
     private static double sparseThreshold(Collection<WinRateCount> counts) {
-        return halfMedian(counts.stream().mapToInt(count -> count.total).toArray());
+        return median(counts.stream().mapToInt(count -> count.total).toArray()) * SPARSE_FRACTION_OF_MEDIAN;
     }
 
-    static double halfMedian(int... totals) {
+    static double median(int... totals) {
         if (totals.length == 0) {
             return 0;
         }
         int[] sorted = totals.clone();
         Arrays.sort(sorted);
         int mid = sorted.length / 2;
-        double median = sorted.length % 2 == 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2.0;
-        return median / 2.0;
+        return sorted.length % 2 == 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2.0;
     }
 
     private static void appendOverallSection(StringBuilder sb, SliceTileWinRateStats stats) {
@@ -302,24 +322,28 @@ public class SliceTileWinRateStatisticsService {
                     .append(stats.factionRecords.get(factionEntry.getKey()))
                     .append('\n');
 
-            List<Entry<String, WinRateCount>> ranked = rankedByWinRate(factionEntry.getValue());
-            if (!ranked.isEmpty()) {
-                sb.append("  - Best:\n");
-                ranked.stream()
-                        .limit(TOP_BOTTOM_COUNT)
-                        .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
+            Map<String, WinRateCount> wellSampled = factionEntry.getValue().entrySet().stream()
+                    .filter(entry -> entry.getValue().total >= sparseBelow)
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+            if (wellSampled.isEmpty()) {
+                sb.append("  - No tiles with a non-sparse sample yet.\n");
+                return;
+            }
 
-                // Take the tail without letting it overlap the best list.
-                int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
-                if (worstFrom < ranked.size()) {
-                    sb.append("  - Worst:\n");
-                    List<Entry<String, WinRateCount>> worst = ranked.subList(worstFrom, ranked.size());
-                    worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
-                }
+            List<Entry<String, WinRateCount>> ranked = rankedByWinRate(wellSampled);
+            sb.append("  - Best:\n");
+            ranked.stream().limit(TOP_BOTTOM_COUNT).forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
+
+            // Take the tail without letting it overlap the best list.
+            int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
+            if (worstFrom < ranked.size()) {
+                sb.append("  - Worst:\n");
+                List<Entry<String, WinRateCount>> worst = ranked.subList(worstFrom, ranked.size());
+                worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
             }
 
             sb.append("  - Most common:\n");
-            factionEntry.getValue().entrySet().stream()
+            wellSampled.entrySet().stream()
                     .sorted(BY_APPEARANCES_DESC)
                     .limit(TOP_BOTTOM_COUNT)
                     .forEach(entry -> appendTileLine(sb, "    * ", entry, sparseBelow));
@@ -426,12 +450,18 @@ public class SliceTileWinRateStatisticsService {
      * would blow up String.compareTo mid-sort.
      */
     private static String tileName(String tileId) {
+        if (HOME_SYSTEM_KEY.equals(tileId)) {
+            return HOME_SYSTEM_LABEL;
+        }
         TileModel tileModel = TileHelper.getTileById(tileId);
         String name = tileModel == null ? null : tileModel.getNameNullSafe();
         return StringUtils.isBlank(name) ? tileId : name;
     }
 
     private static String tileLabel(String tileId) {
+        if (HOME_SYSTEM_KEY.equals(tileId)) {
+            return HOME_SYSTEM_LABEL;
+        }
         return tileId + " (" + tileName(tileId) + ")";
     }
 
