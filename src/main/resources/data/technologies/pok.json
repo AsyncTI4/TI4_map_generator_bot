@@ -667,7 +667,7 @@
     },
     {
         "alias": "scc",
-        "name": "Spatial Conduit Cylinders",
+        "name": "Spatial Conduit Cylinder",
         "types": [
             "PROPULSION"
         ],
