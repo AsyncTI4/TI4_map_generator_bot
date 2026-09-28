@@ -1,0 +1,23 @@
+package ti4.image;
+
+import java.util.List;
+
+final class SectorNames {
+
+    // spotless:off
+    static final List<String> NAMES = List.of(
+            "andromeda", "antlia", "apus", "aquarius", "aquila", "ara", "aries", "auriga",
+            "bootes", "caelum", "camelopardalis", "canes-venatici", "canis-major", "canis-minor", "capricornus", "carina",
+            "cassiopeia", "cepheus", "cetus", "chamaeleon", "circinus", "columba", "coma-berenices", "corona-australis",
+            "corona-borealis", "corvus", "crater", "crux", "cygnus", "delphinus", "dorado", "draco",
+            "equuleus", "eridanus", "fornax", "gemini", "grus", "hercules", "horologium", "hydra",
+            "hydrus", "indus", "lacerta", "leo", "leo-minor", "lepus", "libra", "lupus",
+            "lynx", "lyra", "mensa", "microscopium", "monoceros", "musca", "norma", "octans",
+            "ophiuchus", "orion", "pavo", "pegasus", "perseus", "phoenix", "pictor", "pisces",
+            "piscis-austrinus", "puppis", "pyxis", "reticulum", "sagitta", "sagittarius", "scorpius", "sculptor",
+            "scutum", "serpens", "sextans", "taurus", "telescopium", "triangulum", "triangulum-australe", "tucana",
+            "ursa-major", "ursa-minor", "vela", "virgo", "volans", "vulpecula");
+    // spotless:on
+
+    private SectorNames() {}
+}

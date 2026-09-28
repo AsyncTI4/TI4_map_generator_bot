@@ -1577,6 +1577,20 @@ public final class FoWHelper {
                 .anyMatch(player -> player.getUserID().equals(userId));
     }
 
+    public static boolean canSeeWholeMap(Game game, GenericInteractionCreateEvent event) {
+        if (!game.isFowMode() || game.isHasEnded()) {
+            return true;
+        }
+        return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
+    }
+
+    static boolean isGmRoom(Game game, @Nullable Channel channel) {
+        if (channel instanceof ThreadChannel thread) {
+            channel = thread.getParentChannel();
+        }
+        return channel != null && channel.getName().equalsIgnoreCase(game.getName() + "-gm-room");
+    }
+
     private enum Feature {
         ingress,
         egress,

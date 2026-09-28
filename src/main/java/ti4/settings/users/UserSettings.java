@@ -29,6 +29,7 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+    private RefreshMapStyle refreshMapStyle = RefreshMapStyle.COMBINED;
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
@@ -58,6 +59,10 @@ public class UserSettings {
 
     UserSettings(String userId) {
         this.userId = userId;
+    }
+
+    public RefreshMapStyle getRefreshMapStyle() {
+        return Objects.requireNonNullElse(refreshMapStyle, RefreshMapStyle.COMBINED);
     }
 
     public List<String> getPreferredColors() {
