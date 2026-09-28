@@ -10,6 +10,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
@@ -27,6 +28,7 @@ class ShowGameButtonHandler {
 
     @ButtonHandler(value = REFRESH, save = false)
     public static void simpleShowGame(Game game, ButtonInteractionEvent event, String buttonID) {
+        if (!mayRenderHere(game, event)) return;
         String segment = MapSegmentService.segmentFrom(buttonID, REFRESH);
         if (refreshMapStyle(event).isSplit()) {
             offerMapParts(game, event, segment);
@@ -48,6 +50,15 @@ class ShowGameButtonHandler {
         }
     }
 
+    private static boolean mayRenderHere(Game game, ButtonInteractionEvent event) {
+        if (MapSegmentService.isFoggedView(game, event) || FoWHelper.canSeeWholeMap(game, event)) {
+            return true;
+        }
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event, "In a Fog of War game the map can only be shown in your private channel.");
+        return false;
+    }
+
     private static boolean postsInChannel(Game game, ButtonInteractionEvent event) {
         return game.isFowMode() && refreshMapStyle(event).postsInChannelInFog();
     }
@@ -58,6 +69,7 @@ class ShowGameButtonHandler {
 
     private static void showMapPart(
             Game game, ButtonInteractionEvent event, DisplayType part, @Nullable String segment) {
+        if (!mayRenderHere(game, event)) return;
         boolean inChannel = postsInChannel(game, event);
         MapRenderPipeline.queue(game, event, part, segment, fileUpload -> {
             if (!inChannel) {

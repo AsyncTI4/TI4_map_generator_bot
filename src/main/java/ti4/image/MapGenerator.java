@@ -648,7 +648,12 @@ public class MapGenerator implements AutoCloseable {
                 .filter(segment -> !segment.isFracture())
                 .toList();
         if (visible.isEmpty()) {
-            return null;
+            return knowsGalaxySystems(known)
+                    ? null
+                    : visibleWithFracture.stream()
+                            .filter(MapSegment::isFracture)
+                            .findFirst()
+                            .orElse(null);
         }
         Optional<MapSegment> defaultSegment = MapSegment.defaultSegment(game).filter(visible::contains);
         if (!isFoWPrivate) {
@@ -664,6 +669,12 @@ public class MapGenerator implements AutoCloseable {
                                 .filter(known::contains)
                                 .count()))
                         .orElseThrow());
+    }
+
+    private static boolean knowsGalaxySystems(Set<String> known) {
+        return known.stream()
+                .anyMatch(position ->
+                        !MapSegment.isFracturePosition(position) && !CORNER_POSITIONS.contains(position.toLowerCase()));
     }
 
     private Set<String> positionsWithinCap(Set<String> known) {

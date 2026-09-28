@@ -162,6 +162,27 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     }
 
     @Test
+    void separateFractureIsShownWhenItIsTheOnlySectorInView() {
+        // Nothing but Fracture tiles: before the fix no sector was chosen, the frame fell back to the classic
+        // canvas and galaxy and Fracture were drawn together.
+        Game fractureOnly = new Game();
+        fractureOnly.newGameSetup();
+        fractureOnly.setName("fracture-only-test");
+        fractureOnly.setFowMode(true);
+        for (int index = 1; index <= 7; index++) {
+            fractureOnly.setTile(new Tile("2" + index, "frac" + index));
+        }
+        fractureOnly.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, true);
+
+        try (MapGenerator generator = render(fractureOnly, DisplayType.map, null)) {
+            assertEquals(MapSegment.FRACTURE, generator.shownSegmentName());
+            assertTrue(generator.isInShownRegion("frac1"));
+            assertFalse(generator.isInShownRegion("000"));
+            generator.draw();
+        }
+    }
+
+    @Test
     void knownCornerTileIsPinnedInsideTheFrameWithItsOwnColumn() {
         game.setFowMode(true);
         int contentWidthWithoutCorner;
