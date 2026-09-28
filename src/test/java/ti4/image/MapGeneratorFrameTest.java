@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 class MapGeneratorFrameTest extends BaseTi4Test {
@@ -34,6 +35,12 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         Field field = MapGenerator.class.getDeclaredField("mainImage");
         field.setAccessible(true);
         return (BufferedImage) field.get(generator);
+    }
+
+    private static int classicWidthForRings(Game game, int rings) throws ReflectiveOperationException {
+        Method width = MapGenerator.class.getDeclaredMethod("getMapWidth", Game.class, int.class);
+        width.setAccessible(true);
+        return (int) width.invoke(null, game, rings);
     }
 
     private static int classicSize(String method, Game game) throws ReflectiveOperationException {
@@ -72,26 +79,114 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     }
 
     @Test
-    void fogCombinedViewKeepsTheClassicWidthForThePlayerAreas() throws ReflectiveOperationException {
+    void fogCombinedViewUsesTheClassicWidthOfTheFramedMapSize() throws ReflectiveOperationException {
         game.setFowMode(true);
         try (MapGenerator generator = new MapGenerator(game, DisplayType.all, null)) {
-            assertEquals(
-                    Math.max(1000, classicSize("getMapWidth", game)),
-                    canvas(generator).getWidth());
+            // The placed tiles are only 3 hexes wide, so the player areas get the normal 3-ring width.
+            assertEquals(classicWidthForRings(game, 3), canvas(generator).getWidth());
+            assertTrue(canvas(generator).getWidth() < classicSize("getMapWidth", game));
         }
     }
 
     @Test
-    void gmFrameOverridesTheAutomaticFrame() throws ReflectiveOperationException {
+    void farAwaySegmentGetsANormalSizedCombinedImage() throws ReflectiveOperationException {
+        Game twoMaps = twoFarApartClusters();
+        MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
+        try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.all, null, "south")) {
+            assertEquals(classicWidthForRings(twoMaps, 3), canvas(generator).getWidth());
+            generator.draw();
+        }
+    }
+
+    @Test
+    void separateFractureLeavesTheMainMapAndIsItsOwnSegment() throws ReflectiveOperationException {
+        game.setFowMode(true);
+        for (int index = 1; index <= 7; index++) {
+            game.setTile(new Tile("2" + index, "frac" + index));
+        }
+        int withFracture;
+        try (MapGenerator generator = new MapGenerator(game, DisplayType.map, null)) {
+            withFracture = canvas(generator).getHeight();
+        }
+
+        game.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, true);
+        try (MapGenerator generator = new MapGenerator(game, DisplayType.map, null)) {
+            assertTrue(canvas(generator).getHeight() < withFracture, "the Fracture moved out of the main map");
+            generator.draw();
+        }
+        try (MapGenerator generator = new MapGenerator(game, DisplayType.map, null, MapSegment.FRACTURE)) {
+            assertTrue(canvas(generator).getHeight() < withFracture, "the Fracture on its own is smaller too");
+            generator.draw();
+        }
+    }
+
+    @Test
+    void gmSegmentOverridesTheAutomaticFrame() throws ReflectiveOperationException {
         game.setFowMode(true);
         int autoHeight;
         try (MapGenerator generator = new MapGenerator(game, DisplayType.map, null)) {
             autoHeight = canvas(generator).getHeight();
         }
 
-        MapFrame.setGmFrame(game, "000", 3);
+        MapSegment.put(game, new MapSegment("core", "000", 3));
         try (MapGenerator generator = new MapGenerator(game, DisplayType.map, null)) {
-            assertTrue(canvas(generator).getHeight() > autoHeight, "a 3-ring GM frame is taller than 1 ring");
+            assertTrue(canvas(generator).getHeight() > autoHeight, "a 3-ring segment is taller than the auto frame");
         }
+    }
+
+    @Test
+    void requestedSegmentIsRenderedOnItsOwn() throws ReflectiveOperationException {
+        Game twoMaps = twoFarApartClusters();
+        MapSegment.put(twoMaps, new MapSegment("north", "1201", 1));
+        MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
+
+        try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.map, null, "south")) {
+            // One 3-hex-tall segment plus padding, plus the fixed strip under the map.
+            int segmentHeight = 3 * TileGenerator.TILE_HEIGHT + 2 * 200;
+            assertEquals(segmentHeight + 600, canvas(generator).getHeight());
+        }
+    }
+
+    @Test
+    void gmViewOpensOnTheDefaultSegment() throws ReflectiveOperationException {
+        Game twoMaps = twoFarApartClusters();
+        MapSegment.put(twoMaps, new MapSegment("north", "1201", 2));
+        MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
+
+        int firstSegmentHeight;
+        try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.map, null)) {
+            firstSegmentHeight = canvas(generator).getHeight();
+        }
+
+        MapSegment.setDefault(twoMaps, "south");
+        try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.map, null)) {
+            int southHeight = 3 * TileGenerator.TILE_HEIGHT + 2 * 200 + 600;
+            assertEquals(southHeight, canvas(generator).getHeight());
+            assertTrue(southHeight < firstSegmentHeight, "without a default the GM sees the first segment");
+        }
+    }
+
+    @Test
+    void mapsSpreadBeyondNineRingsAreCappedToOneSubMap() throws ReflectiveOperationException {
+        Game twoMaps = twoFarApartClusters();
+        try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.map, null)) {
+            BufferedImage image = canvas(generator);
+            assertTrue(image.getHeight() <= MapFrame.MAX_HEIGHT + 600, "map section stays within the 9-ring cap");
+            assertTrue(image.getWidth() <= MapFrame.MAX_WIDTH);
+            generator.draw();
+        }
+    }
+
+    // A full 7-hex cluster around 1201 (far north) and a lone system at 1237 (far south): ~7000px apart.
+    private static Game twoFarApartClusters() {
+        Game twoMaps = new Game();
+        twoMaps.newGameSetup();
+        twoMaps.setName("two-maps-test");
+        twoMaps.setFowMode(true);
+        for (String position : MapFrame.positionsWithin("1201", 1)) {
+            twoMaps.setTile(new Tile("19", position));
+        }
+        twoMaps.setTile(new Tile("20", "1237"));
+        return twoMaps;
     }
 }

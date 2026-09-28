@@ -28,7 +28,7 @@ public class FOWCommand implements ParentCommand {
                     new GMCommand(),
                     new CreateFoWGameButton(),
                     new SetupWizard(),
-                    new MapFrameCommand())
+                    new MapSegmentCommand())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
