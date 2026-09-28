@@ -44,6 +44,10 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN,
                 "ephemeral_wrong_button_warning",
                 "True to keep the \"wrong button\" warning ephemeral"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "split_map_refresh",
+                "True: Refresh Map offers separate map and player stats instead of one image"));
     }
 
     @Override
@@ -89,6 +93,11 @@ class SetPreferredSettings extends Subcommand {
                 event.getOption("ephemeral_wrong_button_warning", null, OptionMapping::getAsBoolean);
         if (wrongButtonWarning != null) {
             userSettings.setPrefersWrongButtonEphemeral(wrongButtonWarning);
+        }
+
+        Boolean splitMapRefresh = event.getOption("split_map_refresh", null, OptionMapping::getAsBoolean);
+        if (splitMapRefresh != null) {
+            userSettings.setPrefersSplitMapRefresh(splitMapRefresh);
         }
 
         Integer sabo = event.getOption("sabo_decline_median", null, OptionMapping::getAsInt);
