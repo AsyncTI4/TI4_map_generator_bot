@@ -1,20 +1,29 @@
 package ti4.discord.interactions.buttons.handlers.game;
 
+import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 class ShowGameButtonHandler {
 
     @ButtonHandler(value = "showGameAgain", save = false)
-    public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
+    public static void simpleShowGame(Game game, ButtonInteractionEvent event) {
+        if (UserSettingsManager.get(event.getUser().getId()).isPrefersSplitMapRefresh()) {
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                    event,
+                    "Which part of the map do you want to see?",
+                    List.of(Buttons.gray("showMap", "Show Map"), Buttons.gray("showPlayerAreas", "Show Player Stats")));
+            return;
+        }
         ShowGameService.simpleShowGame(game, event);
     }
 

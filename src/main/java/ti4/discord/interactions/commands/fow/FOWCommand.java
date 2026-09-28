@@ -27,7 +27,8 @@ public class FOWCommand implements ParentCommand {
                     new PrivateCommunicationsCheck(),
                     new GMCommand(),
                     new CreateFoWGameButton(),
-                    new SetupWizard())
+                    new SetupWizard(),
+                    new MapFrameCommand())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

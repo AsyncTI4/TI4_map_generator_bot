@@ -33,6 +33,9 @@ public final class PlayerPreferenceHelper {
         if (player.getUserSettings().isShowTransactables())
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
         else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
+        if (player.getUserSettings().isPrefersSplitMapRefresh())
+            buttons.add(Buttons.gray("playerPref_combinedMap", "Refresh Map: single combined image"));
+        else buttons.add(Buttons.gray("playerPref_splitMap", "Refresh Map: separate map & stats"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose the thing you wish to change.",
@@ -74,6 +77,12 @@ public final class PlayerPreferenceHelper {
             case "hideTransactables" -> {
                 UserSettings settings = player.getUserSettings();
                 settings.setShowTransactables(false);
+                UserSettingsManager.save(settings);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
+            }
+            case "splitMap", "combinedMap" -> {
+                UserSettings settings = player.getUserSettings();
+                settings.setPrefersSplitMapRefresh("splitMap".equals(thing));
                 UserSettingsManager.save(settings);
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
             }

@@ -29,6 +29,7 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+    private boolean prefersSplitMapRefresh;
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;

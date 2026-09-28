@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -78,6 +79,7 @@ public class MapGenerator implements AutoCloseable {
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
     private static final int TILE_WIDTH = 345; // typical width of a tile image
     private static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
+    private static final int EXPEDITION_TRACKER_RIGHT_OFFSET = 1200;
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -103,6 +105,7 @@ public class MapGenerator implements AutoCloseable {
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private final int mapWidth;
+    private final int stripWidth;
     private int minX = -1;
     private int minY = -1;
     private int maxX = -1;
@@ -110,6 +113,12 @@ public class MapGenerator implements AutoCloseable {
     private int fractureYbump;
     private boolean isFoWPrivate;
     private Player fowPlayer;
+    private final Map<String, Tile> tilesToDisplay;
+
+    @Nullable
+    private final MapFrame mapFrame;
+
+    private StatLayout statLayout;
 
     // Map to aggregate unit coordinates by faction from all tiles with global coordinates
     private final Map<String, Map<String, List<Point>>> globalUnitCoordinatesByFaction = new HashMap<>();
@@ -177,44 +186,40 @@ public class MapGenerator implements AutoCloseable {
         // Width of map section
         mapWidth = Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, getMapWidth(game));
 
+        displayTypeBasic = basicTypeOf(this.displayType);
+        tilesToDisplay = new HashMap<>(game.getTileMap());
+        setupFow(tilesToDisplay);
+        mapFrame = computeMapFrame();
+        int framedWidth = mapWidth;
+        if (mapFrame != null) {
+            mapHeight = mapFrame.height();
+            framedWidth = mapFrame.width();
+        }
+
         // Other things
-        switch (this.displayType) {
+        switch (displayTypeBasic) {
             case stats:
                 heightForGameInfo = 40;
                 height = heightOfPlayerAreasSection;
-                displayTypeBasic = DisplayType.stats;
                 width = mapWidth;
                 break;
             case map:
-            case wormholes:
-            case anomalies:
-            case legendaries:
-            case empties:
-            case aetherstream:
-            case spacecannon:
-            case traits:
-            case techskips:
-            case attachments:
-            case shipless:
-            case unlocked:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + SPACE_FOR_TILE_HEIGHT * 2;
-                displayTypeBasic = DisplayType.map;
-                width = mapWidth;
+                width = framedWidth;
                 break;
-            case landscape:
-                heightForGameInfo = 40;
-                height = Math.max(heightOfPlayerAreasSection, mapHeight);
-                displayTypeBasic = DisplayType.all;
-                width = mapWidth + 4 * 520 + EXTRA_X * 2;
-                break;
-            case googly:
             default:
-                heightForGameInfo = mapHeight;
-                height = mapHeight + heightOfPlayerAreasSection;
-                displayTypeBasic = DisplayType.all;
-                width = mapWidth;
+                if (this.displayType == DisplayType.landscape) {
+                    heightForGameInfo = 40;
+                    height = Math.max(heightOfPlayerAreasSection, mapHeight);
+                    width = mapWidth + 4 * 520 + EXTRA_X * 2;
+                } else {
+                    heightForGameInfo = mapHeight;
+                    height = mapHeight + heightOfPlayerAreasSection;
+                    width = framedWidth;
+                }
         }
+        stripWidth = displayTypeBasic == DisplayType.map ? width : mapWidth;
 
         // Create image
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -245,6 +250,25 @@ public class MapGenerator implements AutoCloseable {
         int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
         lawsY += (game.getEventsInEffect().size() / columnsOfLaws + 1) * lawHeight;
         return playersY + lawsY + objectivesY + EXTRA_Y * 3;
+    }
+
+    private static DisplayType basicTypeOf(DisplayType displayType) {
+        return switch (displayType) {
+            case stats -> DisplayType.stats;
+            case map,
+                    wormholes,
+                    anomalies,
+                    legendaries,
+                    empties,
+                    aetherstream,
+                    spacecannon,
+                    traits,
+                    techskips,
+                    attachments,
+                    shipless,
+                    unlocked -> DisplayType.map;
+            default -> DisplayType.all;
+        };
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
@@ -383,6 +407,95 @@ public class MapGenerator implements AutoCloseable {
         }
     }
 
+    @Nullable
+    private MapFrame computeMapFrame() {
+        if (!game.isFowMode() || displayType == DisplayType.landscape || displayType == DisplayType.stats) {
+            return null;
+        }
+        Set<String> positions = MapFrame.gmFramePositions(game);
+        if (positions == null) {
+            positions = framedTilePositions();
+        }
+        int minWidth = displayTypeBasic == DisplayType.map ? mapOnlyMinimumWidth() : mapWidth;
+        return MapFrame.around(game, positions, fractureYbump, EXTRA_X, EXTRA_Y, minWidth);
+    }
+
+    private int mapOnlyMinimumWidth() {
+        return Math.max(
+                Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, EXPEDITION_TRACKER_RIGHT_OFFSET),
+                Math.max(scoreTrackWidth(), objectivesRowWidth()));
+    }
+
+    private int scoreTrackWidth() {
+        int boxCount = 1 + Math.max(game.getVp(), Math.max(scoreTrackPinkLimit(), scoreTrackGreyLimit()));
+        return boxCount * scoreTrackBoxWidth() + SPACING_BETWEEN_OBJECTIVE_TYPES;
+    }
+
+    private int objectivesRowWidth() {
+        Graphics probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
+        try {
+            probe.setFont(Storage.getFont26());
+            List<Objective> stage1 = Objective.retrievePublic1(game);
+            List<Objective> stage2 = new ArrayList<>(Objective.retrievePublic2(game));
+            if (game.isOmegaPhaseMode()) {
+                int splitSize = stage1.size() / 2;
+                stage2.addAll(stage1.stream().skip(splitSize).toList());
+                stage1 = stage1.stream().limit(splitSize).toList();
+            }
+            int rowWidth = 5 + objectiveColumnWidth(probe, stage1) + SPACING_BETWEEN_OBJECTIVE_TYPES;
+            rowWidth += objectiveColumnWidth(probe, stage2);
+            List<Objective> custom = Objective.retrieveCustom(game);
+            if (!custom.isEmpty()) {
+                rowWidth += SPACING_BETWEEN_OBJECTIVE_TYPES + objectiveColumnWidth(probe, custom);
+            }
+            return rowWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
+        } finally {
+            probe.dispose();
+        }
+    }
+
+    private int objectiveColumnWidth(Graphics probe, List<Objective> objectives) {
+        int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, probe, objectives);
+        return ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
+    }
+
+    private Set<String> framedTilePositions() {
+        Set<String> positions = new HashSet<>();
+        tilesToDisplay.forEach((position, tile) -> {
+            if (!isUnseenBlankFogTile(tile)) {
+                positions.add(position);
+            }
+        });
+        if (drawsPlayerInfo()) {
+            positions.addAll(statTilePositions());
+        }
+        return positions;
+    }
+
+    private boolean isUnseenBlankFogTile(Tile tile) {
+        return isFoWPrivate && "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(fowPlayer));
+    }
+
+    private boolean drawsPlayerInfo() {
+        return displayType != DisplayType.stats
+                && (!isFowModeActive() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS));
+    }
+
+    private Set<String> statTilePositions() {
+        StatLayout layout = statLayout();
+        Set<String> positions = new HashSet<>();
+        if (layout.useNewSystem()) {
+            layout.playerStatTiles().values().forEach(positions::addAll);
+        } else {
+            layout.statOrder().stream()
+                    .filter(Objects::nonNull)
+                    .map(Player::getPlayerStatsAnchorPosition)
+                    .filter(Objects::nonNull)
+                    .forEach(positions::add);
+        }
+        return positions;
+    }
+
     private boolean isFowModeActive() {
         return game.isFowMode()
                 && event != null
@@ -439,9 +552,6 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void drawGame() {
-        Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
-        setupFow(tilesToDisplay);
-
         if (debug) debugTileTime = StopWatch.createStarted();
         setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
         if (debug) debugTileTime.stop();
@@ -565,7 +675,7 @@ public class MapGenerator implements AutoCloseable {
         graphics.setFont(Storage.getFont64());
         String roundString = "ROUND: " + game.getRound();
         int roundLen = graphics.getFontMetrics().stringWidth(roundString);
-        if (coord.x > mapWidth - roundLen - 100 * game.getRealPlayers().size()) {
+        if (coord.x > stripWidth - roundLen - 100 * game.getRealPlayers().size()) {
             coord = new Point(landscapeShift + 20, coord.y + 100);
         }
         graphics.drawString(roundString, coord.x, coord.y);
@@ -576,7 +686,7 @@ public class MapGenerator implements AutoCloseable {
         // TURN ORDER
         coord = drawTurnOrderTracker(coord.x + roundLen + 100 + landscapeShift, coord.y);
 
-        drawExpeditionTracker(mapWidth - 1200, coord.y - 265);
+        drawExpeditionTracker(stripWidth - EXPEDITION_TRACKER_RIGHT_OFFSET, coord.y - 265);
 
         y = coord.y + 30;
         x = 10 + landscapeShift;
@@ -593,8 +703,7 @@ public class MapGenerator implements AutoCloseable {
         y = drawObjectives(tempY);
         y = laws(y);
         y = events(y);
-        if (displayTypeBasic != DisplayType.stats
-                && (!isFowModeActive() || !game.getFowOption(FOWOption.HIDE_PLAYER_INFOS))) {
+        if (drawsPlayerInfo()) {
             playerInfo(game);
         }
 
@@ -649,19 +758,11 @@ public class MapGenerator implements AutoCloseable {
         g2.setStroke(stroke5);
         graphics.setFont(Storage.getFont50());
         int boxHeight = 140;
-        int boxWidth = 150;
         int boxBuffer = -1;
 
-        int pinkLimit = 0;
-        if (game.isLiberationC4Mode()) pinkLimit = 12;
-        if (game.isAllianceMode()) pinkLimit = 14;
-        int greyLimit = game.getRealPlayers().stream()
-                .mapToInt(Player::getTotalVictoryPoints)
-                .max()
-                .orElse(0);
-        if (game.getVp() > 14 || greyLimit > 14) {
-            boxWidth = 2250 / (1 + Math.max(game.getVp(), Math.max(pinkLimit, greyLimit)));
-        }
+        int pinkLimit = scoreTrackPinkLimit();
+        int greyLimit = scoreTrackGreyLimit();
+        int boxWidth = scoreTrackBoxWidth();
 
         for (int i = 1 + Math.max(game.getVp(), pinkLimit); i <= greyLimit; i++) {
             graphics.setColor(Color.WHITE);
@@ -741,6 +842,27 @@ public class MapGenerator implements AutoCloseable {
         }
         y += 160;
         return y;
+    }
+
+    private int scoreTrackPinkLimit() {
+        if (game.isAllianceMode()) return 14;
+        if (game.isLiberationC4Mode()) return 12;
+        return 0;
+    }
+
+    private int scoreTrackGreyLimit() {
+        return game.getRealPlayers().stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(0);
+    }
+
+    private int scoreTrackBoxWidth() {
+        int greyLimit = scoreTrackGreyLimit();
+        if (game.getVp() > 14 || greyLimit > 14) {
+            return 2250 / (1 + Math.max(game.getVp(), Math.max(scoreTrackPinkLimit(), greyLimit)));
+        }
+        return 150;
     }
 
     private int drawPriorityTrack(String trackName, int y) {
@@ -846,7 +968,7 @@ public class MapGenerator implements AutoCloseable {
             x += textWidth + 25;
 
             // Drop down a level if there are a lot of SC cards
-            if (x > (displayType == DisplayType.landscape ? mapWidth + 4 * 520 + EXTRA_X * 2 : mapWidth) - 100) {
+            if (x > (displayType == DisplayType.landscape ? mapWidth + 4 * 520 + EXTRA_X * 2 : stripWidth) - 100) {
                 x = 20 + (displayType == DisplayType.landscape ? mapWidth : 0);
                 deltaY += 100;
             }
@@ -1170,6 +1292,32 @@ public class MapGenerator implements AutoCloseable {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
 
+        int ringCount = Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
+        StatLayout layout = statLayout();
+        for (Player player : layout.statOrder()) {
+            if (player.getFaction() == null || !player.isRealPlayer()) {
+                continue;
+            }
+            if (layout.useNewSystem()) {
+                List<String> tiles = layout.playerStatTiles().get(player.getFaction());
+                paintPlayerInfo(game, player, tiles);
+            } else {
+                paintPlayerInfoOld(game, player, ringCount);
+            }
+        }
+    }
+
+    private record StatLayout(
+            List<Player> statOrder, Map<String, List<String>> playerStatTiles, boolean useNewSystem) {}
+
+    private StatLayout statLayout() {
+        if (statLayout == null) {
+            statLayout = computeStatLayout();
+        }
+        return statLayout;
+    }
+
+    private StatLayout computeStatLayout() {
         // Do some stuff for FoW
         boolean fow = isFoWPrivate;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
@@ -1189,8 +1337,6 @@ public class MapGenerator implements AutoCloseable {
                     .forEach(statOrder::add);
         }
 
-        int ringCount = Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
-
         // highlightValidStatTiles(game);
         boolean useNewSystem = true;
         Set<String> statTilesInUse = new HashSet<>();
@@ -1209,18 +1355,7 @@ public class MapGenerator implements AutoCloseable {
             statTilesInUse.addAll(myStatTiles);
             playerStatTiles.put(p.getFaction(), myStatTiles);
         }
-
-        for (Player player : statOrder) {
-            if (player.getFaction() == null || !player.isRealPlayer()) {
-                continue;
-            }
-            if (useNewSystem) {
-                List<String> tiles = playerStatTiles.get(player.getFaction());
-                paintPlayerInfo(game, player, tiles);
-            } else {
-                paintPlayerInfoOld(game, player, ringCount);
-            }
-        }
+        return new StatLayout(statOrder, playerStatTiles, useNewSystem);
     }
 
     private void drawPAImage(int x, int y, String resourceName) {
@@ -1240,7 +1375,7 @@ public class MapGenerator implements AutoCloseable {
             Point p = PositionMapper.getTilePosition(pos);
             if (p == null) return;
             p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y, fractureYbump);
-            p.translate(EXTRA_X, EXTRA_Y);
+            p.translate(EXTRA_X - frameOffsetX(), EXTRA_Y - frameOffsetY());
             points.put(pos, p);
         }
         Point statTileMid = points.get(statTiles.get(0));
@@ -1917,6 +2052,7 @@ public class MapGenerator implements AutoCloseable {
             if (anchorProjectedPoint != null) {
                 Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
                         game, playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y, fractureYbump);
+                playerStatsAnchorPoint.translate(-frameOffsetX(), -frameOffsetY());
                 Integer anchorLocationIndex =
                         PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
                 anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
@@ -2453,8 +2589,11 @@ public class MapGenerator implements AutoCloseable {
             }
 
             positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y, fractureYbump);
-            int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
-            int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
+            int tileX = positionPoint.x + EXTRA_X - TILE_PADDING - frameOffsetX();
+            int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING - frameOffsetY();
+            if (isOutsideFrame(tileX, tileY)) {
+                return;
+            }
 
             TileGenerator tileGenerator = new TileGenerator(game, event, displayType);
             BufferedImage tileImage = tileGenerator.draw(tile, step);
@@ -2466,6 +2605,26 @@ public class MapGenerator implements AutoCloseable {
             BotLogger.error(
                     "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);
         }
+    }
+
+    private int frameOffsetX() {
+        return mapFrame == null ? 0 : mapFrame.offsetX();
+    }
+
+    private int frameOffsetY() {
+        return mapFrame == null ? 0 : mapFrame.offsetY();
+    }
+
+    private boolean isOutsideFrame(int tileX, int tileY) {
+        if (mapFrame == null) {
+            return false;
+        }
+        int hexLeft = tileX + TILE_PADDING;
+        int hexTop = tileY + TILE_PADDING;
+        return hexLeft + TileGenerator.TILE_WIDTH <= 0
+                || hexTop + TileGenerator.TILE_HEIGHT <= 0
+                || hexLeft >= mapFrame.width()
+                || hexTop >= mapFrame.height();
     }
 
     /**
