@@ -169,6 +169,7 @@ public final class Constants {
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String NOTEPAD = "notepad";
     public static final String DISPLAY_TYPE = "display_type";
+    public static final String MAP_SEGMENT = "map_segment";
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";

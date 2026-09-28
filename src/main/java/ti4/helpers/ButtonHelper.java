@@ -158,6 +158,7 @@ import ti4.service.game.GameColorsService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
@@ -2109,7 +2110,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(
                             channel,
                             ident
-                                    + ", you may exhaust _Nullfication Field_ and spend a command token from your strategy pool to end the active player's turn before the movement step.",
+                                    + ", you may exhaust _Nullification Field_ and spend a command token from your strategy pool to end the active player's turn before the movement step.",
                             buttons);
                 }
             }
@@ -5637,7 +5638,8 @@ public class ButtonHelper {
                     tile.getRepresentationForButtons(game, player),
                     UnitEmojis.spacedock));
         }
-        for (int x = 1; x < rings + 1; x++) {
+        boolean smartPicker = SystemPickerService.isEnabled(game);
+        for (int x = 1; x < rings + 1 && !smartPicker; x++) {
             Button ringX = Buttons.green(factionChecker + "ring_" + x, "Ring #" + x);
             ringButtons.add(ringX);
         }
@@ -5647,6 +5649,11 @@ public class ButtonHelper {
         ringButtons.add(corners);
         if (FOWPlusService.isActive(game)) {
             FOWPlusService.filterRingButtons(ringButtons, player, game, visibleFOWPositions);
+        }
+        if (smartPicker) {
+            SystemPickerService.addFirstStep(ringButtons, player, game);
+        }
+        if (FOWPlusService.isActive(game)) {
             ringButtons.add(Buttons.red(factionChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
