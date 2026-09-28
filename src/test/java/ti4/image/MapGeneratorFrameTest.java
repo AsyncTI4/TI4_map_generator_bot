@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -29,6 +30,15 @@ class MapGeneratorFrameTest extends BaseTi4Test {
             game.setTile(new Tile("19", position));
         }
         game.setTile(new Tile("20", "401"));
+    }
+
+    private static final int LABEL_SPACE = 150;
+
+    @SuppressWarnings("unchecked")
+    private static Set<String> drawnSegmentPositions(MapGenerator generator) throws ReflectiveOperationException {
+        Field field = MapGenerator.class.getDeclaredField("segmentDrawPositions");
+        field.setAccessible(true);
+        return (Set<String>) field.get(generator);
     }
 
     private static BufferedImage canvas(MapGenerator generator) throws ReflectiveOperationException {
@@ -141,9 +151,10 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         MapSegment.put(twoMaps, new MapSegment("south", "1237", 1));
 
         try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.map, null, "south")) {
-            // One 3-hex-tall segment plus padding, plus the fixed strip under the map.
-            int segmentHeight = 3 * TileGenerator.TILE_HEIGHT + 2 * 200;
+            // One 3-hex-tall segment, padding, room for the "Map: south" label, plus the strip under the map.
+            int segmentHeight = 3 * TileGenerator.TILE_HEIGHT + 2 * 200 + LABEL_SPACE;
             assertEquals(segmentHeight + 600, canvas(generator).getHeight());
+            assertEquals(MapFrame.positionsWithin("1237", 1), drawnSegmentPositions(generator));
         }
     }
 
@@ -160,7 +171,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
 
         MapSegment.setDefault(twoMaps, "south");
         try (MapGenerator generator = new MapGenerator(twoMaps, DisplayType.map, null)) {
-            int southHeight = 3 * TileGenerator.TILE_HEIGHT + 2 * 200 + 600;
+            int southHeight = 3 * TileGenerator.TILE_HEIGHT + 2 * 200 + LABEL_SPACE + 600;
             assertEquals(southHeight, canvas(generator).getHeight());
             assertTrue(southHeight < firstSegmentHeight, "without a default the GM sees the first segment");
         }

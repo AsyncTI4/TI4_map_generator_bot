@@ -82,6 +82,7 @@ public class MapGenerator implements AutoCloseable {
     private static final int TILE_WIDTH = 345; // typical width of a tile image
     private static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
     private static final int EXPEDITION_TRACKER_RIGHT_OFFSET = 1200;
+    private static final int SEGMENT_LABEL_SPACE = 150;
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -124,6 +125,11 @@ public class MapGenerator implements AutoCloseable {
     private MapSegment shownSegment;
 
     private Set<String> knownSystems = Set.of();
+
+    @Nullable
+    private Set<String> segmentDrawPositions;
+
+    private final Set<String> framedStatFactions = new HashSet<>();
 
     @Nullable
     private final MapFrame mapFrame;
@@ -206,6 +212,10 @@ public class MapGenerator implements AutoCloseable {
         tilesToDisplay = new HashMap<>(game.getTileMap());
         setupFow(tilesToDisplay);
         Rectangle frameBounds = computeFrameBounds();
+        if (frameBounds != null && segmentLabel(true) != null) {
+            frameBounds.y -= SEGMENT_LABEL_SPACE;
+            frameBounds.height += SEGMENT_LABEL_SPACE;
+        }
 
         // Width of map section
         mapWidth = Math.max(
@@ -468,10 +478,16 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private boolean isInShownRegion(@Nullable String position) {
-        if (position == null || mapFrame == null || !MapSegment.isFractureSeparate(game)) {
+        if (position == null || mapFrame == null) {
             return true;
         }
-        return MapSegment.isFracturePosition(position) == isShowingSeparateFracture();
+        if (segmentDrawPositions != null) {
+            return segmentDrawPositions.contains(position);
+        }
+        if (!MapSegment.isFractureSeparate(game)) {
+            return true;
+        }
+        return !MapSegment.isFracturePosition(position);
     }
 
     private Set<String> withoutSeparateFracture(Set<String> positions) {
@@ -492,17 +508,20 @@ public class MapGenerator implements AutoCloseable {
         }
         Set<String> inSegment = segment.positions();
         if (!isFoWPrivate) {
+            segmentDrawPositions = inSegment;
             return withNearbyStatTiles(inSegment);
         }
         Set<String> knownInSegment = new HashSet<>(known);
         knownInSegment.retainAll(inSegment);
-        if (knownInSegment.isEmpty()) {
-            return segment.isDerivedFromMap() ? null : inSegment;
+        if (knownInSegment.isEmpty() && segment.isDerivedFromMap()) {
+            return null;
         }
         if (segment.isDerivedFromMap()) {
-            knownInSegment = knownGroupWithin(knownInSegment);
+            segmentDrawPositions = knownGroupWithin(knownInSegment);
+            return withNearbyStatTiles(segmentDrawPositions);
         }
-        return withNearbyStatTiles(knownInSegment);
+        segmentDrawPositions = inSegment;
+        return withNearbyStatTiles(knownInSegment.isEmpty() ? inSegment : knownInSegment);
     }
 
     private Set<String> knownGroupWithin(Set<String> knownInSegment) {
@@ -525,12 +544,14 @@ public class MapGenerator implements AutoCloseable {
         if (!layout.useNewSystem()) {
             return withStats;
         }
-        for (List<String> statBlock : layout.playerStatTiles().values()) {
-            boolean touchesSegment = statBlock.stream()
+        for (Map.Entry<String, List<String>> statBlock :
+                layout.playerStatTiles().entrySet()) {
+            boolean touchesSegment = statBlock.getValue().stream()
                     .flatMap(statTile -> PositionMapper.getAdjacentTilePositions(statTile).stream())
                     .anyMatch(positions::contains);
             if (touchesSegment) {
-                withStats.addAll(statBlock);
+                withStats.addAll(statBlock.getValue());
+                framedStatFactions.add(statBlock.getKey());
             }
         }
         return withStats;
@@ -744,10 +765,16 @@ public class MapGenerator implements AutoCloseable {
         if (debug) debugImageGraphicsTime.stop();
     }
 
+    @Nullable
+    private String segmentLabel(boolean framed) {
+        if (shownSegment != null && (shownSegment.isFracture() || segmentsVisibleToViewer() > 1)) {
+            return shownSegment.name();
+        }
+        return framed && MapSegment.isFractureSeparate(game) ? MapSegment.MAIN : null;
+    }
+
     private void drawSegmentLabel() {
-        String label = shownSegment != null && segmentsVisibleToViewer() > 1
-                ? shownSegment.name()
-                : mapFrame != null && MapSegment.isFractureSeparate(game) ? MapSegment.MAIN : null;
+        String label = segmentLabel(mapFrame != null);
         if (label == null) {
             return;
         }
@@ -1497,6 +1524,9 @@ public class MapGenerator implements AutoCloseable {
                 continue;
             }
             if (layout.useNewSystem()) {
+                if (shownSegment != null && !framedStatFactions.contains(player.getFaction())) {
+                    continue;
+                }
                 List<String> tiles = layout.playerStatTiles().get(player.getFaction());
                 paintPlayerInfo(game, player, tiles);
             } else {
