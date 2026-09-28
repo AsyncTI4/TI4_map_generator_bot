@@ -132,20 +132,21 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
 
         assertTrue(report.contains("Best, worst and most common slice tiles by faction"), report);
         assertTrue(report.contains("  - Most common:\n"), report);
-        assertTrue(report.contains("Entropic Scar and Legendary tiles by faction"), report);
+        assertTrue(report.contains("All entropic scars and legendary tiles by faction"), report);
         assertTrue(
-                report.contains("No Entropic Scar or Legendary tile appeared in any slice."),
+                report.contains("No entropic scars or legendary tiles appeared in any slice."),
                 "no special tiles were placed in these games");
     }
 
     @Test
-    void buildReportBreaksOutEntropicScarAndLegendaryTilesPerFaction() {
-        // Entropic Scar and Primor sit in Sol's slice every game, and Sol never wins.
-        List<Game> games = repeatGame(GAMES, "letnev", Map.of("318", "114", "302", "65"));
+    void buildReportBreaksOutAllEntropicScarsAndLegendaryTilesPerFaction() {
+        // Both scar tiles and Primor sit in Sol's slice every game, and Sol never wins.
+        List<Game> games = repeatGame(GAMES, "letnev", Map.of("318", "114", "302", "116", "201", "65"));
 
         String report = SliceTileWinRateStatisticsService.buildReport(games);
 
         assertTrue(report.contains("`  0%` (0/10) 114 (" + tileName("114") + ")"), "Entropic Scar line for Sol");
+        assertTrue(report.contains("`  0%` (0/10) 116 (" + tileName("116") + ")"), "Lemox scar line for Sol");
         assertTrue(report.contains("`  0%` (0/10) 65 (" + tileName("65") + ")"), "Primor line for Sol");
         assertFalse(report.contains("without"), "the without metric was dropped");
     }

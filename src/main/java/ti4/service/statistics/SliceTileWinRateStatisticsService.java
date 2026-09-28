@@ -34,8 +34,6 @@ import ti4.service.map.FractureService;
 @UtilityClass
 public class SliceTileWinRateStatisticsService {
 
-    private static final String ENTROPIC_SCAR_TILE_ID = "114";
-
     private static final String CREUSS_GATE_TILE_ID = "17";
 
     static final String HOME_SYSTEM_KEY = "home";
@@ -267,7 +265,8 @@ public class SliceTileWinRateStatisticsService {
     }
 
     private static boolean isSpecialTile(String tileId) {
-        return ENTROPIC_SCAR_TILE_ID.equals(tileId) || isIntrinsicallyLegendaryTile(tileId);
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        return tileModel != null && (tileModel.isScar() || isIntrinsicallyLegendaryTile(tileId));
     }
 
     static boolean isIntrinsicallyLegendaryTile(String tileId) {
@@ -351,12 +350,12 @@ public class SliceTileWinRateStatisticsService {
     }
 
     private static void appendSpecialTileSection(StringBuilder sb, SliceTileWinRateStats stats) {
-        sb.append("\n### Entropic Scar and Legendary tiles by faction\n");
+        sb.append("\n### All entropic scars and legendary tiles by faction\n");
         List<String> specialTileIds = stats.specialTileIds.stream()
                 .sorted(Comparator.comparing(SliceTileWinRateStatisticsService::tileName))
                 .toList();
         if (specialTileIds.isEmpty()) {
-            sb.append("- No Entropic Scar or Legendary tile appeared in any slice.\n");
+            sb.append("- No entropic scars or legendary tiles appeared in any slice.\n");
             return;
         }
         sb.append("_That faction's win rate when the tile was in their slice._\n");
