@@ -9,6 +9,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,6 +85,15 @@ class MapFrameTest extends BaseTi4Test {
         Set<String> north = MapFrame.positionsWithin("1201", 1);
         Set<String> positions = new HashSet<>(north);
         positions.add("1237");
-        assertEquals(north, MapFrame.largestCluster(positions, 1));
+        assertEquals(north, MapFrame.largestCluster(positions, 1, Map.of()));
+    }
+
+    @Test
+    void anAdjacencyLinkJoinsGroupsThatDoNotTouch() {
+        // 000 and 301 are three hexes apart: separate without a link, one group with it.
+        Set<String> positions = Set.of("000", "301");
+        assertEquals(Set.of("000"), MapFrame.cluster(positions, "000", 1));
+        Map<String, Set<String>> links = Map.of("000", Set.of("301"), "301", Set.of("000"));
+        assertEquals(positions, MapFrame.cluster(positions, "000", 1, links));
     }
 }

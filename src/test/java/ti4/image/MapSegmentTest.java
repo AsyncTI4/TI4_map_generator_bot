@@ -160,4 +160,33 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(Set.of("frac1"), fracture.positions());
         assertTrue(MapSegment.stored(game).isEmpty(), "the built-in segment is never stored");
     }
+
+    @Test
+    void customAdjacencyJoinsSectorsButAWormholeLinkDoesNot() {
+        MapSegment.setAutoSectors(game, true);
+        // Tile 25 (Quann) has a beta wormhole: 101 and 1237 are wormhole-adjacent but stay separate sectors.
+        game.setTile(new Tile("25", "101"));
+        game.setTile(new Tile("25", "1237"));
+        assertEquals(3, MapSegment.all(game).size(), "core, 301 and 1237");
+
+        // A GM custom adjacency does connect them.
+        game.addCustomAdjacentTiles("301", List.of("1237"));
+        List<MapSegment> sectors = MapSegment.all(game);
+        assertEquals(2, sectors.size());
+        assertTrue(sectors.stream().anyMatch(sector -> sector.positions().containsAll(Set.of("301", "1237"))));
+    }
+
+    @Test
+    void automaticSectorsKeepTheFractureAsItsOwnSector() {
+        game.setTile(new Tile("25", "frac1"));
+        game.setTile(new Tile("26", "frac2"));
+        MapSegment.setAutoSectors(game, true);
+
+        // Fracture tiles never cluster with the galaxy, so with automatic sectors they must still get a sector,
+        // with or without the Separate Fracture option.
+        assertEquals(Set.of("frac1", "frac2"), positionsOf(MapSegment.FRACTURE));
+        game.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, true);
+        assertEquals(Set.of("frac1", "frac2"), positionsOf(MapSegment.FRACTURE));
+        assertEquals(1, names().stream().filter(MapSegment.FRACTURE::equals).count());
+    }
 }
