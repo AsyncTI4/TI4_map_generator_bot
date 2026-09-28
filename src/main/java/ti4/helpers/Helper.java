@@ -3246,7 +3246,7 @@ public final class Helper {
         if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && game.isMonumentsMode()
                 && player.getUnitByBaseType("monument") != null) {
-            unitButtons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "monument", placePrefix).stream()
+            unitButtons.addAll(getPlanetPlaceUnitButtons(player, game, "monument", placePrefix).stream()
                     .filter(button -> tile.getPlanetUnitHolders().stream()
                             .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
                     .toList());
@@ -4091,12 +4091,9 @@ public final class Helper {
             }
             return true;
         }
-        if (game.getRealPlayers().size() == 1
-                && player.isRealPlayer()
-                && game.getRealAndEliminatedPlayers().size() > 1) {
-            return true;
-        }
-        return false;
+      return game.getRealPlayers().size() == 1
+          && player.isRealPlayer()
+          && game.getRealAndEliminatedPlayers().size() > 1;
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {

@@ -2,6 +2,7 @@ package ti4.image;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -146,7 +147,7 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(2, segments.size());
         assertEquals(takenName, segments.getFirst().name(), "the GM keeps the name");
         assertEquals(FAR_SOUTH, segments.get(1).positions());
-        assertFalse(takenName.equals(segments.get(1).name()), "the automatic sector moved to another name");
+      assertNotEquals(takenName, segments.get(1).name(), "the automatic sector moved to another name");
     }
 
     @Test

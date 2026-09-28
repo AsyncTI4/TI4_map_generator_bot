@@ -25,8 +25,7 @@ public class StoneEmbraceService {
     public boolean canUseStoneEmbrace(Player khrask, Player primary, StrategyCardModel scModel) {
         if (scModel == null || scModel.usesAutomationForSCID("pok1leadership")) return false;
         if (!khrask.hasTech("dskhrag")) return false;
-        if (khrask.getReadiedPlanets().isEmpty()) return false;
-        return true;
+      return !khrask.getReadiedPlanets().isEmpty();
     }
 
     public void serveStoneEmbraceButtons(Game game, Player player, int sc) {
@@ -34,13 +33,13 @@ public class StoneEmbraceService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseStoneEmbrace(player, primary, scModel)) return;
 
-        StringBuilder msg = new StringBuilder(player.getRepresentation())
-                .append(" since you have ")
-                .append("Stone's Embrace")
-                .append(" you may exhaust a planet you control")
-                .append(" instead of spending a command token to follow **")
-                .append(scModel.getName())
-                .append("**. If you wish to do so, please choose which planet to exhaust");
+      String msg = player.getRepresentation() +
+          " since you have " +
+          "Stone's Embrace" +
+          " you may exhaust a planet you control" +
+          " instead of spending a command token to follow **" +
+          scModel.getName() +
+          "**. If you wish to do so, please choose which planet to exhaust";
 
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -51,7 +50,7 @@ public class StoneEmbraceService {
         buttons.add(Buttons.DONE_DELETE_BUTTONS
                 .withLabel("Decline Stone's Embrace")
                 .withEmoji(FactionEmojis.khrask.asEmoji()));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
     @ButtonHandler("stoneEmbraceFollow_")

@@ -690,9 +690,8 @@ public class Tile {
     public boolean hasIngress() {
         TileModel model = getTileModel();
         if (model == null) return false;
-        if (model.hasIngress()) return true;
+      return model.hasIngress();
         // Legacy: ingress tiles used to be identified by an "ingress..." alias
-        return false;
     }
 
     @JsonIgnore

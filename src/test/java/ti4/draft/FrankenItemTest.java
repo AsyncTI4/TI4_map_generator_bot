@@ -22,19 +22,19 @@ class FrankenItemTest extends BaseTi4Test {
         FrankenDrazDraft draft = new FrankenDrazDraft(game);
         game.setBagDraft(draft);
 
-        Assertions.assertEquals(6, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(6, draft.getItemLimitForCategory(DraftCategory.FACTION));
 
         game.setStoredValue("frankenLimit" + DraftCategory.FACTION, "4");
-        Assertions.assertEquals(4, draft.getItemLimitForCategory(DraftCategory.FACTION));
-        Assertions.assertEquals(4, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
-        Assertions.assertEquals(10, draft.getBagSize());
-        Assertions.assertEquals(10, game.getFrankenBagSize());
+        assertEquals(4, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(4, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
+        assertEquals(10, draft.getBagSize());
+        assertEquals(10, game.getFrankenBagSize());
 
         game.setStoredValue("frankenLimit" + DraftCategory.FACTION, "8");
-        Assertions.assertEquals(8, draft.getItemLimitForCategory(DraftCategory.FACTION));
-        Assertions.assertEquals(8, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
-        Assertions.assertEquals(14, draft.getBagSize());
-        Assertions.assertEquals(14, game.getFrankenBagSize());
+        assertEquals(8, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(8, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
+        assertEquals(14, draft.getBagSize());
+        assertEquals(14, game.getFrankenBagSize());
     }
 
     @Test

@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -3063,7 +3063,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             Collections.shuffle(heistObbies);
             for (SecretObjectiveModel so : heistObbies) {
                 if (player.getSecrets().containsKey(so.getAlias())
-                        || getSoToPoList().contains(so.getAlias())) {
+                        || soToPoList.contains(so.getAlias())) {
                     continue;
                 }
                 if (so.getSource() != ComponentSource.erwans_gambit) {

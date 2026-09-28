@@ -498,13 +498,13 @@ public class ThurvialiLeadersHandler {
         for (Player target : game.getRealPlayers()) {
             if ((ownerParticipates && target == agentOwner)
                     || target == firstTarget
-                    || !(ownerParticipates
-                            ? canUseHopeBetween(game, agentOwner, target)
-                            : firstTarget == null
-                                    ? game.getRealPlayers().stream()
-                                            .anyMatch(
-                                                    other -> other != target && canUseHopeBetween(game, target, other))
-                                    : canUseHopeBetween(game, firstTarget, target))) {
+                    || (ownerParticipates ?
+                !canUseHopeBetween(game, agentOwner, target) :
+                firstTarget == null ?
+                    game.getRealPlayers().stream()
+                        .noneMatch(
+                            other -> other != target && canUseHopeBetween(game, target, other)) :
+                !canUseHopeBetween(game, firstTarget, target))) {
                 continue;
             }
 

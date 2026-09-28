@@ -33,10 +33,9 @@ public class VeylorBreakthroughHandler {
 
     @ButtonHandler(USE_FILIBUSTER)
     public static void resolveFilibusteredLegislation(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null
-                || player == null
-                || !VeylorLeadersHandler.isVeylorAgendaPhase(game)
-                || !player.hasReadyBreakthrough(FILIBUSTER)) {
+        if (player == null
+            || !VeylorLeadersHandler.isVeylorAgendaPhase(game)
+            || !player.hasReadyBreakthrough(FILIBUSTER)) {
             return;
         }
 
@@ -59,10 +58,9 @@ public class VeylorBreakthroughHandler {
     @ButtonHandler(DECLINE_FILIBUSTER)
     public static void declineFilibusteredLegislation(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null
-                || player == null
-                || !VeylorLeadersHandler.isVeylorAgendaPhase(game)
-                || !player.hasReadyBreakthrough(FILIBUSTER)) {
+        if (player == null
+            || !VeylorLeadersHandler.isVeylorAgendaPhase(game)
+            || !player.hasReadyBreakthrough(FILIBUSTER)) {
             return;
         }
 

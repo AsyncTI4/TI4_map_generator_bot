@@ -304,7 +304,7 @@ public class DreamLeadersHandler {
             fromPosition = fromPosition.substring(0, fromPosition.lastIndexOf("_page"));
         }
         Tile fromTile = game.getTileByPosition(fromPosition);
-        if (fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) {
+        if (!DreamAbilitiesHandler.hasNexusToken(fromTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That system does not contain a nexus token.");
             return;
         }
@@ -344,10 +344,9 @@ public class DreamLeadersHandler {
         }
         Tile fromTile = game.getTileByPosition(parts[0]);
         Tile toTile = game.getTileByPosition(parts[1]);
-        if (fromTile == null
-                || !DreamAbilitiesHandler.hasNexusToken(fromTile)
-                || !isDreamHeroNexusDestination(game, toTile)
-                || DreamAbilitiesHandler.hasNexusToken(toTile)) {
+        if (!DreamAbilitiesHandler.hasNexusToken(fromTile)
+            || !isDreamHeroNexusDestination(game, toTile)
+            || DreamAbilitiesHandler.hasNexusToken(toTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid nexus token move.");
             return;
         }

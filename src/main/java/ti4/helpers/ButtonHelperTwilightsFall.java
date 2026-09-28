@@ -1009,8 +1009,8 @@ public final class ButtonHelperTwilightsFall {
                     MessageHelper.sendMessageToChannel(
                             activeP.getCorrectChannel(), activeP.getRepresentation() + ", the splice is complete.");
                 } else {
-                    List<String> cards = ButtonHelperTwilightsFall.getSpliceCards(game);
-                    List<MessageEmbed> embeds = ButtonHelperTwilightsFall.getSpliceEmbeds(game, type, cards, null);
+                    List<String> cards = getSpliceCards(game);
+                    List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, null);
                     MessageHelper.sendMessageToChannelWithEmbeds(
                             activeP.getCorrectChannel(),
                             activeP.getRepresentation()

@@ -321,7 +321,6 @@ public class AeternaUnitsHandler {
     public static void resolveGraveyardProduction(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!resolveGraveyardIAction(event, game, player, buttonID, GRAVEYARD_PRODUCE, true)) {
-            return;
         }
     }
 
@@ -525,8 +524,7 @@ public class AeternaUnitsHandler {
         }
         return FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false).stream()
                 .map(game::getTileByPosition)
-                .anyMatch(adjacentTile -> adjacentTile != null
-                        && ButtonHelper.doesPlayerHaveFSHere("aeterna_flagship", player, adjacentTile));
+                .anyMatch(adjacentTile -> ButtonHelper.doesPlayerHaveFSHere("aeterna_flagship", player, adjacentTile));
     }
 
     private static boolean isInOrAdjacentSystem(Game game, Player player, Tile sourceTile, Tile targetTile) {

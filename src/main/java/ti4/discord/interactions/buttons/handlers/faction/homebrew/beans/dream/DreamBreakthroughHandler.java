@@ -65,7 +65,7 @@ public class DreamBreakthroughHandler {
         if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String fromPosition = buttonID.replace("dream_bt_move_nexus_from_", "");
         Tile fromTile = game.getTileByPosition(fromPosition);
-        if (fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) {
+        if (!DreamAbilitiesHandler.hasNexusToken(fromTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That system does not contain a movable nexus token.");
             return;
         }
@@ -106,7 +106,7 @@ public class DreamBreakthroughHandler {
         if (pageSeparator < 1) return;
         String fromPosition = sourceAndPage.substring(0, pageSeparator);
         Tile fromTile = game.getTileByPosition(fromPosition);
-        if (fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) return;
+        if (!DreamAbilitiesHandler.hasNexusToken(fromTile)) return;
 
         String message = player.getRepresentation() + ", choose where to move that nexus token.";
         List<Button> destinationButtons = getDreamBtNexusDestinations(game, player, fromTile).stream()

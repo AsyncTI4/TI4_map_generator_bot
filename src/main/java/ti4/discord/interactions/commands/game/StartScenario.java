@@ -456,7 +456,7 @@ public class StartScenario extends GameStateSubcommand {
             for (Player player : players) {
                 num += 2;
                 String faction = getRandomUnusedFaction(game);
-                PlayerSetupState setupState = new PlayerSetupState(faction, "" + num, 201 == num);
+                PlayerSetupState setupState = new PlayerSetupState(faction, "" + num, num == 201);
                 PlayerSetupService.setupPlayer(setupState, player, game, event);
             }
             DrawSecretService.dealSOToAll(event, 2, game);

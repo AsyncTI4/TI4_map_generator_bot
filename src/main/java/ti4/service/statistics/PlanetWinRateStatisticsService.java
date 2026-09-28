@@ -110,7 +110,7 @@ public class PlanetWinRateStatisticsService {
         if (game.isTwilightsFallMode() || !game.isProphecyOfKings()) {
             return false;
         }
-        return pokOnly ? !game.isThundersEdge() : game.isThundersEdge();
+        return pokOnly != game.isThundersEdge();
     }
 
     /**
@@ -630,18 +630,18 @@ public class PlanetWinRateStatisticsService {
     }
 
     private static void appendStyxSection(List<String> blocks, PlanetWinRateStats stats) {
-        StringBuilder header = new StringBuilder("### Styx\n");
-        header.append("_Each row reads: how often Styx was held at the end of the games it was in, then the win rate"
-                + " when held, when not held with Styx in the game, with Styx in the game, and without Styx._\n");
-        header.append("Styx was in play in ")
-                .append(stats.gamesWithStyx)
-                .append(" of ")
-                .append(StringHelper.pluralize(stats.games, "game"))
-                .append(" (")
-                .append(ActionCardStatsService.formatPercent(
-                        stats.games == 0 ? 0 : stats.gamesWithStyx / (double) stats.games))
-                .append(").\n");
-        blocks.add(header.toString());
+      String header =
+          "### Styx\n" + "_Each row reads: how often Styx was held at the end of the games it was in, then the win rate"
+              + " when held, when not held with Styx in the game, with Styx in the game, and without Styx._\n" +
+              "Styx was in play in " +
+              stats.gamesWithStyx +
+              " of " +
+              StringHelper.pluralize(stats.games, "game") +
+              " (" +
+              ActionCardStatsService.formatPercent(
+                  stats.games == 0 ? 0 : stats.gamesWithStyx / (double) stats.games) +
+              ").\n";
+        blocks.add(header);
         if (stats.gamesWithStyx == 0) {
             return;
         }

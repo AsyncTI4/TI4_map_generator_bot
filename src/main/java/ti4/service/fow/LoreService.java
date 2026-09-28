@@ -142,9 +142,9 @@ public final class LoreService {
         public PERSISTANCE persistance = PERSISTANCE.ONCE;
 
         /** 0 means unbounded on that side — the entry can fire from game start / has no end round. */
-        public int fromRound = 0;
+        public int fromRound;
 
-        public int tillRound = 0;
+        public int tillRound;
 
         public LoreEntry(String loreText) {
             this.loreText = loreText;

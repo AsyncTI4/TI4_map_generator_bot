@@ -1,6 +1,8 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -696,7 +698,7 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         XytherisPromissoryHandler.resolveSwarmSpawnAfterRoll(event, game, player, rollType);
         if (massHypnosisHits > 0 && !game.isFowMode()) {
-            CombatRollService.sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
+            sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
         }
         ThronesUnitHandler.offerGholaAfterRoll(event, game, player, opponent, tile, combatOnHolder, rollType, payload);
         if (rollType == CombatRollType.combatround
@@ -918,7 +920,7 @@ public class CombatRollService {
                             buttons, game, opponent, tile, "afb", h);
                 }
                 List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
-                        game, player, tile, rollType, opponent, h);
+                        game, player, tile, CombatRollType.AFB, opponent, h);
                 if (!stingOfTheHiveButtons.isEmpty()) {
                     buttons.addAll(stingOfTheHiveButtons);
                     msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
@@ -1006,7 +1008,7 @@ public class CombatRollService {
             TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                     buttons, game, opponent, tile, "pds", h);
             List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
-                    game, player, tile, rollType, opponent, h);
+                    game, player, tile, CombatRollType.SpaceCannonOffence, opponent, h);
             if (!stingOfTheHiveButtons.isEmpty()) {
                 buttons.addAll(stingOfTheHiveButtons);
             }
@@ -1022,7 +1024,7 @@ public class CombatRollService {
 
         if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
             List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
-                    game, player, tile, rollType, opponent, h);
+                    game, player, tile, CombatRollType.SpaceCannonDefence, opponent, h);
             if (!stingOfTheHiveButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -1076,7 +1078,7 @@ public class CombatRollService {
                                 List<Button> targetButtons = new ArrayList<>(buttons);
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
-                                                game, player, tile, rollType, p2, h);
+                                                game, player, tile, CombatRollType.bombardment, p2, h);
                                 if (!stingOfTheHiveButtons.isEmpty()) {
                                     targetButtons.addAll(stingOfTheHiveButtons);
                                 }
@@ -1099,7 +1101,7 @@ public class CombatRollService {
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
-                                                game, player, tile, rollType, p2, h);
+                                                game, player, tile, CombatRollType.bombardment, p2, h);
                                 if (!stingOfTheHiveButtons.isEmpty()) {
                                     buttons2.addAll(stingOfTheHiveButtons);
                                 }

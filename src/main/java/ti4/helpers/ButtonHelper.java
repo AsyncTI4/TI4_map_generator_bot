@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1579,7 +1582,7 @@ public class ButtonHelper {
             }
         }
         if (player.hasUnlockedBreakthrough("axisbt")) {
-            int numOfNeighbors = ButtonHelper.getNumberOfUnitUpgrades(player);
+            int numOfNeighbors = getNumberOfUnitUpgrades(player);
             String message = player.getRepresentationUnfogged()
                     + " _Axis Breakthrough_ triggered, so your trade goods have increased due to your "
                     + numOfNeighbors
@@ -3451,14 +3454,14 @@ public class ButtonHelper {
     @ButtonHandler("draw7AC")
     public static void draw7AC(Player p1, Game game, ButtonInteractionEvent event, String buttonID) {
         ActionCardHelper.drawActionCards(p1, 7 - p1.getActionCards().size());
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationNoPing() + " drew up to 7 AC.");
     }
 
     @ButtonHandler("claimMMBoon")
     public static void claimMMBoon(Player p1, Game game, ButtonInteractionEvent event, String buttonID) {
         offerMMBoon(p1, game);
-        ButtonHelper.deleteTheOneButton(event);
+        deleteTheOneButton(event);
     }
 
     @ButtonHandler("finishMMElimination_")
@@ -3488,7 +3491,7 @@ public class ButtonHelper {
         if (!p2.isDummy()) {
             removeUser(event, game, p2, stringBuilder);
         }
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
     }
 
     @ButtonHandler("buyoutPlanet_")
@@ -3511,12 +3514,12 @@ public class ButtonHelper {
         } else {
             AddPlanetService.addPlanet(player, planet, game);
         }
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+        List<Button> buttons = getExhaustButtonsWithTG(game, player, "both");
         Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", please pay for the planet.", buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        deleteTheOneButton(event);
     }
 
     @ButtonHandler("redeemMMBoon_")
@@ -3572,7 +3575,7 @@ public class ButtonHelper {
                         p1.getCorrectChannel(), p1.getRepresentationNoPing() + " gained 5 tg.");
             }
         }
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
     }
 
     @ButtonHandler("ministerOfPeace")
@@ -7359,7 +7362,7 @@ public class ButtonHelper {
     @ButtonHandler("resolveWarfunding")
     public static void resolveWarfunding(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
 
-        if (!player.getPromissoryNotes().keySet().contains("war_funding")) {
+        if (!player.getPromissoryNotes().containsKey("war_funding")) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation() + " you don't have war funding.");
             return;
@@ -7428,7 +7431,7 @@ public class ButtonHelper {
         }
         msg += "\nHave your opponent assign hits with the assign hits button present underneath the combat picture.";
         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
     }
 
     @ButtonHandler("rollThalnos_")
@@ -9190,7 +9193,7 @@ public class ButtonHelper {
         String tilePos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(tilePos);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "dd");
-        ButtonHelper.deleteTheOneButton(event);
+        deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " used the desperado ability to place a destroyer in tile "

@@ -354,24 +354,23 @@ public class SupportWinRateStatisticsService {
     }
 
     private static String renderFactionLine(String label, FactionSupportStats group) {
-        return new StringBuilder("- ")
-                .append(label)
-                .append(": ")
-                .append(formatPercentagePointGap(group.supportGap()))
-                .append(" - ")
-                .append(ActionCardStatsService.formatPercent(group.withASupport.getWinRate()))
-                .append(" (")
-                .append(group.withASupport.getWins())
-                .append('/')
-                .append(group.withASupport.getPlayers())
-                .append(") holding one, ")
-                .append(ActionCardStatsService.formatPercent(group.withoutASupport.getWinRate()))
-                .append(" (")
-                .append(group.withoutASupport.getWins())
-                .append('/')
-                .append(group.withoutASupport.getPlayers())
-                .append(") holding none\n")
-                .toString();
+        return "- " +
+            label +
+            ": " +
+            formatPercentagePointGap(group.supportGap()) +
+            " - " +
+            ActionCardStatsService.formatPercent(group.withASupport.getWinRate()) +
+            " (" +
+            group.withASupport.getWins() +
+            '/' +
+            group.withASupport.getPlayers() +
+            ") holding one, " +
+            ActionCardStatsService.formatPercent(group.withoutASupport.getWinRate()) +
+            " (" +
+            group.withoutASupport.getWins() +
+            '/' +
+            group.withoutASupport.getPlayers() +
+            ") holding none\n";
     }
 
     private static String formatPercentagePointGap(double gap) {

@@ -53,10 +53,9 @@ public class WhiteTfUnitHandler {
         Player opponent = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
         Tile tile = payload.length == 2 ? game.getTileByPosition(payload[1]) : null;
         if (opponent == null
-                || tile == null
-                || !game.isTwilightsFallMode()
-                || !player.ownsUnit(FLAGSHIP)
-                || !ButtonHelper.doesPlayerHaveFSHere(FLAGSHIP, player, tile)) {
+            || !game.isTwilightsFallMode()
+            || !player.ownsUnit(FLAGSHIP)
+            || !ButtonHelper.doesPlayerHaveFSHere(FLAGSHIP, player, tile)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -106,7 +105,7 @@ public class WhiteTfUnitHandler {
         Player opponent = payload.length == 3 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
         String givenAbility = payload.length == 3 ? payload[1] : null;
         String takenAbility = payload.length == 3 ? payload[2] : null;
-        if (opponent == null || !isTfAbility(player, givenAbility) || !isTfAbility(opponent, takenAbility)) {
+        if (!isTfAbility(player, givenAbility) || !isTfAbility(opponent, takenAbility)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }

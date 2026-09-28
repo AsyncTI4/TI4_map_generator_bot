@@ -55,12 +55,11 @@ public class ArdentiaUnitHandler {
         Tile tile = game.getTileByPosition(parts[0]);
         Player opponent = game.getPlayerFromColorOrFaction(parts[1]);
         String factionsInCombat = game.getStoredValue("factionsInCombat");
-        if (tile == null
-                || opponent == null
-                || player.getStrategicCC() < 1
-                || !ButtonHelper.doesPlayerHaveFSHere("ardentia_flagship", player, tile)
-                || !factionsInCombat.contains(player.getFaction())
-                || !factionsInCombat.contains(opponent.getFaction())) {
+        if (opponent == null
+            || player.getStrategicCC() < 1
+            || !ButtonHelper.doesPlayerHaveFSHere("ardentia_flagship", player, tile)
+            || !factionsInCombat.contains(player.getFaction())
+            || !factionsInCombat.contains(opponent.getFaction())) {
             ButtonHelper.deleteMessage(event);
             return;
         }

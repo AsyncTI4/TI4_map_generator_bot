@@ -78,9 +78,8 @@ public class ThurvialiBreakthroughHandler {
         TechnologyModel technology = payload.length == 2 ? Mapper.getTech(payload[1]) : null;
 
         if (target == null
-                || technology == null
-                || !player.hasReadyBreakthrough(NEUROGRAFTING)
-                || !isEligibleNeurograftingTech(player, target, technology)) {
+            || !player.hasReadyBreakthrough(NEUROGRAFTING)
+            || !isEligibleNeurograftingTech(player, target, technology)) {
             ButtonHelper.deleteMessage(event);
             return;
         }

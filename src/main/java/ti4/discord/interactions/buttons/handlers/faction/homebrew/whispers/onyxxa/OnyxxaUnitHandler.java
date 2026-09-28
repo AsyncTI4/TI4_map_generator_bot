@@ -32,7 +32,7 @@ public class OnyxxaUnitHandler {
         return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(nearbyTile ->
-                        nearbyTile != null && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, nearbyTile));
+                    ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, nearbyTile));
     }
 
     public static void offerFlagshipWinButton(Player player, String msg) {

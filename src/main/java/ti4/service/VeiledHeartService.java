@@ -722,7 +722,7 @@ public class VeiledHeartService {
     public static void resolveTelepathicPreset(Game game, Player player) {
         String card = "tf-telepathic";
         if (hasVeiledCard(player, card) && PrePlayService.isAssigned(game, card)) {
-            VeiledHeartService.doAction(
+            doAction(
                     VeiledHeartService.VeiledCardAction.UNVEIL, VeiledCardType.ABILITY, player, card);
             PrePlayService.unassign(game, card);
         }

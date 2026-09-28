@@ -1,6 +1,7 @@
 package ti4.service.fow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
@@ -96,8 +97,8 @@ class MapSegmentServiceTest extends BaseTi4Test {
         assertEquals("showMap_ursa-major", MapSegmentService.withSegment("showMap", "ursa-major"));
 
         assertEquals("ursa-major", MapSegmentService.segmentFrom("showMap_ursa-major", "showMap"));
-        assertEquals(null, MapSegmentService.segmentFrom("showMap", "showMap"), "no segment in the id");
-        assertEquals(null, MapSegmentService.segmentFrom("showMap_Not Valid!", "showMap"), "invalid names are ignored");
+      assertNull(MapSegmentService.segmentFrom("showMap", "showMap"), "no segment in the id");
+      assertNull(MapSegmentService.segmentFrom("showMap_Not Valid!", "showMap"), "invalid names are ignored");
     }
 
     @Test

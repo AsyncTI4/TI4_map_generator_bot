@@ -133,7 +133,7 @@ public class DreamUnitsHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile activeTile = getActiveLiturgyTile(game, player);
         Tile fromTile = game.getTileByPosition(buttonID.replace("dream_offer_move_nexus_from_", ""));
-        if (activeTile == null || fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) return;
+        if (activeTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) return;
 
         String message = player.getRepresentation() + ", choose where to move that nexus token:";
         List<Button> destinationButtons = getLiturgyDestinations(game, player, activeTile).stream()
@@ -170,7 +170,7 @@ public class DreamUnitsHandler {
         if (pageSeparator < 1) return;
         Tile activeTile = getActiveLiturgyTile(game, player);
         Tile fromTile = game.getTileByPosition(sourceAndPage.substring(0, pageSeparator));
-        if (activeTile == null || fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) return;
+        if (activeTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) return;
 
         String message = player.getRepresentation() + ", choose where to move that nexus token:";
         List<Button> destinationButtons = getLiturgyDestinations(game, player, activeTile).stream()
@@ -224,13 +224,12 @@ public class DreamUnitsHandler {
         Tile fromTile = game.getTileByPosition(parts[0]);
         Tile toTile = game.getTileByPosition(parts[1]);
         Tile activeTile = getActiveLiturgyTile(game, player);
-        if (fromTile == null
-                || toTile == null
-                || activeTile == null
-                || !DreamAbilitiesHandler.hasNexusToken(fromTile)
-                || DreamAbilitiesHandler.hasNexusToken(toTile)
-                || fromTile.getPosition().equals(toTile.getPosition())
-                || !getLiturgyDestinations(game, player, activeTile).contains(toTile)) {
+        if (toTile == null
+            || activeTile == null
+            || !DreamAbilitiesHandler.hasNexusToken(fromTile)
+            || DreamAbilitiesHandler.hasNexusToken(toTile)
+            || fromTile.getPosition().equals(toTile.getPosition())
+            || !getLiturgyDestinations(game, player, activeTile).contains(toTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid nexus token move.");
             return;
         }

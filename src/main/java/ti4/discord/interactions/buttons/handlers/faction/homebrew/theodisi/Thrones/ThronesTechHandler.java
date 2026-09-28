@@ -420,7 +420,7 @@ public class ThronesTechHandler {
 
         String position = buttonID.substring(SELECT_RTB_SYSTEM.length());
         Tile tile = game.getTileByPosition(position);
-        if (tile == null || !FoWHelper.playerHasUnitsInSystem(activePlayer, tile)) {
+        if (!FoWHelper.playerHasUnitsInSystem(activePlayer, tile)) {
             ButtonHelper.deleteMessage(event);
             return;
         }

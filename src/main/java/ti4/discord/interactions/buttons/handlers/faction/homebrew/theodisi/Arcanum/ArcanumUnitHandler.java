@@ -113,11 +113,10 @@ public class ArcanumUnitHandler {
     public static List<NamedCombatModifierModel> getAstralCodexExtraRollModifier(
             Player player, Tile tile, UnitHolder combatOnHolder, CombatRollType rollType) {
         if (player == null
-                || tile == null
-                || combatOnHolder == null
-                || rollType != CombatRollType.combatround
-                || !Constants.SPACE.equalsIgnoreCase(combatOnHolder.getName())
-                || !ButtonHelper.doesPlayerHaveFSHere("arcanum_flagship", player, tile)) {
+            || combatOnHolder == null
+            || rollType != CombatRollType.combatround
+            || !Constants.SPACE.equalsIgnoreCase(combatOnHolder.getName())
+            || !ButtonHelper.doesPlayerHaveFSHere("arcanum_flagship", player, tile)) {
             return List.of();
         }
 

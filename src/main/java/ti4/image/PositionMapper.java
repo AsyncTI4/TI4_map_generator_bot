@@ -125,7 +125,7 @@ public final class PositionMapper {
             } else if (position.startsWith("frac")) {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 if (fractureYbump == 400) {
-                    y -= (fractureYbump - 300) / 2; // always 50
+                    y -= (400 - 300) / 2; // always 50
                 } else {
                     y += 250;
                 }

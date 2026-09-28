@@ -258,7 +258,7 @@ public class VanguardLeadersHandler {
                     player.factionButtonChecker() + PLACE_COMMANDER_UNIT + tile.getPosition() + "|" + holder.getName()
                             + "|" + replacement.getAsyncId(),
                     "Place 1 " + replacement.getName() + " on "
-                            + ("space".equals(holder.getName()) ? "Space" : ((Planet) holder).getRepresentation(game)),
+                            + ("space".equals(holder.getName()) ? "Space" : holder.getRepresentation(game)),
                     replacement.getUnitEmoji()));
         }
         if (buttons.isEmpty()) {

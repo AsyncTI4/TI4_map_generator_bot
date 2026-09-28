@@ -123,12 +123,9 @@ public class VeylorLeadersHandler {
 
     // Hero
     public static boolean isVeylorAgendaPhase(Game game) {
-        if (game == null
-                || !game.getStoredValue("executiveOrder").isEmpty()
-                || "action".equals(game.getPhaseOfGame())) {
-            return false;
-        }
-        return true;
+      return game != null
+          && game.getStoredValue("executiveOrder").isEmpty()
+          && !"action".equals(game.getPhaseOfGame());
     }
 
     public static boolean hasHeroAdditionalAgenda(Game game, int aCount) {

@@ -538,32 +538,25 @@ final class LoreEffects {
         EffectDescription apply(EffectContext ctx);
     }
 
-    /** Context handed to every effect: the player who triggered it, the game, and the resolved board target. */
-    private static final class EffectContext {
-        final Player player;
-        final Game game;
-        final Tile tile;
-        final String holder;
-        final String[] args;
+    /**
+     * Context handed to every effect: the player who triggered it, the game, and the resolved board target.
+     */
+        private record EffectContext(Player player, Game game, Tile tile, String holder, String[] args) {
 
-        EffectContext(Player player, Game game, Tile tile, String holder, String[] args) {
-            this.player = player;
-            this.game = game;
-            this.tile = tile;
-            this.holder = holder;
-            this.args = args;
-        }
+        /**
+         * Operand at index i parsed as a signed int ("+2"/"-1"/"3"), or 0 if absent/blank.
+         */
+            int signed(int i) {
+                if (args.length <= i || args[i].isEmpty()) {
+                    return 0;
+                }
+                return Integer.parseInt(args[i].replace("+", ""));
+            }
 
-        /** Operand at index i parsed as a signed int ("+2"/"-1"/"3"), or 0 if absent/blank. */
-        int signed(int i) {
-            if (args.length <= i || args[i].isEmpty()) return 0;
-            return Integer.parseInt(args[i].replace("+", ""));
+            String arg(int i) {
+                return args.length > i ? args[i] : null;
+            }
         }
-
-        String arg(int i) {
-            return args.length > i ? args[i] : null;
-        }
-    }
 
     // ---- Effect registry. To add an effect, register a handler here; no other code changes needed. ----
     private static final Map<String, EffectHandler> EFFECTS = new HashMap<>();

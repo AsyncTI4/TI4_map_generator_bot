@@ -157,7 +157,7 @@ final class FowSetupGameOptionsService {
                             ? Buttons.red("fowSetupToggleAlliance", "Disable Alliance Mode")
                             : Buttons.green("fowSetupToggleAlliance", "Enable Alliance Mode"));
 
-            buttons.add(Buttons.red("fowSetupOptionsRemoveAllHomebrews_" + category, "Remove All Homebrews"));
+            buttons.add(Buttons.red("fowSetupOptionsRemoveAllHomebrews_" + Category.HOMEBREW, "Remove All Homebrews"));
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
