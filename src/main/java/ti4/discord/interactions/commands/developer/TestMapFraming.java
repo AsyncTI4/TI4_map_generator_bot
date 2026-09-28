@@ -66,7 +66,14 @@ class TestMapFraming extends GameStateSubcommand {
             18. `/show_game`, Refresh Map and a map-only view look exactly as before; with Refresh Map style `split`, the prompt is private (ephemeral).
             **F. GM options**
             19. FoW option **Classic map layout** on, then **Show map (as me)**: full classic canvas (still fogged), no `Map:` label or sector buttons, corners in the canvas corners. Turn it off again.
-            20. **Two maps** + **Core + Fracture** tiles, then **GM overview with sector names** (or `/fow map_overview sector_names:true` in the GM room): the whole map incl. Fracture and corners, unfogged, scaled to one image, each sector tinted with its name. In a private channel the command refuses.
+            20. **Two maps** + **Core + Fracture** tiles, then **GM overview with sector names** (or `/fow map_overview sector_names:true` in the GM room): the whole map incl. Fracture and corners, unfogged, scaled to one image, each sector tinted with its name. Anywhere but the GM room the command refuses.
+            21. **Tactical picker**, start a tactical action each time:
+               - **Core** only: `Centre (1)`, `Ring #1 (6)`, no empty rings.
+               - **Three clusters** + auto sectors on + **Give me vision at 1237**: `Map: <name> (n)` buttons; unknown sectors fall under `Map: main`.
+               - Pick a sector with 23 or fewer systems: its systems appear directly; with more, rings from its own middle.
+               - **Over cap**: the far clusters show as `Ring #10`+ with counts, no dead rings in between.
+               - A full ring 4+ in a real fog game (24+ systems): `West half` / `East half` (6 sides from ring 8), all systems reachable.
+               - **Get a Different Ring** returns to the first step without refunding the CC.
             """;
     private static final List<String> SYSTEM_TILE_IDS =
             IntStream.rangeClosed(19, 50).mapToObj(String::valueOf).toList();
