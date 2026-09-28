@@ -1920,7 +1920,7 @@ public final class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     player2.getCorrectChannel(),
                     player2.getFactionEmoji()
-                            + " gained 3 consolation trade goods from having their strategy card stolen via _Quantumn Datahub Node_ "
+                            + " gained 3 consolation trade goods from having their strategy card stolen via _Quantum Datahub Node_ "
                             + player2.gainTG(3, true) + ".");
         }
 
