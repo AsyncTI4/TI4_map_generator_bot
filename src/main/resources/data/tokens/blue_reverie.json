@@ -1,6 +1,6 @@
 [
     {
-        "id": "pharadn_tomb_token",
+        "id": "pharadn_tomb",
         "name": "Pharadn Tomb Token",
         "imagePath": "token_tomb.png",
         "spaceOrPlanet": "planet",
