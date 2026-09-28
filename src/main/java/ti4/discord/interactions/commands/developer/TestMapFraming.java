@@ -16,20 +16,54 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import javax.annotation.Nullable;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.image.MapRenderPipeline;
 import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
-import ti4.service.ShowGameService;
+import ti4.service.fow.MapSegmentService;
 import ti4.service.map.AddTileService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 
 // TODO: temporary live-test panel for fog map framing/segments; delete with its DeveloperCommand entry before merge
 class TestMapFraming extends GameStateSubcommand {
 
     private static final String PREFIX = "devMapFraming_";
     private static final String PREVIOUS_HOME_KEY = "devMapFramingPreviousHome";
+    private static final String CHECKLIST =
+            """
+            ## Fog map framing: live test checklist
+            Press buttons in **your private channel** (player view) unless a step says GM view.
+            **A. Player view**
+            1. **Core**, then **Show map (as me)**: framed tightly, no `Map:` label, no `Map:` buttons.
+            2. **Three clusters**, then **Show map**: label `Map: <constellation>`, no switch buttons (you only know the core).
+            3. **Give me vision at 1237**, then **Show map**: two `Map:` buttons; press the other one, only that sector is drawn, label changes.
+            4. On that sector image press **Refresh Map**: it stays on the same sector.
+            5. **Cycle cluster gap** to 1, then **Show map**: `401` joins the core, so 2 sectors instead of 3.
+            6. **Over cap**, then **Show map**: only the cluster around your home at 1201, image not huge.
+            7. **Long strip**, then **Show map**: window stays inside the strip with 1201 in view.
+            8. **Core + Fracture**: `Map: main` shows no Fracture tiles; `Map: fracture` shows only Fracture tiles, label `Map: fracture`, no stat blocks.
+            9. **Corners**: `tl` pinned top-left, `br` not shown (unknown to you).
+            **B. Split-map preference**
+            10. **Toggle my split-map preference** (on), **Post a real Refresh Map button**, press it: a normal message with Show Map / Show Player Stats / Show Full Map.
+            11. Repeat 3-4 with the preference on: Show Map and Show Full Map keep the sector and carry `Map:` buttons.
+            **C. GM view** (**Show map (GM view, unfogged)**, or the GM room)
+            12. **Two maps**: opens on the default `core`; **Cycle default sector** moves it to `south`.
+            13. **Corners**: both `tl` and `br` pinned.
+            14. **Three clusters** with gap 0: sectors near each other never draw each other's tiles; stat blocks do not cover the label.
+            **D. Commands**
+            15. `/fow map_segment` (GM): lists sectors, automatic sectors, gap and default.
+            16. `/show_game map_segment:` autocomplete: only known sectors in your private channel, all in the GM room (as GM).
+            17. `/user set_preferred_settings split_map_refresh:` and `/user show_user_settings`; Player Settings button in your cards-info thread shows the toggle.
+            **E. Normal game (not this one)**
+            18. `/show_game`, Refresh Map and a map-only view look exactly as before; with the split preference on, the prompt is private (ephemeral).
+            """;
     private static final List<String> SYSTEM_TILE_IDS =
             IntStream.rangeClosed(19, 50).mapToObj(String::valueOf).toList();
 
@@ -47,7 +81,7 @@ class TestMapFraming extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Use this in a Fog of War test game: every layout wipes the map.");
             return;
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), describe(getGame()), buttons());
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), describe(getGame(), getPlayer()), buttons());
     }
 
     private static List<Button> buttons() {
@@ -63,7 +97,13 @@ class TestMapFraming extends GameStateSubcommand {
         buttons.add(Buttons.green(PREFIX + "fracture", "Core + Fracture (separate map option on)"));
         buttons.add(Buttons.gray(PREFIX + "toggleFractureOption", "Toggle Separate Fracture option"));
         buttons.add(Buttons.blue(PREFIX + "revealSouth", "Give me vision at 1237"));
+        buttons.add(Buttons.gray(PREFIX + "cycleGap", "Cycle cluster gap 0 > 1 > 2"));
+        buttons.add(Buttons.gray(PREFIX + "cycleDefault", "Cycle default sector"));
+        buttons.add(Buttons.gray(PREFIX + "toggleSplitPref", "Toggle my split-map preference"));
         buttons.add(Buttons.blue(PREFIX + "show", "Show map (as me)"));
+        buttons.add(Buttons.blue(PREFIX + "showAsGm", "Show map (GM view, unfogged)"));
+        buttons.add(Buttons.blue(PREFIX + "postRefresh", "Post a real Refresh Map button"));
+        buttons.add(Buttons.green(PREFIX + "checklist", "Test checklist"));
         buttons.add(Buttons.red(PREFIX + "wipe", "Wipe map and segments"));
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         return buttons;
@@ -94,8 +134,24 @@ class TestMapFraming extends GameStateSubcommand {
             case "toggleFractureOption" ->
                 game.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, !game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP));
             case "revealSouth" -> placeCarrier(game, player, "1237");
+            case "cycleGap" -> MapSegment.setGap(game, (MapSegment.gap(game) + 1) % (MapSegment.MAX_GAP + 1));
+            case "cycleDefault" -> cycleDefaultSector(game);
+            case "toggleSplitPref" -> toggleSplitPreference(player);
             case "show" -> {
-                ShowGameService.simpleShowGame(game, event);
+                showMap(game, event, event);
+                return;
+            }
+            case "showAsGm" -> {
+                showMap(game, null, event);
+                return;
+            }
+            case "postRefresh" -> {
+                MessageHelper.sendMessageToChannelWithButton(
+                        event.getMessageChannel(), "A real Refresh Map button:", Buttons.REFRESH_MAP);
+                return;
+            }
+            case "checklist" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), CHECKLIST);
                 return;
             }
             case "wipe" -> wipe(game, player);
@@ -105,7 +161,34 @@ class TestMapFraming extends GameStateSubcommand {
             }
         }
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "### `test_map_framing` → `" + action + "`\n" + describe(game));
+                event.getMessageChannel(), "### `test_map_framing` → `" + action + "`\n" + describe(game, player));
+    }
+
+    private static void showMap(
+            Game game, @Nullable ButtonInteractionEvent renderAs, ButtonInteractionEvent event) {
+        boolean foggedView = renderAs != null;
+        MapRenderPipeline.queue(game, renderAs, DisplayType.all, fileUpload -> {
+            List<Button> buttons = new ArrayList<>(Buttons.mapImageButtons(game));
+            buttons.addAll(MapSegmentService.switchButtons(game, event.getUser().getId(), foggedView));
+            ButtonHelper.sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, null, buttons, game, null);
+        });
+    }
+
+    private static void cycleDefaultSector(Game game) {
+        List<String> names = MapSegment.all(game).stream().map(MapSegment::name).toList();
+        String current = MapSegment.defaultSegment(game).map(MapSegment::name).orElse(null);
+        int next = current == null ? 0 : names.indexOf(current) + 1;
+        if (next >= names.size()) {
+            MapSegment.clearDefault(game);
+        } else {
+            MapSegment.setDefault(game, names.get(next));
+        }
+    }
+
+    private static void toggleSplitPreference(Player player) {
+        UserSettings settings = player.getUserSettings();
+        settings.setPrefersSplitMapRefresh(!settings.isPrefersSplitMapRefresh());
+        UserSettingsManager.save(settings);
     }
 
     private static void buildTwoMaps(Game game, Player player) {
@@ -197,14 +280,16 @@ class TestMapFraming extends GameStateSubcommand {
         return union;
     }
 
-    private static String describe(Game game) {
+    private static String describe(Game game, Player player) {
         List<MapSegment> segments = MapSegment.all(game);
         String defaultName =
                 MapSegment.defaultSegment(game).map(MapSegment::name).orElse("none");
-        return "Fog framing test panel. Tiles on map: **" + game.getTileMap().size() + "**, segments: **"
-                + segments.size() + "** (default: " + defaultName + "), separate Fracture: **"
-                + game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP) + "**.\n"
+        return "Fog framing test panel. Tiles on map: **" + game.getTileMap().size() + "**, sectors: **"
+                + segments.size() + "** (default: " + defaultName + "), automatic sectors: **"
+                + MapSegment.isAutoSectors(game) + "**, gap: **" + MapSegment.gap(game)
+                + "**, separate Fracture: **" + game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP)
+                + "**, my split-map preference: **" + player.getUserSettings().isPrefersSplitMapRefresh() + "**.\n"
                 + "Each layout wipes the map, places blue-back systems, sets your home system and a carrier there.\n"
-                + "Check with `/show_game`, `/show_game display_type:map`, and `/fow map_segment` as GM.";
+                + "Press **Test checklist** for the step-by-step scheme.";
     }
 }
