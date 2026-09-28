@@ -592,22 +592,11 @@ public class MapGenerator implements AutoCloseable {
             return null;
         }
         if (segment.isDerivedFromMap()) {
-            segmentDrawPositions = knownGroupWithin(knownInSegment);
-            return withNearbyStatTiles(segmentDrawPositions);
+            segmentDrawPositions = knownInSegment;
+            return withNearbyStatTiles(knownInSegment);
         }
         segmentDrawPositions = inSegment;
         return withNearbyStatTiles(knownInSegment.isEmpty() ? inSegment : knownInSegment);
-    }
-
-    private Set<String> knownGroupWithin(Set<String> knownInSegment) {
-        int reach = MapSegment.gap(game) + 1;
-        String home = homeSystemPosition();
-        if (home != null && knownInSegment.contains(home)) {
-            return MapFrame.cluster(knownInSegment, home, reach);
-        }
-        return MapFrame.clusters(knownInSegment, reach).stream()
-                .max(Comparator.comparingInt(Set::size))
-                .orElse(knownInSegment);
     }
 
     private Set<String> withNearbyStatTiles(Set<String> positions) {
@@ -683,11 +672,12 @@ public class MapGenerator implements AutoCloseable {
             return known;
         }
         int reach = MapSegment.gap(game) + 1;
+        Map<String, Set<String>> links = MapSegment.adjacencyLinks(game, known);
         String home = homeSystemPosition();
         if (home != null && known.contains(home)) {
-            return MapFrame.cluster(known, home, reach);
+            return MapFrame.cluster(known, home, reach, links);
         }
-        return MapFrame.largestCluster(known, reach);
+        return MapFrame.largestCluster(known, reach, links);
     }
 
     @Nullable

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -117,7 +118,7 @@ public record MapSegment(
     }
 
     private static Optional<MapSegment> fractureSegment(Game game) {
-        if (!game.isFowMode() || !game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP)) {
+        if (!game.isFowMode() || !game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP) && !isAutoSectors(game)) {
             return Optional.empty();
         }
         Set<String> placed = FRACTURE_POSITIONS.stream()
@@ -132,7 +133,8 @@ public record MapSegment(
         List<MapSegment> sectors = new ArrayList<>();
         Set<String> takenNames = new HashSet<>(Set.of(MAIN, FRACTURE));
         named.forEach(segment -> takenNames.add(segment.name()));
-        for (Set<String> cluster : MapFrame.clusters(placedGridPositions(game), gap(game) + 1)) {
+        Set<String> placed = placedGridPositions(game);
+        for (Set<String> cluster : MapFrame.clusters(placed, gap(game) + 1, adjacencyLinks(game, placed))) {
             boolean coveredByNamedSegment =
                     named.stream().anyMatch(segment -> !Collections.disjoint(segment.positions(), cluster));
             if (!coveredByNamedSegment) {
@@ -170,6 +172,21 @@ public record MapSegment(
                 .collect(Collectors.toSet());
     }
 
+    static Map<String, Set<String>> adjacencyLinks(Game game, Set<String> placed) {
+        Map<String, Set<String>> links = new HashMap<>();
+        game.getCustomAdjacentTiles().forEach((from, targets) -> targets.forEach(to -> link(links, placed, from, to)));
+        game.getAdjacentTileOverrides().forEach((side, to) -> link(links, placed, side.getLeft(), to));
+        return links;
+    }
+
+    private static void link(Map<String, Set<String>> links, Set<String> placed, String from, String to) {
+        if (!placed.contains(from) || !placed.contains(to)) {
+            return;
+        }
+        links.computeIfAbsent(from, key -> new HashSet<>()).add(to);
+        links.computeIfAbsent(to, key -> new HashSet<>()).add(from);
+    }
+
     private MapSegment resolve(Game game) {
         if (kind != Kind.CLUSTER) {
             return this;
@@ -178,7 +195,8 @@ public record MapSegment(
         if (!placed.contains(centre)) {
             return new MapSegment(name, centre, radius, kind, Set.of(centre));
         }
-        Set<String> cluster = new HashSet<>(MapFrame.cluster(placed, centre, gap(game) + 1));
+        Set<String> cluster =
+                new HashSet<>(MapFrame.cluster(placed, centre, gap(game) + 1, adjacencyLinks(game, placed)));
         if (radius > 0) {
             cluster.retainAll(MapFrame.positionsWithin(centre, radius));
         }

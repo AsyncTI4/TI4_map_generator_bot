@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
@@ -72,12 +73,19 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
     }
 
     static Set<String> cluster(Set<String> positions, String seed, int reach) {
+        return cluster(positions, seed, reach, Map.of());
+    }
+
+    static Set<String> cluster(Set<String> positions, String seed, int reach, Map<String, Set<String>> links) {
         Set<String> cluster = new HashSet<>(Set.of(seed));
         Deque<String> frontier = new ArrayDeque<>(cluster);
         while (!frontier.isEmpty()) {
-            for (String nearby : positionsWithin(frontier.poll(), reach)) {
-                if (positions.contains(nearby) && cluster.add(nearby)) {
-                    frontier.add(nearby);
+            String position = frontier.poll();
+            Set<String> nearby = new HashSet<>(positionsWithin(position, reach));
+            nearby.addAll(links.getOrDefault(position, Set.of()));
+            for (String neighbour : nearby) {
+                if (positions.contains(neighbour) && cluster.add(neighbour)) {
+                    frontier.add(neighbour);
                 }
             }
         }
@@ -85,19 +93,23 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
     }
 
     static List<Set<String>> clusters(Set<String> positions, int reach) {
+        return clusters(positions, reach, Map.of());
+    }
+
+    static List<Set<String>> clusters(Set<String> positions, int reach, Map<String, Set<String>> links) {
         Set<String> unvisited = new HashSet<>(positions);
         List<Set<String>> clusters = new ArrayList<>();
         while (!unvisited.isEmpty()) {
             String seed = unvisited.stream().min(POSITION_ORDER).orElseThrow();
-            Set<String> cluster = cluster(positions, seed, reach);
+            Set<String> cluster = cluster(positions, seed, reach, links);
             unvisited.removeAll(cluster);
             clusters.add(cluster);
         }
         return clusters;
     }
 
-    static Set<String> largestCluster(Set<String> positions, int reach) {
-        return clusters(positions, reach).stream()
+    static Set<String> largestCluster(Set<String> positions, int reach, Map<String, Set<String>> links) {
+        return clusters(positions, reach, links).stream()
                 .max(Comparator.comparingInt(Set::size))
                 .orElse(Set.of());
     }
