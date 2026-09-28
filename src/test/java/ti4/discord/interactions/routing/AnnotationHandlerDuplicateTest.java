@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * one copy have no effect and there is no way to tell which method the bot actually runs. This test fails the build if
  * any such duplicate exists.
  *
- * <p>It mirrors {@link AnnotationHandler#registerHandlers} exactly (same class list, same {@code getAnnotationsByType},
+ * <p>It mirrors  exactly (same class list, same {@code getAnnotationsByType},
  * same non-static skip) so it sees precisely the set of registrations the bot performs at startup. Detection is scoped
  * per annotation type because Button/Modal/Selection each own a separate registry (separate key space).
  */

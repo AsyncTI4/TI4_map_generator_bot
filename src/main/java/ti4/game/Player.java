@@ -614,7 +614,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public Role getRoleForCommunity() {
         try {
             return JdaService.jda.getRoleById(getRoleIDForCommunity());
-        } catch (Exception e) {
+        } catch (Exception _) {
         }
         return null;
     }
@@ -740,7 +740,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @Nullable
-    private ThreadChannel retrieveCardsInfoThreadById(TextChannel parentChannel, Long id) {
+    private static ThreadChannel retrieveCardsInfoThreadById(TextChannel parentChannel, Long id) {
         try {
             return DiscordChannelUtility.retrieveThreadChannelById(parentChannel.getGuild(), id)
                     .complete();
@@ -1080,7 +1080,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return injectPlayerUnitValues(allUnits.getFirst());
     }
 
-    private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
+    private static Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
 
         if ("naaz_voltron".equals(unit.getAlias())) score += 99; // ALWAYS use voltron, if available
@@ -1115,7 +1115,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return score;
     }
 
-    public UnitModel getUnitByID(String unitID) {
+    public static UnitModel getUnitByID(String unitID) {
         return Mapper.getUnit(unitID);
     }
 
@@ -1641,7 +1641,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getUser(getUserID());
     }
 
-    private User getUser(String userId) {
+    private static User getUser(String userId) {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
         return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
     }
@@ -3472,7 +3472,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return eb.build();
     }
 
-    private void addFieldSafely(EmbedBuilder eb, String name, String value, boolean inline) {
+    private static void addFieldSafely(EmbedBuilder eb, String name, String value, boolean inline) {
         if (value.length() > EMBED_FIELD_VALUE_LIMIT) {
             value = value.substring(0, EMBED_FIELD_VALUE_LIMIT - 3) + "...";
         }
@@ -3543,7 +3543,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return Container.of(components).withAccentColor(accent);
     }
 
-    private List<String> getModelNames(Collection<String> ids, Function<String, EmbeddableModel> mapper) {
+    private static List<String> getModelNames(Collection<String> ids, Function<String, EmbeddableModel> mapper) {
         return ids.stream()
                 .map(mapper)
                 .map(EmbeddableModel::getNameRepresentation)

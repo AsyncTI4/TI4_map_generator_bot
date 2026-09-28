@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
 import ti4.testUtils.BaseTi4Test;
 
@@ -26,7 +27,7 @@ class BlindSelectionServiceTest extends BaseTi4Test {
     private static String anyOnMapPlanet(Game game) {
         return game.getTileMap().values().stream()
                 .flatMap(t -> t.getUnitHolders().values().stream())
-                .map(uh -> uh.getName())
+                .map(UnitHolder::getName)
                 .filter(name -> game.getTileFromPlanet(name) != null)
                 .findFirst()
                 .orElse(null);

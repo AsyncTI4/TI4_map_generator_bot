@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.explore.theodisi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -62,6 +63,7 @@ public class LostLegciesExploreHandler {
     private static final String SPENDINF_EE = "spendInfToReadyPlanetsEE";
     // Disruptive Forces
     private static final String GAINN_CC_DRAW_AC = "disruptiveForcesGainCCAndAc";
+    private static final Pattern FINAL_UNDERSCORE_PATTERN = Pattern.compile("_(?=[^_]+$)");
 
     // Disruptive Forces
     public static List<Button> getDisruptiveForcesButtons(
@@ -111,8 +113,7 @@ public class LostLegciesExploreHandler {
             return;
         }
 
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
         buttons.add(Buttons.red(
                 player.factionButtonChecker() + "doneSpendingExplorationEnclave", "Done Spending Influence"));
 
@@ -288,8 +289,7 @@ public class LostLegciesExploreHandler {
     @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_MECH)
     public static void resolveImmediateAssemblyMech(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload =
-                buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_MECH.length()).split("_(?=[^_]+$)");
+        String[] payload = FINAL_UNDERSCORE_PATTERN.split(buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_MECH.length()));
         String planetName = payload[0];
         String result = payload.length > 1 ? payload[1] : "";
         Tile tile = game == null ? null : game.getTileFromPlanet(planetName);
@@ -322,8 +322,7 @@ public class LostLegciesExploreHandler {
     @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_INF)
     public static void resolveImmediateAssemblyInf(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload =
-                buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_INF.length()).split("_(?=[^_]+$)");
+        String[] payload = FINAL_UNDERSCORE_PATTERN.split(buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_INF.length()));
         String planetName = payload[0];
         String result = payload.length > 1 ? payload[1] : "";
         Tile tile = game == null ? null : game.getTileFromPlanet(planetName);

@@ -50,16 +50,14 @@ public final class TransactionGenerator {
         int pnWidth = (int) (width * widthRatio);
         // Add player 1's color
         String pn1 = "pa_pn_color_" + Mapper.getColorID(p1.getColor()) + ".png";
-        BufferedImage color1 =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn1), pnWidth, pnHeight);
+        BufferedImage color1 = ImageHelper.readScaled(ResourceHelper.getPAResource(pn1), pnWidth, pnHeight);
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
         g2.drawImage(color1, -1 * pnHeight, 0, null);
         g2.rotate(NINETY_DEGREES_RADIANS);
 
         // Add player 2's color
         String pn2 = "pa_pn_color_" + Mapper.getColorID(p2.getColor()) + ".png";
-        BufferedImage color2 =
-                ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pn2), pnWidth, pnHeight);
+        BufferedImage color2 = ImageHelper.readScaled(ResourceHelper.getPAResource(pn2), pnWidth, pnHeight);
         g2.rotate(NINETY_DEGREES_RADIANS);
         g2.drawImage(color2, height - pnHeight, -1 * width, null);
         g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
@@ -156,7 +154,7 @@ public final class TransactionGenerator {
     }
 
     public static BufferedImage drawTradeOfferMeme(Game game, Player p1, Player p2) {
-        BufferedImage meme = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("trade_offer_base.png"));
+        BufferedImage meme = ImageHelper.read(ResourceHelper.getExtraFile("trade_offer_base.png"));
         if (meme == null) return null;
         BufferedImage img = new BufferedImage(meme.getWidth(), meme.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();

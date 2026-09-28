@@ -219,26 +219,26 @@ public class SupportWinRateStatisticsService {
     }
 
     private static void appendSupportsHeldSection(List<String> blocks, SupportStats stats) {
-        blocks.add("### Win rate by supports held\n"
-                + "_Each row reads: win rate (wins/players; share of players who held that many)._\n");
+        blocks.add("""
+            ### Win rate by supports held
+            _Each row reads: win rate (wins/players; share of players who held that many)._
+            """);
 
         StringBuilder sb = new StringBuilder("- **All players**: ");
         sb.append(String.format("%.2f", stats.averageSupportsHeld())).append(" supports held on average, from ");
         ActionCardStatsService.appendCount(sb, stats.players, "player");
         sb.append('\n');
-        stats.playersBySupportsHeld.forEach((supportsHeld, count) -> {
-            sb.append("  - ")
-                    .append(supportsHeld)
-                    .append(supportsHeld == 1 ? " support: " : " supports: ")
-                    .append(ActionCardStatsService.formatPercent(count.getWinRate()))
-                    .append(" (")
-                    .append(count.getWins())
-                    .append('/')
-                    .append(count.getPlayers())
-                    .append("; ")
-                    .append(ActionCardStatsService.formatPercent(count.getPlayers() / (double) stats.players))
-                    .append(")\n");
-        });
+        stats.playersBySupportsHeld.forEach((supportsHeld, count) -> sb.append("  - ")
+                .append(supportsHeld)
+                .append(supportsHeld == 1 ? " support: " : " supports: ")
+                .append(ActionCardStatsService.formatPercent(count.getWinRate()))
+                .append(" (")
+                .append(count.getWins())
+                .append('/')
+                .append(count.getPlayers())
+                .append("; ")
+                .append(ActionCardStatsService.formatPercent(count.getPlayers() / (double) stats.players))
+                .append(")\n"));
         blocks.add(sb.toString());
     }
 
@@ -272,8 +272,10 @@ public class SupportWinRateStatisticsService {
     }
 
     private static void appendSwapSection(List<String> blocks, SupportStats stats) {
-        blocks.add("### Support swaps\n"
-                + "_Two players who each ended the game holding the other's Support for the Throne._\n");
+        blocks.add("""
+            ### Support swaps
+            _Two players who each ended the game holding the other's Support for the Throne._
+            """);
 
         StringBuilder sb = new StringBuilder("- Swaps per game: ");
         sb.append(String.format("%.2f", stats.swaps / (double) stats.games)).append(" on average\n");
@@ -354,23 +356,22 @@ public class SupportWinRateStatisticsService {
     }
 
     private static String renderFactionLine(String label, FactionSupportStats group) {
-        return "- " +
-            label +
-            ": " +
-            formatPercentagePointGap(group.supportGap()) +
-            " - " +
-            ActionCardStatsService.formatPercent(group.withASupport.getWinRate()) +
-            " (" +
-            group.withASupport.getWins() +
-            '/' +
-            group.withASupport.getPlayers() +
-            ") holding one, " +
-            ActionCardStatsService.formatPercent(group.withoutASupport.getWinRate()) +
-            " (" +
-            group.withoutASupport.getWins() +
-            '/' +
-            group.withoutASupport.getPlayers() +
-            ") holding none\n";
+        return "- " + label
+                + ": "
+                + formatPercentagePointGap(group.supportGap())
+                + " - "
+                + ActionCardStatsService.formatPercent(group.withASupport.getWinRate())
+                + " ("
+                + group.withASupport.getWins()
+                + '/'
+                + group.withASupport.getPlayers()
+                + ") holding one, "
+                + ActionCardStatsService.formatPercent(group.withoutASupport.getWinRate())
+                + " ("
+                + group.withoutASupport.getWins()
+                + '/'
+                + group.withoutASupport.getPlayers()
+                + ") holding none\n";
     }
 
     private static String formatPercentagePointGap(double gap) {

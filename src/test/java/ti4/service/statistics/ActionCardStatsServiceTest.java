@@ -607,7 +607,10 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         StringBuilder message = new StringBuilder();
         ActionCardStatsService.appendOverruleStats(message, Map.of("Politics", 3, "Technology", 1));
 
-        assertThat(message.toString()).isEqualTo("- Politics: 3 (75%)\n" + "- Technology: 1 (25%)\n");
+        assertThat(message.toString()).isEqualTo("""
+            - Politics: 3 (75%)
+            - Technology: 1 (25%)
+            """);
     }
 
     @Test

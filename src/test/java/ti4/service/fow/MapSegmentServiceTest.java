@@ -97,8 +97,8 @@ class MapSegmentServiceTest extends BaseTi4Test {
         assertEquals("showMap_ursa-major", MapSegmentService.withSegment("showMap", "ursa-major"));
 
         assertEquals("ursa-major", MapSegmentService.segmentFrom("showMap_ursa-major", "showMap"));
-      assertNull(MapSegmentService.segmentFrom("showMap", "showMap"), "no segment in the id");
-      assertNull(MapSegmentService.segmentFrom("showMap_Not Valid!", "showMap"), "invalid names are ignored");
+        assertNull(MapSegmentService.segmentFrom("showMap", "showMap"), "no segment in the id");
+        assertNull(MapSegmentService.segmentFrom("showMap_Not Valid!", "showMap"), "invalid names are ignored");
     }
 
     @Test

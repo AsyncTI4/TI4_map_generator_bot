@@ -141,24 +141,18 @@ public class UnitModelValueInjectionService {
                         .mapToInt(UnitModel::getSpaceCannonHitsOn)
                         .min()
                         .orElse(unit.getSpaceCannonHitsOn()));
-                injectedUnit.setDeepSpaceCannon(unit.getDeepSpaceCannon()
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> monument.getDeepSpaceCannon()));
-                injectedUnit.setPlanetaryShield(unit.getPlanetaryShield()
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> monument.getPlanetaryShield()));
-                injectedUnit.setSustainDamage(unit.getSustainDamage()
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> monument.getSustainDamage()));
+                injectedUnit.setDeepSpaceCannon(
+                        unit.getDeepSpaceCannon() || copiedMonuments.stream().anyMatch(UnitModel::getDeepSpaceCannon));
+                injectedUnit.setPlanetaryShield(
+                        unit.getPlanetaryShield() || copiedMonuments.stream().anyMatch(UnitModel::getPlanetaryShield));
+                injectedUnit.setSustainDamage(
+                        unit.getSustainDamage() || copiedMonuments.stream().anyMatch(UnitModel::getSustainDamage));
                 injectedUnit.setDisablesPlanetaryShield(unit.getDisablesPlanetaryShield()
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> monument.getDisablesPlanetaryShield()));
-                injectedUnit.setCanBeDirectHit(unit.getCanBeDirectHit()
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> monument.getCanBeDirectHit()));
-                injectedUnit.setIsGroundForce(unit.getIsGroundForce()
-                        || copiedMonuments.stream()
-                                .anyMatch(monument -> monument.getIsGroundForce()));
+                        || copiedMonuments.stream().anyMatch(UnitModel::getDisablesPlanetaryShield));
+                injectedUnit.setCanBeDirectHit(
+                        unit.getCanBeDirectHit() || copiedMonuments.stream().anyMatch(UnitModel::getCanBeDirectHit));
+                injectedUnit.setIsGroundForce(
+                        unit.getIsGroundForce() || copiedMonuments.stream().anyMatch(UnitModel::getIsGroundForce));
                 String copiedAbilityText = copiedMonuments.stream()
                         .map(monument -> "**" + monument.getName() + "**: "
                                 + monument.getAbility().orElse(""))

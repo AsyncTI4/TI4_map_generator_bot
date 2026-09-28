@@ -246,7 +246,7 @@ class ConcordAcd2ButtonHandler {
         receiver.setSecret(secretId);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, giver);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, receiver);
-        game.checkSOLimit(receiver);
+        Game.checkSOLimit(receiver);
 
         String cardName = Mapper.getSecretObjective(secretId).getName();
         announceGift(game, giver, receiver, "a secret objective", cardName);

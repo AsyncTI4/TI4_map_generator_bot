@@ -151,17 +151,17 @@ public class Tile {
     }
 
     @Nullable
-    public String getCCPath(String ccID) {
+    public static String getCCPath(String ccID) {
         return Mapper.getCCPath(ccID);
     }
 
     @Nullable
-    public String getAttachmentPath(String tokenID) {
+    public static String getAttachmentPath(String tokenID) {
         return ResourceHelper.getInstance().getAttachmentFile(tokenID);
     }
 
     @Nullable
-    public String getTokenPath(String tokenID) {
+    public static String getTokenPath(String tokenID) {
         return Mapper.getTokenPath(tokenID);
     }
 
@@ -367,7 +367,7 @@ public class Tile {
                 tileName = tileName.replace(".png", "_xmas.png");
             }
         }
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.warning("Could not find tile: " + tileID);
         }
@@ -442,7 +442,7 @@ public class Tile {
         }
 
         String tileName = Mapper.getTileID(fowTileID);
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
         }
@@ -642,7 +642,7 @@ public class Tile {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         if (player != null
                 && player.hasTech("tf-fraactalspikedrives")
-                && getWormholes(game).size() > 0) {
+                && !getWormholes(game).isEmpty()) {
             return true;
         }
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(game);
@@ -690,7 +690,7 @@ public class Tile {
     public boolean hasIngress() {
         TileModel model = getTileModel();
         if (model == null) return false;
-      return model.hasIngress();
+        return model.hasIngress();
         // Legacy: ingress tiles used to be identified by an "ingress..." alias
     }
 
@@ -953,7 +953,6 @@ public class Tile {
         }
     }
 
-    ///
     /**
      * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
      * present (using display names when available). Used for UI strings and logs.

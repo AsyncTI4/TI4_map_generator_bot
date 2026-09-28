@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -21,6 +22,7 @@ import ti4.service.emoji.FactionEmojis;
 @UtilityClass
 public class DreamBreakthroughHandler {
     private static final String DREAM_SPACE_CONVERGENCE = "dreambt";
+    private static final Pattern TO_ = Pattern.compile("_to_");
 
     public static boolean hasDreamBtNexusMove(Game game, Player player) {
         return player != null
@@ -128,7 +130,7 @@ public class DreamBreakthroughHandler {
     public static void resolveDreamBtMoveNexus(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
-        String[] parts = buttonID.replace("dream_bt_move_nexus_", "").split("_to_", 2);
+        String[] parts = TO_.split(buttonID.replace("dream_bt_move_nexus_", ""), 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that nexus move.");
             return;

@@ -25,7 +25,7 @@ public class StoneEmbraceService {
     public boolean canUseStoneEmbrace(Player khrask, Player primary, StrategyCardModel scModel) {
         if (scModel == null || scModel.usesAutomationForSCID("pok1leadership")) return false;
         if (!khrask.hasTech("dskhrag")) return false;
-      return !khrask.getReadiedPlanets().isEmpty();
+        return !khrask.getReadiedPlanets().isEmpty();
     }
 
     public void serveStoneEmbraceButtons(Game game, Player player, int sc) {
@@ -33,13 +33,12 @@ public class StoneEmbraceService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseStoneEmbrace(player, primary, scModel)) return;
 
-      String msg = player.getRepresentation() +
-          " since you have " +
-          "Stone's Embrace" +
-          " you may exhaust a planet you control" +
-          " instead of spending a command token to follow **" +
-          scModel.getName() +
-          "**. If you wish to do so, please choose which planet to exhaust";
+        String msg = player.getRepresentation() + " since you have "
+                + "Stone's Embrace"
+                + " you may exhaust a planet you control"
+                + " instead of spending a command token to follow **"
+                + scModel.getName()
+                + "**. If you wish to do so, please choose which planet to exhaust";
 
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -55,7 +54,7 @@ public class StoneEmbraceService {
 
     @ButtonHandler("stoneEmbraceFollow_")
     private void followWithMindsieve(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Integer sc = Integer.parseInt(buttonID.split("_")[1]);
+        int sc = Integer.parseInt(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!player.getFollowedSCs().contains(sc))

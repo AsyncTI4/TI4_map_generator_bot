@@ -43,7 +43,7 @@ class RevealSpecificEvent extends GameStateSubcommand {
         revealEvent(event, event.getChannel(), eventID);
     }
 
-    private void revealEvent(GenericInteractionCreateEvent event, MessageChannel channel, String eventID) {
+    private static void revealEvent(GenericInteractionCreateEvent event, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel != null) {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed())

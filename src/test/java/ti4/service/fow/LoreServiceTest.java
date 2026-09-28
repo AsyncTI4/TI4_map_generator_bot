@@ -205,7 +205,7 @@ class LoreServiceTest extends BaseTi4Test {
         void unknownVerb() {
             List<String> problems = LoreEffects.validateEffects(entry("!plastik 2 infantry"), game);
             assertFalse(problems.isEmpty());
-            assertTrue(problems.get(0).contains("plastik"));
+            assertTrue(problems.getFirst().contains("plastik"));
         }
 
         @Test
@@ -233,7 +233,7 @@ class LoreServiceTest extends BaseTi4Test {
         void unknownAtTarget() {
             List<String> problems = LoreEffects.validateEffects(entry("!tg +1 @zzz"), game);
             assertFalse(problems.isEmpty());
-            assertTrue(problems.get(0).contains("zzz"));
+            assertTrue(problems.getFirst().contains("zzz"));
         }
 
         @Test
@@ -498,12 +498,12 @@ class LoreServiceTest extends BaseTi4Test {
         void tradeGoodsPluralizedCorrectly() {
             var plural = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!tg +2"), systemTile, Constants.SPACE, true);
-            assertTrue(plural.get(0).contains("trade goods"));
+            assertTrue(plural.getFirst().contains("trade goods"));
 
             var singular = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!tg -1"), systemTile, Constants.SPACE, true);
-            assertTrue(
-                    singular.get(0).contains("trade good") && !singular.get(0).contains("trade goods"));
+            assertTrue(singular.getFirst().contains("trade good")
+                    && !singular.getFirst().contains("trade goods"));
         }
 
         @Test
@@ -527,7 +527,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!ac 2"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("action card"));
+            assertTrue(descs.getFirst().contains("action card"));
         }
 
         @Test
@@ -535,7 +535,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!comms +2"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("commodity"));
+            assertTrue(descs.getFirst().contains("commodity"));
         }
     }
 
@@ -593,9 +593,9 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removeunit 2 infantry"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("Removed")
-                    && descs.get(0).contains("red")
-                    && descs.get(0).contains("infantry"));
+            assertTrue(descs.getFirst().contains("Removed")
+                    && descs.getFirst().contains("red")
+                    && descs.getFirst().contains("infantry"));
         }
     }
 
@@ -632,7 +632,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removetoken gravityrift"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("Removed") && descs.get(0).contains("gravityrift"));
+            assertTrue(descs.getFirst().contains("Removed") && descs.getFirst().contains("gravityrift"));
         }
 
         @Test
@@ -640,7 +640,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removetoken gravityrift"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("nothing removed"));
+            assertTrue(descs.getFirst().contains("nothing removed"));
         }
 
         @Test
@@ -690,7 +690,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!swap 001 002"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("001") && descs.get(0).contains("002"));
+            assertTrue(descs.getFirst().contains("001") && descs.getFirst().contains("002"));
         }
 
         @Test
@@ -750,7 +750,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!vp 2 Big Win"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("VP") && descs.get(0).contains("Big Win"));
+            assertTrue(descs.getFirst().contains("VP") && descs.getFirst().contains("Big Win"));
         }
     }
 
@@ -791,7 +791,7 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!so 2"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
-            assertTrue(descs.get(0).contains("secret objective"));
+            assertTrue(descs.getFirst().contains("secret objective"));
         }
     }
 
@@ -1179,8 +1179,8 @@ class LoreServiceTest extends BaseTi4Test {
 
             assertEquals(1, result.entries().size());
             assertEquals(1, result.errors().size());
-            assertTrue(result.errors().get(0).contains("entry #1"));
-            assertTrue(result.errors().get(0).contains("malformed"));
+            assertTrue(result.errors().getFirst().contains("entry #1"));
+            assertTrue(result.errors().getFirst().contains("malformed"));
         }
 
         @Test
@@ -1195,8 +1195,8 @@ class LoreServiceTest extends BaseTi4Test {
             assertEquals(1, result.entries().size());
             assertTrue(result.entries().containsKey("000"));
             assertEquals(1, result.errors().size());
-            assertTrue(result.errors().get(0).contains("entry #1"));
-            assertTrue(result.errors().get(0).contains("999"));
+            assertTrue(result.errors().getFirst().contains("entry #1"));
+            assertTrue(result.errors().getFirst().contains("999"));
         }
 
         @Test
@@ -1206,8 +1206,8 @@ class LoreServiceTest extends BaseTi4Test {
 
             assertTrue(result.entries().isEmpty());
             assertEquals(1, result.errors().size());
-            assertTrue(result.errors().get(0).contains("RECEIVER"));
-            assertTrue(result.errors().get(0).contains("NOTAREALRECEIVER"));
+            assertTrue(result.errors().getFirst().contains("RECEIVER"));
+            assertTrue(result.errors().getFirst().contains("NOTAREALRECEIVER"));
         }
 
         @Test
@@ -2453,7 +2453,7 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!tech random blue"), systemTile, Constants.SPACE, true);
             assertEquals(1, player.getTechs().size());
-            String granted = player.getTechs().get(0);
+            String granted = player.getTechs().getFirst();
             assertTrue(Mapper.getTech(granted).isType("propulsion"), "expected a propulsion tech, got: " + granted);
         }
 

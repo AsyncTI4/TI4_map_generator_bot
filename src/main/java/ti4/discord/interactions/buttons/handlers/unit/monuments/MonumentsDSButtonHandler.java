@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.unit.monuments;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -1035,7 +1036,7 @@ public class MonumentsDSButtonHandler {
         return player.getPlanets().stream()
                         .filter(planetName -> !player.getExhaustedPlanets().contains(planetName))
                         .map(game::getUnitHolderFromPlanet)
-                        .filter(planet -> planet != null)
+                        .filter(Objects::nonNull)
                         .filter(planet -> planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG))
                         .count()
                 >= 2;
@@ -1044,7 +1045,7 @@ public class MonumentsDSButtonHandler {
     public static List<Button> getReadiedCorePlanetButtons(Game game, Player player) {
         return player.getReadiedPlanets().stream()
                 .map(game::getUnitHolderFromPlanet)
-                .filter(planet -> planet != null)
+                .filter(Objects::nonNull)
                 .filter(planet -> planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG))
                 .map(planet -> Buttons.red(
                         player.factionButtonChecker() + EXHAUST_CORE_PLANET + planet.getName(),

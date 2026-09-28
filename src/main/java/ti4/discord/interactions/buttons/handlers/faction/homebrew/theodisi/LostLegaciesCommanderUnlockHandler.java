@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -143,9 +144,8 @@ public class LostLegaciesCommanderUnlockHandler {
 
                 yield colorsWithTech >= 2;
             }
-            case "oblivion" -> {
-                yield getPlayersUnitTilesAdjacentToEmptyTiles(game, player).size() >= 3;
-            }
+            case "oblivion" ->
+                getPlayersUnitTilesAdjacentToEmptyTiles(game, player).size() >= 3;
             case "revenant" -> {
                 long otherPlayersWithUnlockedCommanders = game.getRealPlayers().stream()
                         .filter(otherPlayer -> otherPlayer != player)
@@ -215,7 +215,7 @@ public class LostLegaciesCommanderUnlockHandler {
 
                 for (String tech : player.getTechs()) {
                     TechnologyModel techM = Mapper.getTech(tech);
-                    if (techM == null || !techM.getRequirements().isEmpty()) {
+                    if (techM == null || techM.getRequirements().isPresent()) {
                         continue;
                     }
 
@@ -259,7 +259,7 @@ public class LostLegaciesCommanderUnlockHandler {
                 yield false;
             }
             case "scrapyard" -> {
-                Set<UnitType> shipTypes = new HashSet<>();
+                Set<UnitType> shipTypes = EnumSet.noneOf(UnitType.class);
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitKey unitKey : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
                         UnitModel unitModel = player.getUnitFromUnitKey(unitKey);

@@ -58,7 +58,7 @@ public final class SelectionMenuProcessor {
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
             if (combatReplayService != null) {
-                combatReplayService.setPreInteractionSnapshot(
+                CombatReplayService.setPreInteractionSnapshot(
                         combatReplayService.capturePreInteractionSnapshot(context.getGame()));
             }
             try {
@@ -66,7 +66,7 @@ public final class SelectionMenuProcessor {
                 context.save();
             } finally {
                 if (combatReplayService != null) {
-                    combatReplayService.clearPreInteractionSnapshot();
+                    CombatReplayService.clearPreInteractionSnapshot();
                 }
             }
         } catch (Exception e) {

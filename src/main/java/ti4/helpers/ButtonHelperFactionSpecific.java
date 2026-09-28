@@ -1616,7 +1616,7 @@ public final class ButtonHelperFactionSpecific {
         int hitRolls = DiceHelper.countSuccesses(resultRolls);
         totalHits += hitRolls;
         String unitRoll = CombatMessageHelper.displayUnitRoll(
-                player.getUnitByID("belkosea_flagship"),
+                Player.getUnitByID("belkosea_flagship"),
                 toHit,
                 modifierToHit,
                 1,

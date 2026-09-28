@@ -478,15 +478,12 @@ public class PlayerTechService {
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
             case "bazephy" -> ZephyrionBountyHandler.offerBountyButtons(game, player);
-            case "tf-mercenarycaptains" -> {
-                TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
-            }
-            case "tf-radiantsigils" -> {
+            case "tf-mercenarycaptains" -> TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
+            case "tf-radiantsigils" ->
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
                                 + " unfortunately at this time I am too lazy to offer an elegant solution to this tech. Use ./add_token token:sigil tile_name: to add the sigil, and /remove_token if you're moving it from somewhere.");
-            }
             case "tf-oracularalgorithms" -> {
                 List<Button> buttons = new ArrayList<>();
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
@@ -682,9 +679,8 @@ public class PlayerTechService {
                         event.getMessageChannel(), "Please choose a planet to explore.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
-            case "betaro" -> { // Resource Optimization
+            case "betaro" -> // Resource Optimization
                 TaFactionTechHandler.resolveResOp(event, game, player);
-            }
             case "tharcanumpmg" -> { // Power Word: Miracle
                 ArcanumPrimordialTechHandler.resolvePowerWordMiracle(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);

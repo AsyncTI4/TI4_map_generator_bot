@@ -24,9 +24,9 @@ public class NetrunnersUnitsHandler {
 
     public static void offerTrojan(Game game, Player player, Tile tile) {
         if (game == null
-            || player == null
-            || !player.hasUnit("netrunners_flagship")
-            || !ButtonHelper.doesPlayerHaveFSHere("netrunners_flagship", player, tile)) {
+                || player == null
+                || !player.hasUnit("netrunners_flagship")
+                || !ButtonHelper.doesPlayerHaveFSHere("netrunners_flagship", player, tile)) {
             return;
         }
         List<String> abilities = tile.getUnitHolders().values().stream()
@@ -63,7 +63,7 @@ public class NetrunnersUnitsHandler {
         }
         Tile tile = game.getTileByPosition(parts[0]);
         if (!player.hasUnit("netrunners_flagship")
-            || !ButtonHelper.doesPlayerHaveFSHere("netrunners_flagship", player, tile)) {
+                || !ButtonHelper.doesPlayerHaveFSHere("netrunners_flagship", player, tile)) {
             return;
         }
         String ability = tile.getUnitHolders().values().stream()

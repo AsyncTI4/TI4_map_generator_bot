@@ -48,8 +48,8 @@ final class FowSetupTableOrderService {
         int i = 1;
         for (Player player : seatCandidates(game, state)) {
             sb.append("> ").append(i).append(". ").append(player.getUserName());
-          i++;
-          if (player.isSpeaker()) sb.append(" (speaker)");
+            i++;
+            if (player.isSpeaker()) sb.append(" (speaker)");
             sb.append('\n');
         }
         sb.append("\n**a. Manual** - pick players one at a time in seat order.\n");

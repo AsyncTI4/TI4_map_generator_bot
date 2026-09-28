@@ -73,7 +73,7 @@ class GameLoadService {
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
             .build();
-    private static final Pattern PATTERN = Pattern.compile("—");
+    private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
     static List<String> loadGameNames() {
@@ -1082,7 +1082,7 @@ class GameLoadService {
                         String tileID = system[1];
                         String label = system[2];
                         if (label != null)
-                            label = PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
+                            label = EM_DASH_PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
                         player.addFogTile(tileID, position, label);
                     }
                 }

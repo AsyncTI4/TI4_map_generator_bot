@@ -69,14 +69,14 @@ class FrankenItemTest extends BaseTi4Test {
         assertEquals(
                 List.of("MONUMENT:titans_monument"),
                 Mapper.getFrankenErrata("ABILITY:terragenesis").getOptionalSwaps().stream()
-                        .filter(item -> "MONUMENT:titans_monument".equals(item.getAlias()))
                         .map(item -> item.getAlias())
+                        .filter("MONUMENT:titans_monument"::equals)
                         .toList());
         assertEquals(
                 List.of("MONUMENT:firmament_monument"),
                 Mapper.getFrankenErrata("BREAKTHROUGH:firmamentbt").getOptionalSwaps().stream()
-                        .filter(item -> "MONUMENT:firmament_monument".equals(item.getAlias()))
                         .map(item -> item.getAlias())
+                        .filter("MONUMENT:firmament_monument"::equals)
                         .toList());
     }
 
@@ -96,7 +96,7 @@ class FrankenItemTest extends BaseTi4Test {
                 .getComponents(game)
                 .contains(DraftItem.generate(DraftCategory.MONUMENT, "arborec_monument")));
 
-        draft.expandFactionPackages(game);
+        FrankenDrazDraft.expandFactionPackages(game);
 
         assertTrue(
                 player.getDraftHand().Contents.contains(DraftItem.generate(DraftCategory.MONUMENT, "arborec_monument")),

@@ -297,7 +297,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
         return null;
     }
 
-    private void sendFactionInfo(DraftManager draftManager, String playerUserId, List<String> informFactions) {
+    private static void sendFactionInfo(DraftManager draftManager, String playerUserId, List<String> informFactions) {
         if (informFactions != null && !informFactions.isEmpty()) {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             List<FactionModel> factions = new ArrayList<>();

@@ -2457,7 +2457,7 @@ public class MapGenerator implements AutoCloseable {
         int count = 0;
         for (int sc : playerSCs) {
             String scText = sc == 0 ? " " : Integer.toString(sc);
-            scText = game.getSCNumberIfNaaluInPlay(player, scText);
+            scText = Game.getSCNumberIfNaaluInPlay(player, scText);
             graphics.setColor(ColorUtil.getSCColor(sc, game));
             graphics.setFont(Storage.getFont64());
             point = PositionMapper.getPlayerStats(Constants.STATS_SC);

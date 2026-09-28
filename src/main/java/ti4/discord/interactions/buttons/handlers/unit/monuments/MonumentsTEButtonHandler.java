@@ -384,9 +384,7 @@ public class MonumentsTEButtonHandler {
     }
 
     public static void offerEpiphanyResearchButtons(Game game, Player player, TechnologyModel technology) {
-        if (player == null
-            || technology == null
-            || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
+        if (player == null || technology == null || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
             return;
         }
         List<String> controlTokens = getEpiphanyControlTokens(game, player);

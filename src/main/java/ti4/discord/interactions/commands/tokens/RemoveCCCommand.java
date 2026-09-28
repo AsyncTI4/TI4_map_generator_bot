@@ -28,7 +28,7 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
     void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
         for (String color : colors) {
             String ccID = Mapper.getCCID(color);
-            String ccPath = tile.getCCPath(ccID);
+            String ccPath = Tile.getCCPath(ccID);
             if (ccPath == null) {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(), "Command token: " + color + " is not valid and not supported.");

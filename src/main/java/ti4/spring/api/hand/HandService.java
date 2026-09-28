@@ -8,15 +8,15 @@ import ti4.game.Player;
 @Service
 public class HandService {
 
-    public Set<String> getActionCards(Player player) {
+    public static Set<String> getActionCards(Player player) {
         return new HashSet<>(player.getActionCards().keySet());
     }
 
-    public Set<String> getSecretObjectives(Player player) {
+    public static Set<String> getSecretObjectives(Player player) {
         return new HashSet<>(player.getSecrets().keySet());
     }
 
-    public Set<String> getPromissoryNotes(Player player) {
+    public static Set<String> getPromissoryNotes(Player player) {
         return new HashSet<>(player.getPromissoryNotes().keySet());
     }
 }

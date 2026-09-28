@@ -636,7 +636,7 @@ public class PlayerSetupService {
                 && game.getStoredValue("monumentsSetupAnnouncementSent").isEmpty()) {
             game.setStoredValue("monumentsSetupAnnouncementSent", "true");
             String helpFileName = "Monuments.txt";
-            String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
+            String path = ResourceHelper.getHelpFile(helpFileName);
             try {
                 String message = Files.readString(Paths.get(path));
                 MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), message);

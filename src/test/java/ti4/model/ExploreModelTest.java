@@ -18,7 +18,7 @@ class ExploreModelTest extends BaseTi4Test {
         }
     }
 
-    private boolean validateAttachmentID(ExploreModel model) {
+    private static boolean validateAttachmentID(ExploreModel model) {
         if (model.getAttachmentId().isEmpty()) return true;
         if (Mapper.isValidAttachment(model.getAttachmentId().get())) return true;
         if (Mapper.isValidToken(model.getAttachmentId().get())) return true;

@@ -65,7 +65,7 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
         return principal;
     }
 
-    private OAuth2AuthenticationException newAuthenticationFailureException() {
+    private static OAuth2AuthenticationException newAuthenticationFailureException() {
         return new OAuth2AuthenticationException("Discord token provided, but failed to authenticate");
     }
 }

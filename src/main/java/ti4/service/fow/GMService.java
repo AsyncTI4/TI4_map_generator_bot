@@ -172,7 +172,7 @@ public final class GMService {
         if (!game.isFowMode()) return;
         MapRenderPipeline.queue(
                 game,
-            null,
+                null,
                 DisplayType.all,
                 fileUpload -> ThreadGetter.getThreadInChannel(
                         getGMChannel(game),

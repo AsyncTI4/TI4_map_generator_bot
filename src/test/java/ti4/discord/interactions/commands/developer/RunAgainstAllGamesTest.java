@@ -30,7 +30,7 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
         int position = 101;
         for (String tileId : tileIds) {
             game.setTile(new Tile(tileId, Integer.toString(position)));
-          position++;
+            position++;
         }
         return game;
     }

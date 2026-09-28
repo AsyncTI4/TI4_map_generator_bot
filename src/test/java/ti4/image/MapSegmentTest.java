@@ -147,7 +147,7 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(2, segments.size());
         assertEquals(takenName, segments.getFirst().name(), "the GM keeps the name");
         assertEquals(FAR_SOUTH, segments.get(1).positions());
-      assertNotEquals(takenName, segments.get(1).name(), "the automatic sector moved to another name");
+        assertNotEquals(takenName, segments.get(1).name(), "the automatic sector moved to another name");
     }
 
     @Test

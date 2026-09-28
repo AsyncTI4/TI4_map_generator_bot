@@ -280,18 +280,18 @@ public final class ButtonHelperTacticalAction {
                                 && player.getHomeSystemTile() != tile
                                 && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
-                              if (player.getPlanets().contains(planet.getName())) {
-                                control = true;
-                                break;
-                              }
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    control = true;
+                                    break;
+                                }
                             }
                         }
                         if (tile.isMecatol(game) && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
-                              if (player.getPlanets().contains(planet.getName())) {
-                                control = true;
-                                break;
-                              }
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    control = true;
+                                    break;
+                                }
                             }
                         }
                         if (control) {

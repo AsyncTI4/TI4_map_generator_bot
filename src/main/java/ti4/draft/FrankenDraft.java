@@ -274,7 +274,7 @@ public class FrankenDraft extends BagDraft {
         return bags;
     }
 
-    protected void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
+    protected static void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
         List<ComponentSource> sources = new ArrayList<>(List.of(
                 ComponentSource.base,
                 ComponentSource.codex1,

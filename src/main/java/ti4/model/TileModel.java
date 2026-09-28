@@ -142,7 +142,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(id);
-        return ResourceHelper.getInstance().getTileFile(tileName);
+        return ResourceHelper.getTileFile(tileName);
     }
 
     @JsonIgnore

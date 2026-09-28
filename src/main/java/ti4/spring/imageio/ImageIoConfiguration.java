@@ -16,7 +16,7 @@ import ti4.logging.BotLogger;
 public class ImageIoConfiguration {
 
     @Bean
-    ApplicationRunner init() {
+    static ApplicationRunner init() {
         return args -> {
             // For some reason the webp plugin doesn't get registered sometimes, which is fixed by restarting the bot
             boolean webpRegistered = ensureWebpWriterRegistered();

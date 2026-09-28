@@ -56,7 +56,7 @@ class BountyAcd2ButtonHandler {
         // One button per distinct base unit type with a cost of 3 or more.
         Map<String, UnitModel> capturable = new LinkedHashMap<>();
         for (String unitId : p2.getUnitsOwned()) {
-            UnitModel model = p2.getUnitByID(unitId);
+            UnitModel model = Player.getUnitByID(unitId);
             if (model != null && model.getCost() >= 3) {
                 capturable.putIfAbsent(model.getBaseType(), model);
             }

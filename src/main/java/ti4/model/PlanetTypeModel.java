@@ -38,7 +38,7 @@ public class PlanetTypeModel {
         }
     }
 
-    public PlanetType getPlanetTypeFromString(String type) {
+    public static PlanetType getPlanetTypeFromString(String type) {
         if (type == null) {
             return PlanetType.NONE;
         }

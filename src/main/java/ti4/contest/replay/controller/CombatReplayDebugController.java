@@ -31,9 +31,6 @@ import tools.jackson.databind.json.JsonMapper;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/contest/replay")
-/**
- * Exposes lightweight admin/debug endpoints for inspecting replay observations, candidates, events, and contests.
- */
 public class CombatReplayDebugController {
 
     private static final JsonMapper MAPPER = JsonMapperManager.basic()

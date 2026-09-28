@@ -82,7 +82,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         try (MapGenerator generator = render(game, DisplayType.map, "core")) {
             assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
             assertEquals(MapGenerator.getMapHeight(game) + STRIP, generator.imageHeight());
-          assertNull(generator.shownSegmentName(), "sectors are ignored");
+            assertNull(generator.shownSegmentName(), "sectors are ignored");
         }
     }
 

@@ -133,7 +133,7 @@ public class SliceImageGeneratorService {
         Point hs = tilePositions.getFirst();
 
         List<String> tileStrings = new ArrayList<>();
-        tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
+        tileStrings.add(ResourceHelper.getTileFile("00_green.png"));
         tileStrings.addAll(
                 slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 

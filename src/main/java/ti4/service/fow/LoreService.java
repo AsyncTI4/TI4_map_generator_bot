@@ -133,6 +133,7 @@ public final class LoreService {
     }
 
     public static class LoreEntry {
+        private static final Pattern EFFECT_DELIMITER_PATTERN = Pattern.compile("(?<=\\s)(?=!)");
         public String target;
         public final String loreText;
         public String footerText = "";
@@ -242,7 +243,7 @@ public final class LoreService {
         /**
          * Splits a footer line into an optional tag ("accept", "reject", or a numeric roll-bin range like
          * "2-10"/"5") and the remainder of the line after the tag; tag is null if untagged.
-         *
+         * <p>
          * The numeric bin tag is only recognized when {@code rollGated} — otherwise a plain flavor line that
          * happens to start with "N:" (e.g. "3: the gate opens") would have its prefix stripped, a regression
          * for lore written before roll gating existed. accept:/reject: are always recognized (they were
@@ -280,7 +281,7 @@ public final class LoreService {
                 String rest = tagged[1];
 
                 // Support multiple effects on one line: "!tg +2 !fleet +1"
-                for (String segment : rest.split("(?<=\\s)(?=!)")) {
+                for (String segment : EFFECT_DELIMITER_PATTERN.split(rest)) {
                     String trimmed = segment.strip();
                     if (trimmed.startsWith("!")) {
                         out.add(tagPrefix + trimmed.substring(1).strip());
@@ -302,16 +303,16 @@ public final class LoreService {
 
                 // Strip effect segments from the line (same split as getEffectLines)
                 StringBuilder lineOut = new StringBuilder();
-                for (String segment : stripped.split("(?<=\\s)(?=!)")) {
+                for (String segment : EFFECT_DELIMITER_PATTERN.split(stripped)) {
                     String trimmed = segment.strip();
                     if (!trimmed.startsWith("!")) {
-                        if (lineOut.length() > 0) lineOut.append(' ');
+                        if (!lineOut.isEmpty()) lineOut.append(' ');
                         lineOut.append(trimmed);
                     }
                 }
                 String displayLine = lineOut.toString().strip();
                 if (!displayLine.isEmpty()) {
-                    if (sb.length() > 0) sb.append('\n');
+                    if (!sb.isEmpty()) sb.append('\n');
                     sb.append(displayLine);
                 }
             }
@@ -497,7 +498,7 @@ public final class LoreService {
         } catch (NumberFormatException e) {
             return "invalid round range `" + fields[7] + "-" + fields[8] + "`";
         }
-        if (from > 0 && till > 0 && from > till) {
+        if (till > 0 && from > till) {
             return "round range `" + from + "-" + till + "` has a from-round after its till-round";
         }
         return null;
@@ -827,7 +828,7 @@ public final class LoreService {
             return "rounds `" + rawRounds
                     + "` isn't a valid round or range (e.g. `3-6`, `4`, or blank) — ignored, entry is unrestricted";
         }
-        if (entry.fromRound > 0 && entry.tillRound > 0 && entry.fromRound > entry.tillRound) {
+        if (entry.tillRound > 0 && entry.fromRound > entry.tillRound) {
             entry.fromRound = 0;
             entry.tillRound = 0;
             return "rounds `" + rawRounds + "` has a from-round after its till-round — ignored, entry is unrestricted";
@@ -1213,7 +1214,7 @@ public final class LoreService {
      * {@code newPhase}. Call from a phase-start hook BEFORE {@code setPhaseOfGame} overwrites the
      * previous phase. A re-assertion (the game is already in {@code newPhase}, e.g. a double-clicked
      * phase button re-entering the start method) fires nothing.
-     *
+     * <p>
      * Not used by the strategy-phase hook: the round number increments during strategy start, so its
      * ends and start must fire on opposite sides of the increment — it calls {@link #showPhaseEndLore}
      * and {@link #showPhaseStartLore} separately instead.

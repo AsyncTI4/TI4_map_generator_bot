@@ -188,7 +188,7 @@ public class StartScenario extends GameStateSubcommand {
             List<Player> highPlayers = new ArrayList<>();
             int highest = 0;
             for (Player p : game.getRealPlayers()) {
-                Integer amountB = Integer.parseInt(game.getStoredValue(p.getFaction() + "bidAmount"));
+                int amountB = Integer.parseInt(game.getStoredValue(p.getFaction() + "bidAmount"));
                 if (amountB == highest) {
                     highPlayers.add(p);
                 }
@@ -359,14 +359,13 @@ public class StartScenario extends GameStateSubcommand {
     }
 
     public static String drawRandomFactionTech(Game game) {
-        List<TechnologyModel> techs = new ArrayList<>();
-        techs.addAll(Mapper.getTechs().values());
+        List<TechnologyModel> techs = new ArrayList<>(Mapper.getTechs().values());
         Collections.shuffle(techs);
         for (TechnologyModel model : techs) {
             if (!model.getSource().isOfficial() || model.getSource() == ComponentSource.twilights_fall) {
                 continue;
             }
-            if (!model.getFaction().isPresent()) {
+            if (model.getFaction().isEmpty()) {
                 continue;
             }
             boolean playerHasIt = false;

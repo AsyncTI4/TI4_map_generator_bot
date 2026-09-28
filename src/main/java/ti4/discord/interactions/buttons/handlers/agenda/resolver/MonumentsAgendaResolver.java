@@ -16,7 +16,7 @@ public record MonumentsAgendaResolver(String agendaId) implements AgendaResolver
         if ("cathedralofixth".equals(agendaId)) {
             game.addLaw(agendaNumericId, winner);
             MonumentsAgendaService.resolveCathedralOfIxthPlacement(
-                game, game.getPlayerThatControlsPlanet(winner), winner);
+                    game, game.getPlayerThatControlsPlanet(winner), winner);
             return;
         }
 

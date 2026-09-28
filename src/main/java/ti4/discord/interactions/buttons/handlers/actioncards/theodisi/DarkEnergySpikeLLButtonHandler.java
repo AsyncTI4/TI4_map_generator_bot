@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.explore.ExploreService;
 
 @UtilityClass
-public class DarkEnergySpikeLLButtonHandler {
+class DarkEnergySpikeLLButtonHandler {
     private static final String RESOLVE_DARK_ENERGY_SPIKE = "resolveDarkEnergySpike";
     private static final String SELECT_DARK_ENERGY_SPIKE_SYSTEM = "selectDarkEnergySpikeSystem_";
 

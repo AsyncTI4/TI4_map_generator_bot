@@ -305,7 +305,7 @@ class PlayerAggregatesService {
     /**
      * Computes all aggregate views from final game state.
      */
-    private ComputedAggregates computeAggregates(String userId, Collection<String> completedGameIds) {
+    private static ComputedAggregates computeAggregates(String userId, Collection<String> completedGameIds) {
         List<GameAggregateSnapshot> snapshots = loadPlayerSnapshotsPerGame(userId, completedGameIds);
 
         TechCountAccumulator techCounts = accumulateEligibleCounts(snapshots);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,22 +42,22 @@ import ti4.service.tech.ListTechService;
  * Effect-processing engine for lore entries.
  * Handles parsing, applying, and validating "!"-prefixed effect lines in lore footer text.
  * To add a new effect, register a handler in the static block — no other code changes needed.
- *
+ * <p>
  * An effect line may end in "?condition" tokens ({@code ?red}, {@code ?!red}, {@code ?faction:winnu},
  * {@code ?round:3-6}); all must hold for the receiving player or the line is skipped for them — see
  * {@link #conditionHolds}.
- *
+ * <p>
  * A footer's {@code !choice} marker gates the whole entry behind an Accept/Reject button per recipient;
  * lines tagged {@code accept:}/{@code reject:} only fire for the matching pick. A {@code !roll NdM} marker
  * gates the entry behind a single "Roll" button instead; lines tagged with a bare numeric range like
  * {@code 2-10:} or a single value like {@code 5:} only fire when the rolled total lands in that range — see
  * {@link #resolveRollBranch}. An entry may use {@code !choice} or {@code !roll}, never both.
- *
+ * <p>
  * Phase entries (target strategy/action/status/agenda with a PHASE_START/PHASE_END trigger) fire with no
  * triggering player and no target tile: map lines apply once via {@link #applyLoreEffectsMapOnly} and must
  * name colors and {@code @targets} explicitly ({@link #validatePhaseEntry} warns otherwise); player-stat
  * lines fan out to every real player.
- *
+ * <p>
  * Known limitations (not yet fixed):
  * - !removeunit removes whatever exists if fewer units are present than requested — silent partial removal by design.
  * - !token with an unresolvable name falls back to the raw arg as a filename; a typo passes validation but may
@@ -69,6 +70,9 @@ import ti4.service.tech.ListTechService;
  *   (no space) is parsed as one malformed effect and silently fails.
  */
 final class LoreEffects {
+
+    private static final Pattern PNG_FILE_SUFFIX_PATTERN = Pattern.compile("\\.png$");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
     record EffectResults(List<String> playerChanges, List<EffectDescription> mapChanges) {}
 
@@ -393,11 +397,11 @@ final class LoreEffects {
             }
         }
 
-        List<String> tokens = new ArrayList<>(Arrays.asList(body.split("\\s+")));
+        List<String> tokens = new ArrayList<>(Arrays.asList(WHITESPACE_PATTERN.split(body)));
         tokens.removeIf(String::isEmpty);
         if (tokens.isEmpty()) return null;
 
-        String verb = tokens.remove(0).toLowerCase();
+        String verb = tokens.removeFirst().toLowerCase();
         verb = VERB_ALIASES.getOrDefault(verb, verb);
         String targetRef = null;
         List<String> args = new ArrayList<>();
@@ -488,7 +492,7 @@ final class LoreEffects {
                 String[] parts = range.split("-", 2);
                 int from = parts[0].isBlank() ? 0 : Integer.parseInt(parts[0].trim());
                 int till = parts[1].isBlank() ? 0 : Integer.parseInt(parts[1].trim());
-                if (from > 0 && till > 0 && from > till) return null;
+                if (till > 0 && from > till) return null;
                 return new int[] {from, till};
             }
             int round = Integer.parseInt(range.trim());
@@ -541,22 +545,22 @@ final class LoreEffects {
     /**
      * Context handed to every effect: the player who triggered it, the game, and the resolved board target.
      */
-        private record EffectContext(Player player, Game game, Tile tile, String holder, String[] args) {
+    private record EffectContext(Player player, Game game, Tile tile, String holder, String[] args) {
 
         /**
          * Operand at index i parsed as a signed int ("+2"/"-1"/"3"), or 0 if absent/blank.
          */
-            int signed(int i) {
-                if (args.length <= i || args[i].isEmpty()) {
-                    return 0;
-                }
-                return Integer.parseInt(args[i].replace("+", ""));
+        int signed(int i) {
+            if (args.length <= i || args[i].isEmpty()) {
+                return 0;
             }
-
-            String arg(int i) {
-                return args.length > i ? args[i] : null;
-            }
+            return Integer.parseInt(args[i].replace("+", ""));
         }
+
+        String arg(int i) {
+            return args.length > i ? args[i] : null;
+        }
+    }
 
     // ---- Effect registry. To add an effect, register a handler here; no other code changes needed. ----
     private static final Map<String, EffectHandler> EFFECTS = new HashMap<>();
@@ -707,7 +711,9 @@ final class LoreEffects {
         if (ctx.tile == null || ctx.args.length == 0) return null;
         String tokenId = resolveTokenOrAttachment(ctx.arg(0));
         ctx.tile.addToken(tokenId, ctx.holder);
-        String readableName = tokenId.replaceFirst("^token_", "").replaceFirst("\\.png$", "");
+        String readableName = PNG_FILE_SUFFIX_PATTERN
+                .matcher(tokenId.replaceFirst("^token_", ""))
+                .replaceFirst("");
         String location = ctx.tile.getPosition() + (Constants.SPACE.equals(ctx.holder) ? "" : " (" + ctx.holder + ")");
         return new EffectDescription(
                 "Placed " + readableName + " token in " + location + ".", true, ctx.tile.getPosition());
@@ -726,7 +732,9 @@ final class LoreEffects {
             }
         }
 
-        String readableName = tokenId.replaceFirst("^token_", "").replaceFirst("\\.png$", "");
+        String readableName = PNG_FILE_SUFFIX_PATTERN
+                .matcher(tokenId.replaceFirst("^token_", ""))
+                .replaceFirst("");
         String location = ctx.tile.getPosition() + (Constants.SPACE.equals(holder) ? "" : " (" + holder + ")");
         boolean removed = ctx.tile.removeToken(tokenId, holder);
         if (!removed) {
@@ -1073,7 +1081,7 @@ final class LoreEffects {
         Set<ComponentSource> sources = AddTileService.getSources(game, false);
         Set<TileModel> onBoard = game.getTileMap().values().stream()
                 .map(Tile::getTileModel)
-                .filter(model -> model != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         List<TileModel> pool = new ArrayList<>();
@@ -1152,7 +1160,7 @@ final class LoreEffects {
             }
             case "ac" -> {
                 if (!isSignedInt(a, 0)
-                        || (isSignedInt(a, 0) && Integer.parseInt(a.get(0).replace("+", "")) <= 0)) {
+                        || (isSignedInt(a, 0) && Integer.parseInt(a.getFirst().replace("+", "")) <= 0)) {
                     problems.add("`ac` needs a positive number, e.g. `!ac 2`" + where);
                 }
             }
@@ -1219,22 +1227,22 @@ final class LoreEffects {
                         problems.add("unknown tech type `" + a.get(1) + "` — use blue/green/yellow/red/unit" + where);
                     }
                 } else if (Mapper.getTech(AliasHandler.resolveTech(a.get(0).toLowerCase())) == null) {
-                    problems.add("unknown tech `" + a.get(0) + "`" + where);
+                    problems.add("unknown tech `" + a.getFirst() + "`" + where);
                 }
             }
             case "removetech" -> {
                 if (a.isEmpty()) {
                     problems.add("`removetech` needs a tech id, e.g. `!removetech gd`" + where);
-                } else if (Mapper.getTech(AliasHandler.resolveTech(a.get(0).toLowerCase())) == null) {
-                    problems.add("unknown tech `" + a.get(0) + "`" + where);
+                } else if (Mapper.getTech(AliasHandler.resolveTech(a.getFirst().toLowerCase())) == null) {
+                    problems.add("unknown tech `" + a.getFirst() + "`" + where);
                 }
             }
             case "addfogtile" -> {
                 if (a.isEmpty()) {
                     problems.add("`addfogtile` needs a tile id, e.g. `!addfogtile 41 Decoy @305`" + where);
                 } else if (!TileHelper.isValidTile(
-                        AliasHandler.resolveTile(a.get(0).toLowerCase()))) {
-                    problems.add("unknown tile `" + a.get(0) + "`" + where);
+                        AliasHandler.resolveTile(a.getFirst().toLowerCase()))) {
+                    problems.add("unknown tile `" + a.getFirst() + "`" + where);
                 }
             }
             case "removefogtile" -> {
@@ -1247,7 +1255,7 @@ final class LoreEffects {
                                     + where);
                 } else {
                     if (!PositionMapper.isTilePositionValid(a.get(0))) {
-                        problems.add("invalid position `" + a.get(0) + "`" + where);
+                        problems.add("invalid position `" + a.getFirst() + "`" + where);
                     }
                     if ("random".equalsIgnoreCase(a.get(1))) {
                         for (String filter : a.subList(2, a.size())) {
@@ -1267,7 +1275,7 @@ final class LoreEffects {
                     problems.add("`rotatehyperlane` needs a position, e.g. `!rotatehyperlane 305 2`" + where);
                 } else {
                     if (!PositionMapper.isTilePositionValid(a.get(0))) {
-                        problems.add("invalid position `" + a.get(0) + "`" + where);
+                        problems.add("invalid position `" + a.getFirst() + "`" + where);
                     }
                     if (a.size() > 1 && !isSignedInt(a, 1)) {
                         problems.add("`rotatehyperlane` steps `" + a.get(1) + "` isn't a number" + where);
@@ -1281,7 +1289,7 @@ final class LoreEffects {
                                     + where);
                 } else {
                     if (!PositionMapper.isTilePositionValid(a.get(0))) {
-                        problems.add("invalid position `" + a.get(0) + "`" + where);
+                        problems.add("invalid position `" + a.getFirst() + "`" + where);
                     }
                     if (decodeHyperlaneMatrixArg(a.get(1)) == null) {
                         problems.add("invalid encoded matrix `" + a.get(1)
@@ -1290,13 +1298,13 @@ final class LoreEffects {
                 }
             }
             case "vp" -> {
-                if (!isSignedInt(a, 0) || Integer.parseInt(a.get(0).replace("+", "")) == 0) {
+                if (!isSignedInt(a, 0) || Integer.parseInt(a.getFirst().replace("+", "")) == 0) {
                     problems.add("`vp` needs a non-zero number, e.g. `!vp 1 Ancient Relic`" + where);
                 }
             }
             case "so", "secretobjective" -> {
                 if (!a.isEmpty()
-                        && (!isSignedInt(a, 0) || Integer.parseInt(a.get(0).replace("+", "")) <= 0)) {
+                        && (!isSignedInt(a, 0) || Integer.parseInt(a.getFirst().replace("+", "")) <= 0)) {
                     problems.add("`" + p.verb() + "` needs a positive number, e.g. `!" + p.verb()
                             + " 2`, or no args for 1" + where);
                 }

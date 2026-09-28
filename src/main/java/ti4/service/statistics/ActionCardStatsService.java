@@ -748,7 +748,7 @@ public class ActionCardStatsService {
         // Win rates and cancel rates spread very differently - most cards win at roughly the deck
         // average while cancels pile onto a handful of cards - so each gets its own shrinkage.
         ShrinkageModel winRateModel = buildShrinkageModel(
-                playToWinCorrelationCounts, PlayToWinCorrelationCount::getWins, count -> count.getTotal());
+                playToWinCorrelationCounts, PlayToWinCorrelationCount::getWins, PlayToWinCorrelationCount::getTotal);
         ShrinkageModel cancelRateModel = buildShrinkageModel(
                 playToWinCorrelationCounts,
                 PlayToWinCorrelationCount::getCanceled,

@@ -87,9 +87,9 @@ class ActionCardPingButtonHandlerTest extends BaseTi4Test {
                     .filter(p -> !seeing.contains(p))
                     .toList();
             if (notSeeing.isEmpty()) continue;
-            Player actor = seeing.get(0);
+            Player actor = seeing.getFirst();
             List<Player> visiblePeers = seeing.subList(1, seeing.size());
-            return new VisibilityCase(actor, visiblePeers, notSeeing.get(0), tile);
+            return new VisibilityCase(actor, visiblePeers, notSeeing.getFirst(), tile);
         }
         return null;
     }
@@ -429,7 +429,7 @@ class ActionCardPingButtonHandlerTest extends BaseTi4Test {
         // instead, this test should be rewritten to assert the stale entry actually gets swept.
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
-            Player actorA = game.getRealPlayers().get(0);
+            Player actorA = game.getRealPlayers().getFirst();
 
             ActionCardPingButtonHandler.pickType(game, actorA, Constants.AC_PING_PICK + "player_11111111_Old");
             game.setRound(game.getRound() + 1);

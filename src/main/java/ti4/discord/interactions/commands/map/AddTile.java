@@ -44,7 +44,7 @@ class AddTile extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;
         }
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;

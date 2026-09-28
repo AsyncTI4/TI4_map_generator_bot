@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -28,6 +29,8 @@ public class DreamUnitsHandler {
     private static final String LITURGY_II_UNIT = "dream_destroyer2";
     private static final String LITURGY_II_TECH = "bedreamdd";
     private static final String LITURGY_MENU_BUTTON_ID = "dream_liturgy_menu_back";
+    private static final Pattern FROM_ = Pattern.compile("_from_");
+    private static final Pattern TO_ = Pattern.compile("_to_");
 
     // Liturgy I / II
 
@@ -216,7 +219,7 @@ public class DreamUnitsHandler {
 
     @ButtonHandler("dream_move_nexus")
     public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] parts = buttonID.replace("dream_move_nexus", "").split("_to_");
+        String[] parts = TO_.split(buttonID.replace("dream_move_nexus", ""));
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse nexus move request.");
             return;
@@ -225,11 +228,11 @@ public class DreamUnitsHandler {
         Tile toTile = game.getTileByPosition(parts[1]);
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (toTile == null
-            || activeTile == null
-            || !DreamAbilitiesHandler.hasNexusToken(fromTile)
-            || DreamAbilitiesHandler.hasNexusToken(toTile)
-            || fromTile.getPosition().equals(toTile.getPosition())
-            || !getLiturgyDestinations(game, player, activeTile).contains(toTile)) {
+                || activeTile == null
+                || !DreamAbilitiesHandler.hasNexusToken(fromTile)
+                || DreamAbilitiesHandler.hasNexusToken(toTile)
+                || fromTile.getPosition().equals(toTile.getPosition())
+                || !getLiturgyDestinations(game, player, activeTile).contains(toTile)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid nexus token move.");
             return;
         }
@@ -382,7 +385,7 @@ public class DreamUnitsHandler {
     public static void offerRecurringMechPlacementButtons(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!player.hasUnit("dream_mech")) return;
-        String[] parts = buttonID.replace("dream_recurring_mech_paid_", "").split("_from_", 2);
+        String[] parts = FROM_.split(buttonID.replace("dream_recurring_mech_paid_", ""), 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that _Recurring_ payment confirmation.");
             return;
@@ -406,13 +409,13 @@ public class DreamUnitsHandler {
     @ButtonHandler("dream_recurring_mech_")
     public static void placeRecurringMech(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!player.hasUnit("dream_mech")) return;
-        String[] parts = buttonID.replace("dream_recurring_mech_", "").split("_to_", 2);
+        String[] parts = TO_.split(buttonID.replace("dream_recurring_mech_", ""), 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that _Recurring_ placement.");
             return;
         }
         int remaining = Integer.parseInt(parts[0]);
-        String[] planetParts = parts[1].split("_from_", 2);
+        String[] planetParts = FROM_.split(parts[1], 2);
         if (planetParts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that _Recurring_ destination.");
             return;

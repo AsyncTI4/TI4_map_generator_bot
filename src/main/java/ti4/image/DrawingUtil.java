@@ -47,7 +47,7 @@ import ti4.service.emoji.TI4Emoji;
 @UtilityClass
 public class DrawingUtil {
 
-    private static final Pattern PATTERN = Pattern.compile("[\\n\n]");
+    private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("[\\n\n]");
 
     private static BasicStroke stroke(int size) {
         return new BasicStroke(size);
@@ -575,7 +575,7 @@ public class DrawingUtil {
     }
 
     public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
-        List<String> initialSplit = new ArrayList<>(Arrays.asList(PATTERN.split(inputText)));
+        List<String> initialSplit = new ArrayList<>(Arrays.asList(LINE_BREAK_PATTERN.split(inputText)));
         List<String> finalSplit = new ArrayList<>();
         try {
             for (String line : initialSplit) {

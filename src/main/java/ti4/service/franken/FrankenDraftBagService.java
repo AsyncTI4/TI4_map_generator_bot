@@ -237,7 +237,9 @@ public class FrankenDraftBagService {
                             items.subList(i, Math.min(i + FACTIONS_PER_CONTAINER, items.size()));
                     Container c = draftBagCategoryContainer(
                             player,
-                        DraftCategory.FACTION, containerItems, " (" + containerNumber + "/" + containerCount + ")");
+                            DraftCategory.FACTION,
+                            containerItems,
+                            " (" + containerNumber + "/" + containerCount + ")");
                     if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
                     Collections.rotate(accents, -1);
                 }

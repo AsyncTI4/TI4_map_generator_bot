@@ -30,7 +30,7 @@ class ShowPurgedFragments extends GameStateSubcommand {
                     .append(fragmentId)
                     .append("`)")
                     .append('\n');
-          index++;
+            index++;
         }
         if (index == 1) {
             message.append("No relic fragments have been purged.");

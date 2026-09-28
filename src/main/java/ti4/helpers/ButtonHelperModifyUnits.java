@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.discord.utility.DiscordErrorUtility.*;
+import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -335,7 +335,7 @@ public final class ButtonHelperModifyUnits {
 
     public static int autoAssignGroundCombatHits(
             Player player, Game game, String planet, int hits, ButtonInteractionEvent event) {
-        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if (unitHolder == null) {
             MessageHelper.replyToMessage(
                     event,
@@ -494,7 +494,7 @@ public final class ButtonHelperModifyUnits {
             for (Player planetInvader : game.getRealPlayersNNeutral()) {
                 if (planetInvader != player && FoWHelper.playerHasUnitsOnPlanet(planetInvader, unitHolder)) {
                     MonumentsPoKButtonHandler.addSheConsumesWorldsButton(
-                            buttons, game, planetInvader, tile, (Planet) unitHolder);
+                            buttons, game, planetInvader, tile, unitHolder);
                 }
             }
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
@@ -1670,7 +1670,7 @@ public final class ButtonHelperModifyUnits {
         return getOpposingUnitsToHit(player, game, tile, exoHit, false);
     }
 
-    public static List<Button> getOpposingUnitsToHit(
+    private static List<Button> getOpposingUnitsToHit(
             Player player, Game game, Tile tile, boolean exoHit, boolean excludeCarriers) {
         String exo = exoHit ? "exo" : "";
         List<Button> buttons = new ArrayList<>();

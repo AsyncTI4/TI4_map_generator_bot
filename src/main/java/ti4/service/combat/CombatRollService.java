@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -119,6 +120,7 @@ import tools.jackson.databind.ObjectMapper;
 @UtilityClass
 public class CombatRollService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Pattern TOTAL_HITS_LINE_PATTERN = Pattern.compile("\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n");
 
     public boolean checkIfUnitsOfType(
             Player player,
@@ -146,8 +148,7 @@ public class CombatRollService {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game, tile);
             }
             List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                    game.getStoredValue("assignedBombardment" + player.getFaction()),
-                    new TypeReference<List<BombardmentAssignment>>() {});
+                    game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
 
             boolean hasValidBombardment = false;
             List<String> bombardedPlanets = new ArrayList<>();
@@ -357,8 +358,7 @@ public class CombatRollService {
                 AshenUnitHandler.prepareFlagshipBombardmentContext(game, player, bombardPlanet);
             }
             List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                    game.getStoredValue("assignedBombardment" + player.getFaction()),
-                    new TypeReference<List<BombardmentAssignment>>() {});
+                    game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             Map<String, Integer> remainingAssignedByAsyncId = new HashMap<>();
             for (BombardmentAssignment assignedUnit : assignedUnits) {
                 if (assignedUnit.planet().equals(bombardPlanet) && assignedUnit.sourceId() != null) {
@@ -548,7 +548,7 @@ public class CombatRollService {
         String gameAssignedBombardment = game.getStoredValue("assignedBombardment" + player.getFaction());
         if (!gameAssignedBombardment.isEmpty() && rollType == CombatRollType.bombardment) {
             List<BombardmentAssignment> assignedBombardment =
-                    MAPPER.readValue(gameAssignedBombardment, new TypeReference<List<BombardmentAssignment>>() {});
+                    MAPPER.readValue(gameAssignedBombardment, new TypeReference<>() {});
             String tempBombardPlanet = bombardPlanet;
             for (NamedCombatModifierModel mod : extraRollsDup) {
                 if ("plus1_roll_plasmascoring"
@@ -571,7 +571,7 @@ public class CombatRollService {
                         .equalsIgnoreCase(mod.getModifier().getAlias())) {
                     if (assignedBombardment.stream()
                             .filter(a -> a.planet().equals(tempBombardPlanet))
-                            .noneMatch(a -> a.galvanized())) {
+                            .noneMatch(BombardmentAssignment::galvanized)) {
                         extraRolls.remove(mod);
                     }
                 }
@@ -639,8 +639,7 @@ public class CombatRollService {
 
         if (massHypnosisHits > 0) {
             h = Math.max(0, h - massHypnosisHits);
-            message = message.replaceFirst(
-                    "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
+            message = TOTAL_HITS_LINE_PATTERN.matcher(message).replaceFirst(CombatMessageHelper.displayHitResults(h));
             if (payload.total() != null) {
                 CombatRollPayload.RollTotal total = payload.total();
                 payload = new CombatRollPayload(
@@ -2519,7 +2518,8 @@ public class CombatRollService {
                     new CombatRollPayload.RollTotal(diceRolled, displayedTotalHits, misses, maximumHits));
         }
 
-        private List<CombatRollPayload.DieRoll> toDieRolls(List<DiceHelper.Die> resultRolls, DieRollSource source) {
+        private static List<CombatRollPayload.DieRoll> toDieRolls(
+                List<DiceHelper.Die> resultRolls, DieRollSource source) {
             if (resultRolls.isEmpty()) return List.of();
             return resultRolls.stream()
                     .map(die ->
@@ -2527,7 +2527,7 @@ public class CombatRollService {
                     .toList();
         }
 
-        private String getDisplayedUnitName(UnitModel unitModel) {
+        private static String getDisplayedUnitName(UnitModel unitModel) {
             if (unitModel.getUpgradesFromUnitId().isPresent()
                     || unitModel.getFaction().isPresent()) {
                 return unitModel.getName();
@@ -2535,7 +2535,7 @@ public class CombatRollService {
             return "";
         }
 
-        private String resolveScopeDisplay(CombatModifierModel modifier, Map<UnitModel, Integer> units) {
+        private static String resolveScopeDisplay(CombatModifierModel modifier, Map<UnitModel, Integer> units) {
             String unitScope = modifier.getScope();
             if (isBlank(unitScope)) return "all";
             return units.keySet().stream()
@@ -3072,7 +3072,7 @@ public class CombatRollService {
             Tile activeSystem) {
 
         IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> countByIdentity = new IdentityHashMap<>();
-        playerUnits.forEach(countByIdentity::put);
+        countByIdentity.putAll(playerUnits);
         Map<String, List<Pair<UnitModel, UnitHolder>>> modelKeys = new LinkedHashMap<>();
         for (Pair<UnitModel, UnitHolder> key : countByIdentity.keySet()) {
             modelKeys
@@ -3091,7 +3091,7 @@ public class CombatRollService {
                 continue;
             }
             if (keys.size() == 1) {
-                Pair<UnitModel, UnitHolder> k = keys.get(0);
+                Pair<UnitModel, UnitHolder> k = keys.getFirst();
                 merged.put(k, countByIdentity.get(k));
                 continue;
             }
@@ -3124,7 +3124,7 @@ public class CombatRollService {
                 for (Pair<UnitModel, UnitHolder> k : keys) merged.put(k, countByIdentity.get(k));
             } else {
                 int totalCount = keys.stream().mapToInt(countByIdentity::get).sum();
-                merged.put(keys.get(0), totalCount);
+                merged.put(keys.getFirst(), totalCount);
             }
         }
         return new MergeResult(merged, divergingModels);

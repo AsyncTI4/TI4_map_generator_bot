@@ -21,9 +21,9 @@ public class HandController {
     public GetHandResponse get(@PathVariable String gameName) {
         var player = RequestContext.getPlayer();
 
-        Set<String> actionCards = handService.getActionCards(player);
-        Set<String> secretObjectives = handService.getSecretObjectives(player);
-        Set<String> promissoryNotes = handService.getPromissoryNotes(player);
+        Set<String> actionCards = HandService.getActionCards(player);
+        Set<String> secretObjectives = HandService.getSecretObjectives(player);
+        Set<String> promissoryNotes = HandService.getPromissoryNotes(player);
 
         return new GetHandResponse(actionCards, secretObjectives, promissoryNotes);
     }
