@@ -14,6 +14,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.fow.MapSegmentService;
+import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -27,7 +28,7 @@ class ShowGameButtonHandler {
     @ButtonHandler(value = REFRESH, save = false)
     public static void simpleShowGame(Game game, ButtonInteractionEvent event, String buttonID) {
         String segment = MapSegmentService.segmentFrom(buttonID, REFRESH);
-        if (UserSettingsManager.get(event.getUser().getId()).isPrefersSplitMapRefresh()) {
+        if (refreshMapStyle(event).isSplit()) {
             offerMapParts(game, event, segment);
             return;
         }
@@ -40,17 +41,26 @@ class ShowGameButtonHandler {
                 Buttons.gray(MapSegmentService.withSegment(SHOW_MAP, segment), "Show Map"),
                 Buttons.gray(SHOW_PLAYER_AREAS, "Show Player Stats"),
                 Buttons.gray(MapSegmentService.withSegment(SHOW_FULL_MAP, segment), "Show Full Map"));
-        if (game.isFowMode()) {
+        if (postsInChannel(game, event)) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         } else {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         }
     }
 
+    private static boolean postsInChannel(Game game, ButtonInteractionEvent event) {
+        return game.isFowMode() && refreshMapStyle(event).postsInChannelInFog();
+    }
+
+    private static RefreshMapStyle refreshMapStyle(ButtonInteractionEvent event) {
+        return UserSettingsManager.get(event.getUser().getId()).getRefreshMapStyle();
+    }
+
     private static void showMapPart(
             Game game, ButtonInteractionEvent event, DisplayType part, @Nullable String segment) {
+        boolean inChannel = postsInChannel(game, event);
         MapRenderPipeline.queue(game, event, part, segment, fileUpload -> {
-            if (!game.isFowMode()) {
+            if (!inChannel) {
                 MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
                 return;
             }

@@ -18,6 +18,7 @@ import ti4.helpers.FoWHelper;
 import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 public class MapSegmentService {
@@ -66,7 +67,7 @@ public class MapSegmentService {
     }
 
     private static List<MapSegment> visibleTo(Game game, String userId, boolean foggedView) {
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() || game.getFowOption(FOWOption.CLASSIC_MAP_LAYOUT)) {
             return List.of();
         }
         if (!foggedView && FoWHelper.isGameMaster(userId, game)) {

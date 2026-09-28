@@ -101,6 +101,17 @@ class MapSegmentServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void classicMapLayoutOffersNoSectorButtons() {
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+        MapSegment.put(game, new MapSegment("far", "1237", 1));
+        game.getTileByPosition("1237")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
+        game.setFowOption(FOWOption.CLASSIC_MAP_LAYOUT, true);
+        assertTrue(
+                MapSegmentService.viewableNames(game, player.getUserID(), true).isEmpty());
+    }
+
+    @Test
     void nonPlayersGetNothingInAFoggedView() {
         MapSegment.put(game, new MapSegment("core", "000", 1));
         assertTrue(MapSegmentService.viewableNames(game, "stranger", true).isEmpty());

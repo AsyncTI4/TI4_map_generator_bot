@@ -74,6 +74,18 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     }
 
     @Test
+    void classicMapLayoutOptionTurnsFramingAndSectorsOff() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.CLASSIC_MAP_LAYOUT, true);
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+        try (MapGenerator generator = render(game, DisplayType.map, "core")) {
+            assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
+            assertEquals(MapGenerator.getMapHeight(game) + STRIP, generator.imageHeight());
+            assertEquals(null, generator.shownSegmentName(), "sectors are ignored");
+        }
+    }
+
+    @Test
     void combinedViewUsesTheClassicWidthMatchingTheFramedMapSize() {
         game.setFowMode(true);
         try (MapGenerator generator = render(game, DisplayType.all, null)) {

@@ -481,7 +481,10 @@ public class MapGenerator implements AutoCloseable {
 
     @Nullable
     private Rectangle computeFrameBounds() {
-        if (!game.isFowMode() || displayType == DisplayType.landscape || displayType == DisplayType.stats) {
+        if (!game.isFowMode()
+                || game.getFowOption(FOWOption.CLASSIC_MAP_LAYOUT)
+                || displayType == DisplayType.landscape
+                || displayType == DisplayType.stats) {
             return null;
         }
         knownSystems = framedSystemPositions();

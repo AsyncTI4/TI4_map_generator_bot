@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -16,18 +17,19 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import javax.annotation.Nullable;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.image.MapOverviewGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.map.AddTileService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
@@ -36,8 +38,7 @@ class TestMapFraming extends GameStateSubcommand {
 
     private static final String PREFIX = "devMapFraming_";
     private static final String PREVIOUS_HOME_KEY = "devMapFramingPreviousHome";
-    private static final String CHECKLIST =
-            """
+    private static final String CHECKLIST = """
             ## Fog map framing: live test checklist
             Press buttons in **your private channel** (player view) unless a step says GM view.
             **A. Player view**
@@ -51,7 +52,7 @@ class TestMapFraming extends GameStateSubcommand {
             8. **Core + Fracture**: `Map: main` shows no Fracture tiles; `Map: fracture` shows only Fracture tiles, label `Map: fracture`, no stat blocks.
             9. **Corners**: `tl` pinned top-left, `br` not shown (unknown to you).
             **B. Split-map preference**
-            10. **Toggle my split-map preference** (on), **Post a real Refresh Map button**, press it: a normal message with Show Map / Show Player Stats / Show Full Map.
+            10. **Cycle my Refresh Map style** to `split`, **Post a real Refresh Map button**, press it: a normal message with Show Map / Show Player Stats / Show Full Map. Cycle to `split_private`: the same, but only visible to you.
             11. Repeat 3-4 with the preference on: Show Map and Show Full Map keep the sector and carry `Map:` buttons.
             **C. GM view** (**Show map (GM view, unfogged)**, or the GM room)
             12. **Two maps**: opens on the default `core`; **Cycle default sector** moves it to `south`.
@@ -60,9 +61,12 @@ class TestMapFraming extends GameStateSubcommand {
             **D. Commands**
             15. `/fow map_segment` (GM): lists sectors, automatic sectors, gap and default.
             16. `/show_game map_segment:` autocomplete: only known sectors in your private channel, all in the GM room (as GM).
-            17. `/user set_preferred_settings split_map_refresh:` and `/user show_user_settings`; Player Settings button in your cards-info thread shows the toggle.
+            17. `/user set_preferred_settings refresh_map_style:` and `/user show_user_settings`; **Player Settings** in your cards-info thread has a **Refresh Map Style** button with the three choices.
             **E. Normal game (not this one)**
-            18. `/show_game`, Refresh Map and a map-only view look exactly as before; with the split preference on, the prompt is private (ephemeral).
+            18. `/show_game`, Refresh Map and a map-only view look exactly as before; with Refresh Map style `split`, the prompt is private (ephemeral).
+            **F. GM options**
+            19. FoW option **Classic map layout** on, then **Show map (as me)**: full classic canvas (still fogged), no `Map:` label or sector buttons, corners in the canvas corners. Turn it off again.
+            20. **Two maps** + **Core + Fracture** tiles, then **GM overview with sector names** (or `/fow map_overview sector_names:true` in the GM room): the whole map incl. Fracture and corners, unfogged, scaled to one image, each sector tinted with its name. In a private channel the command refuses.
             """;
     private static final List<String> SYSTEM_TILE_IDS =
             IntStream.rangeClosed(19, 50).mapToObj(String::valueOf).toList();
@@ -81,7 +85,8 @@ class TestMapFraming extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Use this in a Fog of War test game: every layout wipes the map.");
             return;
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), describe(getGame(), getPlayer()), buttons());
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), describe(getGame(), getPlayer()), buttons());
     }
 
     private static List<Button> buttons() {
@@ -99,10 +104,11 @@ class TestMapFraming extends GameStateSubcommand {
         buttons.add(Buttons.blue(PREFIX + "revealSouth", "Give me vision at 1237"));
         buttons.add(Buttons.gray(PREFIX + "cycleGap", "Cycle cluster gap 0 > 1 > 2"));
         buttons.add(Buttons.gray(PREFIX + "cycleDefault", "Cycle default sector"));
-        buttons.add(Buttons.gray(PREFIX + "toggleSplitPref", "Toggle my split-map preference"));
+        buttons.add(Buttons.gray(PREFIX + "toggleSplitPref", "Cycle my Refresh Map style"));
         buttons.add(Buttons.blue(PREFIX + "show", "Show map (as me)"));
         buttons.add(Buttons.blue(PREFIX + "showAsGm", "Show map (GM view, unfogged)"));
         buttons.add(Buttons.blue(PREFIX + "postRefresh", "Post a real Refresh Map button"));
+        buttons.add(Buttons.blue(PREFIX + "overview", "GM overview with sector names"));
         buttons.add(Buttons.green(PREFIX + "checklist", "Test checklist"));
         buttons.add(Buttons.red(PREFIX + "wipe", "Wipe map and segments"));
         buttons.add(Buttons.gray("deleteButtons", "Done"));
@@ -150,6 +156,11 @@ class TestMapFraming extends GameStateSubcommand {
                         event.getMessageChannel(), "A real Refresh Map button:", Buttons.REFRESH_MAP);
                 return;
             }
+            case "overview" -> {
+                MessageHelper.sendFileUploadToChannel(
+                        event.getMessageChannel(), MapOverviewGenerator.createFileUpload(game, true));
+                return;
+            }
             case "checklist" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), CHECKLIST);
                 return;
@@ -164,8 +175,7 @@ class TestMapFraming extends GameStateSubcommand {
                 event.getMessageChannel(), "### `test_map_framing` → `" + action + "`\n" + describe(game, player));
     }
 
-    private static void showMap(
-            Game game, @Nullable ButtonInteractionEvent renderAs, ButtonInteractionEvent event) {
+    private static void showMap(Game game, @Nullable ButtonInteractionEvent renderAs, ButtonInteractionEvent event) {
         boolean foggedView = renderAs != null;
         MapRenderPipeline.queue(game, renderAs, DisplayType.all, fileUpload -> {
             List<Button> buttons = new ArrayList<>(Buttons.mapImageButtons(game));
@@ -187,7 +197,8 @@ class TestMapFraming extends GameStateSubcommand {
 
     private static void toggleSplitPreference(Player player) {
         UserSettings settings = player.getUserSettings();
-        settings.setPrefersSplitMapRefresh(!settings.isPrefersSplitMapRefresh());
+        RefreshMapStyle[] styles = RefreshMapStyle.values();
+        settings.setRefreshMapStyle(styles[(settings.getRefreshMapStyle().ordinal() + 1) % styles.length]);
         UserSettingsManager.save(settings);
     }
 
@@ -288,7 +299,8 @@ class TestMapFraming extends GameStateSubcommand {
                 + segments.size() + "** (default: " + defaultName + "), automatic sectors: **"
                 + MapSegment.isAutoSectors(game) + "**, gap: **" + MapSegment.gap(game)
                 + "**, separate Fracture: **" + game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP)
-                + "**, my split-map preference: **" + player.getUserSettings().isPrefersSplitMapRefresh() + "**.\n"
+                + "**, my Refresh Map style: **"
+                + player.getUserSettings().getRefreshMapStyle().getValue() + "**.\n"
                 + "Each layout wipes the map, places blue-back systems, sets your home system and a carrier there.\n"
                 + "Press **Test checklist** for the step-by-step scheme.";
     }

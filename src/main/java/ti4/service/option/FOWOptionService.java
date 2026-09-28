@@ -74,6 +74,10 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",
                 "Action card discard pile shows only cards that were played"),
+        CLASSIC_MAP_LAYOUT(
+                FOWOptionCategory.VISIBILITY,
+                "Classic map layout",
+                "Show the full classic map instead of framing it to what each player knows; map sectors are ignored"),
         FRACTURE_SEPARATE_MAP(
                 FOWOptionCategory.VISIBILITY,
                 "Separate Fracture map",
