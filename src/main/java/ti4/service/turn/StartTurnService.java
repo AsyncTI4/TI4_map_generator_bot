@@ -116,7 +116,7 @@ public class StartTurnService {
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("audioSent");
-        game.checkSOLimit(player);
+        Game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         boolean goingToPass = false;
@@ -542,7 +542,7 @@ public class StartTurnService {
             }
             if (MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
                     && MonumentsDSButtonHandler.hasTwoReadiedCorePlanets(player, game)
-                    && game.getLaws().size() > 0) {
+                    && !game.getLaws().isEmpty()) {
                 startButtons.add(MonumentsDSButtonHandler.getVerdantHaloButton(player));
             }
             Tile oasisTile = MonumentsService.getMonumentTile(game, player, "uydai_monument");

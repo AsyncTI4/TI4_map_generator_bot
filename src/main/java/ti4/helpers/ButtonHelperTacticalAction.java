@@ -282,6 +282,7 @@ public final class ButtonHelperTacticalAction {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                                 if (player.getPlanets().contains(planet.getName())) {
                                     control = true;
+                                    break;
                                 }
                             }
                         }
@@ -289,6 +290,7 @@ public final class ButtonHelperTacticalAction {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                                 if (player.getPlanets().contains(planet.getName())) {
                                     control = true;
+                                    break;
                                 }
                             }
                         }

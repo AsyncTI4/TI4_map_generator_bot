@@ -74,9 +74,12 @@ public class TEOptionService {
             // those drafts would (map, factions, positions, seat/speaker order), so the splice on its own is
             // the RAW-style option here - players still draft their abilities/units/genomes.
             buttons.add(Buttons.gray("startTFDraft_splice", "Inaugural Splice Only (abilities/units/genomes)"));
-            msg += "\n\n-# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker "
-                    + "order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the "
-                    + "RAW-style flow once the wizard has assigned factions and positions.";
+            msg += """
+
+
+                -# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker \
+                order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the \
+                RAW-style flow once the wizard has assigned factions and positions.""";
         }
         buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -278,18 +281,18 @@ public class TEOptionService {
                     }
                 }
                 Collections.shuffle(allCards);
-                String msg = "The following abilities have been banned:\n";
+                StringBuilder msg = new StringBuilder("The following abilities have been banned:\n");
                 for (int x = 0; x < allCards.size() / 2; x++) {
                     BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
-                    msg += Mapper.getTech(allCards.get(x)).getName() + "\n";
+                    msg.append(Mapper.getTech(allCards.get(x)).getName()).append("\n");
                 }
-                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg);
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg.toString());
             }
             case "pruned" -> {
                 MessageHelper.sendMessageToChannel(homebrewChannel(game), "Chose to just use a pruned deck of units.");
                 List<String> allCards = Mapper.getDeck("twilight_kart_units").getNewShuffledDeck();
                 game.removeStoredValue("bannedUnits");
-                String msg = "The following units have been banned:\n";
+                StringBuilder msg = new StringBuilder("The following units have been banned:\n");
                 Map<UnitType, Integer> unitCount = new HashMap<>();
 
                 for (String unit : allCards) {
@@ -298,10 +301,10 @@ public class TEOptionService {
                     unitCount.put(type, unitCount.getOrDefault(type, 0) + 1);
                     if (unitCount.get(type) > 4) {
                         BanService.appendStoredValue(game, "bannedUnits", unit);
-                        msg += un.getName() + "\n";
+                        msg.append(un.getName()).append("\n");
                     }
                 }
-                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg);
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg.toString());
             }
         }
         ButtonHelper.deleteMessage(event);

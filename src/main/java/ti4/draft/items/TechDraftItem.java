@@ -86,8 +86,7 @@ public class TechDraftItem extends DraftItem {
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedTechs"));
         if (game.isTwilightsFallMode()) {
             DeckModel deck = Mapper.getDeck(game.getAbilitySpliceDeckID());
-            List<String> allCards = new ArrayList<>();
-            allCards.addAll(deck.getCardIDs());
+            List<String> allCards = new ArrayList<>(deck.getCardIDs());
             if (game.isTwilightDS()) {
                 for (TechnologyModel tech : Mapper.getTechs().values()) {
                     if (tech.getSource() == ComponentSource.twilight_ds) {

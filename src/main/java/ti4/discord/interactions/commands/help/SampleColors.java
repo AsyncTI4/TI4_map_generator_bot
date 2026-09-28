@@ -104,8 +104,7 @@ class SampleColors extends Subcommand {
         int y = top;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage =
-                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
+        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getExtraFile("starfield.png"));
         Graphics graphic = coloursImage.getGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
 

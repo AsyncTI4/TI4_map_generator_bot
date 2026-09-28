@@ -168,7 +168,7 @@ public class GameStatsDashboardPayload {
         return GameModeService.getModes(game);
     }
 
-    public String getPlatform() {
+    public static String getPlatform() {
         return "asyncti4";
     }
 

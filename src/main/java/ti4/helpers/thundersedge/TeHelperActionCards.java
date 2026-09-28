@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -49,6 +50,7 @@ import ti4.service.unit.RemoveUnitService;
 public class TeHelperActionCards {
 
     public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static void nop() {}
 
@@ -57,7 +59,7 @@ public class TeHelperActionCards {
         String ffcc = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
 
-        switch (card.getAlias().replaceAll("\\d", "")) {
+        switch (DIGIT_PATTERN.matcher(card.getAlias()).replaceAll("")) {
             case "blackmarketdealing" ->
                 buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));

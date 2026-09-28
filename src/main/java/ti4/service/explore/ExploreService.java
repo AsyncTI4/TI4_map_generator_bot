@@ -1419,22 +1419,20 @@ public class ExploreService {
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
             }
-            case "objectivedeliberations" -> {
+            case "objectivedeliberations" ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation()
                                 + ", please resolve _Objective Deliberations_.\n-# You have " + player.getTg() + " "
                                 + (player.getTg() > 1 ? "trade goods." : "trade good."),
                         LostLegciesExploreHandler.offerObjectiveDeliberationButtons(event, game, player));
-            }
-            case "explorationenclave" -> {
+            case "explorationenclave" ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation()
                                 + ", please resolve _Exploration Enclave_.\n-# You have " + player.getTg() + " "
                                 + (player.getTg() > 1 ? "trade goods." : "trade good."),
                         LostLegciesExploreHandler.getExplorationEnclaveButtons(event, game, player));
-            }
             case "synergisticresearch" -> {
                 var breakthrough = player.getBreakthroughModel();
                 if (!player.hasUnlockedBreakthrough(player.getBreakthroughID())) {

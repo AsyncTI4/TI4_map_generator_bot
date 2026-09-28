@@ -436,7 +436,6 @@ public final class FowSetupWizardService {
                 *opens to* next time (back to Game Type) - it does not undo or clear any answers you've \
                 already given (factions, map, dice rolls, toggles, etc.), those all stay exactly as set.
                 """;
-            default -> null;
         };
     }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import ti4.message.MessageHelper;
 
@@ -11,6 +12,7 @@ class MatchmakingRatingHistoryTest {
 
     private static final String TRACKED_USER_ID = "u0";
     private static final long DAY_MILLIS = 86_400_000L;
+    private static final Pattern PATTERN = Pattern.compile("```");
 
     @Test
     void finalHistoryRatingMatchesLadderRating() {
@@ -50,7 +52,7 @@ class MatchmakingRatingHistoryTest {
         for (String message : messages) {
             assertThat(message.length()).isLessThanOrEqualTo(2000);
             // An odd number of fences would leave a code block open across messages.
-            assertThat(message.split("```", -1).length % 2).isEqualTo(1);
+            assertThat(PATTERN.split(message, -1).length % 2).isEqualTo(1);
             assertThat(message).contains("Game").contains("Change");
         }
     }

@@ -2654,7 +2654,7 @@ public class ActionCardHelper {
                 player.getRepresentationUnfogged() + ", use buttons to retrieve an action card from the discard pile.");
     }
 
-    public static void pickACardFromDiscardStep1(Game game, Player player, String buttonPrefix, String message) {
+    private static void pickACardFromDiscardStep1(Game game, Player player, String buttonPrefix, String message) {
         pickACardFromDiscardStep1(game, player, buttonPrefix, message, player.getCardsInfoThread());
     }
 

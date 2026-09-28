@@ -172,7 +172,7 @@ public class MonumentsTEButtonHandler {
                         KELERES_MONUMENT_COMMAND_TOKENS + player.getFaction(), Integer.toString(remainingTokens));
             }
         }
-        CommandCounterHelper.addCC(event, player, tile, ping, useMonumentToken ? false : useTactic, true);
+        CommandCounterHelper.addCC(event, player, tile, ping, !useMonumentToken && useTactic, true);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -384,10 +384,7 @@ public class MonumentsTEButtonHandler {
     }
 
     public static void offerEpiphanyResearchButtons(Game game, Player player, TechnologyModel technology) {
-        if (game == null
-                || player == null
-                || technology == null
-                || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
+        if (player == null || technology == null || !MonumentsService.hasMonument(game, player, "firmament_monument")) {
             return;
         }
         List<String> controlTokens = getEpiphanyControlTokens(game, player);

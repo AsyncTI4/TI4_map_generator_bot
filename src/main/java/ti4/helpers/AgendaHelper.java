@@ -89,7 +89,7 @@ import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
 public final class AgendaHelper {
-    public static final String AGENDA_START_VOTE_COUNTS = "agendaStartVoteCounts";
+    private static final String AGENDA_START_VOTE_COUNTS = "agendaStartVoteCounts";
 
     private static void pingAboutDebt(Game game) {
         if (game.isHiddenAgendaMode() || !game.getStoredValue("executiveOrder").isEmpty()) {
@@ -3034,7 +3034,7 @@ public final class AgendaHelper {
         return sb.toString();
     }
 
-    public static Map<String, Integer> getVoteCountByColor(Game game) {
+    private static Map<String, Integer> getVoteCountByColor(Game game) {
         Map<String, Integer> voteCounts = new LinkedHashMap<>();
         for (Player player : getVotingOrder(game)) {
             if (player.getColor() != null && !player.getColor().isBlank()) {

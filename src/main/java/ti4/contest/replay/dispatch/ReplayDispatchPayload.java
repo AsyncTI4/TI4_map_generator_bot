@@ -19,12 +19,6 @@ import ti4.contest.replay.core.CombatRollPayload;
     @JsonSubTypes.Type(value = ReplayDispatchPayload.TileRenderMessageDispatch.class, name = "TILE_RENDER_MESSAGE"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.CombatRollDispatch.class, name = "COMBAT_ROLL")
 })
-/**
- * Canonical persisted replay action model.
- *
- * <p>Most replay events store the exact Discord message payload to resend later, while hit assignment keeps the
- * custom image-rendering inputs.
- */
 public interface ReplayDispatchPayload {
 
     static ReplayDispatchPayload genericMessage(String content) {

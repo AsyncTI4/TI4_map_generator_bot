@@ -1028,7 +1028,7 @@ public class MessageHelper {
         StringBuilder message = new StringBuilder();
         for (String block : blocks) {
             if (block == null || block.isEmpty()) continue;
-            if (message.length() + block.length() > maxLength && message.length() > 0) {
+            if (message.length() + block.length() > maxLength && !message.isEmpty()) {
                 messages.add(message.toString());
                 message.setLength(0);
             }
@@ -1041,7 +1041,7 @@ public class MessageHelper {
             }
             message.append(block);
         }
-        if (message.length() > 0) {
+        if (!message.isEmpty()) {
             messages.add(message.toString());
         }
         return messages;

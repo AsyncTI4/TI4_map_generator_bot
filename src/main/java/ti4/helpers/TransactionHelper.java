@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -2501,7 +2502,7 @@ public class TransactionHelper {
         return player.getFragments().stream()
                 .filter(fragmentId -> fragmentId.startsWith("supermassive"))
                 .map(Mapper::getExplore)
-                .filter(fragment -> fragment != null)
+                .filter(Objects::nonNull)
                 .map(fragment -> switch (fragment.getType().toLowerCase()) {
                     case "cultural" ->
                         Buttons.blue(buttonPrefix + fragment.getAlias(), fragment.getName(), ExploreEmojis.CFrag);

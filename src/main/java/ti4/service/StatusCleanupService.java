@@ -260,7 +260,7 @@ public class StatusCleanupService {
                     thread.getManager().setArchived(true).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception _) {
         }
     }
 }

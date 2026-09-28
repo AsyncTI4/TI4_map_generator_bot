@@ -133,7 +133,7 @@ public class UserSettings {
         activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
-    public String summarizeActiveHours(String activity) {
+    public static String summarizeActiveHours(String activity) {
         Set<Integer> hotHours = getHotHours(activity);
         if (hotHours.isEmpty()) {
             return null;
@@ -177,7 +177,7 @@ public class UserSettings {
         return result.isEmpty() ? null : result.toString();
     }
 
-    public String summarizeActiveHoursEmoji(String activity) {
+    public static String summarizeActiveHoursEmoji(String activity) {
         Set<Integer> hotHours = getHotHours(activity);
         if (hotHours.isEmpty()) {
             return "Not enough data.";

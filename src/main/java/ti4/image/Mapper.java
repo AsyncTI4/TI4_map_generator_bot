@@ -194,7 +194,7 @@ public class Mapper {
 
     private static void readData(String propertyFileName, Properties properties) throws IOException {
         properties.clear();
-        String propFile = ResourceHelper.getInstance().getDataFile(propertyFileName);
+        String propFile = ResourceHelper.getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
@@ -207,7 +207,7 @@ public class Mapper {
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(
             String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
-        String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
+        String folderPath = ResourceHelper.getDataFolder(jsonFolderName);
         // Added to prevent duplicates when running Mapper.init() over and over with ModelTest classes
         objectMap.clear();
 
@@ -257,7 +257,7 @@ public class Mapper {
     private static <T extends ModelInterface> void importJsonObjects(
             String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         List<T> allObjects = new ArrayList<>();
-        String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
+        String filePath = ResourceHelper.getDataFile(jsonFileName);
         JavaType type = jsonMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
 
         if (filePath != null) {
@@ -1542,8 +1542,7 @@ public class Mapper {
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
-        WormholeModel wormholeModel = new WormholeModel();
-        WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        WormholeModel.Wormhole wormhole = WormholeModel.getWormholeFromString(wormholeID);
         if (wormhole == null) {
             return new HashSet<>();
         }

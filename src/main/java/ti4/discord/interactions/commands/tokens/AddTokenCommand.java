@@ -52,13 +52,13 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
     public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game game) {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String tokenFileName = Mapper.getAttachmentImagePath(tokenName);
-        String tokenPath = tile.getAttachmentPath(tokenFileName);
+        String tokenPath = Tile.getAttachmentPath(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
             addToken(event, tile, tokenFileName, true, game);
         } else {
             tokenName = AliasHandler.resolveToken(tokenName);
             tokenFileName = Mapper.getTokenID(tokenName);
-            tokenPath = tile.getTokenPath(tokenFileName);
+            tokenPath = Tile.getTokenPath(tokenFileName);
 
             if (tokenPath == null) {
                 MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");

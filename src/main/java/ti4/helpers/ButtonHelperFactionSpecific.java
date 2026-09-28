@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1613,7 +1616,7 @@ public final class ButtonHelperFactionSpecific {
         int hitRolls = DiceHelper.countSuccesses(resultRolls);
         totalHits += hitRolls;
         String unitRoll = CombatMessageHelper.displayUnitRoll(
-                player.getUnitByID("belkosea_flagship"),
+                Player.getUnitByID("belkosea_flagship"),
                 toHit,
                 modifierToHit,
                 1,
@@ -3112,9 +3115,9 @@ public final class ButtonHelperFactionSpecific {
 
     public static void resolveKolleccAbilities(Player player, Game game) {
         if (player.hasAbility("treasure_hunters") && game.isTwilightDS()) {
-            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "industrial");
-            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "hazardous");
-            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "cultural");
+            resolveExpLook(player, game, null, "industrial");
+            resolveExpLook(player, game, null, "hazardous");
+            resolveExpLook(player, game, null, "cultural");
         }
         if (player.hasAbility("treasure_hunters") && !game.isTwilightDS()) {
             // resolve treasure hunters

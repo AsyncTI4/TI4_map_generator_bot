@@ -367,16 +367,16 @@ public class FrankenSettings extends SettingsMenu {
         if (!banAllDsFactions.isVal()) {
             Mapper.getFactionsValues().stream()
                     .filter(f -> f.getSource() == ComponentSource.ds)
-                    .filter(f -> !ALWAYS_DISABLED_FACTIONS.contains(f.getAlias()))
                     .map(FactionModel::getAlias)
+                    .filter(alias -> !ALWAYS_DISABLED_FACTIONS.contains(alias))
                     .forEach(effectiveBans::add);
         }
 
         if (!banAllBrFactions.isVal()) {
             Mapper.getFactionsValues().stream()
                     .filter(f -> f.getSource() == ComponentSource.blue_reverie)
-                    .filter(f -> !ALWAYS_DISABLED_FACTIONS.contains(f.getAlias()))
                     .map(FactionModel::getAlias)
+                    .filter(alias -> !ALWAYS_DISABLED_FACTIONS.contains(alias))
                     .forEach(effectiveBans::add);
         }
         List<String> values = effectiveBans.stream()

@@ -2,6 +2,7 @@ package ti4.image;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
@@ -81,7 +82,7 @@ class MapGeneratorFrameTest extends BaseTi4Test {
         try (MapGenerator generator = render(game, DisplayType.map, "core")) {
             assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
             assertEquals(MapGenerator.getMapHeight(game) + STRIP, generator.imageHeight());
-            assertEquals(null, generator.shownSegmentName(), "sectors are ignored");
+            assertNull(generator.shownSegmentName(), "sectors are ignored");
         }
     }
 

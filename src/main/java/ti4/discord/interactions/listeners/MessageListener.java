@@ -47,7 +47,7 @@ class MessageListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
-    private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
+    private static final Pattern TRAILING_NON_ALPHANUMERIC_PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
     // The mention itself is 23 characters long
     private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 53;
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
@@ -228,7 +228,7 @@ class MessageListener extends ListenerAdapter {
         if (lfgRole == null || !message.getContentRaw().contains(lfgRole.getAsMention())) {
             return false;
         }
-        if (message.getAttachments().size() > 0 && !(event.getChannel() instanceof ThreadChannel)) {
+        if (!message.getAttachments().isEmpty() && !(event.getChannel() instanceof ThreadChannel)) {
             Member member = event.getMember();
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
@@ -302,8 +302,8 @@ class MessageListener extends ListenerAdapter {
                     }
 
                     String messageLowerCase = messageText.toLowerCase();
-                    String receivingColorOrFaction = PATTERN.matcher(
-                                    StringUtils.substringBetween(messageLowerCase, "to", " "))
+                    String receivingColorOrFaction = TRAILING_NON_ALPHANUMERIC_PATTERN
+                            .matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
                             .replaceAll("");
 
                     if ("futureme".equals(receivingColorOrFaction)) {

@@ -245,7 +245,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         return true;
     }
 
-    public void expandFactionPackages(Game game) {
+    public static void expandFactionPackages(Game game) {
         for (Player player : game.getRealPlayers()) {
             DraftBag hand = player.getDraftHand();
             Map<String, DraftItem> expanded = new LinkedHashMap<>();
@@ -292,11 +292,11 @@ public class FrankenDrazDraft extends FrankenDraft {
     private static void showFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
         if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
             String faction = buttonID.split(";")[1];
-            frankenDrazDraft.sendFactionComponentCards(event, player, faction);
+            FrankenDrazDraft.sendFactionComponentCards(event, player, faction);
         }
     }
 
-    public void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
+    public static void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
         FactionDraftItem item = new FactionDraftItem(faction);
         List<DraftItem> components = item.getComponents(player.getGame());
         if (components.isEmpty()) {
@@ -418,7 +418,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         return getOwner().getRealPlayers();
     }
 
-    private List<Button> getPostDraftCategoryButtons(Player player) {
+    private static List<Button> getPostDraftCategoryButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         for (DraftCategory category : POST_DRAFT_COMPONENT_CATEGORIES) {
             if (category == DraftCategory.MONUMENT && !player.getGame().isMonumentsMode()) {

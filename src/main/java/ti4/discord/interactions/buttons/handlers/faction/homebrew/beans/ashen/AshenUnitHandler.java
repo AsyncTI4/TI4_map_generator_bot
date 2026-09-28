@@ -221,7 +221,7 @@ public class AshenUnitHandler {
         offerAshfallEngineButtons(event, game, player, tile, planets, false, unit.getTotalRemoved(), um.getId());
     }
 
-    public static void offerAshfallEngineButtons(
+    private static void offerAshfallEngineButtons(
             GenericInteractionCreateEvent event,
             Game game,
             Player player,

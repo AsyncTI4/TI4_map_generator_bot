@@ -9,7 +9,7 @@ import ti4.helpers.Units;
 
 class UnitHolderTest {
 
-    private int sum(List<Integer> vals) {
+    private static int sum(List<Integer> vals) {
         return vals.stream().mapToInt(i -> i).sum();
     }
 

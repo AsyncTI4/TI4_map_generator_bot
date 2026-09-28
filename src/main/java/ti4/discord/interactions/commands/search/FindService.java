@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.search;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,6 +23,7 @@ public class FindService {
     private static final String ALL = "all";
     private static final Set<ComponentSource> DEFAULT_SOURCES =
             Set.of(ComponentSource.base, ComponentSource.pok, ComponentSource.thunders_edge);
+    private static final Pattern NON_ALPHANUMERIC_SEPARATOR_PATTERN = Pattern.compile("[^a-z0-9]+");
 
     public static void execute(SlashCommandInteractionEvent event) {
         String typeKey = event.getOption(Constants.SEARCH_TYPE, null, OptionMapping::getAsString);
@@ -194,14 +196,14 @@ public class FindService {
 
     private static List<String> words(String value) {
         if (value == null) return List.of();
-        return Stream.of(value.toLowerCase().split("[^a-z0-9]+"))
+        return Stream.of(NON_ALPHANUMERIC_SEPARATOR_PATTERN.split(value.toLowerCase()))
                 .filter(StringUtils::isNotBlank)
                 .toList();
     }
 
     private static String normalize(String value) {
         if (value == null) return "";
-        return value.toLowerCase().replaceAll("[^a-z0-9]+", "");
+        return NON_ALPHANUMERIC_SEPARATOR_PATTERN.matcher(value.toLowerCase()).replaceAll("");
     }
 
     private record RankedItem(FindItem item, int score) {}

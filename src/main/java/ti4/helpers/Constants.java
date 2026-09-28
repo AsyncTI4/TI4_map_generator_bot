@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static java.util.Map.*;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public final class Constants {
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
 
-    public static final Map<String, String> EMOJI_FARM_SERVERS = Map.ofEntries(
+    public static final Map<String, String> EMOJI_FARM_SERVERS = ofEntries(
             entry("1155639926675746886", "Emoji Farm 1"),
             entry("1156671516784730314", "Emoji Farm 2"),
             entry("1156686770436591637", "Emoji Farm 3"),

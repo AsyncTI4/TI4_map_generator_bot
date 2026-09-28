@@ -188,7 +188,7 @@ public abstract class DraftItem {
         List<TextDisplay> textFields = new ArrayList<>();
 
         String details = getTitle(game);
-        if (showDescr || ItemCategory.showDescrByDefault()) {
+        if (showDescr || DraftCategory.showDescrByDefault()) {
             String descr = getDisplayDescription(game, getLongDescriptionImpl(game));
             descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;

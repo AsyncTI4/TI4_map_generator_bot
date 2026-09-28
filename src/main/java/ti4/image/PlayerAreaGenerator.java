@@ -158,7 +158,7 @@ public class PlayerAreaGenerator {
         }
     }
 
-    private void drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
+    private static void drawString(Graphics2D g2, String text, int x, int y, float maxWidth) {
         var attributedString = new AttributedString(text);
         attributedString.addAttribute(TextAttribute.FONT, g2.getFont());
         AttributedCharacterIterator characterIterator = attributedString.getIterator();
@@ -459,7 +459,7 @@ public class PlayerAreaGenerator {
         return r;
     }
 
-    private String factionDisplayName(Player player) {
+    private static String factionDisplayName(Player player) {
         StringBuilder text = new StringBuilder();
         if (player.getDisplayName() != null && !"null".equalsIgnoreCase(player.getDisplayName())) {
             text.append("[").append(player.getDisplayName()).append("]");
@@ -486,7 +486,7 @@ public class PlayerAreaGenerator {
 
             if (member != null) return member.getEffectiveName() + afk;
             return user.getEffectiveName() + afk;
-        } catch (Exception e) {
+        } catch (Exception _) {
         }
         return player.getUserName() + afk;
     }
@@ -692,7 +692,7 @@ public class PlayerAreaGenerator {
         return xDelta;
     }
 
-    private int getPlotCardColumnCount(List<Entry<String, Integer>> plots) {
+    private static int getPlotCardColumnCount(List<Entry<String, Integer>> plots) {
         return Math.max(1, (plots.size() + 4) / 5);
     }
 
@@ -1337,7 +1337,7 @@ public class PlayerAreaGenerator {
             String relicStatus = isExhausted ? "_exh" : "_rdy";
 
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
+            String resourcePath = ResourceHelper.getPAResource(relicFileName);
             BufferedImage resourceBufferedImage;
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
@@ -1740,7 +1740,7 @@ public class PlayerAreaGenerator {
                 if (abilityFileName != null) {
                     String status = isExhaustedLocked ? "_exh" : "_rdy";
                     abilityFileName += status + ".png";
-                    String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+                    String resourcePath = ResourceHelper.getPAResource(abilityFileName);
 
                     BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
@@ -3271,7 +3271,7 @@ public class PlayerAreaGenerator {
         return xDeltaFromRightSide;
     }
 
-    private String hasInfantryII(List<String> techs) {
+    private static String hasInfantryII(List<String> techs) {
         if (techs == null) {
             return null;
         }
@@ -3371,7 +3371,7 @@ public class PlayerAreaGenerator {
                 if (zealotsHeroActive && zealotsTechs.contains(tech)) {
                     String path = "pa_tech_unitsnew_zealots_" + tech + ".png";
                     try {
-                        path = ResourceHelper.getInstance().getPAResource(path);
+                        path = ResourceHelper.getPAResource(path);
                         BufferedImage img = ImageHelper.read(path);
                         graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                     } catch (Exception e) {
@@ -3436,7 +3436,7 @@ public class PlayerAreaGenerator {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 String path = "pa_tech_unitsnew_zealotspurged_" + tech + ".png";
                 try {
-                    path = ResourceHelper.getInstance().getPAResource(path);
+                    path = ResourceHelper.getPAResource(path);
                     BufferedImage img = ImageHelper.read(path);
                     graphics.drawImage(img, deltaX + x + unitOffset.x, y + unitOffset.y, null);
                 } catch (Exception e) {
@@ -3571,15 +3571,16 @@ public class PlayerAreaGenerator {
         return deltaX;
     }
 
-    private void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
+    private static void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
         drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, false);
     }
 
-    private void drawFactionIconImageBorder(Graphics graphics, String faction, int x, int y, int width, int height) {
+    private static void drawFactionIconImageBorder(
+            Graphics graphics, String faction, int x, int y, int width, int height) {
         drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, true);
     }
 
-    private void drawFactionIconImageBorder(
+    private static void drawFactionIconImageBorder(
             Graphics graphics, String faction, int x, int y, int width, int height, boolean border) {
         drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, border);
     }
@@ -3665,7 +3666,7 @@ public class PlayerAreaGenerator {
 
     public static Rectangle drawPAImage(Graphics g, int x, int y, String resourceName) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            String resourcePath = ResourceHelper.getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             g.drawImage(resourceBufferedImage, x, y, null);
             if (resourceBufferedImage != null)
@@ -3705,7 +3706,7 @@ public class PlayerAreaGenerator {
 
     public static void drawPAImageScaled(Graphics graphics, int x, int y, String resourceName, int width, int height) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            String resourcePath = ResourceHelper.getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
@@ -3715,7 +3716,7 @@ public class PlayerAreaGenerator {
 
     private void drawPAImageOpaque(int x, int y, String resourceName, float opacity) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            String resourcePath = ResourceHelper.getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));

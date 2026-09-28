@@ -30,6 +30,6 @@ class Skulls extends GameStateSubcommand {
 
     @Override
     public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return false;
+        return super.isSuspicious(event);
     }
 }

@@ -43,7 +43,7 @@ public class FlipTileService {
             }
 
             String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            String tilePath = ResourceHelper.getTileFile(tileName);
             if (tilePath == null) {
                 if (event == null) throw new IllegalStateException("Could not find tile: " + planetTileName);
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
@@ -63,7 +63,7 @@ public class FlipTileService {
             }
 
             String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            String tilePath = ResourceHelper.getTileFile(tileName);
             if (tilePath == null) {
                 if (event == null) throw new IllegalStateException("Could not find tile: " + planetTileName);
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
