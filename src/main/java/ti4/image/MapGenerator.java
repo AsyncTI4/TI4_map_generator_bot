@@ -83,6 +83,9 @@ public class MapGenerator implements AutoCloseable {
     private static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
     private static final int EXPEDITION_TRACKER_RIGHT_OFFSET = 1200;
     private static final int SEGMENT_LABEL_SPACE = 150;
+    private static final int CORNER_MARGIN = 20;
+    private static final int CORNER_TOP = 60;
+    private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -130,6 +133,11 @@ public class MapGenerator implements AutoCloseable {
     private Set<String> segmentDrawPositions;
 
     private final Set<String> framedStatFactions = new HashSet<>();
+
+    private Set<String> pinnedCorners = Set.of();
+
+    @Nullable
+    private Rectangle frameContent;
 
     @Nullable
     private final MapFrame mapFrame;
@@ -215,6 +223,11 @@ public class MapGenerator implements AutoCloseable {
         if (frameBounds != null && segmentLabel(true) != null) {
             frameBounds.y -= SEGMENT_LABEL_SPACE;
             frameBounds.height += SEGMENT_LABEL_SPACE;
+        }
+        if (frameBounds != null) {
+            pinnedCorners = cornersToPin();
+            makeRoomForPinnedCorners(frameBounds);
+            frameContent = frameBounds;
         }
 
         // Width of map section
@@ -316,6 +329,27 @@ public class MapGenerator implements AutoCloseable {
             return DisplayType.all;
         }
         return displayType;
+    }
+
+    int imageWidth() {
+        return width;
+    }
+
+    int imageHeight() {
+        return height;
+    }
+
+    @Nullable
+    String shownSegmentName() {
+        return shownSegment == null ? null : shownSegment.name();
+    }
+
+    Set<String> pinnedCorners() {
+        return pinnedCorners;
+    }
+
+    int frameContentWidth() {
+        return frameContent == null ? 0 : frameContent.width;
     }
 
     FileUpload createFileUpload() {
@@ -462,6 +496,44 @@ public class MapGenerator implements AutoCloseable {
         return MapFrame.bounds(game, positions, fractureYbump, EXTRA_X, EXTRA_Y);
     }
 
+    private Set<String> cornersToPin() {
+        if (isShowingSeparateFracture()) {
+            return Set.of();
+        }
+        Set<String> corners = new HashSet<>();
+        tilesToDisplay.forEach((position, tile) -> {
+            if (CORNER_POSITIONS.contains(position.toLowerCase()) && !isUnseenBlankFogTile(tile)) {
+                corners.add(position);
+            }
+        });
+        return corners;
+    }
+
+    private void makeRoomForPinnedCorners(Rectangle bounds) {
+        int column = TileGenerator.TILE_WIDTH + CORNER_MARGIN;
+        if (isPinned("tl") || isPinned("bl")) {
+            bounds.x -= column;
+            bounds.width += column;
+        }
+        if (isPinned("tr") || isPinned("br")) {
+            bounds.width += column;
+        }
+    }
+
+    private boolean isPinned(String corner) {
+        return pinnedCorners.stream().anyMatch(corner::equalsIgnoreCase);
+    }
+
+    Point pinnedCornerTileOrigin(String corner) {
+        int contentLeft = Math.max(0, frameContent.x - mapFrame.offsetX());
+        int contentRight = Math.min(mapFrame.width(), frameContent.x + frameContent.width - mapFrame.offsetX());
+        boolean left = "tl".equalsIgnoreCase(corner) || "bl".equalsIgnoreCase(corner);
+        boolean top = "tl".equalsIgnoreCase(corner) || "tr".equalsIgnoreCase(corner);
+        int hexLeft = left ? contentLeft + CORNER_MARGIN : contentRight - CORNER_MARGIN - TileGenerator.TILE_WIDTH;
+        int hexTop = top ? CORNER_TOP : mapFrame.height() - CORNER_MARGIN - TileGenerator.TILE_HEIGHT;
+        return new Point(hexLeft - TILE_PADDING, hexTop - TILE_PADDING);
+    }
+
     private int layoutWidthFor(int frameContentWidth) {
         int contentWidth = Math.min(frameContentWidth, MapFrame.MAX_WIDTH);
         for (int rings = RING_MIN_COUNT; rings <= RING_MAX_COUNT; rings++) {
@@ -477,8 +549,8 @@ public class MapGenerator implements AutoCloseable {
         return shownSegment != null && shownSegment.isFracture();
     }
 
-    private boolean isInShownRegion(@Nullable String position) {
-        if (position == null || mapFrame == null) {
+    boolean isInShownRegion(@Nullable String position) {
+        if (position == null || mapFrame == null || pinnedCorners.contains(position)) {
             return true;
         }
         if (segmentDrawPositions != null) {
@@ -2819,7 +2891,11 @@ public class MapGenerator implements AutoCloseable {
             positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y, fractureYbump);
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING - frameOffsetX();
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING - frameOffsetY();
-            if (isOutsideFrame(tileX, tileY)) {
+            if (mapFrame != null && pinnedCorners.contains(position)) {
+                Point pinned = pinnedCornerTileOrigin(position);
+                tileX = pinned.x;
+                tileY = pinned.y;
+            } else if (isOutsideFrame(tileX, tileY)) {
                 return;
             }
 
@@ -2869,7 +2945,7 @@ public class MapGenerator implements AutoCloseable {
      * @param game
      * @return space for the (number of rings + 1) + 2 * EXTRA_Y
      */
-    private static int getMapHeight(Game game) {
+    static int getMapHeight(Game game) {
         return getMapHeight(getRingCount(game));
     }
 
@@ -2894,11 +2970,11 @@ public class MapGenerator implements AutoCloseable {
      * @param game
      * @return space for ring count + 2 * EXTRA_X + potential EXTRA_X
      */
-    private static int getMapWidth(Game game) {
+    static int getMapWidth(Game game) {
         return getMapWidth(game, getRingCount(game));
     }
 
-    private static int getMapWidth(Game game, int rings) {
+    static int getMapWidth(Game game, int rings) {
         float ringCount = rings;
         ringCount += ringCount == RING_MIN_COUNT
                 ? 1.5f

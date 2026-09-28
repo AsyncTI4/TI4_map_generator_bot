@@ -67,7 +67,7 @@ public class ShowGameService {
 
         MapRenderPipeline.queue(game, event, displayType, segment, fileUpload -> {
             if (includeButtons(displayType)) {
-                List<Button> buttons = Buttons.mapImageButtons(game);
+                List<Button> buttons = Buttons.mapImageButtons(game, segment);
                 buttons.addAll(
                         MapSegmentService.switchButtons(game, playerId, MapSegmentService.isFoggedView(game, event)));
 

@@ -91,6 +91,16 @@ class MapSegmentServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void segmentTravelsThroughAButtonIdAndBack() {
+        assertEquals("showMap", MapSegmentService.withSegment("showMap", null));
+        assertEquals("showMap_ursa-major", MapSegmentService.withSegment("showMap", "ursa-major"));
+
+        assertEquals("ursa-major", MapSegmentService.segmentFrom("showMap_ursa-major", "showMap"));
+        assertEquals(null, MapSegmentService.segmentFrom("showMap", "showMap"), "no segment in the id");
+        assertEquals(null, MapSegmentService.segmentFrom("showMap_Not Valid!", "showMap"), "invalid names are ignored");
+    }
+
+    @Test
     void nonPlayersGetNothingInAFoggedView() {
         MapSegment.put(game, new MapSegment("core", "000", 1));
         assertTrue(MapSegmentService.viewableNames(game, "stranger", true).isEmpty());

@@ -57,6 +57,7 @@ class TestMapFraming extends GameStateSubcommand {
         buttons.add(Buttons.green(PREFIX + "twoMaps", "Two maps + segments (000 / 1237)"));
         buttons.add(Buttons.green(PREFIX + "overCap", "Over cap: 1201 and 1237, no segments"));
         buttons.add(Buttons.green(PREFIX + "longStrip", "Long strip 1201-1237, home at 1201"));
+        buttons.add(Buttons.green(PREFIX + "corners", "Core + corner tiles tl/br, carrier at tl"));
         buttons.add(Buttons.green(PREFIX + "autoSectors", "Three clusters, automatic sectors on"));
         buttons.add(Buttons.gray(PREFIX + "toggleAutoSectors", "Toggle automatic sectors"));
         buttons.add(Buttons.green(PREFIX + "fracture", "Core + Fracture (separate map option on)"));
@@ -88,6 +89,7 @@ class TestMapFraming extends GameStateSubcommand {
             case "longStrip" -> buildLayout(game, player, longStrip(), "1201");
             case "fracture" -> buildFracture(game, player);
             case "autoSectors" -> buildAutoSectors(game, player);
+            case "corners" -> buildCorners(game, player);
             case "toggleAutoSectors" -> MapSegment.setAutoSectors(game, !MapSegment.isAutoSectors(game));
             case "toggleFractureOption" ->
                 game.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, !game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP));
@@ -111,6 +113,13 @@ class TestMapFraming extends GameStateSubcommand {
         MapSegment.put(game, new MapSegment("core", "000", 3));
         MapSegment.put(game, new MapSegment("south", "1237", 3));
         MapSegment.setDefault(game, "core");
+    }
+
+    private static void buildCorners(Game game, Player player) {
+        buildLayout(game, player, ring("000", 2), "000");
+        AddTileService.addTile(game, new Tile(SYSTEM_TILE_IDS.get(1), "tl"));
+        AddTileService.addTile(game, new Tile(SYSTEM_TILE_IDS.get(2), "br"));
+        placeCarrier(game, player, "tl");
     }
 
     private static void buildAutoSectors(Game game, Player player) {

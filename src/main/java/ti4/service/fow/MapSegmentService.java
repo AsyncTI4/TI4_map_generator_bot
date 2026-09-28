@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -22,6 +23,16 @@ import ti4.service.ShowGameService;
 public class MapSegmentService {
 
     private static final String SWITCH_PREFIX = "showMapSegment_";
+
+    public static String withSegment(String buttonId, @Nullable String segment) {
+        return segment == null ? buttonId : buttonId + "_" + segment;
+    }
+
+    @Nullable
+    public static String segmentFrom(String buttonId, String baseId) {
+        String suffix = StringUtils.substringAfter(buttonId, baseId + "_");
+        return MapSegment.isValidName(suffix) ? suffix : null;
+    }
 
     public static boolean isFoggedView(Game game, GenericInteractionCreateEvent event) {
         return game.isFowMode()
