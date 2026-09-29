@@ -7,11 +7,14 @@ import java.time.Duration;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.apache.commons.lang3.StringUtils;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.service.tigl.TiglGameReport;
+import ti4.service.tigl.TiglRankHistoryRequest;
+import ti4.service.tigl.TiglRankHistoryResponse;
 import ti4.service.tigl.TiglUsernameChangeRequest;
 import tools.jackson.databind.JsonNode;
 
@@ -22,6 +25,7 @@ public class UltimateStatisticsWebsiteHelper {
     private static final String TI4_ULTIMATE_STATISTICS_API_KEY = System.getenv("TI4_ULTIMATE_STATISTICS_API_KEY");
     private static final String PLAYER_SETTINGS_URL = "https://api.ti4ultimate.com/api/Async/player-settings";
     private static final String TIGL_REPORT_GAMES_URL = "https://api.ti4ultimate.com/api/Tigl/report-game";
+    private static final String TIGL_RANK_HISTORY_URL = "https://api.ti4ultimate.com/api/Tigl/tigl-player-rank-history";
     private static final String TIGL_CHANGE_USERNAME_URL = "https://api.ti4ultimate.com/api/Tigl/change-username";
     private static final String TIGL_REPORT_GAMES_SUCCESS_MESSAGE = "TIGL game upload successful.";
     private static final String TIGL_REPORT_GAMES_FAILURE_MESSAGE =
@@ -58,6 +62,60 @@ public class UltimateStatisticsWebsiteHelper {
                 channel,
                 PLAYER_SETTINGS_SUCCESS_MESSAGE,
                 PLAYER_SETTINGS_FAILURE_MESSAGE);
+    }
+
+    public static TiglRankHistoryResponse fetchTiglRankHistory(TiglRankHistoryRequest request) {
+        return postForJson(request, TIGL_RANK_HISTORY_URL, TiglRankHistoryResponse.class);
+    }
+
+    private static <T> T postForJson(Object request, String url, Class<T> responseType) {
+        if (StringUtils.isBlank(TI4_ULTIMATE_STATISTICS_API_KEY)) {
+            throw new UltimateStatisticsApiException(
+                    "The TI4 Ultimate API key is not configured on this bot instance.");
+        }
+        try {
+            String json = JsonMapperManager.basic().writeValueAsString(request);
+
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(30))
+                    .header("Content-Type", "application/json")
+                    .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            HttpResponse<String> response =
+                    EgressClientManager.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return JsonMapperManager.basic().readValue(response.body(), responseType);
+            }
+            throw new UltimateStatisticsApiException(describeFailure(response));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new UltimateStatisticsApiException("The request to TI4 Ultimate was interrupted.");
+        } catch (UltimateStatisticsApiException e) {
+            throw e;
+        } catch (Exception e) {
+            BotLogger.error("An exception occurred while calling TI4 Ultimate Stats: " + url, e);
+            throw new UltimateStatisticsApiException("Could not reach TI4 Ultimate.");
+        }
+    }
+
+    private static String describeFailure(HttpResponse<String> response) {
+        try {
+            JsonNode node = JsonMapperManager.basic().readTree(response.body());
+            String gatewayMessage = node.path("message").asText();
+            if (!gatewayMessage.isEmpty()) {
+                return gatewayMessage;
+            }
+            String details = describeError(node);
+            if (!details.isEmpty()) {
+                return details;
+            }
+        } catch (Exception e) {
+            BotLogger.error("Failed to parse TI4 Ultimate error response", e);
+        }
+        return "HTTP " + response.statusCode();
     }
 
     private static void sendJson(
@@ -109,19 +167,69 @@ public class UltimateStatisticsWebsiteHelper {
     private static void handleErrorResponse(
             HttpResponse<String> response, MessageChannel channel, String failureMessage) {
         String body = response.body();
-        BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
+        JsonNode node = null;
         try {
-            JsonNode node = JsonMapperManager.basic().readTree(body);
-            String title = node.path("problemDetails").path("title").asText();
-            String detail = node.path("problemDetails").path("detail").asText();
-            if (!title.isEmpty() || !detail.isEmpty()) {
-                String details = detail.isEmpty() ? title : title + " - " + detail;
-                MessageHelper.sendMessageToChannel(channel, String.format("%s (%s)", failureMessage, details));
-                return;
-            }
+            node = JsonMapperManager.basic().readTree(body);
         } catch (Exception e) {
             BotLogger.error("Failed to parse TI4 Ultimate error response", e);
         }
+
+        String expected = node == null ? null : describeExpectedRejection(node);
+        if (expected != null) {
+            BotLogger.info("TI4 Ultimate rejected a request as expected: " + expected + "\n```" + body + "```");
+            MessageHelper.sendMessageToChannel(channel, expected);
+            return;
+        }
+
+        BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
+        if (node != null) {
+            String details = describeError(node);
+            if (!details.isEmpty()) {
+                MessageHelper.sendMessageToChannel(channel, String.format("%s (%s)", failureMessage, details));
+                return;
+            }
+        }
         MessageHelper.sendMessageToChannel(channel, failureMessage);
+    }
+
+    static String describeExpectedRejection(JsonNode node) {
+        if (isAlreadyReported(node)) {
+            String message = errorMessage(node);
+            return message.isEmpty()
+                    ? "This game was already reported to TIGL - nothing was sent."
+                    : "This game was already reported to TIGL - " + message;
+        }
+        if (isMissingPlayerProfile(node)) {
+            return "You do not have a TI4 Ultimate profile yet. Profiles are created once a game you are in reaches"
+                    + " round 2, so please try again after that.";
+        }
+        return null;
+    }
+
+    static boolean isAlreadyReported(JsonNode node) {
+        return StringUtils.containsIgnoreCase(errorTitle(node), "already reported");
+    }
+
+    static boolean isMissingPlayerProfile(JsonNode node) {
+        String message = errorMessage(node);
+        return StringUtils.containsIgnoreCase(message, "player profile")
+                && StringUtils.containsIgnoreCase(message, "not found");
+    }
+
+    private static String describeError(JsonNode node) {
+        String title = errorTitle(node);
+        String message = errorMessage(node);
+        if (message.isEmpty()) {
+            return title;
+        }
+        return title.isEmpty() ? message : title + " - " + message;
+    }
+
+    private static String errorTitle(JsonNode node) {
+        return node.path("data").path("errorTitle").asText();
+    }
+
+    private static String errorMessage(JsonNode node) {
+        return node.path("data").path("errorMessage").asText();
     }
 }
