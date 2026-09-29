@@ -22,7 +22,6 @@ import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -70,9 +69,6 @@ public class MiltyService {
                 Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
                 Boolean.toString(
                         settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
-        if (game.isCompetitiveTIGLGame()) {
-            TIGLHelper.sendTIGLSetupText(game);
-        }
 
         MiltyDraftSpec specs = MiltyDraftSpec.fromSettings(settings);
 
