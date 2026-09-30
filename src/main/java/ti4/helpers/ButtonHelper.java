@@ -61,7 +61,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
@@ -6428,10 +6427,6 @@ public class ButtonHelper {
                 String buttonLabel = "Explore " + planetRepresentation
                         + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
-                Button kairnAgentButton = KairnLeadershandler.getKairnAgentExplorePromptButton(player, planet, trait);
-                if (kairnAgentButton != null) {
-                    buttons.add(kairnAgentButton);
-                }
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.factionButtonChecker() + "movedNExplored_" + source + planetId + "_"
                             + trait + "kolleccbt";

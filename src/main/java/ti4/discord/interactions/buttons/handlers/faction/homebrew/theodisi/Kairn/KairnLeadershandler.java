@@ -45,6 +45,7 @@ public class KairnLeadershandler {
     private static final String EXPLORE_COMMANDER_PLANET = "explorePlanetWithKairnCommander_";
     private static final String USE_KAIRN_AGENT = "useKairnAgent";
     private static final String USE_KAIRN_AGENT_DIRECT = "useKairnAgentDirect_";
+    private static final String USE_KAIRN_AGENT_INTERRUPT = "useKairnAgentInterrupt_";
     private static final String SELECT_KAIRN_AGENT_TARGET = "selectKairnAgentTarget_";
     private static final String SELECT_KAIRN_AGENT_PLANET = "selectKairnAgentPlanet_";
     private static final String SELECT_KAIRN_AGENT_TRAIT = "selectKairnAgentTrait_";
@@ -390,18 +391,54 @@ public class KairnLeadershandler {
                 FactionEmojis.kairn);
     }
 
-    public static Button getKairnAgentExplorePromptButton(Player player, Planet planet, String trait) {
+    public static boolean offerKairnAgentExploreInterrupt(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID, String[] exploreData) {
+        Planet planet = exploreData.length > 2 && game != null ? game.getUnitHolderFromPlanet(exploreData[1]) : null;
+        String trait = exploreData.length > 2 ? exploreData[2] : "";
         if (player == null
                 || planet == null
+                || player.getLeader("kairnagent").isEmpty()
                 || !player.hasUnexhaustedLeader("kairnagent")
-                || !player.getPlanets().contains(planet.getName())
-                || !planet.getPlanetTypes().contains(trait)) {
-            return null;
+                || !List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)
+                        .contains(trait)) {
+            return false;
         }
-        return Buttons.gray(
-                player.factionButtonChecker() + USE_KAIRN_AGENT_DIRECT + planet.getName() + "|" + trait,
-                "Exhaust Draven Callas",
-                ExploreEmojis.getTraitEmoji(trait));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", you may exhaust **Draven Callas** instead of resolving this explore.",
+                List.of(
+                        Buttons.gray(
+                                player.factionButtonChecker() + USE_KAIRN_AGENT_INTERRUPT + planet.getName() + "|"
+                                        + trait,
+                                "Use Draven Callas",
+                                ExploreEmojis.getTraitEmoji(trait)),
+                        Buttons.red(
+                                player.factionButtonChecker()
+                                        + buttonID.replace("movedNExplored_", "movedNExplored_skipKairnAgent_"),
+                                "Explore Normally",
+                                ExploreEmojis.getTraitEmoji(trait))));
+        ButtonHelper.deleteMessage(event);
+        return true;
+    }
+
+    @ButtonHandler(USE_KAIRN_AGENT_INTERRUPT)
+    public static void useKairnAgentInterrupt(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(USE_KAIRN_AGENT_INTERRUPT.length()).split("\\|", 2);
+        Planet planet = values.length == 2 && game != null ? game.getUnitHolderFromPlanet(values[0]) : null;
+        Leader agent = player == null ? null : player.getLeader("kairnagent").orElse(null);
+        if (player == null
+                || planet == null
+                || agent == null
+                || !player.hasUnexhaustedLeader("kairnagent")
+                || !List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)
+                        .contains(values[1])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        drawKairnAgentExplores(event, game, player, player, planet, values[1]);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(USE_KAIRN_AGENT)
