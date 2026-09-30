@@ -6,17 +6,17 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "When you produce units:Place this card face up in your play area and place a Dirzuga token on a non-home planet other than Mecatol Rex that has a unit you control with PRODUCTION, or at least 3 infantry you control. Planets that contain Dirzuga tokens have their planet's resources value increased by 2 and their influence value increased by 1. Ditzuga tokens cannot be removed from the planets that contain them \nAt the start of the status phase, return this card to the Arborec Diaspora player."
     },
     {
         "alias": "ggpnhlr",
         "name": "Cortical Backup",
-        "faction": "h4l1r",
+        "faction": "hlr",
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "ACTION: Place this card in your play area.\nDuring your tactical actions, you may treat non-fighter neutral ships as if they were your own.\nAt the end of one of your tactical actions in which you moved neutral units or activated a system that contains 1 or more of the H4L1R's player's units, return this card to the H4L1R player."
     },
     {
@@ -25,7 +25,7 @@
         "faction": "clade",
         "color": "",
         "playArea": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "After another player moves ships into a system that contains your units; you may reveal this card and choose ANTI-FIGHTER BARRAGE, SPACE CANNON, BOMBARDMENT, SUSTAIN DAMAGE or PRODUCTION. Other players cannot use that unit ability in this system this turn. At the end of the turn, return this card to the Neurovoid player."
     },
     {
@@ -35,7 +35,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "After you activate a system, Place this card face up in your play area. While this card is in your play area, you are not an outlaw. Return a decree to the Archon player and return their command tokens from your faction sheet.\nAt the end of your turn, return this card to the Archon player."
     },
     {
@@ -44,7 +44,7 @@
         "faction": "moyin",
         "color": "",
         "playArea": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "When you would research a technology; You may spend a strategy token to gain 1 random genome. Then return this card to the Moyin player."
     },
     {
@@ -53,7 +53,7 @@
         "faction": "veilstrike",
         "color": "",
         "playArea": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "At any time during the action phase: you may discard any number of action cards. For each action card discarded, you gain 1 commodity. Then, convert all commodities to trade goods.\nAt the end of this turn, return this card to the Veilstrike player."
     },
     {
@@ -62,7 +62,7 @@
         "faction": "convocation",
         "color": "",
         "playArea": false,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "When another player activates a system that contains 1 or more of your ships and 1 or more planets you control:For each adjacent system, you may move one of your non-fighter ships in that system into the active system.\nThen, return this card to the Convocation player." 
     },
     {
@@ -105,7 +105,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": true,
-        "source": "WIPgamma",
+        "source": "gamma",
         "text": "When you receive this card, if you are not the Keleres Player, you must place it face up in your play area. At the end of the status phase, draw 1 secret objective, place it face up in your play area, then return this card to the Keleres player."
     },
     {

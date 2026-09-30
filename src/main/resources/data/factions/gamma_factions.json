@@ -41,17 +41,17 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
-        "alias": "h4l1r",
+        "alias": "hlr",
         "factionName": "The H4L1R infocrypt Subnet",
         "homeSystem": "06",
         "startingFleet": "1 dd, 1 cv, 2 ff, 4 inf n, sd n",
         "commodities": 2,
         "factionTech": [
-            "ggh4l1rg",
-            "ggh4l1ry"
+            "gghlr",
+            "gghlry"
         ],
       "startingTech": [
 
@@ -65,12 +65,12 @@
           "legacy_systems"
         ],
         "leaders": [
-            "h4l1ragent",
-            "h4l1rcommander",
-            "h4l1rhero"
+            "hlragent",
+            "hlrcommander",
+            "hlrhero"
         ],
         "promissoryNotes": [
-            "ggpnh4l1r"
+            "ggpnhlr"
         ],
         "units": [
             "fighter",
@@ -78,14 +78,14 @@
             "cruiser",
             "carrier",
             "dreadnought",
-            "h4l1r_flagship",
+            "hlr_flagship",
             "infantry",
-            "h4l1r_mech",
+            "hlr_mech",
             "pds",
             "spacedock"
         ],
         "complexity": "Hard",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "clade",
@@ -130,7 +130,7 @@
             "spacedock"
         ],
         "complexity": "Hard",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "archon",
@@ -176,7 +176,7 @@
             "archon_warsun"
         ],
         "complexity": "Hard",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "moyin",
@@ -220,7 +220,7 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "veilstrike",
@@ -265,7 +265,7 @@
             "spacedock"
         ],
         "complexity": "low",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "convocation",
@@ -310,7 +310,7 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "weaveway",
@@ -402,7 +402,7 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "alias": "gray",
