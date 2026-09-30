@@ -92,7 +92,7 @@ public class ButtonProcessor {
             if (combatReplayService != null) {
                 CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
                         combatReplayService.capturePreInteractionSnapshot(context.getGame());
-                combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+                CombatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
             }
             try {
                 beforeTime = System.currentTimeMillis();
@@ -108,7 +108,7 @@ public class ButtonProcessor {
                 }
             } finally {
                 if (combatReplayService != null) {
-                    combatReplayService.clearPreInteractionSnapshot();
+                    CombatReplayService.clearPreInteractionSnapshot();
                 }
             }
         } catch (Exception e) {

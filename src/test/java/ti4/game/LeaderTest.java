@@ -17,7 +17,7 @@ class LeaderTest extends BaseTi4Test {
     private static final boolean expectedLocked = true;
     private static final boolean expectedActive = false;
 
-    private Leader buildLeader() {
+    private static Leader buildLeader() {
         return new Leader(expectedId, expectedType, expectedTgCount, expectedExhausted, expectedLocked, expectedActive);
     }
 

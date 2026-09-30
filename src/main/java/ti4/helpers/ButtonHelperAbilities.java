@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("drawHeistObj_")
     public static void drawHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Integer type = Integer.parseInt(buttonID.split("_")[1]);
+        int type = Integer.parseInt(buttonID.split("_")[1]);
         game.drawSecretObjective(player.getUserID(), type);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -393,7 +394,7 @@ public final class ButtonHelperAbilities {
         return buttons;
     }
 
-    public static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
+    private static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             boolean empty = true;
@@ -1464,7 +1465,7 @@ public final class ButtonHelperAbilities {
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
                 totalHits += hitRolls;
                 String unitRoll = CombatMessageHelper.displayUnitRoll(
-                        player.getUnitByID("belkosea_flagship"),
+                        Player.getUnitByID("belkosea_flagship"),
                         toHit,
                         modifierToHit,
                         1,

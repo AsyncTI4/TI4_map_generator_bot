@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.jspecify.annotations.NonNull;
 import ti4.discord.JdaService;
 import ti4.image.Mapper;
 import ti4.service.emoji.ExploreEmojis;
@@ -91,7 +92,7 @@ public class Units {
             return String.format("%s_%s.png", colorID, asyncID());
         }
 
-        public String toString() {
+        public @NonNull String toString() {
             return String.format("%s—%s", colorID, unitType.humanReadableName());
         }
 

@@ -99,8 +99,7 @@ public class FractureService {
                 if (game.isCosmicConvergenceMode()) {
                     int countPer = 1;
                     boolean goneThrough = false;
-                    List<TechnologyType> techTypesToAddIngress = new ArrayList<>();
-                    techTypesToAddIngress.addAll(TechnologyType.mainFour);
+                    List<TechnologyType> techTypesToAddIngress = new ArrayList<>(TechnologyType.mainFour);
                     for (TechnologyType type : techTypesToAddIngress) {
                         List<Tile> tilesWithSkip =
                                 getTilesWithSkipAndNoIngressAndNotAdding(game, type, new ArrayList<>());

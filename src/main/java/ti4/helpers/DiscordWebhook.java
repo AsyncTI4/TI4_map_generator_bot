@@ -323,7 +323,7 @@ public class DiscordWebhook {
             return builder.toString().replace("\n", "\\n");
         }
 
-        private String quote(String string) {
+        private static String quote(String string) {
             return "\"" + string + "\"";
         }
     }

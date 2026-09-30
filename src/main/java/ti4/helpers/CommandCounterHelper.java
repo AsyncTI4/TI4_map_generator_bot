@@ -76,7 +76,7 @@ public final class CommandCounterHelper {
         if (useTactic) {
             player.setTacticalCC(player.getTacticalCC() - 1);
         }
-        String ccPath = tile.getCCPath(ccID);
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -131,7 +131,7 @@ public final class CommandCounterHelper {
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
-        String ccPath = tile.getCCPath(ccID);
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");

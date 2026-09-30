@@ -19,9 +19,6 @@ import lombok.NoArgsConstructor;
         name = "combat_replay_prediction",
         indexes = @Index(name = "idx_replay_prediction_contest_id", columnList = "contest_id"),
         uniqueConstraints = @UniqueConstraint(name = "uk_replay_prediction_contest", columnNames = "contest_id"))
-/**
- * Stores the locked replay prediction snapshot for a contest in one compact row.
- */
 public class CombatReplayPredictionEntity {
 
     @Id

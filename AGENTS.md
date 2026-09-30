@@ -17,8 +17,11 @@ methods, and early returns rather than through prose explaining what the code do
 - Do not add comments to code you are only touching incidentally, and leave
   existing comments alone unless the code they describe is being removed.
 
-The exception is test code (`src/test/java`), where comments explaining scenario
-setup, non-obvious assertions, or the reason a case exists are welcome.
+**Exceptions**:
+- test code (`src/test/java`), where comments explaining scenario
+  setup, non-obvious assertions, or the reason a case exists are welcome.
+- Clear To-Do cases. Where there is a non critical bug or the suspicion of one.
+  So it can be found at a later moment, or when someone wants to use similar code or wants to modify code touching the suspected code. Keep this information compact and condense.
 
 ## Discord limits
 

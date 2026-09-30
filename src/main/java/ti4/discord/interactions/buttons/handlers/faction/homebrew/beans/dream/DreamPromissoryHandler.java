@@ -18,7 +18,7 @@ public class DreamPromissoryHandler {
 
     public static void returnVisionsOnSystemActivation(
             GenericInteractionCreateEvent event, Game game, Player activatingPlayer, Tile tile) {
-        if (game == null || activatingPlayer == null || tile == null || !hasVisionsInPlayArea(activatingPlayer)) {
+        if (game == null || tile == null || !hasVisionsInPlayArea(activatingPlayer)) {
             return;
         }
 

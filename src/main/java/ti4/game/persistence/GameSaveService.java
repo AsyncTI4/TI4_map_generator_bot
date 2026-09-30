@@ -1270,6 +1270,10 @@ class GameSaveService {
 
         writer.write(TOKENS);
         writer.write(System.lineSeparator());
+        if (!tile.getFowVisionGrant().isEmpty()) {
+            writer.write(FOW_VISION_GRANT + " " + String.join(",", tile.getFowVisionGrant()));
+            writer.write(System.lineSeparator());
+        }
 
         writer.write(ENDTOKENS);
         writer.write(System.lineSeparator());

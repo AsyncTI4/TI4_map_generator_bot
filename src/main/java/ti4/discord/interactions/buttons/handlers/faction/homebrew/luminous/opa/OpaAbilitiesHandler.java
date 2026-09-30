@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -201,14 +202,13 @@ public class OpaAbilitiesHandler {
 
     private static boolean tileHasAnyBrokenPlanet(Tile tile) {
         return tile != null
-                && List.of(
+                && Stream.of(
                                 Constants.BROKENPLANET1,
                                 Constants.BROKENPLANET2,
                                 Constants.BROKENPLANET3,
                                 Constants.BROKENPLANET4,
                                 Constants.BROKENPLANET5,
                                 Constants.BROKENPLANET6)
-                        .stream()
                         .anyMatch(planetName -> tile.getUnitHolderFromPlanet(planetName) != null);
     }
 }

@@ -92,11 +92,11 @@ public class CombatReplayService {
         return new PreInteractionSnapshot(snapshots);
     }
 
-    public void setPreInteractionSnapshot(PreInteractionSnapshot snapshot) {
+    public static void setPreInteractionSnapshot(PreInteractionSnapshot snapshot) {
         preInteractionSnapshot.set(snapshot);
     }
 
-    public void clearPreInteractionSnapshot() {
+    public static void clearPreInteractionSnapshot() {
         preInteractionSnapshot.remove();
     }
 
@@ -200,7 +200,7 @@ public class CombatReplayService {
         return rollType == CombatRollType.SpaceCannonOffence || matchesParticipants(candidate, player, opponent);
     }
 
-    private boolean isReplayRoll(CombatRollType rollType) {
+    private static boolean isReplayRoll(CombatRollType rollType) {
         return rollType == CombatRollType.combatround
                 || rollType == CombatRollType.AFB
                 || rollType == CombatRollType.SpaceCannonOffence;
@@ -414,7 +414,7 @@ public class CombatReplayService {
         }
     }
 
-    private List<Player> remainingShipPlayers(Game game, Tile tile) {
+    private static List<Player> remainingShipPlayers(Game game, Tile tile) {
         List<Player> remainingShipPlayers = new ArrayList<>();
         for (Player player : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
             if (player.isRealPlayer() && !player.isDummy()) {
@@ -424,7 +424,7 @@ public class CombatReplayService {
         return remainingShipPlayers;
     }
 
-    private boolean containsOnlyOriginalParticipants(
+    private static boolean containsOnlyOriginalParticipants(
             CombatCandidateEntity candidate, List<Player> remainingShipPlayers) {
         for (Player player : remainingShipPlayers) {
             String faction = player.getFaction();
@@ -436,7 +436,7 @@ public class CombatReplayService {
         return true;
     }
 
-    private String loserFaction(CombatCandidateEntity candidate, Player winner) {
+    private static String loserFaction(CombatCandidateEntity candidate, Player winner) {
         return winner.getFaction().equalsIgnoreCase(candidate.getAttackerFaction())
                 ? candidate.getDefenderFaction()
                 : candidate.getAttackerFaction();
@@ -590,7 +590,7 @@ public class CombatReplayService {
         candidateRepository.save(candidate);
     }
 
-    private boolean isInitialSnapshotCaptured(CombatCandidateEntity candidate) {
+    private static boolean isInitialSnapshotCaptured(CombatCandidateEntity candidate) {
         return candidate.getInitialRenderSnapshotJson() != null
                 && !candidate.getInitialRenderSnapshotJson().isBlank();
     }
@@ -618,7 +618,7 @@ public class CombatReplayService {
                 combatSnapshot.defenderHp());
     }
 
-    private ResolutionState buildResolutionState(Game game, CombatCandidateEntity candidate, Tile tile) {
+    private static ResolutionState buildResolutionState(Game game, CombatCandidateEntity candidate, Tile tile) {
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
@@ -710,7 +710,7 @@ public class CombatReplayService {
                 attackerStrength.value(), defenderStrength.value(), attackerStrength.hp(), defenderStrength.hp());
     }
 
-    private void applyInitialCombatStats(CombatCandidateEntity candidate, InitialCombatStats initialStats) {
+    private static void applyInitialCombatStats(CombatCandidateEntity candidate, InitialCombatStats initialStats) {
         candidate.setAttackerStrength(initialStats.attackerStrength());
         candidate.setDefenderStrength(initialStats.defenderStrength());
         candidate.setAttackerHp(initialStats.attackerHp());
@@ -830,7 +830,7 @@ public class CombatReplayService {
         return destroyers;
     }
 
-    private CombatObservationEntity buildObservation(
+    private static CombatObservationEntity buildObservation(
             Game game,
             Player attacker,
             Player defender,
@@ -865,7 +865,7 @@ public class CombatReplayService {
                 && getOpenCandidate(game, tile.getPosition()) == null;
     }
 
-    private boolean isDiscordantStarsGame(Game game) {
+    private static boolean isDiscordantStarsGame(Game game) {
         return game != null && game.isDiscordantStarsMode();
     }
 
@@ -898,7 +898,7 @@ public class CombatReplayService {
         return candidate;
     }
 
-    private boolean hasAssaultCannon(Player player) {
+    private static boolean hasAssaultCannon(Player player) {
         return player != null && player.hasTech("asc");
     }
 
@@ -1020,7 +1020,7 @@ public class CombatReplayService {
         return activeCandidates.size() == 1 ? activeCandidates.getFirst() : null;
     }
 
-    private String extractTilePosition(String sourceChannelName) {
+    private static String extractTilePosition(String sourceChannelName) {
         if (sourceChannelName == null || sourceChannelName.isBlank()) return null;
         Matcher matcher = SYSTEM_TILE_PATTERN.matcher(sourceChannelName);
         return matcher.find() ? matcher.group(1) : null;
@@ -1053,11 +1053,11 @@ public class CombatReplayService {
         return Math.clamp(weaker / stronger, 0.0, 1.0);
     }
 
-    private String firstNonBlank(String first, String fallback) {
+    private static String firstNonBlank(String first, String fallback) {
         return first == null || first.isBlank() ? fallback : first;
     }
 
-    private Game loadGame(String gameName) {
+    private static Game loadGame(String gameName) {
         var managedGame = GameManager.getManagedGame(gameName);
         return managedGame == null ? null : managedGame.getGame();
     }

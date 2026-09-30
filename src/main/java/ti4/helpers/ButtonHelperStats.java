@@ -47,9 +47,9 @@ public final class ButtonHelperStats {
         convertComms(event, game, player, amt, deleteMsg, null);
     }
 
-    public static void convertComms(
+    private static void convertComms(
             ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg, Tile tile) {
-        String message, ident = player.getRepresentation();
+        String message, ident = player.getRepresentationNoPing();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
@@ -91,7 +91,7 @@ public final class ButtonHelperStats {
         gainComms(event, game, player, amt, deleteMsg, skipOutput, null);
     }
 
-    public static void gainComms(
+    private static void gainComms(
             GenericInteractionCreateEvent event,
             Game game,
             Player player,

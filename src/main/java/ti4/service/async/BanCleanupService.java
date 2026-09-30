@@ -115,7 +115,7 @@ public class BanCleanupService {
         return true;
     }
 
-    public int removeUserFromAllGuilds(UserSnowflake user, String reason) {
+    private int removeUserFromAllGuilds(UserSnowflake user, String reason) {
         int errors = 0;
         Collection<UserSnowflake> banList = Collections.singleton(user);
         for (Guild guild : JdaService.guilds) {

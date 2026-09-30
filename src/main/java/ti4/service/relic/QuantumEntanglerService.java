@@ -2,6 +2,7 @@ package ti4.service.relic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -23,6 +24,7 @@ public class QuantumEntanglerService {
     private static final String CHOOSE_FOR_OWNER = "quantumEntanglerGiveOwner_";
     private static final String DRAWN_RELICS = "quantumEntanglerDrawn_";
     private static final String TARGET = "quantumEntanglerTarget_";
+    private static final Pattern EXTRA_RELIC_SUFFIX_PATTERN = Pattern.compile("extra\\d+$");
 
     public static boolean offerQuantumEntanglerTargets(ButtonInteractionEvent event, Game game, Player player) {
         if (game.getAllRelics().size() < 3) {
@@ -172,7 +174,7 @@ public class QuantumEntanglerService {
     }
 
     private static String normalizeRelicID(String relicID) {
-        return relicID.replaceFirst("extra\\d+$", "");
+        return EXTRA_RELIC_SUFFIX_PATTERN.matcher(relicID).replaceFirst("");
     }
 
     private static int getRelicIndex(String indexText) {

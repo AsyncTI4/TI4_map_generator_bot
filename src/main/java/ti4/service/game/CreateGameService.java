@@ -320,7 +320,7 @@ public class CreateGameService {
                 > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
                 > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge. It is the default if you do not press any of these buttons.\
 
-                -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories. """;
+                -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
     }
 
@@ -428,9 +428,7 @@ public class CreateGameService {
                                 }
                                 MessageHelper.sendMessageToChannel(introThread, message);
                                 BufferedImage colorsImage = ImageHelper.readScaled(
-                                        ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"),
-                                        731,
-                                        593);
+                                        ResourceHelper.getExtraFile("Compiled_Async_colors.png"), 731, 593);
                                 FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
@@ -696,7 +694,7 @@ public class CreateGameService {
     }
 
     public static String getNewPlayerInfoText() {
-        String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
+        String path = ResourceHelper.getHelpFile("NewPlayerIntro.txt");
         try {
             return Files.readString(Paths.get(path));
         } catch (Exception e) {

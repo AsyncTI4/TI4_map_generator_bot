@@ -139,7 +139,7 @@ public class FactionSourceSettings extends SettingsMenu {
         return map;
     }
 
-    private boolean isEnabled(List<ComponentSource> enabled, ComponentSource logical) {
+    private static boolean isEnabled(List<ComponentSource> enabled, ComponentSource logical) {
         if (logical == ComponentSource.pok)
             return enabled.contains(ComponentSource.pok)
                     || enabled.stream().anyMatch(s -> s.name().startsWith("codex"));

@@ -58,6 +58,10 @@ public class FOWOptionService {
                 FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
+        NEW_TRANSACTIONS(
+                FOWOptionCategory.GAME,
+                "New transactions",
+                "Use the offer/accept transaction model instead of the legacy direct-send flow"),
 
         // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
@@ -70,6 +74,14 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",
                 "Action card discard pile shows only cards that were played"),
+        CLASSIC_MAP_LAYOUT(
+                FOWOptionCategory.VISIBILITY,
+                "Classic map layout",
+                "Show the full classic map instead of framing it to what each player knows; map sectors are ignored"),
+        FRACTURE_SEPARATE_MAP(
+                FOWOptionCategory.VISIBILITY,
+                "Separate Fracture map",
+                "Show the Fracture as its own map segment instead of below the galaxy"),
 
         // Precise Player Stats Options
         STATS_FROM_HS_ONLY(

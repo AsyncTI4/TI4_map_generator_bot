@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
@@ -106,6 +107,7 @@ public class JdaService {
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
+    private static final Pattern NUMERIC_GUILD_ID_PATTERN = Pattern.compile("\\b[0-9]+\\b");
 
     public static JDA jda;
     public static String guildPrimaryID;
@@ -367,7 +369,7 @@ public class JdaService {
     }
 
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
-        if (!guildID.matches("\\b[0-9]+\\b")) {
+        if (!NUMERIC_GUILD_ID_PATTERN.matcher(guildID).matches()) {
             BotLogger.error(
                     "Invalid Guild ID provided: `" + guildID
                             + "` - If this is running in Production, please correct the ID [here](https://github.com/AsyncTI4/TI4_map_generator_bot/settings/variables/actions/GUILDID_LIST)");

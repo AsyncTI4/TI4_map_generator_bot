@@ -1,11 +1,13 @@
 package ti4.discord.interactions.commands.lazax;
 
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.logging.BotLogger;
 
 final class LazaxReplyHelper {
 
     private static final int MAX_MESSAGE_LENGTH = 1900;
+    private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("\\R");
 
     private LazaxReplyHelper() {}
 
@@ -24,7 +26,7 @@ final class LazaxReplyHelper {
     private static Iterable<String> splitByLine(String message) {
         java.util.List<String> chunks = new java.util.ArrayList<>();
         StringBuilder chunk = new StringBuilder();
-        for (String line : message.split("\\R", -1)) {
+        for (String line : LINE_BREAK_PATTERN.split(message, -1)) {
             if (!chunk.isEmpty() && chunk.length() + line.length() + 1 > MAX_MESSAGE_LENGTH) {
                 chunks.add(chunk.toString());
                 chunk.setLength(0);

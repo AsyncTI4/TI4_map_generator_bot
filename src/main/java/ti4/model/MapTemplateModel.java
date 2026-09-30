@@ -148,7 +148,7 @@ public class MapTemplateModel implements ModelInterface {
 
                 try {
                     locations.add(Integer.parseInt(t.getPos()));
-                } catch (Exception e) {
+                } catch (Exception _) {
                 }
             }
         }

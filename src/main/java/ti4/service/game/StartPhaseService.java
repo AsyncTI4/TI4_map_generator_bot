@@ -1084,6 +1084,7 @@ public class StartPhaseService {
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
         }
+        StatusHelper.sendRemoveBreachButtons(game);
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {

@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.unit.monuments;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -380,7 +381,7 @@ public class MonumentsDSButtonHandler {
         game.setStoredValue(
                 MIRRORFORGE_MOVEMENT + player.getFaction(),
                 opponent.getFaction() + "|" + sourceTile.getPosition() + "|0");
-        sendMirrorforgeShipButtons(event, game, player, opponent, sourceTile, monumentTile, 0F);
+        sendMirrorforgeShipButtons(event, game, player, opponent, sourceTile, monumentTile, 0.0F);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -419,9 +420,9 @@ public class MonumentsDSButtonHandler {
         Tile monumentTile = MonumentsService.getMonumentTile(game, player, "mortheus_monument");
         float movedCost;
         try {
-            movedCost = movementParts.length == 3 ? Float.parseFloat(movementParts[2]) : -1F;
+            movedCost = movementParts.length == 3 ? Float.parseFloat(movementParts[2]) : -1.0F;
         } catch (NumberFormatException e) {
-            movedCost = -1F;
+            movedCost = -1.0F;
         }
         String asyncId = buttonID.substring(MOVE_MIRRORFORGE_SHIP.length());
         UnitKey unitKey = opponent == null || sourceTile == null
@@ -446,7 +447,7 @@ public class MonumentsDSButtonHandler {
         MoveUnitService.moveUnits(
                 event, sourceTile, game, opponent.getColor(), "1 " + asyncId, monumentTile, Constants.SPACE);
         movedCost += unit.getCost();
-        if (movedCost >= 4F
+        if (movedCost >= 4.0F
                 || sourceTile.getSpaceUnitHolder().getUnitKeysForPlayer(opponent).stream()
                         .map(opponent::getUnitFromUnitKey)
                         .noneMatch(model ->
@@ -1035,7 +1036,7 @@ public class MonumentsDSButtonHandler {
         return player.getPlanets().stream()
                         .filter(planetName -> !player.getExhaustedPlanets().contains(planetName))
                         .map(game::getUnitHolderFromPlanet)
-                        .filter(planet -> planet != null)
+                        .filter(Objects::nonNull)
                         .filter(planet -> planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG))
                         .count()
                 >= 2;
@@ -1044,7 +1045,7 @@ public class MonumentsDSButtonHandler {
     public static List<Button> getReadiedCorePlanetButtons(Game game, Player player) {
         return player.getReadiedPlanets().stream()
                 .map(game::getUnitHolderFromPlanet)
-                .filter(planet -> planet != null)
+                .filter(Objects::nonNull)
                 .filter(planet -> planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG))
                 .map(planet -> Buttons.red(
                         player.factionButtonChecker() + EXHAUST_CORE_PLANET + planet.getName(),
@@ -1419,7 +1420,7 @@ public class MonumentsDSButtonHandler {
         }
         return FoWHelper.getAdjacentTiles(game, monumentTile.getPosition(), player, false).stream()
                 .map(game::getTileByPosition)
-                .anyMatch(tile -> tile != null && FoWHelper.playerHasUnitsInSystem(player, tile));
+                .anyMatch(tile -> FoWHelper.playerHasUnitsInSystem(player, tile));
     }
 
     // Corsairs' Cove

@@ -29,7 +29,8 @@ class RunAgainstAllGamesTest extends BaseTi4Test {
         Game game = new Game();
         int position = 101;
         for (String tileId : tileIds) {
-            game.setTile(new Tile(tileId, Integer.toString(position++)));
+            game.setTile(new Tile(tileId, Integer.toString(position)));
+            position++;
         }
         return game;
     }

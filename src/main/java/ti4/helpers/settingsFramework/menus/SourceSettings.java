@@ -300,7 +300,7 @@ public class SourceSettings extends SettingsMenu {
         }
     }
 
-    private String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
+    private static String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
         // when TE is fully implemented, this needs to check for _pok, _pok_te, or _te.
         String suffix = pok.isVal() ? "_pok" : teDemo.isVal() ? "_te" : "";
         return "action_deck_2" + suffix;

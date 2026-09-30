@@ -22,19 +22,19 @@ class FrankenItemTest extends BaseTi4Test {
         FrankenDrazDraft draft = new FrankenDrazDraft(game);
         game.setBagDraft(draft);
 
-        Assertions.assertEquals(6, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(6, draft.getItemLimitForCategory(DraftCategory.FACTION));
 
         game.setStoredValue("frankenLimit" + DraftCategory.FACTION, "4");
-        Assertions.assertEquals(4, draft.getItemLimitForCategory(DraftCategory.FACTION));
-        Assertions.assertEquals(4, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
-        Assertions.assertEquals(10, draft.getBagSize());
-        Assertions.assertEquals(10, game.getFrankenBagSize());
+        assertEquals(4, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(4, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
+        assertEquals(10, draft.getBagSize());
+        assertEquals(10, game.getFrankenBagSize());
 
         game.setStoredValue("frankenLimit" + DraftCategory.FACTION, "8");
-        Assertions.assertEquals(8, draft.getItemLimitForCategory(DraftCategory.FACTION));
-        Assertions.assertEquals(8, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
-        Assertions.assertEquals(14, draft.getBagSize());
-        Assertions.assertEquals(14, game.getFrankenBagSize());
+        assertEquals(8, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(8, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
+        assertEquals(14, draft.getBagSize());
+        assertEquals(14, game.getFrankenBagSize());
     }
 
     @Test
@@ -69,14 +69,14 @@ class FrankenItemTest extends BaseTi4Test {
         assertEquals(
                 List.of("MONUMENT:titans_monument"),
                 Mapper.getFrankenErrata("ABILITY:terragenesis").getOptionalSwaps().stream()
-                        .filter(item -> "MONUMENT:titans_monument".equals(item.getAlias()))
                         .map(item -> item.getAlias())
+                        .filter("MONUMENT:titans_monument"::equals)
                         .toList());
         assertEquals(
                 List.of("MONUMENT:firmament_monument"),
                 Mapper.getFrankenErrata("BREAKTHROUGH:firmamentbt").getOptionalSwaps().stream()
-                        .filter(item -> "MONUMENT:firmament_monument".equals(item.getAlias()))
                         .map(item -> item.getAlias())
+                        .filter("MONUMENT:firmament_monument"::equals)
                         .toList());
     }
 
@@ -96,7 +96,7 @@ class FrankenItemTest extends BaseTi4Test {
                 .getComponents(game)
                 .contains(DraftItem.generate(DraftCategory.MONUMENT, "arborec_monument")));
 
-        draft.expandFactionPackages(game);
+        FrankenDrazDraft.expandFactionPackages(game);
 
         assertTrue(
                 player.getDraftHand().Contents.contains(DraftItem.generate(DraftCategory.MONUMENT, "arborec_monument")),

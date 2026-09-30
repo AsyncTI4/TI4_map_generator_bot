@@ -10,7 +10,7 @@ import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
-public class CombatContestJanitorCron {
+class CombatContestJanitorCron {
 
     public static void register() {
         CronManager.schedulePeriodically(

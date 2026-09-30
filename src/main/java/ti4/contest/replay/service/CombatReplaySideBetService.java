@@ -151,7 +151,7 @@ public class CombatReplaySideBetService {
         for (CombatContestSideBetEntity sideBet : sideBets) {
             boolean won = isWinningBet(candidate, sideBet);
             boolean firstResolution = sideBet.getResolvedAt() == null;
-            int profitPoints = payoutService.resolvedProfitPoints(sideBet);
+            int profitPoints = CombatReplaySideBetPayoutService.resolvedProfitPoints(sideBet);
             CombatReplayLeaderboardEntryEntity entry = entriesByUser.get(sideBet.getDiscordUserId());
             sideBet.setResolvedAt(now);
 
@@ -192,7 +192,7 @@ public class CombatReplaySideBetService {
                     sideBet.getBetType(),
                     sideBet.getTargetFaction(),
                     sideBet.getBetType().label(),
-                    payoutService.resolvedProfitPoints(sideBet)));
+                    CombatReplaySideBetPayoutService.resolvedProfitPoints(sideBet)));
         }
         return resolved;
     }
@@ -266,7 +266,7 @@ public class CombatReplaySideBetService {
         };
     }
 
-    private int safeInt(Integer value) {
+    private static int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
 }

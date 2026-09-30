@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static java.util.Map.*;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public final class Constants {
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
 
-    public static final Map<String, String> EMOJI_FARM_SERVERS = Map.ofEntries(
+    public static final Map<String, String> EMOJI_FARM_SERVERS = ofEntries(
             entry("1155639926675746886", "Emoji Farm 1"),
             entry("1156671516784730314", "Emoji Farm 2"),
             entry("1156686770436591637", "Emoji Farm 3"),
@@ -169,6 +170,7 @@ public final class Constants {
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String NOTEPAD = "notepad";
     public static final String DISPLAY_TYPE = "display_type";
+    public static final String MAP_SEGMENT = "map_segment";
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";
@@ -376,6 +378,9 @@ public final class Constants {
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
     public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String ADD_VISION_TOKEN = "add_vision_token";
+    public static final String REMOVE_VISION_TOKEN = "remove_vision_token";
+    public static final String TOKEN_FOWVISION_PNG = "token_fowvision.png";
     public static final String ADD_ADJACENCY_OVERRIDE = "add_adjacency_override";
     public static final String REMOVE_ADJACENCY_OVERRIDE = "remove_adjacency_override";
     public static final String REMOVE_ALL_ADJACENCY_OVERRIDES = "remove_all_adjacency_overrides";
@@ -1525,6 +1530,7 @@ public final class Constants {
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
+    public static final String MMR_HISTORY = "mmr_history";
     public static final String UPLOAD_RECENT_GAME_STATS = "upload_recent_game_stats";
 
     public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";

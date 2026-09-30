@@ -14,6 +14,7 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
 import ti4.helpers.FoWHelper;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
@@ -211,7 +212,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
 
             String uncontrolled = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
-                    .map(uh -> uh.getName())
+                    .map(UnitHolder::getName)
                     .filter(name -> game.getTileFromPlanet(name) != null)
                     .filter(name -> game.getPlayerThatControlsPlanet(name, true) == null)
                     .findFirst()
@@ -314,7 +315,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
             List<String> onMapPlanets = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .filter(uh -> uh instanceof ti4.game.Planet p && !p.isSpaceStation(game))
-                    .map(uh -> uh.getName())
+                    .map(UnitHolder::getName)
                     .distinct()
                     .limit(26)
                     .toList();
@@ -402,7 +403,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
             List<String> onMapPlanets = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .filter(uh -> uh instanceof ti4.game.Planet p && !p.isSpaceStation(game))
-                    .map(uh -> uh.getName())
+                    .map(UnitHolder::getName)
                     .distinct()
                     .limit(26)
                     .toList();

@@ -65,7 +65,7 @@ public class BorderAnomalyModel {
         }
     }
 
-    public BorderAnomalyType getBorderAnomalyTypeFromString(String type) {
+    public static BorderAnomalyType getBorderAnomalyTypeFromString(String type) {
         if (type == null) {
             return null;
         }

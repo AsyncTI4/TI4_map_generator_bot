@@ -100,7 +100,7 @@ public class NatauDoctrineHandler {
     @ButtonHandler(CHOOSE_DISCOVERY_TILE)
     public static void resolveDiscoveryTileChoice(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null || !hasDiscovery(player)) {
+        if (event == null || game == null || !hasDiscovery(player)) {
             return;
         }
 

@@ -45,4 +45,14 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
         }
         return 3 + pointsAwayFromVictory;
     }
+
+    static String describeRank(int rank) {
+        if (rank == 1) {
+            return "Won";
+        }
+        if (rank == 2) {
+            return "<=3 VP back";
+        }
+        return (rank - 3) + " VP back";
+    }
 }

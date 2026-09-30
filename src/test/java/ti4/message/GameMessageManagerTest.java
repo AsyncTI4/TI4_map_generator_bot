@@ -9,7 +9,7 @@ import ti4.json.JsonMapperManager;
 class GameMessageManagerTest {
 
     @Test
-    void gameMessageDeserializesLegacyJsonWithoutKey() throws Exception {
+    void gameMessageDeserializesLegacyJsonWithoutKey() {
         String legacyJson = """
             {
               "messageId": "123",
@@ -26,7 +26,7 @@ class GameMessageManagerTest {
     }
 
     @Test
-    void gameMessageRoundTripsKey() throws Exception {
+    void gameMessageRoundTripsKey() {
         GameMessage original = new GameMessage("456", GameMessageType.TURN, new LinkedHashSet<>(), 99L, "4::1");
 
         String json = JsonMapperManager.basic().writeValueAsString(original);
@@ -36,7 +36,7 @@ class GameMessageManagerTest {
     }
 
     @Test
-    void gameMessageOmitsNullKeyFromJson() throws Exception {
+    void gameMessageOmitsNullKeyFromJson() {
         GameMessage original = new GameMessage("789", GameMessageType.TURN, new LinkedHashSet<>(), 99L, null);
 
         String json = JsonMapperManager.basic().writeValueAsString(original);
@@ -54,7 +54,7 @@ class GameMessageManagerTest {
     }
 
     @Test
-    void gameMessageOmitsEmptyFactionsThatReactedFromJson() throws Exception {
+    void gameMessageOmitsEmptyFactionsThatReactedFromJson() {
         GameMessage original = new GameMessage("789", GameMessageType.TURN, new LinkedHashSet<>(), 99L, null);
 
         String json = JsonMapperManager.basic().writeValueAsString(original);

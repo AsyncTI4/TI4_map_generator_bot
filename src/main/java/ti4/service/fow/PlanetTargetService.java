@@ -1,7 +1,6 @@
 package ti4.service.fow;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,7 +80,6 @@ public class PlanetTargetService {
     /**
      * @param buttonPrefix    button id prefix; ends with {@link BlindSelectionService#TBD_FACTION} for flows
      *                        that resolve the owner at press time
-     * @param excludeSelfOwned drop planets the acting player controls (they already know their own holdings)
      * @param publicLegality  optional filter, and <b>only</b> for facts a fog player could already know from
      *                        the map: planet trait, is-home-system, is-space-station. Anything depending on
      *                        hidden state (ownership, readied, units present, tokens) must NOT be filtered
@@ -89,9 +87,6 @@ public class PlanetTargetService {
      *                        so that an illegal target fizzles rather than being visibly absent from the list.
      * @param alwaysInclude   planets forced into the list regardless of what the player knows. Used by agenda
      *                        voting, where an outcome someone already voted for must stay selectable.
-     * @param requireOwned    the card needs a controller, so drop uncontrolled planets — but only where the
-     *                        acting player can legitimately see that they are uncontrolled. See
-     *                        {@link #targetButtons} for why that qualifier matters.
      * @param pageNavPrefix   prefix for this spec's page-2-and-beyond nav buttons; defaults to
      *                        {@code buttonPrefix}. Override with {@link #withPageNavPrefix} only when
      *                        {@code buttonPrefix} is <b>not</b> owned exclusively by a spec-aware resolve
@@ -421,7 +416,7 @@ public class PlanetTargetService {
 
     /** Unmodifiable view of the shared pool, for tests asserting both paths draw from it. */
     public static List<String> messagePool() {
-        return Collections.unmodifiableList(FIZZLE_MESSAGES);
+        return FIZZLE_MESSAGES;
     }
 
     /**

@@ -219,7 +219,7 @@ class ActionCardPlayerStatsService {
         blocks.add(heading.toString());
 
         gamesPerFaction.keySet().stream()
-                .sorted(Comparator.comparingDouble((String faction) -> getAverageCardsPlayed(faction))
+                .sorted(Comparator.comparingDouble(this::getAverageCardsPlayed)
                         .reversed()
                         .thenComparing(Comparator.naturalOrder()))
                 // Each row is its own block: the list runs to every faction in the sample, which
@@ -258,7 +258,7 @@ class ActionCardPlayerStatsService {
 
         boolean[] labelsPending = {true};
         gamesPerFaction.keySet().stream()
-                .sorted(Comparator.comparingDouble((String faction) -> getOverrulePlayRate(faction))
+                .sorted(Comparator.comparingDouble(this::getOverrulePlayRate)
                         .reversed()
                         .thenComparing(Comparator.naturalOrder()))
                 .forEach(faction -> {

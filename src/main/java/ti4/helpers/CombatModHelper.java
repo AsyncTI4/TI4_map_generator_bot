@@ -1064,8 +1064,7 @@ public class CombatModHelper {
             String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
             List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
                     .readValue(
-                            game.getStoredValue("assignedBombardment" + player.getFaction()),
-                            new TypeReference<List<BombardmentAssignment>>() {});
+                            game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             return bombardmentAssignments.stream()
                     .filter(a -> a.planet().equals(bombardmentTarget)
                             && a.galvanized()

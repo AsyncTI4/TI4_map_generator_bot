@@ -78,6 +78,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
+import ti4.service.fow.MapSegmentService;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
@@ -259,6 +260,18 @@ class AutoCompleteProvider {
                         .toList();
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokenNames, enteredValue);
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            case Constants.MAP_SEGMENT -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<String> names = List.of();
+                if (GameManager.isValid(gameName)) {
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    boolean foggedView = MapSegmentService.isFoggedView(game, event.getChannel());
+                    names = MapSegmentService.viewableNames(
+                            game, event.getUser().getId(), foggedView);
+                }
+                List<Command.Choice> options = mapTo25ChoicesThatContain(names, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.DISPLAY_TYPE -> {

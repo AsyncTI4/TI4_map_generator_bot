@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -73,6 +74,7 @@ public class LostLegaciesRelicHandler {
     private static final String HORN_REPLACEMENT_BATCH = "hornOfTheAbyssReplacementBatch";
     private static final String HORN_REPLACEMENT_CHOICES = "hornOfTheAbyssReplacementChoices_";
     private static final int HORN_COST_LIMIT = 8;
+    private static final Pattern NUMERIC_INDEX_PATTERN = Pattern.compile("\\d+");
 
     // Horn of the Abyss
     public static void offerNeutralReplacement(
@@ -1070,7 +1072,7 @@ public class LostLegaciesRelicHandler {
         if (values.length == 2) {
             Planet planet = game.getUnitHolderFromPlanet(values[0]);
             if (planet != null) {
-                if (values[1].matches("\\d+")) {
+                if (NUMERIC_INDEX_PATTERN.matcher(values[1]).matches()) {
                     planet.addResourcesModifier(-Integer.parseInt(values[1]));
                 } else {
                     for (String attachment : values[1].split(",")) {

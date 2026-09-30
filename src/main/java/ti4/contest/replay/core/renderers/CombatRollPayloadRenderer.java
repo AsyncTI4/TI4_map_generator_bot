@@ -1,6 +1,7 @@
 package ti4.contest.replay.core.renderers;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatRollPayload;
@@ -17,6 +18,8 @@ import ti4.service.emoji.MiscEmojis;
  */
 @UtilityClass
 public class CombatRollPayloadRenderer {
+
+    private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile(" +");
 
     public String render(CombatRollPayload payload) {
         if (payload == null) return "";
@@ -155,13 +158,14 @@ public class CombatRollPayloadRenderer {
             }
         }
 
-        String optionalText = String.join(
+        String optionalText = MULTIPLE_SPACES_PATTERN
+                .matcher(String.join(
                         " ",
                         List.of(
                                 StringUtils.defaultString(unitRoll.unitDisplayName()),
                                 unitRollsTextInfo,
-                                unitTypeHitsInfo))
-                .replaceAll(" +", " ")
+                                unitTypeHitsInfo)))
+                .replaceAll(" ")
                 .trim();
         String nice = isNice(unitRoll.dice()) ? " (nice)" : "";
         String winnuSigma = "sigma_winnu_flagship_2".equals(unitRoll.unitId())
@@ -199,7 +203,7 @@ public class CombatRollPayloadRenderer {
                     : "remaining " + groupDice + (groupDice == 1 ? " die" : " dice");
             String modifierLabel = groupModifier > 0 ? "+" + groupModifier : Integer.toString(groupModifier);
             int threshold = Math.max(1, unitRoll.printedHitsOn() - groupModifier);
-            String hitLabel = threshold <= 1 ? "always hits" : "hits on **" + threshold + "**";
+            String hitLabel = threshold == 1 ? "always hits" : "hits on **" + threshold + "**";
             groups.add(hitLabel + " for " + diceLabel + " (" + modifierLabel + " mods)");
             groupStart = groupEnd;
         }

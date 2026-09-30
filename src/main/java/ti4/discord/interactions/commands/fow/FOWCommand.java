@@ -12,6 +12,8 @@ public class FOWCommand implements ParentCommand {
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new AddFogTile(),
                     new RemoveFogTile(),
+                    new AddVisionToken(),
+                    new RemoveVisionToken(),
                     new CheckChannels(),
                     new PingActivePlayer(),
                     new PingSystem(),
@@ -25,7 +27,9 @@ public class FOWCommand implements ParentCommand {
                     new PrivateCommunicationsCheck(),
                     new GMCommand(),
                     new CreateFoWGameButton(),
-                    new SetupWizard())
+                    new SetupWizard(),
+                    new MapSegmentCommand(),
+                    new MapOverviewCommand())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

@@ -47,7 +47,8 @@ final class FowSetupTableOrderService {
         sb.append("### Current player order\n");
         int i = 1;
         for (Player player : seatCandidates(game, state)) {
-            sb.append("> ").append(i++).append(". ").append(player.getUserName());
+            sb.append("> ").append(i).append(". ").append(player.getUserName());
+            i++;
             if (player.isSpeaker()) sb.append(" (speaker)");
             sb.append('\n');
         }

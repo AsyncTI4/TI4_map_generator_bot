@@ -7,7 +7,7 @@ import ti4.spring.context.RequestContext;
 @Component("security")
 class GameSecurityService {
 
-    public boolean canAccessGame(String gameName) {
+    public static boolean canAccessGame(String gameName) {
         String contextUserId = RequestContext.getUserId();
         if (!GameManager.isValid(gameName)) throw new UserNotInGameForbiddenException(gameName, contextUserId);
 

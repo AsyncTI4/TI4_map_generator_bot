@@ -21,9 +21,6 @@ import ti4.contest.replay.core.CombatContestReplayStatus;
             @Index(name = "idx_replay_contest_replay_status_due", columnList = "replay_status, next_replay_at"),
             @Index(name = "idx_replay_contest_posted_at", columnList = "posted_at")
         })
-/**
- * Tracks the public replay contest lifecycle once a candidate has been promoted.
- */
 public class CombatReplayContestEntity {
 
     @Id

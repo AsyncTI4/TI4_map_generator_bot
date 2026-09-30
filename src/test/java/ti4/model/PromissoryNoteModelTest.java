@@ -15,7 +15,7 @@ class PromissoryNoteModelTest extends BaseTi4Test {
         }
     }
 
-    private boolean validateHomebrewReplacesID(PromissoryNoteModel pnModel) {
+    private static boolean validateHomebrewReplacesID(PromissoryNoteModel pnModel) {
         if (pnModel.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidPromissoryNote(pnModel.getHomebrewReplacesID().get())) return true;
         System.out.println("PN **" + pnModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `"

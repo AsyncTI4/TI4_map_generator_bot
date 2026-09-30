@@ -1,6 +1,7 @@
 package ti4.service.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedHashSet;
@@ -18,7 +19,7 @@ import ti4.testUtils.BaseTi4Test;
 class FrankenUnitCombiningTest extends BaseTi4Test {
 
     @Test
-    void persistsDuplicateUnitCombiningSetting() throws Exception {
+    void persistsDuplicateUnitCombiningSetting() {
         FrankenSettings settings = new FrankenSettings(new Game(), null);
         settings.getCombineDuplicateUnitTypes().setVal(true);
 
@@ -89,15 +90,15 @@ class FrankenUnitCombiningTest extends BaseTi4Test {
         assertTrue(player.hasTech("cr2"));
         assertTrue(player.hasTech("dskhracr"));
         assertTrue(player.hasTech("dsqhetcr"));
-        assertTrue(!player.hasTech("absol_cr2"));
+        assertFalse(player.hasTech("absol_cr2"));
         assertTrue(player.ownsUnit("cruiser2"));
         assertTrue(player.ownsUnit("khrask_cruiser2"));
         assertTrue(player.ownsUnit("qhet_cruiser2"));
-        assertTrue(!player.ownsUnit("khrask_cruiser"));
-        assertTrue(!player.ownsUnit("qhet_cruiser"));
+        assertFalse(player.ownsUnit("khrask_cruiser"));
+        assertFalse(player.ownsUnit("qhet_cruiser"));
         assertEquals(1, UnitInfoService.getUnitMessageEmbeds(player, true).size());
         assertTrue(player.getUnitsByAsyncID("ca").getFirst().getName().contains("Shattered Sky II"));
-        assertTrue(!player.getUnitsByAsyncID("ca").getFirst().getName().contains("Cruiser II"));
+        assertFalse(player.getUnitsByAsyncID("ca").getFirst().getName().contains("Cruiser II"));
         assertTrue(player.getUnitsByAsyncID("ca")
                 .getFirst()
                 .getAbility()

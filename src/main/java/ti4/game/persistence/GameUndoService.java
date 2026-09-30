@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -107,11 +108,7 @@ class GameUndoService {
             }
             WebSocketNotifier.notifyGameStateChange(loadedGame);
 
-            if (savedButtonsGame != null) {
-                generateSavedButtons(savedButtonsGame);
-            } else {
-                generateSavedButtons(gameToUndo);
-            }
+            generateSavedButtons(Objects.requireNonNullElse(savedButtonsGame, gameToUndo));
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
 

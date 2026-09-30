@@ -89,7 +89,7 @@ public enum DraftCategory {
         };
     }
 
-    public boolean showDescrByDefault() {
+    public static boolean showDescrByDefault() {
         return true;
     }
 }

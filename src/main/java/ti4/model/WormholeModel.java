@@ -54,7 +54,7 @@ public class WormholeModel {
         }
     }
 
-    public Wormhole getWormholeFromString(String wh) {
+    public static Wormhole getWormholeFromString(String wh) {
         Map<String, Wormhole> allWormholes = Arrays.stream(Wormhole.values())
                 .collect(Collectors.toMap(Wormhole::toString, (wormholeModel -> wormholeModel)));
         if (allWormholes.containsKey(wh.toLowerCase())) return allWormholes.get(wh.toLowerCase());

@@ -30,7 +30,7 @@ public class Join extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, getResponseMessage(game));
     }
 
-    private String getResponseMessage(Game game) {
+    private static String getResponseMessage(Game game) {
         return "Joined map: " + game.getName() + " successful.";
     }
 }

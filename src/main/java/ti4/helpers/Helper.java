@@ -96,6 +96,7 @@ import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.PlanetLayoutModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
@@ -645,7 +646,7 @@ public final class Helper {
                 .filter(Objects::nonNull)
                 .map(PlanetModel::getPlanetLayout)
                 .filter(Objects::nonNull)
-                .map(planetLayout -> planetLayout.getCenterPosition())
+                .map(PlanetLayoutModel::getCenterPosition)
                 .filter(Objects::nonNull)
                 .toList();
         if (planetPositions.size() != 3) {
@@ -3246,7 +3247,7 @@ public final class Helper {
         if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && game.isMonumentsMode()
                 && player.getUnitByBaseType("monument") != null) {
-            unitButtons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "monument", placePrefix).stream()
+            unitButtons.addAll(getPlanetPlaceUnitButtons(player, game, "monument", placePrefix).stream()
                     .filter(button -> tile.getPlanetUnitHolders().stream()
                             .anyMatch(planet -> button.getCustomId().endsWith("_" + planet.getName())))
                     .toList());
@@ -4091,12 +4092,9 @@ public final class Helper {
             }
             return true;
         }
-        if (game.getRealPlayers().size() == 1
+        return game.getRealPlayers().size() == 1
                 && player.isRealPlayer()
-                && game.getRealAndEliminatedPlayers().size() > 1) {
-            return true;
-        }
-        return false;
+                && game.getRealAndEliminatedPlayers().size() > 1;
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {

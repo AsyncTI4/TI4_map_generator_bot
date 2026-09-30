@@ -282,6 +282,7 @@ public final class ButtonHelperTacticalAction {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                                 if (player.getPlanets().contains(planet.getName())) {
                                     control = true;
+                                    break;
                                 }
                             }
                         }
@@ -289,6 +290,7 @@ public final class ButtonHelperTacticalAction {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                                 if (player.getPlanets().contains(planet.getName())) {
                                     control = true;
+                                    break;
                                 }
                             }
                         }
@@ -1011,7 +1013,7 @@ public final class ButtonHelperTacticalAction {
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')
-                        .append(player.getRepresentationUnfogged())
+                        .append(player.getRepresentationNoPing())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
                         .append(String.join(", ", mentions));
                 if (mentions.size() > 1 && totalDice > 0) {
@@ -1036,7 +1038,7 @@ public final class ButtonHelperTacticalAction {
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + ", you can use buttons to resolve "
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "I48S, the L1Z1Z" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + "I48S, the L1Z1X" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, if you so wish.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button3);
         }

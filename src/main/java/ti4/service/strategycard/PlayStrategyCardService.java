@@ -630,7 +630,7 @@ public class PlayStrategyCardService {
         }
         Player scHolder = game.getPlayerFromSC(scID);
         if (scHolder == null) {
-            scHolder = game.getRealPlayers().get(0);
+            scHolder = game.getRealPlayers().getFirst();
         }
         for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();

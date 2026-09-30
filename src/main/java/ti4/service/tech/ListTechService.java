@@ -37,6 +37,7 @@ public class ListTechService {
     private static final Pattern B = Pattern.compile("B");
     private static final Pattern R = Pattern.compile("R");
     private static final Pattern G = Pattern.compile("G");
+    private static final Pattern X = Pattern.compile("X");
 
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -284,9 +285,9 @@ public class ListTechService {
                         wilds++;
                     } else {
                         if (synergies.contains(TechnologyType.valueOf(type.toUpperCase()))) {
-                            requirements = requirements.replaceFirst("X", "");
+                            requirements = X.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
-                                requirements = requirements.replaceFirst("X", "");
+                                requirements = X.matcher(requirements).replaceFirst("");
                             }
                             continue;
                         }
@@ -320,7 +321,7 @@ public class ListTechService {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             if (synergies.contains(TechnologyType.valueOf("BIOTIC"))) {
-                requirements = requirements.replaceFirst("X", "");
+                requirements = X.matcher(requirements).replaceFirst("");
             } else {
                 requirements = G.matcher(requirements).replaceFirst("");
             }
@@ -368,14 +369,16 @@ public class ListTechService {
                         : 1;
                 for (int i = 0; i < prerequisiteCount; i++) {
                     if (synergies.contains(type)) {
-                        requirements = requirements.replaceFirst("X", "");
+                        requirements = X.matcher(requirements).replaceFirst("");
                         continue;
                     }
                     switch (type) {
-                        case BIOTIC -> requirements = requirements.replaceFirst("G", "");
-                        case WARFARE -> requirements = requirements.replaceFirst("R", "");
-                        case PROPULSION -> requirements = requirements.replaceFirst("B", "");
-                        case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
+                        case BIOTIC -> requirements = G.matcher(requirements).replaceFirst("");
+                        case WARFARE -> requirements = R.matcher(requirements).replaceFirst("");
+                        case PROPULSION ->
+                            requirements = B.matcher(requirements).replaceFirst("");
+                        case CYBERNETIC ->
+                            requirements = Y.matcher(requirements).replaceFirst("");
                         case UNITUPGRADE -> {
                             if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
                                 wilds++;

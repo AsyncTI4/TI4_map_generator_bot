@@ -228,7 +228,7 @@ final class HyperlaneTileGenerator {
             long seed = matrix.hashCode();
             int tileIndex = Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
             String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
-            String randomTilePath = ResourceHelper.getInstance().getTileFile(randomTile);
+            String randomTilePath = ResourceHelper.getTileFile(randomTile);
             if (randomTilePath != null) {
                 tilePath = randomTilePath;
             }

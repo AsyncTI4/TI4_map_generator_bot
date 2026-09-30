@@ -16,6 +16,7 @@ import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
@@ -33,6 +34,7 @@ public final class PlayerPreferenceHelper {
         if (player.getUserSettings().isShowTransactables())
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
         else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
+        buttons.add(Buttons.gray("playerPref_refreshMapStyle", "Refresh Map Style"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose the thing you wish to change.",
@@ -77,7 +79,35 @@ public final class PlayerPreferenceHelper {
                 UserSettingsManager.save(settings);
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
             }
+            case "refreshMapStyle" -> offerRefreshMapStyles(player);
         }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void offerRefreshMapStyles(Player player) {
+        RefreshMapStyle current = player.getUserSettings().getRefreshMapStyle();
+        List<Button> buttons = new ArrayList<>();
+        for (RefreshMapStyle style : RefreshMapStyle.values()) {
+            String id = "playerPrefRefreshStyle_" + style.getValue();
+            buttons.add(style == current ? Buttons.green(id, style.getLabel()) : Buttons.gray(id, style.getLabel()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation() + ", what should the Refresh Map button show you? This applies to all your"
+                        + " games. The green button is your current choice.",
+                buttons);
+    }
+
+    @ButtonHandler(value = "playerPrefRefreshStyle_", save = false)
+    public static void resolveRefreshMapStyle(Player player, ButtonInteractionEvent event, String buttonID) {
+        RefreshMapStyle.fromValue(buttonID.replace("playerPrefRefreshStyle_", ""))
+                .ifPresent(style -> {
+                    UserSettings settings = player.getUserSettings();
+                    settings.setRefreshMapStyle(style);
+                    UserSettingsManager.save(settings);
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(), "Refresh Map style set to: " + style.getLabel());
+                });
         ButtonHelper.deleteMessage(event);
     }
 
