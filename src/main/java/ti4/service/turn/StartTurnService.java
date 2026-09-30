@@ -1,6 +1,7 @@
 package ti4.service.turn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.ComponentActionHelper;
+import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
@@ -56,6 +58,7 @@ import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.BannerGenerator;
+import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
@@ -77,6 +80,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
@@ -88,6 +92,8 @@ import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class StartTurnService {
+
+    private static final String FOW_FOLLOW_REMINDERS = "fowFollowReminders";
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
@@ -145,23 +151,14 @@ public class StartTurnService {
         String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
         Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
+        if (nextPlayer == player && FoWHelper.isStabarsQol(game)) {
+            offerProveEnduranceQueue(game, player);
+        }
         if (nextPlayer != null && !game.isFowMode()) {
             if (nextPlayer == player) {
                 text +=
                         "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
-                if (player.getSecretsUnscored().containsKey("pe")
-                        && "".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction()))) {
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            "autoProveEndurance_yes", "Queue Prove Endurance", CardEmojis.SecretObjectiveAlt));
-                    buttons.add(Buttons.red("autoProveEndurance_no", "Decline Prove Endurance", "🙅"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(),
-                            player.getRepresentation()
-                                    + " All other players have passed. As such, when you pass, you could score _Prove Endurance_."
-                                    + " You may use these buttons to queue scoring this when you pass (or not).",
-                            buttons);
-                }
+                offerProveEnduranceQueue(game, player);
             } else {
                 String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
                         ? nextPlayer.getRepresentationUnfogged()
@@ -206,6 +203,8 @@ public class StartTurnService {
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
             if (FoWHelper.isStabarsQol(game)) {
+                remindOtherPlayersOfUnfollowedSCs(game, player);
+                postFogMapIfWanted(event, game, player);
                 GMService.logPlayerActivity(
                         game,
                         player,
@@ -459,6 +458,67 @@ public class StartTurnService {
                 .forEach(sb::append);
         appendStrategyPoolReminderIfHelpful(sb, game, player);
         return sendReminder ? sb.toString() : null;
+    }
+
+    private static void offerProveEnduranceQueue(Game game, Player player) {
+        if (!player.getSecretsUnscored().containsKey("pe")
+                || !"".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction()))) {
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("autoProveEndurance_yes", "Queue Prove Endurance", CardEmojis.SecretObjectiveAlt));
+        buttons.add(Buttons.red("autoProveEndurance_no", "Decline Prove Endurance", "🙅"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + " All other players have passed. As such, when you pass, you could score _Prove Endurance_."
+                        + " You may use these buttons to queue scoring this when you pass (or not).",
+                buttons);
+    }
+
+    private static void postFogMapIfWanted(GenericInteractionCreateEvent event, Game game, Player player) {
+        MessageChannel privateChannel = player.getPrivateChannel();
+        if (event == null
+                || privateChannel == null
+                || player.getMember() == null
+                || !player.getUserSettings().isFogMapOnTurnStart()) {
+            return;
+        }
+        GenericInteractionCreateEvent asPlayer =
+                new UserOverridenGenericInteractionCreateEvent(event, player.getMember());
+        MapRenderPipeline.queue(
+                game,
+                asPlayer,
+                DisplayType.all,
+                fileUpload -> MessageHelper.sendFileUploadToChannel(privateChannel, fileUpload));
+    }
+
+    private static void remindOtherPlayersOfUnfollowedSCs(Game game, Player activePlayer) {
+        if (!game.isStratPings()) return;
+        String roundPrefix = game.getRound() + ";";
+        String sent = game.getStoredValue(FOW_FOLLOW_REMINDERS);
+        if (!sent.startsWith(roundPrefix)) sent = roundPrefix;
+        for (int sc : game.getPlayedSCs()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == activePlayer || p2.hasFollowedSC(sc)) continue;
+                String token = sc + ":" + p2.getFaction();
+                if (Arrays.asList(sent.substring(roundPrefix.length()).split(","))
+                        .contains(token)) continue;
+                sent += "," + token;
+                game.setStoredValue(FOW_FOLLOW_REMINDERS, sent);
+
+                StringBuilder sb = new StringBuilder(p2.getRepresentationUnfogged())
+                        .append(" Reminder: **")
+                        .append(Helper.getSCName(sc, game))
+                        .append("** has been played and you haven't reacted yet.");
+                StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                        .ifPresent(scMessage -> sb.append(" Message link is: ")
+                                .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                                .append(".\n"));
+                appendStrategyPoolReminderIfHelpful(sb, game, p2);
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+            }
+        }
     }
 
     public static void appendStrategyPoolReminderIfHelpful(StringBuilder sb, Game game, Player player) {

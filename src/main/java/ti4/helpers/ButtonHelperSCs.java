@@ -290,7 +290,11 @@ public final class ButtonHelperSCs {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Technology**");
             }
             String message = deductCC(game, player, scNum);
-            ReactionService.addReaction(event, game, player, message);
+            if (game.isFowMode()) {
+                reactToStrategyCardMessage(game, player, scNum, message);
+            } else {
+                ReactionService.addReaction(event, game, player, message);
+            }
         }
         Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic Token");
         Button getFleet = Buttons.green("increase_fleet_cc", "Gain 1 Fleet Token");
@@ -1608,7 +1612,7 @@ public final class ButtonHelperSCs {
             player.exhaustTech("thardentiag");
         }
         if (game.isFowMode()) {
-            reactToStrategyCardMessage(game, player, scNum);
+            reactToStrategyCardMessage(game, player, scNum, null);
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -1626,10 +1630,10 @@ public final class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void reactToStrategyCardMessage(Game game, Player player, int scNum) {
+    public static void reactToStrategyCardMessage(Game game, Player player, int scNum, String message) {
         StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), scNum)
                 .ifPresent(scMessage ->
-                        ReactionService.addReaction(player, false, null, null, scMessage.messageId(), game));
+                        ReactionService.addReaction(player, false, message, null, scMessage.messageId(), game));
     }
 
     @ButtonHandler("sc_no_follow_")

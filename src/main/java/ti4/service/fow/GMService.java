@@ -55,6 +55,7 @@ public final class GMService {
             Buttons.green("gmWhoCanSee~MDL", "Who Can See Position..."),
             Buttons.EDIT_SUMMARIES,
             Buttons.green("gmLore", "Manage Lore"),
+            Buttons.green("gmQolSettings~MDL", "QOL Settings..."),
             Buttons.gray("gmRefresh", "Refresh"));
 
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
@@ -345,6 +346,39 @@ public final class GMService {
             sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    @ButtonHandler(value = "gmQolSettings~MDL", save = false)
+    public static void qolSettings(ButtonInteractionEvent event, Game game) {
+        TextInput base = TextInput.create(FowAutoDeclineService.BASE_HOURS_KEY, TextInputStyle.SHORT)
+                .setValue(String.valueOf(FowAutoDeclineService.baseHours(game)))
+                .setRequiredRange(1, 6)
+                .build();
+        TextInput spread = TextInput.create(FowAutoDeclineService.SPREAD_HOURS_KEY, TextInputStyle.SHORT)
+                .setValue(String.valueOf(FowAutoDeclineService.spreadHours(game)))
+                .setRequiredRange(1, 6)
+                .build();
+        Modal modal = Modal.create("gmQolSettingsResolve", "Stabar's QOL Settings")
+                .addComponents(
+                        Label.of("Auto-decline delay (hours)", base), Label.of("Random spread +/- (hours)", spread))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ModalHandler("gmQolSettingsResolve")
+    public static void resolveQolSettings(ModalInteractionEvent event, Game game) {
+        double base = FowAutoDeclineService.parseHours(
+                event.getValue(FowAutoDeclineService.BASE_HOURS_KEY).getAsString(),
+                FowAutoDeclineService.DEFAULT_BASE_HOURS);
+        double spread = FowAutoDeclineService.parseHours(
+                event.getValue(FowAutoDeclineService.SPREAD_HOURS_KEY).getAsString(),
+                FowAutoDeclineService.DEFAULT_SPREAD_HOURS);
+        game.setStoredValue(FowAutoDeclineService.BASE_HOURS_KEY, String.valueOf(base));
+        game.setStoredValue(FowAutoDeclineService.SPREAD_HOURS_KEY, String.valueOf(spread));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Players who cannot follow a strategy card are auto-declined after " + base + " hours +/- " + spread
+                        + " hours (random), or as soon as they react. Needs the **Stabar's QOL** option.");
     }
 
     private static void checkWhoHas(String acId, Game game, ButtonInteractionEvent event) {

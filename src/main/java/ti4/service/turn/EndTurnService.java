@@ -47,6 +47,7 @@ import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -100,6 +101,8 @@ public class EndTurnService {
                     event,
                     "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
                             + player.getRepresentationNoPing() + ".");
+        } else if (game.getFowOption(FOWOption.GM_TURN_MAP)) {
+            GMService.refreshMapInActivityThread(game);
         }
     }
 
