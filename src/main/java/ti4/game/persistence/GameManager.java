@@ -22,6 +22,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.websocket.WebSocketNotifier;
 
 @UtilityClass
@@ -106,6 +107,7 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         WebSocketNotifier.notifyGameStateChange(game);
+        GameDatabaseSyncPipeline.queueSync(game);
 
         gameNames.add(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
@@ -124,6 +126,7 @@ public class GameManager {
             return false;
         }
         handleManagedGameRemoval(gameName);
+        GameDatabaseSyncPipeline.queueDelete(gameName);
         return true;
     }
 
@@ -136,6 +139,7 @@ public class GameManager {
 
     private static Game handleUndo(Game undo) {
         handleMissingMatchingManagedGame(undo);
+        GameDatabaseSyncPipeline.queueSync(undo);
         return undo;
     }
 
@@ -161,9 +165,9 @@ public class GameManager {
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
-            handleUndo(game);
         }
         handleMissingMatchingManagedGame(game);
+        GameDatabaseSyncPipeline.queueSync(game);
         return game;
     }
 

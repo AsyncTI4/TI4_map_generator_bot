@@ -49,7 +49,6 @@ import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.MatchmakerCron;
 import ti4.cron.OldUndoFileCleanupCron;
-import ti4.cron.PersistToSqlCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
@@ -76,6 +75,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.spring.context.SpringContext;
@@ -328,7 +328,6 @@ public class JdaService {
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCron.register();
-        PersistToSqlCron.register();
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
@@ -648,6 +647,7 @@ public class JdaService {
             logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
             logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
             logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
+            logShutdownResult(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline.shutdown());
 
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
