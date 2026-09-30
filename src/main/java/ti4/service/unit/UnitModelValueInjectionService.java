@@ -397,8 +397,8 @@ public class UnitModelValueInjectionService {
             booleans.isGroundForce(true);
         }
 
-        if (player.hasAbility("radiant_grafting_parturition") && unit.getUnitType() == UnitType.Spacedock
-                || unit.getUnitType() == UnitType.Pds) {
+        if (player.hasAbility("radiant_grafting_parturition") && (unit.getUnitType() == UnitType.Spacedock
+                || unit.getUnitType() == UnitType.Pds)) {
             floats.cost(4, true);
         }
 
