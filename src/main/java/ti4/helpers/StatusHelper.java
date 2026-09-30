@@ -996,6 +996,12 @@ public final class StatusHelper {
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged() + " is the one the game is currently waiting on.";
                 }
+                if (FoWHelper.isStabarsQol(game)) {
+                    GMService.logPlayerActivity(
+                            game,
+                            player2,
+                            player2.getRepresentationNoPing() + " is blocking the public objective scoring queue.");
+                }
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
@@ -1076,6 +1082,13 @@ public final class StatusHelper {
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";
+                        }
+                        if (FoWHelper.isStabarsQol(game)) {
+                            GMService.logPlayerActivity(
+                                    game,
+                                    player2,
+                                    player2.getRepresentationNoPing()
+                                            + " is blocking the secret objective scoring queue.");
                         }
                         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");

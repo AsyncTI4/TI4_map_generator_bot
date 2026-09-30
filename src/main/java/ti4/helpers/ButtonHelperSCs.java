@@ -58,6 +58,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.unit.AddUnitService;
 
 public final class ButtonHelperSCs {
@@ -479,6 +480,12 @@ public final class ButtonHelperSCs {
                         message +=
                                 " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
                     }
+                }
+                if (FoWHelper.isStabarsQol(game)) {
+                    GMService.logPlayerActivity(
+                            game,
+                            player2,
+                            player2.getRepresentationNoPing() + " is blocking the secret objective draw queue.");
                 }
                 game.setStoredValue(key2, game.getStoredValue(key2) + player.getFaction() + "*");
                 break;
@@ -1528,11 +1535,6 @@ public final class ButtonHelperSCs {
         return contains;
     }
 
-    // TODO FoW leak: the scepterE/thardentiag branches below post player.getRepresentationUnfogged() to the
-    // shared SC-follow channel unconditionally (no isFowMode() guard), and the closing reaction always uses the
-    // real player.getFactionEmoji() instead of Helper.getPlayerReactionEmoji()'s fog-safe randomized emoji.
-    // These buttons are offered in FoW games too (see PlayStrategyCardService), so this is reachable. Needs the
-    // same private-channel treatment already applied to MindsieveService/StoneEmbraceService.
     @ButtonHandler("scepterE_follow_")
     @ButtonHandler("mahactA_follow_")
     @ButtonHandler("thardentiag_follow_")
@@ -1605,6 +1607,11 @@ public final class ButtonHelperSCs {
                             + Helper.getSCName(scNum, game) + ".");
             player.exhaustTech("thardentiag");
         }
+        if (game.isFowMode()) {
+            reactToStrategyCardMessage(game, player, scNum);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
         if (channel instanceof ThreadChannel) {
@@ -1617,6 +1624,12 @@ public final class ButtonHelperSCs {
                     "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with `/player cc`.");
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void reactToStrategyCardMessage(Game game, Player player, int scNum) {
+        StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), scNum)
+                .ifPresent(scMessage ->
+                        ReactionService.addReaction(player, false, null, null, scMessage.messageId(), game));
     }
 
     @ButtonHandler("sc_no_follow_")

@@ -20,6 +20,7 @@ import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.helpers.Units.UnitType;
@@ -99,7 +100,7 @@ public class StatusCleanupService {
         }
 
         game.setCurrentACDrawStatusInfo("");
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() || FoWHelper.isStabarsQol(game)) {
             for (Player p : game.getActionPhaseTurnOrder()) {
                 ButtonHelper.drawStatusACs(game, p, null);
             }

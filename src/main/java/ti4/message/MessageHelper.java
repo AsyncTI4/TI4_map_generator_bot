@@ -60,6 +60,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -746,14 +747,16 @@ public class MessageHelper {
 
     private static void updateManagedMessages(String text, Message message, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (text == null || message == null || managedGame == null || managedGame.isFowMode()) return;
+        if (text == null || message == null || managedGame == null) return;
+        if (managedGame.isFowMode()) {
+            replaceFogTurnMessage(text, message, managedGame);
+            return;
+        }
 
         String id = message.getId();
         long date = managedGame.getLastModifiedDate();
 
-        if (text.contains("Use buttons to do your turn")
-                || text.contains("Use buttons to end turn")
-                || text.contains("Use the buttons to end turn")) {
+        if (isTurnButtonMessage(text)) {
             String old = GameMessageManager.replace(gameName, new GameMessage(id, GameMessageType.TURN, date));
             if (old != null) {
                 message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -762,6 +765,23 @@ public class MessageHelper {
 
         if (text.contains(VisionariaSelectService.initialButtonHeader())) {
             GameMessageManager.replace(gameName, new GameMessage(id, GameMessageType.VISIONARIA, date));
+        }
+    }
+
+    private static boolean isTurnButtonMessage(String text) {
+        return text.contains("Use buttons to do your turn")
+                || text.contains("Use buttons to end turn")
+                || text.contains("Use the buttons to end turn");
+    }
+
+    private static void replaceFogTurnMessage(String text, Message message, ManagedGame managedGame) {
+        if (!isTurnButtonMessage(text) || !FoWHelper.isStabarsQol(managedGame.getGame())) return;
+        MessageChannel channel = message.getChannel();
+        GameMessage turnMessage = new GameMessage(
+                message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate(), channel.getId());
+        String old = GameMessageManager.replace(managedGame.getName(), turnMessage);
+        if (old != null) {
+            channel.deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

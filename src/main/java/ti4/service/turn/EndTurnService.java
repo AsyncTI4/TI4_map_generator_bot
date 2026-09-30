@@ -43,6 +43,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
@@ -67,6 +68,15 @@ public class EndTurnService {
             }
         }
         return null;
+    }
+
+    private static void sendFogTurnSummary(Game game, Player player) {
+        String summary = game.getStoredValue("currentActionSummary" + player.getFaction());
+        if (summary.isEmpty()) return;
+        String turn = "(Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + ") ";
+        GMService.postToActivityThread(game, turn + player.getRepresentationNoPing() + summary);
+        MessageHelper.sendPrivateMessageToPlayer(player, game, "Your turn summary " + turn + summary);
+        game.removeStoredValue("currentActionSummary" + player.getFaction());
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -295,6 +305,9 @@ public class EndTurnService {
                     game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
                 }
             }
+        }
+        if (FoWHelper.isStabarsQol(game)) {
+            sendFogTurnSummary(game, mainPlayer);
         }
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {

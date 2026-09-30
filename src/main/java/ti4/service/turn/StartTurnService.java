@@ -76,6 +76,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.CardsInfoService;
@@ -204,6 +205,13 @@ public class StartTurnService {
         game.removeStoredValue("violatedSystems");
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
+            if (FoWHelper.isStabarsQol(game)) {
+                GMService.logPlayerActivity(
+                        game,
+                        player,
+                        player.getRepresentationNoPing() + " started turn " + player.getInRoundTurnCount()
+                                + " of round " + game.getRound() + ".");
+            }
 
             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), text);
             if (!goingToPass) {

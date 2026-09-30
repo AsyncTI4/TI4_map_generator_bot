@@ -35,6 +35,7 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
@@ -717,17 +718,7 @@ public class PlayStrategyCardService {
                                         + "** because the bot does not believe you have a space dock in your home system.");
                     }
                 }
-                if (!p2.hasFollowedSC(scToPlay)
-                        && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
-                                .isEmpty()) {
-                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
-                    markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
-                    MessageHelper.sendMessageToChannel(
-                            p2.getCardsInfoThread(),
-                            "You were automatically marked as not following **"
-                                    + stratCardName
-                                    + "** because you told the bot earlier that you wished to pass on it.");
-                } else {
+                if (!applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event)) {
                     if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
                         markPlayerAsAutoFollowing(playersToReact, game, p2, 8, event);
                         MessageHelper.sendMessageToChannel(
@@ -736,6 +727,13 @@ public class PlayStrategyCardService {
                                         + "** because the bot believes you have already scored all "
                                         + p2.getSoScored() + " of your secret objectives.");
                     }
+                }
+            }
+        }
+        if (FoWHelper.isStabarsQol(game) && !isSpecialPbdGame && !game.isHomebrewSCMode() && scToPlay != 5) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 != player) {
+                    applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event);
                 }
             }
         }
@@ -874,6 +872,27 @@ public class PlayStrategyCardService {
 
     private static String getStrategyCardThreadName(String gameName, int round, String strategyCardName) {
         return gameName + "-round-" + round + "-" + strategyCardName;
+    }
+
+    private static boolean applyPreDecline(
+            List<Player> playersToReact,
+            Game game,
+            Player p2,
+            int scToPlay,
+            String stratCardName,
+            GenericInteractionCreateEvent event) {
+        String key = "prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction();
+        if (p2.hasFollowedSC(scToPlay) || game.getStoredValue(key).isEmpty()) {
+            return false;
+        }
+        game.removeStoredValue(key);
+        markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
+        MessageHelper.sendMessageToChannel(
+                p2.getCardsInfoThread(),
+                "You were automatically marked as not following **"
+                        + stratCardName
+                        + "** because you told the bot earlier that you wished to pass on it.");
+        return true;
     }
 
     private static void markPlayerAsAutoFollowing(

@@ -62,6 +62,14 @@ public class FOWOptionService {
                 FOWOptionCategory.GAME,
                 "New transactions",
                 "Use the offer/accept transaction model instead of the legacy direct-send flow"),
+        STABARS_QOL(
+                FOWOptionCategory.GAME,
+                "Stabar's QOL",
+                "Fog quality-of-life helpers: pre-decline strategy cards, auto status action cards, private reminders, GM waiting-on info"),
+        GM_TURN_MAP(
+                FOWOptionCategory.GAME,
+                "GM turn map",
+                "Post the unfogged map to the GM activity log at the end of every turn"),
 
         // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),

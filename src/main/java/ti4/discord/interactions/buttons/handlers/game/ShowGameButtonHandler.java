@@ -43,7 +43,7 @@ class ShowGameButtonHandler {
                 Buttons.gray(MapSegmentService.withSegment(SHOW_MAP, segment), "Show Map"),
                 Buttons.gray(SHOW_PLAYER_AREAS, "Show Player Stats"),
                 Buttons.gray(MapSegmentService.withSegment(SHOW_FULL_MAP, segment), "Show Full Map"));
-        if (postsInChannel(game, event)) {
+        if (postsInChannel(event)) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         } else {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
@@ -59,8 +59,8 @@ class ShowGameButtonHandler {
         return false;
     }
 
-    private static boolean postsInChannel(Game game, ButtonInteractionEvent event) {
-        return game.isFowMode() && refreshMapStyle(event).postsInChannelInFog();
+    private static boolean postsInChannel(ButtonInteractionEvent event) {
+        return refreshMapStyle(event).postsInChannel();
     }
 
     private static RefreshMapStyle refreshMapStyle(ButtonInteractionEvent event) {
@@ -70,7 +70,7 @@ class ShowGameButtonHandler {
     private static void showMapPart(
             Game game, ButtonInteractionEvent event, DisplayType part, @Nullable String segment) {
         if (!mayRenderHere(game, event)) return;
-        boolean inChannel = postsInChannel(game, event);
+        boolean inChannel = postsInChannel(event);
         MapRenderPipeline.queue(game, event, part, segment, fileUpload -> {
             if (!inChannel) {
                 MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
