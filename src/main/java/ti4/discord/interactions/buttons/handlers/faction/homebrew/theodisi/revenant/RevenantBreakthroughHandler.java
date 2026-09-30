@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant;
 
 import java.util.ArrayList;
 import java.util.Arrays;

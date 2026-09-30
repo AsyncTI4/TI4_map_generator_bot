@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;

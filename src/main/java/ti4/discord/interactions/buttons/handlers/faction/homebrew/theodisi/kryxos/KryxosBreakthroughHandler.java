@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -34,10 +34,10 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;

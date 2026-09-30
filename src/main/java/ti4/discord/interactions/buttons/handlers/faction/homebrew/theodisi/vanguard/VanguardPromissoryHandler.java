@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;

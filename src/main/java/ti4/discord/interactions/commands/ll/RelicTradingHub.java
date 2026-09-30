@@ -1,7 +1,7 @@
 package ti4.discord.interactions.commands.ll;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.message.MessageHelper;
 

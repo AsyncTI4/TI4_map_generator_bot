@@ -5,7 +5,7 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;

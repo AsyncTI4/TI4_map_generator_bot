@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor;
 
 import java.util.ArrayList;
 import java.util.Collections;

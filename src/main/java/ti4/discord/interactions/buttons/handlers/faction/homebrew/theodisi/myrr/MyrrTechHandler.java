@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr;
 
 import java.util.ArrayList;
 import java.util.HashMap;

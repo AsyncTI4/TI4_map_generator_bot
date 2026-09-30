@@ -14,11 +14,11 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRid
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;

@@ -57,8 +57,8 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.VoiceOfTheCounc
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WarrantAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;

@@ -13,7 +13,7 @@ import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;

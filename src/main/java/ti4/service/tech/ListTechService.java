@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;

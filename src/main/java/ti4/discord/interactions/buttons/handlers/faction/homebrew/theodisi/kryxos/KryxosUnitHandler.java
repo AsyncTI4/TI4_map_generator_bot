@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
