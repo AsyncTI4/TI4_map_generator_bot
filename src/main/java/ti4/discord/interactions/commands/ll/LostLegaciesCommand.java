@@ -7,8 +7,8 @@ import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
 
 public class LostLegaciesCommand implements ParentCommand {
-    private final Map<String, Subcommand> subcommands =
-            Stream.of(new RevLeaderFix()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+    private final Map<String, Subcommand> subcommands = Stream.of(new RevLeaderFix(), new RelicTradingHub())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones;
 
 import java.util.ArrayList;
 import java.util.List;

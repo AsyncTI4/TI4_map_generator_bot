@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
@@ -92,8 +93,26 @@ public class RelicHelper {
         drawRelicAndNotify(player, event, game, 0, false);
     }
 
+    public static void drawRelicAndNotifyIgnoringKairnBreakthrough(
+            Player player, GenericInteractionCreateEvent event, Game game) {
+        drawRelicAndNotify(player, event, game, 0, false, true);
+    }
+
     public static void drawRelicAndNotify(
             Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
+        drawRelicAndNotify(player, event, game, position, checked, false);
+    }
+
+    private static void drawRelicAndNotify(
+            Player player,
+            GenericInteractionCreateEvent event,
+            Game game,
+            int position,
+            boolean checked,
+            boolean ignoreKairnBreakthrough) {
+        if (!ignoreKairnBreakthrough && KairnBreakthroughHandler.offerRelicGainInterrupt(event, game, player)) {
+            return;
+        }
         if (!checked
                 && (player.hasAbility("data_leak")
                         || (player.getPromissoryNotes().containsKey("dspnflor")
@@ -138,7 +157,7 @@ public class RelicHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
-
+        KairnBreakthroughHandler.offerReadyAfterRelicDraw(game, player);
         if (checked) game.shuffleRelics();
     }
 

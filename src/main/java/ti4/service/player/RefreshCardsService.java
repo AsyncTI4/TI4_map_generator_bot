@@ -3,7 +3,7 @@ package ti4.service.player;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;

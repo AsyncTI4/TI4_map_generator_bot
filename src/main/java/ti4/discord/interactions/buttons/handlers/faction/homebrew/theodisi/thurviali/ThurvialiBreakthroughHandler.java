@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali;
 
 import java.util.ArrayList;
 import java.util.List;

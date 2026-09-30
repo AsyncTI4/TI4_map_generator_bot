@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;

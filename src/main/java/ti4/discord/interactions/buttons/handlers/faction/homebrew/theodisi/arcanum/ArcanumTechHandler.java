@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum;
 
 import java.util.ArrayList;
 import java.util.HashSet;
