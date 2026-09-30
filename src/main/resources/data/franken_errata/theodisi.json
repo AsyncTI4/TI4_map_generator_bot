@@ -238,5 +238,11 @@
             "ABILITY:celestial_envoys"
         ],
         "source": "theodisi"
-    }
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "celestial_envoys",
+								"undraftable": true,
+        "source": "theodisi"
+    } 
 ]
