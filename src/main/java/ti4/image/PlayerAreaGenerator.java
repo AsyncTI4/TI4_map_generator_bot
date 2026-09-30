@@ -68,7 +68,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
-import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.MapGenerator.HorizontalAlign;
@@ -1992,15 +1991,15 @@ public class PlayerAreaGenerator {
 
         int x = mapWidth - 120 - xDeltaFromRightSide;
         boolean onBoard = MonumentsService.hasMonumentOnBoard(game, player);
-        String monumentFile = "outline_monument.png";
+        BufferedImage image = null;
         if (!onBoard) {
-            UnitKey monumentKey = Units.getUnitKey(monument.getUnitType(), player.getColor());
-            monumentFile = monumentKey.getFileName();
+            String monumentKey =
+                    getUnitPath(Mapper.getUnitKey(monument.getUnitType().toString(), player.getColor()));
+            image = ImageHelper.read(monumentKey);
+        } else {
+            image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", "outline_monument.png"));
         }
-        BufferedImage image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", monumentFile));
-        if (image == null) {
-            image = ImageHelper.read(ResourceHelper.getResourceFromFolder("units/", "black_monument.png"));
-        }
+
         graphics.drawImage(image, x + 20, y + 40, null);
         if (NekroMonumentService.hasAssimilatorOnMonument(game, player)) {
             drawFactionIconImageBorder(graphics, "nekro", x + 52, y + 78, 36, 36);
