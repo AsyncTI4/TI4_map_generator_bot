@@ -18,6 +18,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
@@ -196,6 +197,9 @@ public final class BreakthroughCommandHelper {
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
+            }
+            if ("kairnbt".equalsIgnoreCase(bt.getID())) {
+                KairnBreakthroughHandler.refreshRelics(game, player);
             }
             if ("khraskbt".equalsIgnoreCase(bt.getID())) {
                 player.addPlanet("grove");

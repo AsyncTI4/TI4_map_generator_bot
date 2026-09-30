@@ -56,7 +56,8 @@
       "WARFARE",
       "BIOTIC"
     ],
-    "text": "ACTION: Exhaust this card and purge 1 relic fragment. Explore 1 planet with the same trait as the purged relic fragment and gain 2 purged relic fragments of any other color, if able.",
+    "text": "When you gain this breakthrough and at the start of each strategy phase, remove each relic from this card and draw 3 relics and place each on this card. When a player would gain a relic, you may exhaust this card to have them gain 1 of the relics on this card instead or ready this card.",
+    "notes": "This interrupts the relic draw for its owner, but does not for other players. If you are removing something like the obsidian from a player for a relic on this BT, make sure to fix whatever \"On Gain\" effect occurred.",
     "source": "theodisi"
   },
   {

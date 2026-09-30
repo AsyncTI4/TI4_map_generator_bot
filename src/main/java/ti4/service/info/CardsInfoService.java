@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
@@ -149,6 +150,12 @@ public class CardsInfoService {
         }
         if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
+        }
+        if (player.hasUnlockedBreakthrough("kairnbt")) {
+            buttons.add(KairnBreakthroughHandler.getRelicsCardsInfoButton(player));
+            if (player.hasReadyBreakthrough("kairnbt")) {
+                buttons.add(KairnBreakthroughHandler.getOtherPlayerRelicButton(player));
+            }
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
             buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));

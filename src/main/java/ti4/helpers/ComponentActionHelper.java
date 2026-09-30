@@ -21,7 +21,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardBreakthroughHandler;
@@ -174,7 +173,6 @@ public class ComponentActionHelper {
                                     game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
                                 case "crimsonbt" -> true;
                                 case "mahactbt" -> !p1.getTechs().isEmpty();
-                                case "kairnbt" -> KairnBreakthroughHandler.canUse(game, p1);
                                 case "ardentiabt" ->
                                     game.getRealPlayers().stream()
                                             .anyMatch(otherPlayer -> otherPlayer != p1
