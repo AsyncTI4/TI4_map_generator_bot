@@ -12,6 +12,9 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
     @Query("DELETE FROM PlayerEntity p WHERE p.game.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);
 
+    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN FETCH p.game g")
+    List<PlayerEntity> findAllWithUsersAndGames();
+
     @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u")
     List<PlayerEntity> findAllWithUsers();
 

@@ -8,6 +8,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface TitleEntityRepository extends JpaRepository<TitleEntity, Long> {
 
+    @Query("SELECT t FROM TitleEntity t JOIN FETCH t.user JOIN FETCH t.game")
+    List<TitleEntity> findAllWithUsersAndGames();
+
     @Query("SELECT t FROM TitleEntity t JOIN FETCH t.user")
     List<TitleEntity> findAllWithUsers();
 

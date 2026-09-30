@@ -22,6 +22,7 @@ import ti4.spring.service.persistence.GameEntitySnapshot;
 public class GameDatabaseSyncPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
+    private static final int SYNC_EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 5;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
             Thread.ofPlatform().name("ti4-game-database-sync-", 0).factory());
 
@@ -49,6 +50,15 @@ public class GameDatabaseSyncPipeline {
                 EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
+    static void queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(taskName, executionTimeWarningThresholdSeconds, runnable);
+        try {
+            ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+        } catch (RejectedExecutionException e) {
+            BotLogger.error("`" + taskName + "` was rejected because the bot is shutting down.");
+        }
+    }
+
     private static void queue(String gameName, Consumer<GameEntityPersistenceService> databaseWrite) {
         Runnable runnable = () -> {
             try {
@@ -57,11 +67,9 @@ public class GameDatabaseSyncPipeline {
                 BotLogger.error("Failed to sync game " + gameName + " to the database.", e);
             }
         };
-        var timedRunnable = new TimedRunnable("GameDatabaseSyncPipeline task for `" + gameName + "`", runnable);
-        try {
-            ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
-        } catch (RejectedExecutionException e) {
-            BotLogger.error("Database sync for game " + gameName + " was rejected because the bot is shutting down.");
-        }
+        queueTask(
+                "GameDatabaseSyncPipeline task for `" + gameName + "`",
+                SYNC_EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
+                runnable);
     }
 }
