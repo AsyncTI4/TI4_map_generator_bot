@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard;
 
 import java.util.ArrayList;
 import java.util.Comparator;

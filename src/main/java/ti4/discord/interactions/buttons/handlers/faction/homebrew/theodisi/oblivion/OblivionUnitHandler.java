@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion;
 
 import java.util.ArrayList;
 import java.util.HashSet;

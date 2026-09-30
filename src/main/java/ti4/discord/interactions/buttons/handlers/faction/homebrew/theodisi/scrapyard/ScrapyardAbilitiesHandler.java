@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -364,7 +364,7 @@ public class ScrapyardAbilitiesHandler {
         }
 
         CUSTOM_RIGS.forEach(rig -> player.removeExhaustedAbility(rig + ACTIVE_SUFFIX));
-        ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardUnitHandler
+        ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardUnitHandler
                 .clearFuelCell(game, player);
     }
 

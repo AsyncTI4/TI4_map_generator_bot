@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
