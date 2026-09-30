@@ -208,7 +208,7 @@ public abstract class SettingsMenu {
         buttonFailed(event, userMsg, true);
     }
 
-    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean logError) {
+    private static void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean logError) {
         if (logError) {
             BotLogger.error(new LogOrigin(event), userMsg + "\nMenu Framework button has failed.");
         }

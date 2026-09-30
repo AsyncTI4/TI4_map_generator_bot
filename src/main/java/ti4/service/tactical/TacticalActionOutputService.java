@@ -26,6 +26,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
@@ -350,18 +351,14 @@ public class TacticalActionOutputService {
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (unit.unitType() == UnitType.Destroyer) {
-                if (player.ownsUnit("ponthous_destroyer2")) {
-                    output.append("**REMINDER**: Renegade II can only transport ground forces.");
-                } else if (player.ownsUnit("ponthous_destroyer")) {
-                    output.append("**REMINDER**: Renegade I can only transport infantry.");
-                }
-            }
             if (player.hasPlanet("gyraxis")
                     && player.getExhaustedPlanetsAbilities().contains("gyraxis")
                     && "yes".contains(game.getStoredValue("gyraxisActive"))) {
                 output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")) {
+            output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
@@ -479,6 +476,10 @@ public class TacticalActionOutputService {
                     break;
                 }
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")
+                && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
+            bonusMoveValue += 1;
         }
 
         return baseMoveValue + bonusMoveValue;

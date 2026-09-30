@@ -20,6 +20,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 import ti4.service.regex.RegexService;
 import ti4.spring.service.gameevent.GameEventDraft;
 
@@ -77,7 +78,7 @@ public class TacticalActionDisplacementService {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {
-            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
+            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds, UnitType.Monument));
         }
         if (player.hasTech("dsmirvpds") || player.hasUnit("tk-keshnu") || player.hasUnit("mirveda_pds")) {
             movableFromPlanets.add(UnitType.Pds);
@@ -245,7 +246,11 @@ public class TacticalActionDisplacementService {
 
         for (UnitKey unitKey : new HashSet<>(unitHolder.getUnitsByState().keySet())) {
             if (!canMoveUnit(player, allowedAllies, unitKey)) continue;
-            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.unitType())) continue;
+            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+            boolean isFlightStructure =
+                    player.hasAbility("radiant_grafting_flight") && unitModel != null && unitModel.getIsStructure();
+            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.unitType()) && !isFlightStructure)
+                continue;
 
             List<Integer> existing = movement.getOrDefault(unitKey, UnitState.emptyList());
             List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));

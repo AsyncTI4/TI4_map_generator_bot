@@ -63,7 +63,7 @@
     "requirements": "YY",
     "faction": "veylor",
     "source": "theodisi",
-    "text": "After an agenda is revealed, you may exhaust this card and predict aloud the outcome of that agenda. If your prediction is correct, perform the secondary ability of a strategy card without spending a command token."
+    "text": "After an agenda is revealed, you may exhaust this card and predict aloud the outcome of that agenda. If your prediction is correct, perform the secondary ability of a strategy card without spending a command token. If that agenda is not resolved, ready this card."
   },
   {
     "alias": "thmyrry",
@@ -97,7 +97,7 @@
     "requirements": "Y",
     "faction": "kairn",
     "source": "theodisi",
-    "text": "At the end of a tactical action, you may exhaust this card to explore 1 planet you control in the active system. When you gain a relic fragment during exploration, you may remove 1 infantry from the explored planet to ready this card."
+    "text": "Once per action, at the end of a tactical action, you may exhaust this card to explore 1 planet you control in the active system. When you gain a relic fragment during exploration, you may remove 1 infantry from the explored planet to ready this card."
   },
   {
     "alias": "thkairng",
@@ -273,10 +273,10 @@
     "types": [
       "CYBERNETIC"
     ],
-    "requirements": "Y",
+    "requirements": "YY",
     "faction": "revenant",
     "source": "theodisi",
-    "text": "When you exhaust an agent for its effect or a player purges a hero for its effect, you may produce 2 units in a system that contains 1 of your ships."
+    "text": "When you exhaust an agent for its effect or purge a hero for its effect, you may produce 2 units in a system that contains 1 of your ships."
   },
   {
     "alias": "threvenantr",
@@ -284,7 +284,7 @@
     "types": [
       "WARFARE"
     ],
-    "requirements": "RR",
+    "requirements": "R",
     "faction": "revenant",
     "source": "theodisi",
     "text": "During the first round of combat, you may cancel hits equal to the number of leader types you have unlocked, unexhausted, and unpurged."
@@ -298,7 +298,7 @@
     "requirements": "B",
     "faction": "thrones",
     "source": "theodisi",
-    "text": "At the end of a tactical action, you may exhaust this card to move 1 of your ships from the active system into a system that contains no other player's ships. The ship may transport units."
+    "text": "At the end of a tactical action, you may exhaust this card to move 1 of your ships from the active system into a system that contains no other player's ships. This ship may transport units."
   },
   {
     "alias": "ththronesr",
@@ -355,6 +355,128 @@
     "faction": "ponthous",
     "baseUpgrade": "dd2",
     "source": "theodisi",
-    "text": "This unit can only transport ground forces."
+    "text": ""
+  },
+  {
+    "alias": "thvanguardr",
+    "name": "Enhanced Plating",
+    "types": [
+        "WARFARE"
+    ],
+    "faction": "vanguard",
+    "source": "theodisi",
+    "text": "Once per combat round when one of your units uses SUSTAIN DAMAGE during combat, roll a die. If the result is equal to or greater than the unit's combat value, produce one hit against your opponent's units."
+  },
+  {
+    "alias": "thvanguardy",
+    "name": "Reinforce",
+    "types": [
+        "CYBERNETIC"
+    ],
+    "faction": "vanguard",
+    "source": "theodisi",
+    "text": "Once per action, after you win a combat, the active system gains PRODUCTION 3 until the end of the action."
+  },
+  {
+    "alias": "thscrapyardff",
+    "name": "Fuel Cell II",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "ff2",
+    "requirements": "BG",
+    "faction": "scrapyard",
+    "source": "theodisi",
+    "text": "After you activate a system, destroy any number of your fighters to apply +1 to the move value of 1 of your ships during this action for every 2 fighters you destroy. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+  },
+  {
+    "alias": "thscrapyardr",
+    "name": "Hotswapping",
+    "types": [
+        "WARFARE"
+    ],
+    "requirements": "RRR",
+    "faction": "scrapyard",
+    "source": "theodisi",
+    "text": "When you activate a system, or a system containing your units is activated, you may treat 1 unit type you control as if you owned the Unit Upgrade technology for it until the end of that tactical action."
+  },
+  {
+    "alias": "thstoneborng",
+    "name": "Xenolith Dormant",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "G",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "UNLEASH: Return 2 Green Fragmentum Tokens from your player sheet.\nWhen you would explore a planet you control or the frontier deck, you may exhaust this card and instead reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+  },
+  {
+    "alias": "thstoneborngu",
+    "name": "Xenolith Unleashed",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "null",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "After you explore a planet you control or the frontier deck, you may exhaust this card and reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+  },
+  {
+    "alias": "thstoneborndn",
+    "name": "Stalactium II",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "dn2",
+    "requirements": "BBY",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "UNLEASH: Return 2 Blue Fragmentum Tokens from your player sheet.\nDEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+  },
+  {
+    "alias": "thmorphag",
+    "name": "Synaptic Relays",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "GG",
+    "faction": "morpha",
+    "source": "theodisi",
+    "text": "ACTION: Exhaust this card and discard 1 action card to draw 1 action card and 1 random hydromorphic card."
+  },
+  {
+    "alias": "thmorphacv",
+    "name": "Cytoplasmic Transports II",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "cv2",
+    "requirements": "BB",
+    "faction": "morpha",
+    "source": "theodisi",
+    "text": "Once per action, when you discard 1 or more action cards, you may either produce 1 carrier in a system containing your ships, or move 1 carrier you control to a system that contains 1 of your space docks (it may transport units)."
+  },
+  {
+    "alias": "ththurvialig",
+    "name": "Restructuring",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "G",
+    "faction": "thurviali",
+    "source": "theodisi",
+    "text": "ACTION: Exhaust this card and remove up to 3 of your structures from the game board and place them on 1 or more planets you control."
+  },
+  {
+    "alias": "ththurvialib",
+    "name": "Mutualism",
+    "types": [
+        "PROPULSION"
+    ],
+    "requirements": "BB",
+    "faction": "thurviali",
+    "source": "theodisi",
+    "text": "You may use the PRODUCTION, SPACE CANNON or PLANETARY SHIELD of structures you are coexisting with.\nACTION: Exhaust this card and select 1 player. They may place a structure in coexistence from their reinforcements on a planet you control. If they do, they gain 1 command token."
   }
 ]

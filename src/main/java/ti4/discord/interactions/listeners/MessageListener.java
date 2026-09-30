@@ -35,6 +35,7 @@ import ti4.message.MessageHelper;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.GameNameService;
@@ -46,7 +47,7 @@ class MessageListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
-    private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
+    private static final Pattern TRAILING_NON_ALPHANUMERIC_PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
     // The mention itself is 23 characters long
     private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 53;
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
@@ -113,6 +114,7 @@ class MessageListener extends ListenerAdapter {
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
+                if (checkForCalmDownBot(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
 
                 reportInterestingMessages(message);
@@ -172,7 +174,7 @@ class MessageListener extends ListenerAdapter {
                 && !message.getAuthor().isBot()) {
             message.reply(
                             message.getContentRaw()
-                                    + "\n\nEchoing because normal users cant ping bothelpers intro private threads created by the bot.")
+                                    + "\n\nEchoing because normal users cant ping bothelpers into private threads created by the bot.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
@@ -209,13 +211,24 @@ class MessageListener extends ListenerAdapter {
         return true;
     }
 
+    private static boolean checkForCalmDownBot(Message message) {
+        if (!message.getContentRaw().toLowerCase().contains("calm down bot")) {
+            return false;
+        }
+        message.reply(
+                        "I am a robot " + message.getAuthor().getAsMention()
+                                + ", so I am always calm. This is simply my job, which I am executing faithfully, unlike *certain* people who are currently playing a boardgame over discord. \n-# smh no respect for the help these days")
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        return true;
+    }
+
     private static boolean copyLFGPingsToLFGPingsChannel(MessageReceivedEvent event, Message message) {
 
         Role lfgRole = DiscordRoleUtility.getRole("LFG", event.getGuild()); // 947310962485108816
         if (lfgRole == null || !message.getContentRaw().contains(lfgRole.getAsMention())) {
             return false;
         }
-        if (message.getAttachments().size() > 0 && !(event.getChannel() instanceof ThreadChannel)) {
+        if (!message.getAttachments().isEmpty() && !(event.getChannel() instanceof ThreadChannel)) {
             Member member = event.getMember();
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
@@ -289,8 +302,8 @@ class MessageListener extends ListenerAdapter {
                     }
 
                     String messageLowerCase = messageText.toLowerCase();
-                    String receivingColorOrFaction = PATTERN.matcher(
-                                    StringUtils.substringBetween(messageLowerCase, "to", " "))
+                    String receivingColorOrFaction = TRAILING_NON_ALPHANUMERIC_PATTERN
+                            .matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
                             .replaceAll("");
 
                     if ("futureme".equals(receivingColorOrFaction)) {
@@ -403,7 +416,10 @@ class MessageListener extends ListenerAdapter {
                 });
             }
         }
-        if (!managedGame.isFactionReactMode() && !managedGame.isColorReactMode() && !managedGame.isStratReactMode()
+        if (!managedGame.isFactionReactMode()
+                        && !managedGame.isColorReactMode()
+                        && !managedGame.isStratReactMode()
+                        && managedGame.getGame().getStoredValue("skulls").isEmpty()
                 || managedGame.isFowMode()) {
             return false;
         }
@@ -422,6 +438,29 @@ class MessageListener extends ListenerAdapter {
                     if (managedGame.isFactionReactMode()) {
                         var emoji = Emoji.fromFormatted(player.getFactionEmoji());
                         messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                    if (!managedGame.getGame().getStoredValue("skulls").isEmpty()) {
+                        if (!managedGame
+                                .getGame()
+                                .getStoredValue(player.getFaction() + "skulls")
+                                .isEmpty()) {
+                            int skulls = Integer.parseInt(
+                                    managedGame.getGame().getStoredValue(player.getFaction() + "skulls"));
+                            for (int x = 1; x < skulls + 1; x++) {
+                                Emoji emoji;
+                                switch (x) {
+                                    case 2 -> emoji = MiscEmojis.skull2.asEmoji();
+                                    case 3 -> emoji = MiscEmojis.skull3.asEmoji();
+                                    case 4 -> emoji = MiscEmojis.skull4.asEmoji();
+                                    case 5 -> emoji = MiscEmojis.skull5.asEmoji();
+                                    case 6 -> emoji = MiscEmojis.skull6.asEmoji();
+                                    default -> emoji = MiscEmojis.skull1.asEmoji();
+                                }
+                                messages.getFirst()
+                                        .addReaction(emoji)
+                                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                            }
+                        }
                     }
                     if (managedGame.isColorReactMode()) {
                         var emoji = ColorEmojis.getColorEmoji(player.getColor()).asEmoji();

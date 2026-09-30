@@ -95,7 +95,7 @@ public class NekroMonumentService {
         } else {
             game.setStoredValue(ASSIMILATOR_Z, game.getStoredValue(ASSIMILATOR_Z) + faction + "|");
         }
-        sendAssimilatorMessage(nekro, target, "placed Valefar " + token + " on");
+        sendAssimilatorMessage(game, nekro, target, "placed Valefar " + token + " on");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -172,7 +172,7 @@ public class NekroMonumentService {
         } else {
             return;
         }
-        sendAssimilatorMessage(nekro, target, "moved an assimilator token to");
+        sendAssimilatorMessage(game, nekro, target, "moved an assimilator token to");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -256,7 +256,8 @@ public class NekroMonumentService {
         return getFlagshipZFactions(game).size() + getMonumentZFactions(game).size() < maxTokens;
     }
 
-    private static void sendAssimilatorMessage(Player nekro, Player target, String action) {
+    private static void sendAssimilatorMessage(Game game, Player nekro, Player target, String action) {
+        MonumentsService.syncZelianAsteroidFieldToken(game);
         UnitModel monument = target.getUnitByBaseType("monument");
         String ability = monument.getAbility().orElse("");
         MessageHelper.sendMessageToChannel(

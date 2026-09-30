@@ -19,6 +19,8 @@ class RingSelectionButtonHandler {
         String num = buttonID.replace("ring_", "");
         String message;
         if (!"corners".equalsIgnoreCase(num)) {
+            // TODO: reads only the first digit, so rings 10+ skip the left/right message (SystemPickerService fixes
+            // this for fog)
             int ring = Integer.parseInt(num.charAt(0) + "");
             if (ring > 4 && !num.contains("left") && !num.contains("right")) {
                 message =

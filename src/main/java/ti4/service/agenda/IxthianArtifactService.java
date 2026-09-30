@@ -2,6 +2,7 @@ package ti4.service.agenda;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -30,6 +31,8 @@ import ti4.service.relic.HeartOfIxthService;
 
 @UtilityClass
 public class IxthianArtifactService {
+
+    private static final Pattern HEADING_PREFIX_PATTERN = Pattern.compile("## ");
 
     @Nullable
     public static String watchPartyPing(Game game) {
@@ -147,7 +150,9 @@ public class IxthianArtifactService {
             Button bad = Buttons.red(buttonID, "Explode", MiscEmojis.DoubleBoom);
 
             List<Button> buttons = HeartOfIxthService.makeHeartOfIxthButtons(game, heartPlayer, good, bad, result);
-            String msg = resultMessage(game, result, false).replaceFirst("## ", "");
+            String msg = HEADING_PREFIX_PATTERN
+                    .matcher(resultMessage(game, result, false))
+                    .replaceFirst("");
             msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the _Heart of Ixth_";
             msg += " to modify the outcome of _Ixthian Artifact_.";
             MessageHelper.sendMessageToChannelWithButtons(heartPlayer.getCorrectChannel(), msg, buttons);

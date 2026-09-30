@@ -20,9 +20,9 @@ class UserSettingsTest {
         UserSettings settings = new UserSettings();
         String activity = buildActivity(5, 4, 45, 7, 25);
 
-        assertThat(settings.summarizeActiveHours(activity))
+        assertThat(UserSettings.summarizeActiveHours(activity))
                 .isEqualTo("<t:1767240000:t>-<t:1767243600:t>, <t:1767250800:t>-<t:1767254400:t>");
-        assertThat(settings.summarizeActiveHoursEmoji(activity))
+        assertThat(UserSettings.summarizeActiveHoursEmoji(activity))
                 .isEqualTo("🟥🟥🟥🟥🟩🟥🟥🟩🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥");
     }
 
@@ -32,8 +32,8 @@ class UserSettingsTest {
         settings.setActiveHours(buildActivity(1));
 
         assertThat(settings.getActiveHoursAsIntegers()).isEmpty();
-        assertThat(settings.summarizeActiveHours(settings.getActiveHours())).isNull();
-        assertThat(settings.summarizeActiveHoursEmoji(settings.getActiveHours()))
+        assertThat(UserSettings.summarizeActiveHours(settings.getActiveHours())).isNull();
+        assertThat(UserSettings.summarizeActiveHoursEmoji(settings.getActiveHours()))
                 .isEqualTo("Not enough data.");
     }
 

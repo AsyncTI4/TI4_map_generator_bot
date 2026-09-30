@@ -463,7 +463,7 @@ public class MiltyDraftManager {
         return legitPick;
     }
 
-    private String getAutoButtonID(List<Button> buttons) {
+    private static String getAutoButtonID(List<Button> buttons) {
         if (buttons.size() == 1)
             return MILTY_.matcher(buttons.getFirst().getCustomId()).replaceFirst("miltyAuto_");
         return null;

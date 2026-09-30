@@ -183,6 +183,15 @@ public class MessageHelper {
         splitAndSent(messageText, channel, embeds, buttons);
     }
 
+    public static void sendMessageToChannelWithEmbedsAndButtons(
+            @Nonnull MessageChannel channel,
+            @Nullable String messageText,
+            @Nullable List<MessageEmbed> embeds,
+            @Nullable List<Button> buttons,
+            @Nullable Consumer<Message> restAction) {
+        splitAndSentWithAction(messageText, channel, restAction, embeds, buttons);
+    }
+
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
             if (button.getCustomId() != null
@@ -251,7 +260,23 @@ public class MessageHelper {
             List<MessageEmbed> embeds,
             List<Button> buttons,
             boolean saboable) {
+        sendMessageToChannelWithEmbedsAndFactionReact(
+                channel, messageText, game, player, embeds, buttons, saboable, null);
+    }
+
+    public static void sendMessageToChannelWithEmbedsAndFactionReact(
+            MessageChannel channel,
+            String messageText,
+            Game game,
+            Player player,
+            List<MessageEmbed> embeds,
+            List<Button> buttons,
+            boolean saboable,
+            @Nullable Consumer<Message> andThen) {
         Consumer<Message> addFactionReact = (message) -> {
+            if (andThen != null) {
+                andThen.accept(message);
+            }
             if (saboable) {
                 GameMessageManager.add(
                         game.getName(),
@@ -1003,7 +1028,7 @@ public class MessageHelper {
         StringBuilder message = new StringBuilder();
         for (String block : blocks) {
             if (block == null || block.isEmpty()) continue;
-            if (message.length() + block.length() > maxLength && message.length() > 0) {
+            if (message.length() + block.length() > maxLength && !message.isEmpty()) {
                 messages.add(message.toString());
                 message.setLength(0);
             }
@@ -1016,7 +1041,7 @@ public class MessageHelper {
             }
             message.append(block);
         }
-        if (message.length() > 0) {
+        if (!message.isEmpty()) {
             messages.add(message.toString());
         }
         return messages;

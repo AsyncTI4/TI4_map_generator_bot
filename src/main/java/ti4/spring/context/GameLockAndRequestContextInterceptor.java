@@ -44,7 +44,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return true;
     }
 
-    private String getGameNameFromUri(ServletRequest request) {
+    private static String getGameNameFromUri(ServletRequest request) {
         Object attributes = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (!(attributes instanceof Map<?, ?> vars)) {
             return null;
@@ -53,7 +53,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return (gameNameObject instanceof String gameName) ? gameName : null;
     }
 
-    private boolean shouldSaveGame(HttpServletRequest request, Object handler) {
+    private static boolean shouldSaveGame(HttpServletRequest request, Object handler) {
         boolean shouldSaveGame = MUTATION_METHODS.contains(request.getMethod());
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
@@ -68,7 +68,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return shouldSaveGame;
     }
 
-    private boolean shouldSetupGameRequestContext(Object handler) {
+    private static boolean shouldSetupGameRequestContext(Object handler) {
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
             return annotation == null || annotation.value();
@@ -76,7 +76,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return true;
     }
 
-    private void setupGameRequestContext(String gameName, boolean shouldSaveGame) {
+    private static void setupGameRequestContext(String gameName, boolean shouldSaveGame) {
         lockGame(gameName, shouldSaveGame);
         try {
             var game = GameManager.getManagedGame(gameName).getGame();

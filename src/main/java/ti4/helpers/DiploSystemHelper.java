@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -20,6 +21,7 @@ public class DiploSystemHelper {
             return false;
         }
 
+        boolean placedOtherPlayersCommandToken = false;
         for (Player player_ : game.getPlayers().values()) {
             if (player_.hasAbility("diplomatic_immunity")) {
                 continue;
@@ -29,7 +31,12 @@ public class DiploSystemHelper {
                     && !player.getAllianceMembers().contains(player_.getFaction())) {
                 CommandCounterHelper.addCC(event, player_, tile);
                 Helper.isCCCountCorrect(player_);
+                placedOtherPlayersCommandToken = true;
             }
+        }
+
+        if (placedOtherPlayersCommandToken) {
+            VerydithBreakthroughHandler.offerUnyieldingAccord(event, player, tile);
         }
 
         return true;

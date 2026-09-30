@@ -41,7 +41,7 @@ class AddPlayer extends GameStateSubcommand {
         Helper.fixGameChannelPermissions(event.getGuild(), game);
     }
 
-    private void addExtraUser(SlashCommandInteractionEvent event, Game game, String playerID) {
+    private static void addExtraUser(SlashCommandInteractionEvent event, Game game, String playerID) {
         OptionMapping option = event.getOption(playerID);
         if (option == null) {
             return;

@@ -60,6 +60,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private @JsonProperty("isNebula") boolean nebula;
     private @JsonProperty("isGravityRift") boolean gravityRift;
     private @JsonProperty("isScar") boolean isScar;
+    private @JsonProperty("isFowVision") boolean fowVision;
     private @JsonProperty("isFracture") boolean fracture;
     private @JsonProperty("hasEgress") boolean hasEgress;
     private @JsonProperty("hasIngress") boolean hasIngress;
@@ -141,7 +142,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(id);
-        return ResourceHelper.getInstance().getTileFile(tileName);
+        return ResourceHelper.getTileFile(tileName);
     }
 
     @JsonIgnore
@@ -187,6 +188,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public boolean isScar() {
         return isScar;
+    }
+
+    @JsonIgnore
+    public boolean isFowVision() {
+        return fowVision;
     }
 
     @JsonIgnore

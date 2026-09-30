@@ -30,6 +30,7 @@ import ti4.discord.interactions.commands.help.HelpCommand;
 import ti4.discord.interactions.commands.installation.InstallationCommand;
 import ti4.discord.interactions.commands.lazax.LazaxCommand;
 import ti4.discord.interactions.commands.leaders.LeaderCommand;
+import ti4.discord.interactions.commands.ll.LostLegaciesCommand;
 import ti4.discord.interactions.commands.map.MapCommand;
 import ti4.discord.interactions.commands.milty.MiltyCommand;
 import ti4.discord.interactions.commands.monuments.MonumentsCommand;
@@ -121,6 +122,7 @@ public class SlashCommandManager {
                     new SpecialCommand(),
                     new Special2Command(),
                     new LeaderCommand(),
+                    new LostLegaciesCommand(),
                     new CombatCommand(),
                     new CustomCommand(),
                     new FOWCommand(),

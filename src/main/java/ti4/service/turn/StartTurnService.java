@@ -23,14 +23,18 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -38,6 +42,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMon
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -49,6 +54,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
+import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -84,6 +90,7 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
+        VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
         if (BorrowedTimeLLButtonHandler.skipTurnIfNecessary(event, game, player)) {
             return;
@@ -109,7 +116,7 @@ public class StartTurnService {
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("audioSent");
-        game.checkSOLimit(player);
+        Game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         boolean goingToPass = false;
@@ -491,13 +498,18 @@ public class StartTurnService {
         String factionChecker = player.factionButtonChecker();
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
+        Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
+        if (economicBoonButton != null) startButtons.add(economicBoonButton);
         if (!doneActionThisTurn
                 && player.hasRelicReady("waxing_moonphase")
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
             startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
         }
-        if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
-            startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
+        if (!doneActionThisTurn) {
+            Button veylaButton = ArcanumLeadersHandler.getVeylaStartTurnButton(game, player);
+            if (veylaButton != null) {
+                startButtons.add(veylaButton);
+            }
         }
         if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
             Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);
@@ -524,10 +536,30 @@ public class StartTurnService {
             if (MonumentsDSButtonHandler.canUseFlorzenStasisProduction(game, player)) {
                 startButtons.add(MonumentsDSButtonHandler.getFlorzenStasisProductionButton(player));
             }
+            Button dawnstarHqButton = MonumentsDSButtonHandler.getDawnstarHqButton(game, player);
+            if (MonumentsService.isMonumentOnBoard(game, player, "tnelis_monument") && dawnstarHqButton != null) {
+                startButtons.add(dawnstarHqButton);
+            }
             if (MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
                     && MonumentsDSButtonHandler.hasTwoReadiedCorePlanets(player, game)
-                    && game.getLaws().size() > 0) {
+                    && !game.getLaws().isEmpty()) {
                 startButtons.add(MonumentsDSButtonHandler.getVerdantHaloButton(player));
+            }
+            Tile oasisTile = MonumentsService.getMonumentTile(game, player, "uydai_monument");
+            if (MonumentsService.isMonumentOnBoard(game, player, "uydai_monument")
+                    && MonumentsService.isMonumentReady(game, player, "uydai_monument")
+                    && oasisTile != null
+                    && oasisTile.hasPlayerCC(player)) {
+                Button oasisButton = MonumentsBRButtonHandler.getOasisButton(game, player);
+                if (oasisButton != null) {
+                    startButtons.add(oasisButton);
+                }
+            }
+        }
+        if (!doneActionThisTurn) {
+            Button thurvialiAgentButton = ThurvialiLeadersHandler.getHopeStartTurnButton(game, player);
+            if (thurvialiAgentButton != null) {
+                startButtons.add(thurvialiAgentButton);
             }
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
@@ -536,8 +568,8 @@ public class StartTurnService {
         if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {
             startButtons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
         }
-        if (player.hasUnexhaustedLeader("revenantverydithagent")) {
-            startButtons.add(RevenantLeadersHandler.getRevVerydithAgentButton(player));
+        if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
+            startButtons.add(RevenantLeadersHandler.getRevScrapyardAgentButton(player));
         }
         if (player.hasPlanet("skarnath")
                 && !player.getExhaustedPlanetsAbilities().contains("skarnath")) {
@@ -851,6 +883,8 @@ public class StartTurnService {
             if (player.hasUnexhaustedLeader("oblivionagent")) {
                 startButtons.add(OblivionLeadersHandler.getOblivionAgentButton(player));
             }
+
+            startButtons.addAll(TkHelperGenomes.getStartOfTurnButtons(game, player));
         }
         if (player.hasTech("pa")
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {

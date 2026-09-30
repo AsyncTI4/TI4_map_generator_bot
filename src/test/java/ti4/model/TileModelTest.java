@@ -28,7 +28,7 @@ class TileModelTest extends BaseTi4Test {
         assertFalse(TileHelper.getTileById("18").isFracture(), "Mecatol Rex should not be fracture");
     }
 
-    private boolean validatePlanetIDs(TileModel model) {
+    private static boolean validatePlanetIDs(TileModel model) {
         if (model.getPlanets() == null) return true;
         for (String planetId : model.getPlanets()) {
             if (!TileHelper.isValidPlanet(planetId)) return false;

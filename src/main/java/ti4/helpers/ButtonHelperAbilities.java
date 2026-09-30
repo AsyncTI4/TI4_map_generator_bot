@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,8 +18,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -45,6 +49,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
@@ -73,7 +78,7 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("drawHeistObj_")
     public static void drawHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Integer type = Integer.parseInt(buttonID.split("_")[1]);
+        int type = Integer.parseInt(buttonID.split("_")[1]);
         game.drawSecretObjective(player.getUserID(), type);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -389,7 +394,7 @@ public final class ButtonHelperAbilities {
         return buttons;
     }
 
-    public static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
+    private static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             boolean empty = true;
@@ -880,6 +885,13 @@ public final class ButtonHelperAbilities {
         if ("no".equalsIgnoreCase(buttonID.split("_")[2])) {
             removeOmenDie(game, die);
         }
+        if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "mykomentori_monument")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " may produce 1 fighter in the _Gravelord's Keep_ system without spending resources.",
+                    MonumentsDSButtonHandler.getGravelordProduceFighterButton(game, player));
+        }
         String msg = player.getRepresentationUnfogged() + " used an **Omen** die with the number " + die + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1097,8 +1109,9 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("addTombToken_")
     public static void addTombToken(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        var tombSpec =
-                PlanetTargetSpec.of("addTombToken").where(p -> !p.getTokenList().contains("token_tomb.png"));
+        var tombSpec = PlanetTargetSpec.of("addTombToken")
+                .where(p -> !p.getTokenList().contains("token_tomb.png"))
+                .withPageNavPrefix("addTombToken_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, tombSpec)) return;
         String planet = buttonID.split("_")[1];
         String message = player.getFactionEmoji() + " added a Tomb token to "
@@ -1154,7 +1167,8 @@ public final class ButtonHelperAbilities {
                     game,
                     player,
                     PlanetTargetSpec.of("addTombToken")
-                            .where(p -> !p.getTokenList().contains("token_tomb.png")),
+                            .where(p -> !p.getTokenList().contains("token_tomb.png"))
+                            .withPageNavPrefix("addTombToken_"),
                     buttons);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             return;
@@ -1451,7 +1465,7 @@ public final class ButtonHelperAbilities {
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
                 totalHits += hitRolls;
                 String unitRoll = CombatMessageHelper.displayUnitRoll(
-                        player.getUnitByID("belkosea_flagship"),
+                        Player.getUnitByID("belkosea_flagship"),
                         toHit,
                         modifierToHit,
                         1,
@@ -2170,6 +2184,7 @@ public final class ButtonHelperAbilities {
         if (player.getPlanets().contains(planet) && enemyPlayer.isPresent()) {
             AddPlanetService.addPlanet(enemyPlayer.get(), planet, game);
         }
+        ThurvialiBreakthroughHandler.offerNeurografting(event, game, player, unitHolder);
         oceanBoundCheck(game);
         if (player.hasAbility("raider_coves")) {
             player.gainTG(2, true);
@@ -2279,6 +2294,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
+        ThurvialiAbilityHandler.checkRadiantGrafting(game);
     }
 
     @ButtonHandler("startCombatOn_")

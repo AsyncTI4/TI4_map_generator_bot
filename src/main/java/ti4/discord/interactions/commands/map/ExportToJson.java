@@ -30,10 +30,9 @@ class ExportToJson extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        if (!game.isHasEnded()
-                && game.isFowMode()
-                && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
-            MessageHelper.replyToMessage(event, "Only useable by GM in FoW");
+        if (!FoWHelper.canSeeWholeMap(game, event)) {
+            MessageHelper.replyToMessage(
+                    event, "In an active Fog of War game only the GM can export, from the GM room.");
             return;
         }
 

@@ -1,0 +1,16 @@
+{
+    "tileBack": "green",
+    "id": "th14",
+    "name": "Iron Keep - Vanguard",
+    "aliases": [
+        "th14",
+        "ironkeep"
+    ],
+    "imagePath": "th14_vanguardhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "ironkeep"
+    ],
+    "source": "theodisi"
+}

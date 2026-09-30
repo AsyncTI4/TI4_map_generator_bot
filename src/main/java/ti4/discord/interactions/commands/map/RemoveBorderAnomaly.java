@@ -35,9 +35,8 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        BorderAnomalyModel.BorderAnomalyType anomalyType = new BorderAnomalyModel()
-                .getBorderAnomalyTypeFromString(
-                        event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString));
+        BorderAnomalyModel.BorderAnomalyType anomalyType = BorderAnomalyModel.getBorderAnomalyTypeFromString(
+                event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString));
         Set<String> tiles = Helper.getSetFromCSV(tilesString);
 
         if (Constants.ALL.equals(tilesString)) {

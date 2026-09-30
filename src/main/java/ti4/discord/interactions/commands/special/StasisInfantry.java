@@ -29,7 +29,7 @@ class StasisInfantry extends GameStateSubcommand {
         setValue(event, player::setStasisInfantry, player::getStasisInfantry, count);
     }
 
-    private void setValue(
+    private static void setValue(
             SlashCommandInteractionEvent event, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");

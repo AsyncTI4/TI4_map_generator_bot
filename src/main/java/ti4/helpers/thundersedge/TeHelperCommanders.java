@@ -208,7 +208,7 @@ public class TeHelperCommanders {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock, UnitType.Monument).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
                 if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 

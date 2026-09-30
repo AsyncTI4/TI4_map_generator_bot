@@ -1848,7 +1848,7 @@ public final class ButtonHelperActionCards {
      * the target names the holder rather than just the system. VISIBLE_NOW because a dock is a unit: a
      * remembered system tells you nothing about whether it is still there.
      */
-    public static UnitHolderTargetSpec meltdownSpec(Game game) {
+    private static UnitHolderTargetSpec meltdownSpec(Game game) {
         return UnitHolderTargetSpec.of("reactorMeltdownStep3_" + BlindSelectionService.TBD_FACTION, UnitType.Spacedock)
                 .excludingSelf()
                 .where((tile, uh) -> Constants.SPACE.equals(uh.getName())
@@ -3291,7 +3291,7 @@ public final class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
-    public static List<Button> getExplorationRiderButtons(
+    private static List<Button> getExplorationRiderButtons(
             Player player, Game game, int remainingExplores, Set<String> selectedPlanets) {
         List<Button> buttons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -3355,7 +3355,7 @@ public final class ButtonHelperActionCards {
         return "industrial".equalsIgnoreCase(originalPlanetType) || "hazardous".equalsIgnoreCase(originalPlanetType);
     }
 
-    public static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
+    private static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
         if (selectedPlanets.isEmpty()) {
             return "";
         }

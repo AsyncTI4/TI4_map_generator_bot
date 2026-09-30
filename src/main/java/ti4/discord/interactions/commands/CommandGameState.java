@@ -76,13 +76,13 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
         GameEventService.commit(game, GameEventType.MANUAL_COMMAND, player, payload);
     }
 
-    void clear() {
+    static void clear() {
         game.remove();
         player.remove();
     }
 
     @NotNull
-    public Game getGame() {
+    public static Game getGame() {
         return game.get();
     }
 

@@ -1,0 +1,47 @@
+[
+    {
+        "id": "pharadn_tomb",
+        "imagePath": "token_tomb.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "pharadn_tomb"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine1",
+        "imagePath": "token_kaltrimshrine1.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "kaltrimshrine1"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine2",
+        "imagePath": "token_kaltrimshrine2.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "kaltrimshrine2"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine3",
+        "imagePath": "token_kaltrimshrine3.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "kaltrimshrine3"
+        ],
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine4",
+        "imagePath": "token_kaltrimshrine4.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "kaltrimshrine4"
+        ],
+        "source": "blue_reverie"
+    }
+]

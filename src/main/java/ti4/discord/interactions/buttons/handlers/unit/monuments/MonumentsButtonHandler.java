@@ -1174,7 +1174,7 @@ public class MonumentsButtonHandler {
                                 + "_MonumentUnits_" + detail;
                         if (!sender.getTransactionItems().contains(item)) {
                             buttons.add(Buttons.green(
-                                    "offerToTransact_MonumentUnits_" + sender.getFaction() + "_" + receiver.getFaction()
+                                    "offerToTransact_MonumentUnits_" + sender.getColor() + "_" + receiver.getColor()
                                             + "_" + detail,
                                     "Trade " + stateText + unit.getName() + " in "
                                             + tile.getRepresentationForButtons(game, sender),

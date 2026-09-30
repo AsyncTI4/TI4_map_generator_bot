@@ -71,6 +71,8 @@ public class MapJsonIOService {
                 t.setTileID(tile.getTileID());
 
                 // tokens
+                // NOTE: a fog-vision token's recipient grant (Space#getFowVisionGrant) is not exported, so a
+                // restricted vision token round-trips as "visible to everyone". Export/import is GM-only in FoW.
                 if (includeTokens
                         && tile.getSpaceUnitHolder() != null
                         && !tile.getSpaceUnitHolder().getTokenList().isEmpty()) {
@@ -112,7 +114,7 @@ public class MapJsonIOService {
                     if (includeLore) {
                         List<LoreEntry> planetLore = LoreService.getEntriesForBase(game, planet.getName());
                         if (!planetLore.isEmpty()) {
-                            pi.setPlanetLore(buildLoreIO(planetLore.get(0)));
+                            pi.setPlanetLore(buildLoreIO(planetLore.getFirst()));
                             pi.setPlanetLoreEntries(buildLoreIOList(planetLore));
                             planetHasExportedData = true;
                         }
@@ -129,7 +131,7 @@ public class MapJsonIOService {
                 if (includeLore) {
                     List<LoreEntry> systemLore = LoreService.getEntriesForBase(game, tile.getPosition());
                     if (!systemLore.isEmpty()) {
-                        t.setSystemLore(buildLoreIO(systemLore.get(0)));
+                        t.setSystemLore(buildLoreIO(systemLore.getFirst()));
                         t.setSystemLoreEntries(buildLoreIOList(systemLore));
                     }
                 }
@@ -249,7 +251,7 @@ public class MapJsonIOService {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
         }
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             appendError(sb, tileIO, "Could not find tile: " + tileID);
             return false;
@@ -267,15 +269,17 @@ public class MapJsonIOService {
         for (String token : tileIO.getTokens()) {
             Tile tile = game.getTileByPosition(tileIO.getPosition());
             String tokenFileName = token;
-            String tokenPath = tile.getTokenPath(tokenFileName);
+            String tokenPath = Tile.getTokenPath(tokenFileName);
             if (tokenPath == null) {
                 tokenFileName = Mapper.getTokenID(token);
-                tokenPath = tile.getTokenPath(tokenFileName);
+                tokenPath = Tile.getTokenPath(tokenFileName);
                 if (tokenPath == null) {
                     appendError(sb, tileIO, "Token not found: " + token);
                     continue;
                 }
             }
+            // NOTE: no fog-vision grant is imported (see export), so an imported fog-vision token reveals the
+            // system to everyone. To re-restrict: /fow remove_vision_token, then /fow add_vision_token with targets.
             tile.getSpaceUnitHolder().addToken(tokenFileName);
         }
     }
@@ -302,7 +306,7 @@ public class MapJsonIOService {
                 anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
                         anomalyIO.getType().toUpperCase());
             } catch (Exception e) {
-                anomalyType = new BorderAnomalyModel().getBorderAnomalyTypeFromString(anomalyIO.getType());
+                anomalyType = BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyIO.getType());
             }
 
             if (anomalyType == null) {
@@ -331,10 +335,10 @@ public class MapJsonIOService {
             for (String attachment : planetIO.getAttachments()) {
                 String attachmentFileName = attachment;
                 Tile tile = game.getTileByPosition(tileIO.getPosition());
-                String attachmentPath = tile.getAttachmentPath(attachmentFileName);
+                String attachmentPath = Tile.getAttachmentPath(attachmentFileName);
                 if (attachmentPath == null) {
                     attachmentFileName = Mapper.getAttachmentImagePath(attachment);
-                    attachmentPath = tile.getAttachmentPath(attachmentFileName);
+                    attachmentPath = Tile.getAttachmentPath(attachmentFileName);
                     if (attachmentPath == null) {
                         appendError(sb, tileIO, "Attachment not found: " + attachment);
                         continue;

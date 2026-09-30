@@ -262,11 +262,12 @@
         "source": "theodisi"
     },
     {
-        "alias": "exploration_rider",
+        "alias": "exploration_riderll",
         "name": "Exploration Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud the outcome of this agenda. If your prediction is correct, explore 1 planet you control of each trait.",
+        "automationID": "exploration_rider",
         "flavorText": "*\"I'm willing to work with you, but I'll need mineral rights to the area before I can convince our diplomats of anything.\"*",
         "source": "theodisi"
     },

@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class AdministrativeExemptionLLButtonHandler {
     private static final String RESOLVE = "resolveAdministrativeExemption";
-    public static final String STATE = "administrativeExemption_";
+    private static final String STATE = "administrativeExemption_";
 
     @ButtonHandler(RESOLVE)
     public static void resolveAdministrativeExemption(ButtonInteractionEvent event, Game game, Player player) {

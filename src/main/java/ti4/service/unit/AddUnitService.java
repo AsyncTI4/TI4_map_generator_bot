@@ -264,13 +264,26 @@ public class AddUnitService {
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
         }
+        if (unitKey.unitType() == UnitType.Monument) {
+            MonumentsService.syncKyroReliquaryAttachment(game, player);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
         if (!(event instanceof ButtonInteractionEvent buttonEvent)
                 || !buttonEvent.getComponentId().contains("place_")) {
             MonumentsButtonHandler.offerCenotaph(game, player, tile, unitKey, location, amount);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones", "crystellum");
+                player,
+                "dream",
+                "myrr",
+                "natau",
+                "oblivion",
+                "revenantxytheris",
+                "thrones",
+                "crystellum",
+                "scrapyard",
+                "thurviali");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

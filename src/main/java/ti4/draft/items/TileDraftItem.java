@@ -82,11 +82,11 @@ public abstract class TileDraftItem extends DraftItem {
         sb.append(") ");
     }
 
-    private String planetTypeEmoji(PlanetTypeModel.PlanetType type) {
+    private static String planetTypeEmoji(PlanetTypeModel.PlanetType type) {
         return type.getEmoji();
     }
 
-    private String techSpecEmoji(TechSpecialtyModel.TechSpecialty type) {
+    private static String techSpecEmoji(TechSpecialtyModel.TechSpecialty type) {
         return type.getEmoji();
     }
 

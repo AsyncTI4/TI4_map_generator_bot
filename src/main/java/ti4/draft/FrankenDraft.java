@@ -105,7 +105,17 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static final String[] excludedFactions = {
-        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian"
+        "lazax",
+        "admins",
+        "franken",
+        "keleresm",
+        "keleresx",
+        "miltymod",
+        "qulane",
+        "neutral",
+        "obsidian",
+        "stoneborn",
+        "morpha"
     };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
@@ -264,7 +274,7 @@ public class FrankenDraft extends BagDraft {
         return bags;
     }
 
-    protected void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
+    protected static void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
         List<ComponentSource> sources = new ArrayList<>(List.of(
                 ComponentSource.base,
                 ComponentSource.codex1,

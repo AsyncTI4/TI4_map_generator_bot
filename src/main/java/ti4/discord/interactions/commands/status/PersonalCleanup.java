@@ -51,7 +51,7 @@ class PersonalCleanup extends GameStateSubcommand {
 
         for (Tile tile : tileMap.values()) {
             tile.removeCC(ccID);
-            String ccPath = tile.getCCPath(ccID);
+            String ccPath = Tile.getCCPath(ccID);
 
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {

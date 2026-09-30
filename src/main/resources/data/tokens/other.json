@@ -14,6 +14,18 @@
         "source": "other"
     },
     {
+        "id": "fowvision",
+        "imagePath": "token_fowvision.png",
+        "spaceOrPlanet": "space",
+        "isFowVision": true,
+        "aliasList": [
+            "fowvision",
+            "token_fowvision",
+            "vision"
+        ],
+        "source": "other"
+    },
+    {
         "id": "consulate",
         "imagePath": "token_consulate.png",
         "spaceOrPlanet": "planet",

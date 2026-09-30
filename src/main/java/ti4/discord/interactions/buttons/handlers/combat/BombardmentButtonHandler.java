@@ -1,6 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,8 +110,7 @@ class BombardmentButtonHandler {
                 CombatRollService.getUnitsInBombardment(tile, player, null);
 
         List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                game.getStoredValue("assignedBombardment" + player.getFaction()),
-                new TypeReference<List<BombardmentAssignment>>() {});
+                game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
         List<String> usedLabels = new ArrayList<>();
         for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : bombardUnits.entrySet()) {
 
@@ -302,7 +301,7 @@ class BombardmentButtonHandler {
         if (json == null || json.isBlank()) {
             return Collections.emptyList();
         }
-        return MAPPER.readValue(json, new TypeReference<List<BombardmentAssignment>>() {});
+        return MAPPER.readValue(json, new TypeReference<>() {});
     }
 
     private static void saveAssignments(Player player, Game game, List<BombardmentAssignment> assignments) {

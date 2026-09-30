@@ -35,6 +35,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TileModel;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
@@ -191,6 +192,12 @@ public final class FoWHelper {
         String label = fogged
                 ? target.getFactionNameOrColor()
                 : target.getFactionModel().getShortName();
+        if (target.getFaction().contains("franken")
+                && !fogged
+                && target.getDisplayName() != null
+                && !target.getDisplayName().isEmpty()) {
+            label = target.getDisplayName();
+        }
         return styledButton(style, buttonId, label, target.fogSafeEmoji());
     }
 
@@ -341,6 +348,8 @@ public final class FoWHelper {
             tilePositionsToShow.addAll(adjacentTiles);
         }
 
+        addFowVisionTiles(game, player, tilePositionsToShow);
+
         String playerSweep = Mapper.getSweepID(player.getColor());
         for (Tile tile : game.getTileMap().values()) {
             if (tile.hasCC(playerSweep)) {
@@ -374,7 +383,31 @@ public final class FoWHelper {
                 tilePositionsToShow.add(tile.getPosition());
             }
         }
+
+        addFowVisionTiles(game, player, tilePositionsToShow);
         return tilePositionsToShow;
+    }
+
+    /**
+     * Fog-vision tokens/tiles reveal a system independent of unit presence. A tile is added to the
+     * player's visible set if it is an intrinsic fog-vision tile (revealed to everyone) or carries a
+     * fog-vision token whose recipient list ({@link Tile#getFowVisionGrant()}; empty = everyone) includes the
+     * player. Only the tile's own position is added — this grants no adjacency or movement.
+     */
+    private static void addFowVisionTiles(Game game, @NotNull Player player, Set<String> tilePositionsToShow) {
+        for (Tile tile : game.getTileMap().values()) {
+            String pos = tile.getPosition();
+            TileModel model = tile.getTileModel(); // null for unknown tile ids (see Tile.isValid)
+            if (model != null && model.isFowVision()) {
+                tilePositionsToShow.add(pos); // intrinsic vision tile: everyone sees it
+                continue;
+            }
+            if (!tile.hasFowVisionToken()) continue; // token presence is the master gate
+            Set<String> grant = tile.getFowVisionGrant();
+            if (grant.isEmpty() || grant.contains(player.getColor())) {
+                tilePositionsToShow.add(pos);
+            }
+        }
     }
 
     /**
@@ -582,6 +615,22 @@ public final class FoWHelper {
                 if (position.equals(monumentTile.getPosition())) {
                     adjacentPositions.addAll(matchingStructureSystems);
                 } else if (matchingStructureSystems.contains(position)) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
+
+        if (forDistance && player != null && MonumentsService.isMonumentOnBoard(game, player, "nivyn_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "nivyn_monument");
+            Tile woundTile = game.getTileMap().values().stream()
+                    .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains("token_ds_wound.png"))
+                    .findFirst()
+                    .orElse(null);
+
+            if (monumentTile != null && woundTile != null) {
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.add(woundTile.getPosition());
+                } else if (position.equals(woundTile.getPosition())) {
                     adjacentPositions.add(monumentTile.getPosition());
                 }
             }
@@ -1526,6 +1575,20 @@ public final class FoWHelper {
     public static boolean isGameMaster(String userId, Game game) {
         return game.getPlayersWithGMRole().stream()
                 .anyMatch(player -> player.getUserID().equals(userId));
+    }
+
+    public static boolean canSeeWholeMap(Game game, GenericInteractionCreateEvent event) {
+        if (!game.isFowMode() || game.isHasEnded()) {
+            return true;
+        }
+        return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
+    }
+
+    static boolean isGmRoom(Game game, @Nullable Channel channel) {
+        if (channel instanceof ThreadChannel thread) {
+            channel = thread.getParentChannel();
+        }
+        return channel != null && channel.getName().equalsIgnoreCase(game.getName() + "-gm-room");
     }
 
     private enum Feature {

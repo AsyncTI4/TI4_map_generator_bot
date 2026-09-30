@@ -34,7 +34,7 @@ class WipeTurnTime extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }
 
-    private void wipeTurnTime(Game game, String playerId) {
+    private static void wipeTurnTime(Game game, String playerId) {
         Player player = game.getPlayer(playerId);
         if (player != null) {
             player.setTotalTurnTime(0);

@@ -37,6 +37,8 @@ class ExpeditionWinRateStatisticsService {
         WinRateCount thundersEdgeControlStats = new WinRateCount();
         int[] gamesThatDidNotFinishExpeditionsVersusDid = {0, 0};
         int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough = {0, 0};
+        int[] lastExpeditionPlayersControllingThundersEdgeVersusTotal = {0, 0};
+        int[] mostExpeditionsPlayerControllingThundersEdgeVersusTotal = {0, 0};
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getStandardCompetitiveGamesFilter().and(Game::isThundersEdge),
@@ -48,7 +50,9 @@ class ExpeditionWinRateStatisticsService {
                         lastExpeditionStats,
                         thundersEdgeControlStats,
                         gamesThatDidNotFinishExpeditionsVersusDid,
-                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough),
+                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough,
+                        lastExpeditionPlayersControllingThundersEdgeVersusTotal,
+                        mostExpeditionsPlayerControllingThundersEdgeVersusTotal),
                 ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
@@ -66,9 +70,47 @@ class ExpeditionWinRateStatisticsService {
                 .append(" expeditions: ")
                 .append(entry.getValue())
                 .append('\n'));
+        int expeditionCountGameCount = expeditionCountStats.values().stream()
+                .mapToInt(count -> count.total)
+                .sum();
+        double averageExpeditionsCompleted = expeditionCountStats.entrySet().stream()
+                        .mapToInt(entry -> entry.getKey() * entry.getValue().total)
+                        .sum()
+                / (double) expeditionCountGameCount;
+        sb.append("- Game count: ").append(expeditionCountGameCount).append('\n');
+        sb.append("- Average: ")
+                .append(String.format("%.2f", averageExpeditionsCompleted))
+                .append('\n');
 
         sb.append("\n**Who completed the last expedition**\n");
         sb.append("- ").append(lastExpeditionStats).append('\n');
+        int lastExpeditionPlayersControllingThundersEdge = lastExpeditionPlayersControllingThundersEdgeVersusTotal[0];
+        int lastExpeditionPlayersTotal = lastExpeditionPlayersControllingThundersEdgeVersusTotal[1];
+        long lastExpeditionThundersEdgePercent = lastExpeditionPlayersTotal > 0
+                ? Math.round(lastExpeditionPlayersControllingThundersEdge * 100.0 / lastExpeditionPlayersTotal)
+                : 0;
+        sb.append("- Also controlled Thunder's Edge: ")
+                .append(lastExpeditionPlayersControllingThundersEdge)
+                .append('/')
+                .append(lastExpeditionPlayersTotal)
+                .append(" (")
+                .append(lastExpeditionThundersEdgePercent)
+                .append("%)\n");
+
+        sb.append(
+                "\n**Player who completed the most expeditions (ties go to the last expedition) also controlling Thunder's Edge**\n");
+        int mostExpeditionsPlayerControllingThundersEdge = mostExpeditionsPlayerControllingThundersEdgeVersusTotal[0];
+        int mostExpeditionsPlayerTotal = mostExpeditionsPlayerControllingThundersEdgeVersusTotal[1];
+        long mostExpeditionsThundersEdgePercent = mostExpeditionsPlayerTotal > 0
+                ? Math.round(mostExpeditionsPlayerControllingThundersEdge * 100.0 / mostExpeditionsPlayerTotal)
+                : 0;
+        sb.append("- ")
+                .append(mostExpeditionsPlayerControllingThundersEdge)
+                .append('/')
+                .append(mostExpeditionsPlayerTotal)
+                .append(" (")
+                .append(mostExpeditionsThundersEdgePercent)
+                .append("%)\n");
 
         sb.append("\n**Who controls Thunder's Edge**\n");
         sb.append("- ").append(thundersEdgeControlStats).append('\n');
@@ -155,7 +197,9 @@ class ExpeditionWinRateStatisticsService {
             WinRateCount lastExpeditionStats,
             WinRateCount thundersEdgeControlStats,
             int[] gamesThatDidNotFinishExpeditionsVersusDid,
-            int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough) {
+            int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough,
+            int[] lastExpeditionPlayersControllingThundersEdgeVersusTotal,
+            int[] mostExpeditionsPlayerControllingThundersEdgeVersusTotal) {
 
         Player winner = game.getWinner().orElse(null);
         if (winner == null) {
@@ -184,6 +228,8 @@ class ExpeditionWinRateStatisticsService {
         }
         gamesThatDidNotFinishExpeditionsVersusDid[1] += 1;
 
+        Map<String, Integer> factionCompletedExpeditionCounts = new LinkedHashMap<>();
+
         // Get win rate of number of expeditions followed, controlling TE at the end of the game,
         // and faction expeditions
         for (Player player : game.getRealAndEliminatedPlayers()) {
@@ -200,6 +246,7 @@ class ExpeditionWinRateStatisticsService {
                     .filter(entry -> checkFactionsEqual(faction, entry.getValue()))
                     .map(Map.Entry::getKey)
                     .toList();
+            factionCompletedExpeditionCounts.put(faction, completedExpeditions.size());
 
             if (hasTheirBreakthrough(player)) {
                 playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough[1] += 1;
@@ -247,7 +294,51 @@ class ExpeditionWinRateStatisticsService {
                 if (isWinner) {
                     lastExpeditionStats.wins++;
                 }
+                lastExpeditionPlayersControllingThundersEdgeVersusTotal[1] += 1;
+                if (player.hasPlanet(THUNDERS_EDGE)) {
+                    lastExpeditionPlayersControllingThundersEdgeVersusTotal[0] += 1;
+                }
             }
+        }
+
+        if (lastExpeditionFaction != null) {
+            tallyMostExpeditionsPlayerControllingThundersEdge(
+                    game,
+                    factionCompletedExpeditionCounts,
+                    lastExpeditionFaction,
+                    mostExpeditionsPlayerControllingThundersEdgeVersusTotal);
+        }
+    }
+
+    private static void tallyMostExpeditionsPlayerControllingThundersEdge(
+            Game game,
+            Map<String, Integer> factionCompletedExpeditionCounts,
+            String lastExpeditionFaction,
+            int[] mostExpeditionsPlayerControllingThundersEdgeVersusTotal) {
+        int maxCompletedExpeditions = factionCompletedExpeditionCounts.values().stream()
+                .mapToInt(Integer::intValue)
+                .max()
+                .orElse(0);
+        List<String> factionsWithMostExpeditions = factionCompletedExpeditionCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() == maxCompletedExpeditions)
+                .map(Map.Entry::getKey)
+                .toList();
+        String topExpeditionCompleterFaction = factionsWithMostExpeditions.size() == 1
+                ? factionsWithMostExpeditions.getFirst()
+                : factionsWithMostExpeditions.stream()
+                        .filter(faction -> checkFactionsEqual(faction, lastExpeditionFaction))
+                        .findFirst()
+                        .orElseGet(factionsWithMostExpeditions::getFirst);
+
+        boolean topExpeditionCompleterControlsThundersEdge = game.getRealAndEliminatedPlayers().stream()
+                .filter(player -> checkFactionsEqual(player.getFaction(), topExpeditionCompleterFaction))
+                .findFirst()
+                .map(player -> player.hasPlanet(THUNDERS_EDGE))
+                .orElse(false);
+
+        mostExpeditionsPlayerControllingThundersEdgeVersusTotal[1] += 1;
+        if (topExpeditionCompleterControlsThundersEdge) {
+            mostExpeditionsPlayerControllingThundersEdgeVersusTotal[0] += 1;
         }
     }
 

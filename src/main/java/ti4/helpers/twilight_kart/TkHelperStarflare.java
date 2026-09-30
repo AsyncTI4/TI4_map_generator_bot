@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
@@ -36,6 +37,7 @@ import ti4.message.MessageHelper;
 public class TkHelperStarflare {
     public static final String AC_ID = "tk-nova-starflare";
     public static final String RESOLVE_PREFIX = "resolveTkStarflare_";
+    private static final Pattern DIGIT_BOUNDARY_PATTERN = Pattern.compile(RegexHelper.DIGIT_BOUNDARY);
 
     public static List<Button> getResolveButtons(Game game, Player player) {
         String buttonId = player.factionButtonChecker() + RESOLVE_PREFIX + game.getStoredValue(AC_ID);
@@ -81,7 +83,8 @@ public class TkHelperStarflare {
         String movingColor = null;
         Map<String, Integer> unitAmounts = new HashMap<>();
         for (Map<UnitKey, List<Integer>> unitMap : unitMaps) {
-            for (UnitKey unitKey : unitMap.keySet()) {
+            for (Entry<UnitKey, List<Integer>> entry : unitMap.entrySet()) {
+                UnitKey unitKey = entry.getKey();
                 if (movingColor == null) {
                     movingColor = unitKey.getColor();
                 }
@@ -90,7 +93,7 @@ public class TkHelperStarflare {
                     continue;
                 }
                 int unitState = 0;
-                for (int amount : unitMap.get(unitKey)) {
+                for (int amount : entry.getValue()) {
                     if (amount <= 0) {
                         continue;
                     }
@@ -174,7 +177,7 @@ public class TkHelperStarflare {
         int totalAmount = 0;
         List<UnitAmountEntry> unitAmounts = new ArrayList<>();
         for (String entryStr : unitAmountsString.split("_")) {
-            String[] entrySplit = entryStr.split(RegexHelper.DIGIT_BOUNDARY);
+            String[] entrySplit = DIGIT_BOUNDARY_PATTERN.split(entryStr);
             int amount = Integer.parseInt(entrySplit[0]);
             UnitType type = Units.findUnitType(entrySplit[1]);
             UnitState state = UnitState.values()[Integer.parseInt(entrySplit[2])];
@@ -231,7 +234,7 @@ public class TkHelperStarflare {
             MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), sb.toString());
         }
 
-        ButtonHelper.deleteAllButtons(event);
+        ButtonHelper.deleteMessage(event);
     }
 
     private record UnitAmountEntry(UnitType type, UnitState state, int amount) implements Comparable<UnitAmountEntry> {

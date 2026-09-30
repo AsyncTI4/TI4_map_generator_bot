@@ -531,7 +531,8 @@
             "ABILITY:divination"
         ],
         "optionalSwaps": [
-            "AGENT:mykomentoriagent"
+            "AGENT:mykomentoriagent",
+            "MONUMENT:mykomentori_monument"
         ],
         "source": "ds"
     },
@@ -852,6 +853,14 @@
         "itemId": "zelian",
         "additionalComponents": [
             "ABILITY:paranoia"
+        ],
+        "source": "ds"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "zelian_flagship",
+        "optionalSwaps": [
+            "MONUMENT:zelian_monument"
         ],
         "source": "ds"
     }

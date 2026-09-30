@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -249,6 +250,9 @@ public class StartPhaseService {
 
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";
+            ButtonHelperActionCards.checkForAssigningCrisis(game, player2);
+            ButtonHelperActionCards.checkForAssigningStasis(game, player2);
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, player2);
             if (player2.getPromissoryNotesInPlayArea().contains(id)) {
                 player2.removePromissoryNote(id);
                 Player nomad = game.getPNOwner(id);
@@ -1241,12 +1245,13 @@ public class StartPhaseService {
         game.setStoredValue("willRevolution", "");
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        for (Player player : game.getRealPlayers()) {
+            MonumentsBRButtonHandler.offerArmageddonProject(game, player);
+        }
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "action"));
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);
-            ButtonHelperActionCards.checkForAssigningCrisis(game, p2);
-            ButtonHelperActionCards.checkForAssigningStasis(game, p2);
+
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
             if (game.getStoredValue("Play Naalu PN") != null
                     && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {

@@ -22,7 +22,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
@@ -179,12 +181,15 @@ public class DestroyUnitService {
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
         }
+        ScrapyardAbilitiesHandler.offerRepurposedParts(event, game, units, combat);
+        ScrapyardBreakthroughHandler.offerCompactorCapture(event, game, units);
         AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
         TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
         MonumentsDSButtonHandler.resolveKortaliMonument(event, game, units);
+        MonumentsDSButtonHandler.offerKyroReliquaryRelocation(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
@@ -252,6 +257,7 @@ public class DestroyUnitService {
         }
 
         List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
+        VanguardLeadersHandler.offerCommander(event, game, unit, killers, combat);
 
         switch (unit.unitKey().unitType()) {
             case Infantry -> {
@@ -307,11 +313,6 @@ public class DestroyUnitService {
                 }
                 if (player.hasUnit("veylor_mech")) {
                     VeylorUnitHandler.checkVeylorMech(game);
-                }
-                if (combat && player.hasUnit("ponthous_mech")) {
-                    for (int i = 0; i < totalAmount; i++) {
-                        PonthousUnitHandler.offerDragoonsButton(event, game, player, unit);
-                    }
                 }
                 if (player.hasUnit("tyris_mech")) {
                     TyrisAbilityHandler.offerCCForDestroyedReverb(player);

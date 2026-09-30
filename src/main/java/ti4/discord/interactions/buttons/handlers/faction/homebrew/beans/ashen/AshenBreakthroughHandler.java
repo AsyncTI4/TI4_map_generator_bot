@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -274,7 +275,7 @@ public class AshenBreakthroughHandler {
         }
         return FoWHelper.getAdjacentTiles(game, source.getPosition(), player, false, true).stream()
                 .map(game::getTileByPosition)
-                .filter(tile -> tile != null)
+                .filter(Objects::nonNull)
                 .flatMap(tile -> BombardmentService.getBombardablePlanets(player, game, tile).stream()
                         .map(planet -> new PlanetChoice(tile, planet)))
                 .sorted(Comparator.comparing(

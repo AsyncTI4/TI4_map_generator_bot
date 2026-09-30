@@ -29,7 +29,6 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
@@ -75,9 +74,12 @@ public class TEOptionService {
             // those drafts would (map, factions, positions, seat/speaker order), so the splice on its own is
             // the RAW-style option here - players still draft their abilities/units/genomes.
             buttons.add(Buttons.gray("startTFDraft_splice", "Inaugural Splice Only (abilities/units/genomes)"));
-            msg += "\n\n-# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker "
-                    + "order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the "
-                    + "RAW-style flow once the wizard has assigned factions and positions.";
+            msg += """
+
+
+                -# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker \
+                order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the \
+                RAW-style flow once the wizard has assigned factions and positions.""";
         }
         buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -119,19 +121,22 @@ public class TEOptionService {
     }
 
     private static ContainerChildComponent getSingleTfHomebrewInfo(
-            boolean isDisable, String sourceId, String buttonLabel, TI4Emoji sourceEmoji) {
-        SourceModel source = Mapper.getSource(sourceId);
+            boolean isDisable, String sourceId, String buttonLabel) {
+        List<TextDisplay> textDisplays = List.of(TextDisplay.of("invalid sourceId: " + sourceId));
+        TI4Emoji sourceEmoji = null;
+
+        SourceModel sourceModel = Mapper.getSource(sourceId);
+        if (sourceModel != null) {
+            textDisplays = sourceModel.getRepresentationTextDisplays();
+            ComponentSource componentSource = sourceModel.getSource();
+            if (componentSource != null) {
+                sourceEmoji = componentSource.getRawEmoji();
+            }
+        }
+
         String buttonId = TOGGLE_TF_HOMEBREW_PREFIX + sourceId;
         Button button = Buttons.rgToggle(isDisable, buttonId, buttonLabel, sourceEmoji);
-        List<TextDisplay> textDisplays = source != null
-                ? source.getRepresentationTextDisplays()
-                : List.of(TextDisplay.of("invalid sourceId: " + sourceId));
         return Section.of(button, textDisplays);
-    }
-
-    private static ContainerChildComponent getSingleTfHomebrewInfo(
-            boolean isDisable, String sourceId, String buttonLabel) {
-        return getSingleTfHomebrewInfo(isDisable, sourceId, buttonLabel, SourceEmojis.TwilightKart);
     }
 
     public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
@@ -139,10 +144,9 @@ public class TEOptionService {
                 getSingleTfHomebrewInfo(
                         game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
                 getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
-                getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF", null),
-                getSingleTfHomebrewInfo(
-                        game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars", SourceEmojis.DiscordantStars),
-                getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+", SourceEmojis.Monuments));
+                getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF"),
+                getSingleTfHomebrewInfo(game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars"),
+                getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+"));
     }
 
     @ButtonHandler(TOGGLE_TF_HOMEBREW_PREFIX)
@@ -173,10 +177,16 @@ public class TEOptionService {
                     game.removeStoredValue(Constants.TK_NOVA_CUP + "_setup_option");
                 }
             }
-            case Constants.TF_BR -> game.setTfBr(!game.isTfBr());
+            case Constants.TF_BR -> {
+                game.setTfBr(!game.isTfBr());
+                if (game.isTfBr()) {
+                    game.setHomebrew(true);
+                }
+            }
             case Constants.TWILIGHT_DS -> {
                 game.setTwilightDS(!game.isTwilightDS());
                 if (game.isTwilightDS()) {
+                    game.setHomebrew(true);
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("twilightDSSetup_justds", "Just DS Abilities"));
                     buttons.add(Buttons.blue("twilightDSSetup_mixture", "Mixture of Normal and DS abilities"));
@@ -207,6 +217,8 @@ public class TEOptionService {
                 Which sets of Mahact Kings do you want to include in your game?
                 - **Both, but only 1 per Color (Default):** Include both sets. However, each color is only included once. \
                 (For each color, a coin is tossed to determine which set's king of that color is used.)
+                - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example, \
+                the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
                 - **Only Nova Kings:** Only include the 8 Kings added in the Nova Cup.
                 - **Only Vanilla King:** Only include the 8 original, official Kings from vanilla TF.
                 """;
@@ -216,11 +228,10 @@ public class TEOptionService {
                red vanilla king is picked, the red Nova Cup king can no longer be picked (and vice versa).
                - **Both, but draft Color first:** Include all 16 Kings, but only draft the color at first.
                After everyone has drafted a color, each player can choose which king of that color they want to play.
-               - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example,
-               the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
         */
         List<Map.Entry<String, String>> options = List.of(
                 Map.entry("onePerColor", "Both, but only 1 per Color (Default)"),
+                Map.entry("unrestricted", "Both, no restrictions"),
                 Map.entry("onlyNova", "Only Nova Kings"),
                 Map.entry("onlyVanilla", "Only Vanilla Kings"));
         List<Button> buttons = new ArrayList<>();
@@ -270,18 +281,18 @@ public class TEOptionService {
                     }
                 }
                 Collections.shuffle(allCards);
-                String msg = "The following abilities have been banned:\n";
+                StringBuilder msg = new StringBuilder("The following abilities have been banned:\n");
                 for (int x = 0; x < allCards.size() / 2; x++) {
                     BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
-                    msg += Mapper.getTech(allCards.get(x)).getName() + "\n";
+                    msg.append(Mapper.getTech(allCards.get(x)).getName()).append("\n");
                 }
-                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg);
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg.toString());
             }
             case "pruned" -> {
                 MessageHelper.sendMessageToChannel(homebrewChannel(game), "Chose to just use a pruned deck of units.");
                 List<String> allCards = Mapper.getDeck("twilight_kart_units").getNewShuffledDeck();
                 game.removeStoredValue("bannedUnits");
-                String msg = "The following units have been banned:\n";
+                StringBuilder msg = new StringBuilder("The following units have been banned:\n");
                 Map<UnitType, Integer> unitCount = new HashMap<>();
 
                 for (String unit : allCards) {
@@ -290,10 +301,10 @@ public class TEOptionService {
                     unitCount.put(type, unitCount.getOrDefault(type, 0) + 1);
                     if (unitCount.get(type) > 4) {
                         BanService.appendStoredValue(game, "bannedUnits", unit);
-                        msg += un.getName() + "\n";
+                        msg.append(un.getName()).append("\n");
                     }
                 }
-                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg);
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg.toString());
             }
         }
         ButtonHelper.deleteMessage(event);

@@ -17,10 +17,30 @@ methods, and early returns rather than through prose explaining what the code do
 - Do not add comments to code you are only touching incidentally, and leave
   existing comments alone unless the code they describe is being removed.
 
-The exception is test code (`src/test/java`), where comments explaining scenario
-setup, non-obvious assertions, or the reason a case exists are welcome.
+**Exceptions**:
+- test code (`src/test/java`), where comments explaining scenario
+  setup, non-obvious assertions, or the reason a case exists are welcome.
+- Clear To-Do cases. Where there is a non critical bug or the suspicion of one.
+  So it can be found at a later moment, or when someone wants to use similar code or wants to modify code touching the suspected code. Keep this information compact and condense.
 
 ## Discord limits
+
+### Slash commands
+| Thing | Limit |
+| --- | --- |
+| Slash commands per app (per guild, and globally) | 100 |
+| Subcommands per command, or per subcommand group | 25 |
+| Subcommand groups per command | 25 |
+| Options per command or subcommand | 25 |
+| Choices per option | 25 |
+| Autocomplete suggestions per response | 25 |
+| Command name | 32 |
+| Command description | 100 |
+| Option name | 32 |
+| Option description | 100 |
+
+Subcommands, subcommand groups and top-level options all share the **same 25 slots** on a
+command — in Discord's model they are one list, not three separate budgets.
 
 ### Messages
 | Thing | Limit |
@@ -83,3 +103,13 @@ A single action row can hold **either** up to 5 buttons **or** one select menu �
   rely on this for intentional shortening — prefer concise labels, and keep the
   `custom_id` (the `id` argument) within the **100**-char limit yourself, since that is
   not auto-truncated and an over-length id will fail the send.
+- **Parent commands are capped at 25 subcommands, and several sit exactly at the cap.**
+  Adding a 26th makes JDA throw `Cannot have more than 25 subcommands for a command!` from
+  [ParentCommand.register](src/main/java/ti4/discord/interactions/commands/ParentCommand.java)
+  — client-side, while building the command, before any request reaches Discord. That throw
+  lands inside the `try` in `JdaService.startBot`, which aborts registration of *every*
+  command for that guild and skips `guilds.add(guild)`, so the guild never enters the
+  whitelist. On 2026-09-20 that emptied the whitelist and the bot left every server it was
+  in. `SlashCommandLimitsTest` now fails the build first. Before adding a subcommand, check
+  the parent's current count — if it is full, put the command under a different parent
+  rather than freeing a slot.

@@ -78,7 +78,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getShrineButtons(Player p2, Player viewer, Game game) {
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) {
-            buttons = PlanetTargetService.targetButtons(game, viewer, PlanetTargetSpec.of("shrineView"), buttons);
+            buttons = PlanetTargetService.targetButtons(
+                    game, viewer, PlanetTargetSpec.of("shrineView").withPageNavPrefix("shrineView_"), buttons);
             buttons.add(Buttons.red("deleteButtons", "Gain 2 CC instead"));
             return buttons;
         }
@@ -96,7 +97,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("shrineView_")
     public static void resolveShrineView(
             Player player, Player p2, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, PlanetTargetSpec.of("shrineView")))
+        if (PlanetTargetService.handlePlanetPage(
+                event, game, player, buttonID, PlanetTargetSpec.of("shrineView").withPageNavPrefix("shrineView_")))
             return;
         String planet = buttonID.replace("shrineView_", "");
         ButtonHelper.deleteMessage(event);
@@ -1423,11 +1425,11 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         if (sendSftT || sendAlliance) {
             String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
-            message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of ";
+            message2 = p1.getRepresentationNoPing() + " sent " + text + " directly to the play area of ";
         } else {
-            message2 = p1.getRepresentation() + " sent a promissory note to the hand of ";
+            message2 = p1.getRepresentationNoPing() + " sent a promissory note to the hand of ";
         }
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentation() + ".");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentationNoPing() + ".");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2 + p2.getColorIfCanSeeStats(p1));
         }

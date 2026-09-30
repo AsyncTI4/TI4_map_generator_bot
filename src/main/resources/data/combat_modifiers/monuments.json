@@ -1,0 +1,34 @@
+[
+  {
+    "alias": "plus1_rhodun_monument_combat",
+    "type": "mods",
+    "value": "+1",
+    "persistenceType": "ALWAYS",
+    "scope": "",
+    "condition": "rhodun_monument_combat",
+    "forCombatAbility": "combatround",
+    "related": [
+        {
+            "type": "custom",
+            "alias": "custom",
+            "message": "_Vault Of New Phrad_"
+        }
+    ]
+  },
+  {
+    "alias": "plus2_rhodun_monumentback_combat",
+    "type": "mods",
+    "value": "+2",
+    "persistenceType": "ALWAYS",
+    "scope": "",
+    "condition": "rhodun_monumentback_combat",
+    "forCombatAbility": "combatround",
+    "related": [
+        {
+            "type": "custom",
+            "alias": "custom",
+            "message": "_Reliquat Unleashed_"
+        }
+    ]
+  }
+]

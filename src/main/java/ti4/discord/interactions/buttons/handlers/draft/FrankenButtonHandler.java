@@ -373,7 +373,7 @@ public class FrankenButtonHandler {
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
                             if (draft instanceof FrankenDrazDraft frankenDrazDraft) {
-                                frankenDrazDraft.expandFactionPackages(game);
+                                FrankenDrazDraft.expandFactionPackages(game);
                             }
                             String draftType = "FrankenDraft";
                             if (draft instanceof TwilightsFallFrankenDraft) {
@@ -409,7 +409,7 @@ public class FrankenButtonHandler {
                                 FrankenDraftBagService.applyDraftBags(event, game, false);
                             } else {
                                 if (draft instanceof FrankenDrazDraft frankenDrazDraft) {
-                                    frankenDrazDraft.expandFactionPackages(game);
+                                    FrankenDrazDraft.expandFactionPackages(game);
                                 }
                                 Button randomizeButton =
                                         Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");

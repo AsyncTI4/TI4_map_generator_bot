@@ -81,7 +81,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             if (command.accept(event)) {
                 command.preExecute(event);
                 if (combatReplayService != null && resolvedCommand instanceof GameStateContainer gameStateContainer) {
-                    combatReplayService.setPreInteractionSnapshot(
+                    CombatReplayService.setPreInteractionSnapshot(
                             combatReplayService.capturePreInteractionSnapshot(gameStateContainer.getGame()));
                 }
                 logSlashCommand(event);
@@ -96,7 +96,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             command.onException(event, e);
         } finally {
             if (combatReplayService != null) {
-                combatReplayService.clearPreInteractionSnapshot();
+                CombatReplayService.clearPreInteractionSnapshot();
             }
             RollbarManager.clear();
         }

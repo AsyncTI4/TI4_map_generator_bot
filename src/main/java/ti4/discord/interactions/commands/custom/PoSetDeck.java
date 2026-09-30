@@ -64,13 +64,13 @@ class PoSetDeck extends GameStateSubcommand {
         }
     }
 
-    private List<String> parseIds(String idList) {
+    private static List<String> parseIds(String idList) {
         return idList == null
                 ? Collections.emptyList()
                 : Arrays.stream(idList.split(",")).map(String::trim).collect(Collectors.toList());
     }
 
-    private boolean validateIds(List<String> ids, SlashCommandInteractionEvent event) {
+    private static boolean validateIds(List<String> ids, SlashCommandInteractionEvent event) {
         for (String id : ids) {
             if (!Mapper.getPublicObjectives().containsKey(id)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid public objective id: " + id);

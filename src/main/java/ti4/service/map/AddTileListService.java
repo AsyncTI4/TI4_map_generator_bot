@@ -86,7 +86,7 @@ public class AddTileListService {
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            String tilePath = ResourceHelper.getTileFile(tileName);
             if (tilePath == null) {
                 throw new Exception("Could not find tile: " + tileID);
             }

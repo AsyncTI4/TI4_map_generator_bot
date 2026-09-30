@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystel
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -195,7 +196,7 @@ public class CrystellumUnitHandler {
         List<Button> buttons = new ArrayList<>();
         player.getUnitModels().stream()
                 .map(UnitModel::getAsyncId)
-                .filter(asyncId -> asyncId != null)
+                .filter(Objects::nonNull)
                 .distinct()
                 .map(asyncId -> player.getPriorityUnitByAsyncID(asyncId, tile.getSpaceUnitHolder()))
                 .filter(unit -> unit != null

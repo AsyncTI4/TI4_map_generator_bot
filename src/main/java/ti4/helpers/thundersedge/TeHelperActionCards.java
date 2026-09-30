@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -50,6 +50,7 @@ import ti4.service.unit.RemoveUnitService;
 public class TeHelperActionCards {
 
     public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static void nop() {}
 
@@ -58,7 +59,7 @@ public class TeHelperActionCards {
         String ffcc = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
 
-        switch (card.getAlias().replaceAll("\\d", "")) {
+        switch (DIGIT_PATTERN.matcher(card.getAlias()).replaceAll("")) {
             case "blackmarketdealing" ->
                 buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
@@ -326,6 +327,8 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        var exchangeSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3");
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, exchangeSpec)) return;
 
         String planet = buttonID.split("_")[1];
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -415,6 +418,7 @@ public class TeHelperActionCards {
     @ButtonHandler("strategize")
     private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game, player);
+        buttons.addAll(OnyxxaAbilityHandler.getStrategicFluidityPrimaryButtons(game, player));
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()
@@ -430,12 +434,6 @@ public class TeHelperActionCards {
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        if (player.hasUnlockedBreakthrough("onyxxabt")) {
-            OnyxxaBreakthroughHandler.offerSCRollButton(game, player);
-        }
-        if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
-            OnyxxaLeaderHandler.offerCommanderUnlockButton(player);
-        }
         ButtonHelper.deleteMessage(event);
     }
 

@@ -47,7 +47,6 @@ public enum FactionEmojis implements TI4Emoji {
     Neutral,
 
     // Twilight's Fall
-
     redtf,
     greentf,
     blacktf,
@@ -56,6 +55,16 @@ public enum FactionEmojis implements TI4Emoji {
     yellowtf,
     bluetf,
     orangetf,
+
+    // Twilight Kart
+    redtknova,
+    orangetknova,
+    yellowtknova,
+    greentknova,
+    bluetknova,
+    purpletknova,
+    pinktknova,
+    blacktknova,
 
     // BR TF
     whitetf,
@@ -145,6 +154,11 @@ public enum FactionEmojis implements TI4Emoji {
     verydith,
     veylor,
     xytheris,
+    vanguard,
+    scrapyard,
+    stoneborn,
+    morpha,
+    thurviali,
 
     // nomadfalcon
     erock,
@@ -354,6 +368,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "verydith" -> verydith;
             case "veylor" -> veylor;
             case "xytheris" -> xytheris;
+            case "vanguard" -> vanguard;
+            case "scrapyard" -> scrapyard;
+            case "stoneborn" -> stoneborn;
+            case "morpha" -> morpha;
+            case "thurviali" -> thurviali;
             case "diaspora" -> Arborec;
             case "hlr" -> L1Z1X;
             case "clade" -> Naalu;
@@ -374,6 +393,15 @@ public enum FactionEmojis implements TI4Emoji {
             case "purpletf" -> purpletf;
             case "pinktf" -> pinktf;
             case "blacktf" -> blacktf;
+
+            case "redtknova" -> redtknova;
+            case "orangetknova" -> orangetknova;
+            case "yellowtknova" -> yellowtknova;
+            case "greentknova" -> greentknova;
+            case "bluetknova" -> bluetknova;
+            case "purpletknova" -> purpletknova;
+            case "pinktknova" -> pinktknova;
+            case "blacktknova" -> blacktknova;
 
             case "whitetf" -> whitetf;
 

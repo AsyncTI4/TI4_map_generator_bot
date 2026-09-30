@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -1014,7 +1014,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             tkCups.add("Destroyer Cup");
         }
         if (isTkNovaCup()) {
-            tkCups.add("Nova Cup");
+            tkCups.add("Nova Cup " + SourceEmojis.TkNovaCup);
         }
         gameModes.put(
                 SourceEmojis.TwilightKart + " Twilight Kart (" + String.join(" & ", tkCups) + ")", !tkCups.isEmpty());
@@ -1465,7 +1465,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void updateActivePlayer(Player player) {
-        /// update previous active player stats
         Date newTime = new Date();
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
@@ -1637,7 +1636,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
     }
 
-    private void adjustPeekable(int num, List<String> objectiveDeck, List<String> peekable) {
+    private static void adjustPeekable(int num, List<String> objectiveDeck, List<String> peekable) {
         num = Math.min(num, objectiveDeck.size() + peekable.size());
         while (peekable.size() != num) {
             if (peekable.size() > num) {
@@ -1671,7 +1670,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 objective -> trackPeekedObjective(publicObjectives2Peeked, objective, player));
     }
 
-    private void trackPeekedObjective(Map<String, List<String>> peekedObjectives, String objective, Player player) {
+    private static void trackPeekedObjective(
+            Map<String, List<String>> peekedObjectives, String objective, Player player) {
         List<String> playerIds = peekedObjectives.computeIfAbsent(objective, key -> new ArrayList<>());
         if (!playerIds.contains(player.getUserID())) {
             playerIds.add(player.getUserID());
@@ -1696,7 +1696,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         swapObjective(publicObjectives2Peekable, place1, place2);
     }
 
-    private void swapObjective(List<String> objectiveList, int place1, int place2) {
+    private static void swapObjective(List<String> objectiveList, int place1, int place2) {
         if (objectiveList.isEmpty() || place1 == place2) return;
         place1 -= 1;
         place2 -= 1;
@@ -1718,7 +1718,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         addPublicObjectiveToDeck(removed);
     }
 
-    private String peekAtObjective(List<String> objectiveList, int place) {
+    private static String peekAtObjective(List<String> objectiveList, int place) {
         if (objectiveList.isEmpty()) return null;
         place -= 1;
         return objectiveList.get(place);
@@ -2772,7 +2772,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return drawEvent(userID);
     }
 
-    private List<String> getExplores(String reqType, List<String> superDeck) {
+    private static List<String> getExplores(String reqType, List<String> superDeck) {
         List<String> deck = new ArrayList<>();
         for (String id : superDeck) {
             ExploreModel card = Mapper.getExplore(id);
@@ -2975,7 +2975,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setSecretObjectives(multiplyDeck(3, "secret_objectives_pok"));
     }
 
-    private List<String> multiplyDeck(int totalCopies, String... deckIDs) {
+    private static List<String> multiplyDeck(int totalCopies, String... deckIDs) {
         List<String> newDeck = Arrays.stream(deckIDs)
                 .flatMap(deckID -> Mapper.getDecks().get(deckID).getNewDeck().stream())
                 .toList();
@@ -3028,7 +3028,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    public void checkSOLimit(Player player) {
+    public static void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()
                 && !player.getSecretsUnscored().isEmpty()) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
@@ -3062,8 +3062,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     new ArrayList<>(Mapper.getSecretObjectives().values());
             Collections.shuffle(heistObbies);
             for (SecretObjectiveModel so : heistObbies) {
-                if (player.getSecrets().containsKey(so.getAlias())
-                        || getSoToPoList().contains(so.getAlias())) {
+                if (player.getSecrets().containsKey(so.getAlias()) || soToPoList.contains(so.getAlias())) {
                     continue;
                 }
                 if (so.getSource() != ComponentSource.erwans_gambit) {
@@ -3641,9 +3640,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void removeOverruleIfPurged() {
-        if ("true".equals(getStoredValue("removeOverrule"))) {
+        if (isOverrulePurged()) {
             getActionCards().removeIf("overrule"::equals);
         }
+    }
+
+    public boolean isOverrulePurged() {
+        return "true".equals(getStoredValue("removeOverrule"));
     }
 
     public void addTeACs() {
@@ -4115,6 +4118,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("innersanctum", new Planet("innersanctum", new Point(0, 0)));
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
         planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
+        planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4286,18 +4290,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if ("thpnrevenant".equals(pnID)) {
-                Player pnOwner = getPNOwner(pnID);
-                Leader commander = getRevenantPantheonCommander(pnOwner);
-                if (pnOwner != null
-                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
-                        && commander != null
-                        && commander.getId().equalsIgnoreCase(leaderID)
-                        && !commander.isLocked()) {
-                    return true;
-                }
-                continue;
-            }
             if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null
@@ -4372,17 +4364,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    public Leader getRevenantPantheonCommander(Player revenantPlayer) {
-        if (revenantPlayer == null || !"revenant".equalsIgnoreCase(revenantPlayer.getFaction())) {
-            return null;
-        }
-        return revenantPlayer.getLeaders().stream()
-                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                .filter(leader -> Constants.CALL_OF_THE_HAUNTED_LEADERS.contains(leader.getId()))
-                .findFirst()
-                .orElse(null);
-    }
-
     public Leader getRevenantLichCommander(Player lichPoolOwner, Player target) {
         if (lichPoolOwner == null || target == null) {
             return null;
@@ -4407,14 +4388,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
-            if ("thpnrevenant".equals(pnID)) {
-                Player pnOwner = getPNOwner(pnID);
-                Leader commander = getRevenantPantheonCommander(pnOwner);
-                if (pnOwner != null && !pnOwner.equals(player) && commander != null && !commander.isLocked()) {
-                    leaders.add(commander);
-                }
-                continue;
-            }
             if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
@@ -4494,7 +4467,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return leaders;
     }
 
-    public Leader getUnlockedLeaderCopy(Leader leader) {
+    public static Leader getUnlockedLeaderCopy(Leader leader) {
         return new Leader(
                 leader.getId(), leader.getType(), leader.getTgCount(), leader.isExhausted(), false, leader.isActive());
     }
@@ -4937,7 +4910,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
     }
 
-    public String getSCNumberIfNaaluInPlay(Player player, String scText) {
+    public static String getSCNumberIfNaaluInPlay(Player player, String scText) {
         if (player.hasTheZeroToken()) scText = "0/" + scText; // naalu 0 token ability
         if (player.hasAbility("patience")) {
             scText = "9/" + scText;
@@ -4959,12 +4932,19 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
+                || isUnchartedSpaceStuff()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
                 || isTwilightKart()
                 || isTkDestroyerCup()
                 || isTkNovaCup()
+                || isTfBr()
+                || isTwilightDS()
+                || isMuaatManiaMode()
+                || isCosmicConvergenceMode()
+                || isLiberationC4Mode()
+                || isErwansGambitMode()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()

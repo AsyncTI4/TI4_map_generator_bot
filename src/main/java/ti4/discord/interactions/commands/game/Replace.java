@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -37,6 +38,8 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
 
 class Replace extends GameStateSubcommand {
+
+    private static final Pattern EDGE_HYPHEN_PATTERN = Pattern.compile("^-|-$");
 
     Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
@@ -261,7 +264,7 @@ class Replace extends GameStateSubcommand {
         }
     }
 
-    private void updateDraftManagerPlayer(String oldPlayerUserId, String newPlayerUserId, Game game) {
+    private static void updateDraftManagerPlayer(String oldPlayerUserId, String newPlayerUserId, Game game) {
         if (!DraftManager.hasDraftManager(game)) {
             return;
         }
@@ -291,21 +294,22 @@ class Replace extends GameStateSubcommand {
                         });
     }
 
-    private void accessMessage(MessageChannel channel, Member member) {
+    private static void accessMessage(MessageChannel channel, Member member) {
         MessageHelper.sendMessageToChannel(
                 channel, "Access to " + channel.getName() + " granted for " + member.getAsMention());
     }
 
-    private String getNormalizedName(Member member) {
+    private static String getNormalizedName(Member member) {
         String name = member.getNickname();
         if (name == null) {
             name = member.getEffectiveName();
         }
-        name = name.toLowerCase()
-                .replaceAll("[\\s]+", "-")
-                .replaceAll("[^a-z0-9-]", "")
-                .replaceAll("-{2,}", "-")
-                .replaceAll("^-|-$", "");
+        name = EDGE_HYPHEN_PATTERN
+                .matcher(name.toLowerCase()
+                        .replaceAll("[\\s]+", "-")
+                        .replaceAll("[^a-z0-9-]", "")
+                        .replaceAll("-{2,}", "-"))
+                .replaceAll("");
         return name;
     }
 

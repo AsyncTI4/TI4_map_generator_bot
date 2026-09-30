@@ -12,10 +12,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -95,9 +95,6 @@ public class AddPlanetService {
                     "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
         }
-        if ("ponthous".equalsIgnoreCase(planet)) {
-            PonthousAbilityHandler.resetFracturedSouls(game, player);
-        }
         if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
@@ -136,6 +133,9 @@ public class AddPlanetService {
                         + player.getRepresentation() + " scored \"_" + kalt + "_\".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
+                if (game.isMonumentsMode()) {
+                    MonumentsBRButtonHandler.offerKaltrimMonumentDeploy(game, player);
+                }
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),

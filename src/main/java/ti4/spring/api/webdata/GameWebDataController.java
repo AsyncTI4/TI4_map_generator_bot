@@ -35,7 +35,7 @@ public class GameWebDataController {
     }
 
     @GetMapping(value = "/game-state", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WebGameState> getGameState() {
+    public static ResponseEntity<WebGameState> getGameState() {
         Game game = RequestContext.getGame();
         if (game == null) {
             return ResponseEntity.notFound().build();

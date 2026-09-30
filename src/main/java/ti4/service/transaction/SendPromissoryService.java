@@ -2,6 +2,7 @@ package ti4.service.transaction;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Scrapyard.ScrapyardPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
@@ -36,6 +37,9 @@ public class SendPromissoryService {
         PromissoryNoteModel model = Mapper.getPromissoryNote(pnAlias);
         transferCardToReceiversHand(sender, receiver, pnAlias);
         addPromissoryNoteToPlayAreaIfAble(event, game, sender, receiver, model);
+        if ("thpnscrapyard".equals(pnAlias)) {
+            ScrapyardPromissoryHandler.offerUnusedCustomRigs(game, receiver);
+        }
 
         // Report outcomes to relevant channels
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, sender, false);

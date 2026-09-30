@@ -37,7 +37,7 @@ public class GameWebDataService {
     private final Cache<String, String> webDataCache = createCache();
 
     public String getOrCompute(String gameName) {
-        return webDataCache.get(gameName, this::computeForGameName);
+        return webDataCache.get(gameName, GameWebDataService::computeForGameName);
     }
 
     public String getIfCached(String gameName) {
@@ -48,7 +48,7 @@ public class GameWebDataService {
         webDataCache.put(gameName, serializedWebData);
     }
 
-    private String computeForGameName(String gameName) {
+    private static String computeForGameName(String gameName) {
         var managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null || managedGame.getGame() == null) {
             throw new IllegalArgumentException("Unknown game: " + gameName);

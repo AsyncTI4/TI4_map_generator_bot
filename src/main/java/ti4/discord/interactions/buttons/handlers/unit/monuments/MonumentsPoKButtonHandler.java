@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.unit.monuments;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -243,8 +244,9 @@ public class MonumentsPoKButtonHandler {
                     continue;
                 }
                 List<Button> buttons = game.getRealPlayers().stream()
-                        .filter(tokenOwner -> monumentTile.hasPlayerCC(tokenOwner))
-                        .filter(tokenOwner -> !player.getMahactCC().contains(tokenOwner.getColor()))
+                        .filter(monumentTile::hasPlayerCC)
+                        .filter(tokenOwner ->
+                                tokenOwner == player || !player.getMahactCC().contains(tokenOwner.getColor()))
                         .map(tokenOwner -> Buttons.green(
                                 player.factionButtonChecker() + RESOLVE_SPIRE_OF_IXTH + monumentTile.getPosition() + "|"
                                         + tokenOwner.getColor(),
@@ -280,7 +282,9 @@ public class MonumentsPoKButtonHandler {
             }
             for (Tile monumentTile : monumentTiles) {
                 List<Button> buttons = game.getRealPlayers().stream()
-                        .filter(tokenOwner -> monumentTile.hasPlayerCC(tokenOwner))
+                        .filter(monumentTile::hasPlayerCC)
+                        .filter(tokenOwner ->
+                                tokenOwner == player || !player.getMahactCC().contains(tokenOwner.getColor()))
                         .map(tokenOwner -> Buttons.green(
                                 player.factionButtonChecker() + RESOLVE_SPIRE_OF_IXTH + monumentTile.getPosition() + "|"
                                         + tokenOwner.getColor(),
@@ -313,16 +317,17 @@ public class MonumentsPoKButtonHandler {
         if (tile != null && tokenOwner != null && tile.hasPlayerCC(tokenOwner)) {
             if (game.isFrankenGame()) {
                 canUse = player.hasAbility("primacy")
-                        && !player.getMahactCC().contains(tokenOwner.getColor())
+                        && (tokenOwner == player || !player.getMahactCC().contains(tokenOwner.getColor()))
                         && tile == MonumentsService.getMonumentTile(game, player, "mahact_monument");
             } else if ("mahact".equals(player.getFaction())) {
-                canUse = ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile)
-                        || game.getRealPlayers().stream()
-                                .filter(monumentOwner ->
-                                        MonumentsService.isMonumentOnBoard(game, monumentOwner, "mahact_monument"))
-                                .map(monumentOwner ->
-                                        MonumentsService.getMonumentTile(game, monumentOwner, "mahact_monument"))
-                                .anyMatch(tile::equals);
+                canUse = (tokenOwner == player || !player.getMahactCC().contains(tokenOwner.getColor()))
+                        && (ButtonHelper.doesPlayerHaveUnitHere("mahact_monument", player, tile)
+                                || game.getRealPlayers().stream()
+                                        .filter(monumentOwner -> MonumentsService.isMonumentOnBoard(
+                                                game, monumentOwner, "mahact_monument"))
+                                        .map(monumentOwner -> MonumentsService.getMonumentTile(
+                                                game, monumentOwner, "mahact_monument"))
+                                        .anyMatch(tile::equals));
             }
         }
         if (!canUse) {
@@ -349,7 +354,7 @@ public class MonumentsPoKButtonHandler {
         if (game == null || player == null || otherPlayer == null || !game.isMonumentsMode()) {
             return false;
         }
-        return List.of(player, otherPlayer).stream()
+        return Stream.of(player, otherPlayer)
                 .filter(monumentOwner -> MonumentsService.isMonumentOnBoard(game, monumentOwner, "naaz-rokha_monument"))
                 .anyMatch(monumentOwner ->
                         MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, monumentOwner).stream()

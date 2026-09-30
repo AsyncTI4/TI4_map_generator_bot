@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
@@ -173,7 +172,7 @@ public final class GMService {
         if (!game.isFowMode()) return;
         MapRenderPipeline.queue(
                 game,
-                (GenericInteractionCreateEvent) null,
+                null,
                 DisplayType.all,
                 fileUpload -> ThreadGetter.getThreadInChannel(
                         getGMChannel(game),

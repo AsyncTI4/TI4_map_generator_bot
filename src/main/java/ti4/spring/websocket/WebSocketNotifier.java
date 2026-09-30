@@ -107,8 +107,8 @@ public class WebSocketNotifier {
 
         ObjectNode patch = MAPPER.createObjectNode();
         Set<String> fieldNames = new HashSet<>();
-        before.propertyNames().forEach(fieldNames::add);
-        after.propertyNames().forEach(fieldNames::add);
+        fieldNames.addAll(before.propertyNames());
+        fieldNames.addAll(after.propertyNames());
         for (String field : fieldNames) {
             JsonNode beforeValue = before.path(field);
             JsonNode afterValue = after.path(field);
