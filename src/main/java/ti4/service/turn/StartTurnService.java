@@ -73,7 +73,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
@@ -592,9 +591,7 @@ public class StartTurnService {
                 && player.hasPlanet("asgard")
                 && !player.getExhaustedPlanetsAbilities().contains("asgard")) {
             startButtons.add(Buttons.gray(
-                    factionChecker + "planetAbilityExhaust_asgard",
-                    "Use Bifrost Bridge",
-                    MiscEmojis.LegendaryPlanet));
+                    factionChecker + "planetAbilityExhaust_asgard", "Use Bifrost Bridge", MiscEmojis.LegendaryPlanet));
         }
         if (!doneActionThisTurn
                 && player.hasPlanet("vanaheim")
