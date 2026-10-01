@@ -285,7 +285,7 @@ class ActionCardPlayerStatsService {
         return row.toString();
     }
 
-    private static void appendFactionWinRate(
+    static void appendFactionWinRate(
             StringBuilder row,
             Map<String, Integer> winsPerFaction,
             Map<String, Integer> sidePerFaction,
@@ -306,7 +306,7 @@ class ActionCardPlayerStatsService {
         return games == 0 ? 0 : overruleGamesPerFaction.getOrDefault(faction, 0) / (double) games;
     }
 
-    private static String getFactionName(String faction) {
+    static String getFactionName(String faction) {
         FactionModel factionModel = Mapper.getFaction(faction);
         // The combined Obsidian + Firmament tally is a label of its own with no model behind it.
         return factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : faction;
