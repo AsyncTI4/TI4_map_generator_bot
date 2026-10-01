@@ -58,6 +58,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -827,6 +828,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         ThurvialiLeadersHandler.offerMendingLightButtons(game, tile);
         VanguardUnitHandler.offerBulwarkButton(game, player);
         ScrapyardAbilitiesHandler.offerActivationRigButtons(game, player);

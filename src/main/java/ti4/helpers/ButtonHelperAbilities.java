@@ -2295,6 +2295,7 @@ public final class ButtonHelperAbilities {
             }
         }
         ThurvialiAbilityHandler.checkRadiantGrafting(game);
+        DiscordantStarsHelper.checkBRTaranisCrest(game);
     }
 
     @ButtonHandler("startCombatOn_")

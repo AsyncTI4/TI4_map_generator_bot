@@ -81,6 +81,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunar
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -5121,6 +5122,9 @@ public class ButtonHelper {
         }
         if (player.hasRelic("absol_tyrantslament") && !player.hasUnit("tyrantslament")) {
             endButtons.add(Buttons.green("deployTyrant", "Deploy The Tyrant's Lament", SourceEmojis.Absol));
+        }
+        if (player.hasRelicReady("kadlinsstaff")) {
+            endButtons.add(BlueReverieRelicHandler.getKadlinButton(player));
         }
         if (player.getPathTokenCounter() > 4) {
             endButtons.add(Buttons.green(
