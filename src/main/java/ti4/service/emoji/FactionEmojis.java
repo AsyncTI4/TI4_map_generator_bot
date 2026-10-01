@@ -374,7 +374,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "initiative" -> Keleres;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
-
+            case "company" -> Letnev;
+            case "industry" -> Sol;
             case "redtf" -> redtf;
             case "orangetf" -> orangetf;
             case "yellowtf" -> yellowtf;
