@@ -20,6 +20,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private final BooleanSetting eronous;
     private final BooleanSetting lostLegacies;
     private final BooleanSetting monuments;
+    private final BooleanSetting echoesOfYggdrasil;
 
     FrankenHomebrewSettings(Game game, JsonNode json, SettingsMenu parent) {
         super(
@@ -34,6 +35,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
+        echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
 
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
@@ -44,6 +46,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo("Adds Monuments+ cards and enables Monument drafting.");
+        echoesOfYggdrasil.setExtraInfo("Adds the nine Echoes of Yggdrasil tiles to the draft tile pool.");
 
         if (json != null && json.has("homebrewSettings")) json = json.get("homebrewSettings");
         if (json != null
@@ -55,6 +58,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
             eronous.initialize(json.get("eronous"));
             lostLegacies.initialize(json.get("lostLegacies"));
             monuments.initialize(json.get("monuments"));
+            echoesOfYggdrasil.initialize(json.get("echoesOfYggdrasil"));
         }
     }
 
@@ -68,7 +72,8 @@ class FrankenHomebrewSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        return new ArrayList<>(List.of(discoStars, blueReverie, unchartedSpace, eronous, lostLegacies, monuments));
+        return new ArrayList<>(
+                List.of(discoStars, blueReverie, unchartedSpace, eronous, lostLegacies, monuments, echoesOfYggdrasil));
     }
 
     @Override

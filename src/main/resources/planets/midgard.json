@@ -1,0 +1,27 @@
+{
+    "planetLayout":  {
+        "unitHolderName":  "midgard",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  {
+            "x":  171,
+            "y":  151
+        },
+        "planetRadius":  96
+    },
+    "id":  "midgard",
+    "tileId":  "ao1",
+    "name":  "Midgard",
+    "aliases":  [
+        "midgard"
+    ],
+    "resources":  2,
+    "influence":  3,
+    "planetTypes":  [
+        "CULTURAL"
+    ],
+    "legendaryAbilityName":  "Muster Manheim",
+    "legendaryAbilityText":  "You may exhaust this card after your unit is destroyed during ground combat to place 2 infantry on the active planet.",
+    "legendaryAbilityFlavourText":  "Midgard's elite; no chaff, just wheat,",
+    "flavourText":  "The hospitability of this planet has lead to colononization by nearly all those who reach it, but harmony has not always been easily found.",
+    "source":  "goose"
+}

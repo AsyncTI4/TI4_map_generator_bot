@@ -306,6 +306,7 @@ public class MiltyDraftHelper {
             sources.add(ComponentSource.thunders_edge);
         }
         initDraftTiles(manager, sources);
+        EchoesOfYggdrasilService.addTiles(game, manager);
     }
 
     private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {

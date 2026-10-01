@@ -73,6 +73,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
@@ -578,6 +579,30 @@ public class StartTurnService {
         if (player.hasPlanet("cineron")
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
             startButtons.add(ThronesThroneHandler.getCineronButton(player));
+        }
+        if (!doneActionThisTurn
+                && player.hasPlanet("alfheim")
+                && !player.getExhaustedPlanetsAbilities().contains("alfheim")) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "planetAbilityExhaust_alfheim",
+                    "Use Spritely Subterfuge",
+                    MiscEmojis.LegendaryPlanet));
+        }
+        if (!doneActionThisTurn
+                && player.hasPlanet("asgard")
+                && !player.getExhaustedPlanetsAbilities().contains("asgard")) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "planetAbilityExhaust_asgard",
+                    "Use Bifrost Bridge",
+                    MiscEmojis.LegendaryPlanet));
+        }
+        if (!doneActionThisTurn
+                && player.hasPlanet("vanaheim")
+                && !player.getExhaustedPlanetsAbilities().contains("vanaheim")) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "planetAbilityExhaust_vanaheim",
+                    "Use Freyr's Fortifications",
+                    MiscEmojis.LegendaryPlanet));
         }
         if (MonumentsService.isMonumentReady(game, player, "l1z1x_monument")) {
             startButtons.add(MonumentsButtonHandler.getL1MonumentButton(player));

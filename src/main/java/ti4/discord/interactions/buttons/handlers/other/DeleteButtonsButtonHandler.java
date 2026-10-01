@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.planet.SvartalfheimLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -226,6 +227,7 @@ class DeleteButtonsButtonHandler {
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
                 CommanderUnlockCheckService.checkPlayer(player, "revenantponthous");
                 RevenantLeadersHandler.offerRevPonthousCommander(game, player, tile);
+                SvartalfheimLegendaryButtonHandler.offerAndvarisArtificing(event, game, player);
                 if (game.isMonumentsMode()) {
                     if (MonumentsService.isMonumentOnBoard(game, player, "sol_monument")) {
                         MonumentsButtonHandler.offerCenotaphAfterProduction(game, player);

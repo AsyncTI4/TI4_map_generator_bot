@@ -86,6 +86,7 @@ import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
@@ -833,6 +834,16 @@ public final class ButtonHelperTacticalAction {
         ScrapyardUnitHandler.offerFuelCellButton(game, player);
         ScrapyardTechHandler.offerHotswapping(game, tile, player);
         LostLegaciesRelicHandler.offerNaturesBoon(game, player);
+        if (player.hasPlanet("jotunheim")
+                && !player.getExhaustedPlanetsAbilities().contains("jotunheim")) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you may exhaust _Hrungnir's Husk_.",
+                    Buttons.green(
+                            player.factionButtonChecker() + "planetAbilityExhaust_jotunheim",
+                            "Use Hrungnir's Husk",
+                            PlanetEmojis.getPlanetEmojiOrNull("jotunheim")));
+        }
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")

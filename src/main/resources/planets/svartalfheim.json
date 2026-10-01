@@ -1,0 +1,27 @@
+{
+    "planetLayout":  {
+        "unitHolderName":  "svartalfheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  {
+            "x":  172,
+            "y":  154
+        },
+        "planetRadius":  89
+    },
+    "id":  "svartalfheim",
+    "tileId":  "ao4",
+    "name":  "Svartalfheim",
+    "aliases":  [
+        "svartalfheim"
+    ],
+    "resources":  3,
+    "influence":  0,
+    "planetTypes":  [
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName":  "Andvari's Artificing",
+    "legendaryAbilityText":  "You may exhaust this card when you use PRODUCTION. If you do, choose one type of non-fighter ship produced and produce an additional ship of that type at no cost.",
+    "legendaryAbilityFlavourText":  "Forged twice, for the same price.",
+    "flavourText":  "Rich in rare isotopes and raw iron, the planetary magma-wells leave deep scars on the surface. But they also power the foundries of Svartalfheim, forging starships for anyone who will pay.",
+    "source":  "goose"
+}

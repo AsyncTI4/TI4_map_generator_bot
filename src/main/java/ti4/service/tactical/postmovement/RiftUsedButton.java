@@ -4,12 +4,14 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.tactical.PostMovementAbilityButton;
 import ti4.service.tactical.PostMovementButtonContext;
 
 public final class RiftUsedButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return !ctx.game().getStoredValue("possiblyUsedRift").isEmpty();
+        return !ctx.game().getStoredValue("possiblyUsedRift").isEmpty()
+                && !AsgardLegendaryService.isBifrostBridgeActive(ctx.game(), ctx.player());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

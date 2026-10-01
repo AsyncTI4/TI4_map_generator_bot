@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.VanaheimLegendaryButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -26,9 +28,11 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.EmelparService;
 import ti4.service.planet.FaunusService;
 import ti4.service.planet.IndustrexService;
+import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.turn.StartTurnService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
@@ -48,6 +52,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         planet = AliasHandler.resolvePlanet(planet);
         if (("innersanctum".equals(planet) && !player.hasTech("thveylorg"))
                 || ("fabricatestation".equals(planet) && !player.hasTech("tharcanumpmy"))) {
+            return;
+        }
+        if ("jotunheim".equals(planet)
+                && (game.getCurrentActiveSystem().isEmpty() || player != game.getActivePlayer())) {
             return;
         }
         if (exhaust) {
@@ -85,6 +93,26 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                 buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+            }
+            case "alfheim" -> {
+                channel = player.getCardsInfoThread();
+                output = player.getRepresentation() + ", choose a deck to look at and reorder.";
+                buttons.addAll(AlfheimLegendaryButtonHandler.getDeckButtons(player, game));
+            }
+            case "asgard" -> {
+                AsgardLegendaryService.activateBifrostBridge(game, player);
+                output = player.getRepresentationNoPing()
+                        + " exhausted _Bifrost Bridge_. Printed gravity-rift systems are adjacent and their ships ignore gravity-rift effects until the end of this turn.";
+            }
+            case "vanaheim" -> {
+                VanaheimLegendaryButtonHandler.repairAllUnits(game, player);
+                output = player.getRepresentationNoPing()
+                        + " exhausted _Freyr's Fortifications_ to repair all their units.";
+            }
+            case "jotunheim" -> {
+                JotunheimLegendaryService.activate(game, player);
+                output = player.getRepresentationNoPing()
+                        + " exhausted _Hrungnir's Husk_. Other players cannot use **SPACE CANNON** against their ships during this tactical action's Movement step.";
             }
             case "primor" -> {
                 output = "Use buttons to drop 2 infantry on a planet.";

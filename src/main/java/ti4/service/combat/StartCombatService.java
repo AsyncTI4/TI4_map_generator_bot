@@ -100,6 +100,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -950,6 +951,13 @@ public class StartCombatService {
                                     + player.getFactionEmojiOrColor()
                                     + " due to the ability of the Quetzecoatl (the Argent flagship).");
                 }
+            }
+            if (JotunheimLegendaryService.isActive(game, activePlayer)) {
+                MessageHelper.sendMessageToChannel(
+                        threadChannel,
+                        "Reminder that you cannot use SPACE CANNON against the ships of "
+                                + activePlayer.getFactionEmojiOrColor()
+                                + " due to _Hrungnir's Husk_ (Jotunheim).");
             }
             if (game.isOrdinianC1Mode()
                     && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png")
