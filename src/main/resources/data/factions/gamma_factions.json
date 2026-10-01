@@ -414,9 +414,8 @@
             "ggcompanyy",
             "ggcompanydn"
         ],
-        "StartingTechAmount": 2,
+        "startingTechAmount": 2,
         "startingTechOptions": [
-            
             "amd",
             "aida",
             "sdn"
