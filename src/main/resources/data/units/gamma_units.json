@@ -583,7 +583,7 @@
         "ability": "During space combat, while you are not the active player, when your pponent plays an action card, you may remove this unit to cancel that action card."
     },
     {
-        "id": "gray_dreadnought2",
+        "id": "company_dreadnought2",
         "baseType": "dreadnought",
         "asyncId": "dn",
         "name": "Velite Rapax II",
