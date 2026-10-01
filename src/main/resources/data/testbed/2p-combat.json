@@ -1,0 +1,18 @@
+{
+  "name": "2p-combat",
+  "description": "Two seats whose fleets share the system above Mecatol Rex; the space combat thread opens on apply.",
+  "fog": false,
+  "you": {
+    "faction": "letnev",
+    "home": "301",
+    "techs": ["amd"],
+    "leaders": { "unlock": ["commander"] },
+    "units": { "101": "2 dn, cv, 4 ff" }
+  },
+  "seats": [
+    { "faction": "nekro", "home": "310", "units": { "101": "ca, 2 dd, 3 ff" } }
+  ],
+  "defaults": { "acs": 3, "tg": 4, "ccs": "3/3/2" },
+  "start": "action",
+  "combat": ["101"]
+}

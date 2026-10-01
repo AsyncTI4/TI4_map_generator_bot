@@ -1,0 +1,11 @@
+{
+  "name": "action-3p",
+  "description": "Three seats dropped straight into the action phase with strategy cards picked and Sabotage in hand.",
+  "you": { "faction": "sol", "speaker": true, "sc": 3, "acs": ["sabo1", 2] },
+  "seats": [
+    { "faction": "hacan", "sc": 5 },
+    { "faction": "jolnar", "sc": 7, "relics": 1 }
+  ],
+  "defaults": { "acs": 3, "sos": 1, "tg": 3, "commodities": 2, "ccs": "3/3/2" },
+  "start": "action"
+}

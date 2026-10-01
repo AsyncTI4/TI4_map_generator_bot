@@ -30,7 +30,8 @@ public final class GlobalSettings {
         ALLOW_GAME_CREATION,
         SQLITE_PERSISTENCE_DISABLED, // Temporarily no-op auxiliary SQLite/JDBC reads and writes during migration
         READY_TO_RECEIVE_COMMANDS, // Whether the bot is ready to receive commands
-        BOT_LOG_WEBHOOK_URL; // Webhook URL to send rogue bot log messages to
+        BOT_LOG_WEBHOOK_URL, // Webhook URL to send rogue bot log messages to
+        TESTBED_ENABLED;
 
         @Override
         public String toString() {

@@ -29,6 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
+import ti4.service.testbed.TestBedService;
 import ti4.settings.users.UserSettingsManager;
 
 @Getter
@@ -78,7 +79,12 @@ public abstract class ListenerContext {
 
         if (game != null) {
             String userID = event.getUser().getId();
-            player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
+            player = TestBedService.resolveActingPlayer(
+                    game,
+                    event.getMember(),
+                    userID,
+                    event.getChannel() == null ? null : event.getChannel().getId(),
+                    CommandHelper.getPlayerFromGame(game, event.getMember(), userID));
 
             if (player == null && !allowsNonPlayerInteraction()) {
                 String message = event.getUser().getAsMention() + " is not a player of the game";

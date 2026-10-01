@@ -87,6 +87,7 @@ import ti4.service.map.MapPresetService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
+import ti4.service.testbed.TestBedPresetService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -118,6 +119,7 @@ class AutoCompleteProvider {
                 case Constants.SEARCH, "search2" -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN2 -> resolvePlotAutoComplete(event, optionName);
+                case "testbed" -> resolveTestBedAutoComplete(event, optionName);
             }
             if (event.isAcknowledged()) return;
         }
@@ -1495,6 +1497,15 @@ class AutoCompleteProvider {
                     default -> Collections.emptyList();
                 };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void resolveTestBedAutoComplete(
+            @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
+        if (!"preset".equals(optionName)) return;
+        String enteredValue = event.getFocusedOption().getValue();
+        Set<String> presetNames = TestBedPresetService.loadShippedPresets().keySet();
+        event.replyChoices(mapTo25ChoicesThatContain(presetNames, enteredValue))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveFrankenAutoComplete(
