@@ -7,5 +7,6 @@
     "imagePath": "cpti20-emptyleft.png",
     "shipPositionsType": "TYPE08",
     "tileBack": "fracture",
+    "isFracture": true,
     "source": "other"
 }

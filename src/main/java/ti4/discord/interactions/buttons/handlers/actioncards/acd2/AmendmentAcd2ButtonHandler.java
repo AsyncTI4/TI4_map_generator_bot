@@ -112,12 +112,12 @@ class AmendmentAcd2ButtonHandler {
     @ButtonHandler("amendmentRevealStage1")
     public static void amendmentRevealStage1(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        RevealPublicObjectiveService.revealS1(game, event);
+        RevealPublicObjectiveService.revealS1FromDeck(game, event);
     }
 
     @ButtonHandler("amendmentRevealStage2")
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        RevealPublicObjectiveService.revealS2(game, event);
+        RevealPublicObjectiveService.revealS2FromDeck(game, event);
     }
 }

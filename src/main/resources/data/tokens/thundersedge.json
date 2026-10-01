@@ -65,6 +65,16 @@
         "source": "thunders_edge"
     },
     {
+        "id": "fracture",
+        "imagePath": "token_fracture_async.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "fracture",
+            "token_fracture_async"
+        ],
+        "source": "thunders_edge"
+    },
+    {
         "id": "relictoken",
         "imagePath": "token_relictoken.png",
         "spaceOrPlanet": "planet",

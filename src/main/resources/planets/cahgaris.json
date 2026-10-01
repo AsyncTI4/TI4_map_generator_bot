@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cahgaris",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "cahgaris",
     "tileId": "er117",
     "name": "Cahgaris",

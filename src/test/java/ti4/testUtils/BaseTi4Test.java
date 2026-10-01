@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.Presence;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.game.persistence.GameManager;
@@ -39,6 +40,13 @@ public class BaseTi4Test {
         if (!setupCountDownLatch.await(GLOBAL_BEFORE_ALL_WAIT_THRESHOLD_SECONDS, TimeUnit.SECONDS)) {
             throw new AssertionError("Setup timed out");
         }
+    }
+
+    @BeforeEach
+    void restoreSharedJdaMocks() {
+        JdaService.testingMode = true;
+        JdaService.jda = mockJda;
+        JdaService.guildPrimary = mockGuild;
     }
 
     private static void globalBeforeAll() {

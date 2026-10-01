@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -15,7 +16,6 @@ import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.model.LeaderModel;
-import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
@@ -44,16 +44,11 @@ public class SabotageService {
             return true;
         }
 
-        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
-            return false;
-        }
+        if (!ActionCardHelper.canPlayActionCards(player)) return false;
 
         if (isAffectedByTransparasteel(player, game)) return false;
 
         if (playerHasSabotage(player)) return true;
-
-        if (player.getAcCount() == 0) return false;
 
         return !allSabotagesAreDiscarded(game, player);
     }
@@ -128,7 +123,7 @@ public class SabotageService {
             return "All _Sabotages_ are in the discard.";
         }
 
-        String playerName = game.isFowMode() ? "Player" : player.getRepresentationNoPing();
+        String playerName = FoWHelper.actorOrAnon(game, player, "Player");
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
             return playerName + " has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation()
@@ -165,7 +160,8 @@ public class SabotageService {
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
         return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
                 .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
-                .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+                .allMatch(alias -> isActionCardNotPlayable(game, player, alias)
+                        && game.getDiscardACStatus().get(alias) != ActionCardHelper.ACStatus.garbozia);
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {

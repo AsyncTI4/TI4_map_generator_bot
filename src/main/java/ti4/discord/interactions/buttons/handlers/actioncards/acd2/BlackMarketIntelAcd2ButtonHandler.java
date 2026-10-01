@@ -11,6 +11,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
@@ -99,7 +100,7 @@ class BlackMarketIntelAcd2ButtonHandler {
 
         String publicGiveMsg = player.getRepresentationNoPing()
                 + " gave a secret objective to "
-                + (game.isFowMode() ? "another player" : target.getRepresentationNoPing())
+                + FoWHelper.actorOrAnon(game, target, "another player")
                 + " using _Black Market Intel_.";
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicGiveMsg);
 

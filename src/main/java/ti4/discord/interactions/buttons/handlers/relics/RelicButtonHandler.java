@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -93,9 +94,22 @@ class RelicButtonHandler {
     }
 
     @ButtonHandler("drawRelic")
-    static void drawRelic(ButtonInteractionEvent event, Player player, Game game) {
+    static void drawRelic(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         RelicHelper.drawRelicAndNotify(player, event, game);
-        ButtonHelper.deleteMessage(event);
+        if (!buttonID.contains("_sc")) {
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    @ButtonHandler("resolveEvenFall3Primary")
+    static void resolveEvenFall3Primary(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (player.getPlanets().contains("mr") || player.getPlanets().contains("mrte")) {
+            RelicHelper.drawWithAdvantage(player, game, 2);
+            ActionCardHelper.drawActionCards(player, 3);
+        } else {
+            RelicHelper.drawRelicAndNotify(player, event, game);
+            ActionCardHelper.drawActionCards(player, 1);
+        }
     }
 
     @ButtonHandler("dominusOrb")
@@ -104,6 +118,7 @@ class RelicButtonHandler {
         String relicId = "dominusorb";
         player.removeRelic(relicId);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
@@ -119,6 +134,7 @@ class RelicButtonHandler {
         String relicId = "eye_of_vogul";
         player.removeRelic(relicId);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");

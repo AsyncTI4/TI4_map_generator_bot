@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "muaat",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "muaat",
     "tileId": "04",
     "name": "Muaat",

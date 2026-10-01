@@ -9,6 +9,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 
 @UtilityClass
 public class FrankenFactionTechService {
@@ -82,12 +83,9 @@ public class FrankenFactionTechService {
     private void addTF_Techs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         for (String tech : techIDs) {
             if (player.getGame().isVeiledHeartMode()) {
-                String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+                VeiledHeartService.addVeiledCard(player, tech);
+                String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it.";
                 MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-                String key = "veiledCards" + player.getFaction();
-                String val = player.getGame().getStoredValue("veiledCards" + player.getFaction()) + tech + "_";
-                player.getGame().setStoredValue(key, val);
             } else {
                 player.addTech(tech);
             }
@@ -97,15 +95,11 @@ public class FrankenFactionTechService {
     private void removeTF_Techs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         for (String tech : techIDs) {
             if (player.getGame().isVeiledHeartMode()) {
-                String msg = "Removed a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+                VeiledHeartService.removeVeiledCard(player, tech);
+                String msg = "Removed a veiled card.";
                 MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-                String key = "veiledCards" + player.getFaction();
-                String val = player.getGame().getStoredValue("veiledCards" + player.getFaction());
-                val = val.replace(tech + "_", "");
-                player.getGame().setStoredValue(key, val);
             } else {
-                player.addTech(tech);
+                player.removeTech(tech);
             }
         }
     }

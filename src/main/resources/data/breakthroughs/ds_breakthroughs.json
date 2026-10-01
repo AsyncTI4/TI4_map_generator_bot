@@ -8,8 +8,7 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "At the end of your turn, you may exhaust this card to move any number of your ships between two systems that contain your space docks and no other player’s ships",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/axisbt.webp?raw=true",
+        "text": "At the start of a player's turn, you may exhaust this card to allow that player to treat 1 of your unit upgrade technologies as their own until the end of that turn. After you replenish commodities, gain a number of trade goods equal to the number of unit upgrade technologies you own.",
         "source": "ds"
     },
     {
@@ -21,7 +20,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to allow each player to explore a planet they control; gain a number of commodities equal to the number of other players who do.",
+        "text": "ACTION: Exhaust this card to allow all other players to explore 1 planet they control. Then, place up to 1 infantry from your reinforcements into coexistence on 1 of those planets. When you explore a planet, you may exhaust this card to instead explore the frontier deck in that system.",
         "source": "ds"
     },
     {
@@ -52,14 +51,14 @@
     },
     {
         "alias": "cymiaebt",
-        "name": "Cybernetic Armoring",
-        "shortName": "Cybernetic\nArmoring",
+        "name": "Synaptic Interference",
+        "shortName": "Synaptic\nInterference",
         "faction": "cymiae",
         "synergy": [
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At any time, you may discard 1 action card to cancel up to 2 hits produced against your ground forces, or place 1 infantry from your reinforcements on a planet that contains your units. After you lose a ground combat, gain 1 commodity.",
+        "text": "After you win a combat, you may purge 1 of your promissory notes from your hand to move 1 other player's command token in the active system to an adjacent system, or gain 2 trade goods. ACTION: Exhaust this card to discard the top 3 cards of the action card deck.",
         "source": "ds"
     },
     {
@@ -71,8 +70,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "Once per space combat, after 1 of your opponent's non-fighter ships is destroyed, you may exhaust this card to place 1 frontier token in the active system, or produce 1 non-fighter ship in that system to ready this card. You can produce ships in systems that contain both your ships and another player's ships.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/dihmohnbt.webp?raw=true",
+        "text": "Once per space combat, after 1 of your opponent's non-fighter ships is destroyed, you may exhaust this card to place 1 frontier token in the active system, or produce 1 or 2 non-fighter ship in that system to ready this card. You can produce ships in systems that contain both your ships and another player's ships.",
         "source": "ds"
     },
     {
@@ -186,7 +184,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "ACTION: Exhaust this card to either gain 1 command token, or research a technology of the same color as one of your exhausted technologies.",
+        "text": "ACTION: Exhaust this card to either gain 1 command token, or research a technology of the same color as one of your exhausted technologies.\nWhen you exhaust a technology, gain 1 commodity.",
         "source": "ds"
     },
     {
@@ -261,7 +259,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "Gain the Grove card. When you resolve METEOR SLINGS, you may place your units into coexistence to reroll any of your units' BOMBARDMENT rolls; you cannot commit those coexisting ground forces during this action.",
+        "text": "Gain the Grove card. When you resolve METEOR SLINGS, if you cancel all hits produced, you may place your units into coexistence; you cannot commit those coexisting ground forces during this action.",
         "source": "ds"
     },
     {
@@ -273,8 +271,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "At the start and end of your turn, move up to 1 of your PDS units onto a planet you control in that unit's system, or that system's space area. Your PDS units on planets have PLANETARY SHIELD and do not have text abilities; you may use their SPACE CANNON against ships in adjacent systems.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mirvedabt.webp?raw=true",
+        "text": "If you have the Fighter II unit upgrade technology, flip this card and place it on top of Fighter II.",
         "source": "ds"
     },
     {
@@ -286,8 +283,7 @@
             "WARFARE",
             "CYBERNETIC"
         ],
-        "text": "At the start and end of a space combat in which you are the defender, you may swap 1 of your ships in the active system with 1 of your ships in another system that contains 1 of your command tokens; the swapped ships cannot transport units.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mortheusbt.webp?raw=true",
+        "text": "At the start of a space combat in which you are the defender, you may swap 1 of your ships in the active system with 1 of your ships in another system that contains 1 of your command tokens; the swapped ships cannot transport units.",
         "source": "ds"
     },
     {
@@ -337,8 +333,7 @@
             "BIOTIC",
             "WARFARE"
         ],
-        "text": "Once per action, after you resolve a policy ability, you may spend 1 trade good to move 1 of your infantry on the game board into coexistence on a planet in an adjacent system. ACTION: Purge this card to resolve invasion on all planets that contain your coexisting infantry.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/olradinbt.webp?raw=true",
+        "text": "Once per action, after you resolve a policy ability, you may spend 1 trade good to move 1 of your infantry on the game board into coexistence on a planet in an adjacent system. When you pass, you may purge this card to resolve invasion on all planets that contain your coexisting infantry.",
         "source": "ds"
     },
     {
@@ -376,13 +371,13 @@
             "WARFARE",
             "PROPULSION"
         ],
-        "text": "During ground combat, if the active system does not contain 1 of your command tokens, you may place 1 token from your strategy pool in that system to have all your units enter coexistence. When a player ends coexistence with your units, draw 1 secret objective.",
+        "text": "At the end of a round of ground combat, you may discard 1 secret objective to have all your participating units enter coexistence. When a player ends your units' coexistence on a planet, you may draw 1 secret objective.",
         "source": "ds"
     },
     {
         "alias": "vadenbt",
-        "name": "Strongarm Banking",
-        "shortName": "Strongarm\nBanking",
+        "name": "High Security Vault",
+        "shortName": "High Security\nVault",
         "faction": "vaden",
         "synergy": [
             "WARFARE",
@@ -413,8 +408,7 @@
             "CYBERNETIC",
             "PROPULSION"
         ],
-        "text": "Your home system is also a nebula. Hits produced by the combat and ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/veldyrbt.webp?raw=true",
+        "text": "Your home system is also a nebula. Hits produced by the ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
         "source": "ds"
     },
     {

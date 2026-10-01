@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -13,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -27,16 +27,7 @@ class BetrayalAcd2ButtonHandler {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("resolveBetrayalStep2_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "resolveBetrayalStep2_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton("resolveBetrayalStep2_" + p2.getFaction(), "gray", p2));
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -95,7 +86,7 @@ class BetrayalAcd2ButtonHandler {
             List<Button> buttons = List.of(Buttons.green(
                     "resolveBetrayalCollect_" + player.getFaction(), "Send Random Action Card", CardEmojis.ActionCard));
             String msg = p2.getRepresentationUnfogged() + ", _Betrayal_ requires you to send 1 random action card to "
-                    + (game.isFowMode() ? "another player." : player.getFactionEmojiOrColor() + ".");
+                    + FoWHelper.factionEmojiOrAnon(game, player, "another player") + ".";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
             if (p2.isNpc()) {
                 ActionCardHelper.sendRandomACPart2(event, game, p2, player);

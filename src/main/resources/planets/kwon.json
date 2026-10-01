@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kwon",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 130,
+            "y": 215
+        }
+    },
     "id": "kwon",
     "tileId": "c10",
     "name": "Kwon",

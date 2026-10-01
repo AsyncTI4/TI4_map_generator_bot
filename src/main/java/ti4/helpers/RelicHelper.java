@@ -4,14 +4,22 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -19,6 +27,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -26,10 +35,41 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
+import ti4.service.relic.AlluringThroneService;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class RelicHelper {
+
+    /** Returns whether a relic fragment of the requested trait is currently purged and available to gain. */
+    public static boolean hasPurgedRelicFragmentOfType(Game game, String trait) {
+        if (game == null || trait == null) {
+            return false;
+        }
+
+        DeckModel explorationDeck = Mapper.getDeck(game.getExplorationDeckID());
+        if (explorationDeck == null) {
+            return false;
+        }
+
+        Set<String> unavailableFragments = new HashSet<>();
+        for (String exploreType :
+                List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER)) {
+            unavailableFragments.addAll(game.getExploreDeck(exploreType));
+            unavailableFragments.addAll(game.getExploreDiscard(exploreType));
+        }
+        for (Player player : game.getPlayers().values()) {
+            unavailableFragments.addAll(player.getFragments());
+        }
+
+        return explorationDeck.getNewDeck().stream()
+                .filter(fragmentID -> !unavailableFragments.contains(fragmentID))
+                .map(Mapper::getExplore)
+                .anyMatch(fragment -> fragment != null
+                        && Constants.FRAGMENT.equalsIgnoreCase(fragment.getResolution())
+                        && trait.equalsIgnoreCase(fragment.getType()));
+    }
 
     public static void drawWithAdvantage(Player player, Game game, int advantage) {
         List<Button> buttons = new ArrayList<>();
@@ -54,8 +94,23 @@ public class RelicHelper {
         drawRelicAndNotify(player, event, game, 0, false);
     }
 
+    public static void drawRelicAndNotifyIgnoringKairnBreakthrough(
+            Player player, GenericInteractionCreateEvent event, Game game) {
+        drawRelicAndNotify(player, event, game, 0, false, true);
+    }
+
     public static void drawRelicAndNotify(
             Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
+        drawRelicAndNotify(player, event, game, position, checked, false);
+    }
+
+    private static void drawRelicAndNotify(
+            Player player,
+            GenericInteractionCreateEvent event,
+            Game game,
+            int position,
+            boolean checked,
+            boolean ignoreKairnBreakthrough) {
         if (!checked
                 && (player.hasAbility("data_leak")
                         || (player.getPromissoryNotes().containsKey("dspnflor")
@@ -95,11 +150,12 @@ public class RelicHelper {
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
+        WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
-
+        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
         if (checked) game.shuffleRelics();
     }
 
@@ -119,6 +175,12 @@ public class RelicHelper {
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second secret objective due to **Plausible Deniability**.");
+                }
+                if (player.hasAbility("multitasking")) {
+                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+                }
+                if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             }
@@ -144,6 +206,7 @@ public class RelicHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Triad \"planet\" card to your play area.");
             }
+            case "gedustation" -> BlueReverieRelicHandler.offerGeduStationPlacement(game, player);
 
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
@@ -213,6 +276,11 @@ public class RelicHelper {
                     }
                 }
             }
+            case "alluringthrone" -> {
+                AlluringThroneService.serveIllustrionButtons(game, player);
+                AddPlanetService.addPlanet(player, "illustrion", game);
+                player.refreshPlanet("illustrion");
+            }
         }
         CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
@@ -229,6 +297,7 @@ public class RelicHelper {
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
             }
             case "thetriad" -> p1.removePlanet("triad");
+            case "gedustation" -> p1.removePlanet("gedustation");
             case "obsidian", "absol_obsidian" -> {
                 if (p1.getSoScored() > p1.getMaxSOCount()) {
                     // do something for 4 scored secrets
@@ -246,10 +315,21 @@ public class RelicHelper {
 
     public void sendFrags(
             GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
+        sendFrags(event, sender, receiver, trait, count, game, true);
+    }
+
+    public void sendFrags(
+            GenericInteractionCreateEvent event,
+            Player sender,
+            Player receiver,
+            String trait,
+            int count,
+            Game game,
+            boolean includeSupermassive) {
         List<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
             ExploreModel card = Mapper.getExplore(cardID);
-            if (card.getType().equalsIgnoreCase(trait)) {
+            if (card.getType().equalsIgnoreCase(trait) && (includeSupermassive || !cardID.startsWith("supermassive"))) {
                 fragments.add(cardID);
             }
         }
@@ -265,12 +345,12 @@ public class RelicHelper {
             return;
         }
 
-        String p1 = sender.getRepresentation();
-        String p2 = receiver.getRepresentation();
+        String p1 = sender.getRepresentationNoPing();
+        String p2 = receiver.getRepresentationNoPing();
         String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment"
                 + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() && !(event instanceof ButtonInteractionEvent)) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor", "kairn");

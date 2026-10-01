@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sigilus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "sigilus",
     "tileId": "er93",
     "name": "Sigilus",

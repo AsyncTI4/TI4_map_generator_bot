@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "druaa",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "druaa",
     "tileId": "09",
     "name": "Druaa",

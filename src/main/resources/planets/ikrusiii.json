@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ikrusiii",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "ikrusiii",
     "tileId": "er52",
     "name": "Ikrus III",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "widmore",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "widmore",
     "tileId": "c01",
     "name": "widmore",

@@ -204,7 +204,9 @@ class SetPolicy extends GameStateSubcommand {
         } else {
             unitModelID = "olradin_mech";
         }
-        player.addOwnedUnitByID(unitModelID);
+        if (!player.getGame().isTwilightsFallMode()) {
+            player.addOwnedUnitByID(unitModelID);
+        }
         UnitModel unitModel = Mapper.getUnit(unitModelID);
 
         Game game = getGame();

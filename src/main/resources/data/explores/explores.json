@@ -359,7 +359,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
-        "flavorText": "*Suffi An drifted into the derelict orbital and brushed her suited hand across the inner hatch controls. A light glowed, and she smiled. The statis seals were still operational.*",
+        "flavorText": "*Suffi An drifted into the derelict orbital and brushed her suited hand across the inner hatch controls. A light glowed, and she smiled. The stasis seals were still operational.*",
         "source": "pok"
     },
     {
@@ -386,7 +386,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
-        "flavorText": "*The Imperial Survey Corp outpost had been adandoned since the Twilight Wars, but the facilities had been built to last for millennia.*",
+        "flavorText": "*The Imperial Survey Corp outpost had been abandoned since the Twilight Wars, but the facilities had been built to last for millennia.*",
         "source": "pok"
     },
     {

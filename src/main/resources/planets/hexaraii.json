@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hexaraii",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 209,
+            "y": 80
+        }
+    },
     "id": "hexaraii",
     "tileId": "ba3",
     "name": "Hexara II",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nairb",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 220,
+            "y": 235
+        }
+    },
     "id": "nairb",
     "tileId": "d115",
     "name": "Nairb",

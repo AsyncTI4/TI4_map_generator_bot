@@ -1,0 +1,27 @@
+{
+    "planetLayout":  {
+        "unitHolderName":  "muspelheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  {
+            "x":  178,
+            "y":  154
+        },
+        "planetRadius":  81
+    },
+    "id":  "muspelheim",
+    "tileId":  "ao6",
+    "name":  "Muspelheim",
+    "aliases":  [
+        "muspelheim"
+    ],
+    "resources":  3,
+    "influence":  1,
+    "planetTypes":  [
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName":  "Surtr's Smelters",
+    "legendaryAbilityText":  "While you control Muspelheim, your pds gain PRODUCTION 1 or increase the value of their PRODUCTION ability by 1.",
+    "legendaryAbilityFlavourText":  "One hand production, one hand destruction.",
+    "flavourText":  "A frontier world full of technocrats whose primary motivations are equal parts production and self-defense.",
+    "source":  "goose"
+}

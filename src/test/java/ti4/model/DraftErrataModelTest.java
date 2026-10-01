@@ -25,7 +25,7 @@ class DraftErrataModelTest extends ModelTest<DraftErrataModel> {
         }
     }
 
-    private boolean validateAlias(DraftErrataModel model) {
+    private static boolean validateAlias(DraftErrataModel model) {
         List<DraftItem> draftItems = DraftItem.generateAllCards();
         for (DraftItem item : draftItems) {
             if (item.getAlias().equals(model.getAlias())) {
@@ -37,7 +37,7 @@ class DraftErrataModelTest extends ModelTest<DraftErrataModel> {
         return false;
     }
 
-    private boolean validateAdditionalComponents(DraftErrataModel model) {
+    private static boolean validateAdditionalComponents(DraftErrataModel model) {
         if (model.getAdditionalComponents() == null) {
             return true;
         }
@@ -59,7 +59,7 @@ class DraftErrataModelTest extends ModelTest<DraftErrataModel> {
         return false;
     }
 
-    private boolean validateOptionalComponents(DraftErrataModel model) {
+    private static boolean validateOptionalComponents(DraftErrataModel model) {
         if (model.getOptionalSwaps() == null) {
             return true;
         }

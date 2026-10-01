@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vegaminor",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 207
+        }
+    },
     "id": "vegaminor",
     "tileId": "74",
     "name": "Vega Minor",

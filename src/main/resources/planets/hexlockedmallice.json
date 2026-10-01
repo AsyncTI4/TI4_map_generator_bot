@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hexlockedmallice",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 204,
+            "y": 116
+        }
+    },
     "id": "hexlockedmallice",
     "tileId": "82ah",
     "name": "Locked Mallice (Hexagon)",

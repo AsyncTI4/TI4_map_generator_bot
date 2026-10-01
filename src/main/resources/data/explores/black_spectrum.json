@@ -1,0 +1,74 @@
+[
+    {
+        "id": "bsp_freelancers1",
+        "name": "Freelancers (1)",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may produce 1 unit in this system with its cost reduced by 1; you may spend influence as if it were resources to produce that unit.",
+        "flavorText": "As part of the annexation agreement, local artisans would be well paid to lay the groundwork for military installations in the newly acquired territories.",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_freelancers2",
+        "name": "Freelancers (2)",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may produce 1 unit in this system with its cost reduced by 1; you may spend influence as if it were resources to produce that unit.",
+        "flavorText": "Overseer Klix was known for hiring hundreds of freelancers and then \"forgetting\" to pay them once the bulk of the work was complete.",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_freelancers3",
+        "name": "Freelancers (3)",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may produce 1 unit in this system with its cost reduced by 1; you may spend influence as if it were resources to produce that unit.",
+        "flavorText": "The Vexis Howlers were well-equipped with transports, powered armor, and even logistical support—everything a fledgling outpost needed to survive.",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_demilitarized_zone",
+        "name": "Demilitarized Zone",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "Remove units from this planet and place them on another planet you control. Ground forces may instead be placed in the space area of this system.\n\nATTACH: Units cannot be committed to, produced on, or placed on this planet. During the agenda phase, this planet's planet card can be traded as part of a transaction.",
+        "attachmentId": "dmz",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_abandoned_warehouses1",
+        "name": "Abandoned Warehouses (1)",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You gain 1 trade good and may convert 1 of your commodities to a trade good. Then, you gain 1 commodity for each industrial planet you control.",
+        "flavorText": "Far beneath the storm-wracked seas, vast storage tanks drifted in the lightless depths.",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_abandoned_warehouses2",
+        "name": "Abandoned Warehouses (2)",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You gain 1 trade good and may convert 1 of your commodities to a trade good. Then, you gain 1 commodity for each industrial planet you control.",
+        "flavorText": "Looks like some smuggler hid their shipment of gerr root here and forgot to pick it up.",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_abandoned_warehouses3",
+        "name": "Abandoned Warehouses (3)",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You gain 1 trade good and may convert 1 of your commodities to a trade good. Then, you gain 1 commodity for each industrial planet you control.",
+        "flavorText": "Suffi An drifted into the derelict orbital and brushed her suited hand across the inner hatch controls. A light glowed, and she smiled. The stasis seals were still operational.",
+        "source": "black_spectrum"
+    },
+    {
+        "id": "bsp_abandoned_warehouses4",
+        "name": "Abandoned Warehouses (4)",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You gain 1 trade good and may convert 1 of your commodities to a trade good. Then, you gain 1 commodity for each industrial planet you control.",
+        "flavorText": "The storage silos had been half buried in sand dunes, sealed enviro-doors hiding the stockpiles within.",
+        "source": "black_spectrum"
+    }
+]

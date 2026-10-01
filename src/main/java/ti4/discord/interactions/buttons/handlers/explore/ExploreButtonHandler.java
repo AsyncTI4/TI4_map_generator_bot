@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -75,7 +76,7 @@ class ExploreButtonHandler {
                     player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
     }
@@ -172,6 +173,44 @@ class ExploreButtonHandler {
         String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. ";
         message += Helper.getPlanetRepresentation(planetID, game) + " has been readied.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveScorchedDepot_")
+    public static void resolveScorchedDepot(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
+        String unit = buttonID.split("_")[1];
+        String planetID = buttonID.split("_")[2];
+        Tile tile = game.getTileFromPlanet(planetID);
+        if ("mech".equalsIgnoreCase(unit)) {
+            if (!ExploreHelper.checkForMech(planetID, game, player)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
+                return;
+            }
+        } else {
+            if (!ExploreHelper.checkForInf(planetID, game, player)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
+                return;
+            }
+            Planet planet = tile.getUnitHolderFromPlanet(planetID);
+            RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+            ButtonHelper.resolveInfantryRemoval(player, 1, tile);
+            String message = player.getRepresentation() + " is removing an infantry to resolve _Scorched Depot_. ";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        }
+
+        String id = player.getFactionCheckerPrefix() + "removeCCFromBoard_depot_" + tile.getPosition() + "_"
+                + player.getFaction();
+        String label = "Remove Token From " + tile.getRepresentationForButtons(game, player);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(id, label));
+        buttons.add(Buttons.REDISTRIBUTE_CCs);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                player.getRepresentationNoPing()
+                        + " is resolving _Scorched Depot_. Please remove a command token from the tile or redistribute command tokens.",
+                buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -398,12 +437,29 @@ class ExploreButtonHandler {
     @ButtonHandler("movedNExplored_")
     static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
+        boolean skipKairnAgentInterrupt = bID.startsWith("skipKairnAgent_");
+        if (skipKairnAgentInterrupt) {
+            bID = bID.substring("skipKairnAgent_".length());
+        }
+        String[] info = bID.split("_");
+        if (!skipKairnAgentInterrupt
+                && KairnLeadershandler.offerKairnAgentExploreInterrupt(event, game, player, buttonID, info)) {
+            return;
+        }
         boolean dsdihmy = bID.startsWith("dsdihmy_");
         boolean scanlink = bID.startsWith("scanlink_");
-        String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
-        ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
+        if (buttonID.contains("frontier")) {
+            player.setBreakthroughExhausted("bentorbt", true);
+            ExploreService.expFront(event, tile, game, player, true);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " exhausted their breakthrough to explore the frontier deck instead of a normal explore.");
+        } else {
+            ExploreService.explorePlanet(
+                    event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
+        }
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(

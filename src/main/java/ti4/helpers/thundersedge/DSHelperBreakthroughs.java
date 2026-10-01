@@ -32,6 +32,8 @@ import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -207,10 +209,12 @@ public final class DSHelperBreakthroughs {
                 String message2 = p1.getRepresentation()
                         + ", please use these buttons to produce 1 non-fighter ship\n> "
                         + ButtonHelper.getListOfStuffAvailableToSpend(p1, game);
+
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         p1.getFactionEmoji()
-                                + " is using _Exodus Engineering_ to produce 1 non-fighter ship (they may do this once per combat).");
+                                + " is using _Exodus Engineering_ to produce 1 or 2 non-fighter ships (they may do this once per combat).");
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
         }
@@ -261,14 +265,14 @@ public final class DSHelperBreakthroughs {
     }
 
     public static void bentorBTStep1(Game game, Player p1) {
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("acceptBentorBT_" + p1.getFaction(), "Explore 1 Planet"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", " + p1.getFactionNameOrColor()
-                            + " has _Historian Conclave_. This allows to to explore a planet you control. (If you do and you are not them, they will gain 1 commodity.)",
+                            + " has _Historian Conclave_. This allows to to explore a planet you control. (If you do they may be able to coexist on the planet.)",
                     buttons);
         }
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Sent buttons to every player to resolve.");
@@ -281,11 +285,29 @@ public final class DSHelperBreakthroughs {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
-                            + " has been accepted. "
-                            + (p2.getCommodities() >= p2.getCommoditiesTotal()
-                                    ? "You would gain 1 commodity, but you are already at maximum commodities."
-                                    : "You have gained 1 commodity."));
-            p2.gainCommodities(1);
+                            + " has been accepted. You may be able to coexist on the explored planet if you have not already done so with someone else.");
+            List<Button> buttons2 = new ArrayList<>();
+            if (game.isFowMode()) {
+                buttons2 = PlanetTargetService.targetButtons(
+                        game,
+                        p2,
+                        PlanetTargetSpec.of(p2.factionButtonChecker() + "exchangeProgramPart3")
+                                .where(p -> !p.isHomePlanet(game)),
+                        buttons2);
+            } else {
+                for (String planet : p1.getPlanets()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                            && FoWHelper.playerHasUnitsOnPlanet(p1, game.getUnitHolderFromPlanet(planet))) {
+                        buttons2.add(Buttons.gray(
+                                p2.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)));
+                    }
+                }
+            }
+            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            String msg = p2.getRepresentation() + " you can use these buttons to coexist after the explore.";
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
         }
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         ButtonHelper.deleteMessage(event);
@@ -392,8 +414,8 @@ public final class DSHelperBreakthroughs {
                         + ". These trade goods have been returned to the supply."
                         + (!originalBid.equalsIgnoreCase(originalBidFlorz)
                                 ? "\nAs the two players did not spend the same number of trade goods, "
-                                        + p1.getRepresentation() + " has sent a random promissory note to "
-                                        + p2.getRepresentation() + "."
+                                        + p2.getRepresentation()
+                                        + " has been given the option to explore a planet or take a random promissory note."
                                 : ""));
         ButtonHelper.deleteMessage(event);
         if (StringUtils.isNumeric(originalBidFlorz) && Integer.parseInt(originalBidFlorz) > 0) {
@@ -403,8 +425,19 @@ public final class DSHelperBreakthroughs {
             p2.setTg(p2.getTg() - Integer.parseInt(originalBid));
         }
         if (!originalBid.equalsIgnoreCase(originalBidFlorz)) {
-            PromissoryNoteHelper.sendRandom(event, game, p1, p2);
+            List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p2, game);
+            buttons.add(Buttons.red(
+                    p2.getFactionCheckerPrefix() + "florzenBTStep5_" + p1.getFaction(), "Gain Random Promissory Note"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p2.getCorrectChannel(), p2.getRepresentation() + " Please choose an option", buttons);
         }
+    }
+
+    @ButtonHandler("florzenBTStep5")
+    public static void florzenBTStep5(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        PromissoryNoteHelper.sendRandom(event, game, p2, p1);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("useLanefirBt")
@@ -564,12 +597,20 @@ public final class DSHelperBreakthroughs {
             List<Button> buttons = new ArrayList<>();
             Player target = p1;
             Player player = p2;
-            for (String planet : target.getPlanetsAllianceMode()) {
-                if (game.getUnitHolderFromPlanet(planet) != null
-                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
-                    buttons.add(Buttons.gray(
-                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                            Helper.getPlanetRepresentation(planet, game)));
+            if (game.isFowMode()) {
+                buttons = PlanetTargetService.targetButtons(
+                        game,
+                        player,
+                        PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3"),
+                        buttons);
+            } else {
+                for (String planet : target.getPlanetsAllianceMode()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
+                        buttons.add(Buttons.gray(
+                                player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)));
+                    }
                 }
             }
             buttons.add(Buttons.red("deleteButtons", "Cancel"));

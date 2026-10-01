@@ -66,7 +66,7 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
         }
     }
 
-    private Game createGame() {
+    private static Game createGame() {
         var game = new Game();
         game.setName("pbd123");
         game.setCustomName("pbd123-a-test-for-you-and-me");

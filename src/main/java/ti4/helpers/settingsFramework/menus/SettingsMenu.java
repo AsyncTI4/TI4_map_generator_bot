@@ -180,7 +180,7 @@ public abstract class SettingsMenu {
         parseInput(context.getEvent(), context.getOrigComponentID());
     }
 
-    private void parseInput(GenericInteractionCreateEvent event, String originalId) {
+    public void parseInput(GenericInteractionCreateEvent event, String originalId) {
         // This should only ever be run on the most top-level settings menu
         if (parent != null) {
             parent.parseInput(event, originalId);
@@ -208,7 +208,7 @@ public abstract class SettingsMenu {
         buttonFailed(event, userMsg, true);
     }
 
-    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean logError) {
+    private static void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean logError) {
         if (logError) {
             BotLogger.error(new LogOrigin(event), userMsg + "\nMenu Framework button has failed.");
         }

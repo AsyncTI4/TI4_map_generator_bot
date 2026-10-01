@@ -61,8 +61,8 @@ public class TkHelperUnits {
             return;
         }
 
-        String arciveFaction = buttonID.replace("useVisionariaArchive_", "");
-        Player archive = game.getPlayerFromColorOrFaction(arciveFaction);
+        String archiveFaction = buttonID.replace("useVisionariaArchive_", "");
+        Player archive = game.getPlayerFromColorOrFaction(archiveFaction);
 
         String msg = player.getRepresentationUnfogged() + " spent 3 trade goods " + player.gainTG(-3);
         msg += " to draw an ability.";

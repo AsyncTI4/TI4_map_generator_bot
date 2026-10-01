@@ -1,0 +1,621 @@
+[
+    {
+        "alias": "bsp_st",
+        "name": "Sarween Tools",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When 1 or more of your units use PRODUCTION, reduce the combined cost of the produced units by 1.\n\nDuring your turn, when a space dock in your home system uses PRODUCTION, you may exhaust this card to reduce the combined cost of the produced units by 1 for each of your space docks on a planet in home systems.",
+        "homebrewReplacesID": "st",
+        "initials": "ST",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ie",
+        "name": "Integrated Economy",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "text": "When you use the PRODUCTION abilities in your home system, for every 2 of your structures on the game board, you may place 1 of the produced units in adjacent systems that contain your units.\n\nACTION: Exhaust this card and spend 1 command token from your strategy pool to use the PRODUCTION abilities of your units in 1 system. If that system is your home system, gain 1 command token.",
+        "homebrewReplacesID": "ie",
+        "initials": "IE",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_x89c4",
+        "name": "X-89 Bacterial Weapon",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "text": "After you destroy 1 or more of another player's ground forces on a planet during a tactical action, you may exhaust this card to destroy all of that player's remaining ground forces on that planet.\n\nWhen 1 or more of your ground forces on a planet would be destroyed, you may exhaust this card; half of those ground forces, rounded up, are not destroyed.",
+        "homebrewReplacesID": "x89c4",
+        "initials": "X8BW",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_nm",
+        "name": "Neural Motivator",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "The maximum number of action cards you can have in your hand is increased by 2. During the status phase, draw 2 action cards instead of 1.",
+        "homebrewReplacesID": "nm",
+        "initials": "NM",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sar",
+        "name": "Self-Assembly Routines",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "text": "After 1 of your units is destroyed, you may exhaust this card to capture that unit.\n\nAt the end of a combat round, you may return 1 captured unit to produce a unit of the same type and place it with your units participating in the combat. This effect may only be used once per combat.",
+        "homebrewReplacesID": "sar",
+        "initials": "SAR",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pi",
+        "name": "Predictive Intelligence",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\n\nWhen you cast votes during the agenda phase, you may exhaust this card to cast 1 additional vote for each of your structures on the game board. Then, if the outcome you voted for is resolved, ready this card.",
+        "homebrewReplacesID": "pi",
+        "initials": "PI",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pa",
+        "name": "Psychoarchaeology",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When researching technology, you may use technology specialties without exhausting planets, even if they are exhausted.\n\nDuring your turn, you may exhaust this card and a planet with a technology specialty to ready 1 technology you own of a matching color. That technology cannot have more prerequisites than the number of matching specialties on planets you control. This counts as using specialties for SYNERGY and other game effects.",
+        "homebrewReplacesID": "pa",
+        "initials": "P",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sdn",
+        "name": "Scanlink Drone Network",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you activate a system, you may explore 1 planet in that system that contains 1 or more of your units.\n\nWhen you would explore a planet that contains 2 or more of your structures, you may exhaust this card to draw 1 additional card; choose 1 to resolve and discard the rest.",
+        "homebrewReplacesID": "sdn",
+        "initials": "SDN",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ps",
+        "name": "Plasma Scoring",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When your units make a roll for a unit ability, you may choose 1 of those units to roll 1 additional die.",
+        "homebrewReplacesID": "ps",
+        "initials": "PS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dxa",
+        "name": "Dacxive Animators",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "text": "When your infantry on a planet is destroyed or after you win a ground combat, you may place 1 infantry on that planet. This effect can be resolved only once per planet in an action.",
+        "homebrewReplacesID": "dxa",
+        "initials": "DA",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_hm",
+        "name": "Hyper Metabolism",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "text": "At the end of your turn, you may exhaust this card to gain 1 command token.\n\nDuring the action phase, this card cannot be readied by any game effect unless you spend 2 influence.",
+        "homebrewReplacesID": "hm",
+        "initials": "HM",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_gd",
+        "name": "Gravity Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "text": "After you activate a system, you may exhaust this card to apply +1 to the move value of 1 of your ships during this tactical action. Then, after movement, if any ship moved through or out of a system containing a gravity rift, a supernova, or a wormhole, you may spend 1 resource to ready this card.",
+        "homebrewReplacesID": "gd",
+        "initials": "GD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_fl",
+        "name": "Fleet Logistics",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1.\n\nACTION: Exhaust this card and choose 1 of your ships in a system that does not contain your command token; spend resources equal to half that ship's cost (rounded up). Then, move that ship to an adjacent system that contains your ships.",
+        "homebrewReplacesID": "fl",
+        "initials": "FL",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_gls",
+        "name": "Graviton Laser System",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "text": "You may exhaust this card before your units use SPACE CANNON to apply +1 to the result of each die roll; hits produced by those units must be assigned to non-fighter ships, if able.\n\nYour units with PLANETARY SHIELD gain SUSTAIN DAMAGE and may use it to cancel hits produced against your units in the same system.",
+        "homebrewReplacesID": "gls",
+        "initials": "GLS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_md",
+        "name": "Magen Defense Grid",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "text": "Your war suns cannot be damaged or destroyed by your opponent's action cards.\n\nYour units apply +1 to their space cannon rolls against units within the same system.\n\nAt the start of ground combat, for each of your units with PLANETARY SHIELD on the planet, produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "homebrewReplacesID": "md",
+        "initials": "MDG",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_da",
+        "name": "Duranium Armor",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "text": "At the end of a combat round, you may spend 1 resource to repair 1 of your units participating in the combat. You do not need to spend a resource if that unit did not use SUSTAIN DAMAGE during this combat round.",
+        "homebrewReplacesID": "da",
+        "initials": "DA",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_td",
+        "name": "Transit Diodes",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "text": "You may exhaust this card at the start of your turn; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control.\n\nYou may exhaust this card before you roll dice during a round of ground combat; remove all of your ground forces in that combat and place them on 1 planet you control that contains a structure.",
+        "homebrewReplacesID": "td",
+        "initials": "TD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_asc",
+        "name": "Assault Cannon",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of their non-fighter ships.\n\nAt the start of a space combat round, you may exhaust this card to choose a non-fighter non-ground force unit type in the active system. During this combat round, your units of that type roll twice.",
+        "homebrewReplacesID": "asc",
+        "initials": "AC",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sr",
+        "name": "Sling Relay",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "text": "ACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks. You may instead place that ship in an adjacent system that contains 1 or more of your units or planets you control; if you do, the cost of that ship is doubled.",
+        "homebrewReplacesID": "sr",
+        "initials": "SR",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_amd",
+        "name": "Antimass Deflectors",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "Your ships can move into and through asteroid fields.\n\nWhen other players\u2019 units use SPACE CANNON against your units, apply -1 to the result of each die roll.\n\nIf you announce a retreat, your opponent applies -2 to the result of each of their combat rolls during this combat round.",
+        "homebrewReplacesID": "amd",
+        "initials": "AD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_bio",
+        "name": "Bioplasmosis",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "arborec",
+        "text": "When you produce units in a system that is connected to your home system by a path of adjacent systems containing your units, reduce the combined cost of the produced units by 1.\n\nACTION: Exhaust this card to remove any number of ground forces or structures from planets you control and place them on 1 or more planets you control in the same or adjacent systems.",
+        "homebrewReplacesID": "bio",
+        "initials": "B",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pm",
+        "name": "Production Biomes",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "hacan",
+        "text": "ACTION: Exhaust this card to gain 3 trade goods and choose 1 other player; that player gains 2 trade goods.",
+        "homebrewReplacesID": "pm",
+        "initials": "PB",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_yso",
+        "name": "Yin Spinner",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "yin",
+        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.\n\nWhen you spend resources to research a technology, you may spend commodities as if they were resources.",
+        "homebrewReplacesID": "yso",
+        "initials": "YS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_it",
+        "name": "Instinct Training",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "xxcha",
+        "text": "You may exhaust this card when another player plays an action card; cancel that action card.",
+        "homebrewReplacesID": "it",
+        "initials": "IT",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_l4",
+        "name": "L4 Disruptors",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "letnev",
+        "text": "After you spend 2 or more trade goods, gain 1 trade good.",
+        "homebrewReplacesID": "l4",
+        "initials": "LD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ic",
+        "name": "Impulse Core",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "yin",
+        "text": "ACTION: Exhaust this card to choose a system. Destroy up to 3 of your cruisers or destroyers in that system. For each ship destroyed, produce 1 hit against another player's units in 1 adjacent system. That player must assign these hits to non-fighter ships, if able. Then, you may produce a number of infantry in your home system, up to the number of your ships destroyed.",
+        "homebrewReplacesID": "ic",
+        "initials": "IC",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_is",
+        "name": "Inheritance Systems",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "l1z1x",
+        "text": "When you research a technology, you may spend 2 resources and exhaust this card to ignore all of that technology's prerequisites.\n\nAfter an invasion in which you gained control of a planet that contains 1 or more structures of another player, you may exhaust this card to gain 1 non-faction technology owned by that player.",
+        "homebrewReplacesID": "is",
+        "initials": "IS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ers",
+        "name": "E-Res Siphons",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "jolnar",
+        "text": "After another player activates a system that contains 1 or more of your ships, gain 3 trade goods.",
+        "homebrewReplacesID": "ers",
+        "initials": "ERS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_scc",
+        "name": "Spatial Conduit Cylinders",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "jolnar",
+        "text": "You may exhaust this card after a player activates a system; treat each of your unit as if they were adjacent to systems that contain your structures during this tactical action.",
+        "homebrewReplacesID": "scc",
+        "initials": "SCC",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lgf",
+        "name": "Lazax Gate Folding",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "winnu",
+        "text": "After you activate a system, you may exhaust this card; you treat the Mecatol Rex system as if it is adjacent to each system that contains your structures.\n\nACTION: Exhaust this card to place and commit 2 infantry to Mecatol Rex, place 1 more if you don't have custodians token; resolve an invasion on that planet.",
+        "homebrewReplacesID": "lgf",
+        "initials": "LGF",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_vpw",
+        "name": "Valkyrie Particle Weave",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "sardakk",
+        "text": "After you committed at least 1 ground force to a planet, you may commit 1 ground force from each planet in the active system and each planet in adjacent systems that do not contain 1 of your command tokens.\n\nAfter making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit.",
+        "homebrewReplacesID": "vpw",
+        "initials": "VPW",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_mr",
+        "name": "Magmus Reactor",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "muaat",
+        "text": "Your ships can move into supernovas. Each supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units.\n\nAfter you place 1 or more units in a system that contains or is adjacent to a supernova, you may gain 1 commodity.",
+        "homebrewReplacesID": "mr",
+        "initials": "MR",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ds",
+        "name": "Dimensional Splicer",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "ghost",
+        "text": "At the start of a space combat in a system containing a wormhole and 1 or more of your ships, you may produce hits equal to half the number of wormholes in that system (rounded up). Assign these hits to your opponent's ships in that system.",
+        "homebrewReplacesID": "ds",
+        "initials": "DS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_htp",
+        "name": "Hegemonic Trade Policy",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "winnu",
+        "text": "When 1 or more of your units use PRODUCTION, you may swap the influence and resource values of 1 planet you control during this use of PRODUCTION.",
+        "homebrewReplacesID": "htp",
+        "initials": "HTP",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ah",
+        "name": "Aerie Hololattice",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "argent",
+        "text": "Other players cannot move ships through systems that contain your structures, unless you allow it.\n\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.\n\nAfter you activate a system, you may exhaust this card; during this tactical action, your units can move out of systems that contain both your structures and your command tokens.",
+        "homebrewReplacesID": "ah",
+        "initials": "AH",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_inf2",
+        "name": "Infantry II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "text": "Cost 1(x2), Combat 7\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry in your home system or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "inf2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lw2",
+        "name": "Letani Warrior II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "arborec",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 7\nPRODUCTION 2\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry on a planet you control with a structure or in a space area with a war sun or a flagship.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "lw2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_so2",
+        "name": "Spec Ops II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "sol",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 6\nAfter this unit is destroyed, roll 1 die. If the result is 5-10, capture it. At the start of your turn, you may place captured infantry in your home system or in a space area with a war sun or a flagship.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource or influence value, gain that planet readied.",
+        "homebrewReplacesID": "so2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_cl2",
+        "name": "Crimson Legionnaire II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "mahact",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 7\nAfter this unit is destroyed, capture it and gain 1 commodity or convert 1 of your commodities to a trade good. At the start of your turn, you may place captured infantry in your home system or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "cl2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sd2",
+        "name": "Space Dock II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\n\nUp to 4 fighters in this system do not count against your ships' capacity.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "sd2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ffac2",
+        "name": "Floating Factory II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "saar",
+        "baseUpgrade": "bsp_sd2",
+        "text": "Move 2, Capacity 5\nPRODUCTION 8\nThis unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.\n\nDuring your turn, you may treat this space dock and your planets in this system as if they were in your home system.",
+        "homebrewReplacesID": "ffac2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dt2",
+        "name": "Dimensional Tear II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "cabal",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PRODUCTION 8\nThis system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\n\nUp to 13 fighters in this system do not count against your ships' capacity.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "dt2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sdn2",
+        "name": "Super Dreadnought II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "l1z1x",
+        "baseUpgrade": "dn2",
+        "text": "Cost 4, Combat 4, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 4\nThis unit cannot be destroyed by \"Direct Hit\" action cards.\n\nAfter an invasion in this system, if the number of planets you gained is equal to or greater than the number of your dreadnoughts in this system, you may spend 1 token from your strategy pool to ready 1 of your technologies.",
+        "homebrewReplacesID": "sdn2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ac2",
+        "name": "Advanced Carrier II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BB",
+        "faction": "sol",
+        "baseUpgrade": "cv2",
+        "text": "Cost 3, Combat 9, Move 2, Capacity 8\nSUSTAIN DAMAGE\nApply +1 to the movement of this unit when it moves through at least 2 different systems containing your command tokens.",
+        "homebrewReplacesID": "ac2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pws2",
+        "name": "Prototype War Sun II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RRRY",
+        "faction": "muaat",
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD.\n\nDuring an action, you may assign a hit to this unit to treat 1 system other than the Mecatol Rex system that contains your flagship as if it were a supernova for the duration of that action.",
+        "homebrewReplacesID": "pws2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_helios2",
+        "name": "4X41C \"Helios\" V2",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "bastion",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\n\nThe resource value of this planet is increased by 2. Up to 4 fighters in this system do not count against your ships' capacity.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "helios2",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dsceldsd",
+        "name": "Trade Port II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "celdauri",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PRODUCTION X, ANTI-FIGHTER BARRAGE 6(x2)\nThis unit's PRODUCTION value is equal to 5 more than the resource or influence value of this planet.\n\nUp to 4 fighters in this system do not count against your ships' capacity. This unit may use its ANTI-FIGHTER BARRAGE during each round of space combat.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.",
+        "homebrewReplacesID": "dsceldsd",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dsmykosd",
+        "name": "Mycelium Ring II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "mykomentori",
+        "baseUpgrade": "bsp_sd2",
+        "text": "PLANETARY SHIELD, PRODUCTION X\nThis unit's PRODUCTION value is equal to 6 more than the resource value of this planet.\n\nDuring your turn, you may treat this space dock and this planet as if they were in your home system.\n\nDEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock.",
+        "homebrewReplacesID": "dsmykosd",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dscymiinf",
+        "name": "Unholy Abomination II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "cymiae",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1, Combat 4\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry in your home system, on a planet you control or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "dscymiinf",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dszeliinf",
+        "name": "Impactor II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "zelian",
+        "baseUpgrade": "bsp_inf2",
+        "text": "Cost 1(x2), Combat 7\nBOMBARDMENT 8\nAfter this unit is destroyed, roll 1 die. If the result is 6-10, capture it. At the start of your turn, you may place captured infantry in your home system, in an asteroid field system with your units or in a space area with a war sun.\n\nWhen you gain control of a planet, if you have more infantry on that planet than its resource value, gain that planet readied.",
+        "homebrewReplacesID": "dszeliinf",
+        "source": "black_spectrum"
+    }
+]

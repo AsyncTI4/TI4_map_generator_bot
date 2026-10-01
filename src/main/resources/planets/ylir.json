@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ylir",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 81
+        }
+    },
     "id": "ylir",
     "tileId": "58",
     "name": "Ylir",

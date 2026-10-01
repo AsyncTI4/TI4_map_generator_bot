@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vaylar",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "vaylar",
     "tileId": "d28",
     "name": "Vaylar",

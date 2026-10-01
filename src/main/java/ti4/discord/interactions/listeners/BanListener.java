@@ -37,7 +37,7 @@ class BanListener extends ListenerAdapter {
         return null;
     }
 
-    private UserSnowflake getInitiatingUser(AuditLogEntry log) {
+    private static UserSnowflake getInitiatingUser(AuditLogEntry log) {
         return UserSnowflake.fromId(log.getUserId());
     }
 }

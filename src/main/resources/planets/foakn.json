@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "foakn",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "foakn",
     "tileId": "s10",
     "name": "Foak'n",

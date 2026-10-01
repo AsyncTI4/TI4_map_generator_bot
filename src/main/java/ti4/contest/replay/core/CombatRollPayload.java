@@ -96,6 +96,7 @@ public record CombatRollPayload(
             String modifierAlias,
             String sourceName,
             int value,
+            Integer maxDice,
             String type,
             String scopeUnitAsyncId,
             String scopeDisplay,
@@ -119,10 +120,12 @@ public record CombatRollPayload(
             int printedHitsOn,
             int modifier,
             int effectiveThreshold,
+            List<Integer> modifiersByDie,
             RollSegmentType segmentType,
             List<DieRoll> dice,
             int hits) {
         public UnitRoll {
+            modifiersByDie = modifiersByDie == null ? List.of() : List.copyOf(modifiersByDie);
             dice = dice == null ? List.of() : List.copyOf(dice);
         }
     }

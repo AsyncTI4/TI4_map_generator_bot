@@ -17,6 +17,12 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 
 public class RedistributionAgendaResolver implements AgendaResolver {
+
+    /** The static planet name, as the agenda summary renders it - no live resources/influence, no [DMZ]. */
+    private static String planetName(Game game, String planetId) {
+        return AgendaHelper.getAgendaOutcomeName(game, planetId, true);
+    }
+
     @Override
     public String agendaId() {
         return "redistribution";
@@ -34,10 +40,12 @@ public class RedistributionAgendaResolver implements AgendaResolver {
 
                 boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
                 if (containsDMZ) {
-                    String dmzString =
-                            "Because " + Helper.getPlanetRepresentation(winner, game) + " is the _Demilitarized Zone_"
-                                    + ", there is no point in choosing a player to place an infantry."
-                                    + " Feel free to curry favour with another player by claiming you would have chosen them.";
+                    // Name the planet the way the agenda summary does. getPlanetRepresentation appends live
+                    // resources/influence and a [DMZ] marker, which is attachment state the main channel may
+                    // not be entitled to in fog.
+                    String dmzString = "Because " + planetName(game, winner) + " is the _Demilitarized Zone_"
+                            + ", there is no point in choosing a player to place an infantry."
+                            + " Feel free to curry favour with another player by claiming you would have chosen them.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), dmzString);
                     return;
                 }
@@ -48,8 +56,19 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                     }
                     String resolveStr = p2.getRepresentation()
                             + " outright has the fewest victory points, and so 1 of their infantry infantry was added to "
-                            + Helper.getPlanetRepresentation(winner, game) + " automatically.";
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolveStr);
+                            + planetName(game, winner) + " automatically.";
+                    if (game.isFowMode()) {
+                        // Follow DisarmamentAgendaResolver: detail to the players involved, a generic line in
+                        // public. Naming the recipient publicly is what the fog-aware button branch below is
+                        // already careful to avoid.
+                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), resolveStr);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), resolveStr);
+                        MessageHelper.sendMessageToChannel(
+                                game.getMainGameChannel(),
+                                "The player with the fewest victory points placed an infantry on the elected planet.");
+                    } else {
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolveStr);
+                    }
                     return;
                 }
                 List<Button> buttons = new ArrayList<>();

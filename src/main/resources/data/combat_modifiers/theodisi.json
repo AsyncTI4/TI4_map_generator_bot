@@ -1,5 +1,56 @@
 [
     {
+        "alias": "swarm_spawn_AFB",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "AFB",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "swarm_spawn_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "bombardment",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "swarm_spawn_SpaceCannonOffence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonOffence",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "swarm_spawn_SpaceCannonDefence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonDefence",
+        "related": [{"type": "promissory_notes_temp", "alias": "thpnxytheris"}]
+    },
+    {
+        "alias": "demoralizing_environment",
+        "type": "mods",
+        "value": "-2",
+        "persistenceType": "TEMP_ONE_ROUND",
+        "scope": "_ship_no_ff",
+        "applyToOpponent": true,
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "demoralizing_environment"
+            }
+        ]
+    },
+    {
         "alias": "survivalists_extra_die_when_damaged",
         "type": "extrarolls",
         "value": "+1",
@@ -13,5 +64,351 @@
                 "alias": "survivalists"
             }
         ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_combat",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_afb",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "AFB",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "bombardment",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_space_cannon_offence",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonOffence",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_space_cannon_defence",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonDefence",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_ca",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "ca",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_cv",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "cv",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_dn",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "dn",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_dd",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "dd",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_fs",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_ws",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "ws",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_ff",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "ff",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_gf",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "gf",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "scrapyard_commander_plus2_mf",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "mf",
+        "forCombatAbility": "combatround",
+        "related": [{"type": "custom", "alias": "scrapyard_commander_manual"}]
+    },
+    {
+        "alias": "verydith_flagship_plus_1_die",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_cc_in_system",
+        "scope": "_ship_no_ff",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "verydith_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "xytheris_flagship_bonus",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_bombard",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_spacecannondefence",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_spacecannonoffence",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_combat",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_afb",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_bombardment",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_space_cannon_offence",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_space_cannon_offence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_space_cannon_defence",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_space_cannon_defence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonDefence"
     }
 ]

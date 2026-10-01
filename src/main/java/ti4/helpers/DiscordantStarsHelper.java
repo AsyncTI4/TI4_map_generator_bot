@@ -93,6 +93,30 @@ public final class DiscordantStarsHelper {
         }
     }
 
+    public static void checkBRTaranisCrest(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasRelic("taraniscrest")) {
+                for (Tile tile : game.getTileMap().values()) {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder instanceof Planet planet) {
+                            if (player.getPlanets().contains(planet.getName())
+                                    && game.getPlayersPlanetsThatOthersAreCoexistingOn(player)
+                                            .contains(planet.getName())) {
+                                if (!planet.getTokenList().contains("attachment_taraniscrest.png")) {
+                                    planet.addToken("attachment_taraniscrest.png");
+                                }
+                            } else {
+                                if (planet.getTokenList().contains("attachment_taraniscrest.png")) {
+                                    planet.removeToken("attachment_taraniscrest.png");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void checkSigil(Game game) { // Edyn Mech adds Sigil tokens under them
         Player player = Helper.getPlayerFromUnit(game, "edyn_mech");
         if (player == null) {
@@ -312,6 +336,10 @@ public final class DiscordantStarsHelper {
 
         tilesToPullFrom.removeAll(
                 game.getTileMap().values().stream().map(Tile::getTileID).toList());
+        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
+        if (!storedPurgedTiles.isBlank()) {
+            tilesToPullFrom.removeAll(List.of(storedPurgedTiles.split(",")));
+        }
         if (!game.isDiscordantStarsMode()) {
             tilesToPullFrom.removeAll(tilesToPullFrom.stream()
                     .filter(tileID -> tileID.contains("d"))

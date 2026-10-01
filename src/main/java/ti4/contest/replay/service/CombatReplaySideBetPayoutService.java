@@ -73,7 +73,7 @@ public class CombatReplaySideBetPayoutService {
         return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
     }
 
-    public int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
+    public static int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
         return sideBet.getOfferedProfitPoints();
     }
 
@@ -83,7 +83,7 @@ public class CombatReplaySideBetPayoutService {
                 && !collectAfbUnits(context.tile(), context.player()).isEmpty();
     }
 
-    private int fixedPayout(CombatSideBetType betType) {
+    private static int fixedPayout(CombatSideBetType betType) {
         return betType.profitPoints();
     }
 
@@ -298,7 +298,7 @@ public class CombatReplaySideBetPayoutService {
                 false);
     }
 
-    private Map<UnitModel, Integer> collectAfbUnits(Tile tile, Player player) {
+    private static Map<UnitModel, Integer> collectAfbUnits(Tile tile, Player player) {
         Map<String, Integer> unitsByAsyncId = new java.util.HashMap<>();
         String colorId = Mapper.getColorID(player.getColor());
         for (UnitHolder holder : tile.getUnitHolders().values()) {
@@ -437,7 +437,7 @@ public class CombatReplaySideBetPayoutService {
         return distribution;
     }
 
-    private Map<Integer, Double> addDice(Map<Integer, Double> distribution, int diceCount, double hitChance) {
+    private static Map<Integer, Double> addDice(Map<Integer, Double> distribution, int diceCount, double hitChance) {
         Map<Integer, Double> updated = distribution;
         for (int die = 0; die < diceCount; die++) {
             Map<Integer, Double> next = new java.util.HashMap<>();
@@ -494,7 +494,7 @@ public class CombatReplaySideBetPayoutService {
         return 1.0 - missChance * missChance;
     }
 
-    private boolean rerollsMisses(Player player, Game game) {
+    private static boolean rerollsMisses(Player player, Game game) {
         return game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
                 || player.hasTech("tf-tacticalbrilliance");
     }

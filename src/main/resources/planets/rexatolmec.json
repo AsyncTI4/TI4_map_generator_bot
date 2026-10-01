@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rexatolmec",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "rexatolmec",
     "tileId": "rexmec",
     "name": "Rexatol Mec",

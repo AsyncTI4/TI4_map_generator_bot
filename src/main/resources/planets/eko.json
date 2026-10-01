@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "eko",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 205,
+            "y": 120
+        }
+    },
     "id": "eko",
     "tileId": "c06",
     "name": "Eko",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "gaea",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 180,
+            "y": 130
+        }
+    },
     "id": "gaea",
     "tileId": "m07",
     "name": "Gaea",

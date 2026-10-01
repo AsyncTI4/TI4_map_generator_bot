@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -30,6 +31,10 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         String color = event.getOption(Constants.COLOR, null, OptionMapping::getAsString);
         if (color == null) {
             color = pickNeutralColor(game);
+        } else if (!ColorChangeHelper.isColorAllowedForPlayer(color, Constants.dicecordId, game)) {
+            MessageHelper.replyToMessage(
+                    event, "You cannot use this color. It has been made solely for its creator's usage. Sorry!");
+            return;
         } else if (!getUnusedColors(game).contains(color)) {
             MessageHelper.replyToMessage(event, "Selected color is in use.");
             return;
@@ -65,6 +70,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
     private static List<String> getUnusedColors(Game game) {
         return GameColorsService.getUnusedColors(game).stream()
                 .map(ColorModel::getName)
+                .filter(name -> ColorChangeHelper.isColorAllowedForPlayer(name, Constants.dicecordId, game))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 }

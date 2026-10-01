@@ -21,7 +21,9 @@ import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
 
@@ -45,7 +47,9 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.NO_FRACTURE, "True to turn off fracture rolling in TE games."));
+                OptionType.BOOLEAN,
+                Constants.NO_FRACTURE,
+                "True to stop The Fracture ever entering play in TE games."));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
@@ -69,6 +73,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 "True to enable Lore triggers in this non-FoW game (always on in FoW games)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MONUMENTS_MODE, "True to enable Monuments+"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -95,7 +100,11 @@ public class WeirdGameSetup extends GameStateSubcommand {
             if (game.isTwilightsFallMode()) {
                 String msg = "Use the buttons to enable or disable various homebrew options:";
                 List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
-                MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+                // This used to always post to the public main channel, leaking TF homebrew setup chatter in
+                // FoW games (this command has no FoW-specific gating, so it's reachable on any game). Same
+                // fix as TEOptionService's homebrewChannel: GM room in FoW games, unchanged elsewhere.
+                var channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+                MessageV2Builder builder = new MessageV2Builder(channel);
                 builder.append(msg);
                 builder.append(Container.of(sections));
                 builder.append(Buttons.DONE_DELETE_BUTTONS);
@@ -119,6 +128,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (uncharted != null) {
             game.setUnchartedSpaceStuff(uncharted);
             if (uncharted) {
+                game.setHomebrew(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
                 if (game.isAbsolMode()) {
@@ -154,6 +164,23 @@ public class WeirdGameSetup extends GameStateSubcommand {
         Boolean feastOrFamineMode = event.getOption(Constants.FEAST_OR_FAMINE_MODE, null, OptionMapping::getAsBoolean);
         if (feastOrFamineMode != null) game.setFeastOrFamineMode(feastOrFamineMode);
 
+        Boolean monumentsMode = event.getOption(Constants.MONUMENTS_MODE, null, OptionMapping::getAsBoolean);
+        if (monumentsMode != null) {
+            game.setMonumentsMode(monumentsMode);
+            if (monumentsMode) {
+                MonumentsService.applyMonuments(game);
+                if (!game.isFrankenGame()) {
+                    game.getRealPlayers().forEach(player -> MonumentsService.addFactionMonument(player, game));
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Added Monuments+ cards and strategy cards"
+                                + (game.isFrankenGame()
+                                        ? ". Faction monuments are not added in Franken games."
+                                        : ", and added each player's faction monument."));
+            }
+        }
+
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
@@ -182,19 +209,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
         if (thunderMode != null) {
-            game.setThundersEdge(thunderMode);
-            if (thunderMode && !game.getActionCards().contains("brilliance")) {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
-            }
-            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
-                game.addRelicToGame("quantumcore");
-                game.addRelicToGame("thesilverflame");
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
-            }
+            applyThundersEdgeMode(event, game, thunderMode);
         }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
@@ -205,6 +220,23 @@ public class WeirdGameSetup extends GameStateSubcommand {
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
+        }
+    }
+
+    /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Thunder's Edge mode. */
+    public static void applyThundersEdgeMode(GenericInteractionCreateEvent event, Game game, boolean enable) {
+        game.setThundersEdge(enable);
+        if (enable && !game.getActionCards().contains("brilliance")) {
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+        }
+        if (enable && !game.getAllRelics().contains("thesilverflame")) {
+            game.addRelicToGame("quantumcore");
+            game.addRelicToGame("thesilverflame");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
         }
     }
 

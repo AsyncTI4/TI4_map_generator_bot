@@ -1,0 +1,34 @@
+[
+    {
+        "alias": "whitetf",
+        "factionName": "Aelo An Goldos",
+        "shortName": "Goldos",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "whitetf_flagship",
+            "infantry",
+            "whitetf_mech",
+            "pds",
+            "spacedock",
+            "tf_warsun"
+        ],
+        "preferredColours": [
+            "abberation",
+            "gray"
+        ],
+        "source": "tf_br"
+    }
+]

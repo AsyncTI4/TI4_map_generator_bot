@@ -33,6 +33,7 @@ public class UnusedAgentHelper {
             for (String agentName : faction.getLeaders()) {
                 if (Mapper.getLeader(agentName) == null
                         || !"agent".equalsIgnoreCase(Mapper.getLeader(agentName).getType())
+                        || Constants.CALL_OF_THE_HAUNTED_LEADERS.contains(agentName)
                         || Helper.getPlayerFromLeader(game, agentName) != null
                         || agents.contains(agentName)
                         || "unknown"

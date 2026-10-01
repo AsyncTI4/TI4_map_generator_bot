@@ -276,7 +276,7 @@ public class ReplayPayloadRenderer {
         return previousSnapshotJson;
     }
 
-    private List<String> hitAssignmentChanges(Game previous, Game current, String tilePosition) {
+    private static List<String> hitAssignmentChanges(Game previous, Game current, String tilePosition) {
         Map<UnitKey, Counts> before = unitCounts(previous, tilePosition);
         Map<UnitKey, Counts> after = unitCounts(current, tilePosition);
         List<String> changes = new ArrayList<>();

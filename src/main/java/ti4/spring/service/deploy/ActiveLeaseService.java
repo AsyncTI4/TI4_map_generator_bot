@@ -97,7 +97,7 @@ public class ActiveLeaseService {
         return active.get();
     }
 
-    public void setActive(boolean active) {
+    private void setActive(boolean active) {
         this.active.set(active);
         if (!active) {
             draining.set(false);

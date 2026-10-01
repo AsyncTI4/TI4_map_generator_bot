@@ -243,7 +243,7 @@ class UnitRenderGenerator {
                         && !IronAbilitiesHandler.isExoAtmosphericMech(player, unitKey.unitType());
                 wrongPlace &= !unitModel.getIsStructure() || !player.hasAbility("miniaturization");
                 if (wrongPlace) {
-                    String badPath = resourceHelper.getPositionFile(
+                    String badPath = ResourceHelper.getPositionFile(
                             "badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
                     BufferedImage badPositionImage =
                             scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);
@@ -586,7 +586,7 @@ class UnitRenderGenerator {
                 unitTokenPosition);
     }
 
-    private void drawBulkUnitCount(Graphics g, int count, Color color, Color stroke, ImagePosition imagePos) {
+    private static void drawBulkUnitCount(Graphics g, int count, Color color, Color stroke, ImagePosition imagePos) {
         g.setFont(count > 9 ? Storage.getFont28() : Storage.getFont24());
         int offsetX = numberPositionPoint.x + (count > 9 ? 5 : 0);
         int offsetY = numberPositionPoint.y + (count > 9 ? 5 : 0);
@@ -612,22 +612,18 @@ class UnitRenderGenerator {
             UnitType unitType,
             int amt) {
         int imageDmgX, imageDmgY;
+        Point adjustedUnitPos = TileGenerator.offsetTokenPositionForTokenPlanets(unitPos, unitHolder, tile);
 
         if (unitType == UnitType.Infantry || unitType == UnitType.Fighter) {
-            imageDmgX = getCenteredDamageX(unitPos, imagePos, unitImage, galvTag);
-            imageDmgY = getCenteredDamageY(unitPos, imagePos, unitImage, galvTag);
+            imageDmgX = getCenteredDamageX(adjustedUnitPos, imagePos, unitImage, galvTag);
+            imageDmgY = getCenteredDamageY(adjustedUnitPos, imagePos, unitImage, galvTag);
             imageDmgX += 33;
             imageDmgY -= 15;
         } else {
-            imageDmgX = getCenteredDamageX(unitPos, imagePos, unitImage, galvTag);
-            imageDmgY = getCenteredDamageY(unitPos, imagePos, unitImage, galvTag);
+            imageDmgX = getCenteredDamageX(adjustedUnitPos, imagePos, unitImage, galvTag);
+            imageDmgY = getCenteredDamageY(adjustedUnitPos, imagePos, unitImage, galvTag);
             imageDmgX += 5;
             imageDmgY -= 20;
-        }
-
-        if (ctx.isTokenPlanet) {
-            imageDmgX -= TILE_PADDING;
-            imageDmgY -= TILE_PADDING;
         }
 
         imageDmgX += TILE_PADDING;
@@ -663,29 +659,29 @@ class UnitRenderGenerator {
         tileGraphics.drawImage(dmgImage, TILE_PADDING + imageDmgX, TILE_PADDING + imageDmgY, null);
     }
 
-    private int getDamageX(Point position, ImagePosition imagePosition, BufferedImage dmgImage) {
+    private static int getDamageX(Point position, ImagePosition imagePosition, BufferedImage dmgImage) {
         return position != null ? position.x : imagePosition.originalX() - dmgImage.getWidth();
     }
 
-    private int getDamageY(Point position, ImagePosition imagePosition, BufferedImage dmgImage) {
+    private static int getDamageY(Point position, ImagePosition imagePosition, BufferedImage dmgImage) {
         return position != null ? position.y : imagePosition.originalY() - dmgImage.getHeight();
     }
 
-    private int getCenteredDamageX(
+    private static int getCenteredDamageX(
             Point position, ImagePosition imagePosition, BufferedImage unitImage, BufferedImage dmgImage) {
         return position != null
                 ? position.x + (unitImage.getWidth() / 2) - (dmgImage.getWidth() / 2)
                 : imagePosition.originalX() - (dmgImage.getWidth() / 2);
     }
 
-    private int getCenteredDamageY(
+    private static int getCenteredDamageY(
             Point position, ImagePosition imagePosition, BufferedImage unitImage, BufferedImage dmgImage) {
         return position != null
                 ? position.y + (unitImage.getHeight() / 2) - (dmgImage.getHeight() / 2)
                 : imagePosition.originalY() - (dmgImage.getHeight() / 2);
     }
 
-    private boolean shouldSkipInvalidUnit(UnitKey unitKey) {
+    private static boolean shouldSkipInvalidUnit(UnitKey unitKey) {
         return unitKey == null || !Mapper.isValidColor(unitKey.getColor());
     }
 
@@ -778,7 +774,7 @@ class UnitRenderGenerator {
         return spoopy;
     }
 
-    private Integer getBulkUnitCount(UnitKey unitKey, int unitCount) {
+    private static Integer getBulkUnitCount(UnitKey unitKey, int unitCount) {
         return Set.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.unitType()) ? unitCount : null;
     }
 
@@ -872,7 +868,7 @@ class UnitRenderGenerator {
         return ctx.unitTokenPosition.getPosition(positionKey);
     }
 
-    private Point calculateSpiralPosition(
+    private static Point calculateSpiralPosition(
             PositioningContext posCtx, int radius, int degree, int degreeChange, List<Rectangle> rectangles) {
         Point centerPosition = posCtx.centerPosition;
         int unitWidth = posCtx.unitImage.getWidth();

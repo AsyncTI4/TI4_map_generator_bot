@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kanhis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "kanhis",
     "tileId": "er122",
     "name": "Kan'His",

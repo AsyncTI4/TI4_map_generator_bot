@@ -1,0 +1,55 @@
+[
+    {
+        "alias": "public_stage_1_objectives_addiction",
+        "name": "TI Addiction Public Stage I Objectives",
+        "type": "public_stage_1_objective",
+        "description": "Base/PoK Stage I objectives, minus those purged by the Age of Conquest event",
+        "cardIDs": [
+            "amass_wealth",
+            "corner",
+            "deep_space",
+            "engineer_marvel",
+            "infrastructure",
+            "intimidate",
+            "lost_outposts",
+            "make_history",
+            "outer_rim",
+            "raise_fleet",
+            "research_outposts",
+            "trade_routes",
+            "warlord",
+            "foundation",
+            "republic",
+            "empire",
+            "imperium_rex"
+        ],
+        "source": "addiction"
+    },
+    {
+        "alias": "public_stage_2_objectives_addiction",
+        "name": "TI Addiction Public Stage II Objectives",
+        "type": "public_stage_2_objective",
+        "description": "Base/PoK Stage II objectives, minus those purged by the Age of Conquest event",
+        "cardIDs": [
+            "ancient_monuments",
+            "become_legend",
+            "brain_trust",
+            "centralize_trade",
+            "command_armada",
+            "conquer",
+            "control_borderlands",
+            "distant_lands",
+            "galvanize",
+            "golden_age",
+            "manipulate_law",
+            "massive_cities",
+            "master_science",
+            "protect_border",
+            "supremacy",
+            "unify_colonies",
+            "vast_reserves",
+            "vast_territories"
+        ],
+        "source": "addiction"
+    }
+]

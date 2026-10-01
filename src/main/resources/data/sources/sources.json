@@ -47,6 +47,14 @@
         "description": "New Stuff"
     },
     {
+        "source": "tf_br",
+        "name": "Twilight's Fall: Blue Reverie",
+        "canal": "community",
+        "subcanal": "lol homebrew",
+        "credits": "TacticBlue",
+        "description": "Twilight's Fall Mahact King"
+    },
+    {
         "source": "codex1",
         "name": "Twilight Codex\nVolume I: Ordinian",
         "canal": "official",
@@ -149,11 +157,7 @@
         "credits": "Blarknob",
         "description": "new Structure type Monument, overhaul of SC4, new SOs, Agendas, and ACs",
         "data": [
-            "Wiki: https://twilight-imperium.fandom.com/wiki/Monuments",
-            "Assets: https://drive.google.com/drive/folders/1kqtY943syNMRsM1ijmHfymCxVVWxYUJq",
-            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=3442876715",
-            "Post (Monuments, not Monuments+, deprecated): https://www.reddit.com/r/twilightimperium/comments/bpdkmt/monuments_mini_expansion/",
-            "Assets (Monuments, not Monuments+, deprecated): https://drive.google.com/file/d/1JqbTtcYUUodh6L_IgWJ_B0Rrg4dT3m8N/view",
+            "Assets: https://drive.google.com/drive/folders/1U5TTjWyG_qx5q_tyxnLiJ7482_AlkKs1?usp=drive_link",
             "Official channel: https://discord.com/channels/743629929484386395/1205395696950321172"
         ]
     },
@@ -206,7 +210,39 @@
         "canal": "community",
         "subcanal": "lil homebrew",
         "credits": "Gamma Galaxies",
-        "description": "New Factions",
+        "description": "Reimagining of existing actions",
+        "data": []
+    },
+    {
+        "source": "black_spectrum",
+        "name": "Black Spectrum",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Black Spectrum",
+        "data": []
+    },
+    {
+        "source": "expanded_fracture",
+        "name": "Expanded Fracture",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Expanded Fracture",
+        "data": []
+    },
+    {
+        "source": "erwans_gambit",
+        "name": "Erwan's Gambit",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Erwan's Gambit",
+        "data": []
+    },
+    {
+        "source": "muaat_mania",
+        "name": "Muaat Mania",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Muaat Mania",
         "data": []
     },
     {
@@ -307,5 +343,37 @@
         "subcanal": "personal projs",
         "credits": "pvn",
         "description": "Planetary Stabilisation action available to all players; Ghost Experiment SC and AC"
+    },
+    {
+        "source": "addiction",
+        "name": "TI Addiction",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "aubreynadler",
+        "description": "Splits Mecatol Rex into a 3-planet system (Mecatol City, Jun, The Polar Castelle) with new legendary abilities"
+    },
+    {
+        "source": "combosloth",
+        "name": "Combosloth",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "combosloth",
+        "description": "New Faction: The Convergence Khronikon"
+    },
+    {
+        "source": "newdawn",
+        "name": "New Dawn",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "aubreynadler",
+        "description": "Optional alternate unit-upgrade technologies for 13 existing factions, swapped in during setup by purging a faction technology"
+    },
+    {
+        "source": "goose",
+        "name": "Goose",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Goose",
+        "description": "Homebrew from Goose"
     }
 ]

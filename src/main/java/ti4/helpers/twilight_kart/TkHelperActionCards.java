@@ -41,9 +41,11 @@ import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.unit.AddUnitService;
@@ -109,6 +111,7 @@ public class TkHelperActionCards {
             case "tk-succor" -> // TODO
                 nop();
             case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
+            case TkHelperStarflare.AC_ID -> buttons.addAll(TkHelperStarflare.getResolveButtons(game, player));
         }
 
         if (!buttons.isEmpty()) {
@@ -132,33 +135,24 @@ public class TkHelperActionCards {
                 .map(Mapper::getLeader)
                 .map(LeaderModel::getTfRepresentationEmbed)
                 .toList();
-        if (!game.isVeiledHeartMode()) {
-            genomes.forEach(player::addLeader);
+        if (game.isVeiledHeartMode()) {
+            genomes.forEach(genome -> VeiledHeartService.doAction(
+                    VeiledHeartService.VeiledCardAction.DRAW,
+                    VeiledHeartService.VeiledCardType.GENOME,
+                    player,
+                    genome));
 
         } else {
-            String veilKey = "veiledCards" + player.getFaction();
-            String veilCards = game.getStoredValue(veilKey) + String.join("_", genomes) + "_";
-            game.setStoredValue(veilKey, veilCards);
-        }
-
-        for (String cardID : genomes) {
-            if (!game.isVeiledHeartMode()) {
+            for (String cardID : genomes) {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
-            } else {
-                String key = "veiledCards" + player.getFaction();
-                String veiledCards = game.getStoredValue(key);
-                game.setStoredValue(key, veiledCards + cardID + "_");
-
-                String msg = player.getRepresentationNoPing() + " has taken a secret card. They ";
-                msg += "may put it into play with a button in their `#cards-info` thread.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
+
         Button button = Buttons.red("discardSpliceCard_genome", "Discard 1 Genome", MiscEmojis.tf_genome);
         Button deleteButton = Buttons.DONE_DELETE_BUTTONS;
 
@@ -229,7 +223,7 @@ public class TkHelperActionCards {
             player.setTg(player.getTg() - 2);
             String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
-            if (tile != null && tile.getPosition().contains("frac")) {
+            if (tile != null && tile.isFracture()) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
                 if (uh != null) {
                     uh.addToken("token_relictoken.png");
@@ -251,6 +245,13 @@ public class TkHelperActionCards {
         String regex = "resolveTkConscript_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile - and beginPirates' own emptyTile rule (no player ships,
+            // not a hyperlane, not a home system) was never re-checked here at all.
+            if (!TeHelperActionCards.legalPirateTarget(game, tile, "resolveTkConscript")) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "dd, 2 ff");
 
             String message = player.getRepresentation() + " conscripted some pirates to post up at "

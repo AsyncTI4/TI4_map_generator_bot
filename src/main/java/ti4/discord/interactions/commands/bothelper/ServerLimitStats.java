@@ -5,7 +5,10 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.PermissionOverride;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -74,7 +77,7 @@ class ServerLimitStats extends Subcommand {
         long publicThreadCount =
                 cachedThreadChannels.stream().filter(ThreadChannel::isPublic).count();
 
-        String message = """
+        StringBuilder message = new StringBuilder("""
             ## Server Limit Statistics:
             ### Server: %s
             - %,d / %,d%s - members
@@ -129,11 +132,32 @@ class ServerLimitStats extends Subcommand {
                         botThreadCount,
                         getPercentage(botThreadCount, cachedThreadCount),
                         roundThreadCount,
-                        getPercentage(roundThreadCount, cachedThreadCount));
-        MessageHelper.sendMessageToEventChannel(event, message);
+                        getPercentage(roundThreadCount, cachedThreadCount)));
+        Role everyoneRole = guild.getPublicRole();
+        for (GuildChannel channel : guild.getChannels()) {
+            // Check if @everyone has MANAGE_PERMISSIONS (Administrator) or MESSAGE_MANAGE for this specific channel
+            boolean hasPermission = channel.getPermissionContainer() != null;
+            boolean hasManage = false;
+            if (hasPermission) {
+                for (PermissionOverride override :
+                        channel.getPermissionContainer().getRolePermissionOverrides()) {
+                    if (override.getRole() != null
+                            && (override.getRole() == everyoneRole
+                                    || "asyncplayer"
+                                            .equalsIgnoreCase(override.getRole().getName()))
+                            && override.getAllowed().contains(Permission.MESSAGE_MANAGE)) {
+                        hasManage = true;
+                    }
+                }
+            }
+            if (hasManage) {
+                message.append("\n- ").append(channel.getAsMention()).append(" | everyone can manage messages");
+            }
+        }
+        MessageHelper.sendMessageToEventChannel(event, message.toString());
     }
 
-    private String getPercentage(double numerator, double denominator) {
+    private static String getPercentage(double numerator, double denominator) {
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
         formatPercent.setMinimumFractionDigits(1);
         String formatted = formatPercent.format(denominator == 0 ? 0.0 : (numerator / denominator));
@@ -141,7 +165,7 @@ class ServerLimitStats extends Subcommand {
         return formatted;
     }
 
-    private String getThreadAgeInHoursString(ThreadChannel threadChannel) {
+    private static String getThreadAgeInHoursString(ThreadChannel threadChannel) {
         OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
         Duration duration = Duration.between(latestActivityTime, OffsetDateTime.now());
         return "oldest thread is %,d hours old".formatted(duration.toHours());

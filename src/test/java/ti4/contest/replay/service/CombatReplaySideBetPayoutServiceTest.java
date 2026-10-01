@@ -157,14 +157,14 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         locked.setBetType(CombatSideBetType.ROUND_ONE_WHIFF);
         locked.setOfferedProfitPoints(17);
 
-        assertEquals(17, service.resolvedProfitPoints(locked));
+        assertEquals(17, CombatReplaySideBetPayoutService.resolvedProfitPoints(locked));
     }
 
     private CombatCandidateEntity candidate() {
         return candidate(null, null);
     }
 
-    private CombatCandidateEntity candidate(Integer attackerHp, Integer defenderHp) {
+    private static CombatCandidateEntity candidate(Integer attackerHp, Integer defenderHp) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setId(100L);
         candidate.setAttackerFaction("sol");
@@ -274,11 +274,11 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         return candidate;
     }
 
-    private CombatReplayContestEntity oddsContest() {
+    private static CombatReplayContestEntity oddsContest() {
         return new CombatReplayContestEntity();
     }
 
-    private Player player(Game game, String faction) {
+    private static Player player(Game game, String faction) {
         FactionModel model = Mapper.getFaction(faction);
         Player player = game.addPlayer(model.getAlias(), model.getFactionName());
         player.setFaction(game, faction);
@@ -290,7 +290,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         return player;
     }
 
-    private void unlockLeader(Player player, String leaderId) {
+    private static void unlockLeader(Player player, String leaderId) {
         player.addLeader(leaderId);
         player.unsafeGetLeader(leaderId).setLocked(false);
     }
@@ -302,7 +302,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         return tile;
     }
 
-    private String getNextPosition(Game game) {
+    private static String getNextPosition(Game game) {
         for (String position : PositionMapper.getTilePositions()) {
             if (game.getTileByPosition(position) == null) return position;
         }

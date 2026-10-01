@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "drakkol",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "drakkol",
     "tileId": "br3",
     "name": "Drakkol",

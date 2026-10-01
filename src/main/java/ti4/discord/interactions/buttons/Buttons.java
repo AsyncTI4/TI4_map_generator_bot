@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -16,6 +17,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.MapSegmentService;
 import ti4.website.AsyncTi4WebsiteHelper;
 
 public final class Buttons {
@@ -105,6 +107,16 @@ public final class Buttons {
             REFRESH_TECH_INFO,
             REFRESH_PLANET_INFO,
             FACTION_EMBED);
+
+    public static List<Button> mapImageButtons(Game game, @Nullable String segment) {
+        List<Button> buttons = mapImageButtons(game);
+        if (segment != null) {
+            buttons.replaceAll(button -> REFRESH_MAP.equals(button)
+                    ? gray(MapSegmentService.withSegment("showGameAgain", segment), "Refresh Map")
+                    : button);
+        }
+        return buttons;
+    }
 
     public static List<Button> mapImageButtons(Game game) {
         List<Button> buttonsWeb = new ArrayList<>();

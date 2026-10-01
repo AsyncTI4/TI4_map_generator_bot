@@ -2,9 +2,12 @@ package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
@@ -60,6 +63,14 @@ public class UnlockLeaderService {
                     channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
             MessageHelper.sendMessageToChannel(channel, message);
         }
+        if (player.hasAbility("commanding_presence")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", **Commanding Presence** allows you to gain 1 command token after unlocking "
+                            + Helper.getLeaderFullRepresentation(playerLeader) + ".",
+                    ButtonHelper.getGainCCButtons(player));
+        }
 
         if (leaderID.contains("bentorcommander")) {
             MessageHelper.sendMessageToChannel(
@@ -90,6 +101,21 @@ public class UnlockLeaderService {
                                 + ", that officially Xxekir Grom remains locked until after the objective has been scored;"
                                 + " you cannot use the ability to pay for any requirements of the unlocking objective (if it's a spendie).");
             }
+        }
+
+        if ("veylorhero".equals(leaderID)) {
+            game.setStoredValue("veylorHeroActive_" + player.getFaction(), "yes");
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    game.getPing() + ", there will now be a third agenda each agenda phase. Congratulations "
+                            + player.getRepresentationNoPing() + ", you are now the senate!");
+        }
+
+        if ("revenanthero".equals(leaderID)) {
+            RevenantLeadersHandler.offerRevenantHeroChoices(game, player);
+        }
+        if ("verydithcommander".equals(leaderID)) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
         }
 
         if (playerLeader.isExhausted()) {

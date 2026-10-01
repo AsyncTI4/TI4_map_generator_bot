@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "archonfail",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 168,
+            "y": 152
+        }
+    },
     "id": "archonfail",
     "tileId": "59a",
     "name": "Archon Fail",

@@ -14,19 +14,22 @@ import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.model.ColorModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.abilities.MahactTokenService;
 
 @UtilityClass
 public class ColorChangeHelper {
 
     public static boolean isColorAllowedForPlayer(String color, Player player) {
+        return isColorAllowedForPlayer(color, player.getUserID(), player.getGame());
+    }
+
+    public static boolean isColorAllowedForPlayer(String color, String userID, Game game) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always
-            case "ero" -> Constants.eronousId.equals(player.getUserID());
+            case "ero" -> Constants.eronousId.equals(userID);
             // Lightgray is exclusive to chassit if chassit is in the game
-            case "lgy" ->
-                !player.getGame().getPlayerIDs().contains(Constants.chassitId)
-                        || Constants.chassitId.equals(player.getUserID());
+            case "lgy" -> !game.getPlayerIDs().contains(Constants.chassitId) || Constants.chassitId.equals(userID);
             default -> true;
         };
     }
@@ -64,8 +67,8 @@ public class ColorChangeHelper {
             for (String cc : mahactCC) {
                 if (cc.equals(oldColor)) {
                     String replacedCC = cc.replace(oldColor, newColor);
-                    playerInfo.removeMahactCC(cc);
-                    playerInfo.addMahactCC(replacedCC);
+                    MahactTokenService.removeMahactToken(playerInfo, cc);
+                    MahactTokenService.addMahactToken(game, playerInfo, replacedCC);
                 }
             }
 

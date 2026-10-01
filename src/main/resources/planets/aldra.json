@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "aldra",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "aldra",
     "tileId": "d23",
     "name": "Aldra",

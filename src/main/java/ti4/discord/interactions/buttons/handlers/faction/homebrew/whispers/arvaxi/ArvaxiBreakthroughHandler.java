@@ -25,7 +25,7 @@ public class ArvaxiBreakthroughHandler {
     private static final String CURSE_TEXT =
             "The printed values of this unit have been adjusted: Cost +1, Combat +1, Move -1, Capacity -1.";
 
-    static final String STORED_KEY = "arvaxiMobilizationEngine";
+    private static final String STORED_KEY = "arvaxiMobilizationEngine";
 
     public static boolean hasEngineAttached(Game game) {
         return !game.getStoredValue(STORED_KEY).isEmpty();

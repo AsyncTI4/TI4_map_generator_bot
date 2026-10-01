@@ -15,8 +15,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -161,7 +165,9 @@ public final class StatusHelper {
         // On a re-entered scoring phase, commit the previously staged scores instead of letting open() wipe them.
         commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusScoring");
+        VeylorAbilitiesHandler.returnUnassignedTightSchedulingAgendas(game);
         VerydithPromissoryHandler.returnPactRenewedAtStartOfStatus(game);
+        RevenantPromissoryHandler.returnRebrithAtStartOfStatus(game);
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
@@ -259,6 +265,13 @@ public final class StatusHelper {
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
                                 + ", a reminder this is the window to use the _Eerie Predictions_.");
+            }
+            if (player.hasAbility("ignorant_discoveries") && player.getStrategicCC() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you may use the button below to resolve _Ignorant Discoveries_. A strategy token will automatically be deducted.",
+                        OblivionAbilityHandler.getIgnorantDiscoveriesButtons(event, player));
             }
         }
         String key2 = "queueToScorePOs";
@@ -499,9 +512,7 @@ public final class StatusHelper {
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
             NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
-        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("ransomware"))) {
-            NetrunnersAbilitiesHandler.offerRansomwareButtons(game);
-        }
+        MonumentsPoKButtonHandler.sendSpireOfIxthButtons(game);
 
         for (Player player : game.getRealPlayers()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
@@ -625,7 +636,6 @@ public final class StatusHelper {
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
         sendNeuralParasiteButtons(game);
-        sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
         SowingReapingService.resolveTheReaping(game);
 
@@ -633,7 +643,7 @@ public final class StatusHelper {
         resolveSolFlagship(game);
     }
 
-    private static void sendRemoveBreachButtons(Game game) {
+    public static void sendRemoveBreachButtons(Game game) {
         Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
         Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {
@@ -726,6 +736,10 @@ public final class StatusHelper {
                     int remaining = game.changeCommsOnPlanet(1, planet.getName());
 
                     String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
+                    // TODO FOG LEAK: unconditionally reveals this planet's identity/location to
+                    // game.getMainGameChannel()
+                    // even in FoW games, regardless of what any player has actually explored. Should route through a
+                    // fog-aware channel helper (e.g. GMService/FoWHelper) when game.isFowMode().
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
                     if (remaining % 3 == 0) {
                         String msg2 = "The Monument to the Ages on the planet of "
@@ -790,35 +804,39 @@ public final class StatusHelper {
 
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
-            if (game.isTwilightsFallMode() && techs == 0) {
-                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
-                                    + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
-                    player.setStrategicCC(player.getStrategicCC() + 2);
-                    player.addExhaustedRelic("emelpar");
-                    player.addExhaustedRelic("absol_emelpar");
-                } else if (player.getStrategicCC() > 0) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
-                                    + " You have been given net +1 command tokens in your strategy pool.");
-                    player.setStrategicCC(player.getStrategicCC() + 1);
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+            for (int i = 0; i < entry.getValue(); i++) {
+                if (game.isTwilightsFallMode() && (techs == 0 || i > techs - 1)) {
+                    if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                        + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
+                        player.setStrategicCC(player.getStrategicCC() + 2);
+                        player.addExhaustedRelic("emelpar");
+                        player.addExhaustedRelic("absol_emelpar");
+                    } else if (player.getStrategicCC() > 0) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                        + " You have been given net +1 command tokens in your strategy pool.");
+                        player.setStrategicCC(player.getStrategicCC() + 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+                    }
+                    continue;
                 }
-                continue;
-            }
-            String scarMessage = player.getRepresentationUnfogged()
-                    + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
-            scarMessage +=
-                    "You currently have " + StringHelper.pluralize(ccs, "command token") + " in your strategy pool.";
-            if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
-                scarMessage += "You also have the _" + RelicHelper.sillySpelling()
-                        + "_ available to exhaust (this will be spent first).";
-            for (int i = 0; i < techs && i < entry.getValue(); i++) {
+                if (i > techs - 1) {
+                    continue;
+                }
+                String scarMessage = player.getRepresentationUnfogged()
+                        + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
+                scarMessage += "You currently have " + StringHelper.pluralize(ccs, "command token")
+                        + " in your strategy pool.";
+                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
+                    scarMessage += "You also have the _" + RelicHelper.sillySpelling()
+                            + "_ available to exhaust (this will be spent first).";
+
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
             }

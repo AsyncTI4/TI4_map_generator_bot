@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "demis",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "demis",
     "tileId": "d19",
     "name": "Demis",

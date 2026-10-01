@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ako40m",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 130
+        }
+    },
     "id": "ako40m",
     "tileId": "er82",
     "name": "Ako.4.0.m",

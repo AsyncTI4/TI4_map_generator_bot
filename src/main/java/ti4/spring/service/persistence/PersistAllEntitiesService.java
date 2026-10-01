@@ -26,14 +26,21 @@ public class PersistAllEntitiesService {
     private final UserEntityRepository userEntityRepository;
 
     public void persistAll() {
+        deleteAllPersistedEntities();
         Map<String, UserEntity> userCache = persistAllUsers();
         persistAllGames(userCache);
     }
 
+    void deleteAllPersistedEntities() {
+        titleEntityRepository.deleteAllInBatch();
+        playerEntityRepository.deleteAllInBatch();
+        gameEntityRepository.deleteAllInBatch();
+        userEntityRepository.deleteAllInBatch();
+        BotLogger.info("Deleted all persisted entities.");
+    }
+
     private Map<String, UserEntity> persistAllUsers() {
         BotLogger.info("Starting persistAllUsers.");
-        userEntityRepository.deleteAllInBatch();
-        BotLogger.info("Deleted all persisted users.");
 
         List<UserEntity> userEntities = GameManager.getManagedPlayers().stream()
                 .map(player -> new UserEntity(player.getId(), player.getName()))
@@ -49,10 +56,6 @@ public class PersistAllEntitiesService {
 
     private void persistAllGames(Map<String, UserEntity> userCache) {
         BotLogger.info("Starting persistAllGames.");
-        titleEntityRepository.deleteAllInBatch();
-        playerEntityRepository.deleteAllInBatch();
-        gameEntityRepository.deleteAllInBatch();
-        BotLogger.info("Deleted all persisted games.");
 
         List<GameEntity> gameEntities = new ArrayList<>();
         List<TitleEntity> titleEntities = new ArrayList<>();

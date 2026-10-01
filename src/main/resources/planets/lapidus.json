@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lapidus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "lapidus",
     "tileId": "c04",
     "name": "Lapidus",

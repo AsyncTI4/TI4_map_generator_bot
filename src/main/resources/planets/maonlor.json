@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "maonlor",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "maonlor",
     "tileId": "er127",
     "name": "Maon-Lor",

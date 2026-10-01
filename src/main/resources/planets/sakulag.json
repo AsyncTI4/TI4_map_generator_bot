@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sakulag",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 203,
+            "y": 208
+        }
+    },
     "id": "sakulag",
     "tileId": "31",
     "name": "Sakulag",

@@ -17,6 +17,7 @@ import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
+import ti4.draft.items.MonumentDraftItem;
 import ti4.draft.items.PNDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
@@ -31,6 +32,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.milty.EchoesOfYggdrasilService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -40,14 +42,27 @@ public class FrankenDraft extends BagDraft {
         super(owner);
     }
 
+    /**
+     * FoW games don't pre-draft map tiles, and table/speaker order is handled separately by the FoW setup
+     * wizard - blue tile, red tile, and draft order limits are always 0 in Fog of War, for every Franken
+     * draft variant.
+     */
+    protected boolean isFowExcludedCategory(DraftCategory category) {
+        return getOwner().isFowMode()
+                && (category == DraftCategory.BLUETILE
+                        || category == DraftCategory.REDTILE
+                        || category == DraftCategory.DRAFTORDER);
+    }
+
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case ABILITY, BLUETILE -> 3;
             case TECH, REDTILE, STARTINGFLEET -> 2;
             case STARTINGTECH, HOMESYSTEM, PN -> 2;
             case COMMODITIES, FLAGSHIP, MECH -> 2;
-            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 2;
+            case HERO, COMMANDER, AGENT, BREAKTHROUGH, MONUMENT -> 2;
             case DRAFTORDER -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
@@ -55,18 +70,28 @@ public class FrankenDraft extends BagDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case ABILITY, BLUETILE -> 3;
             case TECH, REDTILE -> 2;
             case STARTINGTECH, HOMESYSTEM, PN -> 1;
             case COMMODITIES, FLAGSHIP, MECH -> 1;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+            case MONUMENT -> getConfiguredMonumentLimit();
             case DRAFTORDER, STARTINGFLEET -> 1;
             case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 
+    protected int getConfiguredMonumentLimit() {
+        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.MONUMENT);
+        return configuredLimit.isEmpty() ? 2 : Integer.parseInt(configuredLimit);
+    }
+
     public static int getItemLimitForCategory(DraftCategory category, Game game) {
+        if (game == null || (category == DraftCategory.MONUMENT && !game.isMonumentsMode())) {
+            return 0;
+        }
         BagDraft activeDraft = game.getActiveBagDraft();
         int baseLimit = activeDraft == null ? 0 : activeDraft.getItemLimitForCategory(category);
         if (baseLimit > 0 && !game.getStoredValue("frankenLimit" + category).isEmpty()) {
@@ -89,13 +114,12 @@ public class FrankenDraft extends BagDraft {
         "miltymod",
         "qulane",
         "neutral",
-        "kaltrim",
-        "xin",
-        "sarcosa",
-        "obsidian"
+        "obsidian",
+        "stoneborn",
+        "morpha"
     };
 
-    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions(game);
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {
@@ -194,7 +218,11 @@ public class FrankenDraft extends BagDraft {
         var units = UnitDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.UNIT, units);
 
-        var kings = MahactKingDraftItem.buildAllDraftableItems();
+        if (game.isMonumentsMode()) {
+            allDraftableItems.put(DraftCategory.MONUMENT, MonumentDraftItem.buildAllDraftableItems(game));
+        }
+
+        var kings = MahactKingDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.MAHACTKING, kings);
 
         var positions = SpeakerOrderDraftItem.buildAllDraftableItems(game);
@@ -247,7 +275,7 @@ public class FrankenDraft extends BagDraft {
         return bags;
     }
 
-    protected void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
+    protected static void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
         List<ComponentSource> sources = new ArrayList<>(List.of(
                 ComponentSource.base,
                 ComponentSource.codex1,
@@ -268,6 +296,7 @@ public class FrankenDraft extends BagDraft {
             sources.add(ComponentSource.thunders_edge);
         }
         MiltyDraftHelper.initDraftTiles(draftManager, sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
     }
 
     @Override

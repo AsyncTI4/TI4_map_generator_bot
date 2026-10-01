@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "phar",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "phar",
     "tileId": "br2",
     "name": "Phar",

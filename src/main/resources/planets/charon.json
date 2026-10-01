@@ -1,0 +1,22 @@
+{
+    "id": "charon",
+    "tileId": "ef12",
+    "name": "Charon",
+    "aliases": [
+        "charon"
+    ],
+    "resources": 2,
+    "influence": 3,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "charon",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "expanded_fracture"
+}

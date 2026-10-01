@@ -3,18 +3,20 @@ package ti4.service.player;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass
 public class RefreshCardsService {
     public static void refreshPlayerCards(Game game, Player player, boolean isStatusPhaseCleanup) {
         if (isStatusPhaseCleanup) {
-            PonthousAbilityHandler.resetFracturedSouls(game, player);
+            XytherisLeadersHandler.clearHeroUnitAbilityRoll(
+                    game); // Done so the hero roll state does not persist past purging
         }
 
         boolean planetsOnly = !isStatusPhaseCleanup;
@@ -28,6 +30,7 @@ public class RefreshCardsService {
             player.clearExhaustedPlanets(true);
             player.clearExhaustedRelics();
             player.clearExhaustedAbilities();
+            MonumentsService.readyMonuments(game, player);
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()) {

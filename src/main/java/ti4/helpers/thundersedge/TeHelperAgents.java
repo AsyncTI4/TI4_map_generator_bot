@@ -20,6 +20,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -113,7 +114,7 @@ public final class TeHelperAgents {
                 if (game.isFowMode())
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
-                            (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation())
+                            FoWHelper.identityOrColorIfCanSeeStats(game, player, p2, player.getRepresentation())
                                     + " sent an action card to " + p2.getRepresentation(true, true) + ".");
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Error, player2 is null");

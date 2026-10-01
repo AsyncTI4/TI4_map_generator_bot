@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tarrock",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "tarrock",
     "tileId": "d102",
     "name": "Tarrock",

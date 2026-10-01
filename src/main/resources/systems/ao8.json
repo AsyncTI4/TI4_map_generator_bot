@@ -1,0 +1,38 @@
+{
+    "id":  "ao8",
+    "name":  "Helheim",
+    "aliases":  [
+        "ao8",
+        "helheim"
+    ],
+    "imagePath":  "ao8_helheim.png",
+    "planets":  [
+        "helheim"
+    ],
+    "shipPositionsType":  "TYPE01",
+    "spaceTokenLocations":  [
+        {
+            "x":  245,
+            "y":  100
+        },
+        {
+            "x":  200,
+            "y":  185
+        },
+        {
+            "x":  110,
+            "y":  215
+        },
+        {
+            "x":  120,
+            "y":  40
+        }
+    ],
+    "wormholes":  null,
+    "isAsteroidField":  false,
+    "isSupernova":  false,
+    "isNebula":  false,
+    "isGravityRift":  false,
+    "source":  "goose",
+    "tileBack":  "blue"
+}

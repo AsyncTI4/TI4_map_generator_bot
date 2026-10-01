@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "valkk",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 86,
+            "y": 138
+        }
+    },
     "id": "valkk",
     "tileId": "93new",
     "name": "Valk Keleres",

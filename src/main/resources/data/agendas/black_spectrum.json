@@ -1,0 +1,1265 @@
+[
+    {
+        "alias": "bsp_affirmation_divine",
+        "name": "Affirmation of Divine Right",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: At the end of the strategy phase, players must give the player who controls Mecatol Rex 1 promissory note from their hand.",
+        "text2": "Against: Each player other than the player who controls Mecatol Rex discards 3 of their action cards.\n\nThe player who cast the fewest votes other than the player who controls Mecatol Rex discards 2 additional action cards.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_anti_intellectual",
+        "name": "Anti-Intellectual Revolution",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player who voted \"For\" or abstained must return 1 technology they own with the most prerequisites to the deck.\n\nDouble the prerequisites on all technologies.",
+        "text2": "Against: Each player who voted \"Against\" or abstained removes a number of their units with a combined cost of at least 8 resources.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_archived_secret",
+        "name": "Archived Secret",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player draws 2 secret objectives.\n\nThe other proponent of the elected player: Receives 1 promissory note from the elected player.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_armed_forces",
+        "name": "Armed Forces Standardization",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player places command tokens until they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.\n\nThe other proponent of the elected player: The elected player may look at their promissory notes and take 1 promissory note.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_arms_reduction",
+        "name": "Arms Reduction",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player destroys all but 2 of their dreadnoughts and all but 4 of their cruisers. Then every player destroys 2 of their non-fighter ships.\n\nThe proponent: Adds 1 command token from their reinforcements to their strategy pool.",
+        "text2": "Against: No effect.\n\nThe dissenter: May research 1 unit upgrade technology.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_articles_war",
+        "name": "Articles of War",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE. During a turn, the player whose control token is on this card may discard 1 control token to allow a player to ignore the effects of this law during that turn.\n\nThe proponent: Places 3 of their control tokens on this card.",
+        "text2": "Against: Players who voted \"For\" or abstained must remove all of their mechs.\n\nThe dissenter: May place any number of mechs on any planets they control.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_astral_liturgy",
+        "name": "Astral Liturgy",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: At the start of the status phase, players, in ascending order based on their VPs, may remove their non-token ships from the board and place them on this card. Then, the player with the highest combined cost of ships on this card draws 1 relic. During the status phase, players cannot score public objectives unless the number of their ships on this card is higher than their VPs. After the action phase, discard the ships from this card.",
+        "text2": "Against: Players remove 2 of their space docks.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_benevolent_emperors",
+        "name": "Benevolent Emperors' Tombs Excavation Project",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: At the end of the agenda phase, the player with the fewest VPs places 2 unique tokens on this card (control, trade good, infantry, fighter). The owner of Mecatol Rex gains bonuses based on the tokens placed: other player's control token (+2 to combat rolls against the token's owner); trade good (spending a trade good doubles its value); infantry (+4 to units' PRODUCTION); fighter (-2 to combined cost when using PRODUCTION); Mecatol owner's control token (+2 votes per player in the game).\n\nThe proponent: Receives 2 promissory notes from the owner of Mecatol Rex.",
+        "text2": "Against: Each player who voted \"Against\" or abstained exhausts all planets. Resolve 1 additional agenda after this one.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_black_market",
+        "name": "Black Market Amnesty",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players cannot resolve transactions during the agenda phase. When resolving transactions players may exchange up to 1 of the following: action cards, secret objectives, relics, exploration cards in their play area, non-unit upgrade technologies (including faction technologies), and the speaker token.",
+        "text2": "Against: Exhaust Trade. Players must discard 6 trade goods.\n\nThe dissenter: Replenishes their commodities.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_bourgeoisie_purification",
+        "name": "Bourgeoisie Purification Protocol",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Purge all hero cards.\n\nThe proponent: For each card purged, they may place 2 infantry on planets they control.",
+        "text2": "Against: All players who voted \"Against\" or abstained must exhaust all of their non-home system planets at the start of the next strategy phase.\n\nThe dissenter: May remove up to 4 infantry of any players from the game board.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_call_void",
+        "name": "Call of the Void",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The speaker places The Fracture into play.\n\nWhen a player activates a system in The Fracture, that player applies +1 to the move value of each of their ships. After that player moves 1 or more units into that system, they gain 1 command token. \n\nAfter a player moves or places 1 or more units in a system in The Fracture, that player places 4 neutral ships of the same unit types in a non-home system that contains no ships.",
+        "text2": "Against: Each player except the dissenter returns their breakthrough to the deck.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_cathedral_ixth",
+        "name": "Cathedral of Ixth",
+        "type": "Law",
+        "target": "Elect Non-Home Planet",
+        "text1": "Attach this card to the elected planet. Players may ignore listed planetary requirements when placing a monument on this planet.\n\nIf this planet has a monument on it, it gives 1 VP to the owner and its influence value is increased by 4.\n\nPlayers cannot use BOMBARDMENT against units on this planet. All players must discard 1 action card and spend 1 command token from their strategy pool to commit ground forces to this planet.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_celestial_harvesting",
+        "name": "Celestial Harvesting Deregulation",
+        "type": "Directive",
+        "target": "Elect System With An Anomaly And No Planets",
+        "text1": "Each player gains 3 trade goods for each system adjacent to the elected system that contains their units.\n\nThe proponent of the elected system: Rolls 1 die. After rolling, in voting order, each player may spend 2 influence to apply +1 or −1 to the result. Then, based on the result, the proponent randomly draws unused tiles: 1–5: 1 red; 6–8: 2 red and 1 blue; 9–10: 2 red and 2 blue. The proponent looks at the drawn tiles and replaces the elected system's tile with 1 of them, then discards the rest.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_celestial_wonders",
+        "name": "Celestial Wonders Manifesto",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Players may place up to 2 PDS and up to 1 space dock on their planets with a monument. Then, they may use PRODUCTION abilities in systems with monuments.\n\nThe proponent: May place a monument before the \"For\" effect is resolved.",
+        "text2": "Against: Players remove their monuments from the game board. Then, players who voted \"Against\" or abstained remove 2 of their structures from the game board.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_chartered_interstellar",
+        "name": "Chartered Interstellar Trade Company Act",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The player with the most neighbors gains this card. This card gives 1 VP.\n\nAfter any transaction involving their neighbor, the card's owner may force that neighbor to give them 1 trade good, commodity, or promissory note (neighbor's choice). At the end of any turn, if the active player has more neighbors than the card's owner, give this card to the player with the most neighbors (ties broken by most trade goods in initiative order).",
+        "text2": "Against: Players lose 1 VP.\n\nThe dissenter: Doesn't lose VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_checks_balances",
+        "name": "Checks and Balances",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2, in a three- or four-player game), if able. If a player whose control token is on this card does not currently have a strategy card, they may discard that token to keep a chosen strategy card instead.\n\nThe proponent: Places 1 of their control tokens on this card.",
+        "text2": "Against: Remove all control tokens from public objectives and shuffle all scored secret objectives back into the deck. Players do not gain or lose victory points as a result of this.\n\nThe dissenter: May immediately score 1 public objective.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_civilised_society",
+        "name": "Civilised Society",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players may score 1 additional public objective during the status phase.\n\nThe game does not immediately end when a player reaches the required number of victory points; instead, it ends at the end of that status phase. Players can have more than the required number of victory points. In the case of a tie, the player with the highest combined total of trade goods and influence on planets they control wins.",
+        "text2": "Against: No effect.\n\nThe dissenter: Loses 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_clandestine_operations",
+        "name": "Clandestine Operations",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player removes 1 command token from the command sheet of the player to their left and returns it to that player's reinforcements.\n\nThe proponent: Gains 2 command tokens and takes the speaker token.",
+        "text2": "Against: Exhaust Politics. Each player removes 1 command token from their fleet pool.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_classified_document",
+        "name": "Classified Document Leaks",
+        "type": "Law",
+        "target": "Elect Scored Secret Objective",
+        "text1": "The elected secret objective becomes a public objective.\n\nThe proponent of the elected objective: May immediately score it, if they meet the requirements.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_colonial_expansion",
+        "name": "Colonial Expansion Initiative",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: During combat, the attacker applies +X to the results of their units' combat rolls, where X is the number of victory points the attacker has beyond the defender.\n\nThe player that destroyed a unit or took a planet that resulted in the elimination of another player, gains technologies owned by that player. Then, they take leaders, relics, exploration cards, and promissory notes from the eliminated player's play area and place them in their own play area. If a player gained promissory notes of their color, they return them to their hand instead.",
+        "text2": "Against: Each player removes all control tokens from Support for the Throne cards in their play area and loses VP equal to the number of tokens removed.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_colonial_redistribution",
+        "name": "Colonial Redistribution",
+        "type": "Directive",
+        "target": "Elect Non-Home Planet Other Than Mecatol Rex",
+        "text1": "Remove each unit on the elected planet. The player who controls that planet places the removed units on 1 or more planets they control in their home system, if able. Then chooses one other player with the fewest victory points; that player places 3 infantry from their reinforcements on the elected planet.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_committee_formation",
+        "name": "Committee Formation",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.\n\nBefore players vote on an agenda that requires a player to be elected, the owner of this card may discard it to choose the player to be elected. Players do not vote on that agenda. The owner of this card is considered to have cast the most votes for the resolved outcome.\n\nThe other proponent of the elected player: Receives 1 promissory note from the elected player.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_compensated_disarmament",
+        "name": "Compensated Disarmament",
+        "type": "Directive",
+        "target": "Elect Planet",
+        "text1": "Remove each ground force on the elected planet; the player who controls that planet gains 1 trade good for each infantry removed and 2 trade goods for each mech removed.\n\nThe proponent of the elected planet: Gives the owner of the elected planet 1 promissory note from their hand.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_concession_rights",
+        "name": "Concession Rights Auction",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: No effect.\n\nThe proponent: Gains 1 victory point and does not ready planets in the \"Ready Planets\" step of this agenda phase.",
+        "text2": "Against: Each player who voted \"Against\" or abstained must discard 1 secret objective.\n\nThe proponent: Does not ready planets in the \"Ready Planets\" step of this agenda phase.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_conventions_war",
+        "name": "Conventions of War",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players cannot use BOMBARDMENT against planets with a trait.\n\nThe proponent: Removes 1 of their PDS from the board.",
+        "text2": "Against: Players who voted \"Against\" or abstained must discard all of their action cards.\n\nThe dissenter: Places 1 PDS on a planet they control.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_cosmic_phenomena",
+        "name": "Cosmic Phenomena Study",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Anomalies are adjusted as follows:\n- Nebulae: The defender applies +3 to each combat roll of their ships instead.\n- Asteroid Fields: Fighters that do not have a move value do not participate in space combat.\n- Supernovas: When a player resolves the PRODUCTION abilities of 1 or more of their units in a supernova or in adjacent systems, reduce the combined cost of the produced units by 1.\n- Gravity Rifts: For each of their ships, a player may apply an additional +1 to their move value; if they do, that ship is removed on a result of 1–5.\n- Entropic Scars: At the start of the status phase, place 1 frontier token in its system.",
+        "text2": "Against: No effect.\n\nThe dissenter: Resolve their units' PRODUCTION abilities in 1 system.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lobbying_cosmic",
+        "name": "Council Lobbying: Cosmic Estate",
+        "type": "Resolution",
+        "target": "For/Against",
+        "text1": "Resolve these additional effects for the \"for\" or \"against\" outcome after resolving the next eligible agenda.\n\nFor: No effect.\n\nThe dissenter: Chooses a player. That player must remove 1 of their structures from the game board.",
+        "text2": "Against: No effect.\n\nThe proponent: Places 1 structure.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lobbying_healthcare",
+        "name": "Council Lobbying: Healthcare",
+        "type": "Resolution",
+        "target": "For/Against",
+        "text1": "Resolve these additional effects for the \"for\" or \"against\" outcome after resolving the next eligible agenda.\n\nFor: No effect.\n\nThe dissenter: Explores up to 3 different planets they control.",
+        "text2": "Against: No effect.\n\nThe proponent: Places 4 infantry on a planet they control.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lobbying_media",
+        "name": "Council Lobbying: Media",
+        "type": "Resolution",
+        "target": "For/Against",
+        "text1": "Resolve these additional effects for the \"for\" or \"against\" outcome after resolving the next eligible agenda.\n\nFor: No effect.\n\nThe dissenter: Draws 1 secret objective.",
+        "text2": "Against: No effect.\n\nThe proponent: Looks at 1 unrevealed public objective. They may shuffle it into the deck and draw a new one instead.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lobbying_organized",
+        "name": "Council Lobbying: Organized Religion",
+        "type": "Resolution",
+        "target": "For/Against",
+        "text1": "Resolve these additional effects for the \"for\" or \"against\" outcome after resolving the next eligible agenda.\n\nFor: No effect.\n\nThe dissenter: Takes 1 action card from the discard pile.",
+        "text2": "Against: No effect.\n\nThe proponent: Each player must show them 1 secret objective from their hand.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lobbying_aerospace",
+        "name": "Council Lobbying: Aerospace Industry",
+        "type": "Resolution",
+        "target": "For/Against",
+        "text1": "Resolve these additional effects for the \"for\" or \"against\" outcome after resolving the next eligible agenda.\n\nFor: No effect.\n\nThe dissenter: Places 3 command tokens from their reinforcements in their fleet pool.",
+        "text2": "Against: No effect.\n\nThe proponent: Moves each of up to 4 of their ships to an adjacent system that does not contain another player’s ships.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lobbying_tech",
+        "name": "Council Lobbying: Tech Industry",
+        "type": "Resolution",
+        "target": "For/Against",
+        "text1": "Resolve these additional effects for the \"for\" or \"against\" outcome after resolving the next eligible agenda.\n\nFor: No effect.\n\nThe dissenter: Chooses a player to lose their breakthrough.",
+        "text2": "Against: No effect.\n\nThe proponent: Researches 1 technology.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_council_backed",
+        "name": "Council-Backed Ecliptic Gate Experimentation",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player draws 3 blue tiles faceup at random. Then, that player purges 1 of those tiles and places each remaining one at the edge of the game board, adjacent to at least 2 other systems and not adjacent to a home system.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_council_s_shard",
+        "name": "Council's Shard of the Throne",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. This card gives the owner 1 victory point.\n\nWhen the owner of this card casts votes, they may exhaust this card to cast additional votes equal to twice the number of players in the game. Then, they may ready 2 of their planets.\n\nA player gains this card when they win a combat against the owner of this card.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_council_s_whip",
+        "name": "Council's Whip",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. When a player gains this card, they place 2 of their control tokens on it.\n\nWhen an agenda is revealed, for each token on this card, the owner draws 1 action card. Then, they may remove 1 token from this card to discard that agenda and draw a new one.\n\nAfter an agenda is revealed, the owner of this card must predict the outcome. Each other player casting votes on a different outcome has their total votes cast reduced by the number of tokens on this card. If the prediction is correct, the owner places 1 additional token on this card. Otherwise, remove all tokens from this card and attach it to Politics. After a player resolves the primary ability of Politics, they give this card to a player other than the speaker.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_covert_legislation1",
+        "name": "Covert Legislation (1)",
+        "type": "Resolution",
+        "target": "",
+        "text1": "When this card is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect player, etc.). If it is resolution, it is played as normal, and the speaker draws the next card without revealing it. \n\nPlayers then vote for these outcomes without knowing their effects. The speaker votes first on this agenda and must cast at least 1 vote if able. After all players have voted, the agenda is revealed as the outcome of the voting is resolved.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_covert_legislation2",
+        "name": "Covert Legislation (2)",
+        "type": "Resolution",
+        "target": "",
+        "text1": "When this card is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect player, etc.). If it is resolution, it is played as normal, and the speaker draws the next card without revealing it. \n\nPlayers then vote for these outcomes without knowing their effects. The speaker votes first on this agenda and must cast at least 1 vote if able. After all players have voted, the agenda is revealed as the outcome of the voting is resolved.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_cultural_revolution",
+        "name": "Cultural Revolution",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Players return their starting technologies to the deck.\n\nThe proponent: May explore up to 2 different cultural planets.",
+        "text2": "Against: Purge all commanders.\n\nThe dissenter: May explore up to 2 different industrial planets.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_declaration_galactic",
+        "name": "Declaration of Galactic Homogenization",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Destroying a unit or taking a planet that results in the elimination grants 2 VPs. After winning a combat on a readied planet, the active player gains trade goods equal to the number of their VPs.",
+        "text2": "Against: Players remove 1 command token from their command sheet. Players who voted \"Against\" or abstained must return a unit upgrade technology or a red technology to the deck.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_democratic_control",
+        "name": "Democratic Control",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When 1 or more public objectives are revealed, draw and reveal 2 more objectives of the same stage. At the start of the agenda phase, before any agenda is revealed, players elect one of the last 3 revealed objectives as if it were an agenda outcome. The objective with the most votes remains in the game; the speaker shuffles the other 2 back into the deck.",
+        "text2": "Against: Players who voted \"For\" place up to 5 infantry on their planets. Players who voted \"Against\" or abstained remove 3 of their non-fighter ships.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_denouncement_custodians",
+        "name": "Denouncement of Custodians Collaborators",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Place the custodians token on this card. The player who had the custodians token loses 1 VP. Other players must discard all of their secret objectives.\n\nWhen a player uses Imperial, they do not gain VP for controlling Mecatol Rex (but draw 1 secret objective). Instead, that player gains 1 VP for each other player's home system in which they control all planets.\n\nIf this law is discarded, the player who controls Mecatol Rex gains the custodians token and 1 VP.",
+        "text2": "Against: No effect.\n\nThe dissenter: Gains 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_discretionary_spending",
+        "name": "Discretionary Spending",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: All players gain trade goods equal to the number of planets they control. In voting order, players may spend any number of trade goods as follows, with the given costs: use units' PRODUCTION abilities (paying the cost of units using trade goods instead of resources); research up to 2 technologies (4 each); place a structure (3); draw 1 action card (1); explore a planet they control or a frontier token in a system containing their ships (1). Players cannot explore the same planet more than once while resolving this effect.",
+        "text2": "Against: All players lose half of their trade goods (rounded up).",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_economic_equality",
+        "name": "Economic Equality",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Players return all their trade goods to the supply.",
+        "text2": "Against: The player who cast the fewest votes discards 2 action cards.\n\nThe dissenter: Gains a number of trade goods equal to their current number of trade goods. For every 3 trade goods they gain this way, all other players lose 1 trade good, if able.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_protocol_meritocratic1",
+        "name": "Emergency Protocol: Meritocratic Assembly (1)",
+        "type": "Resolution",
+        "target": "",
+        "text1": "During the next agenda, players cannot cast more votes in total than twice the number of victory points they have. The player who controls Mecatol Rex breaks any ties.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_protocol_meritocratic2",
+        "name": "Emergency Protocol: Meritocratic Assembly (2)",
+        "type": "Resolution",
+        "target": "",
+        "text1": "During the next agenda, players cannot cast more votes in total than twice the number of victory points they have. The player who controls Mecatol Rex breaks any ties.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_protocol_treasury1",
+        "name": "Emergency Protocol: Treasury Deficit (1)",
+        "type": "Resolution",
+        "target": "",
+        "text1": "During the next agenda, players cast votes by spending trade goods instead of exhausting planets. Players cast 5 votes for each trade good spent.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_protocol_treasury2",
+        "name": "Emergency Protocol: Treasury Deficit (2)",
+        "type": "Resolution",
+        "target": "",
+        "text1": "During the next agenda, players cast votes by spending trade goods instead of exhausting planets. Players cast 5 votes for each trade good spent.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_emergency_prowess",
+        "name": "Emergency Prowess",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: In descending order of the number of votes cast for any outcome, each player resolves the primary ability of a strategy card of their choice and then exhausts it. No player can resolve the secondary ability unless instructed by the primary ability. Then, ready each strategy card.",
+        "text2": "Against: Exhaust each strategy card. The players who voted \"For\" must exhaust 2 planets, if able.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_enforced_travel",
+        "name": "Enforced Travel Ban",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Alpha and beta wormholes have no effect during movement. A player whose control token is on this card may discard 1 control token at any time to allow the active player to ignore the effects of this law for the duration of their turn.\n\nThe proponent: Places 3 of their control tokens on this card.",
+        "text2": "Against: Players who voted \"Against\" gain 1 trade good and 1 commodity for each wormhole in systems that contain 1 or more of their units.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ethereal_glade",
+        "name": "Ethereal Glade Nexus Construction",
+        "type": "Law",
+        "target": "Elect System With A Non-Supernova Anomaly And No Planets",
+        "text1": "Place the ethereal glade nexus token in the elected system. At the end of the status phase, the player with 5 or more non-fighter ships in that system gains 1 VP and places their control token on this card. Then, they gain their breakthrough.\n\nFor each of their control tokens on this card, the defender applies +1 to their combat and unit ability rolls in the system with the ethereal glade nexus token.\n\nAt the end of their turn, a player may discard their control token from this card to ready any 1 card.\n\nThe proponent of the elected system: May remove up to 3 ships of any player from the elected system.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_executive_sanctions",
+        "name": "Executive Sanctions",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players without a control token on this card have their action card hand limit reduced by 4. The player with their control token on this card has their hand limit reduced by 2 instead.\n\nThe proponent: Places their control token on this card.",
+        "text2": "Against: No effect.\n\nThe dissenter: Draws 5 action cards.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_faster_light",
+        "name": "Faster Than Light Onslaught Operation",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The first player who passes during the action phase gains the speaker token. Each time a player's turn is skipped due to passing, that player may either gain 1 commodity or convert 1 of their commodities to a trade good.",
+        "text2": "Against: Each player who voted \"For\" or abstained must return 1 blue technology to the deck, if able; then places 2 command tokens in their tactic pool.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_fleet_regulations",
+        "name": "Fleet Regulations",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Any player who does not have a control token on this card can have a maximum of 4 of their command tokens in their fleet pool. A player whose control token is on this card can have a maximum of 5 of their command tokens in their fleet pool.\n\nThe proponent: Places 1 of their control tokens on this card.",
+        "text2": "Against: No effect.\n\nThe dissenter: Places 2 command tokens from their reinforcements in their fleet pool.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_flotilla_bounty",
+        "name": "Flotilla Bounty",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. Put the number of trade goods on this card equal to the number of votes for the elected player +1. Every other player who hasn't cast votes for the elected player must place a promissory note facedown under this card, if able.\n\nAfter the active player wins a space combat against the owner of this card, they gain up to half of the trade goods on this card (rounded up), but no more than the combined value of the card owner's ships destroyed in the combat. Then, if no trade goods are left, that active player takes all promissory notes under this card and discards it.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_forbidden_research",
+        "name": "Forbidden Research",
+        "type": "Directive",
+        "target": "Elect Owned Non-Faction Technology Other Than Unit Upgrade",
+        "text1": "Each player purges the elected technology from their play area or technology deck.\n\nThe proponent of the elected technology: May place 1 command token in their strategy pool for each technology in the play areas purged.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_galactic_copyright",
+        "name": "Galactic Copyright Law",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives. Then, reveal the next public objective, if able. When a player scores a public objective, they gain 1 VP. Players cannot score a public objective with a control token on it.\n\nThe proponent: Removes 1 control token from a public objective, the owner of that token loses 1 VP.",
+        "text2": "Against: Players who voted \"For\" research 1 technology. Players who voted \"Against\" or abstained return 1 command token from their strategy pool.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_galactic_crisis",
+        "name": "Galactic Crisis Pact",
+        "type": "Directive",
+        "target": "Elect Strategy Card",
+        "text1": "Each player may resolve the secondary ability of the elected strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements, instead.\n\nThe proponent of the elected card: May choose to resolve the primary ability, instead.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_galactic_powers",
+        "name": "Galactic Powers Polarization",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player rolls 1 die. The player with the highest result places their control token on this card. Then, this repeats with the next highest result until the number of tokens on this card equals half the number of players (rounded down). At the end of the status phase, if each player with a token on this card is ahead on the victory point track compared to every player without a token, the owners of the tokens gain 1 VP. Otherwise, each must give 1 promissory note to a player without a token.\n\nThe proponent: May swap 1 token on this card with another that is not already on this card.",
+        "text2": "Against: Resolve 1 additional agenda after this one.\n\nThe dissenter: Chooses other player to gain 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_golden_aeon",
+        "name": "Golden Aeon Monument Patronage",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players may place 1 control token on this card by spending 3 resources at the start of their turn, or instead of placing a structure when resolving ability of Construction (2 tokens for each structure that would be placed).\n\nAt the start of the status phase, if a player has more tokens on this card than other players, they may remove 3 of their control tokens from this card to exhaust it and gain 1 VP.\n\nThe proponent: Places 2 control tokens on this card.",
+        "text2": "Against: Exhaust Construction. Each player must remove 1 structure from the game board.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_homeland_defense",
+        "name": "Homeland Defense Act",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Planets other than Mecatol Rex can have any number of PDS units on them. When a player places 1 or more PDS units on a planet, they may place an additional PDS unit on that planet.\n\nThe proponent: May place a PDS unit on a planet they control.",
+        "text2": "Against: Players destroy 1 of their PDS units. The player who cast the fewest votes destroys 1 additional PDS unit.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_hyperlane_development",
+        "name": "Hyperlane Development Program",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Non-Fracture systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through their ships in those systems.",
+        "text2": "Against: All players must return 1 of their blue technologies to the deck.\n\nThe dissenter: May place up to 1 cruiser or destroyer from their reinforcements in each of up to 3 systems that contain no planets or anomalies and no other player's ships.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_idolatry",
+        "name": "Idolatry",
+        "type": "Law",
+        "target": "Elect Non-Legendary Planet With A Trait",
+        "text1": "Attach this card to the elected planet's card. This planet is a legendary planet and gives 1 VP to its owner.\n\nWhen a player explores this planet, they explore it an additional time.\n\nWhen you exhaust this planet to cast votes, you may exhaust 1 planet of the same trait that belongs to another player to cast additional votes equal to the influence of that player's planet.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_imperial_arbiter",
+        "name": "Imperial Arbiter",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card and must give each other player who voted for them 1 promissory note from their hand, starting with the player who cast the most votes and proceeding to the player who cast the least, if able.\n\nAt the end of the strategy phase, the owner of this card may spend 1 command token from their strategy pool and up to 8 influence to swap 1 of their strategy cards with a strategy card that has an initiative value equal to or lower than the influence spent.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_imperial_bonds",
+        "name": "Imperial Bonds",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. At the end of the strategy phase, place 4 trade goods on this card. If the owner controls Mecatol Rex, they place an additional 3 trade goods. When the owner of this card resolves the primary ability of Trade or Imperial, they place 3 trade goods on this card. This card can be exchanged in a transaction.\n\nACTION: Remove 1 command token from your strategy pool and exhaust this card to gain all trade goods on this card. You can perform this action only if you control Mecatol Rex.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_censure_levy",
+        "name": "Imperial Censure: Levy",
+        "type": "Resolution",
+        "target": "",
+        "text1": "Resolve the following additional effect for the player who cast the fewest votes after resolving the next agenda, if able. This effect applies only to players eligible to vote.\n\nThe player who cast the fewest votes removes 2 of their non-fighter ships from the game board, if able. Then, the player with the most victory points captures the removed ships.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_censure_retribution",
+        "name": "Imperial Censure: Retribution",
+        "type": "Resolution",
+        "target": "",
+        "text1": "Resolve the following additional effect for the player who cast the fewest votes after resolving the next agenda, if able. This effect applies only to players eligible to vote.\n\nThe player who cast the fewest votes must damage all of their units with SUSTAIN DAMAGE.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_censure_tithe",
+        "name": "Imperial Censure: Tithe",
+        "type": "Resolution",
+        "target": "",
+        "text1": "Resolve the following additional effect for the player who cast the fewest votes after resolving the next agenda, if able. This effect applies only to players eligible to vote.\n\nThe player who cast the fewest votes must give 1 secret objective from their hand to the player with the most victory points.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_censure_vassalage",
+        "name": "Imperial Censure: Vassalage",
+        "type": "Resolution",
+        "target": "",
+        "text1": "Resolve the following additional effect for the player who cast the fewest votes after resolving the next agenda, if able. This effect applies only to players eligible to vote.\n\nThe player who cast the fewest votes must give 1 promissory note from their hand to the player with the most victory points.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_imperial_throne",
+        "name": "Imperial Throne Tribute",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each other player may give the owner of Mecatol Rex 3 trade goods and 1 action card, or \"Support for the Throne\". If they do not, the Mecatol Rex owner may remove 1 of that player's units with a cost of 2 or less from the board. Then, for each unit removed, the owner of Mecatol Rex places it in the Mecatol Rex system.",
+        "text2": "Against: Exhaust Leadership and Warfare. The player who controls Mecatol Rex gains 3 command tokens.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_incentive_program",
+        "name": "Incentive Program",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.\n\nThe proponent: May immediately score that objective if they meet the requirements.",
+        "text2": "Against: Draw and reveal 1 stage II public objective from the deck and place it near the public objectives.\n\nThe dissenter: May immediately score that objective if they meet the requirements.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_indigenous_emancipation",
+        "name": "Indigenous Emancipation Act",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players who voted \"Against\" or abstained must remove 1 infantry from a planet with a trait, if able.\n\nIf a planet with a trait does not contain any ground forces, it's immediately exhausted and cannot be readied.\n\nThe proponent: May place 1 infantry on 1 of their planets.",
+        "text2": "Against: At the start of the next strategy phase, all players must exhaust all their planets except 1 of each trait.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_interfactional_unionization",
+        "name": "Interfactional Unionization",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players cannot resolve unit abilities, except SUSTAIN DAMAGE. Player may spend 1 resource, influence, or their token from this card to be able to resolve unit abilities of 1 type for the duration of the action. Units are not repaired during the status phase. At the end of their turn, players may spend 1 resource, influence, or their token from this card to repair their 1 unit. At the start of their turn, players may exhaust agents to place up to 2 control tokens of any players on this card.\n\nThe proponent:Places up to 5 control tokens of any players on this card.",
+        "text2": "Against: Players who voted \"Against\" or abstained remove 1 of their structures.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_intergalactic_tariffs",
+        "name": "Intergalactic Tariffs",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: After resolving a transaction, the active player must return 1 trade good or commodity to the supply, if able. If there is no active player, both players must return 1 trade good or commodity to the supply, if able. When a transaction is resolved, a player can remove their token from this card to allow players to ignore the effect of this card during that transaction.\n\nThe proponent: Places 5 of their control tokens on this card.",
+        "text2": "Against: All players gain a number of trade goods equal to their commodity value.\n\nThe dissenter: Replenishes their commodities.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_interstellar_liberum",
+        "name": "Interstellar Liberum Veto",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. When an outcome of an agenda would be resolved, the owner may exhaust this card to discard that agenda and reveal a new agenda from the top of the deck. Then, each player exhausts all of their planets and votes on the new agenda instead. Any player may give the owner 1 promissory note from their hand to cancel this effect and exhaust this card.\n\nACTION: Exhaust this card to discard 1 law from play or return 1 promissory note from any player's play area to its owner's hand. Any player may give you 1 promissory note from their hand to cancel this effect; if they do, exhaust this card and end your turn.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ixthian_artifact",
+        "name": "Ixthian Artifact",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Attach this card to the Mecatol Rex planet card. The player who controls Mecatol Rex gains 1 VP, and loses 1 VP if they lose control of Mecatol Rex.",
+        "text2": "Against: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. The owner of Mecatol Rex researches 2 additional technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their own units in each of those systems.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_judicial_abolishment",
+        "name": "Judicial Abolishment",
+        "type": "Directive",
+        "target": "Elect Law",
+        "text1": "Discard the elected law.\n\nThe proponent of the elected law: Places 1 command token in their strategy pool, then gives a promissory note from their hand to 1 player who owned or had a control token on the elected law.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_junta",
+        "name": "Junta",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player exhausts each planet in their home system to cast votes, they gain 1 vote for each of their non-fighter ships on the game board.\n\nWhen an agenda is revealed, a player may remove their ships with a combined cost of at least 5 from the game board to discard that agenda and draw a new one.\n\nAfter resolving each agenda, including this one, the proponent may produce 1 ship in a system that contains their units.",
+        "text2": "Against: Each player must remove 3 of their non-fighter ships from the game board.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_kings_oracle",
+        "name": "Kings' Oracle Guidance",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: At the start of the strategy phase, the speaker rolls 1 die. During this round's status phase, players skip the step equal to the roll's result. If it's 9, all players with the fewest VPs (speaker's choice order) may look at 1 unrevealed objective and choose 1 strategy card first, if able. If the result is 10, the game ends. Any player may choose to lose 1 VP to reroll the die.",
+        "text2": "Against: Each player who voted \"Against\" or abstained loses 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_late_stage",
+        "name": "Late Stage Planned Economy",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Planet cards are not readied during the status phase. At the end of the strategy phase, players may convert up to 2 of their commodities into 3 trade goods each. Then, the player whose control token is on this card replenishes their commodities.\n\nThe proponent: Places their control token on this card.",
+        "text2": "Against: The player with the most trade goods returns all of them to the supply; they gain 1 victory point and research 2 technologies.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lazax_s",
+        "name": "Lazax's Glaive Battery Reactivation",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player places 1 neutral PDS on 1 planet in a system adjacent to Mecatol Rex; if it contains another player's units, placed PDS coexist. After resolving each agenda, the proponent and the player who controls Mecatol Rex may each use the SPACE CANNON of 1 neutral PDS against ships in 1 system adjacent to that unit's planet, as if it were their own PDS.\n\nNeutral PDS have the following additional abilities:\nCombat 2 (×4), SPACE CANNON 5 (×3)\nThis unit is also a ground force. Each time hits are produced against this unit, 1 of them is canceled. After this unit is destroyed, the active player researches 2 technologies.",
+        "text2": "Against: Each player other than the speaker loses 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_memetic_warfare",
+        "name": "Memetic Warfare",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who voted \"For\" or abstained discards 2 action cards.\n\nThe proponent: Gains 1 VP and takes 2 action cards of their choice from those discarded by this agenda's effect.",
+        "text2": "Against: Each player who voted \"Against\" or abstained discards 2 action cards and removes 2 command tokens from their sheet.\n\nThe dissenter: Takes 2 action cards of their choice from those discarded by this agenda's effect.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_antiquities",
+        "name": "Minister of Antiquities",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of Imperial without spending a command token.\n\nWhen any game effect would allow a player to score 1 or more public objectives, the owner of this card may allow that player to draw a relic instead.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_commerce",
+        "name": "Minister of Commerce",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of Trade without spending a command token.\n\nWhen a player replenishes their commodities, the owner may allow them to gain 1 trade good per player that is their neighbor.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_exploration",
+        "name": "Minister of Exploration",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card gains 1 additional command token when resolving the secondary ability of Leadership.\n\nAfter a player performs a tactical action, the owner may allow that player to explore 1 planet that contains that player's units in the active system.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_industry",
+        "name": "Minister of Industry",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of Construction without using a command token to place any structure.\n\nWhen a space dock uses PRODUCTION, the card owner may increase its PRODUCTION value by 4.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_peace",
+        "name": "Minister of Peace",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of Diplomacy without spending a command token.\n\nAfter a player activates a system that contains 1 or more of another player's units, the owner of this card may spend 1 command token from their strategy pool and give the active player 1 promissory note from their hand to immediately end that player's turn.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_policy",
+        "name": "Minister of Policy",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may use the secondary ability of Politics without spending a command token.\n\nDuring the draw action cards step of the status phase, instead of players drawing randomly, the owner of this card looks at a number of action cards from the top of the deck equal to the number of players plus 1, adds 2 to their hand, then gives one to each other player. Players who are able to draw more than 1 action card may then draw additional cards, as normal.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_sciences",
+        "name": "Minister of Sciences",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of Technology without spending a command token.\n\nWhen a player resolves an ability from Technology, the owner may allow that player to not spend resources to research technology.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_minister_war",
+        "name": "Minister of War",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of Warfare without spending a command token.\n\nACTION: Exhaust this card and spend 1 command token from your strategy pool to remove 1 command token from the game board.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_miscount_disclosed",
+        "name": "Miscount Disclosed",
+        "type": "Directive",
+        "target": "Elect Law",
+        "text1": "Vote on the elected law as if it had just been revealed from the top of the deck.\n\nThe proponent of the elected law: Casts 1 additional vote per player when voting on the elected law.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_molochian_parliamental",
+        "name": "Molochian Parliamental Rites",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Planets are not readied during the agenda phase. When resolving the secondary ability of Leadership, players may also spend resources. At the start of the action phase, 1 player with a token on this card (initiative breaks ties) chooses a player to gain 3 command tokens. Then, if the selected player's token was already on the card, they place a token of any player without a token. If all players' tokens are on this card, discard all of them.\n\nThe proponent: Places a control token on this card.",
+        "text2": "Against: At the start of the next strategy phase, the owner of Mecatol Rex deals strategy cards to players.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_mutiny",
+        "name": "Mutiny",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: All players who voted \"For\" gain 1 VP. If all able to vote players voted \"For,\" the speaker gains 1 additional VP.\n\nThe proponent: Takes the speaker token before victory points are gained.",
+        "text2": "Against: Each player who voted \"For\" loses 1 VP and must give the speaker 1 promissory note from their hand. If all able to vote players voted \"Against\" or abstained, the speaker and the other than speaker dissenter gain 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_natural_resources",
+        "name": "Natural Resources Enrichment Program",
+        "type": "Law",
+        "target": "Elect Planet Trait",
+        "text1": "Each planet with the elected trait has its resource values increased by 2. It also gains an effect based on the token placed on this card.\n\nInfantry: the defender applies -2 to their combat rolls on this planet. Fighter: in this planet's system, the planet's owner applies -1 to their ships' combat rolls. Frontier: ships that begin their movement in the planet's system have their move value reduced to 1. Trade good: when 1 or more units use PRODUCTION on this planet, increase the combined cost of produced units by 2. \n\nThe proponent of the elected trait: Places 1 of the following tokens on this card: trade good, infantry, fighter, or frontier.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_network_transparency",
+        "name": "Network Transparency Decree",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players do not gain victory points when scoring secret objectives. Players can score 1 more public objectives during the score objectives step in the status phase.\n\nThe proponent: Looks at the top 2 cards of the stage I public objective deck. They place 1 near the public objectives and shuffle the other back into the deck.",
+        "text2": "Against: No effect.\n\nThe dissenter: Each player who voted \"Against\" or abstained gives them 1 action card.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_new_constitution",
+        "name": "New Constitution",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Discard all laws in play.\n\nThe proponent: Takes the speaker token, then reveals cards from the bottom of the agenda deck until a law is revealed. Players vote on that law as if it had just been revealed from the top of the deck. Shuffle the other revealed cards back into the agenda deck.",
+        "text2": "Against: No effect.\n\nThe dissenter: Receives a promissory note from 2 players who cast the fewest votes.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_nexus_sovereignty",
+        "name": "Nexus Sovereignty",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect on movement. The player who controls Mallice may spend 1 influence at any time to allow the current active player to ignore the effects of this law for the duration of their turn.",
+        "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system.\n\nThe dissenter: Removes 1 non-fighter ship from the game board controlled by a player who cast the fewest votes.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_oracle_divine",
+        "name": "Oracle of Divine Prophecy",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players skip step 1 of the agenda phase. After step 3, each player, in speaker order, chooses 1 number from 1 to 10 unchosen by another player. Then, the speaker reveals an agenda card from the top of the deck and rolls a die. Players cannot resolve abilities during this agenda and vote on it. Resolve its outcome based on the roll's result: 1-5: resolve \"Against\"; 6-10: resolve \"For\". If the outcome is \"Elect player\" and the roll matches a player's chosen number, that player is elected. If there is no eligible outcome, the speaker discards the agenda, draws a new one, and rolls the die again.",
+        "text2": "Against: Each player discards 2 secret objectives from their hand.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pax_magnifica",
+        "name": "Pax Magnifica, Bellum Gloriosum",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Exhaust Warfare. Players reveal all Ceasefire promissory notes in their hand, then in voting order, give each Ceasefire matching their color to another player. Players may not receive Ceasefire promissory notes matching their color as part of transactions.",
+        "text2": "Against: Exhaust Diplomacy. Players may use the PRODUCTION ability of any number of their units. After resolving this outcome, players do not resolve any more agendas in this agenda phase.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_pioneer_proclamation",
+        "name": "Pioneer Proclamation",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Place 4 trade goods, 4 infantry tokens, and 4 fighter tokens on each public objective without a control token on it.\n\nWhen a player scores a public objective without a control token on it, they look at 1 unrevealed objective. Then, they gain tokens placed by this agenda from the scored objective; infantry and fighter tokens are placed with their units.\n\nThe proponent: Looks at 1 unrevealed objective.",
+        "text2": "Against: At the start of the next strategy phase, each player must exhaust a number of planets equal to the number of public objectives they have scored.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_political_censure",
+        "name": "Political Censure",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. This card gives 1 victory point to the owner.\n\nThe owner of this card cannot play action cards and cannot take or receive the speaker token.\n\nThe other proponent: Takes the speaker token if the elected player is the speaker.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_political_reprioritization",
+        "name": "Political Reprioritization",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player discards all their unscored secret objectives, then draws one secret objective for each one discarded in this way.\n\nThe proponent of the elected player: May look at all the discarded and drawn objectives.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_populistic_multispecies",
+        "name": "Populistic Multispecies Platform",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player readies all of their planets and may spend 1 command token from their strategy pool to discard 1 law from the game, if able. Then, they choose an agenda card from the discard pile and resolve its outcome as if it had been voted on.\n\nThe other proponent of the elected player: Gains 1 command token and receives 2 promissory notes from the elected player.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_preservation_historical",
+        "name": "Preservation of Historical Sites",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players must spend 1 influence to explore industrial planets and 2 influence to explore cultural planets.\n\nThe proponent: Gains 2 trade goods for each legendary planet or planet with attachments that they control.",
+        "text2": "Against: No effect.\n\nThe dissenter: May immediately explore each planet they control in 1 system.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_prime_minister",
+        "name": "Prime Minister",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. At the start of the status phase, the card's owner may look at 1 unrevealed public objective in the common play area and the top card from both objective decks. Then, they may swap 1 unrevealed objective with 1 of the cards they looked at. Then, shuffle the objective decks.\n\nDuring the status phase, the owner of this card can score an additional public objective. They may allow any other player to resolve this effect as well.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_private_military",
+        "name": "Private Military Company",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Place all players' agents in the common play area. After resolving the primary or secondary ability of Trade, a player may spend up to 1 trade good to place 1 agent in their play area. Then, they may spend 2 trade goods to place 1 more agent. At the end of the strategy phase, each player places 1 of their agents in the common play area.\n\nThe proponent: May place 2 agents in their play area.",
+        "text2": "Against: All players must return half of their trade goods to the supply (rounded up). Players who voted \"Against\" or abstained must exhaust their agents.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_proclamation_restitutor",
+        "name": "Proclamation of Restitutor Orbis Populi",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The player with the most planets outside of their home system gains this card. The card grants 1 VP. When casting votes, the owner doubles the influence of non-home system planets.\n\nAt the end of the action phase, the player with more planets than the owner gains this card (in the initiative order). Then, the new card owner removes 1 command token from their command sheet.",
+        "text2": "Against: Players who voted \"Against\" or abstained must discard all action cards. Players remove units with a combined cost equal to the combined influence value of their planets.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_prophecy_ixth",
+        "name": "Prophecy of Ixth",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.\n\nThe owner of this card may ignore the prerequisites on fighter unit upgrade technologies and applies +1 to the results of their fighters' combat rolls. Hits produced by their fighters must be applied to non-fighter ships, if able.\n\nWhen the owner of this card uses PRODUCTION, they return this card to the common play area unless they produce 2 or more fighters. If this card is in the common play area, a player may take it if they produce 4 or more fighters when using PRODUCTION.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_public_execution",
+        "name": "Public Execution",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player exhausts all of their planets, then reveals the action cards in their hand. The players that voted for the elected player (in order of most to least votes) may each take 1 action card from that player’s hand.\n\nThe proponent of the elected player: Takes the speaker token, if the elected player has it.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_publicize_weapon",
+        "name": "Publicize Weapon Schematics",
+        "type": "Law",
+        "target": "Elect Owned Unit Upgrade Technology",
+        "text1": "Each player may ignore the prerequisites on unit upgrade technologies that match the unit type of the elected technology. That unit type loses the SUSTAIN DAMAGE ability if it has it.\n\nThe proponent of the elected technology: May immediately gain a unit upgrade technology matching the elected unit type.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_push_reformation",
+        "name": "Push For Reformation",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The player with the fewest victory points gains 4 trade goods and may discard up to 2 laws in play.\n\nThe proponent: May choose 1 player to gain breakthrough.",
+        "text2": "Against: Each player except the player with the most victory points exhausts a number of their planets equal to 1 more than the number of laws in play. Then, resolve 1 additional agenda.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_quantum_aberration",
+        "name": "Quantum Aberration Research",
+        "type": "Law",
+        "target": "Elect System That Does Not Contain Planets",
+        "text1": "Place the quantum aberration token in the elected system. The system with the token contains alpha and beta wormholes. Units may ignore the movement effects of anomalies in that system.\n\nAt the start of the strategy phase, the player with ships in that system purges 2 non-token ships in it and rolls 1 die. The player resolves the effect based on the roll result: (1-3) destroy 4 ships in this system; (4-5) place 1 frontier token in this system and in 2 systems adjacent to this system, even if they contain planets; (6-7) place 1 ship from your reinforcements in this system; (8) research 1 technology; (9) gain 1 relic; (10) gain 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_radical_terraform",
+        "name": "Radical Terraform Restoration",
+        "type": "Directive",
+        "target": "Elect Non-Legendary, Non-Home Planet With An Attachment",
+        "text1": "Remove all attachments from the elected planet. Discard or return any cards to their decks or owners. For each discarded or returned card, the owner of the planet may choose 1 different player who voted for the elected planet. Each chosen player must give 1 promissory note to the planet's owner.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_rearmament_agreement",
+        "name": "Rearmament Agreement",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player places 1 mech on a planet they control in their home system.\n\nThe proponent: Places a mech on any planet they control and adds 1 command token to their fleet pool.",
+        "text2": "Against: Each player replaces each of their mechs with an infantry from their reinforcements.\n\nThe dissenter: Places 1 command token in their strategy pool for every 2 planets they control that do not contain ground forces.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_red_tape",
+        "name": "Red Tape",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Exhaust Diplomacy. Then, place a fighter token on unrevealed public objectives and turn them faceup. An objective with a token is considered unrevealed. The objectives aren't revealed in the status phase. After a player resolves the primary ability of Diplomacy, they remove 1 token from any objective. When a player removes trade goods from Diplomacy, they also remove an equal number of tokens from objectives. The game ends in the reveal public objective step of the status phase if all objectives are revealed. When this law is discarded, discard unrevealed objectives, shuffle the decks, then draw and place an equal number of objectives.\n\nThe proponent: Removes 1 token from 1 objective.",
+        "text2": "Against: Each player returns their breakthrough to the deck._x0003__x0003_",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_regulated_conscription",
+        "name": "Regulated Conscription",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player produces units, they produce only 1 fighter or infantry for their cost, instead of 2.",
+        "text2": "Against: At the start of the strategy phase, players who voted \"Against\" or abstained must exhaust all of their industrial planets.\n\nThe dissenter: Must give 1 promissory note to the other player with the most industrial planets.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_representative_government",
+        "name": "Representative Government",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead, except for the player who controls Mecatol Rex, who may cast 2 votes on each agenda. Players cannot cast additional votes.\n\nThe proponent: Takes the speaker token.",
+        "text2": "Against: At the start of the next strategy phase, each player who voted \"Against\" or abstained exhausts all of their cultural planets and may not select Politics, if able.\n\nThe dissenter: May place 2 infantry on any planets they control.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_research_grant",
+        "name": "Research Grant Reallocation",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player researches any 2 non-faction technologies.\n\nThe other proponent of the elected player: May spend 2 trade goods per prerequisite on 1 of these technologies to gain that technology.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_rushed_pilot",
+        "name": "Rushed Pilot Draft",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player places 2 fighters in each system containing a space dock or units with capacity. Any player who has removed more fighters than gained must exhaust 2 planets at the start of the next strategy phase.\n\nThe proponent: May remove from the board and then capture 1 destroyer of each of their neighbors.",
+        "text2": "Against: Each player who voted \"For\" or abstained destroys 2 fighters in each system where they have fighters.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sacred_monoliths",
+        "name": "Sacred Monoliths to the Ages",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player would place a structure on a non-home planet, they may instead spend 8 resources to place a neutral space dock into coexistence. A neutral space dock cannot be placed in a system that already contains a neutral space dock. Players may perform the following actions:\n\nACTION: Exhaust 1 planet you control that has a neutral space dock; put The Fracture into play, if able. Then, place 1 ingress token in that planet's system.\nACTION: Exhaust 2 planets you control that each have a neutral space dock; draw 1 relic.\nACTION: Exhaust 3 planets you control that each have a neutral space dock; gain 1 victory point.",
+        "text2": "Against: Each player removes half of their infantry from the game board (rounded down).",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_search_warrant",
+        "name": "Search Warrant",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card and draws 2 secret objectives.\n\nThe owner of this card plays with their secret objectives revealed. When the owner of this card would discard a secret objective, a player whose control token is on this card may take that secret objective instead.\n\nThe other proponent of the elected player: Places their control token on this card.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_seed_empire",
+        "name": "Seed of an Empire",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The player with the most VPs gains the speaker token and 1 VP, then gives 1 promissory note to each other player who voted \"For\" (in order of most to least votes), if able.",
+        "text2": "Against: The player with the fewest VPs gains 1 VP, draws 3 action cards, and adds 1 command token from their reinforcements to each of their tactics, fleet, and strategy pools.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_broadcast_deregulation",
+        "name": "Session Broadcast: Deregulation",
+        "type": "Resolution",
+        "target": "",
+        "text1": "After resolving the next agenda, resolve the following additional effects for the proponent and dissenter.\n\nThe proponent: Removes 4 of their infantry from the game board. Then, researches 1 technology.\n\nThe dissenter: Exhausts their technologies. Then, gains 2 trade goods for each technology they own.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_broadcast_digital",
+        "name": "Session Broadcast: Digital Minds Rights",
+        "type": "Resolution",
+        "target": "",
+        "text1": "After resolving the next agenda, resolve the following additional effects for the proponent and dissenter.\n\nThe proponent: Destroys all units from a planet they control and chooses 1 player; that player places 2 infantry from their reinforcement on that planet. Then, that players gives them 2 promissory notes from their hand.\n\nThe dissenter: Discards 1 secret objective. Then, draws 2 secret objectives.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_broadcast_neo",
+        "name": "Session Broadcast: Neo-Luddism",
+        "type": "Resolution",
+        "target": "",
+        "text1": "After resolving the next agenda, resolve the following additional effects for the proponent and dissenter.\n\nThe proponent: Returns 1 technology to the deck. Then, gains 1 relic.\n\nThe dissenter: Discards 1 relic and shuffles the relic deck. Then, researches 1 technology.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_broadcast_orbital",
+        "name": "Session Broadcast: Orbital Housing",
+        "type": "Resolution",
+        "target": "",
+        "text1": "After resolving the next agenda, resolve the following additional effects for the proponent and dissenter.\n\nThe proponent: Removes 1 attachment from a planet they control. Then, places 2 structures on planets they control.\n\nThe dissenter: Removes 1 of their structures from the game board. Then, gains 3 command tokens.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_broadcast_sustainability",
+        "name": "Session Broadcast: Sustainability",
+        "type": "Resolution",
+        "target": "",
+        "text1": "After resolving the next agenda, resolve the following additional effects for the proponent and dissenter.\n\nThe proponent: Discards 2 action cards. Then, places 1 infantry on each planet they control.\n\nThe dissenter: Removes 3 of their infantry from the game board. Then, explores 3 times 1 planet they control.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_broadcast_unions",
+        "name": "Session Broadcast: Unions Support",
+        "type": "Resolution",
+        "target": "",
+        "text1": "After resolving the next agenda, resolve the following additional effects for the proponent and dissenter.\n\nThe proponent: Returns 1 command token from their command sheet to their reinforcements. Then, resolves PRODUCTION of 1 of their units.\n\nThe dissenter: Removes 2 of their non-fighter ships from the game board. Then, gains 6 trade goods.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_shared_planning",
+        "name": "Shared Planning Paradigm",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. Then, the other player who received the most votes places 1 of their control tokens on this card.\n\nAfter the owner of this card and the player whose control token is on this card both score the same public objective during the same status phase, each of those players researches 2 technologies and draws 1 secret objective.\n\nAt the start of the agenda phase, the owner of this card may exhaust each planet in their home system to replace the control token on this card with a control token of another player.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_shared_research",
+        "name": "Shared Research",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: During tactical actions, the active player may decide that any anomaly that does not contain a frontier token does not affect movement.\n\nThe proponent: May explore 1 frontier token anywhere on the board.",
+        "text2": "Against: No effect.\n\nThe proponent: Takes 1 command token from the reinforcements of each player who voted \"Against\" or abstained and places them in any number of systems that contain anomalies.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_stellar_absolutism",
+        "name": "Stellar Absolutism",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The player who controls Mecatol Rex is treated as the speaker for all game effects.\n\nThe proponent: Must remove up to 2 units in the system containing Mecatol Rex, if able.",
+        "text2": "Against: Exhaust Imperial. All players except the player who controls Mecatol Rex lose 1 VP.\n\nThe dissenter: Gains 1 command token.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_stellar_atomics",
+        "name": "Stellar Atomics",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player places 1 of their control tokens on this card. During the agenda phase, players who do not have a control token on this card cannot vote, resolve transactions, or play action cards. All players can perform the following action:\n\nACTION: Discard your control token from this card and lose 1 victory point to destroy all units in 1 non-home system.\n\nThe proponent: Chooses 1 player to gain war sun unit upgrade technology.",
+        "text2": "Against: The player with the most victory points gains 1 victory point.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_supernal_venalicium",
+        "name": "Supernal Venalicium",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: After resolving Trade, the active player draws the alliance ability card of a random, unused faction and reveals it. Then, clockwise, starting with the player to the left of the active player, each player may place their trade goods on their strategy card, but must place more than any other player. If the active player placed the most trade goods, they gain the alliance card and return the trade goods to the supply. Otherwise, the player who placed the most trade goods gains the card, and the active player gains the trade goods placed by that player. Each other player returns the trade goods they placed to their area.",
+        "text2": "Against: Each player removes all units from 1 planet they control, then places 4 neutral infantry on that planet.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_supremacy_doctrine",
+        "name": "Supremacy Doctrine",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players whose Support for the Throne promissory note is in any play area lose 1 VP, if able, until it is returned or the law is discarded.",
+        "text2": "Against: Players lose 1 VP for each token on Support for the Throne cards in their play area. Then, purge all Support for the Throne promissory notes.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_swords_plowshares",
+        "name": "Swords to Plowshares",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player removes half of their infantry on each planet they control, rounding down. Each player gains trade goods equal to the number of their infantry removed.\n\nThe proponent: May explore every planet from which their infantry were removed.",
+        "text2": "Against: No effect.\n\nThe dissenter: Places 1 infantry from their reinforcements on each planet they control.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_technocracy",
+        "name": "Technocracy",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When casting votes on an outcome of an agenda, players can exhaust their non-unit upgrade technologies to cast additional votes. Each exhausted technology provides 2 votes and 2 additional votes for each of its prerequisites.\n\nAfter resolving each agenda, including this one, the proponent may research 1 technology.",
+        "text2": "Against: Exhaust Technology. Players must return 1 technology to the deck.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_technological_debt",
+        "name": "Technological Debt",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Synergies have no effect.When researching technology, players must spend additional resources equal to the number of technologies they own of the same color as the researched technology.",
+        "text2": "Against: Players who voted \"Against\" or abstained research 1 non-unit upgrade technology. Then, they remove a number of their ships from the board equal to the total number of technologies they own.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_term_limits",
+        "name": "Term Limits",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player takes or receives the speaker token, they place 1 of their control tokens on this card. A player whose control token is on this card may not take or receive the speaker token. If a control token from every player is on this card, remove them.\n\nThe proponent: Takes the speaker token.",
+        "text2": "Against: Exhaust Politics. Players who voted \"Against\" or abstained must give 1 promissory note from their hand to a player who voted \"For\".\n\nThe dissenter: Draws 2 action cards.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_total_war",
+        "name": "Total War",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player destroys another player’s units during combat or by resolving unit abilities, they place a number of commodities from the supply on a planet they control in their home system equal to the combined cost of the units they destroyed. When a player gains control of a home planet that has commodities, they move those commodities to a planet they control in their own home system. All players can perform the following action:\n\nACTION: For each revealed public objective, discard 7 commodities from planets in your home system. If you do, gain 1 victory point.",
+        "text2": "Against: The player with the most victory points gains 1 VP.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_tourism_stimulus",
+        "name": "Tourism Stimulus",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner's commodity value is increased by 3 if their monument is on the game board.\n\nWhen the owner resolves abilities of Construction, they may replenish their commodities.\n\nWhen other player places their command token in the system with the owner's monument, they must give the owner up to 2 trade goods, if able.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_twilight_wars",
+        "name": "Twilight Wars Lustration",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Players discard all secret objectives from their hand and exhaust their agents.",
+        "text2": "Against: Each player places 2 promissory notes from their hand facedown in the common play area. Each player who is unable to place 2 promissory notes exhausts all of their planets, and does not ready those planets at the end of the agenda phase. Then, the speaker collects them without looking, shuffles, and deals 1 card to each player in speaker order until no cards remain.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_unconventional_measures",
+        "name": "Unconventional Measures",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" places 3 command tokens from their reinforcements into their strategy pool.",
+        "text2": "Against: Each player who voted \"Against\" or abstained discards their action cards.\n\nThe proponent: Chooses 1 strategy card to become exhausted.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_unstable_protomolecular",
+        "name": "Unstable Protomolecular Material Indagation",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. At the start of the action phase, the owner rolls 1 die. Before the roll, players in initiative order may spend 3 resources to apply +1 or -1 to the result. Resolve the effect based on the roll result: (1) Players destroy all ships; (2-3) Players destroy half of their non-fighter ships, rounded down; (4-5) No effect; (6-8) The owner places their non-fighter ship from the board on this card; (9-10) The owner places 2 such ships. The owner's units matching the ship type on this card gain +1 move and roll +1 die in combat and ability rolls. Then, if the owner has no units on the board matching the ships on the card, discard this card.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_vir_triumphalis",
+        "name": "Vir Triumphalis March",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: After a ship is destroyed in combat, place a control token of the player who destroyed that ship on this card. At the start of the agenda phase, each player without tokens on this card exhausts all of their planets; the player with the most tokens gains 1 VP and may use their units' PRODUCTION. Then discard this card.",
+        "text2": "Against: Each player who voted \"Against\" or abstained places a command token from their reinforcements in their home system.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_wealth_redistribution",
+        "name": "Wealth Redistribution",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: At the end of the strategy phase, combine all the trade goods on the players’ command sheets. Then divide them equally among the players. Return any remainder to the supply.",
+        "text2": "Against: The player with the most trade goods gains 7 trade goods and may resolve Trade primary ability.\n\nThe dissenter: Gains 3 trade goods and may resolve Trade primary ability.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_winnarian_bureaucrat",
+        "name": "Winnarian Bureaucrat Appointment (Sigmar Sigmani)",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player controls Mecatol Rex, they also gain this agent.\n\nAfter an agenda is revealed, you may exhaust this card to allow a player to choose 1 outcome. To cast votes for a different outcome, players must give that player any combination of 4 trade goods, commodities, and promissory notes, or they must abstain. Players who own the Custodians Token or control Mecatol Rex ignore this effect.",
+        "text2": "Against: Player that controls Mecatol Rex resolves the primary ability of 1 strategy card.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_wormhole_reconstruction",
+        "name": "Wormhole Reconstruction",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: All systems that contain either an alpha or beta wormhole are adjacent to each other. Once per action, a player whose control token is on this card may gain 1 commodity after a ship moves through a wormhole.\n\nThe proponent: Places 1 control token on this card.",
+        "text2": "Against: The player who cast the fewest votes places a command token from their reinforcements in each system that contains an alpha or beta wormhole.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_wormhole_research",
+        "name": "Wormhole Research",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Players with ships in systems that contain 1 or more wormholes may research a technology with no more than 1 prerequisite per type of wormhole in those systems.\n\nThe proponent:May gain any 1 non-faction technology researched this way.",
+        "text2": "Against: In systems that contain their ships and wormholes, each player who voted \"For\" destroys 1 non-fighter ship for each alpha or beta wormhole. Each player who voted \"Against\" or abstained removes 1 command token from their command sheet.",
+        "source": "black_spectrum"
+    }
+]

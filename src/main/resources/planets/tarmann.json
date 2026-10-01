@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tarmann",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 172,
+            "y": 152
+        }
+    },
     "id": "tarmann",
     "tileId": "22",
     "name": "Tar'mann",

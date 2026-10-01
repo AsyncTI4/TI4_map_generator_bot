@@ -32,11 +32,7 @@ class BountyAcd2ButtonHandler {
                 continue;
             }
             String id = player.factionButtonChecker() + "bountyStep2_" + p2.getFaction();
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray(id, p2.getColor()));
-            } else {
-                buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
-            }
+            buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.fogSafeEmoji())));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline Capture"));
 
@@ -60,7 +56,7 @@ class BountyAcd2ButtonHandler {
         // One button per distinct base unit type with a cost of 3 or more.
         Map<String, UnitModel> capturable = new LinkedHashMap<>();
         for (String unitId : p2.getUnitsOwned()) {
-            UnitModel model = p2.getUnitByID(unitId);
+            UnitModel model = Player.getUnitByID(unitId);
             if (model != null && model.getCost() >= 3) {
                 capturable.putIfAbsent(model.getBaseType(), model);
             }

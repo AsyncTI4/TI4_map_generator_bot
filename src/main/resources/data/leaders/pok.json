@@ -67,7 +67,7 @@
     },
     {
         "id": "redcreussagent",
-        "faction": "ghost",
+        "faction": "crimson",
         "type": "agent",
         "name": "\"Who Knows?\"",
         "title": "Forlorn Shadow",
@@ -76,11 +76,11 @@
         "unlockCondition": "Always Unlocked",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreussagent.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreussagent_back.png?raw=true",
-        "source": "pok"
+        "source": "codex4"
     },
     {
         "id": "redcreusscommander",
-        "faction": "ghost",
+        "faction": "crimson",
         "type": "commander",
         "name": "\"Total Mystery\"",
         "title": "Wistful Soul",
@@ -89,11 +89,11 @@
         "unlockCondition": "Resolve a combat with another player",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusscommander.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusscommander_back.png?raw=true",
-        "source": "pok"
+        "source": "codex4"
     },
     {
         "id": "redcreusshero",
-        "faction": "ghost",
+        "faction": "crimson",
         "type": "hero",
         "name": "\"A Tall Stranger\"",
         "title": "Wayward Riftwalker",
@@ -103,7 +103,7 @@
         "unlockCondition": "Have 3 scored objectives.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusshero.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/redcreusshero_back.png?raw=true",
-        "source": "pok"
+        "source": "codex4"
     },
     {
         "id": "orlandohero",
@@ -354,7 +354,7 @@
         "type": "agent",
         "name": "The Thundarian",
         "tfName": "Temporal Genome",
-        "title": "Temporal Engima",
+        "title": "Temporal Enigma",
         "tfTitle": "Echo of Time",
         "abilityWindow": "After the \"Roll Dice\" step of combat:",
         "abilityText": "You may exhaust this card. If you do, hits are not assigned to either player's units. Return to the start of this combat round's \"Roll Dice\" step.",
@@ -467,7 +467,7 @@
         "type": "agent",
         "name": "Brother Milor",
         "tfName": "Splitting Genome",
-        "title": "Purifed by Fire",
+        "title": "Purified by Fire",
         "tfTitle": "Replication",
         "tfAbilityWindow": "After a player's destroyer or cruiser is destroyed:",
         "abilityWindow": "After a player's unit is destroyed during combat:",
@@ -730,7 +730,7 @@
         "id": "saarcommander",
         "faction": "saar",
         "type": "commander",
-        "name": "Rowl Sarring",
+        "name": "Rowl Sarrig",
         "title": "Relay Engineer",
         "abilityWindow": "When you produce fighters or infantry:",
         "abilityText": "You may place each of those units at any of your space docks that are not blockaded.",

@@ -29,6 +29,7 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+    private RefreshMapStyle refreshMapStyle = RefreshMapStyle.COMBINED;
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
@@ -58,6 +59,10 @@ public class UserSettings {
 
     UserSettings(String userId) {
         this.userId = userId;
+    }
+
+    public RefreshMapStyle getRefreshMapStyle() {
+        return Objects.requireNonNullElse(refreshMapStyle, RefreshMapStyle.COMBINED);
     }
 
     public List<String> getPreferredColors() {
@@ -128,7 +133,7 @@ public class UserSettings {
         activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
-    public String summarizeActiveHours(String activity) {
+    public static String summarizeActiveHours(String activity) {
         Set<Integer> hotHours = getHotHours(activity);
         if (hotHours.isEmpty()) {
             return null;
@@ -172,7 +177,7 @@ public class UserSettings {
         return result.isEmpty() ? null : result.toString();
     }
 
-    public String summarizeActiveHoursEmoji(String activity) {
+    public static String summarizeActiveHoursEmoji(String activity) {
         Set<Integer> hotHours = getHotHours(activity);
         if (hotHours.isEmpty()) {
             return "Not enough data.";

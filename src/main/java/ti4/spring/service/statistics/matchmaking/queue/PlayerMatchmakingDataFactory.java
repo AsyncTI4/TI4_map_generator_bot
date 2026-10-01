@@ -1,6 +1,5 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +20,7 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.UserGameInfoService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingGameInfo;
 import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 @UtilityClass
@@ -28,11 +28,8 @@ class PlayerMatchmakingDataFactory {
 
     private static final List<String> ROLES_TO_TRACK =
             List.of(MatchmakingOptions.FLOATERS_ROLE_NAME, MatchmakingOptions.WARRIORS_ROLE_NAME);
-    private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
-    private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
-    private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
     private static final Rating DEFAULT_NEW_PLAYER_RATING =
-            GameInfo.getDefaultGameInfo().getDefaultRating();
+            MatchmakingGameInfo.create().getDefaultRating();
 
     static Map<MatchmakingQueueMember, PlayerMatchmakingData> buildForParties(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()
@@ -93,7 +90,7 @@ class PlayerMatchmakingDataFactory {
                 leaderRestrictions,
                 ownSettings.getMatchmakingAvoidList(),
                 ratings.getOrDefault(userId, DEFAULT_NEW_PLAYER_RATING),
-                computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
+                ownSettings.getActiveHoursAsIntegers(),
                 completedGames(userId),
                 roleNames(guild, userId),
                 queueWait,
@@ -117,27 +114,5 @@ class PlayerMatchmakingDataFactory {
             }
         }
         return roles;
-    }
-
-    private static Set<Integer> computeActiveHourBuckets(Set<Integer> activeHours) {
-        Set<Integer> matchedBuckets = new HashSet<>();
-        for (int i = 0; i < NUMBER_OF_ACTIVE_HOUR_BUCKETS; i++) {
-            int startHour = i * ACTIVE_HOUR_BUCKET_SIZE;
-            int endHour = startHour + ACTIVE_HOUR_BUCKET_SIZE - 1;
-            if (getBucketScore(activeHours, startHour, endHour) >= ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD) {
-                matchedBuckets.add(i);
-            }
-        }
-        return matchedBuckets;
-    }
-
-    private static int getBucketScore(Set<Integer> activeHours, int startInclusive, int endInclusive) {
-        int score = 0;
-        for (int hour : activeHours) {
-            if (hour >= startInclusive && hour <= endInclusive) {
-                score++;
-            }
-        }
-        return score;
     }
 }

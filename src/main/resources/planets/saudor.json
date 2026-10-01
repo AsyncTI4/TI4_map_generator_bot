@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "saudor",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 172,
+            "y": 148
+        }
+    },
     "id": "saudor",
     "tileId": "23",
     "name": "Saudor",

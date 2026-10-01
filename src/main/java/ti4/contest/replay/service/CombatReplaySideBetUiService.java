@@ -278,7 +278,7 @@ class CombatReplaySideBetUiService {
                 ? buttonFactionIdLabel(game, sideBet.getTargetFaction())
                 : buttonFactionDisplayName(game, sideBet.getTargetFaction());
         String label = faction + " " + sideBet.getBetType().label();
-        return label + " +" + payoutService.resolvedProfitPoints(sideBet) + " pts";
+        return label + " +" + CombatReplaySideBetPayoutService.resolvedProfitPoints(sideBet) + " pts";
     }
 
     private String factionSectionTitle(Game game, String faction) {

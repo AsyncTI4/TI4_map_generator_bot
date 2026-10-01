@@ -316,9 +316,9 @@ public class CreateGameService {
         String expMsg = """
                 ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards.
                 > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
-                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
+                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge. It is the default if you do not press any of these buttons.\
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
@@ -428,9 +428,7 @@ public class CreateGameService {
                                 }
                                 MessageHelper.sendMessageToChannel(introThread, message);
                                 BufferedImage colorsImage = ImageHelper.readScaled(
-                                        ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"),
-                                        731,
-                                        593);
+                                        ResourceHelper.getExtraFile("Compiled_Async_colors.png"), 731, 593);
                                 FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
@@ -696,7 +694,7 @@ public class CreateGameService {
     }
 
     public static String getNewPlayerInfoText() {
-        String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
+        String path = ResourceHelper.getHelpFile("NewPlayerIntro.txt");
         try {
             return Files.readString(Paths.get(path));
         } catch (Exception e) {

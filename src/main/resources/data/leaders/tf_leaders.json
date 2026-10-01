@@ -10,6 +10,7 @@
         "abilityWindow": "When a player spends resources",
         "abilityText": "You may exhaust this card to allow that player to remove any number of their infantry from the game board. For each unit removed, reduce the resources spent by 1.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/experimental_genome.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/experimental_genome.png?raw=true",
         "source": "twilights_fall"
     },
@@ -22,6 +23,7 @@
         "abilityWindow": "At any time",
         "abilityText": "You may exhaust this card and choose another player; that player gives you 1 trade good, if able, then you each draw 1 action card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/hyper_genome.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/hyper_genome.png?raw=true",
         "source": "twilights_fall"
     },
@@ -35,6 +37,7 @@
         "tfNotes": "In async, please play this ability before initiating the splice.",
         "abilityText": "You may exhaust this card to add 3 additional cards to that splice.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/research_genome.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/research_genome.png?raw=true",
         "source": "twilights_fall"
     },
@@ -47,6 +50,7 @@
         "abilityWindow": "After a player's unit is destroyed during combat",
         "abilityText": "You may exhaust this card to roll 1 die. If the result is equal to or greater than that unit's combat value, their opponent must choose and destroy 1 of their units.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/valiant_genome.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/valiant_genome.png?raw=true",
         "source": "twilights_fall"
     },
@@ -60,6 +64,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Draw 1 genome, 1 unit upgrade, and 1 ability. Then purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/jolnar_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/jolnar_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -72,6 +77,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Choose a planet that has a technology specialty in a system that contains your units. Destroy any other player's units on that planet. Gain trade goods equal to that planet's combined resource and influence values and draw 1 ability. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/nekro_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/nekro_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -84,6 +90,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Resolve the PRODUCTION abilities of your units in your home system. You may reduce the cost of each of your units to 0 during this use of PRODUCTION. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/nekro_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/nekro_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -96,6 +103,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Reveal 3 edicts; choose 1 to resolve and shuffle the rest back into the edict deck. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/xxcha_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/xxcha_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -108,6 +116,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Choose a player other than the current speaker to gain the speaker token. Choose a player other than the tyrant to gain the benediction token. Then purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/keleresx_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/keleresx_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -120,6 +129,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Gain 1 relic and 2 command tokens. Then, purge this card",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/naazrokha_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/naazrokha_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -133,6 +143,7 @@
         "abilityText": "You may choose an ability owned by another player; they must either give you that ability or give you 2 other abilities. If you do, purge this card.",
         "unlockCondition": "Always Unlocked",
         "tfNotes": "This hero is not affected by someone having bio-synthetic synergy.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/naalu_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/naalu_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -145,6 +156,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Search the ability, unit upgrade, or genome deck for a card and gain it. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/obsidian_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/obsidian_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -157,6 +169,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge an ability owned by any player. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/deepwrought_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/deepwrought_paradigm.png?raw=true",
         "source": "twilights_fall"
     },
@@ -169,6 +182,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Each other player rolls a die for each of their non-fighter ships that are in or adjacent to a system that contains a gravity rift; on a 1-5, return that unit to their reinforcements. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/vuilraith_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/vuilraith_paradigm.png?raw=true",
         "source": "twilights_fall"
     }

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "apis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "apis",
     "tileId": "m32",
     "name": "Apis",

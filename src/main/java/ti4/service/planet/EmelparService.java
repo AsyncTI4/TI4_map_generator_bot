@@ -21,9 +21,11 @@ import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -80,6 +82,11 @@ public class EmelparService {
             PlanetModel model = Mapper.getPlanet(planet);
             buttons.add(
                     Buttons.blue(prefix + planet, "Ready " + model.getName() + " Ability", MiscEmojis.LegendaryPlanet));
+        }
+
+        prefix = "emelparReady_monument_" + player.getFaction() + "_";
+        for (UnitModel monument : MonumentsService.getExhaustedMonuments(game, player)) {
+            buttons.add(Buttons.gray(prefix + monument.getId(), "Ready " + monument.getName() + " Monument"));
         }
         if (!game.isFowMode()) {
             buttons.add(Buttons.gray("getOtherFactionsEmelpar", "Ready Another Player's Components"));
@@ -165,16 +172,13 @@ public class EmelparService {
 
     @ButtonHandler("emelparReady_relic_")
     private static void readyRelic(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "emelparReady_relic_" + RegexHelper.relicRegex(game);
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            String relicID = matcher.group("relic");
-            RelicModel model = Mapper.getRelic(relicID);
-            player2.removeExhaustedRelic(relicID);
-            String readyMsg = ExploreEmojis.Relic + " " + model.getName();
-            postSummary(event, player, readyMsg);
-        });
+        String relicID = buttonID.replace("emelparReady_relic_", "");
+        RelicModel model = Mapper.getRelic(relicID);
+        player2.removeExhaustedRelic(relicID);
+        String readyMsg = ExploreEmojis.Relic + " " + model.getName();
+        postSummary(event, player, readyMsg);
     }
 
     @ButtonHandler("emelparReady_tech_")
@@ -203,5 +207,24 @@ public class EmelparService {
             String readyMsg = model.getLegendaryNameRepresentation();
             postSummary(event, player, readyMsg);
         });
+    }
+
+    @ButtonHandler("emelparReady_monument_")
+    private static void readyMonument(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String payload = buttonID.replace("emelparReady_monument_", "");
+        int separator = payload.indexOf('_');
+        if (separator < 1) {
+            return;
+        }
+        Player player2 = game.getPlayerFromColorOrFaction(payload.substring(0, separator));
+        if (player2 == null) {
+            return;
+        }
+        String monumentId = payload.substring(separator + 1);
+        if (!MonumentsService.readyMonument(game, player2, monumentId)) {
+            return;
+        }
+        UnitModel monument = Mapper.getUnit(monumentId);
+        postSummary(event, player, monument == null ? monumentId : monument.getName() + " Monument");
     }
 }

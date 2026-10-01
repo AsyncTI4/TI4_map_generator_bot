@@ -81,7 +81,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             if (command.accept(event)) {
                 command.preExecute(event);
                 if (combatReplayService != null && resolvedCommand instanceof GameStateContainer gameStateContainer) {
-                    combatReplayService.setPreInteractionSnapshot(
+                    CombatReplayService.setPreInteractionSnapshot(
                             combatReplayService.capturePreInteractionSnapshot(gameStateContainer.getGame()));
                 }
                 logSlashCommand(event);
@@ -96,7 +96,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             command.onException(event, e);
         } finally {
             if (combatReplayService != null) {
-                combatReplayService.clearPreInteractionSnapshot();
+                CombatReplayService.clearPreInteractionSnapshot();
             }
             RollbarManager.clear();
         }
@@ -117,7 +117,8 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
         if (!event.getCommandString().contains("/rules ask")
-                && !event.getCommandString().contains("/fow whisper")) {
+                && !event.getCommandString().contains("/fow whisper")
+                && !event.getCommandString().contains("/bothelper impersonate")) {
             event.getChannel()
                     .sendMessage(commandText)
                     .queue(

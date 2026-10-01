@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -78,6 +79,8 @@ public final class TIGLHelper {
         HERO_XXCHA("TIGL - Xxekir Grom", -1), //
         HERO_YIN("TIGL - Dannel of the Tenth", -1), //
         HERO_YSSARIL("TIGL - Kyver, Blade and Key", -1);
+
+        private static final Pattern NON_ALPHANUMERIC_PATTERN = Pattern.compile("[^a-z0-9]");
 
         @Getter
         private final String name;
@@ -161,7 +164,7 @@ public final class TIGLHelper {
         }
 
         private static String normalizeRankId(String id) {
-            return id.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+            return NON_ALPHANUMERIC_PATTERN.matcher(id.toLowerCase(Locale.ROOT)).replaceAll("");
         }
     }
 
@@ -212,8 +215,17 @@ public final class TIGLHelper {
     }
 
     private static void setTIGLRankSnapshotAtSetup(Game game, boolean isFractured) {
-        List<User> users =
-                game.getPlayers().values().stream().map(Player::getUser).toList();
+        // Dummies (the neutral "Dicecord" player) are bot accounts, not league participants - including them
+        // would permanently report the game as having non-hub members and disable rank handling.
+        List<Player> rankedPlayers = game.getPlayers().values().stream()
+                .filter(player -> !player.isDummy())
+                .toList();
+        if (rankedPlayers.isEmpty()) {
+            // getLowestCommonRankBetweenPlayers starts at the *top* rank and walks down, so an empty list would
+            // record Hero/Archon as the game's minimum rank and draw that badge on the map.
+            return;
+        }
+        List<User> users = rankedPlayers.stream().map(Player::getUser).toList();
         if (!allUsersAreMembersOfHubServer(users)) {
             String message =
                     "Warning - there are players here who are not members of the AsyncTI4 HUB server. Automatic TIGL rank handling will not work.";
@@ -222,7 +234,7 @@ public final class TIGLHelper {
         }
         TIGLRank lowestRank = getLowestCommonRankBetweenPlayers(users, isFractured);
         game.setMinimumTIGLRankAtGameStart(lowestRank);
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : rankedPlayers) {
             player.setPlayerTIGLRankAtGameStart(getUsersHighestTIGLRank(player.getUser(), isFractured));
         }
     }
@@ -244,6 +256,28 @@ public final class TIGLHelper {
         return getAllTIGLRanks().stream()
                 .filter(r -> r.getIndex() == -1)
                 .sorted(Comparator.comparing(TIGLRank::toString))
+                .toList();
+    }
+
+    public static List<String> filterStandardTiglRankOptionsAtOrBelow(User user, List<String> options) {
+        return filterStandardTiglRankOptionsAtOrBelow(
+                getUsersHighestTIGLRank(user, false).getIndex(), options);
+    }
+
+    public static List<String> filterStandardTiglRankOptionsAtOrBelow(List<User> users, List<String> options) {
+        if (users.isEmpty()) {
+            return List.of();
+        }
+        return filterStandardTiglRankOptionsAtOrBelow(
+                getLowestCommonRankBetweenPlayers(users, false).getIndex(), options);
+    }
+
+    private static List<String> filterStandardTiglRankOptionsAtOrBelow(int maxIndex, List<String> options) {
+        return options.stream()
+                .filter(opt -> {
+                    TIGLRank rank = TIGLRank.fromString(opt);
+                    return rank != null && rank.getIndex() >= 0 && rank.getIndex() <= maxIndex;
+                })
                 .toList();
     }
 
@@ -297,6 +331,11 @@ public final class TIGLHelper {
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
         for (User user : users) {
+            // Player.getUser() returns null when JDA can't resolve the id (uncached user, left the server).
+            // Such a player can't be confirmed as a hub member - and dereferencing it here used to NPE.
+            if (user == null) {
+                return false;
+            }
             Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
             if (hubMember == null) {
                 return false;

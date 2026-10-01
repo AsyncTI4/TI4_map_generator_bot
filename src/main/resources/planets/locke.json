@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "locke",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 95
+        }
+    },
     "id": "locke",
     "tileId": "c02",
     "name": "Locke",

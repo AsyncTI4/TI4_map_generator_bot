@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kraag",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "kraag",
     "tileId": "70",
     "name": "Kraag",

@@ -6,6 +6,7 @@ enum LogSeverity {
     Info("bot-log-info", "### INFO\n", Level.INFO),
     Warning("bot-log-warning", "## WARNING\n", Level.WARNING),
     Error("bot-log-error", "## ERROR\n", Level.ERROR),
+    SpammyError("spammy-bot-log-error", "## ERROR\n", Level.ERROR),
     Critical("bot-log-critical", "## CRITICAL\n", Level.CRITICAL);
 
     final String channelName;

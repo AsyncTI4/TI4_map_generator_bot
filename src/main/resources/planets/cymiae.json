@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cymiae",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "cymiae",
     "tileId": "d30",
     "name": "Cymiae",

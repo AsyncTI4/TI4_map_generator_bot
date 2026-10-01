@@ -53,7 +53,7 @@ public class TeHelperCommanders {
 
         // Notify the DWS commander holder that their discount was used
         String message = dws.getRepresentation(true, true) + " ";
-        message += game.isFowMode() ? player.getColorIfCanSeeStats(dws) : player.getRepresentation(true, false);
+        message += FoWHelper.identityOrColorIfCanSeeStats(game, player, dws, player.getRepresentation(true, false));
         message += " has used Aello to get a discount on researching.";
         message += " Use these buttons to gain or convert 1 commodity.";
         message += "\n-# You have (" + dws.getCommoditiesRepresentation() + ") commodities.";
@@ -208,7 +208,7 @@ public class TeHelperCommanders {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock, UnitType.Monument).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
                 if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 

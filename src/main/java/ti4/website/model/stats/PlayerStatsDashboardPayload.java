@@ -304,7 +304,7 @@ public class PlayerStatsDashboardPayload {
     }
 
     @JsonIgnore // Dashboard doesn't use this yet
-    public List<Object> getUnitModifiers() {
+    public static List<Object> getUnitModifiers() {
         return Collections.emptyList();
     }
 

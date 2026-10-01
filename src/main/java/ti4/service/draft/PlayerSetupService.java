@@ -1,5 +1,7 @@
 package ti4.service.draft;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,12 +13,15 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -39,6 +44,7 @@ import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.game.MonumentsService;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.info.LeaderInfoService;
@@ -46,6 +52,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.map.FractureService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
 import ti4.service.player.PlayerColorService;
@@ -284,11 +291,17 @@ public class PlayerSetupService {
         // STARTING OWNED UNITS
         Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
+        MonumentsService.addFactionMonument(player, game);
         if (game.isBaseGameMode()) {
             UnitModel mech = player.getUnitByBaseType("mech");
             if (mech != null) {
                 player.removeOwnedUnitByID(mech.getId());
             }
+        }
+
+        // In Twilight's Fall, every faction (including Franken) should always start with the base TF War Sun
+        if (game.isTwilightsFallMode()) {
+            player.addOwnedUnitByID("tf_warsun");
         }
 
         // Don't do special stuff if Franken Faction
@@ -496,6 +509,12 @@ public class PlayerSetupService {
                             + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
                             + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
         }
+        if (player.hasAbility("phoenix_rising")) {
+            AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "12 infantry");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " added 12 captured infantry to their faction sheet.");
+        }
         if (player.hasAbility("mechanized_military")) {
             String unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 6);
@@ -510,6 +529,18 @@ public class PlayerSetupService {
         if (player.hasAbility("primordial_secrets")) {
             ArcanumAbilityHandler.offerPrimordialSecretsButtons(game, player);
         }
+        if (player.hasAbility("custom_rigs")) {
+            ScrapyardAbilitiesHandler.getScrapyardRigsButtons(game, player);
+        }
+        if ("scrapyard".equalsIgnoreCase(player.getFaction())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", use the buttons below to setup your starting fleet."
+                            + " You must place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, and 2 structures."
+                            + "\nYou do not have to pay for them.");
+            ButtonHelper.offerBuildOrRemove(player, game, player.getHomeSystemTile());
+        }
         if (player.hasAbility("call_of_the_haunted")) {
             RevenantAbilityHandler.offerCallOfTheHauntedButtons(game, player);
         }
@@ -520,9 +551,20 @@ public class PlayerSetupService {
                             + " added the three \"Factory Lease\" promissory notes to their reinforcements.");
         }
         if (player.hasAbility("cycle_of_reclamation")) {
+            player.addRelic("full_moonphase");
+            player.addRelic("waxing_moonphase");
+            player.addRelic("waning_moonphase");
+            player.addRelic("new_moonphase");
+            player.addRelic("lunar_eclipse_moonphase");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
+        }
+        if (player.hasAbility("thrones_of_ruin")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Select the Throne planet you would like to place in your home system:");
+            ThronesAbilityHandler.getUnplacedThronePlanetButtons(event, game, player);
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
@@ -544,7 +586,7 @@ public class PlayerSetupService {
         if ("d11".equalsIgnoreCase(hsTile)) {
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
-        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports"))) {
+        if ("true".equalsIgnoreCase(game.getStoredValue("removeSupports")) || game.isMuaatManiaMode()) {
             player.removeOwnedPromissoryNoteByID(player.getColor() + "_sftt");
             player.removePromissoryNote(player.getColor() + "_sftt");
         }
@@ -575,6 +617,32 @@ public class PlayerSetupService {
                         player.getCorrectChannel(),
                         "You cannot do _Rapid Mobilization_ __yet__, but once the map is setup, you can use this button to do so.",
                         buttons);
+            }
+        }
+        if (isSpeaker && !FractureService.isFractureInPlay(game)) {
+            if (game.isRapidMobilizationMode() || game.isCosmicConvergenceMode()) {
+                FractureService.spawnFracture(event, game);
+                FractureService.spawnIngressTokens(event, game, player, "nah");
+            }
+        }
+        if (game.isMuaatManiaMode()) {
+            player.addOwnedUnitByID("mm_warsun");
+            if (player.getHomeSystemTile() != null) {
+                AddUnitService.addUnits(event, tile, game, color, "ws");
+            }
+        }
+
+        if (game.isMonumentsMode()
+                && game.getStoredValue("monumentsSetupAnnouncementSent").isEmpty()) {
+            game.setStoredValue("monumentsSetupAnnouncementSent", "true");
+            String helpFileName = "Monuments.txt";
+            String path = ResourceHelper.getHelpFile(helpFileName);
+            try {
+                String message = Files.readString(Paths.get(path));
+                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), message);
+            } catch (Exception e) {
+                MessageHelper.sendMessageToChannel(
+                        game.getTableTalkChannel(), "HELP FILE " + helpFileName + " IS BLANK");
             }
         }
     }

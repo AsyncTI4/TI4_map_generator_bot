@@ -66,6 +66,10 @@ public class MiltyService {
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
+        game.setStoredValue(
+                Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(
+                        settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.sendTIGLSetupText(game);
         }
@@ -97,6 +101,7 @@ public class MiltyService {
         }
 
         draftManager.init(sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
         draftManager.setMapTemplate(specs.template.getAlias());
         game.setMapTemplateID(specs.template.getAlias());
         List<String> players = new ArrayList<>(specs.playerIDs);
@@ -250,7 +255,7 @@ public class MiltyService {
      * - Per-source constraints cap/guarantee the remaining slots per expansion.
      * - If constraints is null/empty, falls back to the original unconstrained shuffle.
      */
-    static List<String> createFactionDraft(
+    public static List<String> createFactionDraft(
             int factionCount,
             List<String> factions,
             List<String> firstFactions,

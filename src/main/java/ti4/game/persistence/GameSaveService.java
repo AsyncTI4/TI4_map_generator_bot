@@ -1,23 +1,6 @@
 package ti4.game.persistence;
 
-import static ti4.game.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.TILE;
-import static ti4.game.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.UNITS;
+import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -178,6 +161,9 @@ class GameSaveService {
         Map<String, String> discardStatus = new LinkedHashMap<>(game.getDiscardACStatus().entrySet().stream()
                 .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().toString())));
         writeCardsStrings(discardStatus, writer, Constants.AC_STATUS);
+
+        writer.write(Constants.AC_PLAYED + " " + String.join(",", game.getPlayedActionCards()));
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));
         writer.write(System.lineSeparator());
@@ -569,7 +555,13 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.MONUMENTS_TO_THE_AGES_MODE + " " + game.isMonumentToTheAgesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MONUMENTS_MODE + " " + game.isMonumentsMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.COSMIC_CONVERGENCE_MODE + " " + game.isCosmicConvergenceMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MUAAT_MANIA_MODE + " " + game.isMuaatManiaMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.NO_FRACTURE + " " + game.isNoFractureMode());
         writer.write(System.lineSeparator());
@@ -600,6 +592,8 @@ class GameSaveService {
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIBERATION_C4_MODE + " " + game.isLiberationC4Mode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ERWANS_GAMBIT_MODE + " " + game.isErwansGambitMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
@@ -653,7 +647,11 @@ class GameSaveService {
         writeStrLine(writer, Constants.GENOME_DECK_ID, game.getGenomeSpliceDeckID());
         writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
         writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
+        // isTwilightKart is Deprecated. Once removed, remove this line
         writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
+        writeBoolLine(writer, Constants.TK_DESTROYER_CUP, game.isTkDestroyerCup());
+        writeBoolLine(writer, Constants.TK_NOVA_CUP, game.isTkNovaCup());
+        writeBoolLine(writer, Constants.TF_BR, game.isTfBr());
         writeBoolLine(writer, Constants.TWILIGHT_DS, game.isTwilightDS());
 
         writer.write(Constants.BAG_DRAFT + " "
@@ -990,6 +988,8 @@ class GameSaveService {
 
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
+            writer.write(Constants.STASIS_FIGHTERS + " " + player.getStasisFighters());
+            writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
 
@@ -1270,6 +1270,10 @@ class GameSaveService {
 
         writer.write(TOKENS);
         writer.write(System.lineSeparator());
+        if (!tile.getFowVisionGrant().isEmpty()) {
+            writer.write(FOW_VISION_GRANT + " " + String.join(",", tile.getFowVisionGrant()));
+            writer.write(System.lineSeparator());
+        }
 
         writer.write(ENDTOKENS);
         writer.write(System.lineSeparator());

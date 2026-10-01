@@ -16,6 +16,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CommandCounterHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.planet.AsgardLegendaryService;
 
 @UtilityClass
 class RalNelButtonHandler {
@@ -49,6 +50,7 @@ class RalNelButtonHandler {
                 player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
                 buttons);
         if (game.getTileByPosition(pos).isGravityRift()
+                && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(

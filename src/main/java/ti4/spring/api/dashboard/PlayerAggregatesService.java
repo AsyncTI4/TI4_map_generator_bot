@@ -305,7 +305,7 @@ class PlayerAggregatesService {
     /**
      * Computes all aggregate views from final game state.
      */
-    private ComputedAggregates computeAggregates(String userId, Collection<String> completedGameIds) {
+    private static ComputedAggregates computeAggregates(String userId, Collection<String> completedGameIds) {
         List<GameAggregateSnapshot> snapshots = loadPlayerSnapshotsPerGame(userId, completedGameIds);
 
         TechCountAccumulator techCounts = accumulateEligibleCounts(snapshots);
@@ -502,6 +502,17 @@ class PlayerAggregatesService {
                 || game.isLightFogMode()
                 || game.isRedTapeMode()
                 || game.isDiscordantStarsMode()
+                || game.isUnchartedSpaceStuff()
+                // isTwilightKart is deprecated. Once removed, just check isTkDestroyerCup
+                || game.isTwilightKart()
+                || game.isTkDestroyerCup()
+                || game.isTkNovaCup()
+                || game.isTfBr()
+                || game.isTwilightDS()
+                || game.isMuaatManiaMode()
+                || game.isCosmicConvergenceMode()
+                || game.isLiberationC4Mode()
+                || game.isErwansGambitMode()
                 || game.isMiltyModMode()
                 || game.isThundersEdgeDemo()
                 || game.isAbsolMode()

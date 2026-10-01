@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "prind",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "prind",
     "tileId": "d31",
     "name": "Prind",

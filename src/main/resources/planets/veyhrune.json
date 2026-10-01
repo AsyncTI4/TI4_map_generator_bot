@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "veyhrune",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "veyhrune",
     "tileId": "er125",
     "name": "Veyhrune",

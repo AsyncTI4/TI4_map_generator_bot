@@ -86,7 +86,7 @@ public class AddTileListService {
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            String tilePath = ResourceHelper.getTileFile(tileName);
             if (tilePath == null) {
                 throw new Exception("Could not find tile: " + tileID);
             }
@@ -100,14 +100,16 @@ public class AddTileListService {
     public static void finishSetup(Game game, @Nullable GenericInteractionCreateEvent event) {
         try {
             Tile tile;
-            if (game.getTileByPosition("tl") == null) {
-                game.setTile(new Tile("82a", "tl"));
-            } else {
-                if (game.getTileByPosition("tr") == null) {
-                    game.setTile(new Tile("82a", "tr"));
+            if (game.getTile("82a") == null) {
+                if (game.getTileByPosition("tl") == null) {
+                    game.setTile(new Tile("82a", "tl"));
                 } else {
-                    if (game.getTileByPosition("bl") == null) {
-                        game.setTile(new Tile("82a", "bl"));
+                    if (game.getTileByPosition("tr") == null) {
+                        game.setTile(new Tile("82a", "tr"));
+                    } else {
+                        if (game.getTileByPosition("bl") == null) {
+                            game.setTile(new Tile("82a", "bl"));
+                        }
                     }
                 }
             }

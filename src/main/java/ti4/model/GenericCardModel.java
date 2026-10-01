@@ -1,5 +1,6 @@
 package ti4.model;
 
+import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -19,9 +20,14 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     private String notes;
     CardType cardType;
     ComponentSource source;
+    private String homebrewReplacesID;
 
     public boolean isValid() {
         return alias != null && name != null && text != null && cardType != null && source != null;
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public String autoCompleteString() {

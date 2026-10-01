@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lor",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 203,
+            "y": 208
+        }
+    },
     "id": "lor",
     "tileId": "36",
     "name": "Lor",

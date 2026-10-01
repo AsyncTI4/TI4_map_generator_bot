@@ -7,8 +7,10 @@ import ti4.service.tactical.postmovement.CombatDronesButton;
 import ti4.service.tactical.postmovement.GhostCommanderButton;
 import ti4.service.tactical.postmovement.IronHeroButton;
 import ti4.service.tactical.postmovement.KhraskCommanderButton;
+import ti4.service.tactical.postmovement.KolleccMonumentButton;
 import ti4.service.tactical.postmovement.MirvedaCommanderButton;
 import ti4.service.tactical.postmovement.MoveAvernusButton;
+import ti4.service.tactical.postmovement.MoveIllustrionButton;
 import ti4.service.tactical.postmovement.MuaatHeroButton;
 import ti4.service.tactical.postmovement.NightbloomBuildButton;
 import ti4.service.tactical.postmovement.NokarAgentButton;
@@ -38,10 +40,12 @@ public final class PostMovementAbilityButtons {
             new IronHeroButton(),
             new GhostCommanderButton(),
             new KhraskCommanderButton(),
+            new KolleccMonumentButton(),
             new NokarAgentButton(),
             new TnelisAgentButton(),
             new ZelianAgentButton(),
             new MoveAvernusButton(),
+            new MoveIllustrionButton(),
             new MuaatHeroButton(),
             new NightbloomBuildButton(),
             new VaylerianBTButton(),

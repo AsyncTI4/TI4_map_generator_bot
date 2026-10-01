@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ethan",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 275,
+            "y": 155
+        }
+    },
     "id": "ethan",
     "tileId": "c11",
     "name": "Ethan",

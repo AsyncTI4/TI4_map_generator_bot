@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lirtaiv",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 205,
+            "y": 207
+        }
+    },
     "id": "lirtaiv",
     "tileId": "35",
     "name": "Lirta IV",

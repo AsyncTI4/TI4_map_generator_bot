@@ -1,0 +1,36 @@
+{
+    "id": "ef1",
+    "name": "Persephone",
+    "aliases": [
+        "ef1",
+        "persephone"
+    ],
+    "imagePath": "ef1.png",
+    "shipPositionsType": "TYPE09",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 255.0,
+            "y": 50.0
+        },
+        {
+            "x": 305.0,
+            "y": 105.0
+        },
+        {
+            "x": 115.0,
+            "y": 40.0
+        }
+    ],
+    "wormholes": [],
+    "hasIngress": true,
+    "isFracture": true,
+    "planets": [
+        "persephone"
+    ],
+    "source": "expanded_fracture",
+    "tileBack": "fracture"
+}

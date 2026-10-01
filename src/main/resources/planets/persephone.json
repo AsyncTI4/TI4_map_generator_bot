@@ -1,0 +1,121 @@
+{
+    "planetLayout": {
+        "unitHolderName": "persephone",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 236,
+            "y": 156
+        }
+    },
+    "id": "persephone",
+    "tileId": "ef1",
+    "name": "Persephone",
+    "aliases": [
+        "persephone"
+    ],
+    "positionInTile": {
+        "x": 236.0,
+        "y": 156.0
+    },
+    "radius": 55.0,
+    "resources": 3,
+    "influence": 3,
+    "factionHomeworld": null,
+    "planetType": "LIGHTNING",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Eleusinian Gardens",
+    "legendaryAbilityText": "Your monument gains: When a player activates this system, you may exhaust any number of planets; unless the active player exhausts an equal number of planets, end their turn. Neutral units are treated as if they exhausted 3 planets.",
+    "unitPositions": {
+        "unitHolderName": "persephone",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 198.0,
+                    "y": 148.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 258.0,
+                    "y": 183.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 203.0,
+                    "y": 175.0
+                },
+                {
+                    "x": 220.0,
+                    "y": 175.0
+                },
+                {
+                    "x": 237.0,
+                    "y": 175.0
+                },
+                {
+                    "x": 212.0,
+                    "y": 186.0
+                },
+                {
+                    "x": 230.0,
+                    "y": 186.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 205.0,
+                    "y": 104.0
+                },
+                {
+                    "x": 223.0,
+                    "y": 104.0
+                },
+                {
+                    "x": 198.0,
+                    "y": 117.0
+                },
+                {
+                    "x": 216.0,
+                    "y": 117.0
+                },
+                {
+                    "x": 234.0,
+                    "y": 117.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 217.0,
+                    "y": 145.0
+                },
+                {
+                    "x": 184.0,
+                    "y": 145.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 141.0,
+                    "y": 137.0
+                },
+                {
+                    "x": 149.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 268.0,
+                    "y": 137.0
+                },
+                {
+                    "x": 260.0,
+                    "y": 106.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "contrastColor": "orange",
+    "source": "expanded_fracture"
+}

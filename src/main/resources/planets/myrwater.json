@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "myrwater",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "myrwater",
     "tileId": "er49",
     "name": "Myrwater",

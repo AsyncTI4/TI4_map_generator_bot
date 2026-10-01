@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hulgade",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "hulgade",
     "tileId": "d02",
     "name": "Hulgade",
