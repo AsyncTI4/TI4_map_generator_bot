@@ -16,7 +16,7 @@
   <properties>
     <java.version>26</java.version>
     <lombok.version>1.18.48</lombok.version>
-    <jda.version>6.5.0</jda.version>
+    <jda.version>6.7.0</jda.version>
     <trove4j.version>3.0.3</trove4j.version>
     <aws.sdk.version>2.55.6</aws.sdk.version>
     <reflections.version>0.10.2</reflections.version>
