@@ -239,7 +239,7 @@
         "text": "Each planet you exhaust to cast votes that contains 1 or more of your units with PRODUCTION, provides additional votes equal to its resource value.\nWhen an outcome you voted for or predicted is resolved, you may exhaust this card and place 1 mech from your reinforcements on a planet you control. "
     },
     {
-        "alias": "ggindusty",
+        "alias": "ggindustry",
         "name": "Safework Bypass",
         "types": [
             "CYBERNETIC"
