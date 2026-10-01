@@ -79,12 +79,11 @@ public abstract class ListenerContext {
 
         if (game != null) {
             String userID = event.getUser().getId();
-            player = TestBedService.resolveActingPlayer(
-                    game,
-                    event.getMember(),
-                    userID,
-                    event.getChannel() == null ? null : event.getChannel().getId(),
-                    CommandHelper.getPlayerFromGame(game, event.getMember(), userID));
+            Player clickerPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
+            player = TestBedService.resolveActingPlayer(game, event, clickerPlayer);
+            if (player != null && player != clickerPlayer) {
+                TestBedService.logActingAs(game, event.getUser().getName(), player, getContextType() + " " + compID);
+            }
 
             if (player == null && !allowsNonPlayerInteraction()) {
                 String message = event.getUser().getAsMention() + " is not a player of the game";

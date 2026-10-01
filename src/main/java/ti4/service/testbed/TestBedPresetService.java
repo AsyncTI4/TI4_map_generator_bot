@@ -48,7 +48,15 @@ public class TestBedPresetService {
             .build();
 
     public static TestBedPreset parse(String json) {
-        return STRICT_MAPPER.readValue(json, TestBedPreset.class);
+        return parse(json, TestBedPreset.class);
+    }
+
+    static <T> T parse(String json, Class<T> type) {
+        return STRICT_MAPPER.readValue(json, type);
+    }
+
+    static String toJson(Object value) {
+        return STRICT_MAPPER.writeValueAsString(value);
     }
 
     public static Map<String, TestBedPreset> loadShippedPresets() {
@@ -71,14 +79,18 @@ public class TestBedPresetService {
     }
 
     static List<Path> shippedPresetFiles() {
-        Path folder = Path.of(ResourceHelper.getDataFolder(PRESET_FOLDER));
+        return jsonFilesIn(PRESET_FOLDER);
+    }
+
+    static List<Path> jsonFilesIn(String dataFolder) {
+        Path folder = Path.of(ResourceHelper.getDataFolder(dataFolder));
         if (!Files.isDirectory(folder)) return List.of();
         try (Stream<Path> files = Files.list(folder)) {
             return files.filter(file -> file.toString().endsWith(".json"))
                     .sorted()
                     .toList();
         } catch (IOException e) {
-            BotLogger.error("Could not list test bed presets in " + folder, e);
+            BotLogger.error("Could not list test bed files in " + folder, e);
             return List.of();
         }
     }
@@ -129,6 +141,8 @@ public class TestBedPresetService {
             errors.add("`combat` needs `start` to be `action`.");
         }
         validateSeatIdentities(seats, errors);
+        TestBedScriptService.validateShortcuts(
+                preset.getShortcuts(), TestBedScriptService.knownSeatNames(preset), errors);
         validateHandContents(preset.getDefaults(), "defaults", errors);
         for (int i = 0; i < seats.size(); i++) {
             validateHandContents(seats.get(i), seatLabel(preset, i), errors);
@@ -192,7 +206,7 @@ public class TestBedPresetService {
         }
     }
 
-    private static void validateHandContents(@Nullable Seat seat, String label, List<String> errors) {
+    static void validateHandContents(@Nullable Seat seat, String label, List<String> errors) {
         if (seat == null) return;
         validateCardIds(seat.getAcs(), Mapper::isValidActionCard, label, "action card", errors);
         validateCardIds(seat.getSos(), Mapper::isValidSecretObjective, label, "secret objective", errors);

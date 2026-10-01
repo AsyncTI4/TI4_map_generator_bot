@@ -7,5 +7,16 @@
     { "faction": "jolnar", "sc": 7, "relics": 1 }
   ],
   "defaults": { "acs": 3, "sos": 1, "tg": 3, "commodities": 2, "ccs": "3/3/2" },
-  "start": "action"
+  "start": "action",
+  "shortcuts": [
+    { "label": "Everyone to 5 TG", "steps": [ { "do": "hand", "as": "all", "hand": { "tg": 5 } } ] },
+    { "label": "Sol plays Politics", "steps": [ { "as": "sol", "press": "strategicAction_3" } ] },
+    {
+      "label": "Hacan gets Sabotage",
+      "steps": [
+        { "do": "hand", "as": "hacan", "hand": { "acs": ["sabo2"] } },
+        { "expect": { "state": "hacan.acIds", "contains": "sabo2" } }
+      ]
+    }
+  ]
 }

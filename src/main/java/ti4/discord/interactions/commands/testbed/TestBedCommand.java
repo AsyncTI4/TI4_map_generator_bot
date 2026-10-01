@@ -20,7 +20,9 @@ public class TestBedCommand implements ParentCommand {
                     new TestBedActAs(),
                     new TestBedStatus(),
                     new TestBedApply(),
-                    new TestBedReset())
+                    new TestBedReset(),
+                    new TestBedPanel(),
+                    new TestBedRun())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

@@ -1,0 +1,19 @@
+{
+  "name": "smoke-normal",
+  "description": "Normal game: Sol plays Politics, Hacan follows, Jol-Nar declines, Sol ends the turn.",
+  "preset": "action-3p",
+  "settleSeconds": 2,
+  "steps": [
+    { "expect": { "state": "game.activePlayer", "equals": "sol" } },
+    { "as": "sol", "press": "strategicAction_3" },
+    { "expect": { "state": "game.playedScs", "equals": "3" } },
+    { "as": "hacan", "press": "sc_follow_3" },
+    { "expect": { "state": "hacan.followed", "contains": "3" } },
+    { "expect": { "state": "hacan.ccs", "equals": "3/3/1" } },
+    { "as": "jolnar", "press": "sc_no_follow_3" },
+    { "expect": { "state": "jolnar.followed", "contains": "3" } },
+    { "expect": { "state": "jolnar.ccs", "equals": "3/3/2" } },
+    { "as": "sol", "press": "End Turn" },
+    { "expect": { "state": "game.activePlayer", "equals": "hacan" } }
+  ]
+}

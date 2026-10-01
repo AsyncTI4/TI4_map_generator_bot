@@ -18,6 +18,7 @@ import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.HandlerRegistry;
+import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -61,10 +62,31 @@ public class ButtonProcessor {
 
     public static void queue(ButtonInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String componentId = event.getButton().getCustomId();
-        ExecutionLockType lockType = registry.isSave(componentId) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
+                eventToString(event, gameName),
+                gameName,
+                event.getMessageChannel(),
+                () -> process(event),
+                lockType(event));
+    }
+
+    public static void processNow(ButtonInteractionEvent event) {
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        if (gameName == null) {
+            process(event);
+            return;
+        }
+        ExecutionLockType lockType = lockType(event);
+        ExecutionLockManager.lock(gameName, lockType);
+        try {
+            process(event);
+        } finally {
+            ExecutionLockManager.unlock(gameName, lockType);
+        }
+    }
+
+    private static ExecutionLockType lockType(ButtonInteractionEvent event) {
+        return registry.isSave(event.getButton().getCustomId()) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {

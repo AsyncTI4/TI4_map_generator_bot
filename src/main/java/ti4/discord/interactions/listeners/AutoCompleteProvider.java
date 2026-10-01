@@ -88,6 +88,8 @@ import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.service.testbed.TestBedPresetService;
+import ti4.service.testbed.TestBedScriptService;
+import ti4.service.testbed.TestBedService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -1377,7 +1379,8 @@ class AutoCompleteProvider {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                Player viewer = game.getPlayer(event.getUser().getId());
+                Player viewer = TestBedService.resolveActingPlayer(
+                        game, event, game.getPlayer(event.getUser().getId()));
                 boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
                 Map<String, Integer> discardActionCardIDs = game.getDiscardActionCards();
                 List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
@@ -1501,10 +1504,15 @@ class AutoCompleteProvider {
 
     private static void resolveTestBedAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
-        if (!"preset".equals(optionName)) return;
+        Set<String> names =
+                switch (optionName) {
+                    case "preset" -> TestBedPresetService.loadShippedPresets().keySet();
+                    case "script" -> TestBedScriptService.loadShippedScripts().keySet();
+                    default -> null;
+                };
+        if (names == null) return;
         String enteredValue = event.getFocusedOption().getValue();
-        Set<String> presetNames = TestBedPresetService.loadShippedPresets().keySet();
-        event.replyChoices(mapTo25ChoicesThatContain(presetNames, enteredValue))
+        event.replyChoices(mapTo25ChoicesThatContain(names, enteredValue))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

@@ -1,6 +1,7 @@
 package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ public class TestBedPreset {
     private Seat defaults;
     private String start = "setup";
     private List<String> combat = new ArrayList<>();
+    private List<TestBedScript.Shortcut> shortcuts = new ArrayList<>();
 
     public List<Seat> allSeats() {
         List<Seat> all = new ArrayList<>();
@@ -63,6 +65,14 @@ public class TestBedPreset {
     }
 
     public record CardPick(List<String> ids, int random) {
+
+        @JsonValue
+        public Object toJson() {
+            if (ids.isEmpty()) return random;
+            List<Object> entries = new ArrayList<>(ids);
+            if (random > 0) entries.add(random);
+            return entries;
+        }
 
         @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
         public static CardPick from(Object raw) {

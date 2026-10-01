@@ -46,6 +46,7 @@ public class TestBedApplyService {
     public static List<String> apply(Game game, TestBedPreset preset, GenericInteractionCreateEvent event) {
         List<String> warnings = new ArrayList<>();
         TestBedService.markAsTestBed(game, true);
+        TestBedShortcuts.store(game, preset.getShortcuts());
         placeMap(game, preset, warnings);
         List<SeatPlan> plans = planSeats(game, preset, event.getUser());
         if (game.isFowMode()) prepareFog(game, plans, event.getMember(), warnings);
@@ -183,7 +184,7 @@ public class TestBedApplyService {
         }
     }
 
-    private static void applyHand(
+    static void applyHand(
             Game game, Player player, Seat seat, GenericInteractionCreateEvent event, List<String> warnings) {
         drawActionCards(game, player, seat.getAcs(), warnings);
         drawSecretObjectives(game, player, seat.getSos(), warnings);

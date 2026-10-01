@@ -13,6 +13,7 @@ import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.service.testbed.TestBedService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
@@ -64,7 +65,8 @@ public class StellarConverterService {
 
         message2.append(" by ");
         if (player == null) {
-            player = game.getPlayer(event.getUser().getId());
+            player = TestBedService.resolveActingPlayer(
+                    game, event, game.getPlayer(event.getUser().getId()));
         }
         message2.append(player.getRepresentation());
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");

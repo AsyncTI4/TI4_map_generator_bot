@@ -29,6 +29,7 @@ public class TestBedResetService {
         resetGameState(game);
         TestBedService.clearAllActingAs(game);
         TestBedService.markAsTestBed(game, false);
+        game.removeStoredValue(TestBedShortcuts.STORED_KEY);
         return new ResetResult(removedSeats, resetSeats, missingChannels);
     }
 
@@ -46,7 +47,7 @@ public class TestBedResetService {
     private static void resetGameState(Game game) {
         game.clearTileMap();
         game.setSpeakerUserID("");
-        game.updateActivePlayer(null);
+        game.setActivePlayerID(null);
         game.setPhaseOfGame("");
         game.setRound(1);
         game.setActionCards(new ArrayList<>(Mapper.getDeck(game.getAcDeckID()).getNewShuffledDeck()));

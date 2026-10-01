@@ -24,6 +24,7 @@ import ti4.service.fow.CreateFoWGameService;
 public class TestBedChannelService {
 
     static final String CREATED_CHANNELS_KEY = "testBedChannels";
+    private static final String CHANNEL_SEPARATOR = "_";
     private static final long SEAT_CHANNEL_PERMISSIONS =
             Permission.VIEW_CHANNEL.getRawValue() | Permission.PIN_MESSAGES.getRawValue();
 
@@ -73,13 +74,13 @@ public class TestBedChannelService {
         List<String> ids = createdChannelIds(game);
         if (ids.contains(channelId)) return;
         ids.add(channelId);
-        game.setStoredValue(CREATED_CHANNELS_KEY, String.join(",", ids));
+        TestBedService.store(game, CREATED_CHANNELS_KEY, String.join(CHANNEL_SEPARATOR, ids));
     }
 
     static List<String> createdChannelIds(Game game) {
         String stored = game.getStoredValue(CREATED_CHANNELS_KEY);
         if (stored.isBlank()) return new ArrayList<>();
-        return new ArrayList<>(Arrays.asList(stored.split(",")));
+        return new ArrayList<>(Arrays.asList(stored.split(CHANNEL_SEPARATOR)));
     }
 
     public static int deleteCreatedChannels(Game game) {

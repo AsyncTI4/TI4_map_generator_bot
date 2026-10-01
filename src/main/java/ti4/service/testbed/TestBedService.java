@@ -2,14 +2,18 @@ package ti4.service.testbed;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.service.fow.GMService;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
 @UtilityClass
@@ -18,6 +22,7 @@ public class TestBedService {
     static final String TEST_BED_KEY = "testBed";
     static final String ACTING_AS_PREFIX = "testBedActingAs_";
     public static final String VIRTUAL_SEAT_ID_PREFIX = "90000000000000";
+    private static final Set<Integer> SAVE_FORMAT_SEPARATORS = Set.of((int) ',', (int) ':', (int) '\n');
 
     public static boolean isEnabled() {
         return ImplementedSettings.TESTBED_ENABLED.getAsBoolean(false);
@@ -31,9 +36,20 @@ public class TestBedService {
         return game != null && "true".equals(game.getStoredValue(TEST_BED_KEY));
     }
 
+    public static boolean isSaveSafe(String value) {
+        return value.chars().noneMatch(SAVE_FORMAT_SEPARATORS::contains);
+    }
+
+    static void store(Game game, String key, String value) {
+        if (!isSaveSafe(key) || !isSaveSafe(value)) {
+            throw new IllegalArgumentException("Stored value `" + key + "` would corrupt the game save: " + value);
+        }
+        game.setStoredValue(key, value);
+    }
+
     public static void markAsTestBed(Game game, boolean testBed) {
         if (testBed) {
-            game.setStoredValue(TEST_BED_KEY, "true");
+            store(game, TEST_BED_KEY, "true");
         } else {
             game.removeStoredValue(TEST_BED_KEY);
         }
@@ -78,7 +94,7 @@ public class TestBedService {
         if (seat == null) {
             game.removeStoredValue(ACTING_AS_PREFIX + userId);
         } else {
-            game.setStoredValue(ACTING_AS_PREFIX + userId, seat.getFaction());
+            store(game, ACTING_AS_PREFIX + userId, seat.getFaction());
         }
     }
 
@@ -97,6 +113,22 @@ public class TestBedService {
             @Nullable Player defaultPlayer) {
         if (!isTestBed(game) || !isDeveloper(member)) return defaultPlayer;
         return resolveForDeveloper(game, userId, channelId, defaultPlayer);
+    }
+
+    @Nullable
+    public static Player resolveActingPlayer(
+            Game game, GenericInteractionCreateEvent event, @Nullable Player defaultPlayer) {
+        Channel channel = event.getChannel();
+        return resolveActingPlayer(
+                game,
+                event.getMember(),
+                event.getUser().getId(),
+                channel == null ? null : channel.getId(),
+                defaultPlayer);
+    }
+
+    public static void logActingAs(Game game, String developerName, Player seat, String action) {
+        GMService.logActivity(game, "[dev " + developerName + " as " + seat.getFaction() + "] `" + action + "`", false);
     }
 
     @Nullable
