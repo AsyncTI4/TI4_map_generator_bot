@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.JdaService;
@@ -66,9 +67,18 @@ public class TestBedService {
     @Nullable
     public static Player findNonDeveloper(@Nullable Guild guild, Collection<Player> players) {
         return players.stream()
-                .filter(player -> !isVirtualSeat(player) && !isDeveloperId(guild, player.getUserID()))
+                .filter(player -> !isVirtualSeat(player)
+                        && !isBot(guild, player.getUserID())
+                        && !isDeveloperId(guild, player.getUserID()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static boolean isBot(@Nullable Guild guild, String userId) {
+        Member member = guild == null ? null : guild.getMemberById(userId);
+        User user =
+                member != null ? member.getUser() : JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
+        return user != null && user.isBot();
     }
 
     public static boolean isVirtualSeat(Player player) {

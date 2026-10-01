@@ -1,6 +1,7 @@
 package ti4.service.testbed;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -141,5 +142,18 @@ class TestBedPressTest extends BaseTi4Test {
         }
         assertTrue(checked.size() > 10, "expected many abstract methods, got " + checked);
         assertEquals(List.of(), recorder.unsupportedCalls(), "checked " + Arrays.toString(checked.toArray()));
+    }
+
+    // JDA's own helper (default) methods must run for real, not be answered with null: a handler calling
+    // `event.getTimeCreated()` crashed a live script with a NullPointerException before this was fixed.
+    @Test
+    void jdaHelperMethodsRunForReal() throws Exception {
+        ButtonInteraction interaction = TestBedPress.standInEvent(message, passButton, developer, new Recorder())
+                .getInteraction();
+        assertNotNull(interaction.getTimeCreated());
+        for (Method method : ButtonInteraction.class.getMethods()) {
+            if (!method.isDefault() || method.getParameterCount() > 0) continue;
+            method.invoke(interaction);
+        }
     }
 }

@@ -70,6 +70,7 @@ public class TestBedScriptService {
         }
         if (script.getSteps().isEmpty()) errors.add("The script has no `steps`.");
         if (script.getSettleSeconds() < 0) errors.add("`settleSeconds` may not be negative.");
+        if (script.getTimeoutSeconds() < 0) errors.add("`timeoutSeconds` may not be negative.");
         Set<String> seatNames = knownSeatNames(preset);
         validateSteps(script.getSteps(), "step", seatNames, errors);
         validateShortcuts(script.getShortcuts(), seatNames, errors);

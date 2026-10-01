@@ -23,13 +23,15 @@ class TestBedRun extends GameStateSubcommand {
     static final String SCRIPT = "script";
     private static final String FILE = "file";
     private static final String STOP_ON_FAIL = "stop_on_fail";
+    private static final String RESET = "reset";
 
     TestBedRun() {
         super("run", "Run a test bed script: press buttons as seats and check the results", false, false);
         addOptions(
                 new OptionData(OptionType.STRING, SCRIPT, "Shipped script").setAutoComplete(true),
                 new OptionData(OptionType.ATTACHMENT, FILE, "Your own script .json (overrides script)"),
-                new OptionData(OptionType.BOOLEAN, STOP_ON_FAIL, "Stop at the first failing step"));
+                new OptionData(OptionType.BOOLEAN, STOP_ON_FAIL, "Stop at the first failing step"),
+                new OptionData(OptionType.BOOLEAN, RESET, "Reset the test bed first and apply the script's preset"));
     }
 
     @Override
@@ -49,8 +51,14 @@ class TestBedRun extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "The script is invalid:\n- " + String.join("\n- ", errors));
             return;
         }
-        if (!TestBedService.isTestBed(game)
-                && (script.getPreset() == null || !game.getRealPlayers().isEmpty())) {
+        boolean resetFirst = event.getOption(RESET, false, OptionMapping::getAsBoolean);
+        if (resetFirst && script.getPreset() == null) {
+            MessageHelper.replyToMessage(event, "`reset:true` needs a script with a `preset` to apply afterwards.");
+            return;
+        }
+        boolean presetWillApply = script.getPreset() != null
+                && (resetFirst || game.getRealPlayers().isEmpty());
+        if (!TestBedService.isTestBed(game) && !presetWillApply) {
             MessageHelper.replyToMessage(
                     event,
                     "This game is not a test bed. Use a script with a `preset` in a fresh game, or apply one first.");
@@ -62,7 +70,7 @@ class TestBedRun extends GameStateSubcommand {
                 event,
                 "Running script **" + (script.getName() == null ? "custom" : script.getName()) + "** ("
                         + script.getSteps().size() + " steps). The report follows in this channel.");
-        TestBedScriptRunner.start(game, script, event);
+        TestBedScriptRunner.start(game, script, event, resetFirst);
     }
 
     @Nullable

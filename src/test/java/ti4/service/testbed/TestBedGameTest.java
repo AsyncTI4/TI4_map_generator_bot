@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static ti4.service.testbed.TestBedFixture.DEV_ID;
 
 import java.util.List;
@@ -13,6 +15,9 @@ import java.util.stream.IntStream;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -72,6 +77,21 @@ class TestBedGameTest extends BaseTi4Test {
         assertSame(developer, TestBedService.resolveActingPlayer(game, null, DEV_ID, "seat-channel", developer));
     }
 
+    // Bots that sit in a game (a dice bot, for example) must not block `apply` as if they were real players.
+    @Test
+    void botsDoNotCountAsNonDevelopers() {
+        Player diceBot = game.addPlayer("555", "Dicecord");
+        User botUser = mock(User.class);
+        when(botUser.isBot()).thenReturn(true);
+        Member botMember = mock(Member.class);
+        when(botMember.getUser()).thenReturn(botUser);
+        Guild guild = mock(Guild.class);
+        when(guild.getMemberById("555")).thenReturn(botMember);
+
+        assertNull(TestBedService.findNonDeveloper(guild, List.of(diceBot, nekro)));
+        assertSame(developer, TestBedService.findNonDeveloper(guild, List.of(diceBot, developer)));
+    }
+
     @Test
     void actAsStateIsPerUserAndClearable() {
         assertTrue(TestBedService.isVirtualSeat(nekro));
@@ -96,6 +116,7 @@ class TestBedGameTest extends BaseTi4Test {
         game.setSpeakerUserID(DEV_ID);
         game.drawActionCard(nekro.getUserID(), 3);
         TestBedService.setActingAs(game, DEV_ID, nekro);
+        game.setStoredValue(TestBedApplyService.APPLIED_PRESET_KEY, "action-3p");
         int fullDeck = Mapper.getDeck(game.getAcDeckID()).getNewShuffledDeck().size();
 
         ResetResult result = TestBedResetService.reset(game);
@@ -112,6 +133,7 @@ class TestBedGameTest extends BaseTi4Test {
         assertFalse(TestBedService.isMarkedAsTestBed(game));
         assertNull(TestBedService.getActingAs(game, DEV_ID));
         assertTrue(TestBedChannelService.createdChannelIds(game).isEmpty());
+        assertEquals("", TestBedApplyService.appliedPreset(game));
     }
 
     // Every advertised state path must be implemented; adding a field to the list without a resolver fails here.

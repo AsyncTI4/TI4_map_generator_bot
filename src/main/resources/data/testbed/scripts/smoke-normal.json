@@ -13,7 +13,7 @@
     { "as": "jolnar", "press": "sc_no_follow_3" },
     { "expect": { "state": "jolnar.followed", "contains": "3" } },
     { "expect": { "state": "jolnar.ccs", "equals": "3/3/2" } },
-    { "as": "sol", "press": "End Turn" },
+    { "as": "sol", "pressId": "FFCC_sol_turnEnd" },
     { "expect": { "state": "game.activePlayer", "equals": "hacan" } }
   ]
 }

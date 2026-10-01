@@ -62,8 +62,10 @@ format reference. This file covers how you work with it.
 - **Know what a script cannot see:** messages from before it started (including everything the preset did),
   modal contents, select menus, combat threads, reactions and slash commands. Check those through state, or list
   them for the developer to verify by hand.
-- **Timing:** the default `settleSeconds` is 2. Raise it on a step that posts a lot (map renders, phase starts:
-  about 5), not for the whole script. Crons and timers need a `wait` before their results are checked.
+- **Timing:** `press` waits for its button and positive checks retry, both for up to `timeoutSeconds`
+  (default 20). Absence checks (`notContains`, `noFactionLeak`) run once after `settleSeconds` (default 2): raise
+  that on the step before them when the action posts a lot. Crons and timers need a `wait`.
+- **Use ids, not labels, for buttons whose label carries state** (`End Turn (+1 ability)`, `Tactical Action (3)`).
 - JSON cannot hold comments: put intent in `description` and `note` steps.
 
 ## Extending the framework
@@ -79,7 +81,8 @@ Only when a script genuinely needs it, and say so in the hand-over:
 
 End with a short message to the developer containing:
 1. **What the script tests,** in one sentence, and the file path.
-2. **How to run it:** "In a new normal (or fog) game: `/testbed run script:<name>`" (or `file:` for an attachment).
+2. **How to run it:** "`/testbed run script:<name> reset:true` in a test-bed game, or `/testbed run script:<name>` in
+   a new normal (or fog) game" (`file:` for an attachment).
 3. **What a pass looks like:** the steps that must be ✅, and which message or state each one proves.
 4. **Button ids used,** each with the file and line it came from.
 5. **Not covered:** anything the script cannot check that needs a manual look.

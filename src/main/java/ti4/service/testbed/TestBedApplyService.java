@@ -47,6 +47,7 @@ public class TestBedApplyService {
         List<String> warnings = new ArrayList<>();
         TestBedService.markAsTestBed(game, true);
         TestBedShortcuts.store(game, preset.getShortcuts());
+        recordAppliedPreset(game, preset);
         placeMap(game, preset, warnings);
         List<SeatPlan> plans = planSeats(game, preset, event.getUser());
         if (game.isFowMode()) prepareFog(game, plans, event.getMember(), warnings);
@@ -97,6 +98,20 @@ public class TestBedApplyService {
             }
             StartCombatService.combatCheck(game, event, tile);
         }
+    }
+
+    static final String APPLIED_PRESET_KEY = "testBedPreset";
+    private static final String CUSTOM_PRESET = "custom";
+
+    private static void recordAppliedPreset(Game game, TestBedPreset preset) {
+        String name = preset.getName() == null || !TestBedService.isSaveSafe(preset.getName())
+                ? CUSTOM_PRESET
+                : preset.getName();
+        TestBedService.store(game, APPLIED_PRESET_KEY, name);
+    }
+
+    public static String appliedPreset(Game game) {
+        return game.getStoredValue(APPLIED_PRESET_KEY);
     }
 
     private static void placeMap(Game game, TestBedPreset preset, List<String> warnings) {

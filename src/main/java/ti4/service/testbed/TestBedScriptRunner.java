@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.Member;
@@ -36,6 +37,7 @@ import ti4.service.turn.StartTurnService;
 public final class TestBedScriptRunner {
 
     private static final int HISTORY_SIZE = 50;
+    private static final long POLL_MILLIS = 2000;
     private static final int MAX_DETAIL = 160;
 
     private enum Status {
@@ -54,13 +56,19 @@ public final class TestBedScriptRunner {
     private final Member developer;
     private final MessageChannel reportChannel;
     private final boolean quiet;
+    private final boolean resetFirst;
     private final List<Result> results = new ArrayList<>();
     private final Map<String, Long> baselines = new HashMap<>();
     private Recorder lastPress = new Recorder();
     private String placeholderProblems = "";
 
     private TestBedScriptRunner(
-            Game game, String title, TestBedScript script, GenericInteractionCreateEvent origin, boolean quiet) {
+            Game game,
+            String title,
+            TestBedScript script,
+            GenericInteractionCreateEvent origin,
+            boolean quiet,
+            boolean resetFirst) {
         this.gameName = game.getName();
         this.title = title;
         this.script = script;
@@ -68,11 +76,13 @@ public final class TestBedScriptRunner {
         this.developer = origin.getMember();
         this.reportChannel = origin.getMessageChannel();
         this.quiet = quiet;
+        this.resetFirst = resetFirst;
     }
 
-    public static void start(Game game, TestBedScript script, GenericInteractionCreateEvent origin) {
+    public static void start(
+            Game game, TestBedScript script, GenericInteractionCreateEvent origin, boolean resetFirst) {
         String title = script.getName() == null ? "custom" : script.getName();
-        TestBedScriptRunner runner = new TestBedScriptRunner(game, title, script, origin, false);
+        TestBedScriptRunner runner = new TestBedScriptRunner(game, title, script, origin, false, resetFirst);
         ExecutorServiceManager.runAsync("test bed script " + title, runner::runAndReport);
     }
 
@@ -80,7 +90,7 @@ public final class TestBedScriptRunner {
         TestBedScript script = new TestBedScript();
         script.setName(label);
         script.setSteps(steps);
-        TestBedScriptRunner runner = new TestBedScriptRunner(game, label, script, origin, true);
+        TestBedScriptRunner runner = new TestBedScriptRunner(game, label, script, origin, true, false);
         ExecutorServiceManager.runAsync("test bed shortcut " + label, runner::runAndReport);
     }
 
@@ -103,7 +113,7 @@ public final class TestBedScriptRunner {
             add(0, "start", Status.FAIL, "run by a server member", "no member");
             return;
         }
-        if (!applyPresetIfNeeded()) return;
+        if (!resetIfAsked() || !applyPresetIfNeeded()) return;
         if (!TestBedService.isTestBed(current())) {
             add(0, "start", Status.FAIL, "a test bed game", "not a test bed");
             return;
@@ -123,11 +133,43 @@ public final class TestBedScriptRunner {
         }
     }
 
+    private boolean resetIfAsked() {
+        if (!resetFirst) return true;
+        Game game = current();
+        if (!TestBedService.isTestBed(game) || game.getRealPlayers().isEmpty()) return true;
+        List<TestBedResetService.ResetResult> results = new ArrayList<>();
+        boolean done = TestBedPress.runLocked(game, locked -> results.add(TestBedResetService.reset(locked)));
+        if (!done || results.isEmpty()) {
+            add(0, "reset", Status.FAIL, "reset", "game not loaded");
+            return false;
+        }
+        add(0, "reset", Status.INFO, "", results.getFirst().toString());
+        settle(null);
+        return true;
+    }
+
     private boolean applyPresetIfNeeded() {
         if (script.getPreset() == null) return true;
         Game game = current();
+        String label = "preset `" + script.getPreset() + "`";
         if (!game.getRealPlayers().isEmpty()) {
-            add(0, "preset `" + script.getPreset() + "`", Status.INFO, "", "game already seated; preset skipped");
+            String applied = TestBedApplyService.appliedPreset(game);
+            if (!script.getPreset().equals(applied)) {
+                add(
+                        0,
+                        label,
+                        Status.FAIL,
+                        "a game set up with `" + script.getPreset() + "`",
+                        "this game was set up with `" + (applied.isEmpty() ? "something else" : applied)
+                                + "`; run again with `reset:true` or in a new game");
+                return false;
+            }
+            add(
+                    0,
+                    label,
+                    Status.INFO,
+                    "",
+                    "already applied; earlier runs may have changed the game (use `reset:true`)");
             return true;
         }
         TestBedPreset preset = TestBedPresetService.getShippedPreset(script.getPreset());
@@ -203,7 +245,12 @@ public final class TestBedScriptRunner {
             result = TestBedPress.pressById(game, developer, seat, channel, step.getPressId());
         } else {
             result = TestBedPress.pressVisible(
-                    game, developer, seat, pressChannels(game, seat, step.getIn()), step.getPress());
+                    game,
+                    developer,
+                    seat,
+                    () -> pressChannels(current(), seat, step.getIn()),
+                    step.getPress(),
+                    timeoutMillis(step));
         }
         lastPress = result.recorder();
         settle(step);
@@ -287,38 +334,58 @@ public final class TestBedScriptRunner {
         }
     }
 
+    private record Check(boolean ok, String actual) {}
+
     private Status expect(int index, Step step) {
         Expect expect = step.getExpect();
-        String describe = step.describe();
-        if (expect.getState() != null) return expectState(index, describe, expect);
+        Check check = waitsForChange(expect) ? waitFor(() -> evaluate(expect), step) : evaluate(expect);
+        return add(index, step.describe(), check.ok() ? Status.PASS : Status.FAIL, expect.describe(), check.actual());
+    }
+
+    private static boolean waitsForChange(Expect expect) {
+        if (expect.getState() != null) return true;
+        return expect.getIn() != null && expect.getNotContains().isEmpty() && !expect.isNoFactionLeak();
+    }
+
+    private Check waitFor(Supplier<Check> evaluation, Step step) {
+        long deadline = System.currentTimeMillis() + timeoutMillis(step);
+        Check check = evaluation.get();
+        while (!check.ok() && System.currentTimeMillis() < deadline) {
+            sleep(POLL_MILLIS);
+            check = evaluation.get();
+        }
+        return check;
+    }
+
+    private long timeoutMillis(Step step) {
+        int seconds = step.getTimeoutSeconds() != null ? step.getTimeoutSeconds() : script.getTimeoutSeconds();
+        return seconds * 1000L;
+    }
+
+    private Check evaluate(Expect expect) {
+        if (expect.getState() != null) return checkState(expect);
         if (expect.getEphemeral() != null) {
             String hit = lastPress.replies().stream()
                     .filter(reply -> reply.contains(expect.getEphemeral()))
                     .findFirst()
                     .orElse(null);
-            return add(
-                    index,
-                    describe,
-                    hit != null ? Status.PASS : Status.FAIL,
-                    expect.getEphemeral(),
-                    hit != null ? hit : "replies: " + lastPress.replies());
+            return new Check(hit != null, hit != null ? hit : "replies: " + lastPress.replies());
         }
         if (expect.getModal() != null) {
             String modal = lastPress.modalId();
-            boolean ok = modal != null && modal.startsWith(expect.getModal());
-            return add(index, describe, ok ? Status.PASS : Status.FAIL, expect.getModal(), String.valueOf(modal));
+            return new Check(modal != null && modal.startsWith(expect.getModal()), String.valueOf(modal));
         }
-        return expectMessages(index, describe, expect);
+        return checkMessages(expect);
     }
 
-    private Status expectState(int index, String describe, Expect expect) {
+    private Check checkState(Expect expect) {
         Game game = current();
         String actual = TestBedStateResolver.resolve(game, expect.getState(), name -> seat(game, name));
         boolean ok = expect.getEquals() != null
                 ? expect.getEquals().trim().equalsIgnoreCase(actual.trim())
                 : expect.getContains().stream().allMatch(actual::contains)
                         && expect.getNotContains().stream().noneMatch(actual::contains);
-        return add(index, describe, ok ? Status.PASS : Status.FAIL, expect.describe(), actual);
+        return new Check(ok, actual);
     }
 
     @Nullable
@@ -338,10 +405,10 @@ public final class TestBedScriptRunner {
         return TestBedPresetService.parse(resolution.text(), Step.class);
     }
 
-    private Status expectMessages(int index, String describe, Expect expect) {
+    private Check checkMessages(Expect expect) {
         Game game = current();
         MessageChannel channel = scopeChannel(game, expect.getIn());
-        if (channel == null) return add(index, describe, Status.FAIL, "channel `" + expect.getIn() + "`", "not found");
+        if (channel == null) return new Check(false, "channel `" + expect.getIn() + "` not found");
         List<String> texts = messagesSinceStart(channel);
         List<String> problems = new ArrayList<>();
         if (expect.getCount() != null) {
@@ -361,11 +428,9 @@ public final class TestBedScriptRunner {
                     .ifPresent(hit -> problems.add("found `" + text + "` in: " + abbreviate(hit)));
         }
         if (expect.isNoFactionLeak()) problems.addAll(factionLeaks(game, texts));
-        String actual = problems.isEmpty()
-                ? texts.size() + " new messages checked"
-                : String.join("; ", problems)
-                        + (texts.isEmpty() ? " (no new messages)" : "; latest: " + abbreviate(texts.getFirst()));
-        return add(index, describe, problems.isEmpty() ? Status.PASS : Status.FAIL, expect.describe(), actual);
+        if (problems.isEmpty()) return new Check(true, texts.size() + " new messages checked");
+        String latest = texts.isEmpty() ? " (no new messages)" : "; latest: " + abbreviate(texts.getFirst());
+        return new Check(false, String.join("; ", problems) + latest);
     }
 
     private static List<String> factionLeaks(Game game, List<String> texts) {

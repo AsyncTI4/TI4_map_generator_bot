@@ -32,7 +32,7 @@ Everything is gated three ways. Without all three, the bot behaves exactly as be
 | `/testbed apply [preset] [file]` | Sets up a fresh game from a shipped preset or an attached `.json`. |
 | `/testbed act_as [faction_or_color]` | Acts as that seat in shared channels; leave empty to be yourself again. |
 | `/testbed panel` | Private panel: act-as buttons, +1 TG/commodity/tactic/strategy, ready all, make active player, cards info, shortcuts, start a phase. |
-| `/testbed run [script] [file] [stop_on_fail]` | Runs a test script: presses buttons as seats, checks state and messages, posts a ✅/❌ report and a Markdown log. |
+| `/testbed run [script] [file] [stop_on_fail] [reset]` | Runs a test script: presses buttons as seats, checks state and messages, posts a ✅/❌ report and a Markdown log. |
 | `/testbed status` | Shows the test-bed state of this game. |
 | `/testbed reset confirm:true` | Deletes the test bed's channels, removes virtual seats, unseats you, clears the map and restores the action card, secret objective and relic decks. |
 | `/testbed enable` / `disable` | Marks or unmarks a hand-built game as a test bed. |
@@ -126,8 +126,9 @@ Script fields:
 | Field | Meaning |
 | --- | --- |
 | `name`, `description` | Shown in autocomplete and the report. Scripts cannot hold comments; say it here or in a `note` step. |
-| `preset` | Applied first when the game has no seated factions; skipped (noted in the report) otherwise. |
+| `preset` | Applied first when the game has no seated factions. In a game already set up with the same preset it is skipped (noted in the report); set up with a different one, the run stops and asks for `reset:true`. |
 | `settleSeconds` | Pause after each press or action so Discord catches up. Default 2; a step can set its own. |
+| `timeoutSeconds` | How long `press` waits for its button and a positive check waits to pass. Default 20; a step can set its own. |
 | `stopOnFail` | Stop at the first ❌ (also `/testbed run stop_on_fail:true`, or per step). |
 | `shortcuts` | Mini-scripts for the panel (see [Shortcuts](#shortcuts)). |
 
@@ -136,7 +137,7 @@ Each step has exactly one verb:
 | Verb | Example | What it does |
 | --- | --- | --- |
 | `note` | `{ "note": "round 2 starts" }` | A line in the report. |
-| `press` | `{ "as": "sol", "press": "End Turn" }` | Finds a button the bot is showing and presses it as that seat (see [Finding buttons](#finding-buttons)). |
+| `press` | `{ "as": "sol", "press": "strategicAction_3" }` | Finds a button the bot is showing and presses it as that seat, waiting up to `timeoutSeconds` for it to appear (see [Finding buttons](#finding-buttons)). |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` | Posts a one-button carrier message in the seat's own channel and presses it: fires any button id, shown or not. |
 | `do` | `{ "do": "hand", "as": "all", "hand": { "tg": 0 } }` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: any preset seat fields), `actAs` (as or `you`). |
 | `wait` | `{ "wait": 5 }` | Seconds. |
@@ -206,7 +207,9 @@ Do not guess button ids; find them:
 1. **From a run.** A `press` that finds nothing fails with every visible button as ``Label (`id`)``. The `.md` log
    has the full list. Running a draft with a deliberately wrong `press` is a quick way to see what is on screen.
 2. **From the code.** Search for the label: `grep -rn '"End Turn"' src/main/java` finds
-   `Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn")`. The id is `turnEnd`.
+   `Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn")`. The id is `turnEnd`. Labels change with
+   state: Sol's end-turn button reads `End Turn (+1 ability)` (`endOfTurnAbilities`), so `press: "End Turn"`
+   never matches it. Use the id.
    `factionButtonChecker()` adds `FFCC_<faction>_`; `press` lets you leave that out.
 3. **Dynamic ids.** Many ids carry a number or name: `strategicAction_<sc>`, `sc_follow_<sc>`,
    `sc_no_follow_<sc>`. Write the concrete value.
@@ -265,25 +268,33 @@ the `ac-2p` preset, which holds known cards and draws nothing at random so the c
   `"notContains"` on `acIds`.
 - `equals` compares as text: write `"3"`, not `3`.
 - A message `contains` list means each text appears in some message, not all in one.
-- Scripts change the game. Run them on a throwaway game, and `/testbed reset confirm:true` (or a new game)
-  before running again.
+- Scripts change the game. Run them with `reset:true`, or in a new game, so a run never starts from what an
+  earlier run left behind.
 
 #### Timing
 
-Discord is not instant. `settleSeconds` (default 2) runs after every press and `do`. Raise it on the step that
-needs it (a map render or a phase start posts a lot: try 5) rather than for the whole script. Crons and timers
-need an explicit `wait` before their results are checked. A message check that passes on some runs and fails on
-others is almost always a timing problem.
+Discord is not instant, and a preset or a strategy card play posts many messages that arrive over several
+seconds. The runner deals with that in three ways:
+- **`press` waits** up to `timeoutSeconds` (default 20) for its button to appear, checking every 2 seconds.
+- **Positive checks retry** until they pass or `timeoutSeconds` runs out: state checks, and message checks with
+  only `contains`/`count`.
+- **Absence checks run once**, after the step's `settleSeconds` pause (default 2): message checks with
+  `notContains` or `noFactionLeak`. Retrying those would let them pass before the unwanted message arrived.
+
+Raise `settleSeconds` on a step before an absence check that follows a busy action (a map render, a phase start:
+try 5). Crons and timers need an explicit `wait` before their results are checked.
 
 #### Run, read, fix
 
-1. Create a new game (normal or fog, matching the preset) and run `/testbed run file:<your script>.json`.
+1. Run `/testbed run file:<your script>.json reset:true` in a test-bed game (or without `reset` in a new game of
+   the right kind, normal or fog). `reset:true` resets the test bed and applies the script's preset, so every run
+   starts from the same state.
 2. Read the ❌ lines; the attached `.md` log has the untruncated expected/actual for every step.
    - `no button `X`; visible: …`: pick the right label or id from the list.
    - `unsupported interaction calls [...]`: the handler used part of the click the stand-in only fakes; check
      that step by hand once and mention it in the PR.
    - `found `X` in: …` under `noFactionLeak`: a real leak, or a check in the wrong channel.
-3. Fix the script, reset (or use a new game), run again.
+3. Fix the script and run it again with `reset:true`.
 4. When it passes twice in a row, move it to `data/testbed/scripts/`. The build then validates it on every change.
 
 #### What scripts cannot do yet

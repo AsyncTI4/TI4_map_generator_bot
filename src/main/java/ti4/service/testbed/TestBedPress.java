@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
@@ -38,6 +39,7 @@ import ti4.game.persistence.ManagedGame;
 public class TestBedPress {
 
     static final int HISTORY_SIZE = 25;
+    private static final long SEARCH_RETRY_MILLIS = 2000;
     private static final String FACTION_CHECK_PREFIX = "FFCC_";
 
     public static final class Recorder {
@@ -73,11 +75,36 @@ public class TestBedPress {
 
     public record PressResult(boolean pressed, String detail, Recorder recorder) {}
 
+    private record Found(Message message, Button button) {}
+
     public static PressResult pressVisible(
-            Game game, Member developer, Player seat, List<MessageChannel> channels, String labelOrId) {
+            Game game,
+            Member developer,
+            Player seat,
+            Supplier<List<MessageChannel>> channels,
+            String labelOrId,
+            long timeoutMillis) {
+        long deadline = System.currentTimeMillis() + timeoutMillis;
         List<String> seen = new ArrayList<>();
-        Message prefixMessage = null;
-        Button prefixButton = null;
+        Found found = find(channels.get(), labelOrId, seen);
+        while (found == null && System.currentTimeMillis() < deadline) {
+            sleep(SEARCH_RETRY_MILLIS);
+            seen.clear();
+            found = find(channels.get(), labelOrId, seen);
+        }
+        if (found != null) return press(game, developer, seat, found.message(), found.button());
+        String visible = seen.isEmpty()
+                ? "no buttons"
+                : String.join(", ", seen.stream().distinct().toList());
+        return new PressResult(
+                false,
+                "no button `" + labelOrId + "` after " + timeoutMillis / 1000 + "s; visible: " + visible,
+                new Recorder());
+    }
+
+    @Nullable
+    private static Found find(List<MessageChannel> channels, String labelOrId, List<String> seen) {
+        Found prefixMatch = null;
         for (MessageChannel channel : channels) {
             if (channel == null) continue;
             for (Message message :
@@ -85,20 +112,21 @@ public class TestBedPress {
                 for (Button button : message.getComponentTree().findAll(Button.class)) {
                     if (button.getCustomId() == null) continue;
                     Match match = match(button, labelOrId);
-                    if (match == Match.EXACT) return press(game, developer, seat, message, button);
-                    if (match == Match.PREFIX && prefixButton == null) {
-                        prefixMessage = message;
-                        prefixButton = button;
-                    }
+                    if (match == Match.EXACT) return new Found(message, button);
+                    if (match == Match.PREFIX && prefixMatch == null) prefixMatch = new Found(message, button);
                     seen.add(button.getLabel() + " (`" + button.getCustomId() + "`)");
                 }
             }
         }
-        if (prefixButton != null) return press(game, developer, seat, prefixMessage, prefixButton);
-        String visible = seen.isEmpty()
-                ? "no buttons"
-                : String.join(", ", seen.stream().distinct().toList());
-        return new PressResult(false, "no button `" + labelOrId + "`; visible: " + visible, new Recorder());
+        return prefixMatch;
+    }
+
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public static PressResult pressById(
@@ -183,7 +211,8 @@ public class TestBedPress {
             Message message,
             Button button,
             Member developer,
-            Recorder recorder) {
+            Recorder recorder)
+            throws Throwable {
         String name = method.getName();
         return switch (name) {
             case "getButton", "getComponent" -> button;
@@ -224,6 +253,7 @@ public class TestBedPress {
             case "hashCode" -> System.identityHashCode(self);
             case "equals" -> args[0] == self;
             default -> {
+                if (method.isDefault()) yield InvocationHandler.invokeDefault(self, method, args);
                 recordText(recorder, args);
                 if (!name.startsWith("reply") && !name.startsWith("defer") && !name.startsWith("edit")) {
                     recorder.unsupported(name);

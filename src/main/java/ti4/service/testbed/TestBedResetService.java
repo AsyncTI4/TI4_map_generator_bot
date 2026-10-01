@@ -30,6 +30,7 @@ public class TestBedResetService {
         TestBedService.clearAllActingAs(game);
         TestBedService.markAsTestBed(game, false);
         game.removeStoredValue(TestBedShortcuts.STORED_KEY);
+        game.removeStoredValue(TestBedApplyService.APPLIED_PRESET_KEY);
         return new ResetResult(removedSeats, resetSeats, missingChannels);
     }
 

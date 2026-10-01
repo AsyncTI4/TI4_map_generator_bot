@@ -18,6 +18,7 @@ public class TestBedScript {
     private String description;
     private String preset;
     private int settleSeconds = 2;
+    private int timeoutSeconds = 20;
     private boolean stopOnFail;
     private List<Step> steps = new ArrayList<>();
     private List<Shortcut> shortcuts = new ArrayList<>();
@@ -40,6 +41,7 @@ public class TestBedScript {
         private Double wait;
         private Expect expect;
         private Integer settleSeconds;
+        private Integer timeoutSeconds;
         private Boolean stopOnFail;
 
         public List<String> verbs() {
