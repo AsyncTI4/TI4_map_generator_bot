@@ -20,6 +20,7 @@ import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.GameEntitySnapshot;
 import ti4.spring.service.persistence.PersistedGameState;
 import ti4.spring.service.persistence.PersistedGameStateService;
+import ti4.spring.service.persistence.UnreferencedUserService;
 
 @UtilityClass
 public class GameDatabaseReconciler {
@@ -43,24 +44,33 @@ public class GameDatabaseReconciler {
             GameEntityPersistenceService persistenceService = SpringContext.getBean(GameEntityPersistenceService.class);
 
             List<String> discrepancies = new ArrayList<>();
-            Set<String> managedGameNames = new HashSet<>();
+            Set<String> existingGameNames = new HashSet<>();
             List<ManagedGame> managedGames = GameManager.getManagedGames();
             for (ManagedGame managedGame : managedGames) {
                 if (Thread.currentThread().isInterrupted()) {
                     BotLogger.warning(TASK_NAME + " was interrupted before it finished.");
                     return;
                 }
-                managedGameNames.add(managedGame.getName());
-                reconcileGame(managedGame, persistedStates.get(managedGame.getName()), startedAt, persistenceService)
+                String gameName = managedGame.getName();
+                if (wasChangedAfter(gameName, startedAt)) {
+                    existingGameNames.add(gameName);
+                    continue;
+                }
+                Game game = loadGame(managedGame);
+                if (game == null) continue;
+                existingGameNames.add(gameName);
+                reconcileGame(game, persistedStates.get(gameName), persistenceService)
                         .ifPresent(discrepancies::add);
             }
             for (String persistedGameName : persistedStates.keySet()) {
-                if (managedGameNames.contains(persistedGameName)) continue;
+                if (existingGameNames.contains(persistedGameName)) continue;
                 discrepancies.add(repair(
                         persistedGameName,
                         "in the database but has no game file",
                         () -> persistenceService.delete(persistedGameName)));
             }
+
+            reconcileUnreferencedUsers().ifPresent(discrepancies::add);
 
             report(discrepancies, managedGames.size());
         } catch (Exception e) {
@@ -69,16 +79,8 @@ public class GameDatabaseReconciler {
     }
 
     private static Optional<String> reconcileGame(
-            ManagedGame managedGame,
-            PersistedGameState persistedState,
-            long startedAt,
-            GameEntityPersistenceService persistenceService) {
-        String gameName = managedGame.getName();
-        if (wasChangedAfter(gameName, startedAt)) return Optional.empty();
-
-        Game game = loadGame(managedGame);
-        if (game == null) return Optional.empty();
-
+            Game game, PersistedGameState persistedState, GameEntityPersistenceService persistenceService) {
+        String gameName = game.getName();
         if (!GameEntityMapper.shouldPersist(game)) {
             if (persistedState == null) return Optional.empty();
             return Optional.of(repair(
@@ -97,6 +99,25 @@ public class GameDatabaseReconciler {
         if (differences.isEmpty()) return Optional.empty();
         return Optional.of(repair(
                 gameName, "differs in " + String.join("; ", differences), () -> persistenceService.replace(snapshot)));
+    }
+
+    private static Optional<String> reconcileUnreferencedUsers() {
+        UnreferencedUserService unreferencedUserService = SpringContext.getBean(UnreferencedUserService.class);
+        List<String> unreferencedUserIds = unreferencedUserService.findUnreferencedUserIds();
+        if (unreferencedUserIds.isEmpty()) return Optional.empty();
+
+        String description = StringUtils.abbreviate(
+                String.format(
+                        "%,d discord_user rows are not referenced by any player, title or standalone title: %s",
+                        unreferencedUserIds.size(), String.join(", ", unreferencedUserIds)),
+                MAX_DISCREPANCY_LENGTH);
+        try {
+            int deleted = unreferencedUserService.deleteUnreferencedUsers(unreferencedUserIds);
+            return Optional.of(description + String.format(" (deleted %,d)", deleted));
+        } catch (Exception e) {
+            BotLogger.error(TASK_NAME + " could not delete unreferenced users.", e);
+            return Optional.of(description + " (repair failed)");
+        }
     }
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {

@@ -91,6 +91,7 @@ public class GameManager {
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
         LoreService.evictGameLore(gameName);
+        GameDatabaseSyncPipeline.queueDelete(gameName);
     }
 
     public static boolean isValid(String gameName) {
@@ -126,7 +127,6 @@ public class GameManager {
             return false;
         }
         handleManagedGameRemoval(gameName);
-        GameDatabaseSyncPipeline.queueDelete(gameName);
         return true;
     }
 
@@ -165,6 +165,10 @@ public class GameManager {
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
+        }
+        if (game == null) {
+            handleManagedGameRemoval(gameName);
+            return null;
         }
         handleMissingMatchingManagedGame(game);
         GameDatabaseSyncPipeline.queueSync(game);

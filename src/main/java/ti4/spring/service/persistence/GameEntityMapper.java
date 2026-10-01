@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -87,13 +88,18 @@ public class GameEntityMapper {
         playerEntity.setWinner(player.getGame().getWinners().contains(player));
         playerEntity.setReplaced(!Objects.equals(player.getUserID(), player.getStatsTrackedUserID()));
         playerEntity.setGame(gameEntity);
-        playerEntity.setUser(users.computeIfAbsent(player.getStatsTrackedUserID(), GameEntityMapper::lookUpUser));
+        playerEntity.setUser(users.computeIfAbsent(
+                player.getStatsTrackedUserID(), userId -> toUserEntity(userId, player.getStatsTrackedUserName())));
         return playerEntity;
     }
 
     private static UserEntity lookUpUser(String userId) {
-        String username = JdaService.getUsername(userId);
-        return new UserEntity(userId, username == null ? UNKNOWN_USER_PREFIX + userId : username);
+        return toUserEntity(userId, JdaService.getUsername(userId));
+    }
+
+    private static UserEntity toUserEntity(String userId, String username) {
+        if (StringUtils.isBlank(username)) return new UserEntity(userId, UNKNOWN_USER_PREFIX + userId);
+        return new UserEntity(userId, username);
     }
 
     private static List<TitleEntity> toTitleEntities(Game game, GameEntity gameEntity, Map<String, UserEntity> users) {
