@@ -221,7 +221,7 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "YY",
+        "requirements": "BBY",
         "faction": "company",
         "baseUpgrade": "dn2",
         "source": "gamma",
