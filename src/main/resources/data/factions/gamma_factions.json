@@ -322,6 +322,7 @@
             "ggweasd",
             "ggwear"
         ],
+        "startingTechAmount": 2,
         "startingTechOptions": [
             "amd",
             "st",
