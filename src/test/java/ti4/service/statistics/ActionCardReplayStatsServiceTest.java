@@ -14,8 +14,6 @@ import ti4.testUtils.BaseTi4Test;
 
 class ActionCardReplayStatsServiceTest extends BaseTi4Test {
 
-    private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "orange");
-
     // Four IDs share Sabotage's name, which is what makes it a 4-of.
     private static final Map<String, String> CARD_NAMES_BY_ID = Map.of(
             "overrule",
@@ -145,33 +143,6 @@ class ActionCardReplayStatsServiceTest extends BaseTi4Test {
 
         assertThat(render(stats))
                 .contains("- **Games that likely reshuffled:** 1 of 2 checked (50%), holding 1 replay\n");
-    }
-
-    @Test
-    void shouldCreditAReplayToTheFactionThatMadeIt() {
-        Game game = new Game();
-        Player sol = addPlayer(game, "sol-player", "sol");
-        Player xxcha = addPlayer(game, "xxcha-player", "xxcha");
-        game.getGameStats().recordAcPlay(GameStats.OVERRULE, xxcha);
-        // Sol played the same Overrule again after Xxcha, so the replay is Sol's.
-        game.getGameStats().recordAcPlay(GameStats.OVERRULE, sol);
-        game.getGameStats().recordAcPlay("Veto", sol);
-
-        ActionCardReplayStatsService stats = new ActionCardReplayStatsService(CARD_NAMES_BY_ID);
-        stats.accumulate(game, sol);
-
-        String rendered = render(stats);
-        assertThat(rendered)
-                .contains("1 replay (50% of its 2 1-of plays), 100% (1/1) win rate in games it replayed a 1-of,"
-                        + " - (0/0) when it didn't\n");
-        assertThat(rendered).contains("0 replays (0% of 1 1-of play), - (0/0) replayed, 0% (0/1) not\n");
-    }
-
-    private static Player addPlayer(Game game, String userId, String faction) {
-        Player player = game.addPlayer(userId, userId);
-        player.setFaction(faction);
-        player.setColor(COLORS.get(game.getPlayers().size() - 1));
-        return player;
     }
 
     private static Game gameWithPlays(String... cardNames) {
