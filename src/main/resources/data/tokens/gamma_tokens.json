@@ -7,7 +7,7 @@
             "hallucination",
             "hallucination1"
         ],
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "id": "hallucination2",
@@ -16,7 +16,7 @@
         "aliasList": [
             "hallucination2"
         ],
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "id": "hallucination3",
@@ -25,7 +25,7 @@
         "aliasList": [
             "hallucination3"
         ],
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "id": "hallucination4",
@@ -34,7 +34,7 @@
         "aliasList": [
             "hallucination4"
         ],
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "id": "hallucination5",
@@ -43,7 +43,7 @@
         "aliasList": [
             "hallucination5"
         ],
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "id": "hallucination_back",
@@ -53,7 +53,7 @@
             "hallucinationback",
             "hallucinationhidden"
         ],
-        "source": "WIPgamma"
+        "source": "gamma"
     },
     {
         "id": "weaveway_spacedock_marker",
