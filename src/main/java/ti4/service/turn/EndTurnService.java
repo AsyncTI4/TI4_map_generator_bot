@@ -46,6 +46,8 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.planet.AsgardLegendaryService;
+import ti4.service.planet.JotunheimLegendaryService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -117,6 +119,8 @@ public class EndTurnService {
         TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
+        AsgardLegendaryService.clearBifrostBridge(game, player);
+        JotunheimLegendaryService.clear(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
         FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);

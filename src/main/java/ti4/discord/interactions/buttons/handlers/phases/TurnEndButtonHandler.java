@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.phases;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.planet.VanaheimLegendaryButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -47,6 +48,10 @@ class TurnEndButtonHandler {
                 "lunarium",
                 "zephyrion",
                 "vyserix");
+        if (VanaheimLegendaryButtonHandler.offerEndTurnRepair(event, game, player)) {
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
         EndTurnService.endTurnAndUpdateMap(event, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

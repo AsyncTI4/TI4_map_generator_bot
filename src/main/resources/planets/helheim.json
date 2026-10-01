@@ -1,0 +1,31 @@
+{
+    "planetLayout":  
+    {
+        "unitHolderName":  "helheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  
+        {
+            "x":  171,
+            "y":  156
+        },
+        "planetRadius":  71
+    },
+    "id":  "helheim",
+    "tileId":  "ao8",
+    "name":  "Helheim",
+    "aliases":  
+    [
+        "helheim"
+    ],
+    "resources":  2,
+    "influence":  1,
+    "planetTypes":  
+    [
+        "HAZARDOUS"
+    ],
+    "legendaryAbilityName":  "Guidance of Garmr",
+    "legendaryAbilityText":  "You may treat this system as adjacent to the active system for the purposes of declaring and resolving retreats.",
+    "legendaryAbilityFlavourText":  "Follow the beacon in disaster, like a hound that scents its master.",
+    "flavourText":  "A large elliptical orbit keeps this planet dark and hard to pin-point for long periods of time, but it can always be found with an access code to its signature beacon.",
+    "source":  "goose"
+}

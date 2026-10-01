@@ -61,6 +61,7 @@ public class Source {
         expanded_fracture,
         muaat_mania,
         erwans_gambit,
+        goose,
 
         // async homebrew
         draft,
@@ -239,6 +240,7 @@ public class Source {
                 case gamma -> "Gamma Galaxies [Homebrew]";
                 case black_spectrum -> "Black Spectrum [Homebrew]";
                 case addiction -> "TI Addiction [Homebrew]";
+                case goose -> "Homebrew from Goose [Homebrew]";
                 default -> toString();
             };
         }
