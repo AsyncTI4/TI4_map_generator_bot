@@ -153,9 +153,6 @@ public class CardsInfoService {
         }
         if (player.hasUnlockedBreakthrough("kairnbt")) {
             buttons.add(KairnBreakthroughHandler.getRelicsCardsInfoButton(player));
-            if (player.hasReadyBreakthrough("kairnbt")) {
-                buttons.add(KairnBreakthroughHandler.getOtherPlayerRelicButton(player));
-            }
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
             buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));

@@ -109,7 +109,7 @@ public class ActionCardStatsService {
         Map<String, UnattributedPlays> unattributedPlays = new HashMap<>();
         Set<String> includedGameNames = new HashSet<>();
         ActionCardPlayerStatsService playerStats = new ActionCardPlayerStatsService();
-        ActionCardReplayStatsService replayStats = new ActionCardReplayStatsService();
+        ActionCardReplayStatsService replayStats = new ActionCardReplayStatsService(getCardNamesById(acDeck));
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
         // changed decks mid-game), which would pollute the stats with off-deck cards.
@@ -184,7 +184,7 @@ public class ActionCardStatsService {
         // Same gate, same reason: with no player on a play there is nobody to count the cards
         // against, so a game from before tracking would report six players who played nothing.
         playerStats.accumulate(game, winner);
-        replayStats.accumulate(game);
+        replayStats.accumulate(game, winner);
     }
 
     // Older games recorded plays with no player at all, so they can only contribute cancels - never
@@ -233,6 +233,17 @@ public class ActionCardStatsService {
             copiesPerName.merge(name, 1, Integer::sum);
         }
         return copiesPerName;
+    }
+
+    // Plays are recorded by card name but the discard pile by card ID, so reading one against the
+    // other needs the deck's own mapping between the two.
+    private static Map<String, String> getCardNamesById(DeckModel acDeck) {
+        Map<String, String> cardNamesById = new HashMap<>();
+        for (String cardId : acDeck.getCardIDs()) {
+            ActionCardModel actionCardModel = Mapper.getActionCard(cardId);
+            cardNamesById.put(cardId, actionCardModel != null ? actionCardModel.getName() : cardId);
+        }
+        return cardNamesById;
     }
 
     // The most played card approximates one play per draw, so it stands in for how often it was
@@ -329,7 +340,7 @@ public class ActionCardStatsService {
             blocks.add(overruleTargets.toString());
         }
         playerStats.appendOverruleTo(blocks);
-        replayStats.appendTo(blocks, copiesPerName);
+        replayStats.appendTo(blocks);
 
         StringBuilder playAndCancelStats = new StringBuilder();
         Map<String, Integer> playedEstimatedDraws = computeEstimatedDraws(actionCardsPlayedCounts, copiesPerName);

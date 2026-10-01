@@ -43,6 +43,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting deepreaches;
     private final BooleanSetting lostLegacies;
     private final BooleanSetting monuments;
+    private final BooleanSetting echoesOfYggdrasil;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -73,6 +74,7 @@ public class SourceSettings extends SettingsMenu {
         deepreaches = new BooleanSetting("DeepReaches", "Deep Reaches", false);
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
+        echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -94,6 +96,7 @@ public class SourceSettings extends SettingsMenu {
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo(
                 "Adds faction monuments plus Monuments action cards, agendas, secrets, and strategy cards.");
+        echoesOfYggdrasil.setExtraInfo("Adds the nine Echoes of Yggdrasil tiles to the draft tile pool.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -120,6 +123,7 @@ public class SourceSettings extends SettingsMenu {
             deepreaches.initialize(json.get("deepreaches"));
             lostLegacies.initialize(json.get("lostLegacies"));
             monuments.initialize(json.get("monuments"));
+            echoesOfYggdrasil.initialize(json.get("echoesOfYggdrasil"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -146,6 +150,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(deepreaches);
         ls.add(lostLegacies);
         ls.add(monuments);
+        ls.add(echoesOfYggdrasil);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -297,6 +302,10 @@ public class SourceSettings extends SettingsMenu {
             }
             case "Eronous" -> {}
             case "Monuments" -> game.setMonumentsMode(monuments.isVal());
+            case "EchoesOfYggdrasil" ->
+                game.setStoredValue(
+                        ti4.helpers.Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                        Boolean.toString(echoesOfYggdrasil.isVal()));
         }
     }
 

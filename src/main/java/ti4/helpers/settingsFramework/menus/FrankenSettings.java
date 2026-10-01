@@ -298,6 +298,9 @@ public class FrankenSettings extends SettingsMenu {
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));
+        game.setStoredValue(
+                Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(homebrewSettings.getEchoesOfYggdrasil().isVal()));
         game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
     }
 

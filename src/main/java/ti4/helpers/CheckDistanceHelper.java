@@ -18,6 +18,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
 
 @UtilityClass
@@ -155,7 +156,8 @@ public class CheckDistanceHelper {
                     if (tile != null
                             && tile.isGravityRift(game, player)
                             && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
-                            && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
+                            && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                            && !AsgardLegendaryService.isBifrostBridgeActive(game, player)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
                             num = -2;

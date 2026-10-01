@@ -56,8 +56,7 @@
       "WARFARE",
       "BIOTIC"
     ],
-    "text": "When you gain this breakthrough and at the start of each strategy phase, remove each relic from this card and draw 3 relics and place each on this card. When a player would gain a relic, you may exhaust this card to have them gain 1 of the relics on this card instead or ready this card.",
-    "notes": "This interrupts the relic draw for its owner, but does not for other players. If you are removing something like the obsidian from a player for a relic on this BT, make sure to fix whatever \"On Gain\" effect occurred.",
+    "text": "When you gain this breakthrough and at the start of each strategy phase, shuffle each relic on this card back into the deck. Then, draw 3 relics and place each relic on this card face down. You may look at the relics on this card at any time. After a player gains a relic, you may exhaust this card to purge that relic and give them 1 on this card or ready this card.",
     "source": "theodisi"
   },
   {
