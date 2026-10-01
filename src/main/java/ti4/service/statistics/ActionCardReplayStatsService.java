@@ -121,9 +121,8 @@ class ActionCardReplayStatsService {
     // Nothing records a reshuffle as it happens, so it is read off what the game left behind: the
     // share of the 1-ofs it played that are still in the discard pile at the end.
     private void checkForReshuffle(Game game, Map<String, Integer> playsPerCard) {
-        Set<String> oneOfsPlayed = playsPerCard.keySet().stream()
-                .filter(oneOfs::contains)
-                .collect(Collectors.toSet());
+        Set<String> oneOfsPlayed =
+                playsPerCard.keySet().stream().filter(oneOfs::contains).collect(Collectors.toSet());
         if (oneOfsPlayed.size() < MIN_ONE_OFS_FOR_RESHUFFLE_CHECK) {
             return;
         }
@@ -134,7 +133,8 @@ class ActionCardReplayStatsService {
         Set<String> namesInDiscard = game.getDiscardActionCards().keySet().stream()
                 .map(cardId -> cardNamesById.getOrDefault(cardId, cardId))
                 .collect(Collectors.toSet());
-        long stillInDiscard = oneOfsPlayed.stream().filter(namesInDiscard::contains).count();
+        long stillInDiscard =
+                oneOfsPlayed.stream().filter(namesInDiscard::contains).count();
         if (stillInDiscard >= RESHUFFLE_DISCARD_SHARE * oneOfsPlayed.size()) {
             return;
         }
