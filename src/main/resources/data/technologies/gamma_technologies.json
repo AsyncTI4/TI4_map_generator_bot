@@ -23,24 +23,24 @@
         "text": "Cost 2 Combat 6 Move 2 Capacity 3"
     },
     {
-        "alias": "ggh4l1ry",
+        "alias": "gghlry",
         "name": "Subnet Logistics",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "YY",
-        "faction": "h4l1r",
+        "faction": "hlr",
         "source": "gamma",
         "text": "At the start of the strategy phase choose a non-fighter ship unit upgrade technology you own and place this card on top of that card. Matching units you control and matching neutral units apply +1 to combat rolls.\nDuring your tactical actions while Subnet Logistics is on top of a Unit Upgrade technology, you may pay influence equal to the cost of that unit to replace another player's matching unit with a neutral of the same type."
     },
     {
-        "alias": "ggh4l1rg",
+        "alias": "gghlrg",
         "name": "Data Hollow",
         "types": [
             "BIOTIC"
         ],
         "requirements": "GG",
-        "faction": "h4l1r",
+        "faction": "hlr",
         "source": "gamma",
         "text": "At the start of the strategy phase, choose a non-fighter ship unit upgrade technology you own and place this card on top of that card. Matching units you control and matching neutral units gain +1 movement.\nWhile Data Hollow is on top of a unit upgrade technology, you may replace your matching ships with a matching neutral unit of the same type at the end of your tactical actions. Gain a commodity or convert 1 commodity to a trade goods a number of times equal to this unit's cost."
     },
@@ -223,7 +223,7 @@
         ],
         "requirements": "YY",
         "faction": "gray",
-        "baseUpgrade": "dr2",
+        "baseUpgrade": "dn2",
         "source": "gamma",
         "text": "This unit cannot be destroyed by 'Direct Hit' action cards.\nDEPLOY: After you win a space combat, you may produce 1 dreadnought in the active system."
     },    

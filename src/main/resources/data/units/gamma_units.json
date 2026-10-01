@@ -567,7 +567,7 @@
     {
         "id": "gray_dreadnought",
         "baseType": "dreadnought",
-        "asyncId": "dr",
+        "asyncId": "dn",
         "name": "Velite Rapax I",
         "upgradesToUnitId": "gray_dreadnought2",
         "source": "gamma",
@@ -585,10 +585,10 @@
     {
         "id": "gray_dreadnought2",
         "baseType": "dreadnought",
-        "asyncId": "dr",
+        "asyncId": "dn",
         "name": "Velite Rapax II",
         "upgradesFromUnitId": "gray_dreadnought",
-        "requiredTechId": "gggraydr",
+        "requiredTechId": "gggraydn",
         "source": "gamma",
         "faction": "gray",
         "moveValue": 2,

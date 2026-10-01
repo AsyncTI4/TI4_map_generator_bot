@@ -44,7 +44,7 @@
     {
         "id": "legacy_systems",
         "name": "Legacy Systems",
-        "faction": "h4l1r",
+        "faction": "hlr",
         "window": "During setup",
         "windowEffect": "gain up to 1 technology of each color from among the other players' starting technologies.",
         "source": "gamma"
@@ -75,7 +75,7 @@
         "source": "gamma"
     },
     {
-        "id": "xxcha_accords",
+        "id": "convocation_accords",
         "name": "Xxcha Accords",
         "faction": "archon",
         "window": "",
