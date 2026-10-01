@@ -216,7 +216,7 @@
         "text": "Planets with a trait that contain one or more of your structures are treated as if they had all 3 traits (Cultural, Hazardous, and Industrial).\nWhen you would perform the secondary ability of any strategy card, you may exhaust this card to place 1 structure on a planet you control instead."
     },
     {
-        "alias": "gggrayd",
+        "alias": "gggraydn",
         "name": "Velite Rapax II",
         "types": [
             "UNITUPGRADE"
