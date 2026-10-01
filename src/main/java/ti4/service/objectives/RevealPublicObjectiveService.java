@@ -30,7 +30,7 @@ import ti4.service.relic.NeuraloopService;
 public class RevealPublicObjectiveService {
 
     private static void sendFogObjectiveProgress(Game game, String objectiveId) {
-        if (!FoWHelper.isStabarsQol(game)) return;
+        if (!FoWHelper.isFogQol01(game)) return;
         int threshold = ListPlayerInfoService.getObjectiveThreshold(objectiveId, game);
         PublicObjectiveModel model = Mapper.getPublicObjective(objectiveId);
         if (threshold <= 0 || model == null) return;

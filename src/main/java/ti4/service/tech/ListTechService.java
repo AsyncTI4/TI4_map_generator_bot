@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
@@ -28,6 +29,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -41,7 +43,24 @@ public class ListTechService {
 
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (FoWHelper.isFogQol01(game) && player.hasAbility("propagation")) {
+            offerPropagationPrivately(player);
+        }
         acquireATechWithResources(event, game, player, true, buttonID.contains("first") || !buttonID.contains("_"));
+    }
+
+    private static void offerPropagationPrivately(Player player) {
+        if (player.getPrivateChannel() == null) return;
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getPrivateChannel(),
+                player.getRepresentationUnfogged()
+                        + ", with **Propagation** you may gain 3 command tokens instead of researching a technology.",
+                List.of(
+                        Buttons.gray(
+                                player.factionButtonChecker() + "nekroFollowTech",
+                                "Gain 3 Command Tokens instead (Propagation)",
+                                FactionEmojis.Nekro),
+                        Buttons.DONE_DELETE_BUTTONS));
     }
 
     @ButtonHandler("acquireATech")

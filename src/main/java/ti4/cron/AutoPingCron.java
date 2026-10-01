@@ -204,7 +204,7 @@ public class AutoPingCron {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Active player has been pinged. This is ping #" + pingNumber + ".");
-            if (pingNumber == 2 && FoWHelper.isStabarsQol(game) && player.getPrivateChannel() != null) {
+            if (pingNumber == 2 && FoWHelper.isFogQol01(game) && player.getPrivateChannel() != null) {
                 offerTemporaryPingDisable(player, player.getPrivateChannel());
             }
             return;
@@ -316,7 +316,7 @@ public class AutoPingCron {
             if (!msg.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please allocate command tokens.\n");
             }
-            if (FoWHelper.isStabarsQol(game) && !fogPlayersNotReady.isEmpty()) {
+            if (FoWHelper.isFogQol01(game) && !fogPlayersNotReady.isEmpty()) {
                 GMService.sendMessageToGMChannel(
                         game, "Status homework is waiting on: " + String.join(", ", fogPlayersNotReady) + ".", false);
             }

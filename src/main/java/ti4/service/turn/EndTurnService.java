@@ -309,7 +309,7 @@ public class EndTurnService {
                 }
             }
         }
-        if (FoWHelper.isStabarsQol(game)) {
+        if (FoWHelper.isFogQol01(game)) {
             sendFogTurnSummary(game, mainPlayer);
         }
         if (justPassed) {

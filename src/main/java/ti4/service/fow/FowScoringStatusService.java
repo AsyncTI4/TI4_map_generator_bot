@@ -23,7 +23,7 @@ public class FowScoringStatusService {
     private static final String REFRESH_BUTTON = "fowScoringStatusRefresh";
 
     public static void postForAllPlayers(Game game) {
-        if (!FoWHelper.isStabarsQol(game)) return;
+        if (!FoWHelper.isFogQol01(game)) return;
         for (Player player : game.getRealPlayers()) {
             TextChannel channel = player.getPrivateChannel();
             if (channel == null) continue;
@@ -36,7 +36,7 @@ public class FowScoringStatusService {
     }
 
     public static void refresh(Game game, Player player) {
-        if (!FoWHelper.isStabarsQol(game)) return;
+        if (!FoWHelper.isFogQol01(game)) return;
         TextChannel channel = player.getPrivateChannel();
         if (channel == null) return;
         GameMessageManager.getOne(game.getName(), GameMessageType.FOW_SCORING_STATUS, player.getFaction())

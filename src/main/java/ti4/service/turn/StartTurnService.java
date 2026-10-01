@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -151,7 +154,7 @@ public class StartTurnService {
         String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
         Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
-        if (nextPlayer == player && FoWHelper.isStabarsQol(game)) {
+        if (nextPlayer == player && FoWHelper.isFogQol01(game)) {
             offerProveEnduranceQueue(game, player);
         }
         if (nextPlayer != null && !game.isFowMode()) {
@@ -202,9 +205,8 @@ public class StartTurnService {
         game.removeStoredValue("violatedSystems");
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
-            if (FoWHelper.isStabarsQol(game)) {
+            if (FoWHelper.isFogQol01(game)) {
                 remindOtherPlayersOfUnfollowedSCs(game, player);
-                postFogMapIfWanted(event, game, player);
                 GMService.logPlayerActivity(
                         game,
                         player,
@@ -212,9 +214,19 @@ public class StartTurnService {
                                 + " of round " + game.getRound() + ".");
             }
 
-            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), text);
+            boolean finalGoingToPass = goingToPass;
+            String finalText = text;
+            String finalButtonText = buttonText;
+            Runnable sendTurnPrompt = () -> {
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), finalText);
+                if (!finalGoingToPass) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), finalButtonText, buttons);
+                }
+            };
+            if (!postFogMapThen(event, game, player, sendTurnPrompt)) {
+                sendTurnPrompt.run();
+            }
             if (!goingToPass) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
                 FowCommunicationThreadService.checkNewCommPartners(game, player);
             }
             if (getMissedSCFollowsText(game, player) != null
@@ -476,21 +488,28 @@ public class StartTurnService {
                 buttons);
     }
 
-    private static void postFogMapIfWanted(GenericInteractionCreateEvent event, Game game, Player player) {
+    private static boolean postFogMapThen(
+            GenericInteractionCreateEvent event, Game game, Player player, Runnable afterMap) {
         MessageChannel privateChannel = player.getPrivateChannel();
-        if (event == null
+        if (!FoWHelper.isFogQol01(game)
+                || event == null
                 || privateChannel == null
                 || player.getMember() == null
                 || !player.getUserSettings().isFogMapOnTurnStart()) {
-            return;
+            return false;
         }
         GenericInteractionCreateEvent asPlayer =
                 new UserOverridenGenericInteractionCreateEvent(event, player.getMember());
-        MapRenderPipeline.queue(
-                game,
-                asPlayer,
-                DisplayType.all,
-                fileUpload -> MessageHelper.sendFileUploadToChannel(privateChannel, fileUpload));
+        AtomicBoolean promptSent = new AtomicBoolean();
+        Runnable sendPromptOnce = () -> {
+            if (promptSent.compareAndSet(false, true)) afterMap.run();
+        };
+        MapRenderPipeline.queue(game, asPlayer, DisplayType.all, fileUpload -> {
+            MessageHelper.sendFileUploadToChannel(privateChannel, fileUpload);
+            sendPromptOnce.run();
+        });
+        CompletableFuture.delayedExecutor(45, TimeUnit.SECONDS).execute(sendPromptOnce);
+        return true;
     }
 
     private static void remindOtherPlayersOfUnfollowedSCs(Game game, Player activePlayer) {

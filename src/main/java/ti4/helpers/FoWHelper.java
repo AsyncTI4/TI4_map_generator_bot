@@ -45,8 +45,8 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
-    public static boolean isStabarsQol(Game game) {
-        return game.isFowMode() && game.getFowOption(FOWOption.STABARS_QOL);
+    public static boolean isFogQol01(Game game) {
+        return game.isFowMode() && game.getFowOption(FOWOption.FOG_QOL_01);
     }
 
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {

@@ -40,7 +40,7 @@ public class FastScFollowCron {
 
         List<String> gameNames = GameManager.getManagedGames().stream()
                 .filter(not(ManagedGame::isHasEnded))
-                .filter(managedGame -> managedGame.isFastScFollowMode() || managedGame.isFowMode())
+                .filter(managedGame -> managedGame.isFastScFollowMode() || managedGame.isFogQol01())
                 .map(ManagedGame::getName)
                 .toList();
         ConsumeGameUtility.consumeGames(gameNames, FastScFollowCron::handleFastScFollow, ExecutionLockType.WRITE);

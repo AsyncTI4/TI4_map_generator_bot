@@ -251,7 +251,7 @@ public class PlayStrategyCardService {
                 }
             }
 
-            if (FoWHelper.isStabarsQol(game)) {
+            if (FoWHelper.isFogQol01(game)) {
                 offerFactionFollowButtonsPrivately(game, scModel);
             }
 
@@ -459,8 +459,9 @@ public class PlayStrategyCardService {
                     List<Tile> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);
                     boolean primaryPlayerHasAnyCCInPlay = !tilesWithPrimaryPlayersCC.isEmpty();
                     boolean primaryPlayerHasExactlyOneCCInPlay = tilesWithPrimaryPlayersCC.size() == 1;
-                    if (!primaryPlayerHasAnyCCInPlay
-                            || scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay) {
+                    boolean nothingToRemove = !primaryPlayerHasAnyCCInPlay
+                            || scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay;
+                    if (nothingToRemove && !game.isFowMode()) {
                         continue;
                     }
                     empNMahButtons.addFirst(
@@ -715,7 +716,7 @@ public class PlayStrategyCardService {
                 }
             }
         }
-        if (FoWHelper.isStabarsQol(game) && !isSpecialPbdGame && !game.isHomebrewSCMode() && scToPlay != 5) {
+        if (FoWHelper.isFogQol01(game) && !isSpecialPbdGame && !game.isHomebrewSCMode() && scToPlay != 5) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player || applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event)) {
                     continue;
@@ -872,16 +873,6 @@ public class PlayStrategyCardService {
     }
 
     private static void offerFactionFollowButtonsPrivately(Game game, StrategyCardModel scModel) {
-        Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
-        if (propagationPlayer != null && scModel.usesAutomationForSCID("pok7technology")) {
-            offerPrivateFollowButton(
-                    propagationPlayer,
-                    scModel,
-                    Buttons.gray(
-                            propagationPlayer.factionButtonChecker() + "nekroFollowTech",
-                            "Get Command Tokens",
-                            FactionEmojis.Nekro));
-        }
         Player zealousPlayer = Helper.getPlayerFromAbility(game, "zealousds");
         if (zealousPlayer != null && scModel.usesAutomationForSCID("tf6")) {
             offerPrivateFollowButton(

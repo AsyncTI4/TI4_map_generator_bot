@@ -100,7 +100,7 @@ public class StatusCleanupService {
         }
 
         game.setCurrentACDrawStatusInfo("");
-        if (!game.isFowMode() || FoWHelper.isStabarsQol(game)) {
+        if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
             for (Player p : game.getActionPhaseTurnOrder()) {
                 ButtonHelper.drawStatusACs(game, p, null);
             }

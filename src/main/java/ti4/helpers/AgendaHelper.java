@@ -1457,7 +1457,7 @@ public final class AgendaHelper {
     }
 
     private static String ownVoteTotalLine(Game game, Player player) {
-        if (!FoWHelper.isStabarsQol(game)) return "";
+        if (!FoWHelper.isFogQol01(game)) return "";
         return "\nYou have " + getVoteTotal(player, game)[0] + " votes available.";
     }
 

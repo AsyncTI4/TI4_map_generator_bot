@@ -44,4 +44,11 @@ class ReactionServiceFowStatusDoneTest extends BaseTi4Test {
         game.setStoredValue("fowStatusDone", ",pi_argent");
         assertFalse(ReactionService.isFowStatusDone(game, argent));
     }
+
+    // Games saved before the comma format stored ready factions glued together; they must still count after deploy.
+    @Test
+    void legacyConcatenatedValueStillCounts() {
+        game.setStoredValue("fowStatusDone", "xxchaargent");
+        assertTrue(ReactionService.isFowStatusDone(game, argent));
+    }
 }

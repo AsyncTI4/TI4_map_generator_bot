@@ -52,6 +52,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -485,7 +486,7 @@ public final class ButtonHelperSCs {
                                 " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
                     }
                 }
-                if (FoWHelper.isStabarsQol(game)) {
+                if (FoWHelper.isFogQol01(game)) {
                     GMService.logPlayerActivity(
                             game,
                             player2,
@@ -1555,6 +1556,11 @@ public final class ButtonHelperSCs {
                 setStatus = false;
             }
         }
+        if (setStatus && game.isFowMode() && buttonID.contains("mahact")) {
+            FogTokenRemovalService.startMahactAgent(event, game, player, scNum);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         if (setStatus) {
             if (!player.getFollowedSCs().contains(scNum)) {
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -1632,8 +1638,10 @@ public final class ButtonHelperSCs {
 
     public static void reactToStrategyCardMessage(Game game, Player player, int scNum, String message) {
         StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), scNum)
-                .ifPresent(scMessage ->
-                        ReactionService.addReaction(player, false, message, null, scMessage.messageId(), game));
+                .ifPresentOrElse(
+                        scMessage ->
+                                ReactionService.addReaction(player, false, message, null, scMessage.messageId(), game),
+                        () -> MessageHelper.sendPrivateMessageToPlayer(player, game, message));
     }
 
     @ButtonHandler("sc_no_follow_")

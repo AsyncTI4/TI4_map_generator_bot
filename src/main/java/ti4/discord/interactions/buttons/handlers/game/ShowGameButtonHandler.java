@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -12,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.image.MapRenderPipeline;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.fow.MapSegmentService;
@@ -45,6 +47,9 @@ class ShowGameButtonHandler {
                 Buttons.gray(MapSegmentService.withSegment(SHOW_FULL_MAP, segment), "Show Full Map"));
         if (postsInChannel(event)) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            if (REFRESH.equals(event.getComponentId())) {
+                event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
+            }
         } else {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         }

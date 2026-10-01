@@ -60,7 +60,6 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -775,7 +774,7 @@ public class MessageHelper {
     }
 
     private static void replaceFogTurnMessage(String text, Message message, ManagedGame managedGame) {
-        if (!isTurnButtonMessage(text) || !FoWHelper.isStabarsQol(managedGame.getGame())) return;
+        if (!isTurnButtonMessage(text) || !managedGame.isFogQol01()) return;
         MessageChannel channel = message.getChannel();
         GameMessage turnMessage = new GameMessage(
                 message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate(), channel.getId());

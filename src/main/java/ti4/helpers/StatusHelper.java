@@ -463,7 +463,7 @@ public final class StatusHelper {
         }
         MessageHelper.sendMessageToChannelWithPersistentReacts(
                 gameChannel, messageText, game, poButtons, GameMessageType.STATUS_SCORING);
-        if (FoWHelper.isStabarsQol(game)) {
+        if (FoWHelper.isFogQol01(game)) {
             offerEdynCommanderDrawPrivately(game);
             FowScoringStatusService.postForAllPlayers(game);
         }
@@ -1020,7 +1020,7 @@ public final class StatusHelper {
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged() + " is the one the game is currently waiting on.";
                 }
-                if (FoWHelper.isStabarsQol(game)) {
+                if (FoWHelper.isFogQol01(game)) {
                     GMService.logPlayerActivity(
                             game,
                             player2,
@@ -1108,7 +1108,7 @@ public final class StatusHelper {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";
                         }
-                        if (FoWHelper.isStabarsQol(game)) {
+                        if (FoWHelper.isFogQol01(game)) {
                             GMService.logPlayerActivity(
                                     game,
                                     player2,

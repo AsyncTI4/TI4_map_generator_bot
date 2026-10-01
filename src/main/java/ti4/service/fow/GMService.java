@@ -55,7 +55,6 @@ public final class GMService {
             Buttons.green("gmWhoCanSee~MDL", "Who Can See Position..."),
             Buttons.EDIT_SUMMARIES,
             Buttons.green("gmLore", "Manage Lore"),
-            Buttons.green("gmQolSettings~MDL", "QOL Settings..."),
             Buttons.gray("gmRefresh", "Refresh"));
 
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
@@ -358,7 +357,7 @@ public final class GMService {
                 .setValue(String.valueOf(FowAutoDeclineService.spreadHours(game)))
                 .setRequiredRange(1, 6)
                 .build();
-        Modal modal = Modal.create("gmQolSettingsResolve", "Stabar's QOL Settings")
+        Modal modal = Modal.create("gmQolSettingsResolve", "Fog QoL 01 Settings")
                 .addComponents(
                         Label.of("Auto-decline delay (hours)", base), Label.of("Random spread +/- (hours)", spread))
                 .build();
@@ -378,7 +377,7 @@ public final class GMService {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 "Players who cannot follow a strategy card are auto-declined after " + base + " hours +/- " + spread
-                        + " hours (random), or as soon as they react. Needs the **Stabar's QOL** option.");
+                        + " hours (random), or as soon as they react. Needs the **Fog QoL 01** option.");
     }
 
     private static void checkWhoHas(String acId, Game game, ButtonInteractionEvent event) {

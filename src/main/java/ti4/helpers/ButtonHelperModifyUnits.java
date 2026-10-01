@@ -1040,8 +1040,9 @@ public final class ButtonHelperModifyUnits {
                         event.getMessageChannel(),
                         game.getActivePlayer().getRepresentation() + ", your opponent has finished assigning hits.");
             }
-            if (!player.isActivePlayer()
-                    && FoWHelper.isStabarsQol(game)
+            if (!justSummarizing
+                    && !player.isActivePlayer()
+                    && FoWHelper.isFogQol01(game)
                     && game.getActivePlayer() != null
                     && player.isRealPlayer()
                     && game.getStoredValue("mahactHeroTarget").isEmpty()) {

@@ -9,6 +9,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
@@ -57,7 +59,7 @@ public class FowAutoDeclineService {
     }
 
     public static boolean resolveDue(Game game, BiConsumer<Game, Player> onImperialDecline) {
-        if (!FoWHelper.isStabarsQol(game)) return false;
+        if (!FoWHelper.isFogQol01(game)) return false;
         List<String> keys = new ArrayList<>();
         for (String key : game.getStoredValueMap().keySet()) {
             if (key.startsWith(KEY_PREFIX)) keys.add(key);
@@ -65,7 +67,13 @@ public class FowAutoDeclineService {
         boolean changed = false;
         long now = System.currentTimeMillis();
         for (String key : keys) {
-            changed |= resolveKey(game, key, now, onImperialDecline);
+            try {
+                changed |= resolveKey(game, key, now, onImperialDecline);
+            } catch (Exception e) {
+                BotLogger.error(new LogOrigin(game), "Fog auto-decline failed for " + key, e);
+                game.removeStoredValue(key);
+                changed = true;
+            }
         }
         return changed;
     }

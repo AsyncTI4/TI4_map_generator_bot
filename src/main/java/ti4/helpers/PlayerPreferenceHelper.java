@@ -35,7 +35,7 @@ public final class PlayerPreferenceHelper {
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
         else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
         buttons.add(Buttons.gray("playerPref_refreshMapStyle", "Refresh Map Style"));
-        if (FoWHelper.isStabarsQol(game)) {
+        if (FoWHelper.isFogQol01(game)) {
             if (player.getUserSettings().isFogMapOnTurnStart())
                 buttons.add(Buttons.gray("playerPref_fogTurnMapOff", "Stop posting my fog map at turn start"));
             else buttons.add(Buttons.gray("playerPref_fogTurnMapOn", "Post my fog map at turn start"));

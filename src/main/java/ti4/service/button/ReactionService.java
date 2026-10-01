@@ -166,7 +166,11 @@ public class ReactionService {
     }
 
     public static boolean isFowStatusDone(Game game, Player player) {
-        return Arrays.asList(game.getStoredValue(FOW_STATUS_DONE).split(",")).contains(player.getFaction());
+        String done = game.getStoredValue(FOW_STATUS_DONE);
+        if (!done.isEmpty() && !done.contains(",")) {
+            return done.contains(player.getFaction());
+        }
+        return Arrays.asList(done.split(",")).contains(player.getFaction());
     }
 
     private static void markFowStatusDone(Game game, Player player) {

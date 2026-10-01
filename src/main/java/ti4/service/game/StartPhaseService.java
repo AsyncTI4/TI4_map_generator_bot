@@ -1039,7 +1039,7 @@ public class StartPhaseService {
                     Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
-        if (game.isFowMode() && !FoWHelper.isStabarsQol(game)) {
+        if (game.isFowMode() && !FoWHelper.isFogQol01(game)) {
             Button draw1AC =
                     Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
             buttons.add(draw1AC);
@@ -1363,7 +1363,7 @@ public class StartPhaseService {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            if (!game.isFowMode() || FoWHelper.isStabarsQol(game)) {
+            if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
 
                 var userSettings = UserSettingsManager.get(p2.getUserID());
                 if (!userSettings.isPrefersPrePassOnSC()) {
