@@ -317,8 +317,8 @@ public class AutoPingCron {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please allocate command tokens.\n");
             }
             if (FoWHelper.isFogQol01(game) && !fogPlayersNotReady.isEmpty()) {
-                GMService.sendMessageToGMChannel(
-                        game, "Status homework is waiting on: " + String.join(", ", fogPlayersNotReady) + ".", false);
+                GMService.sendMessageToGMRoom(
+                        game, "Status homework is waiting on: " + String.join(", ", fogPlayersNotReady) + ".");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }

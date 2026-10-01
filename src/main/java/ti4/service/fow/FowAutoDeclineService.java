@@ -26,6 +26,7 @@ public class FowAutoDeclineService {
     public static final double DEFAULT_BASE_HOURS = 1;
     public static final double DEFAULT_SPREAD_HOURS = 1;
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
+    private static final double MAX_HOURS = 168;
 
     public static void schedule(Game game, Player player, int sc) {
         long due = dueTime(
@@ -50,9 +51,10 @@ public class FowAutoDeclineService {
     }
 
     static double parseHours(String value, double fallback) {
+        if (value == null) return fallback;
         try {
             double hours = Double.parseDouble(value);
-            return hours < 0 ? fallback : hours;
+            return Double.isFinite(hours) && hours >= 0 && hours <= MAX_HOURS ? hours : fallback;
         } catch (NumberFormatException e) {
             return fallback;
         }

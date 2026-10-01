@@ -37,4 +37,13 @@ class FowAutoDeclineServiceTest {
         assertEquals(9, FowAutoDeclineService.parseHours("", 9));
         assertEquals(9, FowAutoDeclineService.parseHours("-2", 9));
     }
+
+    // A GM can type NaN or Infinity into the modal; Double.parseDouble accepts both and NaN would cast to a 0 delay.
+    @Test
+    void nonFiniteAndHugeHoursFallBack() {
+        assertEquals(9, FowAutoDeclineService.parseHours("NaN", 9));
+        assertEquals(9, FowAutoDeclineService.parseHours("Infinity", 9));
+        assertEquals(9, FowAutoDeclineService.parseHours("1000", 9));
+        assertEquals(168, FowAutoDeclineService.parseHours("168", 9));
+    }
 }
