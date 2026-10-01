@@ -110,9 +110,6 @@ public class RelicHelper {
             int position,
             boolean checked,
             boolean ignoreKairnBreakthrough) {
-        if (!ignoreKairnBreakthrough && KairnBreakthroughHandler.offerRelicGainInterrupt(event, game, player)) {
-            return;
-        }
         if (!checked
                 && (player.hasAbility("data_leak")
                         || (player.getPromissoryNotes().containsKey("dspnflor")
@@ -157,7 +154,7 @@ public class RelicHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
-        KairnBreakthroughHandler.offerReadyAfterRelicDraw(game, player);
+        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
         if (checked) game.shuffleRelics();
     }
 
