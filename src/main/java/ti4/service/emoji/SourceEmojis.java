@@ -14,6 +14,7 @@ public enum SourceEmojis implements TI4Emoji {
     Absol,
     DiscordantStars,
     UnchartedSpace,
+    BlueReverie,
     Monuments,
     ActionDeck2,
     KeleresPlus,

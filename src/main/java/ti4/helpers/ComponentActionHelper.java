@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -1508,6 +1509,8 @@ public class ComponentActionHelper {
                     "horn_of_the_abyss" -> {
                 // handled above
             }
+            case "theantipode" -> BlueReverieRelicHandler.resolveTheAntipode(event, game, player);
+            case "matjeksdragoncage" -> BlueReverieRelicHandler.resolveMatjeksDragonCage(event, game, player);
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
             case "thesilverflame" -> SilverFlameService.rollSilverFlame(game, player);
             case "quantum_entangler" -> QuantumEntanglerService.offerQuantumEntanglerTargets(event, game, player);

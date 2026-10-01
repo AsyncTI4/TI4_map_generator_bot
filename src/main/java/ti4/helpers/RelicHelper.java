@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -205,6 +206,7 @@ public class RelicHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Triad \"planet\" card to your play area.");
             }
+            case "gedustation" -> BlueReverieRelicHandler.offerGeduStationPlacement(game, player);
 
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
@@ -295,6 +297,7 @@ public class RelicHelper {
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
             }
             case "thetriad" -> p1.removePlanet("triad");
+            case "gedustation" -> p1.removePlanet("gedustation");
             case "obsidian", "absol_obsidian" -> {
                 if (p1.getSoScored() > p1.getMaxSOCount()) {
                     // do something for 4 scored secrets
