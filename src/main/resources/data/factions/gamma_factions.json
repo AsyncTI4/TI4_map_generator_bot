@@ -414,7 +414,8 @@
             "ggcompanyy",
             "ggcompanydn"
         ],
-        "startingTechOptions": [
+        "startingTechOptions": [],
+            "startingTechAmount": 2,[
             "amd",
             "aida",
             "sdn"
@@ -460,8 +461,14 @@
             "ggindustg",
             "ggindustry"
         ],
-        "startingTechOptions": [],
-        "startingTechAmount": 2,
+        "startingTechAmount": 1,
+        "startingTechOptions": [
+        "ps",
+        "aida",
+        "st",
+        "sdn"
+        ],
+        
         
         "homePlanets": [
             "jord"
