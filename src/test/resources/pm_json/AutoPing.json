@@ -1,9 +1,0 @@
-{
-  "gameNameToAutoPing" : {
-    "testbed-reset" : {
-      "lastPingTimeEpochMilliseconds" : 1790856577494,
-      "pingCount" : 0,
-      "quickPing" : false
-    }
-  }
-}
