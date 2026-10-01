@@ -209,7 +209,7 @@
     {
         "id": "bounties",
         "name": "Bounties",
-        "faction": "gray",
+        "faction": "company",
         "permanentEffect": "During Setup, draw and place 3 secret objectives onto your faction sheet faceup. Those cards do not count against your total scored and unscored secret objectives and whenever they would be removed they are returned to the deck instead. ",
         "window": "When a game effect would let you draw or discard a secret objective,",
         "windowEffect": "you may instead place onto or discard from your faction sheet, respectively.",
@@ -218,7 +218,7 @@
     {
         "id": "dogs_of_war",
         "name": "Dogs of War",
-        "faction": "gray",
+        "faction": "company",
         "window": "When you score a secret objective on your faction sheet",
         "windowEffect": "turn it facedown. You do not gain a victory point and it does not count against the number of secret objectives you can score during the status phase.",
         "permanentEffect": "At the end of your turn, you may remove 1 of your facedown secret objectives to perform the secondary ability of any strategy card without spending a command token.",

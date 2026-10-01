@@ -108,10 +108,10 @@
         "source": "gamma"
     },
     {
-        "alias": "graybt",
+        "alias": "companybt",
         "name": "The Grim Tableau",
         "shortName": "The Grim\nTableau",
-        "faction": "gray",
+        "faction": "company",
         "synergy": [
             "BIOTIC",
             "CYBERNETIC"

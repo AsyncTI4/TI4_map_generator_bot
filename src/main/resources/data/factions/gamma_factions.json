@@ -405,14 +405,14 @@
         "source": "gamma"
     },
     {
-        "alias": "gray",
+        "alias": "company",
         "factionName": "The Gray Company",
         "homeSystem": "10",
         "startingFleet": "1 dr, 1 cr, 1 cv, 3 ff, 3 inf d, sd d",
         "commodities": 3,
         "factionTech": [
-            "gggrayr",
-            "gggraydn"
+            "ggcompanyy",
+            "ggcompanydn"
         ],
         "startingTechOptions": [
             "amd",
@@ -428,22 +428,22 @@
             "dogs_of_war"
         ],
         "leaders": [
-            "grayagent",
-            "graycommander",
-            "grayhero"
+            "companyagent",
+            "companycommander",
+            "companyhero"
         ],
         "promissoryNotes": [
-            "ggpngray"
+            "ggpncompany"
         ],
         "units": [
             "fighter",
             "destroyer",
             "cruiser",
             "carrier",
-            "gray_dreadnought",
-            "gray_flagship",
+            "company_dreadnought",
+            "company_flagship",
             "infantry",
-            "gray_mech",
+            "company_mech",
             "pds",
             "spacedock"
         ],

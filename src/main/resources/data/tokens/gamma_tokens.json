@@ -105,11 +105,11 @@
         "source": "gamma"
     },
     {
-        "id": "gray_arc",
+        "id": "company_arc",
         "imagePath": "",
         "spaceOrPlanet": "space",
         "aliasList": [
-            "grayarc"
+            "companyarc"
         ],
         "source": "gamma"
     }

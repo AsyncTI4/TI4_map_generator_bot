@@ -109,9 +109,9 @@
         "text": "When you receive this card, if you are not the Keleres Player, you must place it face up in your play area. At the end of the status phase, draw 1 secret objective, place it face up in your play area, then return this card to the Keleres player."
     },
     {
-        "alias": "ggpngray",
+        "alias": "ggpncompany",
         "name": "Defensive Escorts",
-        "faction": "gray",
+        "faction": "company",
         "color": "",
         "playArea": false,
         "source": "gamma",

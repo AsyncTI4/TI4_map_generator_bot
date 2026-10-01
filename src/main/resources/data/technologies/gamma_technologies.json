@@ -205,24 +205,24 @@
           
     },   
     {
-        "alias": "gggrayr",
+        "alias": "ggcompanyy",
         "name": "Reavic Statismesh",
         "types": [
             "CYBERNETIC"
         ],
         "requirements": "YY",
-        "faction": "gray",
+        "faction": "company",
         "source": "gamma",
         "text": "Planets with a trait that contain one or more of your structures are treated as if they had all 3 traits (Cultural, Hazardous, and Industrial).\nWhen you would perform the secondary ability of any strategy card, you may exhaust this card to place 1 structure on a planet you control instead."
     },
     {
-        "alias": "gggraydn",
+        "alias": "ggcompanydn",
         "name": "Velite Rapax II",
         "types": [
             "UNITUPGRADE"
         ],
         "requirements": "YY",
-        "faction": "gray",
+        "faction": "company",
         "baseUpgrade": "dn2",
         "source": "gamma",
         "text": "This unit cannot be destroyed by 'Direct Hit' action cards.\nDEPLOY: After you win a space combat, you may produce 1 dreadnought in the active system."

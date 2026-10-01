@@ -307,8 +307,8 @@
       "source": "gamma"
     },
     {
-        "id": "grayagent",
-        "faction": "gray",
+        "id": "companyagent",
+        "faction": "company",
         "type": "agent",
         "name": "_AWOL_83_",
         "title": "Bounty Hunter",
@@ -318,8 +318,8 @@
         "source": "gamma"
     },
     {
-        "id": "graycommander",
-        "faction": "gray",
+        "id": "companycommander",
+        "faction": "company",
         "type": "commander",
         "name": "_ZEN_7_",
         "title": "Bail Bondsman",
@@ -329,8 +329,8 @@
         "source": "gamma"
     },
     {
-        "id": "grayhero",
-        "faction": "gray",
+        "id": "companyhero",
+        "faction": "company",
         "type": "hero",
         "name": "_ADMIRAL_0_",
         "title": "Company Admiral",
