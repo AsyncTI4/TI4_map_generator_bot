@@ -58,7 +58,8 @@ class PlaceDrawableCard extends GameStateSubcommand {
         Player player = getPlayer();
         List<String> deck = getDeck(game, deckType);
         if (deck == null || !isCardTypeValid(deckType, cardId)) {
-            MessageHelper.sendMessageToEventChannel(event, "That card ID is not valid for the selected deck: `" + cardId + "`.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "That card ID is not valid for the selected deck: `" + cardId + "`.");
             return;
         }
 
@@ -68,8 +69,8 @@ class PlaceDrawableCard extends GameStateSubcommand {
         } else {
             deck.addLast(cardId);
         }
-        MessageHelper.sendMessageToEventChannel(event, "Placed a card on the " + position + " of the "
-                + deckType.replace('_', ' ') + " deck.");
+        MessageHelper.sendMessageToEventChannel(
+                event, "Placed a card on the " + position + " of the " + deckType.replace('_', ' ') + " deck.");
     }
 
     private List<String> getDeck(Game game, String deckType) {
@@ -104,8 +105,7 @@ class PlaceDrawableCard extends GameStateSubcommand {
             case EXPLORE -> removeExplore(game, cardId);
             case AGENDA -> removeAgenda(game, cardId);
             case EVENT -> removeEvent(game, player, cardId);
-            default -> {
-            }
+            default -> {}
         }
     }
 
