@@ -15,6 +15,12 @@ class TestBedDisable extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        if (TestBedService.allowsRealPlayers(game)) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "🛠️ **Developer test mode** was disabled by "
+                            + event.getUser().getEffectiveName() + ".");
+        }
         TestBedService.markAsTestBed(game, false);
         TestBedService.clearAllActingAs(game);
         MessageHelper.replyToMessage(event, "**" + game.getName() + "** is no longer a test bed.");

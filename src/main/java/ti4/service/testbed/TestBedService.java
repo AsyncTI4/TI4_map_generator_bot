@@ -14,7 +14,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
+import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
 @UtilityClass
@@ -22,11 +24,14 @@ public class TestBedService {
 
     static final String TEST_BED_KEY = "testBed";
     static final String ACTING_AS_PREFIX = "testBedActingAs_";
+    static final String REAL_PLAYERS_KEY = "testBedRealPlayers";
     public static final String VIRTUAL_SEAT_ID_PREFIX = "90000000000000";
     private static final Set<Integer> SAVE_FORMAT_SEPARATORS = Set.of((int) ',', (int) ':', (int) '\n');
 
     public static boolean isEnabled() {
-        return ImplementedSettings.TESTBED_ENABLED.getAsBoolean(false);
+        Object value = GlobalSettings.getSetting(ImplementedSettings.TESTBED_ENABLED.toString(), Object.class, false);
+        return Boolean.TRUE.equals(value)
+                || "true".equalsIgnoreCase(String.valueOf(value).trim());
     }
 
     public static boolean isTestBed(@Nullable Game game) {
@@ -53,7 +58,20 @@ public class TestBedService {
             store(game, TEST_BED_KEY, "true");
         } else {
             game.removeStoredValue(TEST_BED_KEY);
+            game.removeStoredValue(REAL_PLAYERS_KEY);
         }
+    }
+
+    public static boolean allowsRealPlayers(Game game) {
+        return "true".equals(game.getStoredValue(REAL_PLAYERS_KEY));
+    }
+
+    public static void allowRealPlayers(Game game) {
+        store(game, REAL_PLAYERS_KEY, "true");
+    }
+
+    static boolean actAsApplies(Game game, boolean componentInteraction) {
+        return componentInteraction || !allowsRealPlayers(game);
     }
 
     public static boolean isDeveloper(@Nullable Member member) {
@@ -121,24 +139,67 @@ public class TestBedService {
             String userId,
             @Nullable String channelId,
             @Nullable Player defaultPlayer) {
-        if (!isTestBed(game) || !isDeveloper(member)) return defaultPlayer;
-        return resolveForDeveloper(game, userId, channelId, defaultPlayer);
+        return resolve(game, member, userId, channelId, defaultPlayer, false);
     }
 
     @Nullable
     public static Player resolveActingPlayer(
             Game game, GenericInteractionCreateEvent event, @Nullable Player defaultPlayer) {
+        return resolve(game, event, defaultPlayer, false);
+    }
+
+    @Nullable
+    public static Player resolveActingPlayerForComponent(
+            Game game, GenericInteractionCreateEvent event, @Nullable Player defaultPlayer) {
+        return resolve(game, event, defaultPlayer, true);
+    }
+
+    @Nullable
+    private static Player resolve(
+            Game game, GenericInteractionCreateEvent event, @Nullable Player defaultPlayer, boolean component) {
+        if (!isTestBed(game)) return defaultPlayer;
         Channel channel = event.getChannel();
-        return resolveActingPlayer(
+        return resolve(
                 game,
                 event.getMember(),
                 event.getUser().getId(),
                 channel == null ? null : channel.getId(),
-                defaultPlayer);
+                defaultPlayer,
+                component);
+    }
+
+    @Nullable
+    private static Player resolve(
+            Game game,
+            @Nullable Member member,
+            String userId,
+            @Nullable String channelId,
+            @Nullable Player defaultPlayer,
+            boolean component) {
+        if (!isTestBed(game) || !isDeveloper(member) || !actAsApplies(game, component)) return defaultPlayer;
+        return resolveForDeveloper(game, userId, channelId, defaultPlayer);
+    }
+
+    public static boolean isPanelComponent(String componentId) {
+        return componentId.startsWith(TestBedPanelService.PREFIX);
+    }
+
+    public static void logPanelUse(Game game, String developerName, String target, String buttonLabel) {
+        String line = "[dev " + developerName + " panel, as " + target + "] `" + buttonLabel + "`";
+        if (allowsRealPlayers(game) && !game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "🛠️ " + line);
+            return;
+        }
+        GMService.logActivity(game, line, false);
     }
 
     public static void logActingAs(Game game, String developerName, Player seat, String action) {
-        GMService.logActivity(game, "[dev " + developerName + " as " + seat.getFaction() + "] `" + action + "`", false);
+        String line = "[dev " + developerName + " as " + seat.getFaction() + "] `" + action + "`";
+        if (allowsRealPlayers(game) && !isVirtualSeat(seat) && !game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "🛠️ " + line);
+            return;
+        }
+        GMService.logActivity(game, line, false);
     }
 
     @Nullable

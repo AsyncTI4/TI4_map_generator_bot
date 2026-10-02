@@ -28,7 +28,7 @@ class TestBedPanel extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "This game is not a test bed. Run `/testbed apply` or `enable` first.");
             return;
         }
-        Player target = TestBedService.resolveActingPlayer(
+        Player target = TestBedService.resolveActingPlayerForComponent(
                 game, event, game.getPlayer(event.getUser().getId()));
         event.getHook()
                 .sendMessage(TestBedPanelService.content(game, target, null))

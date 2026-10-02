@@ -10,11 +10,18 @@ import ti4.image.Mapper;
 @UtilityClass
 public class TestBedResetService {
 
-    public record ResetResult(int removedSeats, int resetSeats, int missingChannels) {}
+    public record ResetResult(int removedSeats, int resetSeats, int missingChannels, boolean fromSnapshot) {}
 
     public static ResetResult reset(Game game) {
         List<String> deletedChannelIds = TestBedChannelService.createdChannelIds(game);
         int missingChannels = TestBedChannelService.deleteCreatedChannels(game);
+        int virtualSeats = (int) game.getRealPlayers().stream()
+                .filter(TestBedService::isVirtualSeat)
+                .count();
+        int otherSeats = game.getRealPlayers().size() - virtualSeats;
+        if (TestBedSnapshotService.restore(game.getName()) != null) {
+            return new ResetResult(virtualSeats, otherSeats, missingChannels, true);
+        }
         int removedSeats = 0;
         int resetSeats = 0;
         for (Player player : new ArrayList<>(game.getPlayers().values())) {
@@ -31,7 +38,7 @@ public class TestBedResetService {
         TestBedService.markAsTestBed(game, false);
         game.removeStoredValue(TestBedShortcuts.STORED_KEY);
         game.removeStoredValue(TestBedApplyService.APPLIED_PRESET_KEY);
-        return new ResetResult(removedSeats, resetSeats, missingChannels);
+        return new ResetResult(removedSeats, resetSeats, missingChannels, false);
     }
 
     private static void replaceWithUnseatedPlayer(Game game, Player seated, List<String> deletedChannelIds) {
@@ -51,6 +58,7 @@ public class TestBedResetService {
         game.setActivePlayerID(null);
         game.setPhaseOfGame("");
         game.setRound(1);
+        game.getPlayedSCs().forEach(sc -> game.setSCPlayed(sc, false));
         game.setActionCards(new ArrayList<>(Mapper.getDeck(game.getAcDeckID()).getNewShuffledDeck()));
         game.removeOverruleIfPurged();
         game.getDiscardActionCards().clear();

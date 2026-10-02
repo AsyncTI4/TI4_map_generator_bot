@@ -45,6 +45,10 @@ public class TestBedApplyService {
 
     public static List<String> apply(Game game, TestBedPreset preset, GenericInteractionCreateEvent event) {
         List<String> warnings = new ArrayList<>();
+        if (!TestBedSnapshotService.take(game)) {
+            warnings.add("No snapshot of the game before the preset was saved; `/testbed reset` will rebuild it"
+                    + " instead of restoring it exactly.");
+        }
         TestBedService.markAsTestBed(game, true);
         TestBedShortcuts.store(game, preset.getShortcuts());
         recordAppliedPreset(game, preset);

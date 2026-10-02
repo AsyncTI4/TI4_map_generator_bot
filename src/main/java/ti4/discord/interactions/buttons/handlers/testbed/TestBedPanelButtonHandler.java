@@ -110,7 +110,15 @@ class TestBedPanelButtonHandler {
     }
 
     private static boolean isAllowed(ButtonInteractionEvent event, Game game) {
-        if (TestBedService.isTestBed(game) && TestBedService.isDeveloper(event.getMember())) return true;
+        if (TestBedService.isTestBed(game) && TestBedService.isDeveloper(event.getMember())) {
+            Player target = actingPlayer(event, game);
+            TestBedService.logPanelUse(
+                    game,
+                    event.getUser().getName(),
+                    target == null ? "themselves" : target.getFaction(),
+                    event.getButton().getLabel());
+            return true;
+        }
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "The test bed panel only works for developers in a test bed game.");
         return false;
@@ -118,7 +126,7 @@ class TestBedPanelButtonHandler {
 
     @Nullable
     private static Player actingPlayer(ButtonInteractionEvent event, Game game) {
-        return TestBedService.resolveActingPlayer(
+        return TestBedService.resolveActingPlayerForComponent(
                 game, event, game.getPlayer(event.getUser().getId()));
     }
 

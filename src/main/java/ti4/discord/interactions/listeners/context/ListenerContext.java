@@ -80,8 +80,8 @@ public abstract class ListenerContext {
         if (game != null) {
             String userID = event.getUser().getId();
             Player clickerPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
-            player = TestBedService.resolveActingPlayer(game, event, clickerPlayer);
-            if (player != null && player != clickerPlayer) {
+            player = TestBedService.resolveActingPlayerForComponent(game, event, clickerPlayer);
+            if (player != null && player != clickerPlayer && !TestBedService.isPanelComponent(compID)) {
                 TestBedService.logActingAs(game, event.getUser().getName(), player, getContextType() + " " + compID);
             }
 

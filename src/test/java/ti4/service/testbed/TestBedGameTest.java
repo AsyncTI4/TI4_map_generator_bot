@@ -27,6 +27,8 @@ import ti4.image.Mapper;
 import ti4.model.TestBedScript.Shortcut;
 import ti4.service.testbed.TestBedPanelService.Tool;
 import ti4.service.testbed.TestBedResetService.ResetResult;
+import ti4.settings.GlobalSettings;
+import ti4.settings.GlobalSettings.ImplementedSettings;
 import ti4.testUtils.BaseTi4Test;
 
 // Behaviour on an in-memory game: who a developer acts as, reset, the state paths scripts read, and the panel.
@@ -92,6 +94,41 @@ class TestBedGameTest extends BaseTi4Test {
         assertSame(developer, TestBedService.findNonDeveloper(guild, List.of(diceBot, developer)));
     }
 
+    // With real players seated, act-as only applies to buttons, selects and modals (which announce every action);
+    // slash commands, chat and views stay the developer's own. Disabling the test bed drops the opt-in.
+    @Test
+    void realPlayerModeLimitsActAsToComponents() {
+        TestBedService.markAsTestBed(game, true);
+        assertTrue(TestBedService.actAsApplies(game, true));
+        assertTrue(TestBedService.actAsApplies(game, false));
+
+        TestBedService.allowRealPlayers(game);
+        assertTrue(TestBedService.allowsRealPlayers(game));
+        assertTrue(TestBedService.actAsApplies(game, true));
+        assertFalse(TestBedService.actAsApplies(game, false));
+        assertTrue(TestBedService.isPanelComponent(TestBedPanelService.TOOL + "tg"));
+
+        TestBedService.markAsTestBed(game, false);
+        assertFalse(TestBedService.allowsRealPlayers(game));
+    }
+
+    // The switch is set with `/developer setting`, where a developer may pick `setting_type:string`. That must
+    // still work and must never throw: the check runs on every button press in every game.
+    @Test
+    void globalSwitchAcceptsBooleanOrText() {
+        String key = ImplementedSettings.TESTBED_ENABLED.toString();
+        try {
+            GlobalSettings.setSetting(key, "true");
+            assertTrue(TestBedService.isEnabled());
+            GlobalSettings.setSetting(key, true);
+            assertTrue(TestBedService.isEnabled());
+            GlobalSettings.setSetting(key, "no");
+            assertFalse(TestBedService.isEnabled());
+        } finally {
+            GlobalSettings.setSetting(key, false);
+        }
+    }
+
     @Test
     void actAsStateIsPerUserAndClearable() {
         assertTrue(TestBedService.isVirtualSeat(nekro));
@@ -117,11 +154,13 @@ class TestBedGameTest extends BaseTi4Test {
         game.drawActionCard(nekro.getUserID(), 3);
         TestBedService.setActingAs(game, DEV_ID, nekro);
         game.setStoredValue(TestBedApplyService.APPLIED_PRESET_KEY, "action-3p");
+        game.setSCPlayed(3, true);
         int fullDeck = Mapper.getDeck(game.getAcDeckID()).getNewShuffledDeck().size();
 
         ResetResult result = TestBedResetService.reset(game);
 
-        assertEquals(new ResetResult(1, 1, 1), result);
+        assertEquals(new ResetResult(1, 1, 1, false), result);
+        assertTrue(game.getPlayedSCs().isEmpty());
         assertNull(game.getPlayer(nekro.getUserID()));
         Player unseated = game.getPlayer(DEV_ID);
         assertNotNull(unseated);

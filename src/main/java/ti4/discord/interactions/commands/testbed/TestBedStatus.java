@@ -28,7 +28,9 @@ class TestBedStatus extends GameStateSubcommand {
         }
         MessageHelper.replyToMessage(
                 event,
-                "Test bed: **" + TestBedService.isTestBed(game) + "**. You are acting as: **"
+                "Test bed: **" + TestBedService.isTestBed(game) + "**"
+                        + (TestBedService.allowsRealPlayers(game) ? " (with real players: actions are announced)" : "")
+                        + ". You are acting as: **"
                         + (actingAs == null ? "yourself" : actingAs.getFaction()) + "**.\nSeats:" + seats);
     }
 }

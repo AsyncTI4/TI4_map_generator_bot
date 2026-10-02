@@ -12,9 +12,22 @@ Everything is gated three ways. Without all three, the bot behaves exactly as be
    /developer setting setting_name:testbed_enabled setting_value:true setting_type:bool
    ```
 2. **Per game.** A game becomes a test bed through `/testbed apply` or `/testbed enable`. Both refuse a game that
-   has a seated player without the developer role.
+   has a seated player without the developer role (bots do not count), unless the developer opts in; see
+   [Games with real players](#games-with-real-players).
 3. **Per user.** Acting as another seat only applies to members with a developer role
    (`JdaService.developerRoles`, which includes admins).
+
+### Games with real players
+
+`/testbed enable allow_real_players:true` turns the test bed on in a game with real (non-developer) players, for
+example to unblock a stuck game or reproduce a bug in place. Extra rules apply there:
+- **Announced:** enabling and disabling post a notice in the game channel. Every button press made as another
+  player's seat, and every panel press, is posted to the main channel (the GM activity log in fog games, so no
+  faction leaks).
+- **Buttons only:** act-as applies to buttons, selects, modals and the panel. Slash commands, typed messages and
+  whispers, and map or card views stay the developer's own, so a developer cannot chat as a player or see their
+  fog or hidden cards through act-as.
+- **Blocked:** `/testbed reset` (it would unseat everyone), `/testbed apply` and `/testbed run`.
 
 ## Quick start
 
@@ -23,7 +36,8 @@ Everything is gated three ways. Without all three, the bot behaves exactly as be
 3. Press buttons inside a seat's private channel or cards-info thread to act as that seat. For shared channels
    (strategy card follows, agenda votes, scoring), switch with `/testbed act_as faction_or_color:nekro` or the panel.
 4. `/testbed panel` opens your private control panel.
-5. `/testbed reset confirm:true` clears everything, so you can `apply` again in the same game.
+5. `/testbed reset confirm:true` puts the game back exactly as it was before `apply`, so you can apply again in
+   the same game.
 
 ## Commands
 
@@ -34,8 +48,8 @@ Everything is gated three ways. Without all three, the bot behaves exactly as be
 | `/testbed panel` | Private panel: act-as buttons, +1 TG/commodity/tactic/strategy, ready all, make active player, cards info, shortcuts, start a phase. |
 | `/testbed run [script] [file] [stop_on_fail] [reset]` | Runs a test script: presses buttons as seats, checks state and messages, posts a ✅/❌ report and a Markdown log. |
 | `/testbed status` | Shows the test-bed state of this game. |
-| `/testbed reset confirm:true` | Deletes the test bed's channels, removes virtual seats, unseats you, clears the map and restores the action card, secret objective and relic decks. |
-| `/testbed enable` / `disable` | Marks or unmarks a hand-built game as a test bed. |
+| `/testbed reset confirm:true` | Deletes the test bed's channels and restores the snapshot `apply` took, so the game is exactly as it was before (seats, map, decks, played strategy cards, round, stored values). |
+| `/testbed enable [allow_real_players]` / `disable` | Marks or unmarks an existing game as a test bed. `allow_real_players:true` is needed when real players are seated. |
 
 ## Who am I acting as?
 
@@ -324,6 +338,10 @@ The panel's **Shortcuts** button lists:
   channel `<game>-testseatN-private`, and you get the `<game> GM` role.
 - Every channel or thread the test bed creates is recorded in the stored value `testBedChannels`; `reset` deletes
   only those.
+- `apply` first copies the game file to `storage/testbed/<game>.txt`; `reset` restores that copy and reloads the
+  game. The folder is outside `storage/maps`, so it is never loaded as a game or an undo file. A game applied
+  before snapshots existed falls back to rebuilding: seats removed, map, played strategy cards and the action
+  card, secret objective and relic decks reset.
 
 ## Regression guards
 
@@ -357,5 +375,5 @@ fog private channel instead of being dropped.
 Other limits:
 - Code that looks a virtual seat up as a Discord member or user gets nothing back. Report anything that breaks
   because of that.
-- `reset` does not undo revealed objectives, agendas, explores or game options. Create a new game for a fully clean
-  slate.
+- `reset` restores the game exactly only when `apply` took a snapshot (any apply since snapshots were added).
+  Without one it rebuilds the main parts but not revealed objectives, agendas, explores or game options.

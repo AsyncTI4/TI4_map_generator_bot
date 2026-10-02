@@ -138,7 +138,11 @@ public final class TestBedScriptRunner {
         Game game = current();
         if (!TestBedService.isTestBed(game) || game.getRealPlayers().isEmpty()) return true;
         List<TestBedResetService.ResetResult> results = new ArrayList<>();
-        boolean done = TestBedPress.runLocked(game, locked -> results.add(TestBedResetService.reset(locked)));
+        boolean done = TestBedPress.runLocked(game, false, locked -> {
+            TestBedResetService.ResetResult result = TestBedResetService.reset(locked);
+            if (!result.fromSnapshot()) GameManager.save(locked, "Test bed reset");
+            results.add(result);
+        });
         if (!done || results.isEmpty()) {
             add(0, "reset", Status.FAIL, "reset", "game not loaded");
             return false;

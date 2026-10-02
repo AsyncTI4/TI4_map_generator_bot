@@ -180,6 +180,10 @@ public class TestBedPress {
     }
 
     public static boolean runLocked(Game game, Consumer<Game> action) {
+        return runLocked(game, true, action);
+    }
+
+    public static boolean runLocked(Game game, boolean saveAfterwards, Consumer<Game> action) {
         String gameName = game.getName();
         ExecutionLockManager.lock(gameName, ExecutionLockType.WRITE);
         try {
@@ -187,7 +191,7 @@ public class TestBedPress {
             if (managed == null) return false;
             Game current = managed.getGame();
             action.accept(current);
-            GameManager.save(current, "Test bed script step");
+            if (saveAfterwards) GameManager.save(current, "Test bed script step");
             return true;
         } finally {
             ExecutionLockManager.unlock(gameName, ExecutionLockType.WRITE);

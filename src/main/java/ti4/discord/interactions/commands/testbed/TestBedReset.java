@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.testbed.TestBedResetService;
 import ti4.service.testbed.TestBedResetService.ResetResult;
@@ -16,7 +17,7 @@ class TestBedReset extends GameStateSubcommand {
     private static final String CONFIRM = "confirm";
 
     TestBedReset() {
-        super("reset", "Remove virtual seats and their channels, unseat you and clear the map", true, false);
+        super("reset", "Remove virtual seats and their channels, unseat you and clear the map", false, false);
         addOptions(new OptionData(OptionType.BOOLEAN, CONFIRM, "Deletes the test bed's channels; cannot be undone")
                 .setRequired(true));
     }
@@ -39,9 +40,12 @@ class TestBedReset extends GameStateSubcommand {
             return;
         }
         ResetResult result = TestBedResetService.reset(game);
+        if (!result.fromSnapshot()) GameManager.save(game, "Test bed reset");
+        String restored = result.fromSnapshot()
+                ? "restored the game exactly as it was before `/testbed apply`"
+                : "cleared the map, played strategy cards and the action card, secret objective and relic decks";
         String summary = "Test bed reset: removed " + result.removedSeats() + " virtual seats, unseated "
-                + result.resetSeats() + " developer seats, cleared the map and restored the action card, secret"
-                + " objective and relic decks. Run `/testbed apply` to start again.";
+                + result.resetSeats() + " developer seats and " + restored + ". Run `/testbed apply` to start again.";
         if (result.missingChannels() > 0) {
             summary += "\n" + result.missingChannels() + " test bed channels were already gone.";
         }
