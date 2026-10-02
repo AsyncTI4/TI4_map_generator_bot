@@ -96,7 +96,9 @@ class GameLoadService {
     public static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
-            return readGame(gameFile);
+            Game game = readGame(gameFile);
+            if (game != null) game.setDatabaseSyncVersion(GameDatabaseSyncVersion.next());
+            return game;
         });
     }
 

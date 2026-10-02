@@ -16,6 +16,7 @@ public class GameEntityPersistenceService {
 
     @Transactional
     public void replace(GameEntitySnapshot snapshot) {
+        if (hasNewerVersion(snapshot.game().getGameName(), snapshot.game().getSyncVersion())) return;
         upsertUsers(snapshot.users());
         deleteGameRows(snapshot.game().getGameName());
         gameEntityRepository.save(snapshot.game());
@@ -25,6 +26,20 @@ public class GameEntityPersistenceService {
     @Transactional
     public void delete(String gameName) {
         deleteGameRows(gameName);
+    }
+
+    @Transactional
+    public void deleteUnlessNewer(String gameName, long syncVersion) {
+        if (hasNewerVersion(gameName, syncVersion)) return;
+        deleteGameRows(gameName);
+    }
+
+    private boolean hasNewerVersion(String gameName, Long syncVersion) {
+        if (syncVersion == null) return false;
+        return gameEntityRepository
+                .findSyncVersionByGameName(gameName)
+                .filter(storedVersion -> storedVersion > syncVersion)
+                .isPresent();
     }
 
     private void upsertUsers(List<UserEntity> users) {

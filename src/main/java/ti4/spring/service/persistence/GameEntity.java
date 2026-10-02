@@ -79,6 +79,9 @@ public class GameEntity {
     @Column(name = "player_count")
     private int playerCount;
 
+    @Column(name = "sync_version")
+    private Long syncVersion;
+
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
 

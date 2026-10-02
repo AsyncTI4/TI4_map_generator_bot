@@ -127,6 +127,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     @Getter
     private Map<String, Player> players = new LinkedHashMap<>();
 
+    @Setter
+    @Getter
+    private long databaseSyncVersion;
+
     private final Map<String, Planet> planets = new HashMap<>();
 
     @Getter

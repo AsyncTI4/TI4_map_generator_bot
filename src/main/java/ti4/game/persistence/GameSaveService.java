@@ -67,7 +67,9 @@ class GameSaveService {
     static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
             game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
-            return save(game);
+            boolean saved = save(game);
+            if (saved) game.setDatabaseSyncVersion(GameDatabaseSyncVersion.next());
+            return saved;
         });
     }
 

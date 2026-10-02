@@ -24,7 +24,9 @@ class GameSaveLoadTest extends BaseTi4Test {
                             "latestCommand",
                             "draftManager.game.latestCommand",
                             "lastModifiedDate",
-                            "draftManager.game.lastModifiedDate")
+                            "draftManager.game.lastModifiedDate",
+                            "databaseSyncVersion",
+                            "draftManager.game.databaseSyncVersion")
                     .isEqualTo(game);
 
             assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
@@ -47,7 +49,9 @@ class GameSaveLoadTest extends BaseTi4Test {
                             "latestCommand",
                             "draftManager.game.latestCommand",
                             "lastModifiedDate",
-                            "draftManager.game.lastModifiedDate")
+                            "draftManager.game.lastModifiedDate",
+                            "databaseSyncVersion",
+                            "draftManager.game.databaseSyncVersion")
                     .isEqualTo(game);
 
             assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
