@@ -61,6 +61,7 @@ public class GameDatabaseSyncPipeline {
 
     private static void queue(String gameName, Consumer<GameEntityPersistenceService> databaseWrite) {
         Runnable runnable = () -> {
+            if (DatabasePersistenceGate.isDisabled()) return;
             try {
                 databaseWrite.accept(SpringContext.getBean(GameEntityPersistenceService.class));
             } catch (Exception e) {

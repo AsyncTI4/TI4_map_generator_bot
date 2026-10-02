@@ -26,10 +26,6 @@ public class GameEntityMapper {
 
     public static GameEntitySnapshot toSnapshot(Game game) {
         Map<String, UserEntity> users = new LinkedHashMap<>();
-        for (Player player : game.getRealAndEliminatedPlayers()) {
-            users.putIfAbsent(player.getUserID(), new UserEntity(player.getUserID(), player.getUserName()));
-        }
-
         GameEntity gameEntity = toGameEntity(game, users);
         List<TitleEntity> titles = toTitleEntities(game, gameEntity, users);
         return new GameEntitySnapshot(gameEntity, List.copyOf(users.values()), titles);
@@ -89,8 +85,13 @@ public class GameEntityMapper {
         playerEntity.setReplaced(!Objects.equals(player.getUserID(), player.getStatsTrackedUserID()));
         playerEntity.setGame(gameEntity);
         playerEntity.setUser(users.computeIfAbsent(
-                player.getStatsTrackedUserID(), userId -> toUserEntity(userId, player.getStatsTrackedUserName())));
+                player.getStatsTrackedUserID(), userId -> toUserEntity(userId, statsTrackedUserName(player))));
         return playerEntity;
+    }
+
+    private static String statsTrackedUserName(Player player) {
+        if (Objects.equals(player.getUserID(), player.getStatsTrackedUserID())) return player.getUserName();
+        return player.getStatsTrackedUserName();
     }
 
     private static UserEntity lookUpUser(String userId) {

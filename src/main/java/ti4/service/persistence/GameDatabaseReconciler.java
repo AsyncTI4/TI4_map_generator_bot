@@ -51,6 +51,10 @@ public class GameDatabaseReconciler {
                     BotLogger.warning(TASK_NAME + " was interrupted before it finished.");
                     return;
                 }
+                if (DatabasePersistenceGate.isDisabled()) {
+                    BotLogger.warning(TASK_NAME + " stopped because database maintenance mode was turned on.");
+                    return;
+                }
                 String gameName = managedGame.getName();
                 if (wasChangedAfter(gameName, startedAt)) {
                     existingGameNames.add(gameName);
@@ -102,6 +106,7 @@ public class GameDatabaseReconciler {
     }
 
     private static Optional<String> reconcileUnreferencedUsers() {
+        if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
         UnreferencedUserService unreferencedUserService = SpringContext.getBean(UnreferencedUserService.class);
         List<String> unreferencedUserIds = unreferencedUserService.findUnreferencedUserIds();
         if (unreferencedUserIds.isEmpty()) return Optional.empty();
@@ -135,6 +140,7 @@ public class GameDatabaseReconciler {
 
     private static String repair(String gameName, String discrepancy, Runnable databaseWrite) {
         String description = StringUtils.abbreviate(gameName + ": " + discrepancy, MAX_DISCREPANCY_LENGTH);
+        if (DatabasePersistenceGate.isDisabled()) return description + " (not repaired: database maintenance mode)";
         try {
             databaseWrite.run();
             return description;

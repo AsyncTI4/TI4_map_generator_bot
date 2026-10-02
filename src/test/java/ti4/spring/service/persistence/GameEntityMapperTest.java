@@ -25,6 +25,9 @@ class GameEntityMapperTest extends BaseTi4Test {
         assertThat(playerEntity.isReplaced()).isTrue();
         assertThat(playerEntity.getUser().getId()).isEqualTo("original-id");
         assertThat(playerEntity.getUser().getName()).isEqualTo("Original");
+        // Only users a player or title row points at are written, otherwise the nightly reconciler would
+        // delete the replacement's unreferenced user row and report it every night.
+        assertThat(snapshot.users()).extracting(UserEntity::getId).containsExactly("original-id");
     }
 
     @Test
