@@ -6,9 +6,13 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
@@ -16,6 +20,8 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class LogBufferManager {
 
+    private static final int MAX_DISCORD_MESSAGE_LENGTH = 2000;
+    private static final int LOG_SEND_TIMEOUT_MINUTES = 10;
     private static final int INITIAL_STRING_BUFFER_SIZE = 2000;
     private static final int INITIAL_BUFFER_SIZE = 500;
     private static final Object BUFFER_LOCK = new Object();
@@ -82,17 +88,26 @@ public class LogBufferManager {
         try {
             TextChannel channel = logCandidates.getFirst();
             if (target.threadName() == null) {
-                MessageHelper.sendMessageToChannel(channel, message.toString());
+                sendLogChunks(channel, message.toString());
             } else {
                 ThreadGetter.getThreadInChannel(
                         channel,
                         target.threadName(),
                         false,
                         false,
-                        (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
+                        (threadChannel) -> sendLogChunks(threadChannel, message.toString()));
             }
         } catch (Exception e) {
             BotLogger.error("Failed to send LogBufferManager message", e);
+        }
+    }
+
+    private static void sendLogChunks(MessageChannel channel, String message) {
+        for (String chunk : MessageHelper.splitLargeText(message, MAX_DISCORD_MESSAGE_LENGTH)) {
+            if (StringUtils.isBlank(chunk)) continue;
+            channel.sendMessage(chunk)
+                    .timeout(LOG_SEND_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
