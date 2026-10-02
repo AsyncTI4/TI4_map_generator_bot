@@ -21,6 +21,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
@@ -774,6 +775,12 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Maertin Donaais, the Toldar" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+        }
+
+        if ("uydaiagent".equalsIgnoreCase(agent)) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "This is not automated. The following command allows you to place a card back on the bottom of a deck: `/game place_drawable_card`. Any immediate effects of the already drawn card will need to be undone manually. Use the search function to find a cards ID if unknown.");
         }
 
         if ("zephyrionagent".equalsIgnoreCase(agent)) {
@@ -1633,6 +1640,13 @@ public final class ButtonHelperAgents {
                 return;
             }
             VanguardLeadersHandler.resolveVanguardAgentTarget(game, target);
+        }
+        if ("sarcosaagent".equalsIgnoreCase(agent)) {
+            Player target = rest.contains("_") ? game.getPlayerFromColorOrFaction(rest.split("_")[1]) : player;
+            if (target != null) {
+                SarcosaAgentHandler.offerSarcosaAgentSystemButtons(game, target, event);
+            }
+            return;
         }
 
         TkHelperGenomes.onExhaust(event, game, player, agent, ssruuClever, rest);

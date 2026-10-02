@@ -46,6 +46,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -97,7 +98,8 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    private static void resetStoredValuesEndOfTurn(Game game, Player player) {
+    private static void resetStoredValuesEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        AtokeraHeroButton.returnCommittedShips(event, game, player);
         AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
         AeternaUnitsHandler.clearCryptActionState(game);
@@ -144,7 +146,7 @@ public class EndTurnService {
     public static void pingNextPlayer(
             GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         MonumentsButtonHandler.offerFireflyReplacement(game, mainPlayer);
-        resetStoredValuesEndOfTurn(game, mainPlayer);
+        resetStoredValuesEndOfTurn(event, game, mainPlayer);
 
         var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
 

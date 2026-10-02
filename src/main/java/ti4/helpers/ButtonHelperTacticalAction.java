@@ -24,6 +24,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.QhetAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -115,6 +119,9 @@ public final class ButtonHelperTacticalAction {
         ScrapyardAbilitiesHandler.resolveEndOfTacticalAction(game, player, event);
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         ScrapyardTechHandler.clearHotswapping(game);
+        SarcosaCommanderHandler.clearAdjacency(game, player);
+        XinCommanderHandler.clearCombat(game);
+        QhetAgentHandler.returnTemporaryUnitUpgrades(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
         RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
@@ -325,11 +332,17 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("vanguardReinforce" + player.getFaction());
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
+        SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
     }
 
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         endOfTacticalActionThings(player, game, event);
+
+        if (SarcosaHeroHandler.consumeNeutralTacticalActionContinuation(game, player)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
 
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
@@ -829,6 +842,7 @@ public final class ButtonHelperTacticalAction {
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
+        SarcosaCommanderHandler.offerAdjacencySelection(game, player);
         ThurvialiLeadersHandler.offerMendingLightButtons(game, tile);
         VanguardUnitHandler.offerBulwarkButton(game, player);
         ScrapyardAbilitiesHandler.offerActivationRigButtons(game, player);

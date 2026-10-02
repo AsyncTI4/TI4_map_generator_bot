@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
@@ -40,6 +41,7 @@ public class PassService {
 
         player.setPassed(true);
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
+        SarcosaHeroHandler.offerPassAbility(game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         RevenantLeadersHandler.offerRevArcanumAgentButtons(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {

@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -662,6 +663,14 @@ public final class FoWHelper {
         }
 
         OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
+
+        if (player != null) {
+            for (String tilePosition : game.getTileMap().keySet()) {
+                if (SarcosaCommanderHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
+                    adjacentPositions.add(tilePosition);
+                }
+            }
+        }
 
         if (includeTile) {
             adjacentPositions.add(position);
