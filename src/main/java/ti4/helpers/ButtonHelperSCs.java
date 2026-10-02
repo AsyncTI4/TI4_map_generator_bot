@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
@@ -1803,11 +1804,12 @@ public final class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("Tyrannus").orElse(null);
         }
-        if (!used
+        boolean followedPolitics = !used
                 && scModel != null
                 && scModel.usesAutomationForSCID("pok3politics")
                 && !player.getFollowedSCs().contains(scModel.getInitiative())
-                && game.getPlayedSCs().contains(scModel.getInitiative())) {
+                && game.getPlayedSCs().contains(scModel.getInitiative());
+        if (followedPolitics) {
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -1826,6 +1828,9 @@ public final class ButtonHelperSCs {
         }
         ReactionService.addReaction(event, game, player, message);
         ActionCardHelper.drawActionCardsSilent(player, 2);
+        if (followedPolitics) {
+            KaltrimAgentHandler.offerAfterPoliticsSecondary(game, player);
+        }
 
         if (player.hasAbility("contagion")) {
             List<Button> buttons2 =

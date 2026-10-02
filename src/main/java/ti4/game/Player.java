@@ -51,6 +51,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
@@ -3273,10 +3274,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unit) {
+        if (isSarcosaNeutralControl() && unit != null) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null && neutral.unitBelongsToPlayer(unit)) {
+                return neutral.getUnitFromAsyncID(unit.asyncID());
+            }
+        }
         return getUnitFromAsyncID(unit.asyncID());
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
+        if (isSarcosaNeutralControl()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null) {
+                return neutral.getUnitFromAsyncID(asyncID);
+            }
+        }
         // TODO: Maybe this sort can be better, idk
         return getUnitsByAsyncID(asyncID).stream()
                 .min(UnitModel::sortFactionUnitsFirst)
@@ -3287,7 +3300,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unit == null) {
             return false;
         }
+        if (isSarcosaNeutralControl()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            return neutral != null && neutral.unitBelongsToPlayer(unit);
+        }
         return getColor().equals(AliasHandler.resolveColor(unit.colorID()));
+    }
+
+    private boolean isSarcosaNeutralControl() {
+        return SarcosaHeroHandler.isControllingNeutralUnits(game, this);
     }
 
     public boolean removeTempMod(TemporaryCombatModifierModel tempMod) {

@@ -283,7 +283,9 @@ public class AddUnitService {
                 "thrones",
                 "crystellum",
                 "scrapyard",
-                "thurviali");
+                "thurviali",
+                "sarcosa",
+                "xin");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

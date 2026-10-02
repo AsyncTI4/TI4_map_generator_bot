@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -220,6 +221,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
         }
@@ -270,6 +272,7 @@ public class StartCombatService {
             UnitHolder unitHolder,
             Tile tile) {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -1659,6 +1662,8 @@ public class StartCombatService {
         if (commanderUnitHolder != null && tile.getUnitHolders().containsKey(commanderUnitHolder)) {
             ScrapyardLeaderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
             ScrapyardLeaderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
+            XinCommanderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
+            XinCommanderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
         }
 
         if (isSpaceCombat) {

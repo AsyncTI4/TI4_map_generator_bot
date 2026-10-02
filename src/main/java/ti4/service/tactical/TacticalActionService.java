@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRid
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.*;
@@ -49,7 +50,9 @@ import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 
 @UtilityClass
 public class TacticalActionService {
@@ -210,6 +213,7 @@ public class TacticalActionService {
     }
 
     public void finishMovement(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+        BelkoseaAgentService.clear(game, player);
         // Pre-check: The Void
         if (FOWPlusService.isVoid(game, tile.getPosition())) {
             FOWPlusService.resolveVoidActivation(player, game);
@@ -447,7 +451,13 @@ public class TacticalActionService {
         List<Button> unlandUnitButtons = new ArrayList<>();
 
         UnitHolder space = tile.getSpaceUnitHolder();
-        List<UnitType> committable = getCommittableGroundUnitTypes(player, space);
+        Player unitController = SarcosaHeroHandler.isControllingNeutralUnits(game, player)
+                ? game.getPlayerFromColorOrFaction("neutral")
+                : player;
+        if (unitController == null) {
+            return buttons;
+        }
+        List<UnitType> committable = getCommittableGroundUnitTypes(game, unitController, tile, space);
 
         String landPrefix = player.factionButtonChecker() + "landUnits_" + tile.getPosition() + "_";
         String unlandPrefix = player.factionButtonChecker() + "spaceUnits_" + tile.getPosition() + "_";
@@ -455,7 +465,7 @@ public class TacticalActionService {
             if (shouldSkipLandingOnPlanet(planet)) continue;
 
             LandingContext ctx =
-                    LandingContext.of(game, player, tile, space, planet, landPrefix, unlandPrefix, committable);
+                    LandingContext.of(game, unitController, tile, space, planet, landPrefix, unlandPrefix, committable);
 
             addLandingAndUnlandingButtonsForPlanet(ctx, buttons, unlandUnitButtons);
             for (PlanetAbilityButton ability : PlanetAbilityButtons.ABILITIES) {
@@ -466,14 +476,16 @@ public class TacticalActionService {
             unlandUnitButtons.clear();
         }
 
-        PostMovementButtonContext ctx = new PostMovementButtonContext(game, player, tile);
-        for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
-            if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
-        }
-        ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
-        if (game.isMonumentsMode()) {
-            if (MonumentsService.isMonumentOnBoard(game, player, "celdauri_monument")) {
-                buttons.addAll(MonumentsDSButtonHandler.getCeldauriMonumentCommitButtons(game, player, tile));
+        if (unitController == player) {
+            PostMovementButtonContext ctx = new PostMovementButtonContext(game, player, tile);
+            for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
+                if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
+            }
+            ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
+            if (game.isMonumentsMode()) {
+                if (MonumentsService.isMonumentOnBoard(game, player, "celdauri_monument")) {
+                    buttons.addAll(MonumentsDSButtonHandler.getCeldauriMonumentCommitButtons(game, player, tile));
+                }
             }
         }
 
@@ -512,7 +524,7 @@ public class TacticalActionService {
         return hasUnits;
     }
 
-    private List<UnitType> getCommittableGroundUnitTypes(Player player, UnitHolder space) {
+    private List<UnitType> getCommittableGroundUnitTypes(Game game, Player player, Tile tile, UnitHolder space) {
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
                 && space.getUnitCount(UnitType.Flagship, player) > 0;
@@ -525,6 +537,7 @@ public class TacticalActionService {
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             committable.add(UnitType.Pds);
         }
+        committable.addAll(AtokeraHeroButton.getCommittableShipTypes(game, player, tile, space));
         return committable;
     }
 

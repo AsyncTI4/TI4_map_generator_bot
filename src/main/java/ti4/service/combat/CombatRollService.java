@@ -42,6 +42,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
@@ -155,6 +157,7 @@ public class CombatRollService {
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                 if (assignedUnits.stream().anyMatch(a -> a.planet().equals(planet))) {
                     game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
+                    XinCommanderHandler.warnAboutCoexistingUnitsBombardment(game, player, tile, planet, event);
                     secondHalfOfCombatRoll(
                             player, game, event, tile, unitHolderName, CombatRollType.bombardment, false);
                     hasValidBombardment = true;
@@ -651,6 +654,26 @@ public class CombatRollService {
             }
             message += "\n_Mass Hypnosis_ redirected " + massHypnosisHits + " hit" + (massHypnosisHits == 1 ? "" : "s")
                     + " to its owner's ships.";
+        }
+        if (rollType == CombatRollType.combatround && SarcosaHeroHandler.isLeviathanCombatant(game, opponent)) {
+            int cancelledHits =
+                    SarcosaHeroHandler.consumeLeviathanCancellations(game, opponent, tile, combatOnHolder, h);
+            if (cancelledHits > 0) {
+                h -= cancelledHits;
+                message =
+                        TOTAL_HITS_LINE_PATTERN.matcher(message).replaceFirst(CombatMessageHelper.displayHitResults(h));
+                if (payload.total() != null) {
+                    CombatRollPayload.RollTotal total = payload.total();
+                    payload = new CombatRollPayload(
+                            payload.header(),
+                            payload.notes(),
+                            payload.modifiers(),
+                            payload.unitRolls(),
+                            new CombatRollPayload.RollTotal(
+                                    total.diceRolled(), h, total.misses(), total.maximumHits()));
+                }
+                message += "\n**Leviathan** canceled " + cancelledHits + " hit" + (cancelledHits == 1 ? "." : "s.");
+            }
         }
         XytherisAbilityHandler.beginStingOfTheHiveRoll(game, player, tile, rollType, h);
         int round;
@@ -1604,6 +1627,21 @@ public class CombatRollService {
                     mult = 2;
                 }
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                int hitsBeforeLeviathan = hitRolls;
+                hitRolls = SarcosaHeroHandler.doubleFirstRoundLeviathanHits(
+                        game, player, activeSystem, unitHolder, unitModel, rollType, hitRolls);
+                SarcosaHeroHandler.recordLeviathanCancellation(
+                        game, player, activeSystem, unitHolder, unitModel, rollType, hitsBeforeLeviathan);
+                if (hitRolls > hitsBeforeLeviathan) {
+                    maximumHits += numRolls;
+                    resultBuilder
+                            .append(player.getFactionEmoji())
+                            .append(" doubled ")
+                            .append(hitsBeforeLeviathan)
+                            .append(" hit")
+                            .append(hitsBeforeLeviathan == 1 ? "" : "s")
+                            .append(" with **Leviathan**.\n");
+                }
                 if ("kryxos_mech3".equals(unitModel.getId()) && numOfUnit > 0) {
                     int[] hitsPerMech = new int[numOfUnit];
                     int nativeRollCount = numOfUnit * numRollsPerUnit;

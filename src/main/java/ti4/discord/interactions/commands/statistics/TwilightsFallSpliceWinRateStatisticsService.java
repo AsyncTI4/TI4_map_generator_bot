@@ -99,11 +99,13 @@ class TwilightsFallSpliceWinRateStatisticsService {
     private static void appendSection(
             StringBuilder sb, String title, Map<String, WinRateCount> stats, Function<String, String> displayName) {
         sb.append("\n**").append(title).append("**\n");
-        stats.entrySet().stream().sorted(getWinRateComparator(displayName)).forEach(entry -> sb.append("- ")
-                .append(displayName.apply(entry.getKey()))
-                .append(": ")
-                .append(entry.getValue())
-                .append('\n'));
+        stats.entrySet().stream()
+                .sorted(getWinRateComparator(displayName))
+                .forEach(entry -> sb.append("- ")
+                        .append(displayName.apply(entry.getKey()))
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append('\n'));
     }
 
     private static void appendSectionEstimated(

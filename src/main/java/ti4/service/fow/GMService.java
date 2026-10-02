@@ -291,11 +291,12 @@ public final class GMService {
                     acs.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getActionCards().forEach((key, value) -> acs.append("> ")
-                            .append(Mapper.getActionCard(key).getNameRepresentation())
-                            .append(" (")
-                            .append(value)
-                            .append(")\n"));
+                    player.getActionCards()
+                            .forEach((key, value) -> acs.append("> ")
+                                    .append(Mapper.getActionCard(key).getNameRepresentation())
+                                    .append(" (")
+                                    .append(value)
+                                    .append(")\n"));
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), acs.toString());
             }
@@ -305,11 +306,12 @@ public final class GMService {
                     pns.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getPromissoryNotes().forEach((key, value) -> pns.append("> ")
-                            .append(Mapper.getPromissoryNote(key).getNameRepresentation())
-                            .append(" (")
-                            .append(value)
-                            .append(")\n"));
+                    player.getPromissoryNotes()
+                            .forEach((key, value) -> pns.append("> ")
+                                    .append(Mapper.getPromissoryNote(key).getNameRepresentation())
+                                    .append(" (")
+                                    .append(value)
+                                    .append(")\n"));
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), pns.toString());
             }

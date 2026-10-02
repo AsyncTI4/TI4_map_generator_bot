@@ -364,10 +364,16 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }
         if (player.hasUnexhaustedLeader("belkoseaagent")) {
-            buttons.add(Buttons.gray("getAgentSelection_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useBelkoseaAgent", "Use Belkosea Agent", FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("qhetagent")) {
-            buttons.add(Buttons.gray("getAgentSelection_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
+            buttons.add(
+                    Buttons.gray(player.factionButtonChecker() + "useQhetAgent", "Use Qhet Agent", FactionEmojis.qhet));
+        }
+        if (player.hasUnexhaustedLeader("xinagent")) {
+            buttons.add(
+                    Buttons.gray(player.factionButtonChecker() + "useXinAgent", "Use Xin Agent", FactionEmojis.xin));
         }
         if (player.hasAbility("hired_guns")) {
             buttons.add(Buttons.gray("fakeHiredGuns", "Sell Ships Via Hired Guns", FactionEmojis.nokar));

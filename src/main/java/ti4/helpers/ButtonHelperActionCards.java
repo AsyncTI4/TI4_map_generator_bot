@@ -2807,9 +2807,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReparationsStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, reparationsSpec())) return;
-        var target = PlanetTargetService.resolve(game, player, buttonID, reparationsSpec(), t -> t.owner()
-                .getReadiedPlanets()
-                .contains(t.planetId()));
+        var target = PlanetTargetService.resolve(
+                game,
+                player,
+                buttonID,
+                reparationsSpec(),
+                t -> t.owner().getReadiedPlanets().contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;
