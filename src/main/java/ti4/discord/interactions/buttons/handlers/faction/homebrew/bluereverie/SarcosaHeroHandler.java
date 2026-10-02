@@ -127,7 +127,10 @@ public class SarcosaHeroHandler {
     }
 
     public static boolean isControllingNeutralUnits(Game game, Player player) {
-        return game != null && player != null && player.getFaction() != null && player.getFaction().equals(game.getStoredValue(NEUTRAL_CONTROL));
+        return game != null
+                && player != null
+                && player.getFaction() != null
+                && player.getFaction().equals(game.getStoredValue(NEUTRAL_CONTROL));
     }
 
     public static void completeNeutralTacticalAction(Game game, Player player) {
