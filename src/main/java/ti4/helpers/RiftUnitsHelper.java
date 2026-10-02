@@ -27,6 +27,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -456,11 +457,16 @@ public final class RiftUnitsHelper {
 
     @ButtonHandler("getRiftButtons_")
     public static void offerRiftButtons(Player player, String buttonID, Game game) {
-        if (ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
+        if (ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                || AsgardLegendaryService.isBifrostBridgeActive(game, player)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
-                            + " ignores gravity-rift effects during this tactical action due to _Power Word: Plane Shift_.");
+                            + " ignores gravity-rift effects during this turn due to _"
+                            + (AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                                    ? "Bifrost Bridge"
+                                    : "Power Word: Plane Shift")
+                            + "_.");
             return;
         }
         String tilePosition = buttonID.replace("getRiftButtons_", "");

@@ -44,6 +44,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.UydaiHeroService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
@@ -562,6 +563,7 @@ public final class FoWHelper {
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
         adjacentPositions.addAll(otherAdjacencies);
+        AsgardLegendaryService.addBifrostBridgeAdjacencies(game, player, position, adjacentPositions);
 
         if (player != null
                 && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")

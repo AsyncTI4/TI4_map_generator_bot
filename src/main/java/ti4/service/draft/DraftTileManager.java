@@ -83,6 +83,12 @@ public class DraftTileManager {
         }
     }
 
+    public void addDraftTile(String tileId) {
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        if (tileModel == null || isNotDraftable(tileModel) || tileModel.isHyperlane()) return;
+        addDraftTile(getDraftTileFromModel(tileModel));
+    }
+
     /**
      * Get the provided tiles broken into their tiers. The tiering calculation still uses ALL draft tiles.
      * @param specificTiles

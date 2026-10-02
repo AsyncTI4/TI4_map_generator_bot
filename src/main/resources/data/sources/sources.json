@@ -367,5 +367,13 @@
         "subcanal": "personal projs",
         "credits": "aubreynadler",
         "description": "Optional alternate unit-upgrade technologies for 13 existing factions, swapped in during setup by purging a faction technology"
+    },
+    {
+        "source": "goose",
+        "name": "Goose",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Goose",
+        "description": "Homebrew from Goose"
     }
 ]
