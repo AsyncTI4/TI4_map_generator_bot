@@ -200,17 +200,20 @@ class FindRegistry {
             Function<T, String> textSearch,
             Function<T, MessageEmbed> exactEmbed,
             Function<T, MessageEmbed> listEmbed) {
-        return new FindSpec(key, displayName, () -> models.get().stream()
-                .map(model -> new FindItem(
-                        model.getAlias(),
-                        model.getSource(),
-                        model.getAutoCompleteName(),
-                        model.getNameRepresentation(),
-                        textSearch.apply(model),
-                        model::search,
-                        () -> exactEmbed.apply(model),
-                        () -> listEmbed.apply(model)))
-                .toList());
+        return new FindSpec(
+                key,
+                displayName,
+                () -> models.get().stream()
+                        .map(model -> new FindItem(
+                                model.getAlias(),
+                                model.getSource(),
+                                model.getAutoCompleteName(),
+                                model.getNameRepresentation(),
+                                textSearch.apply(model),
+                                model::search,
+                                () -> exactEmbed.apply(model),
+                                () -> listEmbed.apply(model)))
+                        .toList());
     }
 
     private static <T extends ModelInterface & EmbeddableModel> FindSpec spec(

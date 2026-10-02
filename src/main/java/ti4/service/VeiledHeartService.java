@@ -201,8 +201,9 @@ public class VeiledHeartService {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
-                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
+        getVeiledCards(player)
+                .forEach(card -> VeiledCardType.fromCard(card)
+                        .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 

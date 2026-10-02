@@ -630,12 +630,14 @@ public final class ButtonHelperAgents {
         }
 
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
-        playerLeader.getLeaderModel().ifPresent(agentModel -> SpringContext.getBean(CombatReplayService.class)
-                .mirrorLeaderPlayed(
-                        game,
-                        player,
-                        agentModel.getAlias(),
-                        player.getCorrectChannel().getName()));
+        playerLeader
+                .getLeaderModel()
+                .ifPresent(agentModel -> SpringContext.getBean(CombatReplayService.class)
+                        .mirrorLeaderPlayed(
+                                game,
+                                player,
+                                agentModel.getAlias(),
+                                player.getCorrectChannel().getName()));
 
         MessageChannel channel = player.getCorrectChannel();
         String message;

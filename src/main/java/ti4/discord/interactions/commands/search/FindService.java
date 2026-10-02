@@ -111,8 +111,9 @@ public class FindService {
         return items.stream()
                 .map(item -> new RankedItem(item, score(item, normalizedQuery)))
                 .filter(item -> item.score() > 0)
-                .sorted(Comparator.comparingInt(RankedItem::score).reversed().thenComparing(item -> item.item()
-                        .autoCompleteName()))
+                .sorted(Comparator.comparingInt(RankedItem::score)
+                        .reversed()
+                        .thenComparing(item -> item.item().autoCompleteName()))
                 .map(RankedItem::item)
                 .toList();
     }
