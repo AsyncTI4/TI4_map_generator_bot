@@ -419,6 +419,10 @@ public class UnitModelValueInjectionService {
             booleans.isStructure(true);
         }
 
+        if (player.getPlanets().contains("muspelheim") && unit.getUnitType() == UnitType.Pds) {
+            integers.productionValue(1);
+        }
+
         return UnitValueInjection.of(integers, floats, booleans);
     }
 

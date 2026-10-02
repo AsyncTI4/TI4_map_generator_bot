@@ -7,7 +7,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "gamma",
-        "text": "When you produce units: place a Dizurga token onto either a planet that has a unit with production or 3 infantry you control. Then, return this card to the Arborec Diaspora player."
+        "text": "When you produce units:Place this card face up in your play area and place a Dirzuga token on a non-home planet other than Mecatol Rex that has a unit you control with PRODUCTION, or at least 3 infantry you control. Planets that contain Dirzuga tokens have their planet's resources value increased by 2 and their influence value increased by 1. Ditzuga tokens cannot be removed from the planets that contain them \nAt the start of the status phase, return this card to the Arborec Diaspora player."
     },
     {
         "alias": "ggpnhlr",
@@ -17,7 +17,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "gamma",
-        "text": "ACTION: place this card in your play area. During your tactical actions, you may treat non-fighter neutral ships as if they were your own. If you move neutral units or activate a system that contains 1 or more of the H4L1R's player's units, return this card to the H4L1R player."
+        "text": "ACTION: Place this card in your play area.\nDuring your tactical actions, you may treat non-fighter neutral ships as if they were your own.\nAt the end of one of your tactical actions in which you moved neutral units or activated a system that contains 1 or more of the H4L1R's player's units, return this card to the H4L1R player."
     },
     {
         "alias": "ggpnclade",
@@ -30,13 +30,13 @@
     },
     {
         "alias": "ggpnarch",
-        "name": "Transit Indulgence",
+        "name": "Indulgent representation",
         "faction": "archon",
         "color": "",
         "playArea": true,
         "playImmediately": false,
         "source": "gamma",
-        "text": "When you activate a system, place this card face up in your play area. While this card is in your area, you are not an outlaw. Return a decree to the Xxcha player and return their command token from your faction sheet. At the end of your turn, return this card to the Xxcha player."
+        "text": "After you activate a system, Place this card face up in your play area. While this card is in your play area, you are not an outlaw. Return a decree to the Archon player and return their command tokens from your faction sheet.\nAt the end of your turn, return this card to the Archon player."
     },
     {
         "alias": "ggpnmoyin",
@@ -45,7 +45,7 @@
         "color": "",
         "playArea": false,
         "source": "gamma",
-        "text": "When you would research a technology; you may reveal this card and gain 1 random genome instead. Then, retrun this card to the Moyin player."
+        "text": "When you would research a technology; You may spend a strategy token to gain 1 random genome. Then return this card to the Moyin player."
     },
     {
         "alias": "ggpnveil",
@@ -54,7 +54,7 @@
         "color": "",
         "playArea": false,
         "source": "gamma",
-        "text": "At any time: you may discard any number of action cards. For each action card discarded, you gain 1 commodity. Then, convert all commodities to trade goods. At the end of this turn, return this card to the Veilstrike player."
+        "text": "At any time during the action phase: you may discard any number of action cards. For each action card discarded, you gain 1 commodity. Then, convert all commodities to trade goods.\nAt the end of this turn, return this card to the Veilstrike player."
     },
     {
         "alias": "ggpncon",
@@ -63,16 +63,40 @@
         "color": "",
         "playArea": false,
         "source": "gamma",
-        "text": "When another player activates a system that contains 1 or more of your infantry: for each adjacent system, you may move one of your non-fighter shups in that system into the active system. Then, return this card to the Convocation player" 
+        "text": "When another player activates a system that contains 1 or more of your ships and 1 or more planets you control:For each adjacent system, you may move one of your non-fighter ships in that system into the active system.\nThen, return this card to the Convocation player." 
     },
     {
-        "alias": "ggpnara",
-        "name": "Pull the Thread",
+        "alias": "ggpnaraf",
+        "name": "Weaveway Fabricators",
         "faction": "weaveway",
         "color": "",
-        "playArea": false,
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "ggpnaraf",
         "source": "gamma",
-        "text": "If you are not the Araenean player, you may reveal this card and choose a system that contains a weaveway token and none of your units. If you do, move that token into an adjacent system that contains 1 or more of your ships. Then, return this card to the Araenean player."
+        "text": "ACTION: Attach this card to a non-home, non-legendary planet you control. This system contains a nebula. At the start of the status phase, if a player has ships in this system, they may place 1 cruiser from their reinforcements in this system."
+    }, 
+    {
+        "alias": "ggpnaras",
+        "name": "Weaveway Spinners",
+        "faction": "weaveway",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "ggpnaras",
+        "source": "gamma",
+        "text": "ACTION: Attach this card to a non-home, non-legendary planet you control. This system contains a nebula. At the start of the status phase, if a player has ships in this system, they may gain 2 trade goods."
+    },
+    {
+        "alias": "ggpnarah",
+        "name": "Weaveway Harvesters",
+        "faction": "weaveway",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "ggpnarah",
+        "source": "gamma",
+        "text": "ACTION: Attach this card to a non-home, non-legendary planet you control. This system contains a nebula. At the start of the status phase, if a player has ships in this system, they may draw 1 action card."
     },
     {
         "alias": "ggpninit",
@@ -82,6 +106,24 @@
         "playArea": true,
         "playImmediately": true,
         "source": "gamma",
-        "text": "When you recieve this card, if you are not the Keleres Player, you must place it face up in your play area. At the end of the status phase, draw 1 secret obkectove, place it face up in your play area, then return this card to the Keleres player."
+        "text": "When you receive this card, if you are not the Keleres Player, you must place it face up in your play area. At the end of the status phase, draw 1 secret objective, place it face up in your play area, then return this card to the Keleres player."
+    },
+    {
+        "alias": "ggpncompany",
+        "name": "Defensive Escorts",
+        "faction": "company",
+        "color": "",
+        "playArea": false,
+        "source": "gamma",
+        "text": "At the start of combat, place this card face up in your play area. When 1 of your ships in this system would be destroyed during combat, you may choose 1 Company player's ship in an adjacent system with SUSTAIN DAMAGE to become damaged instead. At the end of combat, return this card to the Company player."
+    },
+    {
+        "alias": "ggpnindust",
+        "name": "Contract Rider",
+        "faction": "industries",
+        "color": "",
+        "playArea": false,
+        "source": "gamma",
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, resolve the PRODUCTION ability of 1 of your space docks. Then, return this card to the Jord player."
     }
 ]

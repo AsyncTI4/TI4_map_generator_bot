@@ -38,6 +38,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
 
 @UtilityClass
@@ -278,6 +279,7 @@ public class TacticalActionOutputService {
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
         boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                || AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 || (unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile));
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
@@ -332,7 +334,9 @@ public class TacticalActionOutputService {
                     output.append(
                             ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
-                                    : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
+                                    : AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                                            ? " (ignores gravity-rift effects due to _Bifrost Bridge_)"
+                                            : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
                 } else {
                     // Don't automatically count rifts, allowing the player to verify the chosen path.
                     output.append(" (gravity rifts along a path could add +")

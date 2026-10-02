@@ -32,6 +32,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.milty.EchoesOfYggdrasilService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -295,6 +296,7 @@ public class FrankenDraft extends BagDraft {
             sources.add(ComponentSource.thunders_edge);
         }
         MiltyDraftHelper.initDraftTiles(draftManager, sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
     }
 
     @Override

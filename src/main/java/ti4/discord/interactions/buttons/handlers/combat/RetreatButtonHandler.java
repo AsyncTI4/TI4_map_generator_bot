@@ -25,6 +25,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
 
@@ -75,6 +76,7 @@ class RetreatButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
 
         if (game.getTileByPosition(pos).isGravityRift()
+                && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(

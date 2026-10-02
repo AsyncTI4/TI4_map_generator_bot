@@ -11,6 +11,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -42,6 +43,7 @@ public class PassService {
         player.setPassed(true);
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
         SarcosaHeroHandler.offerPassAbility(game, player);
+        NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         RevenantLeadersHandler.offerRevArcanumAgentButtons(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {

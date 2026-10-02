@@ -1328,6 +1328,13 @@ public final class ButtonHelperModifyUnits {
             skilledS += "feint";
         }
         Set<String> positions = FoWHelper.getAdjacentTiles(game, pos1, player, false);
+        Tile helheimTile = game.getTileFromPlanet("helheim");
+        if (player.hasPlanet("helheim")
+                && helheimTile != null
+                && !game.getActiveSystem().isEmpty()
+                && (pos1.equals(game.getActiveSystem()) || pos1.equals(helheimTile.getPosition()))) {
+            positions.add(pos1.equals(game.getActiveSystem()) ? helheimTile.getPosition() : game.getActiveSystem());
+        }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander") && player.getHomeSystemTile() != null) {
             positions.addAll(FoWHelper.getAdjacentTiles(game, player.getHomeSystemPosition(), player, false));
         }

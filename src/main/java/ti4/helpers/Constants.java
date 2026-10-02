@@ -395,6 +395,7 @@ public final class Constants {
     public static final String ADD_TILE_RANDOM = "add_tile_random";
     public static final String RANDOM_TYPE = "random_type";
     public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
+    public static final String INCLUDE_ECHOES_OF_YGGDRASIL_TILES = "echoes_of_yggdrasil_tiles";
     public static final String DRAW_ONLY = "draw_only";
     public static final String ADD_TILE_LIST_RANDOM = "add_tile_list_random";
     public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";

@@ -1,0 +1,27 @@
+{
+    "planetLayout":  {
+        "unitHolderName":  "vanaheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  {
+            "x":  172,
+            "y":  153
+        },
+        "planetRadius":  99
+    },
+    "id":  "vanaheim",
+    "tileId":  "ao5",
+    "name":  "Vanaheim",
+    "aliases":  [
+        "vanaheim"
+    ],
+    "resources":  2,
+    "influence":  3,
+    "planetTypes":  [
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName":  "Freyr's Fortifications",
+    "legendaryAbilityText":  "You may exhaust this card at the beginning or end of your turn to repair all your units.",
+    "legendaryAbilityFlavourText":  "Freyr arrives, the fleet survives.",
+    "flavourText":  "This planet has a long history of unionized shipwrights who are willing to take on dangerous jobs for the right pay.",
+    "source":  "goose"
+}

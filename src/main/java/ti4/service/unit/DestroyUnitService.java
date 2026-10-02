@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.planet.MidgardLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -193,6 +194,7 @@ public class DestroyUnitService {
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
+        MidgardLegendaryButtonHandler.offerMusterManheim(event, game, units, combat);
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);
