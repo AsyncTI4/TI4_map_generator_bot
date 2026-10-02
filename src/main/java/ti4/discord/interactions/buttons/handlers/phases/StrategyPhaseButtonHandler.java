@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -31,6 +33,7 @@ class StrategyPhaseButtonHandler {
 
     @ButtonHandler("proceed_to_strategy")
     public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
+        RelitigateLLButtonHandler.clearExtraAgenda(game);
         String readiedCardsString = "All planets have been readied at the end of the Agenda Phase.";
         if (game.isOmegaPhaseMode()) {
             readiedCardsString = "All cards have been readied at the end of the Omega Phase.";
@@ -58,6 +61,7 @@ class StrategyPhaseButtonHandler {
                     "Did not automatically ready planets due to _Checks and Balances_ resolving \"against\"."
                             + " Players have been sent buttons to ready up to 3 planets.");
         }
+        VeylorAbilitiesHandler.offerTightSchedulingCleanup(game);
         StartPhaseService.startStrategyPhase(event, game);
         ButtonHelper.deleteMessage(event);
     }

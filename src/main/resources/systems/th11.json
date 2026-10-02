@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "th11",
+    "name": "Ruin - Thrones",
+    "aliases": [
+        "th11",
+        "ruin",
+        "thrones"
+    ],
+    "imagePath": "th11_throneshs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "ruin"
+    ],
+    "source": "theodisi"
+}

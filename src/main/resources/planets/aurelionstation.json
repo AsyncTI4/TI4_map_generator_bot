@@ -1,0 +1,17 @@
+{
+    "id": "aurelionstation",
+    "name": "Aurelion",
+    "aliases": [
+        "aurelionstation",
+        "aurelion"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes" : [
+        "SPACESTATION",
+        "FAKE"
+    ],
+    "legendaryAbilityName": "Thone of Pride",
+    "legendaryAbilityText": "The system containing the Aurelion Station is treated as an entrpic scar. This anomaly does not prevent player's from using unit abilities in it's system.",
+    "source": "theodisi"
+}

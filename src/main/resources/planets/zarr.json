@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "zarr",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "zarr",
     "tileId": "d04",
     "name": "Zarr",

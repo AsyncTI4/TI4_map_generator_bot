@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "solitude",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "solitude",
     "tileId": "d05",
     "name": "Solitude",

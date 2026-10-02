@@ -1,7 +1,7 @@
 package ti4.discord;
 
 import jakarta.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -20,18 +22,21 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
-import ti4.contest.cron.CombatContestJanitorCron;
 import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.cron.AutoPingCron;
 import ti4.cron.BothelperDashboardCron;
+import ti4.cron.CardsInfoPinCleanupCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
@@ -39,9 +44,11 @@ import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
 import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
+import ti4.cron.KeepThreadsAliveCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
+import ti4.cron.MatchmakerCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.PersistToSqlCron;
 import ti4.cron.ReuploadStaleEmojisCron;
@@ -55,6 +62,8 @@ import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
+import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -76,12 +85,31 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class JdaService {
 
+    private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
+    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
+    private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int DISCORD_REQUEST_TIMEOUT_SECONDS = 60;
+    private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
+            // User is playing a game, listening to Spotify, etc.
+            CacheFlag.ACTIVITY,
+            // User on Desktop, Mobile, or Web? Could be useful for stats
+            CacheFlag.CLIENT_STATUS,
+            // User is online, idle, etc
+            CacheFlag.ONLINE_STATUS,
+            // Needed for Role.getTags()
+            CacheFlag.ROLE_TAGS,
+            CacheFlag.SCHEDULED_EVENTS,
+            CacheFlag.SOUNDBOARD_SOUNDS,
+            CacheFlag.STICKER,
+            CacheFlag.VOICE_STATE);
+
     // TODO:
     //       we may not want to trust any old "Admin" role on a server
     //       should actually have admin rights
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
+    private static final Pattern NUMERIC_GUILD_ID_PATTERN = Pattern.compile("\\b[0-9]+\\b");
 
     public static JDA jda;
     public static String guildPrimaryID;
@@ -106,8 +134,8 @@ public class JdaService {
     private static Guild guildMegagame;
     private static Guild guildTourney;
     public static final Set<Guild> guilds = new HashSet<>();
-    public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
-    public static final List<Guild> fowServers = new ArrayList<>();
+    public static final Set<Guild> serversToCreateNewGamesOn = new HashSet<>();
+    public static final Set<Guild> fowServers = new HashSet<>();
 
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
@@ -115,21 +143,23 @@ public class JdaService {
 
     public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");
+        RestAction.setDefaultTimeout(DISCORD_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
-                // This is a privileged gateway intent that is used to update user information and join/leaves
-                // (including kicks). This is required to cache all members of a guild (including chunking)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // This is a privileged gateway intent this is only used to enable access to the user content in
-                // messages (also including embeds/attachments/components).
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
-                .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+                .enableIntents(
+                        // Needed to listen for joins/leaves
+                        // Needed to cache all members of a guild (including chunking) - remove?
+                        GatewayIntent.GUILD_MEMBERS,
+                        // Needed to parse raw user messages
+                        GatewayIntent.MESSAGE_CONTENT,
+                        // Needed for emoji searches and validation
+                        GatewayIntent.GUILD_EXPRESSIONS)
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
                 // and avoid loading every user at startup
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
+                .disableCache(DISABLED_JDA_CACHE_FLAGS)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
                 .build();
@@ -256,7 +286,10 @@ public class JdaService {
         BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
                 + guilds.size() + " total servers connected\n> "
                 + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
-                + fowServers.size() + " Fog of War servers");
+                + fowServers.size() + " Fog of War servers"
+                + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
+
+        if (isProduction()) leaveNonWhitelistedGuilds();
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -304,16 +337,20 @@ public class JdaService {
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
         GameMessageCleanupCron.register();
+        CardsInfoPinCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
+        MatchmakerCron.register();
         CloseLaunchThreadsCron.register();
-        CombatReplaySelectionCron.register();
-        CombatReplayPromotionCron.register();
-        CombatReplayPromotionScoreBackfillCron.register();
-        CombatReplayCron.register();
-        CombatContestJanitorCron.register();
+        KeepThreadsAliveCron.register();
+        if (CombatContestSettings.isEnabledStatic()) {
+            CombatReplaySelectionCron.register();
+            CombatReplayPromotionCron.register();
+            CombatReplayPromotionScoreBackfillCron.register();
+            CombatReplayCron.register();
+        }
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
@@ -335,7 +372,7 @@ public class JdaService {
     }
 
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
-        if (!guildID.matches("\\b[0-9]+\\b")) {
+        if (!NUMERIC_GUILD_ID_PATTERN.matcher(guildID).matches()) {
             BotLogger.error(
                     "Invalid Guild ID provided: `" + guildID
                             + "` - If this is running in Production, please correct the ID [here](https://github.com/AsyncTI4/TI4_map_generator_bot/settings/variables/actions/GUILDID_LIST)");
@@ -459,6 +496,9 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
         adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
         adminRoles.add(jda.getRoleById("1487725249398308884")); // Balacasi's server
+        adminRoles.add(jda.getRoleById("1500012691224395906")); // BEANS's server
+        adminRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
+        adminRoles.add(jda.getRoleById("1527947707518423150")); // niugnip's Server
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -496,6 +536,9 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
         developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
         developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
+        developerRoles.add(jda.getRoleById("1500012939326001263")); // BEANS's server
+        developerRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
+        developerRoles.add(jda.getRoleById("1527947972615209041")); // niugnip's Server
 
         developerRoles.removeIf(Objects::isNull);
 
@@ -537,6 +580,9 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
         bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
         bothelperRoles.add(jda.getRoleById("1487725393673719950")); // Balacasi's server
+        bothelperRoles.add(jda.getRoleById("1500013009492246558")); // BEANS's server
+        bothelperRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
+        bothelperRoles.add(jda.getRoleById("1527947912108183686")); // niugnip's Server
 
         bothelperRoles.removeIf(Objects::isNull);
     }
@@ -569,59 +615,80 @@ public class JdaService {
         return null;
     }
 
+    private static void leaveNonWhitelistedGuilds() {
+        jda.getGuilds().forEach(JdaService::leaveGuildIfNotWhitelisted);
+    }
+
+    public static void leaveGuildIfNotWhitelisted(Guild guild) {
+        // if (!isProduction() || isWhitelistedGuild(guild)) return;
+        // BotLogger.warning(
+        //         "Leaving guild '" + guild.getName() + "' (" + guild.getId() + ") because it isn't whitelisted!");
+        // guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static boolean isProduction() {
+        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(guildPrimaryID);
+    }
+
+    private static boolean isWhitelistedGuild(Guild guild) {
+        return guilds.stream().anyMatch(whitelistGuild -> whitelistGuild.getId().equals(guild.getId()))
+                || Constants.EMOJI_FARM_SERVERS.containsKey(guild.getId());
+    }
+
     public static void shutdown() {
         try {
             AsyncTI4DiscordBot.markShuttingDown();
+
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
+
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            if (shutdownEventExecutor()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
-            }
-            if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
-            }
-            if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED RENDERING MAPS");
-            } else {
-                BotLogger.info("DID NOT FINISH RENDERING MAPS");
-            }
-            if (SliceGenerationPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
-            } else {
-                BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
-            }
-            if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING STATISTICS");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
-            }
-            CronManager.shutdown(); // will wait for up to an additional 20 seconds
-            LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
+
+            logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
+            logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
+            logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
+            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
+            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
+            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
+
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
-            BotLogger.info("SHUTDOWN PROCESS COMPLETE");
-            TimeUnit.SECONDS.sleep(1); // wait for BotLogger
-            jda.shutdown();
-            jda.awaitShutdown(30, TimeUnit.SECONDS);
+
+            BotLogger.info("SHUTTING DOWN JDA.");
+
+            LogBufferManager.sendBufferedLogsToDiscord();
+
+            shutdownJda();
         } catch (Exception e) {
             BotLogger.error("Error encountered within shutdown process:\n> ", e);
         }
     }
 
-    private static boolean shutdownEventExecutor() {
-        EVENT_EXECUTOR.shutdownNow();
+    private static ShutdownResult shutdownEventExecutor() {
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private static void logShutdownResult(String executorName, ShutdownResult result) {
+        switch (result) {
+            case GRACEFUL_TERMINATION -> BotLogger.info(executorName + " terminated gracefully.");
+            case FORCED_TERMINATION -> BotLogger.info(executorName + " terminated after interrupt request.");
+            case TIMED_OUT -> BotLogger.info(executorName + " did not terminate before the shutdown timeout.");
+            case INTERRUPTED -> BotLogger.info(executorName + " shutdown was interrupted.");
+        }
+    }
+
+    private static void shutdownJda() {
+        jda.shutdown();
         try {
-            return EVENT_EXECUTOR.awaitTermination(20, TimeUnit.SECONDS);
+            if (!jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                jda.shutdownNow();
+                jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            }
         } catch (InterruptedException e) {
-            BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
             Thread.currentThread().interrupt();
-            return false;
+            jda.shutdownNow();
         }
     }
 }

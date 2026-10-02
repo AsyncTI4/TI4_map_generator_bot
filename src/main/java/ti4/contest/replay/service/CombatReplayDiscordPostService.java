@@ -1,11 +1,11 @@
 package ti4.contest.replay.service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatReplayChannels;
-import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -28,6 +27,7 @@ import ti4.message.MessageHelper;
 @RequiredArgsConstructor
 public class CombatReplayDiscordPostService {
 
+    private static final Pattern EDGE_HYPHEN_PATTERN = Pattern.compile("(^-+|-+$)");
     private final ti4.contest.replay.core.CombatContestSettings settings;
     private final ReplayPayloadRenderer replayPayloadRenderer;
 
@@ -52,14 +52,12 @@ public class CombatReplayDiscordPostService {
                         String content,
                         List<MessageEmbed> embeds,
                         String tilePosition,
-                        String snapshotJson,
-                        boolean applyReplayDecoys)) {
+                        String snapshotJson)) {
             sendTileRenderMessage(
                     channel,
                     content,
                     embeds,
-                    replayPayloadRenderer.restoreReplayGame(
-                            snapshotJson, game, candidate, tilePosition, applyReplayDecoys),
+                    replayPayloadRenderer.restoreReplayGame(snapshotJson, game, candidate, tilePosition),
                     tilePosition);
             return;
         }
@@ -68,7 +66,7 @@ public class CombatReplayDiscordPostService {
     }
 
     @SneakyThrows
-    public Message sendTileRenderMessage(
+    public static Message sendTileRenderMessage(
             MessageChannel channel, String message, List<MessageEmbed> embeds, Game snapshotGame, String tilePosition) {
         if (snapshotGame == null) {
             return sendDiscordMessage(channel, message, embeds);
@@ -80,14 +78,14 @@ public class CombatReplayDiscordPostService {
             }
             MessageCreateBuilder builder = new MessageCreateBuilder().addFiles(fileUpload);
             if (!messageParts.isEmpty()) {
-                builder.addContent(messageParts.get(messageParts.size() - 1));
+                builder.addContent(messageParts.getLast());
             }
             if (!embeds.isEmpty()) builder.addEmbeds(embeds);
             return channel.sendMessage(builder.build()).complete();
         }
     }
 
-    public Message sendDiscordMessage(MessageChannel channel, String content, List<MessageEmbed> embeds) {
+    public static Message sendDiscordMessage(MessageChannel channel, String content, List<MessageEmbed> embeds) {
         if (embeds.isEmpty()) {
             return channel.sendMessage(content).complete();
         }
@@ -99,11 +97,11 @@ public class CombatReplayDiscordPostService {
 
     public ThreadChannel createReplayThread(Message posted, CombatCandidateEntity winner) {
         return posted.createThreadChannel(buildReplayThreadName(winner))
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                 .complete();
     }
 
-    public MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
+    public static MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
         if (JdaService.guildPrimary == null) return null;
         TextChannel contestChannel = JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
         if (contestChannel == null) return null;
@@ -121,27 +119,6 @@ public class CombatReplayDiscordPostService {
         return channels.isEmpty() ? null : channels.getFirst();
     }
 
-    public TextChannel houseChannel(CombatReplayHouse house) {
-        if (JdaService.guildPrimary == null || house == null) return null;
-        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName(house.channelName(), true);
-        return channels.isEmpty() ? null : channels.getFirst();
-    }
-
-    public String getLazaxRoleMention() {
-        if (JdaService.guildPrimary == null) return "";
-        List<Role> roles =
-                JdaService.guildPrimary.getRolesByName(CombatReplayLeaderboardService.LAZAX_MINIGAME_ROLE_NAME, true);
-        Role role = roles.isEmpty() ? null : roles.getFirst();
-        return role == null ? "" : role.getAsMention();
-    }
-
-    public String getHouseRoleMention(CombatReplayHouse house) {
-        if (JdaService.guildPrimary == null || house == null) return "";
-        List<Role> roles = JdaService.guildPrimary.getRolesByName(house.roleName(), true);
-        Role role = roles.isEmpty() ? null : roles.getFirst();
-        return role == null ? "" : role.getAsMention();
-    }
-
     private String buildReplayThreadName(CombatCandidateEntity candidate) {
         String attacker = normalizeThreadNamePart(candidate.getAttackerFaction());
         String defender = normalizeThreadNamePart(candidate.getDefenderFaction());
@@ -151,12 +128,13 @@ public class CombatReplayDiscordPostService {
         return "combat-archive-c" + candidateId + "-t" + tilePosition + "-" + attacker + "-v-" + defender;
     }
 
-    private String normalizeThreadNamePart(String value) {
-        String normalized = StringUtils.defaultIfBlank(value, "unknown")
-                .trim()
-                .toLowerCase()
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("(^-+|-+$)", "");
+    private static String normalizeThreadNamePart(String value) {
+        String normalized = EDGE_HYPHEN_PATTERN
+                .matcher(StringUtils.defaultIfBlank(value, "unknown")
+                        .trim()
+                        .toLowerCase()
+                        .replaceAll("[^a-z0-9]+", "-"))
+                .replaceAll("");
         if (normalized.isBlank()) return "unknown";
         return StringUtils.abbreviate(normalized, 18);
     }

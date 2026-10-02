@@ -89,7 +89,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("slice"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             numSlices.initialize(json.get("numSlices"));
             numFactions.initialize(json.get("numFactions"));
             minimumRes.initialize(json.get("minimumRes"));
@@ -110,11 +110,16 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
-        ls.add(numFactions);
+        boolean randomSetup = parent instanceof MiltySettings ms && ms.isRandomSetup();
+        if (!randomSetup) {
+            ls.add(numFactions);
+        }
         if (presetSlices != null) {
             return ls;
         }
-        ls.add(numSlices);
+        if (!randomSetup) {
+            ls.add(numSlices);
+        }
         ls.add(minimumRes);
         ls.add(minimumInf);
         ls.add(totalValue);

@@ -16,6 +16,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -168,6 +174,10 @@ public final class BreakthroughCommandHelper {
                 .toList();
         if (!lockedBtIDs.isEmpty()) {
             unlockBreakthroughs(game, player, lockedBtIDs);
+        } else {
+            if (game.isCosmicConvergenceMode()) {
+                serveRollFractureButtons(player, "eh");
+            }
         }
     }
 
@@ -187,6 +197,9 @@ public final class BreakthroughCommandHelper {
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
+            }
+            if ("kairnbt".equalsIgnoreCase(bt.getID())) {
+                KairnBreakthroughHandler.refreshRelics(game, player);
             }
             if ("khraskbt".equalsIgnoreCase(bt.getID())) {
                 player.addPlanet("grove");
@@ -215,10 +228,22 @@ public final class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("rohdhna_warsun2");
                 }
             }
+            if ("mirvedabt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("ff2")) {
+                    player.addOwnedUnitByID("mirveda_fighter3");
+                    player.removeOwnedUnitByID("fighter2");
+                }
+            }
             if ("kortalbt".equalsIgnoreCase(bt.getID())) {
                 if (player.hasTech("dn2")) {
                     player.addOwnedUnitByID("tribune3");
                     player.removeOwnedUnitByID("dreadnought2");
+                }
+            }
+            if ("uydaibt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("inf2")) {
+                    player.addOwnedUnitByID("death_commandos3");
+                    player.removeOwnedUnitByID("infantry2");
                 }
             }
             if ("veldyrbt".equalsIgnoreCase(bt.getID())) {
@@ -230,27 +255,56 @@ public final class BreakthroughCommandHelper {
                         player.getCorrectChannel(),
                         player.getRepresentation() + " Made your home system into a nebula.");
             }
-
+            if ("crystellumbt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("ff2")) {
+                    player.addOwnedUnitByID("crystellum_fighter3");
+                    player.removeOwnedUnitByID("fighter2");
+                }
+            }
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
                 if (btIDs.size() == 1) {
                     // If there are other BTs to potentially roll, don't automatically spawn
-                    if (!FractureService.isFractureInPlay(game)) {
+                    if (FractureService.enterPlayOrExplain(null, game, player, bt.getID())) {
                         String msg = player.getRepresentation(false, false)
                                 + " has gained _Al'Raith Ix Ianovar_, and so The Fracture enters play automatically!"
                                 + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.";
-                        FractureService.spawnFracture(null, game);
-                        FractureService.spawnIngressTokens(null, game, player, bt.getID());
-                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
-                    AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
+                    // Only offer the move if The Fracture is actually on the board
+                    if (FractureService.isFractureInPlay(game)) {
+                        AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
+                    }
+                }
+            }
+            if ("onyxxabt".equalsIgnoreCase(bt.getID()) && btIDs.size() == 1) {
+                if (FractureService.enterPlayOrExplain(null, game, player, bt.getID())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation(false, false)
+                                    + " has gained _Styx and Stones_, and so The Fracture enters play automatically!"
+                                    + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.");
                 }
             }
             if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
                 SowingReapingService.sendTheSowingButtons(game);
             }
-
-            if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
-                serveRollFractureButtons(player, btID);
+            if ("revenantbt".equalsIgnoreCase(bt.getID())) {
+                RevenantBreakthroughHandler.gainAttachedAgent(game, player);
+            }
+            if (player.hasBreakthrough("arcanumbt")) {
+                ArcanumBreakthroughHandler.offerArcanumBTFlipOnGain(game, player);
+            }
+            if ("thronesbt".equalsIgnoreCase(bt.getID())) {
+                player.addOwnedUnitByID("thrones_aurelion");
+                ThronesUnitHandler.offerAurelionPlacement(game, player);
+            }
+            if ("oblivionbt".equalsIgnoreCase(bt.getID())) {
+                OblivionBreakthroughHandler.startCallOfTheVoid(game, player);
+            }
+            if ("netrunnersbt".equalsIgnoreCase(bt.getID())) {
+                NetrunnersBreakthroughHandler.offerDataBreachPlacement(game, player);
+            }
+            if (FractureService.canFractureEnterPlay(game)) serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);
             if ("keleresbt".equals(bt.getAlias())) player.gainCustodiaVigilia();
         });
@@ -270,6 +324,10 @@ public final class BreakthroughCommandHelper {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.Cabal.asEmoji());
             message =
                     "You can roll for other breakthroughs first and then spawn The Fracture with _Al'Raith Ix Ianovar_.";
+        }
+        if ("onyxxabt".equals(btID)) {
+            rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.onyxxa.asEmoji());
+            message = "You can roll for other breakthroughs first and then spawn The Fracture with _Styx and Stones_.";
         }
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
     }

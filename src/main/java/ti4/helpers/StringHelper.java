@@ -41,6 +41,11 @@ public final class StringHelper {
         "nineteen",
         "twenty"
     };
+    private static final Pattern CHARACTER_SPLIT_PATTERN = Pattern.compile("");
+
+    public static String pluralize(int count, String word) {
+        return count + " " + word + (count == 1 ? "" : "s");
+    }
 
     public static String ordinal(int i) {
         return switch (i % 100) {
@@ -251,7 +256,7 @@ public final class StringHelper {
         }
 
         // Nothing good worked, just do the crappy character-by-character split
-        List<List<String>> partitioned = ListUtils.partition(List.of(input.split("")), maxLength);
+        List<List<String>> partitioned = ListUtils.partition(List.of(CHARACTER_SPLIT_PATTERN.split(input)), maxLength);
         List<String> messages = new ArrayList<>();
         for (List<String> part : partitioned) {
             messages.add(String.join("", part));

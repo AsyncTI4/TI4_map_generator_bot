@@ -12,25 +12,52 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class MahactTokenService {
+    private static final String PRIMACY_DEBT_POOL = "Primacy";
+
+    public void addMahactToken(Game game, Player player, String color) {
+        if (player.getMahactCC().contains(color)) {
+            return;
+        }
+
+        player.addMahactCC(color);
+        if (player.hasAbility("primacy")) {
+            if (game.getDebtPoolIcon(PRIMACY_DEBT_POOL) == null) {
+                game.setDebtPoolIcon(PRIMACY_DEBT_POOL, FactionEmojis.Mahact.emojiString());
+            }
+            player.addDebtTokens(color, 1, PRIMACY_DEBT_POOL);
+        }
+    }
+
+    public void removeMahactToken(Player player, String color) {
+        if (!player.getMahactCC().contains(color)) {
+            return;
+        }
+
+        player.removeMahactCC(color);
+        player.clearAllDebtTokens(color, PRIMACY_DEBT_POOL);
+    }
 
     public void removeFleetCC(Game game, Player player, String reason) {
         String message = player.getRepresentation();
-        if (!player.getMahactCC().isEmpty()) {
+        if (!(player.hasAbility("primacy"))
+                && (player.hasAbility("edict") || player.hasAbility("imperia"))
+                && !player.getMahactCC().isEmpty()) {
             if (player.getFleetCC() == 0 && player.getMahactCC().size() == 1) {
                 // exactly 1 token in fleet
                 String color = player.getMahactCC().getFirst();
                 Player p2 = game.getPlayerFromColorOrFaction(color);
                 message += " has been forced to lose the " + p2.fogSafeEmoji() + " command token from their fleet pool "
                         + reason + ".";
-                player.getMahactCC().remove(color);
+                removeMahactToken(player, color);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelper.checkFleetInEveryTile(player, game);
             } else {
                 message += ", you are being forced to lose 1 command token from your fleet pool, " + reason
-                        + ", and have the option to remove another player's command token from your pool instead of your own.";
+                        + " You have the option to remove another player's command token from your pool instead of your own.";
                 List<Button> options = removeFleetTokenOptions(game, player, true, false);
                 MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, options);
             }
@@ -44,6 +71,9 @@ public class MahactTokenService {
 
     public List<Button> removeFleetTokenOptions(Game game, Player player, boolean includeSelf, boolean keepButtons) {
         List<Button> buttons = new ArrayList<>();
+        if (player.hasAbility("primacy") || (!player.hasAbility("edict") && !player.hasAbility("imperia"))) {
+            return buttons;
+        }
         String prefix = player.factionButtonChecker() + "loseMahactCC_";
         String suffix = keepButtons ? "_keep" : "";
         String label = "Lose your own token";
@@ -77,7 +107,7 @@ public class MahactTokenService {
         boolean delOne = false;
 
         if (player.getMahactCC().contains(color)) {
-            player.removeMahactCC(color);
+            removeMahactToken(player, color);
             Player p2 = game.getPlayerFromColorOrFaction(color);
             msg += "the " + p2.fogSafeEmoji() + " token from their fleet pool.";
             delOne = true;

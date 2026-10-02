@@ -1,0 +1,134 @@
+[
+    {
+        "alias": "diasporabt",
+        "name": "Organic Reprocessing",
+        "shortName": "Organic\nReprocessing",
+        "faction": "diaspora",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "After 1 or more units uses its PRODUCTION ability, you may return 3 captured infantry on that planet to ready that planet.",
+        "source": "gamma"
+    },
+    {
+        "alias": "hlrbt",
+        "name": "Brain in a Jar",
+        "shortName": "Brain\nin a Jar",
+        "faction": "hlr",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "At the end of your tactical action, you may replace any number of your units in the active system with 2 matching neutral units. For each unit replaced, Gain a commodity or convert 1 commodity to a trade good a number of times equal to that unit's cost.",
+        "source": "gamma"
+    },
+    {
+        "alias": "cladebt",
+        "name": "Out of the mist",
+        "shortName": "Out\nof the mist",
+        "faction": "clade",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "When you gain this card, gain the Gamma Irridius planet card and its legendary planet ability card.\nWhen you activate or retreat from a system containing a Hallucination token, you may treat all systems containing Hallucination tokens as adjacent.",
+        "source": "gamma"
+    },
+    {
+        "alias": "archonbt",
+        "name": "Retribution Cascade",
+        "shortName": "Retribution\nCascade",
+        "faction": "archon",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When another player activates a system, you may return your command token from their faction sheet to your reinforcements and choose a non-faction, non-unit upgrade technology you control. Outlaws treat that technology as blank until the end of this tactical action.",
+        "source": "gamma"
+    },
+    {
+        "alias": "moyinbt",
+        "name": "Awakening Mutagens",
+        "shortName": "Awwkening\nMutagens",
+        "faction": "moyin",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "When you gain this breakthrough or score a public objective, place the mech of a random unused faction on this card.\nYour mechs gain the text and unit abilities of mechs on this card in addition to their own.",
+        "source": "gamma"
+    },
+    {
+        "alias": "veilstrikebt",
+        "name": "Iron Curtain",
+        "shortName": "Iron\nCurtain",
+        "faction": "veilstrike",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "During space combat, you may discard 1 action card to produce 1 hit against enemy ships.\nDuring ground combat, you may discard 1 action card to produce 2 hits against enemy ground forces.",
+        "source": "gamma"
+    },
+    {
+        "alias": "convocationbt",
+        "name": "Talon Transfer",
+        "shortName": "Talon\nTransfer",
+        "faction": "convocation",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "At the end of your tactical action, you may exhaust this card and swap the position of your command token in the active system with another player's command token in an adjacent system.",
+        "source": "gamma"
+    },
+    {
+        "alias": "weavewaybt",
+        "name": "Dimensional Threading",
+        "shortName": "Dimensional\nThreading",
+        "faction": "weaveway",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When 1 or more of your units use PRODUCTION, you may exhaust this card to reduce the combined cost of the produced units by the number of anomalies that contain 1 or more of your ships.\nAfter you win a combat in an anomaly, ready this card.",
+        "source": "gamma"
+    },
+    {
+        "alias": "initiativebt",
+        "name": "Sirocco DMZ",
+        "shortName": "Sirocco\nDMZ",
+        "faction": "initiative",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "You may exchange secret objectives as part of transactions.\nWhen you exchange a secret objective as part of a transaction, place one of your infantry into coexistence onto one of that player's planets of your choice. When you would perform a transaction with a player with a revealed secret objective, keep any revealed secret objectives face up.\nPlayers you are coexisting with can score revealed Secret Objectives in any player's play area as if they were public objectives.",
+        "source": "gamma"
+    },
+    {
+        "alias": "companybt",
+        "name": "The Grim Tableau",
+        "shortName": "The Grim\nTableau",
+        "faction": "company",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you pass, place or move the arc token to a non-home system; your home system is adjacent to that system. Players ignore the effects of anomalies in systems containing the arc token.\nYou may exhaust this card to place 2 infantry on a planet you control in or adjacent to your home system.",
+        "source": "gamma"
+    },
+    {
+        "alias": "industriesbt",
+        "name": "Industrial OVerload",
+        "shortName": "Industrial\nOVerload",
+        "faction": "industries",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "If you have the Space Dock II technology, flip this card and place it on top of Space Dock II.\nForgeworld [Combat 6; PRODUCTION X, PLANETARY SHIELD, SUSTAIN DAMAGE] This unit is treated as both a structure and a ground force.This unit's PRODUCTION value is equal to 6 more than the resource or influence value of this planet.Up to 6 fighters in this system do not count against your ships' capacity.",
+        "source": "gamma"
+    }
+]

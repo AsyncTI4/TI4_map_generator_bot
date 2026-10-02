@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sentuim",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "sentuim",
     "tileId": "er120",
     "name": "Sentuim",

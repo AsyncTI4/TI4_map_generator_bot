@@ -35,7 +35,7 @@ class StatusPhaseButtonHandler {
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if ("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) {
+            if (StatusHelper.isStatusScoring(game)) {
                 StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
@@ -67,6 +67,14 @@ class StatusPhaseButtonHandler {
         if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event);
+            } else if (stage.contains("2position_")) {
+                int location = Integer.parseInt(stage.replace("2position_", ""));
+                game.swapStage2(1, location);
+                RevealPublicObjectiveService.revealS2(game, event);
+            } else if (stage.contains("1position_")) {
+                int location = Integer.parseInt(stage.replace("1position_", ""));
+                game.swapStage1(1, location);
+                RevealPublicObjectiveService.revealS1(game, event);
             } else if ("2x2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealTwoStage2(game, event.getChannel());
             } else if ("none".equalsIgnoreCase(stage)) {
@@ -95,6 +103,7 @@ class StatusPhaseButtonHandler {
         if (!game.isOmegaPhaseMode()) {
             StartPhaseService.startStatusHomework(event, game);
         } else {
+            StatusHelper.commitStatusScoringEvent(game);
             if (Constants.IMPERIUM_REX_ID.equalsIgnoreCase(revealedObjective)) {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {

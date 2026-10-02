@@ -112,7 +112,7 @@ public class UnitDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(Game game) {
         List<DraftItem> allItems = buildAllItems(game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.UNIT);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.UNIT, game.isTwilightsFallMode());
         return allItems;
     }
 

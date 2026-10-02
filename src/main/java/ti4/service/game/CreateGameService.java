@@ -35,6 +35,7 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -180,14 +181,23 @@ public class CreateGameService {
                 .addRolePermissionOverride(gameRoleID, permission, 0)
                 .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-
-        Role bothelperRole = getRole("Bothelper", guild);
         List<Member> nonGameBothelpers = new ArrayList<>();
+        Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
                 boolean inGame =
                         members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
                 if (!inGame) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
+        }
+        Role adminRole = DiscordRoleUtility.getRole("Admin", guild);
+        if (adminRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(adminRole)) {
+                boolean inGame =
+                        members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
+                if (!inGame && !nonGameBothelpers.contains(botHelper)) {
                     nonGameBothelpers.add(botHelper);
                 }
             }
@@ -272,34 +282,43 @@ public class CreateGameService {
                 "How would you like to set up the players and map?",
                 List.of(miltyButton, nucleusButton, addMapString));
 
-        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
-        MessageHelper.sendMessageToChannelWithButton(
-                actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
-
-        HomebrewService.offerGameHomebrewButtons(actionsChannel);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
+        List<Button> setupButtons = new ArrayList<>();
+        setupButtons.add(Buttons.green("offerGameOptionButtons", "Aesthetic Options"));
+        setupButtons.add(Buttons.green("getHomebrewButtons", "Supported Homebrew"));
+        // MessageHelper.sendMessageToChannelWithButton(
+        //         actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
+
+        // HomebrewService.offerGameHomebrewButtons(actionsChannel);
+
         MessageHelper.sendMessageToChannel(
                 actionsChannel,
                 "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
-        Button teOptions = Buttons.green("offerTEOptionButtons", "Galactic Events");
-        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
+        setupButtons.add(Buttons.green("offerTEOptionButtons", "Galactic Events"));
+        // MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
 
-        Button tfOptions = Buttons.green("startTFGame", "Start Twilight's Fall Game");
-        MessageHelper.sendMessageToChannelWithButton(
-                actionsChannel,
-                "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
-                tfOptions);
+        setupButtons.add(Buttons.green("startTFGame", "Start Twilight's Fall Game"));
+        // MessageHelper.sendMessageToChannelWithButton(
+        //         actionsChannel,
+        //         "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use
+        // this button",
+        //         tfOptions);
+
+        setupButtons.add(Buttons.green("frankenSetup", "Start Franken Setup"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                actionsChannel, "These buttons can help you setup alternate game modes.", setupButtons);
 
         List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red("setupBaseGameMode", "Start Base Game Only Setup"));
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg = """
                 ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards.
                 > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
-                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
+                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge. It is the default if you do not press any of these buttons.\
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
@@ -409,9 +428,7 @@ public class CreateGameService {
                                 }
                                 MessageHelper.sendMessageToChannel(introThread, message);
                                 BufferedImage colorsImage = ImageHelper.readScaled(
-                                        ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"),
-                                        731,
-                                        593);
+                                        ResourceHelper.getExtraFile("Compiled_Async_colors.png"), 731, 593);
                                 FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
@@ -581,7 +598,7 @@ public class CreateGameService {
 
     private static int getMaxGamesPerCategory() {
         int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
-        return Math.max(1, Math.min(25, maxGamesPerCategory));
+        return Math.clamp(maxGamesPerCategory, 1, 25);
     }
 
     private static int getChannelCountForNewCategory() {
@@ -661,9 +678,9 @@ public class CreateGameService {
 
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
         EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
-        Role bothelperRole = getRole("Bothelper", guild);
-        Role spectatorRole = getRole("Spectator", guild);
-        Role everyoneRole = getRole("@everyone", guild);
+        Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);
+        Role spectatorRole = DiscordRoleUtility.getRole("Spectator", guild);
+        Role everyoneRole = DiscordRoleUtility.getRole("@everyone", guild);
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null)
             createCategoryAction =
@@ -676,12 +693,8 @@ public class CreateGameService {
         return createCategoryAction.complete();
     }
 
-    public static Role getRole(String name, Guild guild) {
-        return guild.getRolesByName(name, true).stream().findFirst().orElse(null);
-    }
-
     public static String getNewPlayerInfoText() {
-        String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
+        String path = ResourceHelper.getHelpFile("NewPlayerIntro.txt");
         try {
             return Files.readString(Paths.get(path));
         } catch (Exception e) {

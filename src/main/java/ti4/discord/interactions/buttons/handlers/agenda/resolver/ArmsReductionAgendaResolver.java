@@ -8,6 +8,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 
 public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
@@ -26,8 +27,8 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
             if (excessCruisers > 0) {
                 removeButtons.addAll(
                         ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser", true));
-                message = player.getRepresentation() + ", please remove " + excessCruisers + " excess cruiser"
-                        + (excessCruisers == 1 ? "" : "s");
+                message = player.getRepresentation() + ", please remove "
+                        + StringHelper.pluralize(excessCruisers, "excess cruiser");
             }
 
             int excessDreadnoughts = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) - 2;
@@ -35,11 +36,11 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
                 removeButtons.addAll(
                         ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "dreadnought", true));
                 if (message.isEmpty()) {
-                    message = player.getRepresentation() + ", please remove " + excessDreadnoughts
-                            + " excess dreadnought" + (excessDreadnoughts == 1 ? "" : "s");
+                    message = player.getRepresentation() + ", please remove "
+                            + StringHelper.pluralize(excessDreadnoughts, "excess dreadnought");
                 } else {
-                    message += player.getRepresentation() + " and " + excessDreadnoughts + " excess dreadnought"
-                            + (excessDreadnoughts == 1 ? "" : "s");
+                    message += player.getRepresentation() + " and "
+                            + StringHelper.pluralize(excessDreadnoughts, "excess dreadnought");
                 }
             }
 

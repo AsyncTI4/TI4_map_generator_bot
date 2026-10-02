@@ -9,6 +9,17 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -20,16 +31,22 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.twilight_kart.TkHelperStarflare;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -116,15 +133,61 @@ public class TacticalActionService {
     }
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        boolean skipPlacingAbilities = shouldSkipPlacingAbilities(game, player);
-        if (!skipPlacingAbilities
-                && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
-            if (!game.getStoredValue("absolLux").isEmpty()) {
-                player.setTacticalCC(player.getTacticalCC() + 1);
+        String combatInitiativeKey = CombatInitiativeLLButtonHandler.STATE + player.getFaction();
+        if (!game.getStoredValue(combatInitiativeKey).isEmpty()) {
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                CommandCounterHelper.addCC(event, player, tile);
             }
-            player.setTacticalCC(player.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, player, tile);
+            game.removeStoredValue(combatInitiativeKey);
+            return true;
+        }
+        String transitRiderKey = TransitRiderLLButtonHandler.STATE + player.getFaction();
+        if (!game.getStoredValue(transitRiderKey).isEmpty()) {
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                CommandCounterHelper.addCC(event, player, tile);
+            }
+            game.removeStoredValue(transitRiderKey);
+            return true;
+        }
+        String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
+        if (!borrowedAuthorityColor.isEmpty()) {
+            String ccId = Mapper.getCCID(borrowedAuthorityColor);
+            if (ccId != null
+                    && player.getDebtTokenCount(borrowedAuthorityColor, "Seize Command") > 0
+                    && !tile.hasCC(ccId)) {
+                player.removeDebtTokens(borrowedAuthorityColor, 1, "Seize Command");
+                tile.addCC(ccId);
+                Player borrowedFrom = game.getPlayerFromColorOrFaction(borrowedAuthorityColor);
+                String borrowedFromName =
+                        borrowedFrom == null ? borrowedAuthorityColor : borrowedFrom.getFactionNameOrColor();
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " returned " + borrowedFromName
+                                + "'s command token from their **Seize Command** debt pool to use _Borrowed Authority_.");
+                if (borrowedFrom != null) {
+                    MessageHelper.sendMessageToChannel(
+                            borrowedFrom.getCorrectChannel(),
+                            borrowedFrom.getRepresentationUnfogged() + ", your command token was placed in "
+                                    + tile.getRepresentationForButtons(game, borrowedFrom)
+                                    + " for _Borrowed Authority_.");
+                }
+                if (game.isFowMode()) {
+                    FoWHelper.pingSystem(
+                            game,
+                            tile.getPosition(),
+                            player.getFactionEmojiOrColor() + " activated a system using _Borrowed Authority_.");
+                }
+                ArdentiaTechHandler.offerOverlordMatrixButton(game, tile);
+            }
+            game.removeStoredValue("borrowedAuthorityColor");
+            return true;
+        }
+
+        boolean skipPlacingAbilities = shouldSkipPlacingAbilities(game, player);
+        if (!skipPlacingAbilities) {
+            CommandCounterHelper.addCC(
+                    event, player, tile, true, game.getStoredValue("absolLux").isEmpty());
+            ArdentiaTechHandler.offerOverlordMatrixButton(game, tile);
             return true;
         }
         return false;
@@ -140,6 +203,8 @@ public class TacticalActionService {
                 return false;
             }
         }
+
+        TkHelperStarflare.onTacticalMove(game, tile);
 
         return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
     }
@@ -158,7 +223,7 @@ public class TacticalActionService {
 
         // Core logic block: movement, token placement, after-move effects, and state flags
         FinishMovementContext ctx = executeCoreFinishMovement(event, game, player, tile);
-
+        TeHelperGeneral.checkCoexistTransfer(game);
         // UI/message block: build message and buttons
         LoreService.showSystemLore(player, game, tile.getPosition(), LoreService.TRIGGER.MOVED);
         String message = buildFinishMovementMessage(game, player, ctx);
@@ -166,7 +231,7 @@ public class TacticalActionService {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
 
         // Post-core triggers
-        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "dream");
         CommanderUnlockCheckService.checkPlayer(
                 player,
                 "nivyn",
@@ -178,12 +243,14 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix");
+                "vyserix",
+                "natau");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
-        if (tile.getPosition().startsWith("frac")) {
+        if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
+        NetrunnersUnitsHandler.offerTrojan(game, player, ctx.tile);
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
@@ -197,11 +264,15 @@ public class TacticalActionService {
 
     private FinishMovementContext executeCoreFinishMovement(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
+        if (player.hasLeader("ironhero")) {
+            IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
+        }
+        ArcanumBreakthroughHandler.movePowerWordWishUnitsToActiveSystem(game, player, tile);
+        XytherisLeadersHandler.moveMyrixAgentShipToActiveSystem(game, player, tile);
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
         Tile updatedTile = game.getTileByPosition(tile.getPosition());
-        spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);
 
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
@@ -219,6 +290,21 @@ public class TacticalActionService {
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
         }
+        if (game.isErwansGambitMode()) {
+            if (tile == player.getHomeSystemTile()
+                    && game.getStoredValue("unclaimedRelicLocations").contains(player.getFaction())) {
+                Die d1 = new Die(10);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " rolled " + d1.getResult() + " for their defense roll.");
+                if (d1.isSuccess()) {
+                    game.setStoredValue(
+                            "unclaimedRelicLocations",
+                            game.getStoredValue("unclaimedRelicLocations").replace(player.getFaction(), ""));
+                    RelicHelper.drawRelicAndNotify(player, event, game);
+                }
+            }
+        }
 
         return new FinishMovementContext(updatedTile, unitsWereMoved, hasGfsInRange, playersWithPds2);
     }
@@ -233,7 +319,9 @@ public class TacticalActionService {
     private List<Button> buildFinishMovementButtons(
             ButtonInteractionEvent event, Game game, Player player, FinishMovementContext ctx) {
         List<Button> systemButtons;
-        if (!ctx.unitsWereMoved && !ctx.hasGfsInRange) {
+        if (!ctx.unitsWereMoved
+                && !ctx.hasGfsInRange
+                && !ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(ctx.tile)) {
             systemButtons = getBuildButtons(event, game, player, ctx.tile);
         } else {
             systemButtons = getLandingTroopsButtons(game, player, ctx.tile);
@@ -307,6 +395,9 @@ public class TacticalActionService {
         for (MoveAbilityButton ability : MoveAbilityButtons.ABILITIES) {
             if (ability.enabled(pubCtx)) buttons.addAll(ability.build(pubCtx));
         }
+        if (player.hasTechReady("becrystrd")) {
+            CrystellumTechHandler.addResonanceDriveButton(buttons, player);
+        }
 
         // Finish movement controls
         buttons.add(
@@ -339,6 +430,7 @@ public class TacticalActionService {
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
                             || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
                 out.add(Buttons.green(
@@ -378,6 +470,12 @@ public class TacticalActionService {
         for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
             if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
         }
+        ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "celdauri_monument")) {
+                buttons.addAll(MonumentsDSButtonHandler.getCeldauriMonumentCommitButtons(game, player, tile));
+            }
+        }
 
         return buttons;
     }
@@ -386,10 +484,11 @@ public class TacticalActionService {
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, tile, moveOrRemove);
     }
 
-    private boolean shouldSkipPlacingAbilities(Game game, Player player) {
+    public boolean shouldSkipPlacingAbilities(Game game, Player player) {
         return game.isNaaluAgent()
                 || game.isWarfareAction()
                 || game.isL1Hero()
+                || ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                 || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
     }
 
@@ -405,7 +504,7 @@ public class TacticalActionService {
         for (Player p2 : game.getRealPlayers()) {
             if (player.getAllianceMembers().contains(p2.getFaction()) && !game.isFowMode()) {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)
-                        && !CommandCounterHelper.hasCC(event, p2.getColor(), tile)) {
+                        && (!CommandCounterHelper.hasCC(event, p2.getColor(), tile))) {
                     hasUnits = true;
                 }
             }
@@ -422,6 +521,10 @@ public class TacticalActionService {
                 || player.hasUnit("tf-morphwing");
         boolean hierarch = player.hasUnit("tk-hierarch") && space.getUnitCount(UnitType.Cruiser, player) > 0;
         if (naaluFS || belkoFF || hierarch) committable.add(UnitType.Fighter);
+        if (ScrapyardAbilitiesHandler.isRigActive(player, "cruiser_customrig")) committable.add(UnitType.Cruiser);
+        if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
+            committable.add(UnitType.Pds);
+        }
         return committable;
     }
 

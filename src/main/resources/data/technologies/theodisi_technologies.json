@@ -1,0 +1,482 @@
+[
+  {
+    "alias": "thardentiag",
+    "name": "Cognitive Parallax Engine",
+    "types": [
+      "BIOTIC"
+    ],
+    "requirements": "G",
+    "faction": "ardentia",
+    "source": "theodisi",
+    "text": "When you would spend a command token from your strategy pool, you may exhaust this card to instead spend a command token from your reinforcements."
+  },
+  {
+    "alias": "thardentiar",
+    "name": "Overlord Matrix",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "RR",
+    "faction": "ardentia",
+    "source": "theodisi",
+    "text": "When you activate a system or a system containing your units is activated, you may exhaust this card to treat 1 of your units as Galvanized during this tactical action for each command token in your tactic pool."
+  },
+  {
+    "alias": "thverydithy",
+    "name": "Domestic Production Agreements",
+    "types": [
+      "CYBERNETIC"
+    ],
+    "requirements": "Y",
+    "faction": "verydith",
+    "source": "theodisi",
+    "text": "You may treat systems that contain command tokens as units with PRODUCTION equal to the number of command tokens in those systems."
+  },
+  {
+    "alias": "thverydithg",
+    "name": "Bilateral Nexus",
+    "types": [
+      "BIOTIC"
+    ],
+    "requirements": "GGG",
+    "faction": "verydith",
+    "source": "theodisi",
+    "text": "When you perform the primary effect of a strategy card, you may exhaust this card to perform the secondary effect of that strategy card without spending a command token."
+  },
+  {
+    "alias": "thveylorg",
+    "name": "Inner Sanctum",
+    "types": [
+      "BIOTIC"
+    ],
+    "requirements": "G",
+    "faction": "veylor",
+    "source": "theodisi",
+    "text": "Gain the Inner Sanctum planet card and its legendary planet ability card, and ready them. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it."
+  },
+  {
+    "alias": "thveylory",
+    "name": "Kleptocratic Politics",
+    "types": [
+      "CYBERNETIC"
+    ],
+    "requirements": "YY",
+    "faction": "veylor",
+    "source": "theodisi",
+    "text": "After an agenda is revealed, you may exhaust this card and predict aloud the outcome of that agenda. If your prediction is correct, perform the secondary ability of a strategy card without spending a command token. If that agenda is not resolved, ready this card."
+  },
+  {
+    "alias": "thmyrry",
+    "name": "Segmented Structuring",
+    "types": [
+      "CYBERNETIC"
+    ],
+    "requirements": "Y",
+    "faction": "myrr",
+    "source": "theodisi",
+    "text": "After movement, you may remove any number of your non-flagship ships from the active system. Place a number of units up to the combined PRODUCTION value of your units in that system whose combined cost is equal to or less than that of the removed units."
+  },
+  {
+    "alias": "thmyrrdn",
+    "name": "Replicator II",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "BBY",
+    "faction": "myrr",
+    "baseUpgrade": "dn2",
+    "source": "theodisi",
+    "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can produce only dreadnoughts or units that can be transported that are in the space area of this system."
+  },
+  {
+    "alias": "thkairny",
+    "name": "Surveyor's Lens",
+    "types": [
+      "CYBERNETIC"
+    ],
+    "requirements": "Y",
+    "faction": "kairn",
+    "source": "theodisi",
+    "text": "Once per action, at the end of a tactical action, you may exhaust this card to explore 1 planet you control in the active system. When you gain a relic fragment during exploration, you may remove 1 infantry from the explored planet to ready this card."
+  },
+  {
+    "alias": "thkairng",
+    "name": "Trait Harmonizer",
+    "types": [
+      "BIOTIC"
+    ],
+    "requirements": "GG",
+    "faction": "kairn",
+    "source": "theodisi",
+    "text": "Increase your commodity value by 1 for each non-home planet trait you control."
+  },
+  {
+    "alias": "thkryxosfs",
+    "name": "Ultimate Evolution II",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "GBY",
+    "faction": "kryxos",
+    "source": "theodisi",
+    "text": "When you research or gain a technology, you may flip this card instead."
+  },
+  {
+    "alias": "thkryxosfs2",
+    "name": "Ultimate Evolution III",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "GBY",
+    "faction": "kryxos",
+    "source": "theodisi",
+    "text": "Cost 8, Combat 2(x3), Move 4, Capacity 12\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 3(x3)\nWhen this unit uses SUSTAIN DAMAGE, cancel an additional hit."
+  },
+  {
+    "alias": "thkryxosmf",
+    "name": "Warspawn Juggernaut II",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "BYR",
+    "faction": "kryxos",
+    "source": "theodisi",
+    "text": "When you research or gain a technology, you may flip this card instead."
+  },
+  {
+    "alias": "thkryxosmf2",
+    "name": "Warspawn Juggernaut III",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "BYR",
+    "faction": "kryxos",
+    "source": "theodisi",
+    "text": "Cost 2, Combat 4(x2), BOMBARDMENT 4(x2)\nSUSTAIN DAMAGE\nWhen this unit produces a hit, you may SUSTAIN DAMAGE to place infantry with this unit up to the number of hits produced."
+  },
+  {
+    "alias": "tharcanumbg",
+    "name": "Seal of Revelation",
+    "types": [
+      "BIOTIC",
+      "PROPULSION"
+    ],
+    "requirements": "BG",
+    "faction": "arcanum",
+    "source": "theodisi",
+    "text": "This technology may be treated as either a biotic or propulsion technology.\n\nACTION: Exhaust this card to shuffle up to 1 purged exploration card that does not place a token on the game board into its respective deck. Then, explore a planet you control."
+  },
+  {
+    "alias": "tharcanumry",
+    "name": "Sigil of Transmutation",
+    "types": [
+      "CYBERNETIC",
+      "WARFARE"
+    ],
+    "requirements": "RY",
+    "faction": "arcanum",
+    "source": "theodisi",
+    "text": "This technology may be treated as either a warfare or cybernetic technology.\n\nWhen you move ships into a non-home system, you may exhaust this card. That system gains SPACE CANNON 5 (x3) and PRODUCTION 3 as if it were a unit until the end of that tactical action."
+  },
+  {
+    "alias": "tharcanumpmy",
+    "name": "Power Word: Fabricate",
+    "types": [
+      "CYBERNETIC"
+    ],
+    "requirements": "YYYY",
+    "faction": "arcanum",
+    "source": "theodisi",
+    "text": "Gain the Fabricate Station planet card and its legendary ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it."
+  },
+  {
+    "alias": "tharcanumpmg",
+    "name": "Power Word: Miracle",
+    "types": [
+      "BIOTIC"
+    ],
+    "requirements": "GGGG",
+    "faction": "arcanum",
+    "source": "theodisi",
+    "text": "ACTION: Exhaust this card and do each of the following: Discard 1 action card and draw 2 action cards. Gain 1 command token. Place up to 4 infantry on planets you control."
+  },
+  {
+    "alias": "tharcanumpmr",
+    "name": "Power Word: Disintegrate",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "RRRR",
+    "faction": "arcanum",
+    "source": "theodisi",
+    "text": "At the start of a combat involving your units, you may produce 1 hit against your opponent's units. At the start of a combat involving your units, you may exhaust this card to destroy 1 unit involved in that combat."
+  },
+  {
+    "alias": "tharcanumpmb",
+    "name": "Power Word: Plane Shift",
+    "types": [
+      "PROPULSION"
+    ],
+    "requirements": "BBBB",
+    "faction": "arcanum",
+    "source": "theodisi",
+    "text": "ACTION: Exhaust this card to perform a tactical action in a system that contains no planets without spending a command token. Ignore the effects of anomalies during this tactical action."
+  },
+  {
+    "alias": "thxytherisr",
+    "name": "Biomechanical Nutrients",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "R",
+    "faction": "xytheris",
+    "source": "theodisi",
+    "text": "When you produce 1 or more hits with a unit ability, you may place 1 ship in a system that contains your ships with a cost less than the number of hits produced."
+  },
+  {
+    "alias": "thxytherisdd",
+    "name": "Stingers II",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "RR",
+    "faction": "xytheris",
+    "baseUpgrade": "dd2",
+    "source": "theodisi",
+    "text": "Cost 1, Combat 8, Move 2, Capacity 1, ANTI-FIGHTER BARRAGE 6(x3), SPACE CANNON 6"
+  },
+  {
+    "alias": "thoblivionr",
+    "name": "Oblivion Cannon",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "R",
+    "faction": "oblivion",
+    "source": "theodisi",
+    "text": "At the end of a round of space combat, you may purge 1 non-fighter ship you control in that system with a cost of 4 or less. Produce and assign hits equal to half its cost (rounded up) against your opponent's units in that system."
+  },
+  {
+    "alias": "thobliviong",
+    "name": "Mirrored Memories",
+    "types": [
+      "BIOTIC"
+    ],
+    "requirements": "GG",
+    "faction": "oblivion",
+    "source": "theodisi",
+    "text": "ACTION: Play 1 action card with a component action from the discard pile and exhaust this card. Purge that action card instead of discarding it."
+  },
+  {
+    "alias": "threvenanty",
+    "name": "Lazarus Pods",
+    "types": [
+      "CYBERNETIC"
+    ],
+    "requirements": "YY",
+    "faction": "revenant",
+    "source": "theodisi",
+    "text": "When you exhaust an agent for its effect or purge a hero for its effect, you may produce 2 units in a system that contains 1 of your ships."
+  },
+  {
+    "alias": "threvenantr",
+    "name": "Eternal Aegis",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "R",
+    "faction": "revenant",
+    "source": "theodisi",
+    "text": "During the first round of combat, you may cancel hits equal to the number of leader types you have unlocked, unexhausted, and unpurged."
+  },
+  {
+    "alias": "ththronesb",
+    "name": "Specter Step",
+    "types": [
+      "PROPULSION"
+    ],
+    "requirements": "B",
+    "faction": "thrones",
+    "source": "theodisi",
+    "text": "At the end of a tactical action, you may exhaust this card to move 1 of your ships from the active system into a system that contains no other player's ships. This ship may transport units."
+  },
+  {
+    "alias": "ththronesr",
+    "name": "Rift-Touched Bastion",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "RR",
+    "faction": "thrones",
+    "source": "theodisi",
+    "text": "When you activate a system or a system containing your units is activated, you may exhaust this card to treat 1 system that contains the active player's units as a gravity rift until the end of this action."
+  },
+  {
+    "alias": "thaeternar",
+    "name": "Thanatocyte Lattice",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "R",
+    "faction": "aeterna",
+    "source": "theodisi",
+    "text": "Once per combat round, when a unit is destroyed, you may assign 1 hit to a unit of the same type as that destroyed unit."
+  },
+  {
+    "alias": "thaeternasd",
+    "name": "Graveyard II",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "YY",
+    "faction": "aeterna",
+    "baseUpgrade": "sd2",
+    "source": "theodisi",
+    "text": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity and produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
+  },
+  {
+    "alias": "thponthousr",
+    "name": "Thunderbird Protocol",
+    "types": [
+      "WARFARE"
+    ],
+    "requirements": "R",
+    "faction": "ponthous",
+    "source": "theodisi",
+    "text": "At the start of space combat involving your units, select 2 of your ground forces in that system. Those units participate in space combat as if they were ships, and you may treat them as Galvanized until the end of the combat."
+  },
+  {
+    "alias": "thponthousdd",
+    "name": "Renegade II",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "RR",
+    "faction": "ponthous",
+    "baseUpgrade": "dd2",
+    "source": "theodisi",
+    "text": ""
+  },
+  {
+    "alias": "thvanguardr",
+    "name": "Enhanced Plating",
+    "types": [
+        "WARFARE"
+    ],
+    "faction": "vanguard",
+    "source": "theodisi",
+    "text": "Once per combat round when one of your units uses SUSTAIN DAMAGE during combat, roll a die. If the result is equal to or greater than the unit's combat value, produce one hit against your opponent's units."
+  },
+  {
+    "alias": "thvanguardy",
+    "name": "Reinforce",
+    "types": [
+        "CYBERNETIC"
+    ],
+    "faction": "vanguard",
+    "source": "theodisi",
+    "text": "Once per action, after you win a combat, the active system gains PRODUCTION 3 until the end of the action."
+  },
+  {
+    "alias": "thscrapyardff",
+    "name": "Fuel Cell II",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "ff2",
+    "requirements": "BG",
+    "faction": "scrapyard",
+    "source": "theodisi",
+    "text": "After you activate a system, destroy any number of your fighters to apply +1 to the move value of 1 of your ships during this action for every 2 fighters you destroy. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+  },
+  {
+    "alias": "thscrapyardr",
+    "name": "Hotswapping",
+    "types": [
+        "WARFARE"
+    ],
+    "requirements": "RRR",
+    "faction": "scrapyard",
+    "source": "theodisi",
+    "text": "When you activate a system, or a system containing your units is activated, you may treat 1 unit type you control as if you owned the Unit Upgrade technology for it until the end of that tactical action."
+  },
+  {
+    "alias": "thstoneborng",
+    "name": "Xenolith Dormant",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "G",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "UNLEASH: Return 2 Green Fragmentum Tokens from your player sheet.\nWhen you would explore a planet you control or the frontier deck, you may exhaust this card and instead reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+  },
+  {
+    "alias": "thstoneborngu",
+    "name": "Xenolith Unleashed",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "null",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "After you explore a planet you control or the frontier deck, you may exhaust this card and reveal cards from that deck until you reveal a relic fragment. Resolve that exploration and shuffle the remaining revealed cards back into that exploration deck."
+  },
+  {
+    "alias": "thstoneborndn",
+    "name": "Stalactium II",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "dn2",
+    "requirements": "BBY",
+    "faction": "stoneborn",
+    "source": "theodisi",
+    "text": "UNLEASH: Return 2 Blue Fragmentum Tokens from your player sheet.\nDEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+  },
+  {
+    "alias": "thmorphag",
+    "name": "Synaptic Relays",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "GG",
+    "faction": "morpha",
+    "source": "theodisi",
+    "text": "ACTION: Exhaust this card and discard 1 action card to draw 1 action card and 1 random hydromorphic card."
+  },
+  {
+    "alias": "thmorphacv",
+    "name": "Cytoplasmic Transports II",
+    "types": [
+        "UNITUPGRADE"
+    ],
+    "baseUpgrade": "cv2",
+    "requirements": "BB",
+    "faction": "morpha",
+    "source": "theodisi",
+    "text": "Once per action, when you discard 1 or more action cards, you may either produce 1 carrier in a system containing your ships, or move 1 carrier you control to a system that contains 1 of your space docks (it may transport units)."
+  },
+  {
+    "alias": "ththurvialig",
+    "name": "Restructuring",
+    "types": [
+        "BIOTIC"
+    ],
+    "requirements": "G",
+    "faction": "thurviali",
+    "source": "theodisi",
+    "text": "ACTION: Exhaust this card and remove up to 3 of your structures from the game board and place them on 1 or more planets you control."
+  },
+  {
+    "alias": "ththurvialib",
+    "name": "Mutualism",
+    "types": [
+        "PROPULSION"
+    ],
+    "requirements": "BB",
+    "faction": "thurviali",
+    "source": "theodisi",
+    "text": "You may use the PRODUCTION, SPACE CANNON or PLANETARY SHIELD of structures you are coexisting with.\nACTION: Exhaust this card and select 1 player. They may place a structure in coexistence from their reinforcements on a planet you control. If they do, they gain 1 command token."
+  }
+]

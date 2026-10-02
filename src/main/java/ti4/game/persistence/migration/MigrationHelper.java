@@ -63,6 +63,7 @@ class MigrationHelper {
             mapNeededMigrating |= replace(game.getActionCards(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardActionCards(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardACStatus(), toReplace, replacement);
+            mapNeededMigrating |= replace(game.getPlayedActionCards(), toReplace, replacement);
 
             for (Player player : game.getRealPlayers()) {
                 mapNeededMigrating |= replaceKey(player.getActionCards(), toReplace, replacement);
@@ -95,6 +96,14 @@ class MigrationHelper {
             V value = map.get(toReplace);
             map.put(replacement, value);
             map.remove(toReplace);
+            return true;
+        }
+        return false;
+    }
+
+    private static <K> boolean replace(Set<K> set, K toReplace, K replacement) {
+        if (set.remove(toReplace)) {
+            set.add(replacement);
             return true;
         }
         return false;

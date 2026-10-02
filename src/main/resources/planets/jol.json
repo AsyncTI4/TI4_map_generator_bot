@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "jol",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "jol",
     "tileId": "12",
     "name": "Jol",

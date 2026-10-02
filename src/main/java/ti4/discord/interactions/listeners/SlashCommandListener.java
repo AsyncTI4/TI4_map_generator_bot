@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.commands.Command;
 import ti4.discord.interactions.commands.GameStateContainer;
@@ -21,6 +22,7 @@ import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.usage.InteractionCountService;
 
 class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
@@ -73,17 +75,19 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         Command<SlashCommandInteractionEvent> resolvedCommand = getCommand(event);
-        CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+        CombatReplayService combatReplayService =
+                CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
-                if (resolvedCommand instanceof GameStateContainer gameStateContainer) {
-                    combatReplayService.setPreInteractionSnapshot(
+                if (combatReplayService != null && resolvedCommand instanceof GameStateContainer gameStateContainer) {
+                    CombatReplayService.setPreInteractionSnapshot(
                             combatReplayService.capturePreInteractionSnapshot(gameStateContainer.getGame()));
                 }
                 logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
+                InteractionCountService.get().incrementSlashCommand(event.getFullCommandName());
                 if (!isModalCommand(event) && !resolvedCommand.isEphemeral(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
@@ -91,7 +95,9 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         } catch (Exception e) {
             command.onException(event, e);
         } finally {
-            combatReplayService.clearPreInteractionSnapshot();
+            if (combatReplayService != null) {
+                CombatReplayService.clearPreInteractionSnapshot();
+            }
             RollbarManager.clear();
         }
 
@@ -110,14 +116,18 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-        event.getChannel()
-                .sendMessage(commandText)
-                .queue(
-                        m -> {
-                            BotLogger.logSlashCommand(event, m);
-                            SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
-                        },
-                        BotLogger::catchRestError);
+        if (!event.getCommandString().contains("/rules ask")
+                && !event.getCommandString().contains("/fow whisper")
+                && !event.getCommandString().contains("/bothelper impersonate")) {
+            event.getChannel()
+                    .sendMessage(commandText)
+                    .queue(
+                            m -> {
+                                BotLogger.logSlashCommand(event, m);
+                                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
+                            },
+                            BotLogger::catchRestError);
+        }
     }
 
     private static ExecutionLockType getLockType(Command<SlashCommandInteractionEvent> command) {

@@ -1,0 +1,38 @@
+[
+    {
+        "alias": "arachnerabt",
+        "name": "Feed the Swarm",
+        "shortName": "Feed the\nSwarm",
+        "faction": "arachnera",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When researching a technology you may treat this card as a planet with a green technology specialty symbol.\n\nYou may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit.",
+        "source": "luminous"
+    },
+    {
+        "alias": "psmbt",
+        "name": "PSM Breakthrough",
+        "shortName": "PSM\nBreakthrough",
+        "faction": "psm",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "Each system or planet can contain a number of structures equal to +1 the number of structures that game effects or abilities would allow. You may exhaust this card at the start of your turn during the action phase; remove up to 2 of your structures from the game board and place them in a system you control.",
+        "source": "luminous"
+    },
+    {
+        "alias": "opabt",
+        "name": "Ring Gates",
+        "shortName": "Ring\nGates",
+        "faction": "opa",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "When you gain this card, place an additional broken planet token in your Homesystem. Then Gain that broken planet token Card and ready it. Then all Broken Planet Planets are now treated as stations with no other planet type for the rest of the game. All units and structures on each Broken planet are moved to space if possible, or returned to the unit owner’s unit pool.\n\nAfter you activate a system: You may treat all systems that contain a Space Station as being adjacent to each other during a tactical action.",
+        "source": "luminous"
+    }
+]

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
@@ -100,9 +101,11 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                     .filter(tile -> withNebula == null || withNebula == tile.isNebula())
                     .filter(tile -> withSupernova == null || withSupernova == tile.isSupernova())
                     .filter(tile -> withLegendaries == null
-                            || tile.getPlanets().stream()
-                                    .map(Mapper::getPlanet)
-                                    .anyMatch(planet -> planet.isLegendary() == withLegendaries))
+                            || withLegendaries
+                                    == (tile.getPlanets() != null
+                                            && tile.getPlanets().stream()
+                                                    .map(Mapper::getPlanet)
+                                                    .anyMatch(PlanetModel::isLegendary)))
                     .sorted(Comparator.comparing(TileModel::getId))
                     .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
                     .forEach(tileEmbeds::add);

@@ -36,7 +36,7 @@ public class AddBorderAnomaly extends GameStateSubcommand {
 
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE).getAsString();
         BorderAnomalyModel.BorderAnomalyType anomalyType =
-                new BorderAnomalyModel().getBorderAnomalyTypeFromString(anomalyTypeString);
+                BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyTypeString);
 
         StringBuilder sb = new StringBuilder();
         int amountAdded = 0;

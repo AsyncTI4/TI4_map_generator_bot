@@ -18,8 +18,8 @@ public class ActionCardDeckController {
 
     @PostMapping("/shuffle")
     @PreAuthorize("@security.canAccessGame(#gameName)")
-    public ResponseEntity<String> shuffle(@PathVariable String gameName) {
-        actionCardDeckService.shuffle(RequestContext.getGame(), RequestContext.getPlayer());
+    public static ResponseEntity<String> shuffle(@PathVariable String gameName) {
+        ActionCardDeckService.shuffle(RequestContext.getGame(), RequestContext.getPlayer());
         return ResponseEntity.ok("Shuffled the action card deck.");
     }
 }

@@ -15,6 +15,8 @@ import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.service.game.ManagedGameService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.persistence.StandaloneTitleEntityRepository;
 
 @UtilityClass
 public class TitlesHelper {
@@ -37,11 +39,12 @@ public class TitlesHelper {
             }
             Arrays.stream(titlesForPlayer.split("_")).forEach(title -> {
                 if (!title.isEmpty() && !"**".equalsIgnoreCase(title)) {
-                    titles.merge(title, 1, Integer::sum);
-                    gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
+                    addTitle(titles, gameHistory, title, game.getName());
                 }
             });
         }
+
+        addStandaloneTitles(userId, titles, gameHistory);
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
@@ -70,6 +73,21 @@ public class TitlesHelper {
         }
 
         return sb;
+    }
+
+    private static void addStandaloneTitles(
+            String userId, Map<String, Integer> titles, HashMap<String, String> gameHistory) {
+        for (var standaloneTitle :
+                SpringContext.getBean(StandaloneTitleEntityRepository.class).findByUserIdWithUser(userId)) {
+            var title = standaloneTitle.getTitle();
+            addTitle(titles, gameHistory, title, standaloneTitle.getSource());
+        }
+    }
+
+    private static void addTitle(
+            Map<String, Integer> titles, HashMap<String, String> gameHistory, String title, String source) {
+        titles.merge(title, 1, Integer::sum);
+        gameHistory.merge(title, source, (existing, newName) -> existing + ", " + newName);
     }
 
     @ButtonHandler("offerToGiveTitles")

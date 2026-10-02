@@ -34,7 +34,7 @@ public class SusSlashCommandService {
 
         boolean isPrivateThread = event.getMessageChannel() instanceof ThreadChannel thread && !thread.isPublic();
         boolean isPublicThread = event.getMessageChannel() instanceof ThreadChannel thread && thread.isPublic();
-        boolean isNotGameChannel = event.getMessageChannel() != managedGame.getActionsChannel()
+        boolean isNotGameChannel = event.getMessageChannel() != managedGame.getMainGameChannel()
                 && event.getMessageChannel() != managedGame.getTableTalkChannel()
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
         boolean isSinglePlayerGame = managedGame.getRealPlayers().size() <= 1;
@@ -45,7 +45,9 @@ public class SusSlashCommandService {
                 && !isSinglePlayerGame
                 && (isPrivateThread || isNotGameChannel)
                 && !isPublicThread) {
-            reportToSusSlashCommandLog(event, jumpUrl, gameName);
+            if (!"player cc".equalsIgnoreCase(event.getFullCommandName())) {
+                reportToSusSlashCommandLog(event, jumpUrl, gameName);
+            }
             String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
                     + event.getFullCommandName() + "`";
             MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
@@ -89,14 +91,13 @@ public class SusSlashCommandService {
         String gameName = GameNameService.getGameName(event);
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame != null) {
-            TextChannel actionsChannel = managedGame.getActionsChannel();
+            TextChannel mainGameChannel = managedGame.getMainGameChannel();
             TextChannel tableTalkChannel = managedGame.getTableTalkChannel();
-            if (actionsChannel != null) {
-                message.append("\nActions: ").append(actionsChannel.getAsMention());
-            }
-            if (tableTalkChannel != null) {
-                message.append("\nTabletalk: ").append(tableTalkChannel.getAsMention());
-            }
+            String tabletalkLink =
+                    String.format("[__[" + tableTalkChannel.getName() + "](%s)__]", tableTalkChannel.getJumpUrl());
+            String actionsLink = String.format("[__[Actions](%s)__]", mainGameChannel.getJumpUrl());
+            message.append(" ").append(actionsLink);
+            message.append(" ").append(tabletalkLink);
         }
         MessageHelper.sendMessageToChannel(moderationLogChannel, message.toString());
     }

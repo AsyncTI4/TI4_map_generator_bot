@@ -121,7 +121,7 @@ public class MiltyDraftHelper {
         Point hs = tilePositions.getFirst();
 
         List<String> tileStrings = new ArrayList<>();
-        tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
+        tileStrings.add(ResourceHelper.getTileFile("00_green.png"));
         tileStrings.addAll(
                 slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 
@@ -296,14 +296,17 @@ public class MiltyDraftHelper {
                 ComponentSource.codex3,
                 ComponentSource.codex4,
                 ComponentSource.pok));
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
         initDraftTiles(manager, sources);
+        EchoesOfYggdrasilService.addTiles(game, manager);
     }
 
     private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lodor",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "lodor",
     "tileId": "26",
     "name": "Lodor",

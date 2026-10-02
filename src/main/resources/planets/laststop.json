@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "laststop",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "laststop",
     "tileId": "d09",
     "name": "Last Stop",

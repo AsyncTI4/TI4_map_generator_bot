@@ -1,32 +1,54 @@
 package ti4.service.option;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.franken.ban.BanService;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
-import ti4.service.emoji.SourceEmojis;
+import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.fow.GMService;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class TEOptionService {
+    private static final String TOGGLE_TF_HOMEBREW_PREFIX = "toggleTfHomebrew_";
+
+    /**
+     * These homebrew-toggle confirmations were hardcoded to the public main channel regardless of where the
+     * GM clicked from - in a FoW game that leaks setup chatter to every player, so route to the GM room instead.
+     */
+    private static MessageChannel homebrewChannel(Game game) {
+        return game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+    }
 
     @ButtonHandler("startTFGame")
     public static void startTFGame(Game game, ButtonInteractionEvent event) {
-        ButtonHelper.deleteMessage(event);
+        // ButtonHelper.deleteMessage(event);
         String msg = """
             There are currently two draft options for Twilight's Fall.
 
@@ -39,16 +61,45 @@ public class TEOptionService {
             The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
-        buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
-        buttons.add(
-                Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        // Milty/Nucleus draft slices, tiles and speaker order - in FoW the GM hand-builds the map and sets
+        // seat/speaker order via `/fow setup` instead, and tile/draft-order categories are already forced to
+        // 0 for FoW (FrankenDraft.isFowExcludedCategory), so those two drafts have nothing left to draft.
+        if (!game.isFowMode()) {
+            buttons.add(
+                    Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
+            buttons.add(Buttons.gray(
+                    "startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        } else {
+            // The splice is normally phase 2 after a milty/nucleus draft. In FoW the wizard already does what
+            // those drafts would (map, factions, positions, seat/speaker order), so the splice on its own is
+            // the RAW-style option here - players still draft their abilities/units/genomes.
+            buttons.add(Buttons.gray("startTFDraft_splice", "Inaugural Splice Only (abilities/units/genomes)"));
+            msg += """
+
+
+                -# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker \
+                order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the \
+                RAW-style flow once the wizard has assigned factions and positions.""";
+        }
         buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("startTFDraft")
-    public static void startTFDraft(ButtonInteractionEvent event, Game game) {
+    public static void startTFDraft(ButtonInteractionEvent event, Game game, String buttonID) {
         game.setupTwilightsFallMode(event);
+        if (buttonID.endsWith("_splice")) {
+            // force=false so any player the GM already set up through the wizard keeps their faction, colour
+            // and (crucially) their assigned home position - setUpFrankenFactions with force=true re-parks
+            // everyone at the temporary off-map 50x anchors, which would undo the wizard's placements.
+            FrankenDraftBagService.setUpFrankenFactions(game, event, false);
+            FrankenDraftBagService.clearPlayerHands(game);
+            // Same entry point the automatic post-milty splice uses; it deliberately skips seat-order
+            // assignment in FoW, since the wizard owns that.
+            ButtonHelperTwilightsFall.startInauguralSplice(game);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
         game.setBagDraft(new TwilightsFallFrankenDraft(game));
@@ -56,11 +107,11 @@ public class TEOptionService {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("editTFHomebrew")
+    @ButtonHandler(value = "editTFHomebrew", save = false)
     private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
         String msg = "Use the buttons to enable or disable various homebrew options:";
         List<ContainerChildComponent> sections = getTFHomebrewInfo(game);
-        MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+        MessageV2Builder builder = new MessageV2Builder(homebrewChannel(game));
         builder.append(msg);
         builder.append(Container.of(sections));
         builder.append(Buttons.DONE_DELETE_BUTTONS);
@@ -69,26 +120,193 @@ public class TEOptionService {
         // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
     }
 
-    private static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
-        String idPre = "toggleTFHomebrew_";
-        List<ContainerChildComponent> sections = new ArrayList<>();
+    private static ContainerChildComponent getSingleTfHomebrewInfo(
+            boolean isDisable, String sourceId, String buttonLabel) {
+        List<TextDisplay> textDisplays = List.of(TextDisplay.of("invalid sourceId: " + sourceId));
+        TI4Emoji sourceEmoji = null;
 
-        SourceModel tk = Mapper.getSource("twilight_kart");
-        String tkId = idPre + "twilightkart";
-        Button button = Buttons.rgToggle(game.isTwilightKart(), tkId, "Twilight Kart", SourceEmojis.TwilightKart);
-        sections.add(Section.of(button, tk.getRepresentationTextDisplays()));
-        // sections.add(Separator.create(true, Spacing.LARGE));
+        SourceModel sourceModel = Mapper.getSource(sourceId);
+        if (sourceModel != null) {
+            textDisplays = sourceModel.getRepresentationTextDisplays();
+            ComponentSource componentSource = sourceModel.getSource();
+            if (componentSource != null) {
+                sourceEmoji = componentSource.getRawEmoji();
+            }
+        }
 
-        return sections;
+        String buttonId = TOGGLE_TF_HOMEBREW_PREFIX + sourceId;
+        Button button = Buttons.rgToggle(isDisable, buttonId, buttonLabel, sourceEmoji);
+        return Section.of(button, textDisplays);
     }
 
-    @ButtonHandler("toggleTFHomebrew")
-    private static void toggleTFHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
-        String homebrew = buttonID.split("_")[1];
+    public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
+        return List.of(
+                getSingleTfHomebrewInfo(
+                        game.isTkDestroyerCup(), Constants.TK_DESTROYER_CUP, "Twilight Kart: Destroyer Cup"),
+                getSingleTfHomebrewInfo(game.isTkNovaCup(), Constants.TK_NOVA_CUP, "Twilight Kart: Nova Cup"),
+                getSingleTfHomebrewInfo(game.isTfBr(), Constants.TF_BR, "WhiteTF"),
+                getSingleTfHomebrewInfo(game.isTwilightDS(), Constants.TWILIGHT_DS, "Discordant Stars"),
+                getSingleTfHomebrewInfo(game.isMonumentsMode(), "monuments", "Monuments+"));
+    }
+
+    @ButtonHandler(TOGGLE_TF_HOMEBREW_PREFIX)
+    private static void toggleTfHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
+        String homebrew = buttonID.replace(TOGGLE_TF_HOMEBREW_PREFIX, "");
         switch (homebrew) {
-            case "twilightkart" -> game.setTwilightKart(!game.isTwilightKart());
+            case Constants.TK_DESTROYER_CUP -> {
+                game.setTkDestroyerCup(!game.isTkDestroyerCup());
+                game.setupTwilightsFallMode(event);
+                if (game.isTkDestroyerCup()) {
+                    List<Button> buttons = new ArrayList<>();
+                    game.removeStoredValue("bannedUnits");
+                    buttons.add(Buttons.green("twilightDSSetup_pruned", "Just 4 units of each type"));
+                    buttons.add(Buttons.blue("deleteButtons", "All the Units"));
+                    MessageHelper.sendMessageToChannel(
+                            homebrewChannel(game),
+                            "Some people find there's too many units and would prefer to prune the deck to just 4 random units of each type (normal deck has 31 units, TK (Destroyer Cup) + normal is 60 units, pruned is 43 units)",
+                            buttons);
+                }
+            }
+            case Constants.TK_NOVA_CUP -> {
+                game.setTkNovaCup(!game.isTkNovaCup());
+                game.setupTwilightsFallMode(event);
+                if (game.isTkNovaCup()) {
+                    game.setStoredValue(Constants.TK_NOVA_CUP + "_setup_option", "onePerColor");
+                    postTkNovaSetupOptions(game);
+                } else {
+                    game.removeStoredValue(Constants.TK_NOVA_CUP + "_setup_option");
+                }
+            }
+            case Constants.TF_BR -> {
+                game.setTfBr(!game.isTfBr());
+                if (game.isTfBr()) {
+                    game.setHomebrew(true);
+                }
+            }
+            case Constants.TWILIGHT_DS -> {
+                game.setTwilightDS(!game.isTwilightDS());
+                if (game.isTwilightDS()) {
+                    game.setHomebrew(true);
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("twilightDSSetup_justds", "Just DS Abilities"));
+                    buttons.add(Buttons.blue("twilightDSSetup_mixture", "Mixture of Normal and DS abilities"));
+                    MessageHelper.sendMessageToChannel(
+                            homebrewChannel(game),
+                            "Do you want to use just DS abilities or a mixture of Normal and DS abilities?",
+                            buttons);
+                }
+            }
+            case "monuments" -> {
+                game.setMonumentsMode(!game.isMonumentsMode());
+                if (game.isMonumentsMode()) {
+                    MonumentsService.applyTwilightsFallMonuments(game);
+                    MessageHelper.sendMessageToChannel(
+                            homebrewChannel(game),
+                            "Added Monuments+ secret objectives and the Monuments+ Twilight's Fall strategy card set.");
+                }
+            }
         }
+        ButtonHelper.deleteMessage(event);
         postTwilightFallHomebrewOptions(event, game);
+    }
+
+    private static void postTkNovaSetupOptions(Game game) {
+        String msg = """
+                The Nova Cup provides a set of alternate Mahact Kings which \
+                can be used in addition to or in place of the Vanilla Kings.
+                Which sets of Mahact Kings do you want to include in your game?
+                - **Both, but only 1 per Color (Default):** Include both sets. However, each color is only included once. \
+                (For each color, a coin is tossed to determine which set's king of that color is used.)
+                - **Both, no restrictions:** Include all 16 Kings with no color restrictions. For example, \
+                the red vanilla king and the alternate red king added in the Nova Cup can end up in the same game.
+                - **Only Nova Kings:** Only include the 8 Kings added in the Nova Cup.
+                - **Only Vanilla King:** Only include the 8 original, official Kings from vanilla TF.
+                """;
+        /*
+        Not implemented:
+               - **Both, but lock Colors:** Include all 16 Kings. However, when, for example, the
+               red vanilla king is picked, the red Nova Cup king can no longer be picked (and vice versa).
+               - **Both, but draft Color first:** Include all 16 Kings, but only draft the color at first.
+               After everyone has drafted a color, each player can choose which king of that color they want to play.
+        */
+        List<Map.Entry<String, String>> options = List.of(
+                Map.entry("onePerColor", "Both, but only 1 per Color (Default)"),
+                Map.entry("unrestricted", "Both, no restrictions"),
+                Map.entry("onlyNova", "Only Nova Kings"),
+                Map.entry("onlyVanilla", "Only Vanilla Kings"));
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, String> entry : options) {
+            String buttonID = "tkNovaSetup_" + entry.getKey();
+            String buttonLabel = entry.getValue();
+            if (entry.getKey().equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
+                buttons.add(Buttons.green(buttonID, buttonLabel));
+            } else {
+                buttons.add(Buttons.red(buttonID, buttonLabel));
+            }
+        }
+        MessageHelper.sendMessageToChannel(homebrewChannel(game), msg, buttons);
+    }
+
+    @ButtonHandler("tkNovaSetup_")
+    public static void tkNovaSetup(ButtonInteractionEvent event, Game game, String buttonID) {
+        String optionId = buttonID.split("_")[1];
+        if (optionId.equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
+            return;
+        }
+        game.setStoredValue(Constants.TK_NOVA_CUP + "_setup_option", optionId);
+        postTkNovaSetupOptions(game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("twilightDSSetup_")
+    public static void twilightDSSetup(ButtonInteractionEvent event, Game game, String buttonID) {
+        String choice = buttonID.split("_")[1];
+        switch (choice.toLowerCase()) {
+            case "justds" -> {
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), "Chose to just use DS abilities");
+                List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+                game.removeStoredValue("bannedTechs");
+                for (String tech : allCards) {
+                    BanService.appendStoredValue(game, "bannedTechs", tech);
+                }
+            }
+            case "mixture" -> {
+                MessageHelper.sendMessageToChannel(
+                        homebrewChannel(game), "Chose to just use a mixture of DS and normal abilities");
+                List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+                game.removeStoredValue("bannedTechs");
+                for (TechnologyModel tech : Mapper.getTechs().values()) {
+                    if (tech.getSource() == ComponentSource.twilight_ds) {
+                        allCards.add(tech.getID());
+                    }
+                }
+                Collections.shuffle(allCards);
+                StringBuilder msg = new StringBuilder("The following abilities have been banned:\n");
+                for (int x = 0; x < allCards.size() / 2; x++) {
+                    BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
+                    msg.append(Mapper.getTech(allCards.get(x)).getName()).append("\n");
+                }
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg.toString());
+            }
+            case "pruned" -> {
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), "Chose to just use a pruned deck of units.");
+                List<String> allCards = Mapper.getDeck("twilight_kart_units").getNewShuffledDeck();
+                game.removeStoredValue("bannedUnits");
+                StringBuilder msg = new StringBuilder("The following units have been banned:\n");
+                Map<UnitType, Integer> unitCount = new HashMap<>();
+
+                for (String unit : allCards) {
+                    UnitModel un = Mapper.getUnit(unit);
+                    UnitType type = un.getUnitType();
+                    unitCount.put(type, unitCount.getOrDefault(type, 0) + 1);
+                    if (unitCount.get(type) > 4) {
+                        BanService.appendStoredValue(game, "bannedUnits", unit);
+                        msg.append(un.getName()).append("\n");
+                    }
+                }
+                MessageHelper.sendMessageToChannel(homebrewChannel(game), msg.toString());
+            }
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -99,6 +317,7 @@ public class TEOptionService {
             case "newpok" -> {
                 game.removeStoredValue("useOldPok");
                 game.setThundersEdge(false);
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
             }
             case "oldpok" -> {
                 game.setStoredValue("useOldPok", "true");
@@ -118,7 +337,7 @@ public class TEOptionService {
                         + " components.");
     }
 
-    @ButtonHandler("offerTEOptionButtons")
+    @ButtonHandler(value = "offerTEOptionButtons", save = false)
     public static void offerTEOptionButtons(Game game, MessageChannel channel) {
         List<Button> galacticEventButtons = getGalacticEventButtons(game);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
@@ -227,6 +446,13 @@ public class TEOptionService {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
+        }
+        if (game.isCosmicConvergenceMode()) {
+            galacticEventButtons.add(
+                    Buttons.red("enableDaneMode_CosmicConvergence_disable", "Disable Cosmic Convergence"));
+        } else {
+            galacticEventButtons.add(
+                    Buttons.green("enableDaneMode_CosmicConvergence_enable", "Enable Cosmic Convergence"));
         }
         if (game.isWildWildGalaxyMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild, Wild Galaxy"));

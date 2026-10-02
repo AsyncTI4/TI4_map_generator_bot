@@ -16,6 +16,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.milty.EchoesOfYggdrasilService;
 import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
@@ -50,8 +51,10 @@ public class DraftSetupService {
         // Draft Manager Setup
         // --------------------------------------------------------------
         List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -60,6 +63,7 @@ public class DraftSetupService {
         // Setup managers and game state
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.addAllDraftTiles(sources);
+        EchoesOfYggdrasilService.addTiles(game, tileManager);
         DraftManager draftManager = game.getDraftManager();
         draftManager.resetForNewDraft();
         draftManager.setPlayers(specs.playerIDs);
@@ -161,10 +165,15 @@ public class DraftSetupService {
         if (sourceSettings == null) {
             return "Error: Could not find source settings.";
         }
+        game.setStoredValue(
+                ti4.helpers.Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(sourceSettings.getEchoesOfYggdrasil().isVal()));
 
         List<ComponentSource> tileSources = new ArrayList<>(sourceSettings.getTileSources());
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             tileSources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             tileSources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -173,6 +182,7 @@ public class DraftSetupService {
         DraftTileManager tileManager = game.getDraftTileManager();
         tileManager.clear();
         tileManager.addAllDraftTiles(tileSources);
+        EchoesOfYggdrasilService.addTiles(game, tileManager);
 
         for (String draftableKey : settings.getDraftablesList().getKeys()) {
             Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);

@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.base.nekro;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -43,7 +44,7 @@ class NekroHeroButtonHandler {
                 if (!p2.getColor().equals(key.getColor())) continue;
                 int amt = unitHolder.getUnitCount(key);
                 unitHolder.removeUnit(key, amt);
-                emoji.append(key.unitEmoji().emojiString().repeat(amt));
+                emoji.repeat(Objects.requireNonNull(key.unitEmoji().emojiString()), amt);
             }
             if (!emoji.isEmpty()) {
                 message.append(p2.getRepresentation())

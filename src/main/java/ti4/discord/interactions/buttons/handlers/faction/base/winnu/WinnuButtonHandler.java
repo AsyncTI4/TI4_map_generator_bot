@@ -13,6 +13,7 @@ import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.service.statistics.overrule.OverruleStatsService;
 
 @UtilityClass
 class WinnuButtonHandler {
@@ -37,6 +38,9 @@ class WinnuButtonHandler {
         int sc = Integer.parseInt(buttonID.split("_")[1]);
         boolean isOverrule = buttonID.contains("overrule");
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
+        if (isOverrule) {
+            OverruleStatsService.get().recordChoice(game.getName(), Helper.getSCName(sc, game));
+        }
         if (isOverrule && sc == 5 && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),

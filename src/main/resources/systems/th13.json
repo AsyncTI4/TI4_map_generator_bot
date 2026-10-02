@@ -1,0 +1,16 @@
+{
+    "tileBack": "green",
+    "id": "th13",
+    "name": "Ponthous - Ponthous",
+    "aliases": [
+        "th13",
+        "ponthous"
+    ],
+    "imagePath": "th13_ponthoushs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "ponthous"
+    ],
+    "source": "theodisi"
+}

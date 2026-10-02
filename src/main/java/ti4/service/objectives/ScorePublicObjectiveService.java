@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
@@ -20,9 +21,11 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StatusHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
 
@@ -30,9 +33,12 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
+        MessageChannel channel = player.getCorrectChannel();
+        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
+            return;
+        }
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
-        MessageChannel channel = player.getCorrectChannel();
         String id = "";
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -46,7 +52,7 @@ public class ScorePublicObjectiveService {
             int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
+                        channel,
                         player.getFactionEmoji() + ", the bot does not believe you meet the requirements to score "
                                 + poName + ". The bot has you at " + playerProgress + "/" + threshold
                                 + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"
@@ -63,7 +69,14 @@ public class ScorePublicObjectiveService {
                     channel,
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
+            StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
             informAboutScoring(event, channel, game, player, poID);
+            if (player.hasAbility("primordial")) {
+                KaloraAbilityHandler.primordial(player, game);
+            }
+            if (player.getPromissoryNotesInPlayArea().contains("bapnkalo")) {
+                KaloraAbilityHandler.sharedTreasure(player, game);
+            }
             for (Player p2 : player.getNeighbouringPlayers(true)) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
@@ -133,6 +146,9 @@ public class ScorePublicObjectiveService {
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
+        if (game.isMuaatManiaMode()) {
+            ButtonHelper.offerMMBoon(player, game);
+        }
         if (player.hasTech("tf-yinascendant") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");
@@ -146,7 +162,14 @@ public class ScorePublicObjectiveService {
         }
         if (!poName.toLowerCase().contains("custodian")
                 && (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt"))) {
-            if (Mapper.getPublicObjective(id) != null || Mapper.getSecretObjective(id) != null) {
+            boolean soToPo = false;
+            for (String so : game.getSoToPoList()) {
+                if (Mapper.getSecretObjectivesJustNames().get(so) != null
+                        && Mapper.getSecretObjectivesJustNames().get(so).equalsIgnoreCase(id)) {
+                    soToPo = true;
+                }
+            }
+            if (Mapper.getPublicObjective(id) != null || Mapper.getSecretObjective(id) != null || soToPo) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
             }
         }
@@ -198,6 +221,24 @@ public class ScorePublicObjectiveService {
                                 + " __either__ the resource or influence requirement of this objective, but __not__ both.";
             }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+            List<Integer> unfollowedSCs = player.getUnfollowedSCs();
+            if (unfollowedSCs != null
+                    && !unfollowedSCs.contains(1)
+                    && !game.getPhaseOfGame().contains("action")
+                    && !unfollowedSCs.contains(6)
+                    && !unfollowedSCs.contains(7)) {
+                message2 = player.getRepresentationUnfogged()
+                        + ", please choose the planets you wish to exhaust to score the objective.";
+                game.setStoredValue("resetSpend", "sup");
+                for (String planet : player.getPlanets()) {
+                    if (!player.getExhaustedPlanets().contains(planet)) {
+                        player.exhaustPlanet(planet);
+                        player.addSpentThing(planet);
+                    }
+                }
+                message2 += "\n" + Helper.buildSpentThingsMessage(player, game, "both");
+                buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+            }
             Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);

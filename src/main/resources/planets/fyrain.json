@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "fyrain",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "fyrain",
     "tileId": "er92",
     "name": "Fyrain",

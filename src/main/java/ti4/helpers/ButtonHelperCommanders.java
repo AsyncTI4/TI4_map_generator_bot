@@ -40,6 +40,8 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
@@ -158,7 +160,7 @@ public class ButtonHelperCommanders {
         ButtonHelperAgents.resolveArtunoCheck(player, count);
         String msg = player.getRepresentationUnfogged() + " used Knak Halfear, the Olradin Commander, to exhaust "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain "
-                + count + " trade good" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
+                + StringHelper.pluralize(count, "trade good") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -432,27 +434,38 @@ public class ButtonHelperCommanders {
         }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        player.addSpentThing(msg);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     public static void resolveLetnevCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
-            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String mMessage = player.getRepresentationUnfogged()
-                        + " Since you have Rear Admiral Farran, the Letnev commander, unlocked,"
-                        + " 1 trade good has been added automatically " + player.gainTG(1) + ".";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-                ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            } else {
-                String mMessage = player.getRepresentationUnfogged()
-                        + ", you have Rear Admiral Farran, the Letnev commander, unlocked,"
-                        + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+            switch (ButtonHelperAbilities.resolveOptionalTgGainMode(player, game)) {
+                case FOW_OPT_IN -> {
+                    String mMessage = player.getRepresentationUnfogged()
+                            + ", you have Rear Admiral Farran, the Letnev commander, unlocked,"
+                            + " so you __may__ gain 1 trade good.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
+                }
+                case RANGE_OPT_IN -> {
+                    String mMessage = player.getRepresentationUnfogged()
+                            + ", you have Rear Admiral Farran, the Letnev commander, unlocked,"
+                            + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                }
+                case AUTO -> {
+                    String mMessage = player.getRepresentationUnfogged()
+                            + " Since you have Rear Admiral Farran, the Letnev commander, unlocked,"
+                            + " 1 trade good has been added automatically " + player.gainTG(1) + ".";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                }
             }
         }
     }
@@ -466,7 +479,10 @@ public class ButtonHelperCommanders {
         player.setGhostCommanderCounter(player.getGhostCommanderCounter() + 1);
         String factionEmoji = player.getFactionEmoji();
 
-        String method = game.isTwilightKart() ? "IFF Support Wing" : "Sai Seravus, the Creuss commander";
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        String method = game.isTwilightKart() || game.isTkDestroyerCup()
+                ? "IFF Support Wing"
+                : "Sai Seravus, the Creuss commander";
         String msg = factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
                 + " using " + method + ".\n-# " + factionEmoji
                 + " has placed a total of " + player.getGhostCommanderCounter()
@@ -669,22 +685,34 @@ public class ButtonHelperCommanders {
     public static void resolveMuaatCommanderCheck(
             Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander") || player.hasTech("tf-stellargenesis")) {
-            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String message = player.getRepresentationUnfogged()
-                        + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1)
-                        + ", when you " + reason + ".";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            } else {
-                String mMessage =
-                        player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
-                                + " so you __may__ gain 1 trade good when you " + reason
-                                + ", but since you are in **Pillage** range, this has not been done automatically.";
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+            switch (ButtonHelperAbilities.resolveOptionalTgGainMode(player, game)) {
+                case FOW_OPT_IN -> {
+                    String mMessage =
+                            player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
+                                    + " so you __may__ gain 1 trade good when you " + reason + ".";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
+                }
+                case RANGE_OPT_IN -> {
+                    String mMessage =
+                            player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
+                                    + " so you __may__ gain 1 trade good when you " + reason
+                                    + ", but since you are in **Pillage** range, this has not been done automatically.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                }
+                case AUTO -> {
+                    String message = player.getRepresentationUnfogged()
+                            + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1)
+                            + ", when you " + reason + ".";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                }
             }
         }
         if (player.hasUnit("kolume_mech")) {
@@ -702,7 +730,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        if (player.hasUnlockedBreakthrough("freesystemsbt")) {
+        if (player.hasUnlockedBreakthrough("freesystemsbt") || player.hasTech("tf-rallyingmarshalls")) {
             List<Button> buttons = new ArrayList<>();
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 buttons.add(Buttons.green(
@@ -719,6 +747,7 @@ public class ButtonHelperCommanders {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
+                buttons2.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve _Peace Accords_.",
@@ -729,6 +758,7 @@ public class ButtonHelperCommanders {
             String msg = "Please choose the system in which you wish to produce a ship using ";
             msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
             List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -744,15 +774,22 @@ public class ButtonHelperCommanders {
             return;
         }
         List<Button> buttons = new ArrayList<>();
-        for (String planet : target.getPlanetsAllianceMode()) {
-            if (game.getUnitHolderFromPlanet(planet) != null
-                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
-                    && !ButtonHelper.getPlanetExplorationButtons(
-                                    game, game.getUnitHolderFromPlanet(planet), player, false, true)
-                            .isEmpty()) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
+        if (game.isFowMode()) {
+            // Ground forces and explorability are both hidden state, so neither can narrow the fog list -
+            // which planets are explorable would also disclose their traits and attachments.
+            buttons = PlanetTargetService.targetButtons(
+                    game, player, PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3"), buttons);
+        } else {
+            for (String planet : target.getPlanetsAllianceMode()) {
+                if (game.getUnitHolderFromPlanet(planet) != null
+                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
+                        && !ButtonHelper.getPlanetExplorationButtons(
+                                        game, game.getUnitHolderFromPlanet(planet), player, false, true)
+                                .isEmpty()) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Cancel"));
@@ -985,6 +1022,26 @@ public class ButtonHelperCommanders {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
+    @ButtonHandler("ralnelMechPull_")
+    public static void ralnelMechPull(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String mechorInf = buttonID.split("_")[1];
+        String planet1 = buttonID.split("_")[2];
+        String planet2 = buttonID.split("_")[3];
+        String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
+        String planetRepresentation = Helper.getPlanetRepresentation(planet1, game);
+
+        String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
+                + " to " + planetRepresentation + " using the Ralnel Mech ability.";
+        RemoveUnitService.removeUnits(
+                event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        game.setStoredValue("coexistFlag", "yes");
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
+        game.removeStoredValue("coexistFlag");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<Button> getSardakkCommanderButtons(
             Game game, Player player, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
@@ -995,11 +1052,14 @@ public class ButtonHelperCommanders {
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
-            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true, true)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 if (CommandCounterHelper.hasCC(event, player.getColor(), tile2)
                         && !game.isDominusOrb()
                         && tile2 != tile) {
+                    continue;
+                }
+                if (tile2 == tile && tile.getPlanetUnitHolders().size() == 3) {
                     continue;
                 }
                 for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
@@ -1015,12 +1075,12 @@ public class ButtonHelperCommanders {
                     String planetName2 = Helper.getPlanetName(planetId2);
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
-                        String label = "1 Infantry From " + planetName2 + " To " + planetName + " With G'hom Sek'kus";
+                        String label = "1 Inf From " + planetName2 + " To " + planetName + " With Commander";
                         buttons.add(Buttons.green(id, label, FactionEmojis.Sardakk));
                     }
                     if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         String id = "sardakkcommander_mech_" + planetId + "_" + planetId2;
-                        String label = "1 Mech From " + planetName2 + " To " + planetName + " With G'hom Sek'kus";
+                        String label = "1 Mech From " + planetName2 + " To " + planetName + " With Commander";
                         buttons.add(Buttons.blue(id, label, FactionEmojis.Sardakk));
                     }
                 }

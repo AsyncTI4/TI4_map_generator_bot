@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cyon",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 220,
+            "y": 200
+        }
+    },
     "id": "cyon",
     "tileId": "m09",
     "name": "Cyon",

@@ -25,8 +25,9 @@ public class SpawnFracture extends GameStateSubcommand {
             return;
         }
 
-        if (FractureService.isFractureInPlay(game)) {
-            MessageHelper.sendMessageToEventChannel(event, "The Fracture is already in play.");
+        if (!FractureService.canFractureEnterPlay(game)) {
+            MessageHelper.sendMessageToEventChannel(event, FractureService.whyFractureCannotEnterPlay(game));
+            return;
         }
 
         FractureService.spawnFracture(event, game);

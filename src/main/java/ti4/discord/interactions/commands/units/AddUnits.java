@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
@@ -19,6 +22,8 @@ import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.ParseUnitService;
+import ti4.service.unit.ParsedUnit;
 
 public class AddUnits extends GameStateCommand {
 
@@ -83,13 +88,25 @@ public class AddUnits extends GameStateCommand {
                     || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
         }
         AddUnitService.addUnits(event, tile, game, color, unitList);
+        if (coexist) {
+            ThurvialiAbilityHandler.checkRadiantGrafting(game);
+            ParseUnitService.getParsedUnits(event, color, tile, unitList).stream()
+                    .map(ParsedUnit::location)
+                    .filter(location -> !Constants.SPACE.equals(location))
+                    .distinct()
+                    .map(tile.getUnitHolders()::get)
+                    .filter(java.util.Objects::nonNull)
+                    .forEach(
+                            planet -> ThurvialiBreakthroughHandler.offerNeurografting(null, game, getPlayer(), planet));
+        }
         if (space != null
                 && getPlayer().getColor() != null
                 && !doesTileHaveFloatingGF
                 && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile)
                         .isEmpty()) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF = (space.getUnitCount(UnitType.Mech, getPlayer()) > 0
+                            || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0)
+                    && !tile.getPlanetUnitHolders().isEmpty();
             if (doesTileHaveFloatingGF) {
                 List<Button> buttons = TacticalActionService.getLandingTroopsButtons(game, getPlayer(), tile);
                 Button concludeMove =
@@ -101,7 +118,9 @@ public class AddUnits extends GameStateCommand {
                         buttons);
             }
         }
-        if (!coexist) StartCombatService.combatCheck(game, event, tile);
+        if (!coexist || TwilightsFallMonumentsButtonHandler.preventsCoexistence(game, tile)) {
+            StartCombatService.combatCheck(game, event, tile);
+        }
         handleSlingRelayOption(event);
         UnitCommandHelper.handleCcUseOption(event, tile, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "axis",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "axis",
     "tileId": "d27",
     "name": "Axis",

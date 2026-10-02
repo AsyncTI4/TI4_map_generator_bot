@@ -104,7 +104,7 @@ public class AverageHitsPerTurnService {
         return toResultString(sortedResults, null);
     }
 
-    private String toResultString(
+    private static String toResultString(
             Collection<HitsPerTurnAccumulator> accumulators, Map<HitsPerTurnAccumulator, String> tiers) {
         StringBuilder sb = new StringBuilder("## __**Average Expected Hits Per Turn**__\n");
         int index = 1;

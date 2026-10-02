@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -14,6 +16,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.UnitModel;
+import ti4.service.game.MonumentsService;
+import ti4.service.unit.UnitModelValueInjectionService;
 
 /**
  * Selects which units participate in a combat round for a given tile, holder, and player.
@@ -29,7 +33,7 @@ public class CombatUnitSelectionHelper {
         if (context.isSpaceCombat()) {
             return selectSpaceUnits(context);
         }
-        return selectGroundUnits(context.unitsOnCombatHolder());
+        return selectGroundUnits(context);
     }
 
     private static Map<UnitModel, Integer> selectSpaceUnits(CombatSelectionContext context) {
@@ -40,6 +44,17 @@ public class CombatUnitSelectionHelper {
             // Purple TF mechs / Naaz Voltron let those mechs join the space combat from planets in the system.
         } else if (hasPurpleTFMech(context.player())) {
             selectedUnits = includeMechsFromPlanets(context);
+        }
+        UnitModel thunderbirdGroundForce = PonthousPromissoryHandler.getThunderbirdPrototypeGroundForce(
+                context.player().getGame(), context.player(), context.tile());
+        if (thunderbirdGroundForce != null) {
+            // This unit can already have an equivalent model in space (for example, through another temporary
+            // effect). It is still a separate selected ground force, so it must contribute one combat die.
+            selectedUnits.merge(thunderbirdGroundForce, 1, Integer::sum);
+        }
+        for (UnitModel protocolGroundForce : PonthousTechHandler.getThunderbirdProtocolGroundForces(
+                context.player().getGame(), context.player(), context.tile())) {
+            selectedUnits.merge(protocolGroundForce, 1, Integer::sum);
         }
         return applySpaceRestrictions(context, selectedUnits);
     }
@@ -79,8 +94,30 @@ public class CombatUnitSelectionHelper {
         return filterUnits(unitsOnCombatHolder, UnitModel::getIsShip);
     }
 
-    private static Map<UnitModel, Integer> selectGroundUnits(Map<UnitModel, Integer> unitsOnCombatHolder) {
-        return filterUnits(unitsOnCombatHolder, unit -> unit.getIsGroundForce() || unit.getIsShip());
+    private static Map<UnitModel, Integer> selectGroundUnits(CombatSelectionContext context) {
+        Map<UnitModel, Integer> selectedUnits =
+                filterUnits(context.unitsOnCombatHolder(), unit -> unit.getIsGroundForce() || unit.getIsShip());
+
+        if (!MonumentsService.isMonumentOnBoard(context.player().getGame(), context.player(), "khrask_monument")
+                || context.tile()
+                        != MonumentsService.getMonumentTile(
+                                context.player().getGame(), context.player(), "khrask_monument")
+                || context.unitHolder().getUnitCount(UnitType.Monument, context.player()) < 1) {
+            return selectedUnits;
+        }
+
+        context.unitsOnCombatHolder().entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .filter(entry -> entry.getKey().getUnitType() == UnitType.Monument)
+                .findFirst()
+                .ifPresent(entry -> selectedUnits.put(
+                        UnitModelValueInjectionService.injectValues(
+                                entry.getKey(),
+                                UnitModelValueInjectionService.BooleanValueInjection.create()
+                                        .isGroundForce(true)),
+                        entry.getValue()));
+
+        return selectedUnits;
     }
 
     private static Map<UnitModel, Integer> collectEligibleUnitsFromSystem(

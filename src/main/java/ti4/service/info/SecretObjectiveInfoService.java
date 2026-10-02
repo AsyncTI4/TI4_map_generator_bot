@@ -22,8 +22,6 @@ import ti4.service.emoji.CardEmojis;
 @UtilityClass
 public class SecretObjectiveInfoService {
 
-    private static final String PINNED_SO_INFO_MESSAGE_ID = "pinned_so_info_message_id";
-
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         sendSecretObjectiveInfo(game, player, event, false, false);
     }
@@ -66,8 +64,7 @@ public class SecretObjectiveInfoService {
     public static void sendSecretObjectiveInfo(
             Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons) {
         // SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
-                game, player, PINNED_SO_INFO_MESSAGE_ID, getSecretObjectiveCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 
@@ -89,6 +86,12 @@ public class SecretObjectiveInfoService {
         } else {
             Button discardB = Buttons.blue("get_so_discard_buttons", "Discard A Secret Objective");
             buttons.add(discardB);
+        }
+        if (player.hasAbility("safe_harbor")) {
+            buttons.add(Buttons.green("drawHeistObj_1", "Draw 1 VP Heist Objective"));
+            buttons.add(Buttons.green("drawHeistObj_2", "Draw 2 VP Heist Objective"));
+            buttons.add(Buttons.gray("revealHeistObj", "Reveal Heist Objective"));
+            buttons.add(Buttons.red("removeHeistObj", "Remove Revealed Heist Objective"));
         }
 
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
@@ -148,6 +151,9 @@ public class SecretObjectiveInfoService {
                             .append(Helper.leftpad("" + so.getValue(), 3))
                             .append(")`\n> ")
                             .append(soModel.getText());
+                    if (soModel.getPoints() > 1) {
+                        sb.append(" (").append(soModel.getPoints()).append(" VP)");
+                    }
                     index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
@@ -191,6 +197,9 @@ public class SecretObjectiveInfoService {
     private static String getSecretObjectiveRepresentation(String soID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        if (so == null) {
+            return "Unknown Secret Objective: " + soID;
+        }
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();

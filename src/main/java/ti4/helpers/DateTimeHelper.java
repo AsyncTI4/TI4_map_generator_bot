@@ -16,6 +16,12 @@ public class DateTimeHelper {
         return snowflake.getTimeCreated().toInstant().toEpochMilli();
     }
 
+    public static long getTimeinMinutes(long totalMillis) {
+        long totalSeconds = totalMillis / 1000; // total seconds (truncates)
+        long totalMinutes = totalSeconds / 60; // total minutes (truncates)
+        return totalMinutes;
+    }
+
     public static String getTimeRepresentationToSeconds(long totalMillis) {
         long totalSeconds = totalMillis / 1000; // total seconds (truncates)
         long seconds = totalSeconds % 60;

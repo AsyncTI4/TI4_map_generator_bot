@@ -9,7 +9,6 @@
     "influence": 2,
     "factionHomeworld": "bastion",
     "planetTypes": [
-        "FACTION",
         "SPACESTATION"
     ],
     "planetLayout": {

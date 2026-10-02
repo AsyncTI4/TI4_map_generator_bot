@@ -83,6 +83,12 @@ public class DraftTileManager {
         }
     }
 
+    public void addDraftTile(String tileId) {
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        if (tileModel == null || isNotDraftable(tileModel) || tileModel.isHyperlane()) return;
+        addDraftTile(getDraftTileFromModel(tileModel));
+    }
+
     /**
      * Get the provided tiles broken into their tiers. The tiering calculation still uses ALL draft tiles.
      * @param specificTiles
@@ -185,8 +191,10 @@ public class DraftTileManager {
                 ComponentSource.codex3,
                 ComponentSource.codex4,
                 ComponentSource.pok));
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         return sources;

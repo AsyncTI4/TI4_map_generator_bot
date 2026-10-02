@@ -73,7 +73,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         // Load JSON if applicable
         if (!(json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText("")))) {
+                || !MENU_ID.equals(json.get("menuId").asString("")))) {
             numPackages.initialize(json.get("numPackages"));
             banFactions.initialize(json.get("banFactions"));
 
@@ -267,7 +267,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         return null;
     }
 
-    private String parseFactionToAlias(String inputFaction) {
+    private static String parseFactionToAlias(String inputFaction) {
         FactionModel faction = Mapper.getFaction(inputFaction);
         if (faction != null) {
             return faction.getAlias();

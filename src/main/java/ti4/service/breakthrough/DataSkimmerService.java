@@ -77,6 +77,9 @@ public class DataSkimmerService {
         List<Button> peekButton = List.of(Buttons.gray("peekDataSkimmer", "See Cards on Data Skimmer", "👀"));
 
         String message = "Use these buttons to pick a card from _Data Skimmer_, to add to your hand.";
+        if (pickButtons.isEmpty()) {
+            message = "There are no cards on Data Skimmer at the moment, and so you cannot use it to pick one up.";
+        }
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 null, ralnel.getCorrectChannel(), pickButtons, peekButton, message, buttonPrefix, buttonID)) {
             ButtonHelper.deleteMessage(event);
@@ -109,7 +112,7 @@ public class DataSkimmerService {
     }
 
     @ButtonHandler("discardDataSkimmer")
-    public static void discardCardsOnDataSkimmer(Game game, Player ralnel) {
+    private static void discardCardsOnDataSkimmer(Game game, Player ralnel) {
         if (!ralnel.hasUnlockedBreakthrough("ralnelbt")) return;
 
         List<String> discarded = new ArrayList<>();
@@ -125,7 +128,15 @@ public class DataSkimmerService {
     }
 
     @ButtonHandler(value = "peekDataSkimmer", save = false)
-    public static void peekDataSkimmer(ButtonInteractionEvent event, Game game) {
+    public static void peekDataSkimmer(ButtonInteractionEvent event, Game game, Player player) {
+        if (ActionCardHelper.hidesUnplayedDiscards(game, player)
+                && (player == null || !player.hasUnlockedBreakthrough("ralnelbt"))) {
+            event.getHook()
+                    .sendMessage("Only the holder of _Data Skimmer_ can see the cards on it.")
+                    .setEphemeral(true)
+                    .queue(null, BotLogger::catchRestError);
+            return;
+        }
         String dataSkimmerText = ShowActionCardsService.getDataSkimmerDiscardText(game, true);
         List<String> splits = MessageHelper.splitLargeText(dataSkimmerText, 2000);
         for (String split : splits) {

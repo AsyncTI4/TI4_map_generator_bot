@@ -24,7 +24,7 @@ class MovementService {
     /**
      * Apply the provided displacement to the given target position, handle token placement, and return the updated tile.
      */
-    Tile commitMovement(
+    static Tile commitMovement(
             Game game, Player player, String targetPosition, Map<String, List<MovementUnitCount>> displacement) {
         try {
             // Transform web payload into internal displacement structure, normalizing unit-holder keys
@@ -75,7 +75,7 @@ class MovementService {
         }
     }
 
-    private String normalizeUnitHolderKey(String raw) {
+    private static String normalizeUnitHolderKey(String raw) {
         if (raw == null) return null;
         int dash = raw.indexOf('-');
         if (dash <= 0) return raw;

@@ -21,7 +21,7 @@ public class DrumrollService {
         StringBuilder sb = new StringBuilder();
         if (message != null) sb.append(message).append('\n');
         sb.append("# Drumroll please.... ").append(MiscEmojis.RollDice).append('\n');
-        sb.append("# 🥁").append(" 🥁".repeat(iteration));
+        sb.append("# 🥁").repeat(" 🥁", iteration);
         return sb.toString();
     }
 

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "eloknu",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 225,
+            "y": 205
+        }
+    },
     "id": "eloknu",
     "tileId": "er10",
     "name": "Elok Nu",

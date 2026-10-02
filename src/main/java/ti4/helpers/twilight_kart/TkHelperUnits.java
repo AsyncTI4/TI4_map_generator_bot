@@ -55,14 +55,14 @@ public class TkHelperUnits {
     @ButtonHandler("useVisionariaArchive")
     private void useVisionariaArchive(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (player.getTg() < 3) {
-            String msg = "You only have " + player.getTg() + " trade goods, so you cannot use this ability.";
-            msg = " You can try transacting for more trade goods first.";
+            String msg = "You only have " + player.getTg() + " trade goods, so you cannot use this ability."
+                    + " You can try transacting for more trade goods first.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             return;
         }
 
-        String arciveFaction = buttonID.replace("useVisionariaArchive_", "");
-        Player archive = game.getPlayerFromColorOrFaction(arciveFaction);
+        String archiveFaction = buttonID.replace("useVisionariaArchive_", "");
+        Player archive = game.getPlayerFromColorOrFaction(archiveFaction);
 
         String msg = player.getRepresentationUnfogged() + " spent 3 trade goods " + player.gainTG(-3);
         msg += " to draw an ability.";

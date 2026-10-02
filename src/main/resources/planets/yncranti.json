@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "yncranti",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "yncranti",
     "tileId": "er106",
     "name": "Yncranti",

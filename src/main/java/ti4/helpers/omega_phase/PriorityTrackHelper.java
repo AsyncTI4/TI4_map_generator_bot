@@ -102,7 +102,7 @@ public final class PriorityTrackHelper {
         if (priority > 0) {
             // Assign the player's priority
             player.setPriorityPosition(priority);
-            messageOutput += player.getRepresentation() + " has been assigned to position " + priority
+            messageOutput += player.getRepresentationNoPing() + " has been assigned to position " + priority
                     + " on the priority track.";
         } else if (player.hasPriorityPosition()) {
             // If priority is -1, remove the player from the priority track

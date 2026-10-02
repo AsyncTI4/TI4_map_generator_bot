@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "elysium",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "elysium",
     "tileId": "55",
     "name": "Elysium",

@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -35,6 +37,7 @@ public class ListTechService {
     private static final Pattern B = Pattern.compile("B");
     private static final Pattern R = Pattern.compile("R");
     private static final Pattern G = Pattern.compile("G");
+    private static final Pattern X = Pattern.compile("X");
 
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -105,6 +108,10 @@ public class ListTechService {
             boolean dwsBt,
             List<TechnologyType> techTypes,
             boolean first) {
+        if (sc && first && NetrunnersLeadersHandler.shouldChooseCommanderTechnologySecondary(game, player)) {
+            NetrunnersLeadersHandler.offerCommanderTechnologySecondary(game, player);
+            return;
+        }
         game.setComponentAction(!sc);
         String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(!sc);
@@ -112,6 +119,7 @@ public class ListTechService {
         String techSuffix = dwsBt ? "_dwsbt" : "";
 
         if (sc || dwsBt) {
+            boolean commanderSkipsToken = NetrunnersLeadersHandler.commanderSkipsTechnologySecondaryToken(game, player);
             boolean used = dwsBt || ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
@@ -121,13 +129,23 @@ public class ListTechService {
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
-                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
-                if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Technology**");
+                if (!commanderSkipsToken) {
+                    ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+                    if (player.getStrategicCC() > 0) {
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                                player, game, event, "followed **Technology**");
+                    }
+                    String message = ButtonHelperSCs.deductCC(game, player, scNum);
+                    ReactionService.addReaction(event, game, player, message);
+                } else {
+                    ReactionService.addReaction(
+                            event,
+                            game,
+                            player,
+                            "used **Tek Mir-un** to follow **Technology** without spending a strategy token.");
                 }
-                String message = ButtonHelperSCs.deductCC(game, player, scNum);
-                ReactionService.addReaction(event, game, player, message);
             }
+            game.removeStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction());
 
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
@@ -161,7 +179,7 @@ public class ListTechService {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    @ButtonHandler("getAllTechOfType_")
+    @ButtonHandler(value = "getAllTechOfType_", save = false)
     public static void getAllTechOfType(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         getAllTechOfType(event, player, buttonID, game, event.getMessageChannel());
     }
@@ -208,6 +226,10 @@ public class ListTechService {
                     " The buttons shown correspond to technologies that the bot believes you meet the prerequisites for."
                             + " To get a technology that isn't shown, please use the \"Get Other Technology\" button.";
         }
+        if (player.hasAbility("doctrine_knowledge")) {
+            message +=
+                    "\n\n**REMINDER**: You have the _Knowledge_ doctrine and therefore may ignore 1 prerequisite on techs owned by your neighbors. This is not automated, and you must use the \"Get Other Technology\" button.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
@@ -215,7 +237,7 @@ public class ListTechService {
         return getTechButtons(techs, player, "normal");
     }
 
-    private static boolean isTechResearchable(TechnologyModel tech, Player player) {
+    public static boolean isTechResearchable(TechnologyModel tech, Player player) {
         Game game = player.getGame();
         String requirements = tech.getRequirements().orElse("");
         int wilds = 0;
@@ -252,17 +274,20 @@ public class ListTechService {
                     && !(player.hasTech("pa") || player.hasTech("absol_pa"))) {
                 continue;
             }
+            Planet unitHolder = game.getPlanetsInfo().get(planet);
+            if (unitHolder == null) {
+                continue;
+            }
             if (ButtonHelper.checkForTechSkips(game, planet)) {
-                Planet unitHolder = game.getPlanetsInfo().get(planet);
                 List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
                     } else {
                         if (synergies.contains(TechnologyType.valueOf(type.toUpperCase()))) {
-                            requirements = requirements.replaceFirst("X", "");
+                            requirements = X.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
-                                requirements = requirements.replaceFirst("X", "");
+                                requirements = X.matcher(requirements).replaceFirst("");
                             }
                             continue;
                         }
@@ -295,7 +320,11 @@ public class ListTechService {
             }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            requirements = G.matcher(requirements).replaceFirst("");
+            if (synergies.contains(TechnologyType.valueOf("BIOTIC"))) {
+                requirements = X.matcher(requirements).replaceFirst("");
+            } else {
+                requirements = G.matcher(requirements).replaceFirst("");
+            }
             if (ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true)
                     .contains(tech.getAlias())) {
                 requirements = "";
@@ -314,6 +343,9 @@ public class ListTechService {
             if (player.hasTechReady("aida") || player.hasTechReady("absol_aida")) {
                 wilds++;
             }
+            if (player.hasAbility("battle_tested_designs")) {
+                wilds++;
+            }
         } else if (player.hasAbility("analytical")) {
             wilds++;
         }
@@ -321,6 +353,7 @@ public class ListTechService {
         if (player.hasRelicReady("prophetstears") || player.hasRelicReady("absol_prophetstears")) {
             wilds++;
         }
+        wilds += ArcanumUnitHandler.getReadyRuneboundCount(game, player);
 
         // All sources of pre-requisites below can also apply via synergy.
         // - Replace all synergies that the player has with a simple "X"
@@ -329,21 +362,30 @@ public class ListTechService {
             TechnologyModel playerTech = Mapper.getTech(techID);
             if (playerTech == null) continue;
             for (TechnologyType type : playerTech.getTypes()) {
-                if (synergies.contains(type)) {
-                    requirements = requirements.replaceFirst("X", "");
-                    continue;
-                }
-                switch (type) {
-                    case BIOTIC -> requirements = requirements.replaceFirst("G", "");
-                    case WARFARE -> requirements = requirements.replaceFirst("R", "");
-                    case PROPULSION -> requirements = requirements.replaceFirst("B", "");
-                    case CYBERNETIC -> requirements = requirements.replaceFirst("Y", "");
-                    case UNITUPGRADE -> {
-                        if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
-                            wilds++;
-                        }
+                int prerequisiteCount = TechnologyType.mainFour.contains(type)
+                                && game.playerHasLeaderUnlockedOrAlliance(player, "revenantvanguardcommander")
+                                && playerTech.getRequirements().isEmpty()
+                        ? 2
+                        : 1;
+                for (int i = 0; i < prerequisiteCount; i++) {
+                    if (synergies.contains(type)) {
+                        requirements = X.matcher(requirements).replaceFirst("");
+                        continue;
                     }
-                    default -> {}
+                    switch (type) {
+                        case BIOTIC -> requirements = G.matcher(requirements).replaceFirst("");
+                        case WARFARE -> requirements = R.matcher(requirements).replaceFirst("");
+                        case PROPULSION ->
+                            requirements = B.matcher(requirements).replaceFirst("");
+                        case CYBERNETIC ->
+                            requirements = Y.matcher(requirements).replaceFirst("");
+                        case UNITUPGRADE -> {
+                            if (game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
+                                wilds++;
+                            }
+                        }
+                        default -> {}
+                    }
                 }
             }
         }

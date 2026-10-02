@@ -28,6 +28,7 @@ public final class GlobalSettings {
         GUILD_ID_FOR_NEW_GAME_CATEGORIES, // Which guild to create new game categories in (DEPRECATED)
         MAX_GAMES_PER_CATEGORY, // Max # of games when creating a category
         ALLOW_GAME_CREATION,
+        SQLITE_PERSISTENCE_DISABLED, // Temporarily no-op auxiliary SQLite/JDBC reads and writes during migration
         READY_TO_RECEIVE_COMMANDS, // Whether the bot is ready to receive commands
         BOT_LOG_WEBHOOK_URL; // Webhook URL to send rogue bot log messages to
 

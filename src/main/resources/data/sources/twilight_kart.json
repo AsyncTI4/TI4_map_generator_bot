@@ -1,13 +1,34 @@
 [
     {
-        "source": "twilight_kart",
+        "source": "tk_destroyer_cup",
         "name": "Twilight Kart: Destroyer Cup",
         "canal": "community",
         "credits": "Disasper, OnTheWind, and andcat. With special thanks to QuantumOctopus, SqueamishEmu, Jazzxhands, Wekker, Tactic Blue",
-        "description": "29 Unit Upgrades, 5 Edicts, and 25 Action Cards for use with Twilight's Fall",
+        "description": "29 Unit Upgrades, 5 Edicts, and 25 Action Cards. For use with Twilight's Fall. Can be combined with Twilight Kart: Nova Cup or used standalone.",
         "data": [
             "[Google Sheet](https://docs.google.com/spreadsheets/d/1RMZd-Gu8SuArRtlS_9IxcksDjN8yuEaCEAbaP7ws3sk/edit?usp=sharing)",
             "[Assets Folder](https://drive.google.com/drive/folders/1OMrhOYkMDSBjUOk95fF6_nLegivHYNfh?usp=sharing)"
+        ]
+    },
+    {
+        "source": "tk_nova_cup",
+        "name": "Twilight Kart: Nova Cup",
+        "canal": "community",
+        "credits": "Disasper, OnTheWind, and andcat. With special thanks to SqueamishEmu, El Blasto, JayCyrZak, QuantumOctopus, Wekker, RoundtreeBard",
+        "description": "8 Alternate Mahact Kings, 13 Reworked Genomes, and 1 Reworked Action Card. For use with Twilight's Fall. Can be combined with Twilight Kart: Destroyer Cup or used standalone.",
+        "data": [
+          "[Google Sheet](https://docs.google.com/spreadsheets/d/1k2S4_cm96fKZ-qHHZXAxFekM6uoqAC8Ysf0oxHh4R8c/edit?usp=sharing)",
+          "[Assets Folder](https://drive.google.com/drive/folders/1Dd192T3VHtdUD3te1soVvgFXjETEb8pR?usp=sharing)"
+        ]
+    },
+    {
+        "source": "twilight_ds",
+        "name": "Twilight Discordant Stars",
+        "canal": "community",
+        "credits": "Tactic Blue",
+        "description": "73 abilities right now for use with Twilight's Fall",
+        "data": [
+            "[Google Sheet](https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg/edit?tab=t.0#heading=h.edh8li2jdsvb)"
         ]
     }
 ]

@@ -8,8 +8,7 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "At the end of your turn, you may exhaust this card to move any number of your ships between two systems that contain your space docks and no other player’s ships",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/axisbt.webp?raw=true",
+        "text": "At the start of a player's turn, you may exhaust this card to allow that player to treat 1 of your unit upgrade technologies as their own until the end of that turn. After you replenish commodities, gain a number of trade goods equal to the number of unit upgrade technologies you own.",
         "source": "ds"
     },
     {
@@ -21,8 +20,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to allow each other player to explore a planet they control; gain a number of commodities equal to the number of players who do.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/bentorbt.webp?raw=true",
+        "text": "ACTION: Exhaust this card to allow all other players to explore 1 planet they control. Then, place up to 1 infantry from your reinforcements into coexistence on 1 of those planets. When you explore a planet, you may exhaust this card to instead explore the frontier deck in that system.",
         "source": "ds"
     },
     {
@@ -53,15 +51,14 @@
     },
     {
         "alias": "cymiaebt",
-        "name": "Cybernetic Armoring",
-        "shortName": "Cybernetic\nArmoring",
+        "name": "Synaptic Interference",
+        "shortName": "Synaptic\nInterference",
         "faction": "cymiae",
         "synergy": [
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At any time, you may discard 1 action card to cancel up to 2 hits produced against your ground forces.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/cymiaebt.webp?raw=true",
+        "text": "After you win a combat, you may purge 1 of your promissory notes from your hand to move 1 other player's command token in the active system to an adjacent system, or gain 2 trade goods. ACTION: Exhaust this card to discard the top 3 cards of the action card deck.",
         "source": "ds"
     },
     {
@@ -73,8 +70,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "Once per space combat, after 1 of your opponent's non-fighter ships is destroyed, you may exhaust this card to place 1 frontier token in the active system, or produce 1 non-fighter ship in that system to ready this card. You can produce ships in systems that contain both your ships and another player's ships.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/dihmohnbt.webp?raw=true",
+        "text": "Once per space combat, after 1 of your opponent's non-fighter ships is destroyed, you may exhaust this card to place 1 frontier token in the active system, or produce 1 or 2 non-fighter ship in that system to ready this card. You can produce ships in systems that contain both your ships and another player's ships.",
         "source": "ds"
     },
     {
@@ -125,8 +121,7 @@
             "BIOTIC",
             "PROPULSION"
         ],
-        "text": "When you pass, you may exhaust this card to move 1 ingress token into an empty system. Your units may retreat to any empty system that does not contain another player's ships.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/ghotibt.webp?raw=true",
+        "text": "When you pass, you may exhaust this card to move 1 ingress token into an empty system, or move 1 of your ships to an adjacent system that contains your ships. Your units may retreat to any empty system that does not contain another player's ships.",
         "source": "ds"
     },
     {
@@ -151,8 +146,7 @@
             "CYBERNETIC",
             "BIOTIC"
         ],
-        "text": "When you would explore a planet, you may instead draw 1 action card.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/augersbt.webp?raw=true",
+        "text": "When you explore a planet, you may discard that card to draw 1 action card instead.",
         "source": "ds"
     },
     {
@@ -190,8 +184,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "ACTION: Exhaust this card to either gain 1 command token, or spend 3 influence to research a technology of the same color as 1 of your exhausted technologies.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kolumebt.webp?raw=true",
+        "text": "ACTION: Exhaust this card to either gain 1 command token, or research a technology of the same color as one of your exhausted technologies.\nWhen you exhaust a technology, gain 1 commodity.",
         "source": "ds"
     },
     {
@@ -203,8 +196,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "At the end of your turn, you may exhaust this card and choose 1 other player; you and that player each secretly spend 0, 1, or 2 trade goods. Then, reveal the spent trade goods; if you spent the same number of trade goods, take 1 promissory note from that player's hand, at random.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/florzenbt.webp?raw=true",
+        "text": "At the end of your turn, you may exhaust this card and choose 1 other player; you and that player each secretly spend 0, 1, or 2 trade goods. Then, reveal the spent trade goods; if you spent a different number of trade goods, you may take 1 promissory note from that player's hand, at random, or explore 1 planet you control.",
         "source": "ds"
     },
     {
@@ -229,8 +221,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "When researching a technology, you may discard an action card to ignore 1 of that technology's prerequisites. Other players must spend 1 influence as an additional cost to research or gain a technology you own.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kyrobt.webp?raw=true",
+        "text": "When researching a technology, you may discard an action card to ignore 1 of that technology's prerequisites. Once per action, when you win a combat, for each technology your opponent owns, if you do not own that technology, gain 1 commodity or convert 1 of your commodities to a trade good.",
         "source": "ds"
     },
     {
@@ -268,8 +259,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When you resolve METEOR SLINGS, you may choose for your units to coexist instead; if you do, you may reroll each of your unit's BOMBARDMENT rolls. While you are coexisting on 1 or more planets, you control the Grove card.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/khraskbt.webp?raw=true",
+        "text": "Gain the Grove card. When you resolve METEOR SLINGS, if you cancel all hits produced, you may place your units into coexistence; you cannot commit those coexisting ground forces during this action.",
         "source": "ds"
     },
     {
@@ -281,8 +271,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "At the start and end of your turn, move up to 1 of your PDS units onto a planet you control in that unit's system, or that system's space area. Your PDS units on planets have PLANETARY SHIELD and do not have text abilities; you may use their SPACE CANNON against ships in adjacent systems.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mirvedabt.webp?raw=true",
+        "text": "If you have the Fighter II unit upgrade technology, flip this card and place it on top of Fighter II.",
         "source": "ds"
     },
     {
@@ -294,8 +283,7 @@
             "WARFARE",
             "CYBERNETIC"
         ],
-        "text": "At the start and end of a space combat in which you are the defender, you may swap 1 of your ships in the active system with 1 of your ships in another system that contains 1 of your command tokens; the swapped ships cannot transport units.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mortheusbt.webp?raw=true",
+        "text": "At the start of a space combat in which you are the defender, you may swap 1 of your ships in the active system with 1 of your ships in another system that contains 1 of your command tokens; the swapped ships cannot transport units.",
         "source": "ds"
     },
     {
@@ -333,8 +321,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. After another player wins a space combat in a system that contains your ships, gain 2 commodities.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/nokarbt.webp?raw=true",
+        "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. After another player wins a space combat in a system that contains your ships, gain 2 commodities or 1 command token.",
         "source": "ds"
     },
     {
@@ -346,8 +333,7 @@
             "BIOTIC",
             "WARFARE"
         ],
-        "text": "Once per action, after you resolve a policy ability, you may spend 1 trade good to move 1 of your infantry on the game board into coexistence on a planet in an adjacent system. ACTION: Purge this card to resolve invasion on all planets that contain your coexisting infantry.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/olradinbt.webp?raw=true",
+        "text": "Once per action, after you resolve a policy ability, you may spend 1 trade good to move 1 of your infantry on the game board into coexistence on a planet in an adjacent system. When you pass, you may purge this card to resolve invasion on all planets that contain your coexisting infantry.",
         "source": "ds"
     },
     {
@@ -385,21 +371,19 @@
             "WARFARE",
             "PROPULSION"
         ],
-        "text": "During ground combat, you may exhaust this card; all your units on that planet enter coexistence and that combat ends in a draw. When a player ends coexistence with your units, draw 1 secret objective.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/tnelisbt.webp?raw=true",
+        "text": "At the end of a round of ground combat, you may discard 1 secret objective to have all your participating units enter coexistence. When a player ends your units' coexistence on a planet, you may draw 1 secret objective.",
         "source": "ds"
     },
     {
         "alias": "vadenbt",
-        "name": "Strongarm Banking",
-        "shortName": "Strongarm\nBanking",
+        "name": "High Security Vault",
+        "shortName": "High Security\nVault",
         "faction": "vaden",
         "synergy": [
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "Other players cannot take any of your trade goods, commodities, or relic fragments unless you allow it. When another player returns 1 of your promissory notes, place 1 of their control tokens on your faction sheet.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/vadenbt.webp?raw=true",
+        "text": "Other players cannot take or force you to give them any of your trade goods, commodities, or relic fragments, unless you allow it. When another player returns 1 of your promissory notes, place 1 of their control tokens on your faction sheet.",
         "source": "ds"
     },
     {
@@ -424,8 +408,7 @@
             "CYBERNETIC",
             "PROPULSION"
         ],
-        "text": "Your home system is also a nebula. Hits produced by the combat and ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/veldyrbt.webp?raw=true",
+        "text": "Your home system is also a nebula. Hits produced by the ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
         "source": "ds"
     },
     {

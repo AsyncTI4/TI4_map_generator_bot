@@ -22,6 +22,7 @@ public class BothelperCommand implements ParentCommand {
                     new BeginVideoGeneration(),
                     new JazzCommand(),
                     new ListButtons(),
+                    new ImpersonateBot(),
                     new ReloadGame(),
                     new ServerGameStats(),
                     new CorrectFaction(),
@@ -35,6 +36,7 @@ public class BothelperCommand implements ParentCommand {
                     new ListSlashCommandsUsed(),
                     new ReserveGame(),
                     new DeleteFOWCommThreads(),
+                    new KeepThreadAlive(),
                     new ManageRoles())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "swog",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "swog",
     "tileId": "d105",
     "name": "Swog",

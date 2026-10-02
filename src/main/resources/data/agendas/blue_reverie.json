@@ -1,5 +1,33 @@
 [
     {
+        "alias": "collective_ambition",
+        "name": "Collective Ambition",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Purge all \"Support for the Throne\" promissory notes.",
+        "text2": "Against: Players who voted \"For\" purge their \"Alliance\" promissory note, if able",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "council_abolishment",
+        "name": "Council Abolishment",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: At the start of the agenda phase, each player exhausts half their planets, rounded up, at random.",
+        "text2": "Against: Each player readies up to 2 of their planets, at random. Then, reveal 1 agenda from the top of the deck. Players vote on that agenda.",
+        "mapText": "At the start of the agenda phase, each player exhausts half their planets, rounded up, at random.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "council_games",
+        "name": "Council Games",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player may place 1 infantry from their reinforcements into coexistence on a non-home planet another player controls.",
+        "text2": "Against: Each player destroys all but 2 of their units in coexistence on each planet.",
+        "source": "blue_reverie"
+    },
+    {
         "alias": "galactic_fair",
         "name": "Galactic Fair",
         "type": "Directive",
@@ -9,55 +37,13 @@
         "source": "blue_reverie"
     },
     {
-        "alias": "collective_ambition",
-        "name": "Collective Ambition",
-        "type": "Directive",
+        "alias": "galactic_sanctions",
+        "name": "Galactic Sanctions",
+        "type": "Law",
         "target": "For/Against",
-        "text1": "For: Purge all Support for the Throne promissory notes.",
-        "text2": "Against: Players who voted For purge their Alliance promissory note, if able",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "transparency_accord",
-        "name": "Transparency Accord",
-        "type": "Directive",
-        "target": "For/Against",
-        "text1": "For: Each player reveals one of their unscored secret objectives, at random, if able.",
-        "text2": "Against: Each player who voted For draws 1 secret objective.",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "political_entanglement",
-        "name": "Political Entanglement",
-        "type": "Directive",
-        "target": "For/Against",
-        "text1": "For: Each player with the most victory points gives 1 promissory note to each other player, if able.",
-        "text2": "Against: Each player with the fewest victory points may take 1 promissory note at random from each other player.",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "invalidated_patent",
-        "name": "Invalidated Patent",
-        "type": "Directive",
-        "target": "Elect a non-faction echnology",
-        "text1": "Each player gains the elected technology, if able",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "minister_of_justice",
-        "name": "Minister of Justice",
-        "type": "Directive",
-        "target": "Elect a player",
-        "text1": "For each player in the game, the elected player may gain 1 command token and allow that player to gain 1 command token.",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "vote_of_confidence",
-        "name": "Vote Of Confidence",
-        "type": "Directive",
-        "target": "For/Against",
-        "text1": "For: The speaker gains 1 victory point.",
-        "text2": "Against: During the next strategy phase, strategy cards are chosen at random.",
+        "text1": "For: During the status phase, Initiative Order is reversed, and begins with the player who has the highest-numbered strategy card.",
+        "text2": "Against: Each player who voted \"For\" may resolve the secondary ability of 1 strategy card of their choice.",
+        "mapText": "Initiative Order is reversed.",
         "source": "blue_reverie"
     },
     {
@@ -65,38 +51,8 @@
         "name": "Imperial Referendum",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For:Each player who has the fewest victory points gains 1 command token.",
-        "text2": "Against:Each player who does not have the most victory points loses 1 command token from their command sheet.",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "council_abolishment",
-        "name": "Council Abolishment",
-        "type": "Law",
-        "target": "For/Against",
-        "text1": "For:During the agenda phase, instead of players voting, the speaker randomly determines all agenda outcomes.",
-        "text2": "Against:Ready all planets and reveal 1 agenda from the top of the deck. Players vote on that agenda.",
-        "mapText": "During the agenda phase, instead of players voting, the speaker randomly determines all agenda outcomes.",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "galactic_sanctions",
-        "name": "Galactic Sanctions",
-        "type": "Law",
-        "target": "For/Against",
-        "text1": "For:Initiative Order is reversed, and begins with the player who has the highest numbered strategy card.",
-        "text2": "Against:Each player who voted For may resolve the secondary ability of 1 strategy card of their choice.",
-        "mapText": "Initiative Order is reversed.",
-        "source": "blue_reverie"
-    },
-    {
-        "alias": "isolationist_movement",
-        "name": "Isolationist Movement",
-        "type": "Law",
-        "target": "For/Against",
-        "text1": "For: Players are not neighbors with another player unless they have units in the same system as that player.",
-        "text2": "Against: Each player who voted For may produce 1 unit in a system that contains 1 or more of their ships and a planet they control.",
-        "mapText": "Players are not neighbors with another player unless they have units in the same system as that player.",
+        "text1": "For: Each player who has the fewest victory points gains 2 command tokens.",
+        "text2": "Against: Each player who does not have the most victory points loses 1 command token from their command sheet.",
         "source": "blue_reverie"
     },
     {
@@ -110,12 +66,103 @@
         "source": "blue_reverie"
     },
     {
+        "alias": "invalidated_patent",
+        "name": "Invalidated Patent",
+        "type": "Directive",
+        "target": "Elect a non-faction technology",
+        "text1": "Each player gains the elected technology, if able",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "isolationist_movement",
+        "name": "Isolationist Movement",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players are not neighbors with another player unless they have units in the same system as that player.",
+        "text2": "Against: Each player who voted \"For\" may produce 1 unit in a system that contains 1 or more of their ships and a planet they control.",
+        "mapText": "Players are not neighbors with another player unless they have units in the same system as that player.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "minister_of_diplomacy",
+        "name": "Minister of Diplomacy",
+        "type": "Law",
+        "target": "Elect a player",
+        "text1": "Attach that player's \"Alliance\" promissory note to this card, all players have that alliance ability.",
+        "mapText": "All player's have the alliance ability of the elected player.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "minister_of_justice",
+        "name": "Minister of Justice",
+        "type": "Directive",
+        "target": "Elect a player",
+        "text1": "For each player in the game, the elected player may gain 1 command token and allow that player to gain 1 command token.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "political_entanglement",
+        "name": "Political Entanglement",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player with the most victory points gives 1 promissory note to 2 of their neighbours.",
+        "text2": "Against: Each player with the fewest victory points may take 1 promissory note at random from 2 other players.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "scientific_collaboration",
+        "name": "Scientific Collaboration",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players also have the synergies of their neighbors.",
+        "text2": "Against: Each player with synergy in any colors purges one of their unowned technologies in each of those colors.",
+        "mapText": "Players have the synergies of their neighbors.",
+        "source": "blue_reverie"
+    },
+    {
         "alias": "strategic_coordination",
         "name": "Strategic Coordination",
         "type": "Law",
         "target": "Elect Strategy Card",
         "text1": "Attach this card to that strategy card. Players may resolve the secondary of this strategy card without spending a command token",
         "mapText": "May resolve the secondary of elected card without spending a command token.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "suspicious_vault",
+        "name": "Suspicious Vault",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Place 1 ingress token in the home system of each player that voted \"For\", if able. If the Fracture is not in play, the speaker places it in play.",
+        "text2": "Against: Each player destroys 5 of their units in each system in the Fracture, and 3 units in each system not in, but adjacent to a system in, the Fracture.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "trade_monopoly",
+        "name": "Trade Monopoly",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: During the action phase, the active player cannot resolve transactions unless they have 3 or more trade goods.",
+        "text2": "Against: Place 2 neutral fighters in each system that contains no ships.",
+        "mapText": "Active player cannot transact unless they have 3 trade goods.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "transparency_accord",
+        "name": "Transparency Accord",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player reveals one of their unscored secret objectives, at random, if able.",
+        "text2": "Against: Each player who voted \"For\" draws 1 secret objective.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "vote_of_confidence",
+        "name": "Vote Of Confidence",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The speaker gains 1 victory point.",
+        "text2": "Against: During the next strategy phase, strategy cards are chosen at random.",
         "source": "blue_reverie"
     }
 ]

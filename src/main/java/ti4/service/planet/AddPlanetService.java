@@ -3,6 +3,7 @@ package ti4.service.planet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -10,6 +11,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -20,10 +26,11 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
@@ -41,9 +48,12 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class AddPlanetService {
@@ -56,8 +66,14 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
+        DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
-        player.exhaustPlanet(planet);
+        if (setup && "ponthous".equalsIgnoreCase(planet)) {
+            // Setup exhausts Ponthous without opening its optional ready-planet window.
+            player.getExhaustedPlanets().add(planet);
+        } else {
+            player.exhaustPlanet(planet);
+        }
         if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
         }
@@ -69,7 +85,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation(game))) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -91,7 +107,10 @@ public class AddPlanetService {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
-
+        if (player.ownsUnit("kairn_flagship") && ButtonHelper.doesPlayerHaveFSHere("kairn_flagship", player, tile)) {
+            player.gainCommodities(1);
+            ButtonHelperStats.afterGainCommsChecks(game, player, 1);
+        }
         int shrineCount = 0;
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
@@ -116,6 +135,9 @@ public class AddPlanetService {
                         + player.getRepresentation() + " scored \"_" + kalt + "_\".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
+                if (game.isMonumentsMode()) {
+                    MonumentsBRButtonHandler.offerKaltrimMonumentDeploy(game, player);
+                }
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -142,6 +164,7 @@ public class AddPlanetService {
             if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
+                GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, Map.of("category", "CUSTODIAN"));
                 MessageChannel channel = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
@@ -155,9 +178,13 @@ public class AddPlanetService {
                 if (!player.hasAbility("blood_ties")) {
                     MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
                 }
+                if (game.isMuaatManiaMode()) {
+                    ButtonHelper.offerMMBoon(player, game);
+                }
             }
         }
         boolean alreadyOwned = false;
+        Player previousOwner = null;
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
                 List<String> planets = player_.getPlanets();
@@ -167,6 +194,23 @@ public class AddPlanetService {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
+                        previousOwner = player_;
+                    }
+                    if (player_.hasAbility("planetary_reconfiguration")) {
+                        TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
+                    }
+                    if (player_.hasTech("pa")
+                            && !player_.getExhaustedPlanets().contains(planet)
+                            && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                            && ButtonHelper.checkForTechSkips(game, planet)
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                        player_.exhaustPlanet(planet);
+                        MessageHelper.sendMessageToChannel(
+                                player_.getCorrectChannel(),
+                                player_.getRepresentation() + " Your " + Helper.getPlanetRepresentation(planet, game)
+                                        + " was auto exhausted due to your **Psychoarchaeology** technology to gain 1tg.");
+                        player_.gainTG(1, true);
+                        ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
@@ -233,6 +277,19 @@ public class AddPlanetService {
                             }
                         }
                     }
+                    if (player.hasRelic("taraniscrest")) {
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                player_.dummyPlayerSpoof() + "exchangeProgramPart3_" + planet,
+                                "Place Enemy into Coexistence"));
+                        buttons.add(Buttons.red("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " you can place a " + player_.getFactionEmoji()
+                                        + " infantry into coexistence on "
+                                        + Mapper.getPlanet(planet).getName() + " due to the Taranis Crest relic.",
+                                buttons);
+                    }
                     if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
                                 + " lost control of "
@@ -263,11 +320,11 @@ public class AddPlanetService {
                 }
             }
         }
-        if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
+        if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck
                 && !setup
-                && !unitHolder.isSpaceStation()) {
+                && !unitHolder.isSpaceStation(game)) {
             String msg10 = player.getRepresentationUnfogged()
                     + " you may have an opportunity to use _Dacxive Animators_ on "
                     + Helper.getPlanetRepresentation(planet, game)
@@ -285,9 +342,6 @@ public class AddPlanetService {
                     + ". Click to confirm a valid combat occurred and to draw 1 action card or delete these buttons (note: this technology is max once per action).";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), msg10, ButtonHelper.getScavengerExosButtons(player));
-        }
-        if (!setup && player.isRealPlayer()) {
-            RoundStatsTracker.recordPlanetTaken(game, player, alreadyOwned);
         }
         if (!alreadyOwned
                 && game.isMinorFactionsMode()
@@ -322,7 +376,9 @@ public class AddPlanetService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
-
+        if (!alreadyOwned && player.hasLeader("tacommander")) {
+            CommanderUnlockCheckService.checkPlayer(player, "ta");
+        }
         if (game.isMinorFactionsMode()
                 && tile != null
                 && unitHolder.getTokenList().contains("attachment_threetraits.png")
@@ -379,7 +435,17 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
+        }
 
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")
+                && alreadyOwned
+                && !setup
+                && tile != null
+                && tile.isFracture()) {
+            OnyxxaLeaderHandler.onGainFracturePlanet(event, player, game, previousOwner);
+        }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
@@ -399,6 +465,7 @@ public class AddPlanetService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
+        GameEventDraft.stage(game, new GameSubEvent.ControlEstablished(planet));
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasAbility("scavenge")
@@ -419,7 +486,7 @@ public class AddPlanetService {
                         || game.getActivePlayerID() != null && !"".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasUnlockedBreakthrough("zealotsbt")
                 && tile != null
-                && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
+                && (tile.isFracture() || unitHolder.isLegendary())
                 && !doubleCheck
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
@@ -444,12 +511,7 @@ public class AddPlanetService {
                 && !doubleCheck
                 && !setup
                 && !unitHolder.getTechSpecialities().isEmpty()) {
-            String fac = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    fac + " placed 1 PDS on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)
-                            + " due to the Veiled Ember Forge ability. This is optional but was done automatically.");
-            AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + unitHolder.getName());
+            VyserixAbilityHandler.onGainPlanetWithTechSpec(player, game, event, tile, unitHolder);
         }
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
@@ -510,17 +572,6 @@ public class AddPlanetService {
                     + " agent, to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
-        if (game.getActivePlayerID() != null
-                && !("".equalsIgnoreCase(game.getActivePlayerID()))
-                && player.hasAbility("enslave")
-                && !setup
-                && tile != null) {
-            UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-            tile.getUnitHolders().get(planet).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Added 1 infantry to " + planet + " due to **Enslave**.");
-        }
-
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasAbility("scour")
@@ -584,7 +635,8 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
+        if (!unitHolder.isSpaceStation(game)
+                && IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -646,12 +698,13 @@ public class AddPlanetService {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
-        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
+        if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet) && !game.isMuaatManiaMode()) {
             String marrow = "A Song Like Marrow";
             Integer id = game.getRevealedPublicObjectives().getOrDefault(marrow, null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);

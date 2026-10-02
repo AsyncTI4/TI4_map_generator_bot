@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "chrion",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "chrion",
     "tileId": "d19",
     "name": "Chrion",

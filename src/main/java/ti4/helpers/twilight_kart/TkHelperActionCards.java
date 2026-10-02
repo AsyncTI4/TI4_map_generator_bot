@@ -24,6 +24,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
@@ -40,9 +41,11 @@ import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.unit.AddUnitService;
@@ -96,7 +99,7 @@ public class TkHelperActionCards {
             case "tk-initiate" -> buttons.addAll(getTkInitiateButtons(game, player));
             case "tk-oppress" -> buttons.addAll(PlayerTechService.getMageonImplantsButtons(game, player));
             case "tk-ordain" -> buttons.add(Buttons.green(ffcc + "startOrdain", resolve));
-            case "tk-posture" -> buttons.add(Buttons.green(ffcc + "non_sc_draw_so", resolve));
+            case "tk-posture" -> buttons.add(Buttons.green(ffcc + "non_sc_draw_sodeleteThisMessage", resolve));
             case "tk-preside" -> {
                 List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
                 buttons.add(Buttons.green(ffcc + "resolveEdict_" + edicts.getFirst(), "Resolve 1 Edict"));
@@ -108,6 +111,7 @@ public class TkHelperActionCards {
             case "tk-succor" -> // TODO
                 nop();
             case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
+            case TkHelperStarflare.AC_ID -> buttons.addAll(TkHelperStarflare.getResolveButtons(game, player));
         }
 
         if (!buttons.isEmpty()) {
@@ -131,33 +135,29 @@ public class TkHelperActionCards {
                 .map(Mapper::getLeader)
                 .map(LeaderModel::getTfRepresentationEmbed)
                 .toList();
-        if (!game.isVeiledHeartMode()) {
-            genomes.forEach(player::addLeader);
+        if (game.isVeiledHeartMode()) {
+            genomes.forEach(genome -> VeiledHeartService.doAction(
+                    VeiledHeartService.VeiledCardAction.DRAW,
+                    VeiledHeartService.VeiledCardType.GENOME,
+                    player,
+                    genome));
 
         } else {
-            String veilKey = "veiledCards" + player.getFaction();
-            String veilCards = game.getStoredValue(veilKey) + String.join("_", genomes) + "_";
-            game.setStoredValue(veilKey, veilCards);
-        }
-
-        for (String cardID : genomes) {
-            if (!game.isVeiledHeartMode()) {
+            for (String cardID : genomes) {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
-            } else {
-                String key = "veiledCards" + player.getFaction();
-                String veiledCards = game.getStoredValue(key);
-                game.setStoredValue(key, veiledCards + cardID + "_");
-
-                String msg = player.getRepresentationNoPing() + " has taken a secret card. They ";
-                msg += "may put it into play with a button in their `#cards-info` thread.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
+
+        Button button = Buttons.red("discardSpliceCard_genome", "Discard 1 Genome", MiscEmojis.tf_genome);
+        Button deleteButton = Buttons.DONE_DELETE_BUTTONS;
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Use the button to discard a genome card.", List.of(button, deleteButton));
     }
 
     private static List<Button> getTkBestowButtons(Player player, String resolve) {
@@ -194,7 +194,9 @@ public class TkHelperActionCards {
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
-                            return Buttons.red(id, label, p2.getFactionEmoji());
+                            return game.isFowMode()
+                                    ? Buttons.red(id, label)
+                                    : Buttons.red(id, label, p2.getFactionEmoji());
                         }
                     }
                     return Buttons.gray(id, label);
@@ -218,9 +220,10 @@ public class TkHelperActionCards {
             Tile tile = game.getTileFromPlanet(planet);
             String units = "mech " + planet + ", pds " + planet;
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, units);
-            String message = player.getRepresentation() + " 'commissioned' some mercenaries to post up at "
+            player.setTg(player.getTg() - 2);
+            String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
-            if (tile != null && tile.getPosition().contains("frac")) {
+            if (tile != null && tile.isFracture()) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
                 if (uh != null) {
                     uh.addToken("token_relictoken.png");
@@ -242,6 +245,13 @@ public class TkHelperActionCards {
         String regex = "resolveTkConscript_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile - and beginPirates' own emptyTile rule (no player ships,
+            // not a hyperlane, not a home system) was never re-checked here at all.
+            if (!TeHelperActionCards.legalPirateTarget(game, tile, "resolveTkConscript")) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "dd, 2 ff");
 
             String message = player.getRepresentation() + " conscripted some pirates to post up at "
@@ -254,9 +264,10 @@ public class TkHelperActionCards {
     @ButtonHandler("beginTkContract")
     private static void beginTkContract(ButtonInteractionEvent event, Game game, Player player) {
         Predicate<Tile> hasThreeShips = tile ->
-                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip) <= 3;
+                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip) <= 3
+                        && FoWHelper.playerHasActualShipsInSystem(player, tile);
         List<Button> buttons =
-                ButtonHelper.getTilesWithPredicateForAction(player, game, "resolveTkContract", hasThreeShips, false);
+                ButtonHelper.getTilesWithPredicateForAction(player, game, "resolveTkContract", hasThreeShips, true);
         String message =
                 player.getRepresentationUnfogged() + " choose a system to replace your ships with neutral ships.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -457,7 +468,7 @@ public class TkHelperActionCards {
 
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(true)) {
-            List<String> abilities = player.getTechs();
+            List<String> abilities = p2.getTechs();
             // If they have biosynthetic, then that is the only discardable ability
             if (p2.hasAbility("tf-biosyntheticsynergy")) abilities = List.of("tf-biosyntheticsynergy");
 
@@ -471,7 +482,11 @@ public class TkHelperActionCards {
             if (count > 0) {
                 String id = player.factionButtonChecker() + "ordainDiscardOne_" + planetName + "_" + p2.getColor();
                 String label = "Discard " + p2.getColorDisplayName() + " ability (" + count + " available)";
-                buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                if (game.isFowMode()) {
+                    buttons.add(Buttons.red(id, label));
+                } else {
+                    buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                }
             }
         }
         if (buttons.isEmpty()) {
@@ -493,7 +508,7 @@ public class TkHelperActionCards {
         Player victim = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         Planet planet = game.getPlanetsInfo().get(buttonID.split("_")[1]);
 
-        List<String> abilities = player.getTechs();
+        List<String> abilities = victim.getTechs();
         // If they have biosynthetic, then that is the only discardable ability
         if (victim.hasAbility("tf-biosyntheticsynergy")) abilities = List.of("tf-biosyntheticsynergy");
 
@@ -512,6 +527,18 @@ public class TkHelperActionCards {
         msg += victim.getRepresentation() + "'s abilities. You may still decline to discard, if you so wish:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("ordainDiscard_")
+    private static void ordainDiscard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player victim = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String tech = buttonID.split("_")[2];
+        victim.removeTech(tech);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " discarded " + victim.getRepresentation() + "'s ability: "
+                        + Mapper.getTech(tech).getName());
     }
 
     @ButtonHandler("resolveRaze_")

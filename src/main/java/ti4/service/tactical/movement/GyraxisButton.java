@@ -1,0 +1,20 @@
+package ti4.service.tactical.movement;
+
+import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.tactical.MoveAbilityButton;
+import ti4.service.tactical.MoveContext;
+
+public final class GyraxisButton implements MoveAbilityButton {
+    public boolean enabled(MoveContext ctx) {
+        return ctx.player.hasPlanet("gyraxis")
+                && !ctx.player.getExhaustedPlanetsAbilities().contains("gyraxis");
+    }
+
+    public List<Button> build(MoveContext ctx) {
+        return List.of(
+                Buttons.gray("planetAbilityExhaust_gyraxis", "Exhaust Throne of Greed", MiscEmojis.LegendaryPlanet));
+    }
+}

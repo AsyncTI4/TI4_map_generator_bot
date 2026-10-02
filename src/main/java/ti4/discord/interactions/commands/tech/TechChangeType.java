@@ -38,7 +38,7 @@ class TechChangeType extends GameStateSubcommand {
         parseParameter(event, event.getOption(Constants.TECH4), event.getOption(Constants.TECH_TYPE), game);
     }
 
-    private void parseParameter(
+    private static void parseParameter(
             SlashCommandInteractionEvent event, OptionMapping techOption, OptionMapping techType, Game game) {
         if (techOption == null || techType == null) {
             return;

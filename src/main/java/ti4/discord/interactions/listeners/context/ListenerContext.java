@@ -8,13 +8,16 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -54,7 +57,9 @@ public abstract class ListenerContext {
     }
 
     private boolean allowsNonPlayerInteraction() {
-        return "showGameAgain".equalsIgnoreCase(componentID) || componentID.startsWith(CombatSideBetButtonIds.PREFIX);
+        return "showGameAgain".equalsIgnoreCase(componentID)
+                || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
+                || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX);
     }
 
     ListenerContext(GenericInteractionCreateEvent event, String compID) {
@@ -99,7 +104,6 @@ public abstract class ListenerContext {
             }
 
             if ("button".equals(getContextType())) {
-                componentID = componentID.replace("delete_buttons_", "resolveAgendaVote_");
                 game.increaseButtonPressCount();
             }
 
@@ -155,6 +159,12 @@ public abstract class ListenerContext {
         componentID = componentID.replace("FFCC_", "");
         String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
 
+        String grantedComponentID = getComponentIDIfGrantedHolderAccess(event);
+        if (grantedComponentID != null) {
+            componentID = grantedComponentID;
+            factionChecked = true;
+            return true;
+        }
         if (player != null
                 && !componentID.startsWith(factionWhoPressedButton + "_")
                 && (!componentID.contains("firmament_") || !factionWhoPressedButton.contains("obsidian"))) {
@@ -167,6 +177,13 @@ public abstract class ListenerContext {
         componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
         factionChecked = true;
         return true;
+    }
+
+    private String getComponentIDIfGrantedHolderAccess(GenericInteractionCreateEvent event) {
+        if (player == null || componentID.startsWith(player.getFaction() + "_")) return null;
+        if (!(event instanceof GenericComponentInteractionCreateEvent componentEvent)) return null;
+        return OnyxxaAbilityHandler.stripHolderPrefixIfGrantedAccess(
+                game, componentEvent.getMessage(), player, componentID);
     }
 
     private void handlePlayerHittingButtonTheyDoNotOwn(Interaction event) {

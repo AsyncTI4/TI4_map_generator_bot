@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mollprimus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "mollprimus",
     "tileId": "02",
     "name": "Moll Primus",

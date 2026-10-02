@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nn",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "nn",
     "tileId": "fin1",
     "name": "Necatol Nex",

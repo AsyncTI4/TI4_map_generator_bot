@@ -6,6 +6,8 @@ public enum FrankenDraftMode {
     OVERDRAFT("overdraft", "Keep everything you draft except for mechs and flagships"),
     POWEREDONEPICK("poweredonepick", "Combines powered and onepick modes."),
     POWEREDOVERDRAFT("powered_overdraft", "Combines powered and overdraft modes."),
+    FRANKENDRAZ(
+            "frankendraz", "Draft faction packages, then build from their components using powered franken limits."),
     TWILIGHTSFALL("twilights_fall", "Used for Thunder's Edge Twilights Fall Franken Draft"),
     INAUGURALSPLICE("inaugural_splice", "Used for Thunder's Edge Twilights Fall RAW Draft");
 

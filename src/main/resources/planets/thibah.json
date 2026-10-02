@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "thibah",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 172,
+            "y": 148
+        }
+    },
     "id": "thibah",
     "tileId": "21",
     "name": "Thibah",

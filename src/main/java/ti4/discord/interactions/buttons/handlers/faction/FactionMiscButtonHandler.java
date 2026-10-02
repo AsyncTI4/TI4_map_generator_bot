@@ -89,7 +89,7 @@ class FactionMiscButtonHandler {
         ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
     }
 
-    @ButtonHandler("getAgentSelection_")
+    @ButtonHandler(value = "getAgentSelection_", save = false)
     public static void getAgentSelection(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID.split("_")[1]);

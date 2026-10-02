@@ -1,19 +1,19 @@
+enabled: true
+
 candidateSelection:
   window:
-    lookbackMinutes: 60
+    lookbackMinutes: 480
     refreshCronIntervalSeconds: 300
   targetCandidatesPerHour: 4
 
 promotion:
   enabled: true
   intervalSeconds: 5
-  candidateLookbackHours: 12
-  maxPromotionsPerHour: 100
 
 replayExecution:
   startDelaySeconds: 15
-  discussionWindowSeconds: 60
-  sideBetWindowSeconds: 60
+  dailyLockHourCentral: -1
+  dailyLockMinuteCentral: 0
   replayIntervalSeconds: 1
   maxEventGapSeconds: 1
   pendingResolutionWindowSeconds: 30
@@ -25,46 +25,17 @@ retention:
 runtime:
   devMode: true
   trackAllCombatsAsCandidates: true
-  immediatePromotionOnResolve: false
+  immediatePromotionOnResolve: true
 
 sideBets:
   enableSideBets: true
   maxBetsPerUser: 3
   costPoints: 1
-  dynamicPayoutCap: 100
+  dynamicPayoutCap: 50
+  afbWhiffSelectionBias: 2.0
+  roundOneWhiffSelectionBias: 3.0
+  roundOneSlamSelectionBias: 3.0
+  winnerOneHpPayoutMultiplier: 0.5625
+  dynamicPayoutTiers: "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30"
 
-decoysEnabled: false
-housesEnabled: true
-
-houseAbilities:
-  minimumAbilityVotesToResolve: 1
-  baseCombatFavorGain: 10
-  initialHousePoints: 1000
-  catchupFavorPointsPerBonus: 100
-  catchupFavorBonusStep: 0
-  maxCatchupFavorBonus: 0
-  naalu:
-    # actionCardPeekFavorCost: 0
-    actionCardPeekFavorCost: 30
-    # roundOneRollPeekFavorCost: 0
-    roundOneRollPeekFavorCost: 50
-  mentak:
-    previewLeadSeconds: 15
-    # destroyerDecoyFavorCost: 0
-    destroyerDecoyFavorCost: 30
-    # cruiserDecoyFavorCost: 0
-    cruiserDecoyFavorCost: 40
-    # dreadnoughtDecoyFavorCost: 0
-    dreadnoughtDecoyFavorCost: 60
-    # warSunDecoyFavorCost: 0
-    warSunDecoyFavorCost: 80
-  hacan:
-    maxSubsidiesPerContest: 2
-    subsidyFavorOnHit: 10
-    marketMakerPointsPerBet: 1
-    lowTradeConvoysFavorCost: 10
-    lowTradeConvoysPredictionBonus: 5
-    mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 10
-    highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 15
+initialIndividualPoints: 100

@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 class ShowRandomSO extends GameStateSubcommand {
 
-    public ShowRandomSO() {
+    ShowRandomSO() {
         super("show_random", "Show a Secret Objective to a player", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
                 .setRequired(true)

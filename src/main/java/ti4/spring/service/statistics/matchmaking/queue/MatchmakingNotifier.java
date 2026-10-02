@@ -1,0 +1,170 @@
+package ti4.spring.service.statistics.matchmaking.queue;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.discord.utility.DiscordRoleUtility;
+import ti4.helpers.StringHelper;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameLaunchPostService;
+import ti4.service.game.CreateGameService;
+import ti4.settings.users.UserSettings;
+
+@UtilityClass
+class MatchmakingNotifier {
+
+    static void notifyExpired(List<QueuedParty> expired) {
+        if (expired.isEmpty()) return;
+        String expiryMessage = "The matchmaking service wasn't able to find you a game in the time frame you selected. "
+                + "Queue again when ready and consider being open to additional game types or longer wait times.";
+        for (QueuedParty party : expired) {
+            BotLogger.info(describeExpiredParty(party));
+            if (party.members().size() != 1) continue;
+            User user = JdaService.jda.getUserById(party.members().getFirst().getUserId());
+            if (user == null) continue;
+            MessageHelper.sendMessageToUser(expiryMessage, user);
+        }
+    }
+
+    private static String describeExpiredParty(QueuedParty party) {
+        UserSettings settings = party.leaderSettings();
+        int maxHours = MatchmakingOptions.getHours(settings.getMatchmakingMaxQueueTime());
+        List<String> memberIds =
+                party.members().stream().map(MatchmakingQueueMember::getUserId).toList();
+        List<String> extras = new ArrayList<>();
+        if (party.party().isTigl()) {
+            extras.add("tiglRanks=" + settings.getMatchmakingTiglRanks());
+        }
+        List<String> avoidList = settings.getMatchmakingAvoidList();
+        if (avoidList != null && !avoidList.isEmpty()) {
+            extras.add("avoidList=" + avoidList);
+        }
+        String extrasText = extras.isEmpty() ? "" : ", " + String.join(", ", extras);
+        return String.format(
+                "Matchmaking queue: dropping party %d (tigl=%s, members=%s) after reaching max queue time of %dh."
+                        + " Settings: expansions=%s, playerCounts=%s, victoryPoints=%s, paces=%s, restrictions=%s%s",
+                party.party().getId(),
+                party.party().isTigl(),
+                memberIds,
+                maxHours,
+                settings.getMatchmakingExpansions(),
+                settings.getMatchmakingPlayerCounts(),
+                settings.getMatchmakingVictoryPointGoals(),
+                settings.getMatchmakingPaces(),
+                settings.getMatchmakingRestrictions(),
+                extrasText);
+    }
+
+    static void postMatchedGames(List<MatchedGame> gamesToCreate) {
+        Guild guild = JdaService.guildPrimary;
+        if (gamesToCreate.isEmpty() || guild == null) return;
+
+        Map<String, ForumChannel> forumByNameCache = new HashMap<>();
+        for (MatchedGame game : gamesToCreate) {
+            String forumName = !game.tiglRanks().isEmpty()
+                    ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
+                    : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
+            ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
+            if (forum == null) continue;
+
+            List<MatchmakingQueueMember> queueMembers = game.members();
+            List<Member> members = queueMembers.stream()
+                    .map(member -> guild.getMemberById(member.getUserId()))
+                    .filter(Objects::nonNull)
+                    .toList();
+            if (members.size() != queueMembers.size()) continue;
+
+            String gameFunName = CreateGameService.autoGenerateGameName();
+            String threadTitle = MatchDescriber.threadTitle(game);
+            String setupMessage = MatchDescriber.setupBody(game);
+            // Forum channels require an initial message payload, so the setup text becomes the post body.
+            forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
+                    .queue(
+                            forumPost -> {
+                                ThreadChannel thread = forumPost.getThreadChannel();
+                                Consumer<Message> onLaunchPosted = message -> {
+                                    if (getPlayersNeeded(game) > 0) {
+                                        MatchmakingQueueSearchService.get()
+                                                .register(thread.getId(), message.getId(), toSearchCriteria(game));
+                                    }
+                                    postLfgPing(thread, game);
+                                };
+                                CreateGameLaunchPostService.postLaunchButtons(
+                                        thread, members, gameFunName, onLaunchPosted);
+                            },
+                            BotLogger::catchRestError);
+        }
+    }
+
+    private static int getPlayersNeeded(MatchedGame game) {
+        return Integer.parseInt(game.playerCount()) - game.members().size();
+    }
+
+    private static PlayerSearchCriteria toSearchCriteria(MatchedGame game) {
+        return new PlayerSearchCriteria(
+                List.of(game.playerCount()),
+                List.of(game.victoryPointGoal()),
+                List.of(game.expansion()),
+                List.of(game.pace()),
+                game.restrictions(),
+                !game.tiglRanks().isEmpty(),
+                game.tiglRanks());
+    }
+
+    private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
+        int playersNeeded = getPlayersNeeded(game);
+        if (playersNeeded <= 0) return;
+
+        List<String> tiglRankMentions = game.tiglRanks().stream()
+                .filter(rank -> !MatchmakingOptions.UNRANKED_OPTION.equals(rank))
+                .map(rank -> DiscordRoleUtility.getRole("TIGL - " + rank, thread.getGuild()))
+                .filter(Objects::nonNull)
+                .map(Role::getAsMention)
+                .toList();
+
+        if (tiglRankMentions.isEmpty()) {
+            postLfgRolePing(thread, playersNeeded);
+        } else {
+            postTiglRankRolePing(thread, tiglRankMentions, playersNeeded);
+        }
+    }
+
+    private static void postLfgRolePing(ThreadChannel thread, int playersNeeded) {
+        Role lfgRole = DiscordRoleUtility.getRole("LFG", thread.getGuild());
+        String message = lfgRole == null
+                ? "Ping the `@LFG` role to find additional members, if the game doesn't fill soon."
+                : lfgRole.getAsMention() + " this game needs " + StringHelper.pluralize(playersNeeded, "player")
+                        + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
+    }
+
+    private static void postTiglRankRolePing(ThreadChannel thread, List<String> tiglRankMentions, int playersNeeded) {
+        String message = String.join(" ", tiglRankMentions) + " this game needs "
+                + StringHelper.pluralize(playersNeeded, "player") + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
+    }
+
+    private static ForumChannel findForum(Guild guild, String forumName) {
+        List<ForumChannel> forums = guild.getForumChannelsByName(forumName, true);
+        if (forums.isEmpty()) {
+            BotLogger.error("MatchmakerService could not find a thread container named #" + forumName + ".");
+            return null;
+        }
+        return forums.getFirst();
+    }
+}

@@ -18,12 +18,13 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class LeaderInfoService {
 
     public static void sendLeadersInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentationNoPing() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendLeadersInfo(game, player);
     }
@@ -70,8 +71,14 @@ public class LeaderInfoService {
                 if (otherPlayer != player) {
                     for (String leaderID : otherPlayer.getLeaderIDs()) {
                         if (leaderID.contains("agent") && (Mapper.getLeader(leaderID) != null)) {
-                            yssarilEmbeds.add(
-                                    Mapper.getLeader(leaderID).getRepresentationEmbed(game.isTwilightsFallMode()));
+                            yssarilEmbeds.add(FrankenAlternateTextService.getLeaderEmbed(
+                                    game,
+                                    Mapper.getLeader(leaderID),
+                                    false,
+                                    true,
+                                    false,
+                                    false,
+                                    game.isTwilightsFallMode()));
                         }
                     }
                 }
@@ -86,7 +93,7 @@ public class LeaderInfoService {
 
         // ADD MAHACT IMPERIA REFERENCE
         List<MessageEmbed> imperiaEmbeds = new ArrayList<>();
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
                     if (player.getMahactCC().contains(otherPlayer.getColor())) {
@@ -94,7 +101,7 @@ public class LeaderInfoService {
                         if (leader == null) {
                             continue;
                         }
-                        imperiaEmbeds.add(leader.getLeaderEmbed());
+                        imperiaEmbeds.add(leader.getLeaderEmbed(game));
                     }
                 }
             }
@@ -104,6 +111,28 @@ public class LeaderInfoService {
                     player.getCardsInfoThread(),
                     "**Commanders from " + FactionEmojis.Mahact + " Imperia:**",
                     imperiaEmbeds);
+        }
+
+        List<MessageEmbed> lichEmbeds = new ArrayList<>();
+        Player lichPoolOwner = game.getRevenantCommanderOwner(player);
+        if (lichPoolOwner != null) {
+            for (Player otherPlayer : game.getRealPlayers()) {
+                if (otherPlayer.equals(lichPoolOwner)
+                        || lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                    continue;
+                }
+
+                Leader commander = game.getRevenantLichCommander(lichPoolOwner, otherPlayer);
+                if (commander != null) {
+                    lichEmbeds.add(Game.getUnlockedLeaderCopy(commander).getLeaderEmbed(game));
+                }
+            }
+        }
+        if (!lichEmbeds.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    "**Commanders from " + FactionEmojis.revenant + " Allure of Darkness:**",
+                    lichEmbeds);
         }
     }
 

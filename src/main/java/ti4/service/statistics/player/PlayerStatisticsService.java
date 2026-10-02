@@ -26,6 +26,8 @@ public class PlayerStatisticsService {
             case PLAYER_WIN_PERCENT -> PlayerWinPercentStatisticsService.showPlayerWinPercent(event);
             case PLAYER_WIN_PERFORMANCE -> PlayerExpectedWinDeltaStatisticsService.showPlayerExpectedWinDelta(event);
             case PLAYER_GAME_COUNT -> PlayerGameCountStatisticsService.showPlayerGameCount(event);
+            case PLAYER_AVERAGE_OPPONENT_MMR ->
+                PlayerAverageOpponentMmrStatisticsService.showPlayerAverageOpponentMmr(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }
     }

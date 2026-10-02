@@ -11,12 +11,13 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class AbilityInfoService {
 
     public static void sendAbilityInfo(Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentationNoPing() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendAbilityInfo(player);
     }
@@ -31,7 +32,7 @@ public class AbilityInfoService {
                 .map(Mapper::getAbility)
                 .sorted(Comparator.comparing(AbilityModel::getAlias))
                 .toList()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed();
+            MessageEmbed representationEmbed = FrankenAlternateTextService.getAbilityEmbed(player.getGame(), model);
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;

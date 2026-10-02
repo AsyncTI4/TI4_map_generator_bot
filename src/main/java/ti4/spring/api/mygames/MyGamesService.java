@@ -15,19 +15,19 @@ import ti4.game.persistence.ManagedPlayer;
 @Service
 class MyGamesService {
 
-    List<MyGameSummary> getMyGames(String userId) {
+    static List<MyGameSummary> getMyGames(String userId) {
         ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
         if (managedPlayer == null) return Collections.emptyList();
 
         return managedPlayer.getGames().stream()
                 .filter(ManagedGame::isActive)
-                .filter(managedGame -> !managedGame.getGame().isFowMode())
+                .filter(managedGame -> !managedGame.isFowMode())
                 .map(game -> toSummary(game, userId))
                 .filter(Objects::nonNull)
                 .toList();
     }
 
-    private MyGameSummary toSummary(ManagedGame managedGame, String userId) {
+    private static MyGameSummary toSummary(ManagedGame managedGame, String userId) {
         Game game = managedGame.getGame();
         if (game == null) return null;
         Player player = game.getPlayer(userId);

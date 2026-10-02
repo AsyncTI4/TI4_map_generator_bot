@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -23,6 +25,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
 
@@ -73,6 +76,7 @@ class RetreatButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
 
         if (game.getTileByPosition(pos).isGravityRift()
+                && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(
@@ -87,10 +91,13 @@ class RetreatButtonHandler {
 
     @ButtonHandler("retreatUnitsFrom_")
     public static void retreatUnitsFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         String both = buttonID.replace("retreatUnitsFrom_", "");
         String pos1 = both.split("_")[0];
         String pos2 = both.split("_")[1];
+        if (player.hasUnlockedBreakthrough("kalorabt")) {
+            KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
+        }
+        ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
@@ -103,6 +110,9 @@ class RetreatButtonHandler {
                         event.getChannel().getName());
         LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
         CommanderUnlockCheckService.checkPlayer(player, "kalora");
+        if (player.hasAbility("carapace_regeneration")) {
+            KaloraAbilityHandler.carapaceRegeneration(player, game.getTileByPosition(pos2), event);
+        }
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");
         String message =

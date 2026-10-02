@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.AbolishmentAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.AbsolAbolishmentAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.AbsolArtifactAgendaResolver;
@@ -35,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.GrantReallocati
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.IncentiveAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.MinisterAntiquitiesAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.MiscountMessageAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.MonumentsAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.MutinyAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.NexusAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.PlowsharesAgendaResolver;
@@ -55,6 +57,8 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.VoiceOfTheCounc
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WarrantAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -70,6 +74,8 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 class AgendaResolveButtonHandler {
@@ -124,6 +130,9 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("warrant", new WarrantAgendaResolver());
         AGENDA_HANDLERS.put("wormhole_recon", new WormholeReconAgendaResolver());
         AGENDA_HANDLERS.put("wormhole_research", new WormholeResearchAgendaResolver());
+
+        AGENDA_HANDLERS.put("cathedralofixth", new MonumentsAgendaResolver("cathedralofixth"));
+        AGENDA_HANDLERS.put("ministerofculture", new MonumentsAgendaResolver("ministerofculture"));
     }
 
     @ButtonHandler("agendaResolution_")
@@ -131,9 +140,21 @@ class AgendaResolveButtonHandler {
         String winner = buttonID.substring(buttonID.indexOf('_') + 1);
         String agendaId = game.getCurrentAgendaInfo().split("_")[2];
         if (guardDoublePress(game, winner, agendaId)) return;
-
         int aID = computeAgendaNumericId(game, agendaId);
         String agID = getAgendaId(game, aID);
+        String agendaName = StringUtils.defaultString(Mapper.getAgendaTitleNoCap(agID));
+        // Keyed by the id the web state reads back (for Covert Legislation that is "covert", not the hidden agenda).
+        game.setStoredValue("resolvedAgendaId", StringUtils.defaultString(AgendaHelper.getCurrentAgendaId(game)));
+        game.setStoredValue("resolvedAgendaOutcome", winner);
+        GameEventService.commit(
+                game,
+                GameEventType.AGENDA_RESOLVED,
+                null,
+                Map.of(
+                        "agendaId", agID,
+                        "agendaName", agendaName,
+                        "outcome", winner,
+                        "votes", game.getCurrentAgendaVotes()));
 
         // Pre-resolution
         handlePredictiveIntelligence(game, winner);
@@ -156,6 +177,9 @@ class AgendaResolveButtonHandler {
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
+        VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
+        VeylorAbilitiesHandler.resolveLobbyistDues(event, game, winner);
+        VeylorLeadersHandler.resolveVeylorCommanderLosingVote(event, game, winner);
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
@@ -163,8 +187,18 @@ class AgendaResolveButtonHandler {
         int aCount = computeNextAgendaCount(game);
         List<Button> buttons = buildNextButtons(game, aCount);
         String voteMessage = buildVoteMessage(game, aCount);
-        if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
-            sendNextStepUi(game, event, resMes, voteMessage, buttons);
+        boolean isMiscount = "miscount".equalsIgnoreCase(agID) || "absol_miscount".equalsIgnoreCase(agID);
+        boolean waitingForTightScheduling = !isMiscount
+                && buttons.stream().anyMatch(button -> "flip_agenda".equals(button.getCustomId()))
+                && VeylorAbilitiesHandler.offerTightSchedulingRevealChoice(game, false);
+        if (!isMiscount) {
+            if (waitingForTightScheduling) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        resMes + "\n" + game.getPing() + " Waiting for Veylor to resolve _Tight Scheduling_.");
+            } else {
+                sendNextStepUi(game, event, resMes, voteMessage, buttons);
+            }
         } else {
             handleMiscountRevote(game, winner, event);
         }
@@ -393,7 +427,14 @@ class AgendaResolveButtonHandler {
 
     private static List<Button> buildNextButtons(Game game, int aCount) {
         List<Button> buttons = new ArrayList<>();
-        if (aCount < 3 || game.isAbsolMode()) {
+        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
+        int agendaLimit = 2
+                + (heroActive ? 1 : 0)
+                + (veylorBtExtraAgenda ? 1 : 0)
+                + (RelitigateLLButtonHandler.hasExtraAgenda(game) ? 1 : 0);
+        if (aCount <= agendaLimit || game.isAbsolMode()) {
             buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
         }
         RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
@@ -481,6 +522,14 @@ class AgendaResolveButtonHandler {
     private static void handleMiscountRevote(Game game, String winner, ButtonInteractionEvent event) {
         game.removeLaw(winner);
         game.putAgendaBackIntoDeckOnTop(winner);
+        int aCount;
+        String agendaCount = game.getStoredValue("agendaCount");
+        if (agendaCount.isEmpty()) {
+            aCount = 0;
+        } else {
+            aCount = Integer.parseInt(agendaCount) - 1;
+        }
+        game.setStoredValue("agendaCount", aCount + "");
         AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
     }
 }

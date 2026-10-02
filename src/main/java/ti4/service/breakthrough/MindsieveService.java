@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RegexHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -20,6 +21,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.transaction.SendPromissoryService;
 
 @UtilityClass
@@ -67,8 +69,10 @@ public class MindsieveService {
                 continue;
             }
             Player owner = game.getPNOwner(pn);
-            buttons.add(
-                    Buttons.green("mindsieveFollow_" + sc + "_" + pn, "Send " + model.getName(), owner.fogSafeEmoji()));
+            buttons.add(Buttons.green(
+                    "mindsieveFollow_" + sc + "_" + pn,
+                    "Send " + model.getName(),
+                    PromissoryNoteHelper.ownerEmoji(game, owner, pn)));
         }
         buttons.add(
                 Buttons.DONE_DELETE_BUTTONS.withLabel("Decline Mindsieve").withEmoji(FactionEmojis.Naalu.asEmoji()));
@@ -94,15 +98,24 @@ public class MindsieveService {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(naalu, sc, game, event);
                     naalu.addFollowedSC(sc, event);
 
-                    String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ReactionService.addReaction(naalu, false, null, null, messageID, game);
+                    StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                            .ifPresent(scMessage ->
+                                    ReactionService.addReaction(naalu, false, null, null, scMessage.messageId(), game));
 
-                    MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
-                    String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
-                            + primary.getRepresentationUnfogged() + " via " + mindsieve()
-                            + " to perform the secondary ability of **" + scModel.getName()
-                            + "** without spending a command token.";
-                    MessageHelper.sendMessageToChannel(scChannel, msg);
+                    if (game.isFowMode()) {
+                        String privateMsg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
+                                + primary.getColorIfCanSeeStats(naalu) + " via " + mindsieve()
+                                + " to perform the secondary ability of **" + scModel.getName()
+                                + "** without spending a command token.";
+                        MessageHelper.sendMessageToChannel(naalu.getCorrectChannel(), privateMsg);
+                    } else {
+                        MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
+                        String publicMsg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
+                                + primary.getRepresentationUnfogged() + " via " + mindsieve()
+                                + " to perform the secondary ability of **" + scModel.getName()
+                                + "** without spending a command token.";
+                        MessageHelper.sendMessageToChannel(scChannel, publicMsg);
+                    }
                     ButtonHelper.deleteMessage(event);
                 },
                 e -> {

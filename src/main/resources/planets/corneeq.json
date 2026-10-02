@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "corneeq",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "corneeq",
     "tileId": "33",
     "name": "Corneeq",

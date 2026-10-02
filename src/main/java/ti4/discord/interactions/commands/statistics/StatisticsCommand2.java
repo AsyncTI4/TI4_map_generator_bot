@@ -3,15 +3,22 @@ package ti4.discord.interactions.commands.statistics;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
+import ti4.service.persistence.DatabasePersistenceGate;
 
 public class StatisticsCommand2 implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ActionCardStats(),
                     new TwilightsFallSpliceWinRates(),
                     new ExpeditionWinRates(),
+                    new SliceTileWinRates(),
+                    new PlanetWinRates(),
+                    new SupportWinRates(),
                     new StellarConverterStatistics(),
                     new FactionRecordOfTech(),
                     new FactionRecordOfSCPick(),
@@ -31,5 +38,15 @@ public class StatisticsCommand2 implements ParentCommand {
     @Override
     public Map<String, Subcommand> getSubcommands() {
         return subcommands;
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        if (DatabasePersistenceGate.isDisabled()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Statistics are temporarily unavailable while database maintenance is in progress.");
+            return;
+        }
+        ParentCommand.super.execute(event);
     }
 }

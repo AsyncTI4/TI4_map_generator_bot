@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "dryun",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "dryun",
     "tileId": "br6",
     "name": "Dryun",
@@ -108,5 +116,5 @@
         "removeUnitCoordinate": true
     },
     "contrastColor": "orange",
-    "source": "ds"
+    "source": "blue_reverie"
 }

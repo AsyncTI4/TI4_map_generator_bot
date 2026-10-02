@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.strategycard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -17,11 +16,12 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -94,7 +94,7 @@ public class PickStrategyCardButtonHandler {
                                 + " yourself.");
                 game.setStoredValue("Public Disgrace", "");
             } else if (pdOnly.isEmpty()
-                    || (pdOnly.equalsIgnoreCase(player.getFaction()) || pdOnly.equalsIgnoreCase(player.getColor()))) {
+                    || (pdOnly.contains("_" + player.getFaction()) || pdOnly.contains("_" + player.getColor()))) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) continue;
                     if (pdValue.contains(p2.getFaction())
@@ -116,16 +116,12 @@ public class PickStrategyCardButtonHandler {
                 }
             }
         }
-        if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num) && !game.isTwilightsFallMode()) {
-            if (player.getEffectiveFleetCC() < 1) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your fleet pool to spend.");
-                return false;
-            } else {
-                MahactTokenService.removeFleetCC(game, player, "due to _Deflection_");
-            }
+        if (!applyDeflectionCostIfNeeded(game, player, scpick, event)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
+            return false;
         }
 
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
@@ -142,61 +138,84 @@ public class PickStrategyCardButtonHandler {
         return false;
     }
 
-    @ButtonHandler("checksNBalancesPt2_")
-    public static void resolvePt2ChecksNBalances(
-            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String scPicked = buttonID.split("_")[1];
-        int scpick = Integer.parseInt(scPicked);
-        String factionPicked = buttonID.split("_")[2];
-        Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
-
-        PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
-
-        String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
-                + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
-
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
-        }
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
-        if (buttons.isEmpty()) {
-            StartPhaseService.startActionPhase(event, game);
-            game.setStoredValue("willRevolution", "");
-        } else {
-            boolean foundPlayer = false;
-            Player privatePlayer = null;
-            List<Player> players = game.getRealPlayers();
-            if (game.isReverseSpeakerOrder()
-                    || !game.getStoredValue("willRevolution").isEmpty()) {
-                Collections.reverse(players);
-            }
-            for (Player p3 : players) {
-                if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
-                    continue;
-                }
-                if (foundPlayer) {
-                    privatePlayer = p3;
-                    foundPlayer = false;
-                }
-                if (p3 == player) {
-                    foundPlayer = true;
-                }
-            }
-            if (privatePlayer == null) {
-                privatePlayer = game.getRealPlayers().getFirst();
-            }
-            game.setPhaseOfGame("strategy");
-            game.updateActivePlayer(privatePlayer);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    privatePlayer.getCorrectChannel(),
-                    privatePlayer.getRepresentationUnfogged()
-                            + ", please use buttons to pick which strategy card you wish to give someone else.",
-                    Helper.getRemainingSCButtons(game, privatePlayer));
-        }
+    static boolean isDeflectedStrategyCard(Game game, int scpick) {
+        return game.getStoredValue("deflectedSC").equalsIgnoreCase(String.valueOf(scpick));
     }
+
+    static boolean applyDeflectionCostIfNeeded(Game game, Player player, int scpick, ButtonInteractionEvent event) {
+        if (game.isTwilightsFallMode() || !isDeflectedStrategyCard(game, scpick)) {
+            return true;
+        }
+        if (player.hasRelicReady("emelpar")) {
+            player.addExhaustedRelic("emelpar");
+            return true;
+        }
+        if (player.hasRelicReady("absol_emelpar")) {
+            player.addExhaustedRelic("absol_emelpar");
+            return true;
+        }
+        if (player.getStrategicCC() < 1) return false;
+
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "picked a _Deflection_'d strategy card");
+        return true;
+    }
+
+    // @ButtonHandler("checksNBalancesPt2_")
+    // public static void resolvePt2ChecksNBalances(
+    //         ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    //     String scPicked = buttonID.split("_")[1];
+    //     int scpick = Integer.parseInt(scPicked);
+    //     String factionPicked = buttonID.split("_")[2];
+    //     Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
+
+    //     PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
+
+    //     String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
+    //             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
+    //     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
+
+    //     if (game.isFowMode()) {
+    //         MessageHelper.sendMessageToChannel(
+    //                 player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
+    //     }
+    //     event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    //     List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
+    //     if (buttons.isEmpty()) {
+    //         StartPhaseService.startActionPhase(event, game);
+    //         game.setStoredValue("willRevolution", "");
+    //     } else {
+    //         boolean foundPlayer = false;
+    //         Player privatePlayer = null;
+    //         List<Player> players = game.getRealPlayers();
+    //         if (game.isReverseSpeakerOrder()
+    //                 || !game.getStoredValue("willRevolution").isEmpty()) {
+    //             Collections.reverse(players);
+    //         }
+    //         for (Player p3 : players) {
+    //             if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
+    //                 continue;
+    //             }
+    //             if (foundPlayer) {
+    //                 privatePlayer = p3;
+    //                 foundPlayer = false;
+    //             }
+    //             if (p3 == player) {
+    //                 foundPlayer = true;
+    //             }
+    //         }
+    //         if (privatePlayer == null) {
+    //             privatePlayer = game.getRealPlayers().getFirst();
+    //         }
+    //         game.setPhaseOfGame("strategy");
+    //         game.updateActivePlayer(privatePlayer);
+    //         MessageHelper.sendMessageToChannelWithButtons(
+    //                 privatePlayer.getCorrectChannel(),
+    //                 privatePlayer.getRepresentationUnfogged()
+    //                         + ", please use buttons to pick which strategy card you wish to give someone else.",
+    //                 Helper.getRemainingSCButtons(game, privatePlayer));
+    //     }
+    // }
 
     public static List<Button> getPlayerOptionsForChecksNBalances(Player player, Game game, int scPicked) {
         List<Button> buttons = new ArrayList<>();
@@ -262,11 +281,11 @@ public class PickStrategyCardButtonHandler {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                    player.getRepresentation() + " gained " + StringHelper.pluralize(tgCount, "trade good")
                             + " from picking **" + Helper.getSCName(scPicked, game) + "**.");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking **"
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained "
+                        + StringHelper.pluralize(tgCount, "trade good") + " from picking **"
                         + Helper.getSCName(scPicked, game) + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }

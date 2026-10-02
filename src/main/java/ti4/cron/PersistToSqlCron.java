@@ -3,6 +3,7 @@ package ti4.cron;
 import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 import ti4.logging.BotLogger;
+import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.persistence.PersistAllEntitiesService;
@@ -17,6 +18,10 @@ public class PersistToSqlCron {
 
     private static void persist() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (DatabasePersistenceGate.isDisabled()) {
+            BotLogger.logCron("Skipping PersistToSqlCron because database maintenance mode is active.");
+            return;
+        }
         BotLogger.logCron("Running PersistToSqlCron.");
         try {
             SpringContext.getBean(PersistAllEntitiesService.class).persistAll();

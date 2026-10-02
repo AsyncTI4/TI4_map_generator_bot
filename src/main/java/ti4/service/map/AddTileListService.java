@@ -17,11 +17,13 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
@@ -84,7 +86,7 @@ public class AddTileListService {
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            String tilePath = ResourceHelper.getTileFile(tileName);
             if (tilePath == null) {
                 throw new Exception("Could not find tile: " + tileID);
             }
@@ -98,15 +100,23 @@ public class AddTileListService {
     public static void finishSetup(Game game, @Nullable GenericInteractionCreateEvent event) {
         try {
             Tile tile;
-            if (game.getTileByPosition("tl") == null) {
-                game.setTile(new Tile("82a", "tl"));
-            } else {
-                if (game.getTileByPosition("tr") == null) {
-                    game.setTile(new Tile("82a", "tr"));
+            if (game.getTile("82a") == null) {
+                if (game.getTileByPosition("tl") == null) {
+                    game.setTile(new Tile("82a", "tl"));
                 } else {
-                    if (game.getTileByPosition("bl") == null) {
-                        game.setTile(new Tile("82a", "bl"));
+                    if (game.getTileByPosition("tr") == null) {
+                        game.setTile(new Tile("82a", "tr"));
+                    } else {
+                        if (game.getTileByPosition("bl") == null) {
+                            game.setTile(new Tile("82a", "bl"));
+                        }
                     }
+                }
+            }
+            if (Helper.getPlayerFromAbility(game, "diplomats") != null) {
+                Tile mallice = game.getTile("82a");
+                for (Planet uh : mallice.getPlanetUnitHolders()) {
+                    uh.addToken("token_freepeople.png");
                 }
             }
             if (game.getTileByPosition("000") == null) {
@@ -130,8 +140,7 @@ public class AddTileListService {
                     "Press this button after every player is setup.",
                     List.of(Buttons.DEAL_2_SO));
 
-            if (!game.isFowMode()
-                    && game.getRealPlayers().size() < game.getPlayers().size()) {
+            if (!game.isFowMode() && game.getRealPlayers().size() < 3) {
                 ButtonHelper.offerPlayerSetupButtons(channel, game);
             }
         }

@@ -12,6 +12,7 @@ import ti4.image.Mapper;
 import ti4.model.DeckModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -76,7 +77,7 @@ public class TechDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.TECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.TECH, game.isTwilightsFallMode());
         return allItems;
     }
 
@@ -85,7 +86,15 @@ public class TechDraftItem extends DraftItem {
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedTechs"));
         if (game.isTwilightsFallMode()) {
             DeckModel deck = Mapper.getDeck(game.getAbilitySpliceDeckID());
-            for (String id : deck.getCardIDs()) {
+            List<String> allCards = new ArrayList<>(deck.getCardIDs());
+            if (game.isTwilightDS()) {
+                for (TechnologyModel tech : Mapper.getTechs().values()) {
+                    if (tech.getSource() == ComponentSource.twilight_ds) {
+                        allCards.add(tech.getID());
+                    }
+                }
+            }
+            for (String id : allCards) {
                 if (!Arrays.asList(results).contains(id)) {
                     allItems.add(generate(DraftCategory.TECH, id));
                 }

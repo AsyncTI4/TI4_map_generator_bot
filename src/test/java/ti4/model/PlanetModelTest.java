@@ -23,17 +23,17 @@ class PlanetModelTest extends BaseTi4Test {
         }
     }
 
-    private boolean validateTileId(PlanetModel model) {
+    private static boolean validateTileId(PlanetModel model) {
         if (model.getTileId() == null) return true;
         return TileHelper.isValidTile(model.getTileId());
     }
 
-    private boolean validateTileContainsPlanet(PlanetModel model) {
+    private static boolean validateTileContainsPlanet(PlanetModel model) {
         if (model.getTileId() == null) return true;
         return TileHelper.getTileById(model.getTileId()).getPlanets().contains(model.getAlias());
     }
 
-    private boolean validateFactionHomeworld(PlanetModel model) {
+    private static boolean validateFactionHomeworld(PlanetModel model) {
         if (model.getFactionHomeworld() == null) return true;
         return Mapper.isValidFaction(model.getFactionHomeworld());
     }

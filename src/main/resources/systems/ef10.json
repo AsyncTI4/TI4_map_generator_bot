@@ -1,0 +1,17 @@
+{
+    "id": "ef10",
+    "name": "Mnemosyne",
+    "aliases": [
+        "ef10",
+        "mnemosyne",
+        "mne"
+    ],
+    "imagePath": "ef10.png",
+    "planets": [
+        "mnemosyne"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "expanded_fracture"
+}

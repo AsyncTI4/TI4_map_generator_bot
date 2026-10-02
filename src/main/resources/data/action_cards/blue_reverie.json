@@ -1,0 +1,162 @@
+[
+    {
+        "alias": "antiquities_rider",
+        "name": "Antiquities Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed:",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 relic.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "audit",
+        "name": "Audit",
+        "phase": "Any",
+        "window": "After two other players resolve a transaction:",
+        "text": "Each of those players must give you 1 of their action cards or place 2 infantry from your reinforcements into coexistence on a planet they control.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "backup_team",
+        "name": "Backup Team",
+        "phase": "Any",
+        "window": "When you draw a card:",
+        "text": "Place that card on the bottom of the corresponding deck to draw another card from the top of that deck instead. Then, if that card was not an agenda card, shuffle that deck.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "conspiratorial_legal_text",
+        "name": "Conspiratorial Legal Text",
+        "phase": "Agenda",
+        "window": "During the agenda phase, after an outcome another player predicted with an action card is not resolved:",
+        "text": "Resolve the that card as if you had predicted the resolved outcome.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "deny",
+        "name": "Deny",
+        "phase": "Any",
+        "window": "When another player plays any action card:",
+        "text": "Cancel that action card.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "dubious_occultist",
+        "name": "Dubious Occultist",
+        "phase": "Action",
+        "window": "At the start of your turn:",
+        "text": "Destroy 1 unit you control to move 1 ingress token on the game board into that unit's system, or gain 2 commodities.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "entanglement",
+        "name": "Entanglement",
+        "phase": "Any",
+        "window": "When you negotiate a transaction:",
+        "text": "Agents, Commanders, and non-unit upgrade faction technologies can be exchanged as part of that transaction.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "entente",
+        "name": "Entente",
+        "phase": "Action",
+        "window": "ACTION:",
+        "text": "Give another player 1 unexhausted strategy card from your play area. Then, that player gives you 1 strategy card from their play area.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "frame_shift",
+        "name": "Frame Shift",
+        "phase": "Action",
+        "window": "After you activate a system:",
+        "text": "Apply +1 to the move value of your ships that start their movement in the fracture, and treat each wormhole as an ingress token, during this tactical action.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "innovative_officer",
+        "name": "Innovative Officer",
+        "phase": "Action",
+        "window": "After you move a non-fighter ship into a system:",
+        "text": "Remove that ship from the game board to produce a number of hits against units on 1 planet in that system equal to 1 more than that ship's cost value; you may assign 1 of those hits.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "partisans",
+        "name": "Partisans",
+        "phase": "Action",
+        "window": "ACTION:",
+        "text": "Place 2 infantry or 1 mech from your reinforcements into coexistence on a non-home planet 1 of your neighbors controls.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "pirate_horde",
+        "name": "Pirate Horde",
+        "phase": "Action",
+        "window": "After you activate a system:",
+        "text": "During this tactical action, you may move up to 5 neutral ships, instead of moving your own, doubling those ships’ move values.\nAt the end of this tactical action, replenish the neutral ships in each fracture system that contains no other player’s ships.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "pro_forma_session",
+        "name": "Pro Forma Session",
+        "phase": "Action",
+        "window": "ACTION:",
+        "text": "Draw the top card of the agenda deck. Players immediately vote on this agenda as if you were the speaker.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "realignment",
+        "name": "Realignment",
+        "phase": "Strategy",
+        "window": "At the start of the strategy phase:",
+        "text": "During this strategy phase, strategy card selection order is reversed.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "repurpose",
+        "name": "Repurpose",
+        "phase": "Action",
+        "window": "At the end of your turn:",
+        "text": "Replace 1 of your non-fighter ships with 1 carrier and 1 fighter or infantry from your reinforcements.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "retaliation",
+        "name": "Retaliation",
+        "phase": "Any",
+        "window": "After another player takes 1 or more of your trade goods, commodities, promissory notes, action cards, or secret objectives:",
+        "text": "Take up to twice as many of the same component from that player, at random.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "stasis_teams",
+        "name": "Stasis Teams",
+        "phase": "Any",
+        "window": "After 1 or more of another player’s units are destroyed in a system that contains your units:",
+        "text": "Capture each of the destroyed units.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "stolen_files",
+        "name": "Stolen Files",
+        "phase": "Action",
+        "window": "When you win a combat:",
+        "text": "Draw 2 secret objectives, choose 1 to keep and return the other to the secret objective deck. Then, shuffle that deck.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "unconventional_diplomacy",
+        "name": "Unconventional Diplomacy",
+        "phase": "Any",
+        "window": "When any game effect would allow you to score an objective:",
+        "text": "Instead, gain the alliance ability of a random, unused faction.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "war_games",
+        "name": "War Games",
+        "phase": "Action",
+        "window": "ACTION:",
+        "text": "Spend 2 trade goods to place up to 4 neutral units that have a combined cost of 5 or less in a system that contains your ships; resolve space combat in that system. During that combat, after you destroy 1 of those units, place 1 unit of that type in that system.",
+        "source": "blue_reverie"
+    }
+]

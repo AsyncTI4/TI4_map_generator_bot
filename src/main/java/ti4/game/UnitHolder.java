@@ -246,7 +246,9 @@ public abstract class UnitHolder {
     }
 
     public void removeAllUnitDamage() {
-        for (UnitKey uk : unitsByState.keySet()) removeDamagedUnit(uk, getUnitCount(uk));
+        for (UnitKey uk : unitsByState.keySet()) {
+            removeDamagedUnit(uk, getUnitCount(uk));
+        }
     }
 
     public void removeAllUnits(String color) {

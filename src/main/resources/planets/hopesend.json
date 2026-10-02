@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hopesend",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 169,
+            "y": 151
+        }
+    },
     "id": "hopesend",
     "tileId": "66",
     "name": "Hope's End",

@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ti4.cache.CacheManager;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -22,7 +21,6 @@ import ti4.game.persistence.ManagedPlayer;
 class CommunityStatsService {
 
     private static final Duration STATS_TTL = Duration.ofHours(4);
-    private static final String CACHE_NAME = "communityStatsCache";
     private static final String CACHE_KEY = "global";
     private static final List<String> UNAVAILABLE_METRICS = List.of();
     private static final int SAMPLE_SIZE = 4;
@@ -35,13 +33,11 @@ class CommunityStatsService {
     }
 
     private static Cache<String, CommunityStatsResponse> createCache() {
-        Cache<String, CommunityStatsResponse> cache = Caffeine.newBuilder()
+        return Caffeine.newBuilder()
                 .maximumSize(1)
                 .expireAfterWrite(STATS_TTL)
                 .recordStats()
                 .build();
-        CacheManager.registerCache(CACHE_NAME, cache);
-        return cache;
     }
 
     private static CommunityStatsResponse computeStats() {

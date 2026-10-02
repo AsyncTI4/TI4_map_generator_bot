@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "archonrenk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 86
+        }
+    },
     "id": "archonrenk",
     "tileId": "92new",
     "name": "Archon Ren Keleres",

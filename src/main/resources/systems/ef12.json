@@ -1,0 +1,18 @@
+{
+    "id": "ef12",
+    "name": "Thanatos/Charon",
+    "aliases": [
+        "ef12",
+        "thanatos",
+        "charon"
+    ],
+    "imagePath": "ef12.png",
+    "planets": [
+        "thanatos",
+        "charon"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "expanded_fracture"
+}

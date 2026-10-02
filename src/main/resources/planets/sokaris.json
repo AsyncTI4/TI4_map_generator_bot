@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sokaris",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "sokaris",
     "tileId": "er126",
     "name": "Sokaris",

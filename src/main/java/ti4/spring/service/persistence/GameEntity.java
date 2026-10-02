@@ -46,6 +46,9 @@ public class GameEntity {
     @Column(name = "is_thunders_edge")
     private boolean thundersEdge;
 
+    @Column(name = "is_twilights_fall")
+    private boolean twilightsFall;
+
     @Column(name = "is_fracture_in_play")
     private boolean fractureInPlay;
 

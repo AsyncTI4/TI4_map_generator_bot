@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ang",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 172,
+            "y": 148
+        }
+    },
     "id": "ang",
     "tileId": "61",
     "name": "Ang",

@@ -33,11 +33,10 @@ public class LifeTimeRecordService {
             User user = event.getOption("player" + i).getAsUser();
             users.add(user);
         }
-
+        // + averageTurnTimeService.getAverageTurnTimesString(userIds)
         List<String> userIds = users.stream().map(User::getId).toList();
         String records = diceLuckService.getDiceLuck(userIds)
                 + averageHitsPerTurnService.getAverageHitsPerTurn(userIds)
-                + averageTurnTimeService.getAverageTurnTimesString(userIds)
                 + userGameInfoService.getUserGameInfo(users);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);

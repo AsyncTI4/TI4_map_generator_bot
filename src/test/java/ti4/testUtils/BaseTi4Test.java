@@ -7,8 +7,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.Presence;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.game.persistence.GameManager;
@@ -27,7 +29,8 @@ public class BaseTi4Test {
     private static final int GLOBAL_BEFORE_ALL_WAIT_THRESHOLD_SECONDS = 30;
     private static final CountDownLatch setupCountDownLatch = new CountDownLatch(1);
     private static final AtomicBoolean setupStarted = new AtomicBoolean(false);
-    private static final JDA jda = mock(JDA.class);
+    private static final JDA mockJda = mock(JDA.class);
+    private static final Guild mockGuild = mock(Guild.class);
 
     @BeforeAll
     public static void beforeAll() throws InterruptedException {
@@ -39,12 +42,20 @@ public class BaseTi4Test {
         }
     }
 
+    @BeforeEach
+    void restoreSharedJdaMocks() {
+        JdaService.testingMode = true;
+        JdaService.jda = mockJda;
+        JdaService.guildPrimary = mockGuild;
+    }
+
     private static void globalBeforeAll() {
         // Use this to turn off random chance things that may impact testing
         // and reroute all logging to the console
         JdaService.testingMode = true;
-        JdaService.jda = jda;
-        when(jda.getPresence()).thenReturn(mock(Presence.class));
+        JdaService.jda = mockJda;
+        when(mockJda.getPresence()).thenReturn(mock(Presence.class));
+        JdaService.guildPrimary = mockGuild;
 
         // This is set when running tests within docker. However, this must be manually
         // set when running tests within vs code for resources to be loaded properly.

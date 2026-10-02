@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +39,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
@@ -69,8 +69,20 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    public static List<Button> getShrineButtons(Player p2, Game game) {
+    /**
+     * @param viewer the player who will be shown these buttons. In fog the list is built from the planets
+     *               {@code viewer} knows about rather than from {@code p2}'s holdings - "which planets hold a
+     *               shrine" is token state the viewer has no general right to, and listing one player's
+     *               shrine planets discloses part of their holdings besides.
+     */
+    public static List<Button> getShrineButtons(Player p2, Player viewer, Game game) {
         List<Button> buttons = new ArrayList<>();
+        if (game.isFowMode()) {
+            buttons = PlanetTargetService.targetButtons(
+                    game, viewer, PlanetTargetSpec.of("shrineView").withPageNavPrefix("shrineView_"), buttons);
+            buttons.add(Buttons.red("deleteButtons", "Gain 2 CC instead"));
+            return buttons;
+        }
         for (String planet : p2.getPlanets()) {
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (uH != null && uH.getTokenList().contains("token_kaltrimshrine1.png")) {
@@ -85,6 +97,9 @@ public class ButtonHelperHeroes {
     @ButtonHandler("shrineView_")
     public static void resolveShrineView(
             Player player, Player p2, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(
+                event, game, player, buttonID, PlanetTargetSpec.of("shrineView").withPageNavPrefix("shrineView_")))
+            return;
         String planet = buttonID.replace("shrineView_", "");
         ButtonHelper.deleteMessage(event);
         if (planet.equalsIgnoreCase(game.getStoredValue("kaltrimcrownplanet"))) {
@@ -171,8 +186,10 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null || (unitModel.getIsStructure() && !Objects.equals(unitHolder.getName(), "space")))
-                    continue;
+                if (unitModel == null
+                        || (unitModel.getIsStructure()
+                                && !Objects.equals(unitHolder.getName(), "space")
+                                && !player.hasAbility("miniaturization"))) continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = unitKey.unitName();
                 int totalUndamagedUnits = unitEntry.getValue();
@@ -287,17 +304,20 @@ public class ButtonHelperHeroes {
 
     public static void resolveKhraskHero(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
+        if (game.isFowMode()) {
+            // Which of a player's planets are readied/exhausted is hidden state, so it cannot narrow the
+            // list at all. Offer Ready/Exhaust straight away against the TBDF placeholder; the planet lists
+            // behind them are built from what this player knows, and an illegal pick fizzles.
+            buttons.add(Buttons.green("khraskHeroStep3Ready_" + BlindSelectionService.TBD_FACTION, "Ready a Planet"));
+            buttons.add(Buttons.red("khraskHeroStep3Exhaust_" + BlindSelectionService.TBD_FACTION, "Exhaust a Planet"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", please choose if you wish to exhaust or ready a planet.",
+                    buttons);
+            return;
+        }
         for (Player p2 : game.getRealPlayers()) {
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("khraskHeroStep2_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "khraskHeroStep2_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton("khraskHeroStep2_" + p2.getFaction(), "gray", p2));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -321,14 +341,31 @@ public class ButtonHelperHeroes {
     @ButtonHandler("khraskHeroStep3Exhaust_")
     public static void resolveKhraskHeroStep3Exhaust(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        if (game.isFowMode()) {
+            buttons = PlanetTargetService.targetButtons(
+                    game,
+                    player,
+                    PlanetTargetSpec.of("khraskHeroStep4Exhaust_" + BlindSelectionService.TBD_FACTION),
+                    buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
+                    buttons);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Chosen player had no readied planets. Nothing has been done.");
             ButtonHelper.deleteMessage(event);
             return;
         }
-        List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getReadiedPlanets()) {
             buttons.add(Buttons.gray(
                     "khraskHeroStep4Exhaust_" + p2.getFaction() + "_" + planet,
@@ -344,8 +381,16 @@ public class ButtonHelperHeroes {
     @ButtonHandler("khraskHeroStep4Exhaust_")
     public static void resolveKhraskHeroStep4Exhaust(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String planet = buttonID.split("_")[2];
+        var spec = PlanetTargetSpec.of("khraskHeroStep4Exhaust_" + BlindSelectionService.TBD_FACTION);
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
+        var target = PlanetTargetService.resolve(
+                game, player, buttonID, spec, t -> t.owner().getReadiedPlanets().contains(t.planetId()));
+        if (target == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        Player p2 = target.owner();
+        String planet = target.planetId();
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         p2.exhaustPlanet(planet);
         MessageHelper.sendMessageToChannel(
@@ -456,7 +501,7 @@ public class ButtonHelperHeroes {
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s") + ".");
+                player.getFactionEmoji() + " may gain " + StringHelper.pluralize(size, "command token") + ".");
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
@@ -547,16 +592,8 @@ public class ButtonHelperHeroes {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("axisHeroStep3_" + shipOrder + "_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "axisHeroStep3_" + shipOrder + "_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(
+                    FoWHelper.fogSafeTargetButton("axisHeroStep3_" + shipOrder + "_" + p2.getFaction(), "gray", p2));
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -585,14 +622,32 @@ public class ButtonHelperHeroes {
     @ButtonHandler("khraskHeroStep3Ready_")
     public static void resolveKhraskHeroStep3Ready(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        if (game.isFowMode()) {
+            // Exhausted-ness is hidden state, so it cannot narrow the list; an already-readied pick fizzles.
+            buttons = PlanetTargetService.targetButtons(
+                    game,
+                    player,
+                    PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION),
+                    buttons);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", please choose the planet you wish to ready.",
+                    buttons);
+            return;
+        }
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         if (p2.getExhaustedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Chosen player had no exhausted planets. Nothing has been done.");
             ButtonHelper.deleteMessage(event);
             return;
         }
-        List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getExhaustedPlanets()) {
             buttons.add(Buttons.gray(
                     "khraskHeroStep4Ready_" + p2.getFaction() + "_" + planet,
@@ -608,8 +663,17 @@ public class ButtonHelperHeroes {
     @ButtonHandler("khraskHeroStep4Ready_")
     public static void resolveKhraskHeroStep4Ready(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String planet = buttonID.split("_")[2];
+        var spec = PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION);
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
+        var target = PlanetTargetService.resolve(game, player, buttonID, spec, t -> t.owner()
+                .getExhaustedPlanets()
+                .contains(t.planetId()));
+        if (target == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        Player p2 = target.owner();
+        String planet = target.planetId();
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.deleteMessage(event);
         p2.refreshPlanet(planet);
@@ -888,10 +952,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet);
-            boolean oneOfThree = planetReal != null
-                    && isNotBlank(planetReal.getOriginalPlanetType())
-                    && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
-            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
+            if (!planet.contains("mr") && !planetReal.isHomePlanet(game) && !planetReal.isSpaceStation()) {
                 buttons.add(
                         Buttons.green("freeSystemsHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
@@ -1030,23 +1091,6 @@ public class ButtonHelperHeroes {
         return techToGain;
     }
 
-    public static List<Button> getArboHeroButtons(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry));
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech));
-        List<String> poses = new ArrayList<>();
-        for (Tile tile : tiles) {
-            if (!poses.contains(tile.getPosition())) {
-                buttons.add(Buttons.green(
-                        "arboHeroBuild_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-                poses.add(tile.getPosition());
-            }
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
-        return buttons;
-    }
-
     public static List<Button> getSaarHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
@@ -1100,17 +1144,6 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + " destroyed all opposing infantry and fighters in "
                         + tile.getRepresentationForButtons(game, player) + " using Gurno Aggero, the Saar hero.");
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("arboHeroBuild_")
-    public static void resolveArboHeroBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String pos = buttonID.split("_")[1];
-        List<Button> buttons;
-        buttons =
-                Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "arboHeroBuild", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static List<Button> getNekroHeroButtons(Player player, Game game) {
@@ -1288,7 +1321,7 @@ public class ButtonHelperHeroes {
         List<Tile> tiles = new ArrayList<>();
         if (game.isTwilightsFallMode()) {
             for (Tile tile : game.getTileMap().values()) {
-                if (tile.isGravityRift(game)) {
+                if (tile.isGravityRift(game, player)) {
                     tiles.add(tile);
                 }
             }
@@ -1327,9 +1360,6 @@ public class ButtonHelperHeroes {
                     factionChecker + "cabalHeroTile_" + tile.getPosition(),
                     "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        empties.add(Buttons.red(
-                factionChecker + "cabalHeroAll",
-                "Resolve " + (game.isTwilightsFallMode() ? "Paradigm" : "Hero") + " For All Tiles [Experimental]"));
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
@@ -1395,11 +1425,11 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         if (sendSftT || sendAlliance) {
             String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
-            message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of ";
+            message2 = p1.getRepresentationNoPing() + " sent " + text + " directly to the play area of ";
         } else {
-            message2 = p1.getRepresentation() + " sent a promissory note to the hand of ";
+            message2 = p1.getRepresentationNoPing() + " sent a promissory note to the hand of ";
         }
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentation() + ".");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentationNoPing() + ".");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2 + p2.getColorIfCanSeeStats(p1));
         }
@@ -1517,6 +1547,9 @@ public class ButtonHelperHeroes {
     public static void augersHeroResolution(Player player, Game game, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
+            if (game.getPublicObjectives1Peekable().isEmpty()) {
+                game.setUpPeekableObjectives(1, 1);
+            }
             for (int x = 0; x < 3; x++) {
                 String obj = game.getTopPublicObjective(1);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
@@ -1651,7 +1684,9 @@ public class ButtonHelperHeroes {
         } else {
             unitModelID = "olradin_mech_negative";
         }
-        player.addOwnedUnitByID(unitModelID);
+        if (!player.getGame().isTwilightsFallMode()) {
+            player.addOwnedUnitByID(unitModelID);
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         DiscordantStarsHelper.checkOlradinMech(game);
         ButtonHelper.deleteMessage(event);
@@ -1660,9 +1695,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getGhostHeroTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t")
-                    || tile.getPosition().contains("b")
-                    || tile.getPosition().contains("frac")) {
+            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile.isFracture()) {
                 continue;
             }
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
@@ -1810,10 +1843,7 @@ public class ButtonHelperHeroes {
                         player.getCardsInfoThread(), message, stuffToTransButtons);
             }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, vaden, msg);
     }
 
     public static void killShipsSardakkHero(Player player, Game game, ButtonInteractionEvent event) {

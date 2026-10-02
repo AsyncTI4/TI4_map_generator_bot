@@ -35,7 +35,7 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
+    private static ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
         List<DeckModel> decks = Mapper.getDecks().values().stream()
                 .filter(deck -> deck.getType() == deckType)
                 .toList();
@@ -89,7 +89,7 @@ public class DeckSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("decks"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             stage1.initialize(json.get("stage1"));
             stage2.initialize(json.get("stage2"));
             secrets.initialize(json.get("secrets"));

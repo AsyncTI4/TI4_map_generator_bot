@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatCandidateStatus;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -42,6 +43,7 @@ public class CombatReplayPromotionScoreBackfillCron {
 
     private static void runBackfill() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (!CombatContestSettings.isEnabledStatic()) return;
         BotLogger.logCron("Running CombatReplayPromotionScoreBackfillCron.");
         try {
             runBackfillInternal();
@@ -62,10 +64,16 @@ public class CombatReplayPromotionScoreBackfillCron {
         int updated = 0;
         int skipped = 0;
         for (CombatCandidateEntity candidate : candidateRepository.findByStatus(CombatCandidateStatus.RESOLVED)) {
-            if (recomputePromotionScore(candidate)) {
-                updated++;
-            } else {
+            try {
+                if (recomputePromotionScore(candidate)) {
+                    updated++;
+                } else {
+                    skipped++;
+                }
+            } catch (Exception e) {
                 skipped++;
+                BotLogger.warning(
+                        "Skipped combat replay promotion-score backfill for candidate " + candidate.getId() + ".", e);
             }
         }
 
@@ -117,6 +125,19 @@ public class CombatReplayPromotionScoreBackfillCron {
         CombatReplayService.InitialCombatStats initialStats = CombatReplayService.initialCombatStats(candidate);
         if (initialStats == null) return false;
 
+        int roundsObserved = SpringContext.getBean(CombatCandidateEventRepository.class)
+                .findMaxRoundNumberByCandidateId(candidate.getId())
+                .orElse(0);
+        if (isDraw(candidate)) {
+            candidate.setPromotionScore(CombatReplayService.computeDrawPromotionScore(initialStats, roundsObserved));
+            candidate.setAttackerStrength(initialStats.attackerStrength());
+            candidate.setDefenderStrength(initialStats.defenderStrength());
+            candidate.setAttackerHp(initialStats.attackerHp());
+            candidate.setDefenderHp(initialStats.defenderHp());
+            SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
+            return true;
+        }
+
         String snapshotJson = extractLatestSnapshotJson(candidate.getId());
         if (snapshotJson == null || snapshotJson.isBlank()) return false;
 
@@ -137,9 +158,6 @@ public class CombatReplayPromotionScoreBackfillCron {
                 LazaxCombatSupport.calculateFleetStrength(attacker, defender, tile, space);
         LazaxCombatSupport.FleetStrength defenderRemainingStrength =
                 LazaxCombatSupport.calculateFleetStrength(defender, attacker, tile, space);
-        int roundsObserved = SpringContext.getBean(CombatCandidateEventRepository.class)
-                .findMaxRoundNumberByCandidateId(candidate.getId())
-                .orElse(0);
         candidate.setPromotionScore(CombatReplayService.computePromotionScore(
                 candidate,
                 initialStats,
@@ -153,6 +171,10 @@ public class CombatReplayPromotionScoreBackfillCron {
         candidate.setDefenderHp(initialStats.defenderHp());
         SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
         return true;
+    }
+
+    private static boolean isDraw(CombatCandidateEntity candidate) {
+        return candidate.getWinnerFaction() == null && candidate.getLoserFaction() == null;
     }
 
     private static String extractLatestSnapshotJson(Long candidateId) {

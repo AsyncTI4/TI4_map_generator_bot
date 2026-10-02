@@ -1,20 +1,21 @@
 package ti4.discord.interactions.listeners;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
+import ti4.discord.interactions.routing.HandlerRegistry;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
@@ -26,7 +27,7 @@ public final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 
-    private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
+    private final HandlerRegistry<ModalContext> registry;
 
     public static ModalListener getInstance() {
         if (instance == null) instance = new ModalListener();
@@ -34,13 +35,13 @@ public final class ModalListener extends ListenerAdapter {
     }
 
     public static void checkModalHandlersSetup() {
-        if (getInstance().knownModals.isEmpty()) {
+        if (getInstance().registry.getSize() == 0) {
             throw new IllegalStateException("No modal handlers were registered");
         }
     }
 
     private ModalListener() {
-        knownModals.putAll(AnnotationHandler.findKnownHandlers(ModalContext.class, ModalHandler.class));
+        registry = AnnotationHandler.buildHandlerRegistry(ModalContext.class, ModalHandler.class);
     }
 
     @Override
@@ -58,33 +59,40 @@ public final class ModalListener extends ListenerAdapter {
         event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        var modalContext = new ModalContext(event);
-        if (!modalContext.isValid()) {
-            BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
-            return;
-        }
+        String rawModalID = event.getModalId();
+        ExecutionLockType lockType = registry.isSave(rawModalID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(modalContext, event),
-                modalContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
+                () -> handleModal(event),
+                lockType);
     }
 
-    private void handleModal(ModalContext context, ModalInteractionEvent event) {
+    private void handleModal(ModalInteractionEvent event) {
+        ModalContext context = new ModalContext(event);
+        if (!context.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
+            return;
+        }
         try {
             RollbarManager.putInteractionMetadata("modal", event);
             RollbarManager.put("modal_id", event.getModalId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
-            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-            combatReplayService.setPreInteractionSnapshot(
-                    combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            CombatReplayService combatReplayService =
+                    CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
+            if (combatReplayService != null) {
+                CombatReplayService.setPreInteractionSnapshot(
+                        combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            }
             try {
                 resolveModalInteractionEvent(context);
                 context.save();
             } finally {
-                combatReplayService.clearPreInteractionSnapshot();
+                if (combatReplayService != null) {
+                    CombatReplayService.clearPreInteractionSnapshot();
+                }
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
@@ -95,37 +103,25 @@ public final class ModalListener extends ListenerAdapter {
         }
     }
 
-    private boolean handleKnownModals(ModalContext context) {
-        String modalID = context.getModalID();
-        // Check for exact match first
-        if (knownModals.containsKey(modalID)) {
-            RollbarManager.put("modal_handler_id", modalID);
-            knownModals.get(modalID).accept(context);
-            return true;
-        }
-
-        // Then check for prefix match
-        for (Map.Entry<String, Consumer<ModalContext>> entry : knownModals.entrySet()) {
-            if (modalID.startsWith(entry.getKey())) {
-                RollbarManager.put("modal_handler_id", entry.getKey());
-                entry.getValue().accept(context);
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 
-        if (handleKnownModals(context)) return;
+        if (registry.handle(modalID, context)) return;
 
         if (modalID.startsWith("jmfA_")) {
             // Detect new settings menu navId() to route to the correct handler.
             String draftSystemNavPart = ".*_draft[._].*";
             if (modalID.matches(draftSystemNavPart)) {
                 game.initializeDraftSystemSettings().parseInput(context);
+                return;
+            }
+            if (BaseGameMiniMiltySettings.isBaseGameMiniMiltyMenuComponent(modalID)) {
+                game.initializeBaseGameMiniMiltySettings().parseInput(context);
+                return;
+            }
+            if (FrankenSettings.isFrankenMenuComponent(modalID)) {
+                game.initializeFrankenSettings().parseInput(context);
                 return;
             }
             game.initializeMiltySettings().parseInput(context);

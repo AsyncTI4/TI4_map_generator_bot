@@ -8,9 +8,10 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -23,9 +24,10 @@ class FactionWinPercentStatisticsService {
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getFactionWinPercent(game, factionWinCount, factionGameCount));
+                game -> getFactionWinPercent(game, factionWinCount, factionGameCount),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append('\n');

@@ -98,7 +98,7 @@ public class SliceDraftableSettings extends SettingsMenu {
         // Load JSON if applicable
         if (!(json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText("")))) {
+                || !MENU_ID.equals(json.get("menuId").asString("")))) {
             numSlices.initialize(json.get("numSlices"));
             mapTemplate.initialize(json.get("mapTemplate"));
             mapGenerationMode.initialize(json.get("mapGenerationMode"));

@@ -6,10 +6,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Helper;
@@ -19,6 +22,7 @@ import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.fow.GMService;
 
 @UtilityClass
 public class ShowActionCardsService {
@@ -29,6 +33,14 @@ public class ShowActionCardsService {
 
     public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
         List<String> unplayedACs = Helper.unplayedACs(game);
+        if (ActionCardHelper.hidesUnplayedDiscards(game, viewer(game, event))) {
+            // The discarded-but-never-played cards are hidden from the discard list, so they have to stay here -
+            // otherwise this list is just the inverse leak.
+            game.getDiscardActionCards().keySet().stream()
+                    .filter(ac -> !game.getPlayedActionCards().contains(ac))
+                    .forEach(unplayedACs::add);
+            Collections.sort(unplayedACs);
+        }
         String title = game.getName() + " - Unplayed Action Cards";
         String actionCardString = unplayedActionCardsText(unplayedACs, title, showFullText, game);
         MessageHelper.sendMessageToChannelWithButton(
@@ -38,43 +50,60 @@ public class ShowActionCardsService {
     }
 
     public static void showDiscard(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
+        Player viewer = viewer(game, event);
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
         StringBuilder sb = new StringBuilder();
 
-        String purgedText = getPurgedText(game, showFullText);
+        String purgedText = getPurgedText(game, viewer, showFullText);
         if (purgedText != null) {
             sb.append(purgedText).append("\n\n");
         }
 
-        String actionCardText = getActionCardDiscardPileText(game, showFullText);
+        String actionCardText = getActionCardDiscardPileText(game, viewer, showFullText);
         sb.append(actionCardText);
 
-        String dataSkimmerText = getDataSkimmerDiscardText(game, showFullText);
-        if (dataSkimmerText != null) {
-            sb.append("\n\n").append(dataSkimmerText);
+        // Cards on Data Skimmer or Garbozia are private to the player holding them.
+        if (!hideUnplayed) {
+            String dataSkimmerText = getDataSkimmerDiscardText(game, showFullText);
+            if (dataSkimmerText != null) {
+                sb.append("\n\n").append(dataSkimmerText);
+            }
+
+            String garboziaText = getGarboziaDiscardText(game, showFullText);
+            if (garboziaText != null) {
+                sb.append("\n\n").append(garboziaText);
+            }
         }
 
-        String garboziaText = getGarboziaDiscardText(game, showFullText);
-        if (garboziaText != null) {
-            sb.append("\n\n").append(garboziaText);
+        // A GM gets the whole pile, so keep it out of any channel the players can read.
+        MessageChannel channel = event.getMessageChannel();
+        if (!hideUnplayed && ActionCardHelper.hidesUnplayedDiscards(game, null)) {
+            channel = GMService.getGMChannel(game);
         }
 
         MessageHelper.sendMessageToChannelWithButton(
-                event.getMessageChannel(),
-                sb.toString(),
-                showFullText ? null : Buttons.green("ACShowDiscardFullText", "Show Full Text"));
+                channel, sb.toString(), showFullText ? null : Buttons.green("ACShowDiscardFullText", "Show Full Text"));
     }
 
-    public static String getActionCardDiscardPileText(Game game, boolean showFullText) {
+    private static Player viewer(Game game, GenericInteractionCreateEvent event) {
+        return game.getPlayer(event.getUser().getId());
+    }
+
+    private static String getActionCardDiscardPileText(Game game, Player viewer, boolean showFullText) {
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
         List<Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream()
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == null)
+                .filter(x -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, x.getKey()))
                 .toList();
-        String title = "Action card discard list";
+        String title = hideUnplayed ? "Action cards played" : "Action card discard list";
         return acDiscardText(showFullText, discards, title, game);
     }
 
-    public static String getPurgedText(Game game, boolean showFullText) {
+    public static String getPurgedText(Game game, Player viewer, boolean showFullText) {
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
         List<Entry<String, Integer>> purged = game.getDiscardActionCards().entrySet().stream()
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
+                .filter(x -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, x.getKey()))
                 .toList();
         if (!purged.isEmpty()) {
             String title = "Purged action cards";
@@ -134,7 +163,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
+            sb.repeat(Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()), ids.size());
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
             ActionCardModel model =
@@ -169,7 +198,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
+            sb.repeat(Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()), ids.size());
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));
         }
@@ -201,9 +230,9 @@ public class ShowActionCardsService {
         for (Map.Entry<String, List<String>> entry : displayOrder) {
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.getACEmoji(game)
-                    .toString()
-                    .repeat(entry.getValue().size()));
+            sb.repeat(
+                    Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()),
+                    entry.getValue().size());
             sb.append(" _").append(entry.getKey()).append("_\n> ");
             ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
             sb.append(model.getRepresentationJustText(game));

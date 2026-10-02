@@ -31,6 +31,10 @@ services:
       DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
       GUILDID_LIST: ${GUILDID_LIST}
       MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY: ${MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY}
+      POSTGRES_JDBC_URL: ${POSTGRES_JDBC_URL:?Set the POSTGRES_JDBC_URL repository variable}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set the POSTGRES_PASSWORD repository secret}
+      POSTGRES_POOL_SIZE: ${POSTGRES_POOL_SIZE:-10}
+      POSTGRES_USER: ${POSTGRES_USER:?Set the POSTGRES_USER repository variable}
       REPO_DISPATCH_TOKEN: ${REPO_DISPATCH_TOKEN}
       RESOURCE_PATH: /opt/resources
       ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN}
@@ -51,6 +55,8 @@ services:
       traefik.http.services.tibot.loadbalancer.healthcheck.interval: 2s
       traefik.http.services.tibot.loadbalancer.healthcheck.path: /api/public/ready
       traefik.http.services.tibot.loadbalancer.server.port: "8081"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - ti4-rollout
 

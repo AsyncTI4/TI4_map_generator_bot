@@ -91,7 +91,13 @@ public enum MiscEmojis implements TI4Emoji {
     Wololo,
     TaDont,
     Zobat,
-    SharkLoan;
+    SharkLoan,
+    skull1,
+    skull2,
+    skull3,
+    skull4,
+    skull5,
+    skull6;
 
     public static TI4Emoji getCreussWormhole(@NotNull String wormhole) {
         return switch (wormhole.toLowerCase()) {

@@ -27,6 +27,7 @@ public class Source {
         codex4,
         thunders_edge,
         twilights_fall,
+        tf_br,
 
         // big homebrew
         ds,
@@ -35,7 +36,10 @@ public class Source {
         uncharted_space,
         monuments,
         blue_reverie,
-        twilight_kart,
+        tk_destroyer_cup,
+        tk_nova_cup,
+        twilight_ds,
+        pally,
 
         // lil homebrew
         lazax,
@@ -50,6 +54,14 @@ public class Source {
         viability_patch,
         beans,
         endlesst,
+        theodisi,
+        gamma,
+        black_spectrum,
+        addiction,
+        expanded_fracture,
+        muaat_mania,
+        erwans_gambit,
+        goose,
 
         // async homebrew
         draft,
@@ -84,6 +96,9 @@ public class Source {
         omega_phase,
         fowplus,
         untangled_space,
+        combosloth,
+        newdawn,
+        deepreaches,
 
         // eronous' stuff
         eronous,
@@ -138,15 +153,21 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, thunders_edge, uncharted_space, blue_reverie ->
-                    true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, thunders_edge, uncharted_space -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isBr() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3, codex4, blue_reverie, thunders_edge -> true;
                 default -> false;
             };
         }
 
         public boolean isTwilightFallish() {
             return switch (this) {
-                case twilights_fall, twilight_kart -> true;
+                case twilights_fall, tf_br, tk_destroyer_cup, tk_nova_cup, twilight_ds -> true;
                 default -> false;
             };
         }
@@ -154,7 +175,7 @@ public class Source {
         public boolean isHiddenFromSearch() {
             return switch (this) {
                 case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
-                case keleresplus, project_pi, asteroid -> true;
+                case keleresplus, project_pi, asteroid, newdawn -> true;
                 case pbd100, pbd500, pbd1000 -> true;
                 default -> false;
             };
@@ -166,26 +187,33 @@ public class Source {
             return !isOfficial();
         }
 
+        public TI4Emoji getRawEmoji() {
+            return switch (this) {
+                case absol -> SourceEmojis.Absol;
+                case ds -> SourceEmojis.DiscordantStars;
+                case uncharted_space -> SourceEmojis.UnchartedSpace;
+                case blue_reverie -> SourceEmojis.BlueReverie;
+                case eronous, riftset -> SourceEmojis.Eronous;
+                case admins -> FactionEmojis.AdminsFaction;
+                case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
+                case keleresplus -> SourceEmojis.KeleresPlus;
+                case project_pi -> SourceEmojis.ProjectPi;
+                case flagshipping -> SourceEmojis.Flagshipping;
+                case promises_promises -> SourceEmojis.PromisesPromises;
+                case miltymod -> SourceEmojis.MiltyMod;
+                case lazax -> FactionEmojis.Lazax;
+                case salliance -> SourceEmojis.StrategicAlliance;
+                case monuments -> SourceEmojis.Monuments;
+                case deepreaches -> SourceEmojis.DeepReaches;
+                case tk_destroyer_cup -> SourceEmojis.TwilightKart;
+                case tk_nova_cup -> SourceEmojis.TkNovaCup;
+                case twilight_ds -> SourceEmojis.DiscordantStars;
+                default -> null;
+            };
+        }
+
         public String emoji() {
-            TI4Emoji emoji =
-                    switch (this) {
-                        case absol -> SourceEmojis.Absol;
-                        case ds -> SourceEmojis.DiscordantStars;
-                        case uncharted_space -> SourceEmojis.UnchartedSpace;
-                        case eronous, riftset -> SourceEmojis.Eronous;
-                        case admins -> FactionEmojis.AdminsFaction;
-                        case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
-                        case keleresplus -> SourceEmojis.KeleresPlus;
-                        case project_pi -> SourceEmojis.ProjectPi;
-                        case flagshipping -> SourceEmojis.Flagshipping;
-                        case promises_promises -> SourceEmojis.PromisesPromises;
-                        case miltymod -> SourceEmojis.MiltyMod;
-                        case lazax -> FactionEmojis.Lazax;
-                        case salliance -> SourceEmojis.StrategicAlliance;
-                        case monuments -> SourceEmojis.Monuments;
-                        case twilight_kart -> SourceEmojis.TwilightKart;
-                        default -> null;
-                    };
+            TI4Emoji emoji = getRawEmoji();
             return emoji == null ? "" : emoji.toString();
         }
 
@@ -202,6 +230,7 @@ public class Source {
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
                 case codex4 -> "Codex 4 - Relics";
                 case ds -> "Discordant Stars [Homebrew]";
+                case blue_reverie -> "Blue Reverie [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
                 case flagshipping -> "Flagshipping [Homebrew]";
                 case promises_promises -> "Promises Promises [Homebrew]";
@@ -209,6 +238,11 @@ public class Source {
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
+                case theodisi -> "Lost Legacies [Homebrew]";
+                case gamma -> "Gamma Galaxies [Homebrew]";
+                case black_spectrum -> "Black Spectrum [Homebrew]";
+                case addiction -> "TI Addiction [Homebrew]";
+                case goose -> "Homebrew from Goose [Homebrew]";
                 default -> toString();
             };
         }

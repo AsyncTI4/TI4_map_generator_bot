@@ -25,7 +25,8 @@ public class SOCardsCommand implements ParentCommand {
                     new DealSOToAll(),
                     new DrawSpecificSO(),
                     new ShowUnScoredSOs(),
-                    new ListAllScored())
+                    new ListAllScored(),
+                    new SendSecretObjectiveCommand())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

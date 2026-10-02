@@ -1,11 +1,15 @@
 package ti4.discord.interactions.commands.game;
 
 import java.util.ArrayList;
+import java.util.List;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,12 +18,16 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.option.TEOptionService;
 
-class WeirdGameSetup extends GameStateSubcommand {
+public class WeirdGameSetup extends GameStateSubcommand {
 
     WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
@@ -33,11 +41,15 @@ class WeirdGameSetup extends GameStateSubcommand {
                 Constants.DISCORDANT_STARS_MODE,
                 "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.BLUE_REVERIE_MODE, "True to add the Blue Reverie factions to the pool."));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.NO_FRACTURE, "True to turn off fracture rolling in TE games."));
+                OptionType.BOOLEAN,
+                Constants.NO_FRACTURE,
+                "True to stop The Fracture ever entering play in TE games."));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
@@ -55,6 +67,13 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.THUNDERS_EDGE_MODE, "True to enable Thunder's Edge Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VEILED_HEART_MODE, "True to enable Veiled Heart Mode"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.LORE_MODE,
+                "True to enable Lore triggers in this non-FoW game (always on in FoW games)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MONUMENTS_MODE, "True to enable Monuments+"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -76,7 +95,22 @@ class WeirdGameSetup extends GameStateSubcommand {
         if (fowMode != null) game.setFowMode(fowMode);
 
         Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
-        if (tfMode != null) game.setTwilightsFallMode(tfMode);
+        if (tfMode != null) {
+            game.setTwilightsFallMode(tfMode);
+            if (game.isTwilightsFallMode()) {
+                String msg = "Use the buttons to enable or disable various homebrew options:";
+                List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
+                // This used to always post to the public main channel, leaking TF homebrew setup chatter in
+                // FoW games (this command has no FoW-specific gating, so it's reachable on any game). Same
+                // fix as TEOptionService's homebrewChannel: GM room in FoW games, unchanged elsewhere.
+                var channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+                MessageV2Builder builder = new MessageV2Builder(channel);
+                builder.append(msg);
+                builder.append(Container.of(sections));
+                builder.append(Buttons.DONE_DELETE_BUTTONS);
+                builder.send();
+            }
+        }
 
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(
@@ -94,6 +128,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         if (uncharted != null) {
             game.setUnchartedSpaceStuff(uncharted);
             if (uncharted) {
+                game.setHomebrew(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
                 if (game.isAbsolMode()) {
@@ -123,6 +158,29 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean veiledHeartMode = event.getOption(Constants.VEILED_HEART_MODE, null, OptionMapping::getAsBoolean);
         if (veiledHeartMode != null) game.setVeiledHeartMode(veiledHeartMode);
 
+        Boolean loreMode = event.getOption(Constants.LORE_MODE, null, OptionMapping::getAsBoolean);
+        if (loreMode != null) game.setLoreMode(loreMode);
+
+        Boolean feastOrFamineMode = event.getOption(Constants.FEAST_OR_FAMINE_MODE, null, OptionMapping::getAsBoolean);
+        if (feastOrFamineMode != null) game.setFeastOrFamineMode(feastOrFamineMode);
+
+        Boolean monumentsMode = event.getOption(Constants.MONUMENTS_MODE, null, OptionMapping::getAsBoolean);
+        if (monumentsMode != null) {
+            game.setMonumentsMode(monumentsMode);
+            if (monumentsMode) {
+                MonumentsService.applyMonuments(game);
+                if (!game.isFrankenGame()) {
+                    game.getRealPlayers().forEach(player -> MonumentsService.addFactionMonument(player, game));
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Added Monuments+ cards and strategy cards"
+                                + (game.isFrankenGame()
+                                        ? ". Faction monuments are not added in Franken games."
+                                        : ", and added each player's faction monument."));
+            }
+        }
+
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
@@ -151,19 +209,7 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
         if (thunderMode != null) {
-            game.setThundersEdge(thunderMode);
-            if (thunderMode && !game.getActionCards().contains("brilliance")) {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
-            }
-            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
-                game.addRelicToGame("quantumcore");
-                game.addRelicToGame("thesilverflame");
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
-            }
+            applyThundersEdgeMode(event, game, thunderMode);
         }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
@@ -177,10 +223,28 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
     }
 
+    /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Thunder's Edge mode. */
+    public static void applyThundersEdgeMode(GenericInteractionCreateEvent event, Game game, boolean enable) {
+        game.setThundersEdge(enable);
+        if (enable && !game.getActionCards().contains("brilliance")) {
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+        }
+        if (enable && !game.getAllRelics().contains("thesilverflame")) {
+            game.addRelicToGame("quantumcore");
+            game.addRelicToGame("thesilverflame");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
+        }
+    }
+
     private static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+                && event.getOption(Constants.BLUE_REVERIE_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
                 && event.getOption(Constants.MILTYMOD_MODE) == null
                 && event.getOption(Constants.VOTC_MODE) == null) {
@@ -193,11 +257,21 @@ class WeirdGameSetup extends GameStateSubcommand {
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
                 Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean blueReverieMode =
+                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+                event,
+                game,
+                baseGameMode,
+                absolMode,
+                miltyModMode,
+                discordantStarsMode,
+                blueReverieMode,
+                isTIGLGame,
+                votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
@@ -209,6 +283,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean absolMode,
             boolean miltyModMode,
             boolean discordantStarsMode,
+            boolean blueReverieMode,
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame && (game.isAllianceMode() || game.isCommunityMode())) {
@@ -221,6 +296,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
+                        || blueReverieMode
                         || game.isHomebrewSCMode()
                         || game.isFowMode()
                         || votcMode)) {
@@ -245,10 +321,10 @@ class WeirdGameSetup extends GameStateSubcommand {
             return false;
         }
 
-        if (baseGameMode && (absolMode || discordantStarsMode)) {
+        if (baseGameMode && (absolMode || discordantStarsMode || blueReverieMode)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
+                    "No Expansion Mode is not supported with Discordant Stars, Blue Reverie, or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
@@ -277,6 +353,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.setMiltyModMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         } else if (baseGameMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
@@ -285,8 +362,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base")))
                 return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1")))
-                return false;
+            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_base"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
@@ -300,6 +376,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         }
         game.setBaseGameMode(false);
@@ -343,6 +420,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.swapOutVariantTechs();
         }
         game.setDiscordantStarsMode(discordantStarsMode);
+        game.setBlueReverieMode(blueReverieMode);
 
         // JUST ABSOL
         if (absolMode) {
@@ -395,6 +473,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             game.swapInVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
@@ -425,5 +504,16 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         return true;
+    }
+
+    public static boolean applyBaseGameMode(GenericInteractionCreateEvent event, Game game) {
+        game.setThundersEdge(false);
+        game.setTwilightsFallMode(false);
+        game.removeStoredValue("useOldPok");
+        boolean success = setGameMode(event, game, true, false, false, false, false, false, false);
+        if (success) {
+            game.setStrategyCardSet("pok");
+        }
+        return success;
     }
 }

@@ -9,6 +9,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 
 class ClearDebt extends GameStateSubcommand {
@@ -54,9 +55,9 @@ class ClearDebt extends GameStateSubcommand {
         clearingPlayer.clearDebt(clearedPlayer, debtCountToClear, pool);
         MessageHelper.sendMessageToChannel(
                 clearingPlayer.getCorrectChannel(),
-                clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt token"
-                        + (debtCountToClear == 1 ? "" : "s") + " owned by " + clearedPlayer.getRepresentation()
-                        + ", from their \"" + pool + "\" pool.");
+                clearingPlayer.getRepresentation() + " cleared "
+                        + StringHelper.pluralize(debtCountToClear, "debt token") + " owned by "
+                        + clearedPlayer.getRepresentation() + ", from their \"" + pool + "\" pool.");
     }
 
     @Override

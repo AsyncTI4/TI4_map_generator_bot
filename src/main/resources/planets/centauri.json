@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "centauri",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 139,
+            "y": 89
+        }
+    },
     "id": "centauri",
     "tileId": "34",
     "name": "Centauri",

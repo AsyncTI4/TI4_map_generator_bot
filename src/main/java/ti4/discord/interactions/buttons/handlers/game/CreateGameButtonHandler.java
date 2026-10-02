@@ -1,17 +1,21 @@
 package ti4.discord.interactions.buttons.handlers.game;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -24,17 +28,20 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.service.statistics.AverageTurnTimeService;
+import ti4.spring.service.statistics.UserGameInfoService;
+import ti4.spring.service.statistics.matchmaking.queue.JoinBlocker;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakingQueueSearchService;
+import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchCriteria;
+import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -65,6 +72,19 @@ public class CreateGameButtonHandler {
             return;
         }
 
+        int rosterSize =
+                resolveMembers(event, event.getMessage().getContentRaw()).size();
+        Optional<String> launchBlocker =
+                MatchmakingQueueSearchService.get().findLaunchBlocker(event.getChannelId(), rosterSize);
+        if (launchBlocker.isPresent()) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage("This game can't launch because " + launchBlocker.get()
+                            + " You must first leave matchmaking.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
         createGameAndChannels(event);
     }
 
@@ -72,17 +92,39 @@ public class CreateGameButtonHandler {
     public static void finishSignup(ModalInteractionEvent event) {
         List<Member> members = event.getValue("players").getAsMentions().getMembers();
         List<Member> membersOG = fetchMembersFromMessage(event);
+        boolean addedByPlayerInTheGame = membersOG.contains(event.getMember());
+        List<String> blocked = new ArrayList<>();
+        List<String> exemptedIds = new ArrayList<>();
         for (Member member : members) {
             if (membersOG.contains(member)) continue;
+            Optional<JoinBlocker> blocker = addedByPlayerInTheGame
+                    ? findMemberAddBlocker(event.getChannelId(), member.getId(), membersOG)
+                    : findQueueJoinBlocker(event.getChannelId(), member.getId(), membersOG);
+            if (blocker.isPresent()) {
+                blocked.add(member.getAsMention() + " can't join because "
+                        + blocker.get().reason());
+                continue;
+            }
             membersOG.add(member);
-            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " joined the game.");
+            if (addedByPlayerInTheGame) exemptedIds.add(member.getId());
+            MatchmakerService.get().leaveQueue(member.getId());
+            MessageHelper.sendMessageToEventChannel(
+                    event, event.getUser().getEffectiveName() + " added " + member.getAsMention() + " to the game.");
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
                 .queue();
+        MatchmakingQueueSearchService.get().addExemptMembers(event.getChannelId(), exemptedIds);
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(membersOG));
+        if (!blocked.isEmpty()) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage(String.join("\n", blocked))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
-    @ButtonHandler("editPlayers~MDL")
+    @ButtonHandler(value = "editPlayers~MDL", save = false)
     public static void editPlayers(ButtonInteractionEvent event) {
         String modalID = "signupModal";
         String fieldID = "players";
@@ -104,11 +146,14 @@ public class CreateGameButtonHandler {
         for (Member member : members) {
             if (!membersOG.contains(member)) continue;
             membersOG.remove(member);
-            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " was removed from the game.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    event.getUser().getEffectiveName() + " removed " + member.getAsMention() + " from the game.");
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
                 .queue();
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(membersOG));
     }
 
     @ModalHandler("addSillyNameModal")
@@ -118,9 +163,12 @@ public class CreateGameButtonHandler {
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, sillyName))
                 .queue();
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                event.getUser().getEffectiveName() + " set the game name to **" + sillyName.replace(":", "") + "**.");
     }
 
-    @ButtonHandler("addSillyName~MDL")
+    @ButtonHandler(value = "addSillyName~MDL", save = false)
     public static void addSillyName(ButtonInteractionEvent event) {
         String modalID = "addSillyNameModal";
         String fieldID = "sillyName";
@@ -134,7 +182,7 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("removePlayers~MDL")
+    @ButtonHandler(value = "removePlayers~MDL", save = false)
     public static void removePlayers(ButtonInteractionEvent event) {
         String modalID = "removeSignupModal";
         String fieldID = "players";
@@ -150,73 +198,101 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
+    private static List<Member> fetchMembersFromMessage(String buttonMsg, Guild guild) {
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
             String user = buttonMsg.split("@")[i + 1];
             user = StringUtils.substringBefore(user, ">");
-            Member member = event.getGuild().getMemberById(user);
+            Member member = guild.getMemberById(user);
             if (member != null) {
                 members.add(member);
             }
         }
         return members;
+    }
+
+    public static List<Member> fetchMembersFromMessage(Message message, Guild guild) {
+        return fetchMembersFromMessage(message.getContentRaw(), guild);
+    }
+
+    private static Optional<JoinBlocker> findQueueJoinBlocker(
+            String threadId, String joiningUserId, List<Member> existingMembers) {
+        return MatchmakingQueueSearchService.get().findJoinBlocker(threadId, joiningUserId, memberIds(existingMembers));
+    }
+
+    private static Optional<JoinBlocker> findMemberAddBlocker(
+            String threadId, String joiningUserId, List<Member> existingMembers) {
+        return MatchmakingQueueSearchService.get()
+                .findMemberAddBlocker(threadId, joiningUserId, memberIds(existingMembers));
+    }
+
+    private static List<String> memberIds(List<Member> members) {
+        return members.stream().map(Member::getId).toList();
+    }
+
+    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
+        return fetchMembersFromMessage(event.getMessage().getContentRaw(), event.getGuild());
     }
 
     private static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
-        List<Member> members = new ArrayList<>();
-        for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
-            String user = buttonMsg.split("@")[i + 1];
-            user = StringUtils.substringBefore(user, ">");
-            Member member = event.getGuild().getMemberById(user);
-            if (member != null) {
-                members.add(member);
-            }
-        }
-        return members;
+        return fetchMembersFromMessage(event.getMessage().getContentRaw(), event.getGuild());
+    }
+
+    private static String fetchSillyNameFromMessage(String buttonMsg) {
+        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
     }
 
     private static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
-        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        return fetchSillyNameFromMessage(event.getMessage().getContentRaw());
     }
 
     private static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
-        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        return fetchSillyNameFromMessage(event.getMessage().getContentRaw());
     }
 
     public static String generateMemberListMessage(List<Member> members, String gameFunName) {
+        return generateMemberListMessage(members, gameFunName, true);
+    }
+
+    public static String generateMemberListMessage(List<Member> members, String gameFunName, boolean ping) {
         StringBuilder memberList = new StringBuilder();
 
         if (gameFunName == null || gameFunName.isEmpty()) {
-            memberList.append("## Players Signed Up:\n");
+            if (ping) {
+                memberList.append("## Players Signed Up:\n");
+            } else {
+                memberList.append("## Players:\n");
+            }
         } else {
-            memberList
-                    .append("## Game Fun Name: ")
-                    .append(gameFunName.replace(":", ""))
-                    .append("\n\nPlayers:");
+            if (ping) {
+                memberList
+                        .append("## Game Fun Name: ")
+                        .append(gameFunName.replace(":", ""))
+                        .append("\n\nPlayers Signed Up:");
+            } else {
+                memberList.append(gameFunName.replace(":", "")).append("\n\nPlayers:");
+            }
         }
 
         StringBuilder activityList = new StringBuilder();
 
-        var userIds = members.stream().map(Member::getId).toList();
-        Map<String, Long> userIdsToAverageTurnTimes =
-                AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
         int playerNumber = 1;
         for (Member member : members) {
-            memberList
-                    .append('\n')
-                    .append(playerNumber)
-                    .append(". ")
-                    .append(member.getUser().getAsMention());
+            String mention = ping ? member.getUser().getAsMention() : member.getEffectiveName();
+            memberList.append('\n').append(playerNumber).append(". ").append(mention);
 
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount > completedGames + 2) {
+            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            var userSettings = UserSettingsManager.get(member.getId());
+            if (managedPlayer != null) {
+                String trackRecord = userSettings.getTrackRecord();
+                int droppedGames = 0;
+                droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+                droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
+                completedGames += droppedGames;
+            }
+            if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
                 memberList
                         .append("⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
@@ -226,16 +302,18 @@ public class CreateGameButtonHandler {
             } else {
                 memberList.append(' ').append(completedGames).append(" games completed. ");
             }
-            if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
-                long averageTurnTime =
-                        userIdsToAverageTurnTimes.get(member.getUser().getId());
-                memberList
-                        .append(" `")
-                        .append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime))
-                        .append("` average turn time.");
+            List<Integer> threeFastestDays = UserGameInfoService.get()
+                    .getUsersThreeFastestDaysToComplete6PlayerGames(
+                            member.getUser().getId());
+            if (!threeFastestDays.isEmpty()) {
+                memberList.append(" (");
+                for (int i = 0; i < threeFastestDays.size() && i < 3; i++) {
+                    memberList.append("`").append(threeFastestDays.get(i)).append("`");
+                    if (i != threeFastestDays.size() - 1) memberList.append(", ");
+                }
+                memberList.append(" fastest 6 player game length(s) in days) ");
             }
-            var userSettings = UserSettingsManager.get(member.getId());
-            String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
+            String activeHoursSummary = UserSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
                 if (activityList.isEmpty()) {
                     activityList
@@ -252,26 +330,82 @@ public class CreateGameButtonHandler {
         return memberList.toString() + activityList;
     }
 
-    @ButtonHandler("joinGameList")
+    @ButtonHandler(value = "joinGameList", save = false)
     public static void joinGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         if (!members.contains(event.getMember())) {
+            Optional<JoinBlocker> blocker =
+                    findQueueJoinBlocker(event.getChannelId(), event.getUser().getId(), members);
+            if (blocker.isPresent()) {
+                event.getHook()
+                        .setEphemeral(true)
+                        .sendMessage("You can't join this game because "
+                                + blocker.get().reason() + askToBeAddedSuggestion(blocker.get()))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
             members.add(event.getMember());
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(members));
+        if (MatchmakerService.get().leaveQueue(event.getUser().getId())) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage("Because you joined a game, you are no longer queued to find a game.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
-    @ButtonHandler("leaveGameList")
+    private static String askToBeAddedSuggestion(JoinBlocker blocker) {
+        if (!blocker.canBeAddedByMember()) return "";
+        return "\nIf you believe you would be a good match for this game, ask one of the players currently signed up"
+                + " to add you to it. Alternatively, they can leave the matchmaking queue.";
+    }
+
+    public static int addPlayersFromQueueSearch(ModalInteractionEvent event, PlayerSearchCriteria criteria) {
+        return addPlayersFromQueueSearch(event.getGuild(), event.getMessage(), criteria, Set.of());
+    }
+
+    public static int addPlayersFromQueueSearch(
+            Guild guild, Message message, PlayerSearchCriteria criteria, Set<String> exemptUserIds) {
+        String content = message.getContentRaw();
+        List<Member> members = fetchMembersFromMessage(content, guild);
+        List<String> existingIds = members.stream().map(Member::getId).toList();
+
+        Duration hostWait = Duration.between(message.getTimeCreated().toInstant(), Instant.now());
+        if (hostWait.isNegative()) hostWait = Duration.ZERO;
+        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds, exemptUserIds, hostWait);
+
+        List<Member> added = new ArrayList<>();
+        for (String id : addedIds) {
+            Member member = guild.getMemberById(id);
+            if (member == null || members.contains(member)) continue;
+            members.add(member);
+            added.add(member);
+        }
+        if (added.isEmpty()) return 0;
+
+        message.editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(content)))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        String mentions = added.stream().map(Member::getAsMention).collect(Collectors.joining(" & "));
+        MessageHelper.sendMessageToChannel(
+                message.getChannel(),
+                mentions + (added.size() == 1 ? " was" : " were") + " added to the game from the matchmaking queue.");
+        return added.size();
+    }
+
+    @ButtonHandler(value = "leaveGameList", save = false)
     public static void leaveGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         members.remove(event.getMember());
         event.getMessage()
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
+        MatchmakingQueueSearchService.get().updateForRoster(event.getChannelId(), memberIds(members));
     }
 
     private static synchronized void createGameAndChannels(ButtonInteractionEvent event) {
@@ -323,6 +457,7 @@ public class CreateGameButtonHandler {
         }
 
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MatchmakingQueueSearchService.get().remove(event.getChannelId());
 
         String gameSillyName = parseOrGenerateSillyName(buttonMessage);
 
@@ -335,8 +470,28 @@ public class CreateGameButtonHandler {
             return;
         }
 
+        removeLaunchedMembersFromMatchmakingQueue(members, gameName, event);
+
         MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMessage);
         GameManager.save(game, "Created game channels");
+    }
+
+    private static void removeLaunchedMembersFromMatchmakingQueue(
+            List<Member> members, String gameName, ButtonInteractionEvent event) {
+        List<Member> removed = new ArrayList<>();
+        for (Member member : members) {
+            if (MatchmakerService.get().leaveQueue(member.getId())) {
+                removed.add(member);
+                BotLogger.info("Removed user " + member.getId() + " from the matchmaking queue because they are in"
+                        + " newly launched game " + gameName + ".");
+            }
+        }
+        if (removed.isEmpty()) return;
+        String mentions = removed.stream().map(Member::getAsMention).collect(Collectors.joining(" & "));
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                mentions + (removed.size() == 1 ? " was" : " were")
+                        + " removed from the matchmaking queue because they are in this newly launched game.");
     }
 
     private static void resetPbdNumber(String gameName) {
@@ -414,20 +569,40 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount > completedGames + 2) {
+            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            int limitIncrease = 0;
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                String parentName = channel.getParentChannel().getName();
+                if ("making-private-games".equalsIgnoreCase(parentName)) {
+                    limitIncrease = 1;
+                }
+            }
+            var userSettings = UserSettingsManager.get(member.getId());
+            String trackRecord = userSettings.getTrackRecord();
+            int droppedGames = 0;
+            droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+            droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
+            limitIncrease += droppedGames;
+            if (ongoingAmount > completedGames + 2 + limitIncrease && ongoingAmount != 0) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         member.getUser().getAsMention()
-                                + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
+                                + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3 - dropped games) and so cannot join more games at the moment."
                                 + " Their number of ongoing games is " + ongoingAmount
-                                + " and their number of completed games is " + completedGames + ".\n\n"
+                                + ", their number of completed games is " + completedGames
+                                + " and their number of dropped games is " + Math.abs(droppedGames) + ".\n\n"
                                 + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
                 return false;
             }
+            if (ongoingAmount == completedGames + 2 + limitIncrease && ongoingAmount != 0) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        member.getUser().getAsMention()
+                                + " this is a notice that you are now at your game limit. Your game limit is equal to your number of completed games + 3. If you are playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit. If you get replaced or drop any games, your limit decreases by 1.");
+            }
             // Used for specific people we are limiting the amount of games of
-            var userSettings = UserSettingsManager.get(member.getId());
+
             if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
 
                 MessageHelper.sendMessageToChannel(
@@ -438,36 +613,6 @@ public class CreateGameButtonHandler {
             }
         }
         return true;
-    }
-
-    private static int countOngoingGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
-        if (managedPlayer == null) return 0;
-        Set<ManagedGame> managedGames = managedPlayer.getGames();
-        return (int) managedGames.stream()
-                .filter(managedGame -> !managedGame.isHasEnded())
-                .map(ManagedGame::getGame)
-                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
-                .count();
-    }
-
-    private static int countCompletedGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
-        if (managedPlayer == null) return 0;
-        Set<ManagedGame> managedGames = managedPlayer.getGames();
-        return (int) managedGames.stream()
-                .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
-                .map(ManagedGame::getGame)
-                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
-                .count();
-    }
-
-    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
-        return game -> {
-            List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
-            return realAndEliminatedPlayers.size() >= 3
-                    && realAndEliminatedPlayers.stream()
-                            .map(Player::getUserID)
-                            .anyMatch(id -> managedPlayer.getId().equals(id));
-        };
     }
 
     private static boolean isLikelyDoublePressedButton(List<Member> members, ButtonInteractionEvent event) {

@@ -1,0 +1,31 @@
+[
+    {
+        "alias": "lupnarachnera",
+        "name": "Infestation",
+        "faction": "arachnera",
+        "color": "",
+        "playArea": false,
+        "source": "luminous",
+        "text": "During ground combat, after one of your opponent's units is destroyed: You may place up to 2 infantry on that planet. Then, return this card to the Arachnera player."
+    },
+    {
+        "alias": "lupnpsm",
+        "name": "Plea Deal",
+        "faction": "psm",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "Before you would perform an action on your turn: You may place this card face up in your play area. Until the end of this turn, treat this card as if it were a copy of a technology card that the PSM player controls. Return this card to the PSM player at the start of the status phase.",
+        "source": "luminous"
+    },
+    {
+        "alias": "lupnopa",
+        "name": "Rokawowk",
+        "faction": "opa",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "When a player would explore a planet: Instead of exploring that planet, explore that planet 2 times. Then place this card face up in your play area. Return this card to the The Outer Planet Alliance player at the start of the status phase.",
+        "source": "luminous"
+    }
+]

@@ -1,0 +1,37 @@
+[
+    {
+        "id": "superweapon_availyn",
+        "name": "Superweapon Availyn",
+        "imagePath": "attachment_superweapon_availyn.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_caled",
+        "name": "Superweapon Caled",
+        "imagePath": "attachment_superweapon_caled.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_glatison",
+        "name": "Superweapon Glatison",
+        "imagePath": "attachment_superweapon_glatison.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_mors",
+        "name": "Superweapon Mors",
+        "imagePath": "attachment_superweapon_mors.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_grom",
+        "name": "Superweapon Grom",
+        "imagePath": "attachment_superweapon_grom.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    }
+]

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "taaldorn",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "taaldorn",
     "tileId": "er58",
     "name": "Taal'Dorn",

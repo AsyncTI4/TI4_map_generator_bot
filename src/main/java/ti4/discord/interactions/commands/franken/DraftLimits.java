@@ -55,7 +55,7 @@ class DraftLimits extends GameStateSubcommand {
         }
     }
 
-    private void updateLimit(SlashCommandInteractionEvent event, Game game, String limitName, int value) {
+    private static void updateLimit(SlashCommandInteractionEvent event, Game game, String limitName, int value) {
         // Shared logic for key generation and messaging
         String storageKey = "frankenLimit" + StringUtils.upperCase(limitName.replace("_limit", ""));
         game.setStoredValue(storageKey, String.valueOf(value));

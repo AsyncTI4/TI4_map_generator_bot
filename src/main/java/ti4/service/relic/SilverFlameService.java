@@ -137,10 +137,7 @@ public class SilverFlameService {
         Helper.checkEndGame(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         ButtonHelper.deleteAllButtons(event);
-        if (!FractureService.isFractureInPlay(game)) {
-            FractureService.spawnFracture(null, game);
-            FractureService.spawnIngressTokens(null, game, player, null);
-        }
+        FractureService.enterPlayOrExplain(null, game, player, null);
     }
 
     private void resolveSilverFlamePurge(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -197,7 +194,8 @@ public class SilverFlameService {
             for (Player p : game.getRealPlayers()) {
                 if (p.hasPlanet(planet.getName())) p.removePlanet(buttonID);
             }
-            if (!planet.isSpaceStation() && player.getPlanetsForScoring(false).contains(planet)) {
+            if (!planet.isSpaceStation(game)
+                    && player.getPlanetsForScoring(false).contains(planet)) {
                 controlsAPlanet = true;
             }
         }
@@ -206,10 +204,7 @@ public class SilverFlameService {
         String planetTileName = AliasHandler.resolveTile("silver_flame");
         Tile tile = new Tile(planetTileName, homeSystem.getPosition());
         AddTileService.addTile(game, tile);
-        if (!FractureService.isFractureInPlay(game)) {
-            FractureService.spawnFracture(null, game);
-            FractureService.spawnIngressTokens(null, game, player, null);
-        }
+        FractureService.enterPlayOrExplain(null, game, player, null);
         ButtonHelper.deleteAllButtons(event);
 
         if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {

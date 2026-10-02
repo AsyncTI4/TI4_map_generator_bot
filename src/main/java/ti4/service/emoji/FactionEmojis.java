@@ -47,7 +47,6 @@ public enum FactionEmojis implements TI4Emoji {
     Neutral,
 
     // Twilight's Fall
-
     redtf,
     greentf,
     blacktf,
@@ -56,6 +55,19 @@ public enum FactionEmojis implements TI4Emoji {
     yellowtf,
     bluetf,
     orangetf,
+
+    // Twilight Kart
+    redtknova,
+    orangetknova,
+    yellowtknova,
+    greentknova,
+    bluetknova,
+    purpletknova,
+    pinktknova,
+    blacktknova,
+
+    // BR TF
+    whitetf,
 
     // Discordant Stars
     augers,
@@ -122,6 +134,31 @@ public enum FactionEmojis implements TI4Emoji {
     dream,
     ashen,
     natau,
+
+    // luminous
+    arachnera,
+    psm,
+    opa,
+
+    // theodisi
+    aeterna,
+    arcanum,
+    ardentia,
+    kairn,
+    kryxos,
+    myrr,
+    oblivion,
+    ponthous,
+    revenant,
+    thrones,
+    verydith,
+    veylor,
+    xytheris,
+    vanguard,
+    scrapyard,
+    stoneborn,
+    morpha,
+    thurviali,
 
     // nomadfalcon
     erock,
@@ -200,11 +237,6 @@ public enum FactionEmojis implements TI4Emoji {
     franken_zor_thul_matriarchate, //
 
     // Other (random homebrew)
-    canto,
-    eidolon,
-    mechi,
-    saera,
-    shadows, // Eronous
     Lazax,
     RandomFaction,
     AdminsFaction,
@@ -323,21 +355,57 @@ public enum FactionEmojis implements TI4Emoji {
             case "sarcosa" -> sarcosa;
             case "toldar" -> toldar;
             case "belkosea" -> belkosea;
+            case "aeterna" -> aeterna;
+            case "arcanum" -> arcanum;
+            case "ardentia" -> ardentia;
+            case "kairn" -> kairn;
+            case "kryxos" -> kryxos;
+            case "myrr" -> myrr;
+            case "oblivion" -> oblivion;
+            case "ponthous" -> ponthous;
+            case "revenant" -> revenant;
+            case "thrones" -> thrones;
+            case "verydith" -> verydith;
+            case "veylor" -> veylor;
+            case "xytheris" -> xytheris;
+            case "vanguard" -> vanguard;
+            case "scrapyard" -> scrapyard;
+            case "stoneborn" -> stoneborn;
+            case "morpha" -> morpha;
+            case "thurviali" -> thurviali;
+            case "diaspora" -> Arborec;
+            case "hlr" -> L1Z1X;
+            case "clade" -> Naalu;
+            case "archon" -> Xxcha;
+            case "moyin" -> Yin;
+            case "veilstrike" -> Yssaril;
+            case "convocation" -> Argent;
+            case "weaveway" -> Empyrean;
+            case "initiative" -> Keleres;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
-            case "canto" -> canto;
-            case "eidolon" -> eidolon;
-            case "mechi" -> mechi;
-            case "saera" -> saera;
-            case "shadows" -> shadows;
+            case "company" -> Letnev;
+            case "industry" -> Sol;
             case "redtf" -> redtf;
-            case "greentf" -> greentf;
-            case "blacktf" -> blacktf;
-            case "pinktf" -> pinktf;
-            case "purpletf" -> purpletf;
-            case "yellowtf" -> yellowtf;
-            case "bluetf" -> bluetf;
             case "orangetf" -> orangetf;
+            case "yellowtf" -> yellowtf;
+            case "greentf" -> greentf;
+            case "bluetf" -> bluetf;
+            case "purpletf" -> purpletf;
+            case "pinktf" -> pinktf;
+            case "blacktf" -> blacktf;
+
+            case "redtknova" -> redtknova;
+            case "orangetknova" -> orangetknova;
+            case "yellowtknova" -> yellowtknova;
+            case "greentknova" -> greentknova;
+            case "bluetknova" -> bluetknova;
+            case "purpletknova" -> purpletknova;
+            case "pinktknova" -> pinktknova;
+            case "blacktknova" -> blacktknova;
+
+            case "whitetf" -> whitetf;
+
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;
             case "franken3" -> Franken3;
@@ -395,6 +463,10 @@ public enum FactionEmojis implements TI4Emoji {
             case "netrunners" -> netrunners;
             case "crystellum" -> crystellum;
             case "natau" -> natau;
+
+            case "arachnera" -> arachnera;
+            case "psm" -> psm;
+            case "opa" -> opa;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

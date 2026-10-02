@@ -19,6 +19,7 @@ public class FrankenPlotService {
 
     public static void removePlot(GenericInteractionCreateEvent event, Player player, String itemID) {
         player.getPlotCardsRaw().remove(itemID);
+        player.removePlotCardFaction(itemID);
         GenericCardModel model = Mapper.getPlot(itemID);
         String msg = player.getRepresentation() + " removed Plot Card: " + model.getNameRepresentation();
         MessageHelper.sendEphemeralMessageToEventChannel(event, msg);

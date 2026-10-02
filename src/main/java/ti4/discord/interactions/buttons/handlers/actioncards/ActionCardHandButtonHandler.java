@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiAgentButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -74,8 +74,8 @@ class ActionCardHandButtonHandler {
         receiver.setActionCard(acID);
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                player.getRepresentationNoPing() + " gave _"
-                        + Mapper.getActionCard(acID).getName() + "_ to " + receiver.getRepresentationNoPing() + ".");
+                player.getRepresentationNoPing() + " gave an action card to " + receiver.getRepresentationNoPing()
+                        + ".");
         ActionCardHelper.sendActionCardInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, receiver);
         ButtonHelper.checkACLimit(game, receiver);
@@ -90,6 +90,7 @@ class ActionCardHandButtonHandler {
         boolean stalling = false;
         boolean drawReplacement = false;
         boolean retainButtons = false;
+        boolean arvaxiCommander = false;
         if (acIndex.contains("stall")) {
             acIndex = acIndex.replace("stall", "");
             stalling = true;
@@ -102,7 +103,6 @@ class ActionCardHandButtonHandler {
             acIndex = acIndex.replace("retain", "");
             retainButtons = true;
         }
-        boolean arvaxiCommander = false;
         if (acIndex.endsWith("arvaxicommander")) {
             acIndex = acIndex.replace("arvaxicommander", "");
             arvaxiCommander = true;
@@ -178,7 +178,7 @@ class ActionCardHandButtonHandler {
                         buttons2);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
-            ArvaxiAgentButtonHandler.postInitialButtons(game, player, acID);
+            ArvaxiLeaderHandler.postAgentOfferButtons(game, player, acID);
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
                         player.getRepresentationUnfogged() + ", please **Scrap Metal** by using these buttons.";

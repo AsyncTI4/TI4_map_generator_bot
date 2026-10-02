@@ -1,0 +1,42 @@
+[
+    {
+        "alias": "warlord",
+        "name": "Warlord",
+        "phase": "Start the game",
+        "text": "Start the game.",
+        "points": 0,
+        "source": "addiction"
+    },
+    {
+        "alias": "foundation",
+        "name": "Foundation",
+        "phase": "Progression",
+        "text": "Control 6 planets in non-home systems.",
+        "points": 0,
+        "source": "addiction"
+    },
+    {
+        "alias": "republic",
+        "name": "Republic",
+        "phase": "Progression",
+        "text": "Control 6 planets in non-home systems\nOwn 4 or more structures\nOR\nOwn 2 technologies in each of 2 colors.",
+        "points": 0,
+        "source": "addiction"
+    },
+    {
+        "alias": "empire",
+        "name": "Empire",
+        "phase": "Progression",
+        "text": "Control more planets than each of 2 of your neighbors.\nSpend 8 influence\nOR\nSpend a total of 3 tokens from your tactical and or strategy pools.\nOwn 2 unit upgrade technologies.",
+        "points": 0,
+        "source": "addiction"
+    },
+    {
+        "alias": "imperium_rex",
+        "name": "Imperium Rex",
+        "phase": "Progression",
+        "text": "Control 11 planets in non-home Systems.\nSpend 8 influence.\nSpend 8 resources.\nOwn 3-Unit Upgrade technologies.",
+        "points": 0,
+        "source": "addiction"
+    }
+]

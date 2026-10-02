@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "dralius",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "dralius",
     "tileId": "ba8",
     "name": "Dralius",

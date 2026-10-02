@@ -72,7 +72,8 @@ public class StartingFleetDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.STARTINGFLEET);
+        DraftErrataModel.filterUndraftablesAndShuffle(
+                allItems, DraftCategory.STARTINGFLEET, game.isTwilightsFallMode());
         return allItems;
     }
 

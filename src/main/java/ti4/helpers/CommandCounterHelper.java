@@ -1,8 +1,16 @@
 package ti4.helpers;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -10,18 +18,38 @@ import ti4.helpers.thundersedge.TeHelperAgents;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public final class CommandCounterHelper {
+
+    // Weak event keys keep this deduplication limited to the originating interaction.
+    private static final Map<GenericInteractionCreateEvent, Set<String>> VERYDITH_PROMPTS_BY_EVENT =
+            new WeakHashMap<>();
 
     public static void addCC(GenericInteractionCreateEvent event, Game game, String color, Tile tile) {
         addCC(event, game.getPlayerFromColorOrFaction(color), tile);
     }
 
     public static void addCC(GenericInteractionCreateEvent event, Player player, Tile tile) {
-        addCC(event, player, tile, true);
+        addCC(event, player, tile, true, false);
     }
 
     public static void addCC(GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping) {
+        addCC(event, player, tile, ping, false);
+    }
+
+    public static void addCC(
+            GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping, boolean useTactic) {
+        addCC(event, player, tile, ping, useTactic, false);
+    }
+
+    public static void addCC(
+            GenericInteractionCreateEvent event,
+            Player player,
+            Tile tile,
+            boolean ping,
+            boolean useTactic,
+            boolean skipKeleresMonumentPrompt) {
         if (player == null || !Mapper.isValidColor(player.getColor())) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -33,7 +61,22 @@ public final class CommandCounterHelper {
             return;
         }
         String ccID = Mapper.getCCID(player.getColor());
-        String ccPath = tile.getCCPath(ccID);
+        if (tile.hasCC(ccID)) {
+            return;
+        }
+        if (!skipKeleresMonumentPrompt
+                && MonumentsTEButtonHandler.offerKeleresMonumentTokenReplacement(
+                        event, player, tile, ping, useTactic)) {
+            return;
+        }
+        if (!skipKeleresMonumentPrompt
+                && RevenantLeadersHandler.offerRevVerydithAgentPrompt(event, player, tile, ping, useTactic)) {
+            return;
+        }
+        if (useTactic) {
+            player.setTacticalCC(player.getTacticalCC() - 1);
+        }
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -48,16 +91,47 @@ public final class CommandCounterHelper {
                     player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
+        Game game = player.getGame();
+        for (Player verydithPlayer : game.getRealPlayers()) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
+            if (verydithPlayer == player || !verydithPlayer.hasUnlockedBreakthrough("verydithbt")) {
+                continue;
+            }
+
+            boolean controlsPlanetInSystem =
+                    tile.getPlanetUnitHolders().stream().anyMatch(planet -> verydithPlayer.hasPlanet(planet.getName()));
+            if (!controlsPlanetInSystem) {
+                continue;
+            }
+
+            String promptKey = game.getName() + "|" + verydithPlayer.getFaction() + "|" + tile.getPosition();
+            if (event != null) {
+                synchronized (VERYDITH_PROMPTS_BY_EVENT) {
+                    if (!VERYDITH_PROMPTS_BY_EVENT
+                            .computeIfAbsent(event, ignored -> new HashSet<>())
+                            .add(promptKey)) {
+                        continue;
+                    }
+                }
+            }
+            VerydithBreakthroughHandler.offerUnyieldingAccord(event, verydithPlayer, tile);
+        }
+        if (player.hasLeader("ardentiacommander")) {
+            CommanderUnlockCheckService.checkPlayer(player, "ardentia");
+        }
+        CommanderUnlockCheckService.checkAllPlayersInGame(player.getGame(), "verydith");
+
         for (Player p : player.getGame().getRealPlayers()) {
             if (p.hasUnexhaustedLeader("naaluagent-te")) {
                 TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
             }
         }
+        RevenantLeadersHandler.offerRevArdentiaAgentButtons(player.getGame(), player, tile);
     }
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
-        String ccPath = tile.getCCPath(ccID);
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");

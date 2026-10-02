@@ -174,7 +174,7 @@ public class ImageHelper {
                 return image;
             }
         } catch (HttpTimeoutException e) {
-            BotLogger.error("Timeout fetching image: " + imageUrl);
+            BotLogger.spammyerror("Timeout fetching image: " + imageUrl);
         } catch (IOException e) {
             BotLogger.error("Network error fetching image: " + imageUrl, e);
         } catch (InterruptedException e) {

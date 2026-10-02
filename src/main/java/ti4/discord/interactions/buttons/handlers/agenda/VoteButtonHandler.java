@@ -1,11 +1,10 @@
 package ti4.discord.interactions.buttons.handlers.agenda;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -15,26 +14,23 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.helpers.AgendaHelper;
+import ti4.game.Tile;
+import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.AgendaModel;
-import ti4.model.StrategyCardSetModel;
-import ti4.model.TechnologyModel;
-import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
-import ti4.service.tech.ListTechService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 
 @UtilityClass
-public class VoteButtonHandler {
+class VoteButtonHandler {
 
     @ButtonHandler("erasePreVote")
-    public static void erasePreVote(GenericInteractionCreateEvent event, Player player, Game game) {
+    static void erasePreVote(GenericInteractionCreateEvent event, Player player, Game game) {
         game.setStoredValue("preVoting" + player.getFaction(), "");
         player.resetSpentThings();
         if (event instanceof ButtonInteractionEvent bEvent) {
@@ -47,22 +43,8 @@ public class VoteButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Erased the pre-vote", buttons);
     }
 
-    public static void erasePreVoteDueToAfterPlay(Player player, Game game) {
-        game.setStoredValue("preVoting" + player.getFaction(), "");
-        player.resetSpentThings();
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
-        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentation()
-                        + " due to the playing of an \"after\", your pre-vote was erased. You can use these buttons to pre-vote again.",
-                buttons);
-    }
-
     @ButtonHandler("preVote")
-    public static void preVote(ButtonInteractionEvent event, Player player, Game game) {
+    static void preVote(ButtonInteractionEvent event, Player player, Game game) {
         game.setStoredValue("preVoting" + player.getFaction(), "0");
         firstStepOfVoting(game, event, player);
     }
@@ -74,54 +56,83 @@ public class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
+            // A stale Vote button - pressed after the agenda window closed, e.g. from an old message - has no
+            // agenda info to read. Same guard AgendaHelper.autoResolve uses for the same reason.
+            if (game.getCurrentAgendaInfo().split("_").length < 2) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "This agenda resolution window has closed.");
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
             String voteMessage = player.getRepresentation()
                     + " is up to vote. Please use the buttons to choose the outcome you wish to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
             if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
-                outcomeActionRow = getForAgainstOutcomeButtons(
+                outcomeActionRow = AgendaRiderHelper.getForAgainstOutcomeButtons(
                         game, null, "outcome", game.getCurrentAgendaInfo().split("_")[2], player);
             } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-                outcomeActionRow = getPlayerOutcomeButtons(game, null, "outcome", null);
+                outcomeActionRow = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "outcome", null);
             } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-                voteMessage = player.getRepresentation() + " is up to vote."
-                        + " Since there are too many planets in the game to represent all as buttons,"
-                        + " please use the buttons to choose the player who controls the planet you wish to vote for."
-                        + " You will then be given a list of their planets to vote for.";
-                outcomeActionRow = getPlayerOutcomeButtons(game, null, "planetOutcomes", null);
+                if (game.isFowMode()) {
+                    // Picking a player and then being shown their entire planet list is the leak. Offer the
+                    // planets this voter already knows about, plus anything already voted for (those are
+                    // public in the vote summary and must stay selectable), plus Blind Target.
+                    voteMessage = player.getRepresentation()
+                            + " is up to vote. Please choose the planet you wish to vote for.";
+                    outcomeActionRow = fogPlanetOutcomeButtons(game, player, "outcome");
+                } else {
+                    voteMessage = player.getRepresentation() + " is up to vote."
+                            + " Since there are too many planets in the game to represent all as buttons,"
+                            + " please use the buttons to choose the player who controls the planet you wish to vote for."
+                            + " You will then be given a list of their planets to vote for.";
+                    outcomeActionRow = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "planetOutcomes", null);
+                }
             } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-                outcomeActionRow = getSecretOutcomeButtons(game, null, "outcome");
+                outcomeActionRow = AgendaRiderHelper.getSecretOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
-                outcomeActionRow = getStrategyOutcomeButtons(game, null, "outcome");
+                outcomeActionRow = AgendaRiderHelper.getStrategyOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("unit upgrade")) {
-                outcomeActionRow = getUnitUpgradeOutcomeButtons(game, null, "outcome");
+                outcomeActionRow = AgendaRiderHelper.getUnitUpgradeOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-                outcomeActionRow = getUnitOutcomeButtons(game, null, "outcome");
+                outcomeActionRow = AgendaRiderHelper.getUnitOutcomeButtons(game, null, "outcome");
             } else {
-                outcomeActionRow = getLawOutcomeButtons(game, null, "outcome");
+                outcomeActionRow = AgendaRiderHelper.getLawOutcomeButtons(game, null, "outcome");
+            }
+            if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event,
+                        "**Reminder: _Checks and Balances_ has resolved \"Against\" — you will only be able to ready 3 planets at the end of this agenda phase.**");
             }
             ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(),
-                    AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
+                    AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
                     outcomeActionRow);
         }
     }
 
+    // Non-fog only. firstStepOfVoting is this button's one and only generator, and it only builds a
+    // planetOutcomes_ button from its non-fog branch - in fog it calls fogPlanetOutcomeButtons directly and
+    // skips this step entirely. Unlike tiedPlanets_ below, nothing else in the codebase builds this id, and
+    // fog mode is fixed at game creation (no live toggle exists), so there is no real path that reaches this
+    // method with fog on.
     @ButtonHandler("planetOutcomes_")
-    public static void planetOutcomes(ButtonInteractionEvent event, String buttonID, Game game) {
+    static void planetOutcomes(ButtonInteractionEvent event, String buttonID, Game game) {
         String factionOrColor = buttonID.substring(buttonID.indexOf('_') + 1);
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
+        if (planetOwner == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
+            return;
+        }
         String voteMessage = "Choosing to vote for one of " + factionOrColor
                 + "'s planets. Please use the buttons to choose the planet you wish to vote for.";
-        List<Button> outcomeActionRow;
-        outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "outcome", null);
+        List<Button> outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "outcome", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("tiedPlanets_")
-    public static void tiedPlanets(ButtonInteractionEvent event, String buttonID, Game game) {
+    static void tiedPlanets(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         buttonID = buttonID.replace("tiedPlanets_", "");
         buttonID = buttonID.replace("resolveAgendaVote_outcomeTie*_", "");
         buttonID = buttonID.replace("agendaResolution_", "");
@@ -131,163 +142,103 @@ public class VoteButtonHandler {
                 + "'s planets. As Speaker, please decide a winner.";
 
         List<Button> outcomeActionRow;
-        outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "resolveAgendaVote_outcomeTie*", null);
+        if (game.isFowMode()) {
+            // Reached when nobody voted, and from manual resolution. "Any planet" is rules-correct here, but
+            // it must still be any planet the chooser could know about rather than everyone's holdings.
+            // This id carries no FFCC_ gate, so anyone can press it - including someone who is not a seated
+            // player, whose fog knowledge does not exist.
+            if (player == null) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
+                return;
+            }
+            voteMessage = "As Speaker, please decide a winner.";
+            outcomeActionRow = fogPlanetOutcomeButtons(game, player, "resolveAgendaVote_outcomeTie*");
+        } else if (planetOwner == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
+            return;
+        } else {
+            outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "resolveAgendaVote_outcomeTie*", null);
+        }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getLawOutcomeButtons(Game game, String rider, String prefix) {
-        List<Button> lawButtons = new ArrayList<>();
-        for (Map.Entry<String, Integer> law : game.getLaws().entrySet()) {
-            String lawName = Mapper.getAgendaTitleNoCap(law.getKey());
-            Button button;
-            if (rider == null) {
-                button = Buttons.blue(prefix + "_" + law.getKey(), lawName);
-            } else {
-                button = Buttons.blue(prefix + "rider_law;" + law.getKey() + "_" + rider, lawName);
-            }
-            lawButtons.add(button);
-        }
-        return lawButtons;
+    /** Static portion of the page-nav prefix; the real outcome prefix is appended per spec. */
+    private static final String VOTE_PLANET_PAGE_PREFIX = "votePlanetPage_";
+
+    /**
+     * The fog-safe candidate list for an Elect Planet outcome.
+     *
+     * <p>Two sources: planets the voter could know exist, and planets already named in this agenda's votes.
+     * The second set matters for correctness rather than secrecy - the vote summary shows later voters which
+     * outcomes have been picked, so those must remain selectable even if the voter has never seen the planet.
+     *
+     * <p>Safe to relabel: an outcome is keyed by the raw planet id, and the summary renders it through
+     * {@code getAgendaOutcomeName}, so nothing downstream depends on this button's text.
+     *
+     * <p>{@code prefix} ("outcome", "resolveAgendaVote_outcomeTie*") is also matched by
+     * {@code AgendaHelper.outcome}, a generic vote-casting handler with no idea what a
+     * {@code PlanetTargetSpec} is - so unlike every other card, this spec needs its own dedicated
+     * {@code pageNavPrefix} to keep {@link PlanetTargetService#targetButtons}'s pagination from routing a nav
+     * press there instead of to {@link #votePlanetPage} below. Known planets are not naturally bounded -
+     * stat-visibility alone can add a whole ally's holdings on top of everything scouted - so a big pod with a
+     * couple of alliances routinely exceeds Discord's 25-buttons-per-message cap.
+     */
+    static List<Button> fogPlanetOutcomeButtons(Game game, Player player, String prefix) {
+        PlanetTargetSpec spec = electPlanetSpec(game, prefix);
+        if (spec == null) return List.of();
+        return PlanetTargetService.targetButtons(game, player, spec, new ArrayList<>());
     }
 
-    public static List<Button> getForAgainstOutcomeButtons(
-            Game game, String rider, String prefix, String agendaID, Player player) {
-        List<Button> voteButtons = new ArrayList<>();
-        Button buttonFor;
-        Button buttonAgainst;
-        String factionChecker = "";
-        if (player != null) {
-            factionChecker = player.factionButtonChecker();
-        }
-        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
-        Integer agendaInt = null;
-        String forEmojiString = "👍";
-        String againstEmojiString = "👎";
-        try {
-            agendaInt = Integer.valueOf(agendaID);
-        } catch (NumberFormatException e) {
-        }
-        if (agendaInt != null) {
-            String agendaAlias = "";
-            for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
-                if (agendas.getValue().equals(agendaInt)) {
-                    agendaAlias = agendas.getKey();
-                    break;
-                }
-            }
-            AgendaModel agendaDetails = Mapper.getAgenda(agendaAlias);
-            if (agendaDetails != null) {
-                forEmojiString = agendaDetails.getForEmoji();
-                againstEmojiString = agendaDetails.getAgainstEmoji();
-            }
-            for (TI4Emoji emoji : TI4Emoji.allEmojiEnums()) {
-                if (forEmojiString.equals(emoji.name())) {
-                    forEmojiString = emoji.toString();
-                    break;
-                }
-            }
-            for (TI4Emoji emoji : TI4Emoji.allEmojiEnums()) {
-                if (againstEmojiString.equals(emoji.name())) {
-                    againstEmojiString = emoji.toString();
-                    break;
-                }
-            }
-        }
-        if (rider == null) {
-            buttonFor = Buttons.green(factionChecker + prefix + "_for", "For");
-            buttonAgainst = Buttons.red(factionChecker + prefix + "_against", "Against");
-        } else {
-            buttonFor = Buttons.green(factionChecker + prefix + "rider_fa;for_" + rider, "For");
-            buttonAgainst = Buttons.red(factionChecker + prefix + "rider_fa;against_" + rider, "Against");
-        }
-
-        buttonFor = buttonFor.withEmoji(Emoji.fromFormatted(forEmojiString));
-        buttonAgainst = buttonAgainst.withEmoji(Emoji.fromFormatted(againstEmojiString));
-
-        voteButtons.add(buttonFor);
-        voteButtons.add(buttonAgainst);
-        return voteButtons;
+    /** The spec {@link #fogPlanetOutcomeButtons} and {@link #votePlanetPage} both build from, or null if the
+     * agenda window has closed. */
+    static PlanetTargetSpec electPlanetSpec(Game game, String prefix) {
+        // A button pressed after the agenda window closed has no agenda info to read. AgendaHelper.autoResolve
+        // guards the same expression the same way. Null is an unambiguous signal to the callers below,
+        // because a live fog list always carries at least the Blind Target button.
+        String[] agendaInfo = game.getCurrentAgendaInfo() == null
+                ? new String[0]
+                : game.getCurrentAgendaInfo().split("_");
+        if (agendaInfo.length < 2) return null;
+        String agendaDetails = agendaInfo[1].toLowerCase();
+        boolean nonHome = agendaDetails.contains("non-home");
+        return PlanetTargetSpec.of(prefix)
+                .where(planet -> {
+                    if (planet.isSpaceStation(game)) return false;
+                    if (!nonHome) return true;
+                    Tile tile = game.getTileFromPlanet(planet.getName());
+                    if (tile != null && tile.isHomeSystem(game)) return false;
+                    return !"mrte".equalsIgnoreCase(planet.getName()) && !"mr".equalsIgnoreCase(planet.getName());
+                })
+                .withAlwaysInclude(new HashSet<>(game.getCurrentAgendaVotes().keySet()))
+                .withPageNavPrefix(VOTE_PLANET_PAGE_PREFIX + prefix + "|");
     }
 
-    public static List<Button> getSecretOutcomeButtons(Game game, String rider, String prefix) {
-        List<Button> secretButtons = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            for (Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
-                Button button;
-                String soName = Mapper.getSecretObjectivesJustNames().get(so.getKey());
-                if (rider == null) {
-                    button = Buttons.blue(prefix + "_" + so.getKey(), soName);
-                } else {
-                    button = Buttons.blue(prefix + "rider_so;" + so.getKey() + "_" + rider, soName);
-                }
-                if (!game.isFowMode()) {
-                    String colorEmojiString =
-                            ColorEmojis.getColorEmoji(player.getColor()).toString();
-                    button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
-                }
-                secretButtons.add(button);
-            }
+    /** Page 2 and beyond of {@link #fogPlanetOutcomeButtons}. Read-only: paging casts no vote. */
+    @ButtonHandler(value = VOTE_PLANET_PAGE_PREFIX, save = false)
+    static void votePlanetPage(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
+            return;
         }
-        return secretButtons;
+        String remainder = buttonID.substring(VOTE_PLANET_PAGE_PREFIX.length());
+        if (!remainder.contains("|page")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String realPrefix = StringUtils.substringBeforeLast(remainder, "|page");
+        PlanetTargetSpec spec = electPlanetSpec(game, realPrefix);
+        if (spec == null || !PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) {
+            ButtonHelper.deleteMessage(event);
+        }
     }
 
-    public static List<Button> getUnitUpgradeOutcomeButtons(Game game, String rider, String prefix) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            for (TechnologyModel tech : ListTechService.getAllNonFactionUnitUpgradeTech(game, player)) {
-                Button button;
-                if (rider == null) {
-                    button = Buttons.blue(prefix + "_" + tech.getAlias(), tech.getName());
-                } else {
-                    button = Buttons.blue(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
-                }
-                buttons.add(button);
-            }
-        }
-        return buttons;
-    }
-
-    public static List<Button> getUnitOutcomeButtons(Game game, String rider, String prefix) {
-        List<Button> buttons = new ArrayList<>();
-        for (TechnologyModel tech : ListTechService.getAllNonFactionUnitUpgradeTech(game)) {
-            Button button;
-            if (rider == null) {
-                button = Buttons.blue(prefix + "_" + tech.getAlias(), tech.getName());
-            } else {
-                button = Buttons.blue(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
-            }
-            buttons.add(button);
-        }
-        return buttons;
-    }
-
-    public static List<Button> getStrategyOutcomeButtons(Game game, String rider, String prefix) {
-        List<Button> strategyButtons = new ArrayList<>();
-        StrategyCardSetModel stratCards = game.getStrategyCardSet();
-        for (ti4.model.StrategyCardModel sc : stratCards.getStrategyCardModels()) {
-            Button button;
-            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc.getInitiative());
-            if (rider == null) {
-                button = Buttons.blue(
-                        prefix + "_" + sc.getInitiative(), stratCards.getSCName(sc.getInitiative()), scEmoji);
-            } else {
-                button = Buttons.blue(
-                        prefix + "rider_sc;" + sc.getInitiative() + "_" + rider,
-                        stratCards.getSCName(sc.getInitiative()),
-                        scEmoji);
-            }
-            strategyButtons.add(button);
-        }
-        return strategyButtons;
-    }
-
-    private static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
+    private static List<Button> getPlanetOutcomeButtons(Player planetOwner, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
+        List<String> planets = new ArrayList<>(planetOwner.getPlanets());
         for (String planet : planets) {
             Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (p != null && p.isSpaceStation()) continue;
+            if (p != null && p.isSpaceStation(game)) continue;
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1].toLowerCase();
             if (agendaDetails.contains("non-home")) {
                 if (game.getTileFromPlanet(planet) != null
@@ -311,49 +262,5 @@ public class VoteButtonHandler {
             planetOutcomeButtons.add(button);
         }
         return planetOutcomeButtons;
-    }
-
-    public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
-        List<Button> playerOutcomeButtons = new ArrayList<>();
-        List<Player> players = game.getRealPlayers();
-        if (prefix.contains("solagent") || prefix.contains("letnevagent")) {
-            players = game.getRealPlayersNNeutral();
-        }
-        if (prefix.contains("yinHero")) {
-            players = game.getRealPlayersNNeutral();
-        }
-        for (Player player : players) {
-            String faction = player.getFaction();
-            Button button;
-            if (!game.isFowMode() && !faction.contains("franken")) {
-                if (rider != null) {
-                    if (planetRes != null) {
-                        button = Buttons.blue(
-                                prefix + planetRes + "_" + faction + "_" + rider, StringUtils.capitalize(faction));
-                    } else {
-                        button = Buttons.blue(
-                                prefix + "rider_player;" + faction + "_" + rider, StringUtils.capitalize(faction));
-                    }
-                } else {
-                    button = Buttons.blue(prefix + "_" + faction, StringUtils.capitalize(faction));
-                }
-                String colorEmojiString =
-                        ColorEmojis.getColorEmoji(player.getColor()).toString();
-                button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
-            } else {
-                if (rider != null) {
-                    if (planetRes != null) {
-                        button = Buttons.blue(planetRes + "_" + player.getColor() + "_" + rider, player.getColor());
-                    } else {
-                        button = Buttons.blue(
-                                prefix + "rider_player;" + player.getColor() + "_" + rider, player.getColor());
-                    }
-                } else {
-                    button = Buttons.blue(prefix + "_" + player.getColor(), player.getColor());
-                }
-            }
-            playerOutcomeButtons.add(button);
-        }
-        return playerOutcomeButtons;
     }
 }

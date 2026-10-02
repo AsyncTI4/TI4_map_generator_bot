@@ -13,6 +13,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -47,17 +48,16 @@ class SecretObjectiveButtonHandler {
                 return;
             }
 
-            String msg = player.getRepresentation() + " discarded a secret objective";
+            String msg = player.getRepresentationNoPing() + " discarded a secret objective";
             if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 1) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2.getSo() > 1) {
+                    if (p2.getSo() > 1 && (!game.isErwansGambitMode() || !"mentak".equalsIgnoreCase(p2.getFaction()))) {
                         amountLeftToDiscard++;
                     }
                 }
                 if (amountLeftToDiscard > -1) {
-                    msg += " (" + amountLeftToDiscard + " player" + (amountLeftToDiscard == 1 ? "" : "s")
-                            + " still to discard)";
+                    msg += " (" + StringHelper.pluralize(amountLeftToDiscard, "player") + " still to discard)";
                 }
             }
             if (!DiscardSecretService.discardSO(player, soIndex, game)) {

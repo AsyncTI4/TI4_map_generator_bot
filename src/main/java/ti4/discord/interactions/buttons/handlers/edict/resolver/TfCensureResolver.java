@@ -17,7 +17,7 @@ public class TfCensureResolver implements EdictResolver {
     @Getter
     public String edict = "tf-censure";
 
-    private List<Button> buttons(Game game, Player player) {
+    private static List<Button> buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String id = player.factionButtonChecker() + "electCensure_";
         for (Player p2 : game.getRealPlayers()) {

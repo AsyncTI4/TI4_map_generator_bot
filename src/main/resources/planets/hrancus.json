@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hrancus",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "hrancus",
     "tileId": "er122",
     "name": "Hr'an Cus",

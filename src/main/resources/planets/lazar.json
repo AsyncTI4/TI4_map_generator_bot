@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lazar",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 91
+        }
+    },
     "id": "lazar",
     "tileId": "31",
     "name": "Lazar",

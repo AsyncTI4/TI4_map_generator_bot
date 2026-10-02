@@ -14,7 +14,7 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
         Map<GameEntity, List<PlayerEntity>> gamePlayers = new LinkedHashMap<>();
         for (PlayerEntity player : players) {
             gamePlayers
-                    .computeIfAbsent(player.getGame(), game -> new ArrayList<>())
+                    .computeIfAbsent(player.getGame(), _ -> new ArrayList<>())
                     .add(player);
         }
 
@@ -44,5 +44,15 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
             return 2;
         }
         return 3 + pointsAwayFromVictory;
+    }
+
+    static String describeRank(int rank) {
+        if (rank == 1) {
+            return "Won";
+        }
+        if (rank == 2) {
+            return "<=3 VP back";
+        }
+        return (rank - 3) + " VP back";
     }
 }

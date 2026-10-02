@@ -8,11 +8,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Expeditions;
@@ -69,13 +71,13 @@ public class TeHelperGeneral {
         }
     }
 
-    @ButtonHandler("expeditionInfo")
+    @ButtonHandler(value = "expeditionInfo", save = false)
     private static void expeditionInfo(ButtonInteractionEvent event, Game game, Player player) {
         String info = game.getExpeditions().printExpeditionInfo(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), info);
     }
 
-    @ButtonHandler("expeditionInfoAndButtons")
+    @ButtonHandler(value = "expeditionInfoAndButtons", save = false)
     private static void expeditionInfoWithButtons(ButtonInteractionEvent event, Game game, Player player) {
         String info = game.getExpeditions().printExpeditionInfo(game, player);
         List<Button> butts = game.getExpeditions().getRemainingExpeditionButtons(player);
@@ -94,8 +96,12 @@ public class TeHelperGeneral {
         if (newOwner == null) {
             return;
         }
-        for (Planet station : tile.getSpaceStations()) {
+
+        for (Planet station : tile.getSpaceStations(game)) {
             Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
+            if (newOwner == prevOwner) {
+                continue;
+            }
             if (prevOwner != null && FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;
 
             AddPlanetService.addPlanet(newOwner, station.getName(), game, event, false);
@@ -107,6 +113,7 @@ public class TeHelperGeneral {
                     newOwner.getRepresentation() + " acquired control of the " + station.getRepresentation(game)
                             + " space station.");
         }
+        BlueReverieRelicHandler.transferGeduStationIfNecessary(event, game, tile, newOwner);
     }
 
     @ButtonHandler("placeThundersEdge")
@@ -173,11 +180,18 @@ public class TeHelperGeneral {
         }
 
         if (newMessage != null) {
-            // edit the message with the new partX buttons
-            event.getMessage()
-                    .editMessage(newMessage)
-                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            List<List<ActionRow>> partitions = MessageHelper.getPartitionedButtonLists(newButtons);
+            if (partitions.size() > 1) {
+                // too many buttons to fit one message's component limit, so send them split up instead
+                ButtonHelper.deleteMessage(event);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), newMessage, newButtons);
+            } else {
+                // edit the message with the new partX buttons
+                event.getMessage()
+                        .editMessage(newMessage)
+                        .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+            }
         }
     }
 }

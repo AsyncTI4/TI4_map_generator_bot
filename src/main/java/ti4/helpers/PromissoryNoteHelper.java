@@ -10,7 +10,18 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -29,17 +40,15 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class PromissoryNoteHelper {
 
-    private static final String PINNED_PN_INFO_MESSAGE_ID = "pinned_pn_info_message_id";
-
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat) {
-        MessageHelper.sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
-                game,
-                player,
-                PINNED_PN_INFO_MESSAGE_ID,
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
                 getPromissoryNoteCardInfo(game, player, longFormat, false),
                 getPNButtons(game, player));
     }
@@ -48,7 +57,7 @@ public class PromissoryNoteHelper {
             Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentationUnfogged() + ", heads up, someone refreshed your promissory notes.";
+        String headerText = player.getRepresentationNoPing() + ", heads up, someone refreshed your promissory notes.";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
@@ -87,7 +96,7 @@ public class PromissoryNoteHelper {
                         continue;
                     }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-                    sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
+                    sb.append(ownerColorTag(game, pnOwner, pn.getKey()));
                     sb.append(" `(").append(pn.getValue()).append(")`\n");
                     if (longFormat || pnOwner != player || !genericPromissoryNotes.contains(pn.getKey())) {
                         sb.append("> ").append(pnModel.getTextFormatted(game)).append('\n');
@@ -127,7 +136,7 @@ public class PromissoryNoteHelper {
                                 sb.append("✋");
                             } else {
                                 if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
-                                sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
+                                sb.append(ownerColorTag(game, pnOwner, pn.getKey()));
                             }
                             sb.append(" `(")
                                     .append(pn.getValue())
@@ -140,6 +149,25 @@ public class PromissoryNoteHelper {
             }
         }
         return sb.toString();
+    }
+
+    public static boolean isFactionPromissoryNote(String pnID) {
+        PromissoryNoteModel model = Mapper.getPromissoryNote(pnID);
+        return model != null && StringUtils.isNotBlank(model.getFaction().orElse(""));
+    }
+
+    public static String ownerColorPrefix(Player owner, String pnID) {
+        return isFactionPromissoryNote(pnID) ? "" : owner.getColor() + " ";
+    }
+
+    public static String ownerEmoji(Game game, Player owner, String pnID) {
+        return game.isFowMode() && isFactionPromissoryNote(pnID) ? null : owner.fogSafeEmoji();
+    }
+
+    public static String ownerColorTag(Game game, Player owner, String pnID) {
+        return game.isFowMode() && isFactionPromissoryNote(pnID)
+                ? ""
+                : ColorEmojis.getColorEmojiWithName(owner.getColor());
     }
 
     public static void checkAndAddPNs(Game game, Player player) {
@@ -186,7 +214,8 @@ public class PromissoryNoteHelper {
             Button transact;
             if (game.isFowMode()) {
                 transact = Buttons.green(
-                        "resolvePNPlay_" + pnShortHand, "Play " + owner.getColor() + " " + promissoryNote.getName());
+                        "resolvePNPlay_" + pnShortHand,
+                        "Play " + ownerColorPrefix(owner, pnShortHand) + promissoryNote.getName());
             } else {
                 transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
                         .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
@@ -217,8 +246,17 @@ public class PromissoryNoteHelper {
         }
         PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();
+        GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = game.getPNOwner(id);
+        if ("bepnta".equalsIgnoreCase(id)
+                && !TaPromissoryHandler.hasLegalAdvancedStructuralEngineeringTargets(player, game)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
+            return;
+        }
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
         } else {
@@ -252,10 +290,19 @@ public class PromissoryNoteHelper {
         }
         // And refresh cards info
         sendPromissoryNoteInfo(game, player, false);
-        sendPromissoryNoteInfo(game, owner, false);
-        MessageHelper.sendMessageToChannel(
-                owner.getCardsInfoThread(),
-                owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        if (!"malevolency".equalsIgnoreCase(id)) {
+            sendPromissoryNoteInfo(game, owner, false);
+            MessageHelper.sendMessageToChannel(
+                    owner.getCardsInfoThread(),
+                    owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        }
+
+        if ("bepncryst".equalsIgnoreCase(id)) {
+            CrystellumPromissoryHandler.resolveFracture(game, player, event);
+        }
+        if ("thpnxytheris".equalsIgnoreCase(id)) {
+            XytherisPromissoryHandler.activateSwarmSpawn(game, player);
+        }
 
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);
@@ -349,6 +396,12 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(),
                     player.getRepresentation()
                             + " drew an extra secret objective due to _Sycophancy_. Please discard an extra secret objective.");
+        }
+        if ("bapnluna".equalsIgnoreCase(id)) {
+            game.drawSecretObjective(player.getUserID());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " drew 1 secret objective due to _Theory Renovation_.");
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
@@ -450,6 +503,7 @@ public class PromissoryNoteHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -458,6 +512,7 @@ public class PromissoryNoteHelper {
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -476,7 +531,7 @@ public class PromissoryNoteHelper {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged()
                         + " you gained trade goods equal to the number of commodities the player had (your trade goods went from "
-                        + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " to -> " + (oldTGs + comms)
+                        + StringHelper.pluralize(oldTGs, "trade good") + " to -> " + (oldTGs + comms)
                         + " trade good" + (oldTGs + comms == 1 ? "" : "s")
                         + "). Please follow up with the player if this number seems off.";
                 player.setTg(oldTGs + comms);
@@ -490,7 +545,7 @@ public class PromissoryNoteHelper {
                         + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit"
                         + (comms == 1 ? "y" : "ies")
                         + " ("
-                        + oldTGs + " tg" + (oldTGs == 1 ? "" : "s") + " -> " + (oldTGs + comms) + "tg"
+                        + StringHelper.pluralize(oldTGs, "tg") + " -> " + (oldTGs + comms) + "tg"
                         + (oldTGs + comms == 1 ? "" : "s") + ").";
                 player.setTg(oldTGs + comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());
@@ -546,8 +601,8 @@ public class PromissoryNoteHelper {
             String riderName = "Keleres Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
                     player.getRepresentation() + "Please choose your Rider target.",
@@ -559,8 +614,8 @@ public class PromissoryNoteHelper {
             String riderName = "Edyn Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            // List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
                     player.getRepresentation() + "Please choose your Rider target.",
@@ -572,8 +627,8 @@ public class PromissoryNoteHelper {
             String riderName = "Kyro Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            // List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
                     player.getRepresentation() + "Please choose your Rider target.",
@@ -607,39 +662,57 @@ public class PromissoryNoteHelper {
                 String factionChecker = "";
                 String message = "Please choose the fragments you wish to purge. ";
                 List<Button> purgeFragButtons = new ArrayList<>();
-                int numToBeat = 2 - player.getUrf();
+                int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);
+                int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.INDUSTRIAL);
+                int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.HAZARDOUS);
+                int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.FRONTIER);
+                int supermassiveCultural = ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.CULTURAL);
+                int supermassiveIndustrial =
+                        ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.INDUSTRIAL);
+                int supermassiveHazardous =
+                        ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.HAZARDOUS);
+                int supermassiveFrontier = ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.FRONTIER);
+                int numToBeat = 2 - frontierFragments - supermassiveFrontier;
 
                 numToBeat -= 1;
 
-                if (player.getCrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < player.getCrf() + 1 && x < 4); x++) {
+                if (culturalFragments + supermassiveCultural > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveCultural + 1);
+                            (x < culturalFragments + 1 && x < 4);
+                            x++) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_" + x, "Cultural Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (player.getIrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < player.getIrf() + 1 && x < 4); x++) {
+                if (industrialFragments + supermassiveIndustrial > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveIndustrial + 1);
+                            (x < industrialFragments + 1 && x < 4);
+                            x++) {
                         Button transact = Buttons.green(
                                 factionChecker + "purge_Frags_IRF_" + x, "Industrial Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (player.getHrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < player.getHrf() + 1 && x < 4); x++) {
+                if (hazardousFragments + supermassiveHazardous > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveHazardous + 1);
+                            (x < hazardousFragments + 1 && x < 4);
+                            x++) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_" + x, "Hazardous Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
 
-                if (player.getUrf() > 0) {
-                    for (int x = 1; x < player.getUrf() + 1; x++) {
+                if (frontierFragments > 0) {
+                    for (int x = 1; x < frontierFragments + 1; x++) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_" + x, "Frontier Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
+                purgeFragButtons.addAll(
+                        ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
                 Button transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
                 if (player.hasAbility("a_new_edifice")) {
                     transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Explore");
@@ -666,7 +739,44 @@ public class PromissoryNoteHelper {
                             + ") from playing _Primitivism_. Please use the button to gain your command token.",
                     transact2);
         }
-        if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
+        if ("bepnta".equalsIgnoreCase(id)) {
+            TaPromissoryHandler.offerAdvancedStructuralEngineeringButtons(event, player, game);
+        }
+        if ("thpnmyrri".equalsIgnoreCase(id) || "thpnmyrrh".equalsIgnoreCase(id) || "thpnmyrrc".equalsIgnoreCase(id)) {
+            MyrrPromissoryHandler.offerFactoryLeaseButtons(event, player, game, id);
+        }
+        if ("thpnkairn".equalsIgnoreCase(id)) {
+            KairnPromissoryHandler.offerArchaeologicalOutpostButtons(event, player, game);
+        }
+        if ("thpnoblivion".equalsIgnoreCase(id)) {
+            OblivionPromissoryHandler.offerShardOfNothingnessButtons(game, player);
+        }
+        if ("thpnverydith".equalsIgnoreCase(id)) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getActionsChannel(),
+                    player.getRepresentation()
+                            + ", you may use these buttons to perform the secondary ability of the strategy card you played _Pact Renewed_ for.\n**REMINDER**: You do not spend a command token when doing this.",
+                    ButtonHelperHeroes.getSecondaryButtons(game));
+        }
+        if ("thpnthrones".equalsIgnoreCase(id)) {
+            ThronesPromissoryHandler.getUnplacedThronePlanetButtonsForPN(event, game, player);
+        }
+        if ("thpnveylor".equalsIgnoreCase(id)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", buttons to discard an action card have been sent to your #cards-info thread.");
+            VeylorPromissoryHandler.sendDiscardButtonsForPn(event, game, player);
+        }
+        if ("thpnrevenant".equalsIgnoreCase(id)) {
+            RevenantPromissoryHandler.getRevenantPNButtons(game, player);
+        }
+        if ("thpnthurviali".equalsIgnoreCase(id)) {
+            ThurvialiPromissoryHandler.resolveRadiantAssembly(event, game, player);
+        }
+        // These PNs' text contains "action:" but describe a trigger on another player's action
+        List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");
+        if (pn.getText().toLowerCase().contains("action:") && !actionTextPNsNotOwnAction.contains(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),

@@ -2,6 +2,7 @@ package ti4.service;
 
 import java.util.List;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,6 +18,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
@@ -25,6 +27,9 @@ import ti4.spring.context.SpringContext;
 public class ShowGameService {
 
     public static void simpleEphemeralShowGame(Game game, GenericInteractionCreateEvent event) {
+        if (!hasGameToShow(game, event)) {
+            return;
+        }
         ephemeralShowGame(game, event, DisplayType.map);
     }
 
@@ -33,6 +38,14 @@ public class ShowGameService {
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+        simpleShowGame(game, event, displayType, null);
+    }
+
+    public static void simpleShowGame(
+            Game game, GenericInteractionCreateEvent event, DisplayType displayType, @Nullable String segment) {
+        if (!hasGameToShow(game, event)) {
+            return;
+        }
         boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
         boolean shouldPersistFowMapMessageId = displayType == DisplayType.all && game.isFowMode();
 
@@ -52,9 +65,11 @@ public class ShowGameService {
                                 msg.getChannel().getIdLong())
                 : null;
 
-        MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
+        MapRenderPipeline.queue(game, event, displayType, segment, fileUpload -> {
             if (includeButtons(displayType)) {
-                List<Button> buttons = Buttons.mapImageButtons(game);
+                List<Button> buttons = Buttons.mapImageButtons(game, segment);
+                buttons.addAll(
+                        MapSegmentService.switchButtons(game, playerId, MapSegmentService.isFoggedView(game, event)));
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
@@ -141,5 +156,14 @@ public class ShowGameService {
                     unlocked -> false;
             default -> true;
         };
+    }
+
+    private static boolean hasGameToShow(Game game, GenericInteractionCreateEvent event) {
+        if (game != null) {
+            return true;
+        }
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event, "Could not find a game to show. Please use this from a current game channel.");
+        return false;
     }
 }

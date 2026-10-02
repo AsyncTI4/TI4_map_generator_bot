@@ -3,11 +3,13 @@ package ti4.service.franken;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.DraftCategory;
 import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 
 @UtilityClass
 public class FrankenFactionTechService {
@@ -20,16 +22,22 @@ public class FrankenFactionTechService {
 
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added technologies:\n");
         for (String techID : techIDs) {
+            TechnologyModel techModel = Mapper.getTech(techID);
             if (player.getFactionTechs().contains(techID)) {
                 sb.append("> ").append(techID).append(" (player had this faction technology)");
             } else {
-                sb.append("> ").append(Mapper.getTech(techID).getRepresentation(true));
+                sb.append("> ")
+                        .append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                                player.getGame(),
+                                DraftCategory.TECH,
+                                techID,
+                                techModel.getNameRepresentation(),
+                                techModel.getRepresentation(true)));
             }
             sb.append('\n');
             player.addFactionTech(techID);
 
             // ADD BASE UNIT IF ADDING UNIT UPGRADE TECH
-            TechnologyModel techModel = Mapper.getTech(techID);
             if (techModel == null) continue;
             if (techModel.isUnitUpgrade()) {
                 UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
@@ -75,12 +83,9 @@ public class FrankenFactionTechService {
     private void addTF_Techs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         for (String tech : techIDs) {
             if (player.getGame().isVeiledHeartMode()) {
-                String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+                VeiledHeartService.addVeiledCard(player, tech);
+                String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it.";
                 MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-                String key = "veiledCards" + player.getFaction();
-                String val = player.getGame().getStoredValue("veiledCards" + player.getFaction()) + tech + "_";
-                player.getGame().setStoredValue(key, val);
             } else {
                 player.addTech(tech);
             }
@@ -90,15 +95,11 @@ public class FrankenFactionTechService {
     private void removeTF_Techs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         for (String tech : techIDs) {
             if (player.getGame().isVeiledHeartMode()) {
-                String msg = "Removed a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+                VeiledHeartService.removeVeiledCard(player, tech);
+                String msg = "Removed a veiled card.";
                 MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-                String key = "veiledCards" + player.getFaction();
-                String val = player.getGame().getStoredValue("veiledCards" + player.getFaction());
-                val = val.replace(tech + "_", "");
-                player.getGame().setStoredValue(key, val);
             } else {
-                player.addTech(tech);
+                player.removeTech(tech);
             }
         }
     }

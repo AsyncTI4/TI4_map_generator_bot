@@ -1,0 +1,15 @@
+{
+    "id":"mobilemountain",
+    "name":"Mobile Mountain",
+    "aliases":[
+        "mobilemountain",
+        "mountain"
+    ],
+    "resources":1,
+    "influence":3,
+    "planetTypes":[
+        "FAKE",
+        "FACTION"
+    ],
+    "source":"theodisi"
+}

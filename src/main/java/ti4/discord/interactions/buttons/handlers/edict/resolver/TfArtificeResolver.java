@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
@@ -68,9 +69,9 @@ public class TfArtificeResolver implements EdictResolver {
         int paradigms = Integer.parseInt(buttonID.split("_")[2]);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " has decided to draw " + relics + " extra relic"
-                        + (relics == 1 ? "" : "s") + " and " + paradigms + " extra paradigm"
-                        + (paradigms == 1 ? "" : "s") + ".");
+                player.getRepresentationNoPing() + " has decided to draw "
+                        + StringHelper.pluralize(relics, "extra relic") + " and "
+                        + StringHelper.pluralize(paradigms, "extra paradigm") + ".");
         if (relics > 0) {
             RelicHelper.drawWithAdvantage(player, game, 1 + relics);
         } else {

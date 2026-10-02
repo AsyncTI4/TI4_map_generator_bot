@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "arinam",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "arinam",
     "tileId": "37",
     "name": "Arinam",

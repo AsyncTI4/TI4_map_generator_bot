@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rhyah",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "rhyah",
     "tileId": "er58",
     "name": "Rhyah",

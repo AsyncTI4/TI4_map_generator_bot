@@ -41,6 +41,7 @@ class Info extends GameStateSubcommand {
 
     private static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
         boolean privateGame = FoWHelper.isPrivateGame(game, event);
+        boolean hidesMap = !FoWHelper.canSeeWholeMap(game, event);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## Game Info:").append('\n');
@@ -98,7 +99,7 @@ class Info extends GameStateSubcommand {
             }
         }
         sb.append("Map Template: `").append(game.getMapTemplateID()).append('`').append('\n');
-        if (!privateGame || game.isHasEnded()) {
+        if (!hidesMap) {
             sb.append("Map String: `").append(game.getMapString()).append('`').append('\n');
             sb.append("Hex Summary: ` ")
                     .append(game.getHexSummary())
@@ -272,7 +273,7 @@ class Info extends GameStateSubcommand {
             sb.append('\n');
         }
 
-        if (!privateGame) {
+        if (!privateGame && !hidesMap) {
             sb.append("### Players: ").append('\n');
             int index = 1;
             for (Player player : game.getRealPlayers()) {
@@ -342,10 +343,6 @@ class Info extends GameStateSubcommand {
                 .append('\n');
         sb.append("Buttons pressed: `")
                 .append(game.getButtonPressCount())
-                .append('`')
-                .append('\n');
-        sb.append("SlashCommands used: `")
-                .append(game.getSlashCommandsRunCount())
                 .append('`')
                 .append('\n');
 

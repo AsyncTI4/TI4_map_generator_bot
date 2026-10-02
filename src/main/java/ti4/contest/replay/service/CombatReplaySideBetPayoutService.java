@@ -1,6 +1,7 @@
 package ti4.contest.replay.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,6 @@ import ti4.service.combat.CombatUnitSelectionHelper;
 @RequiredArgsConstructor
 public class CombatReplaySideBetPayoutService {
 
-    public static final String ODDS_V1 = "ODDS_V1";
-
     private final CombatContestSettings settings;
 
     public int offeredPayout(
@@ -45,11 +44,10 @@ public class CombatReplaySideBetPayoutService {
             CombatCandidateEntity candidate,
             CombatSideBetType betType,
             String targetFaction) {
-        if (!ODDS_V1.equalsIgnoreCase(contest.getSideBetPayoutModel())
-                || (betType != CombatSideBetType.AFB_WHIFF
-                        && betType != CombatSideBetType.ROUND_ONE_WHIFF
-                        && betType != CombatSideBetType.ROUND_ONE_SLAM
-                        && betType != CombatSideBetType.WINNER_ONE_HP)) {
+        if (betType != CombatSideBetType.AFB_WHIFF
+                && betType != CombatSideBetType.ROUND_ONE_WHIFF
+                && betType != CombatSideBetType.ROUND_ONE_SLAM
+                && betType != CombatSideBetType.WINNER_ONE_HP) {
             return fixedPayout(betType);
         }
 
@@ -64,7 +62,7 @@ public class CombatReplaySideBetPayoutService {
         if (betType == CombatSideBetType.AFB_WHIFF) {
             Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
             if (probability == null) return fixedPayout(CombatSideBetType.AFB_WHIFF);
-            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
+            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(CombatSideBetType.AFB_WHIFF, probability);
         }
 
         Double probability = betType == CombatSideBetType.ROUND_ONE_SLAM
@@ -72,12 +70,11 @@ public class CombatReplaySideBetPayoutService {
                 : openingRoundProbabilityFromInitialSnapshot(candidate, targetFaction, false);
         if (probability == null) return fixedPayout(betType);
 
-        return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
+        return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
     }
 
-    public int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
-        Integer offeredProfitPoints = sideBet.getOfferedProfitPoints();
-        return offeredProfitPoints == null ? sideBet.getBetType().profitPoints() : offeredProfitPoints;
+    public static int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
+        return sideBet.getOfferedProfitPoints();
     }
 
     public boolean hasAfbUnits(CombatCandidateEntity candidate, String targetFaction) {
@@ -86,18 +83,50 @@ public class CombatReplaySideBetPayoutService {
                 && !collectAfbUnits(context.tile(), context.player()).isEmpty();
     }
 
-    private int fixedPayout(CombatSideBetType betType) {
+    private static int fixedPayout(CombatSideBetType betType) {
         return betType.profitPoints();
     }
 
-    private int dynamicPayout(double probability) {
-        if (probability >= 0.20) return 4;
-        if (probability >= 0.10) return 6;
-        if (probability >= 0.05) return 10;
-        if (probability >= 0.025) return 15;
-        if (probability >= 0.01) return 30;
-        if (probability >= 0.005) return 75;
-        return maxDynamicPayout();
+    private int dynamicPayout(CombatSideBetType betType, double probability) {
+        double adjustedProbability = Math.min(1.0, probability * selectionBiasMultiplier(betType));
+        for (PayoutTier tier : dynamicPayoutTiers()) {
+            if (adjustedProbability >= tier.minimumProbability()) {
+                return boundedDynamicPayout(betType, tier.payout());
+            }
+        }
+        return boundedDynamicPayout(betType, maxDynamicPayout());
+    }
+
+    private int boundedDynamicPayout(CombatSideBetType betType, int payout) {
+        int minimumPayout =
+                switch (betType) {
+                    case ROUND_ONE_WHIFF -> 20;
+                    default -> 1;
+                };
+        return Math.clamp(minimumPayout, payout, maxDynamicPayout());
+    }
+
+    private double selectionBiasMultiplier(CombatSideBetType betType) {
+        return switch (betType) {
+            case AFB_WHIFF -> settings.getSideBets().getAfbWhiffSelectionBias();
+            case ROUND_ONE_WHIFF -> settings.getSideBets().getRoundOneWhiffSelectionBias();
+            case ROUND_ONE_SLAM -> settings.getSideBets().getRoundOneSlamSelectionBias();
+            default -> 1.0;
+        };
+    }
+
+    private List<PayoutTier> dynamicPayoutTiers() {
+        List<PayoutTier> tiers = new ArrayList<>();
+        String configuredTiers = settings.getSideBets().getDynamicPayoutTiers();
+        for (String rawTier : configuredTiers.split(",")) {
+            String[] parts = rawTier.trim().split(":", 2);
+            if (parts.length != 2) {
+                throw new IllegalStateException("Invalid dynamic payout tier: " + rawTier);
+            }
+            tiers.add(new PayoutTier(Double.parseDouble(parts[0]), Integer.parseInt(parts[1])));
+        }
+        tiers.sort(Comparator.comparingDouble(PayoutTier::minimumProbability).reversed());
+        return tiers;
     }
 
     private int maxDynamicPayout() {
@@ -110,7 +139,9 @@ public class CombatReplaySideBetPayoutService {
         double x = Math.max(0.0, totalHp - 8.0) / 52.0;
         int profitPoints = (int) Math.round(3.0 + Math.pow(x, 1.35) * (64.0 + 8.0 * Math.sqrt(balance)));
         profitPoints = Math.max(3, profitPoints);
-        return Math.min(settings.getSideBets().getDynamicPayoutCap(), profitPoints * 2);
+        int tunedPayout =
+                (int) Math.round(profitPoints * 2 * settings.getSideBets().getWinnerOneHpPayoutMultiplier());
+        return Math.clamp(tunedPayout, 1, maxDynamicPayout());
     }
 
     private Double openingRoundSlamProbabilityFromInitialSnapshot(
@@ -267,7 +298,7 @@ public class CombatReplaySideBetPayoutService {
                 false);
     }
 
-    private Map<UnitModel, Integer> collectAfbUnits(Tile tile, Player player) {
+    private static Map<UnitModel, Integer> collectAfbUnits(Tile tile, Player player) {
         Map<String, Integer> unitsByAsyncId = new java.util.HashMap<>();
         String colorId = Mapper.getColorID(player.getColor());
         for (UnitHolder holder : tile.getUnitHolders().values()) {
@@ -406,7 +437,7 @@ public class CombatReplaySideBetPayoutService {
         return distribution;
     }
 
-    private Map<Integer, Double> addDice(Map<Integer, Double> distribution, int diceCount, double hitChance) {
+    private static Map<Integer, Double> addDice(Map<Integer, Double> distribution, int diceCount, double hitChance) {
         Map<Integer, Double> updated = distribution;
         for (int die = 0; die < diceCount; die++) {
             Map<Integer, Double> next = new java.util.HashMap<>();
@@ -450,8 +481,8 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private double hitChance(int effectiveThreshold) {
-        int boundedThreshold = Math.max(1, Math.min(11, effectiveThreshold));
-        return Math.max(0.0, Math.min(1.0, (11 - boundedThreshold) / 10.0));
+        int boundedThreshold = Math.clamp(effectiveThreshold, 1, 11);
+        return Math.clamp((11 - boundedThreshold) / 10.0, 0.0, 1.0);
     }
 
     private double hitChanceForRoll(Player player, Game game, CombatRollType rollType, int effectiveThreshold) {
@@ -463,7 +494,7 @@ public class CombatReplaySideBetPayoutService {
         return 1.0 - missChance * missChance;
     }
 
-    private boolean rerollsMisses(Player player, Game game) {
+    private static boolean rerollsMisses(Player player, Game game) {
         return game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
                 || player.hasTech("tf-tacticalbrilliance");
     }
@@ -475,4 +506,6 @@ public class CombatReplaySideBetPayoutService {
             Player player,
             Player opponent,
             LazaxCombatSupport.SpaceCombatSnapshot snapshot) {}
+
+    private record PayoutTier(double minimumProbability, int payout) {}
 }

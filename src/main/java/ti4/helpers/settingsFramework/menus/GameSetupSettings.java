@@ -96,7 +96,7 @@ public class GameSetupSettings extends SettingsMenu {
         // Load JSON if applicable
         if (json != null
                 && json.has("menuId")
-                && MENU_ID.equals(json.get("menuId").asText(""))) {
+                && MENU_ID.equals(json.get("menuId").asString(""))) {
             pointTotal.initialize(json.get("pointTotal"));
             stage1s.initialize(json.get("stage1s"));
             stage2s.initialize(json.get("stage2s"));

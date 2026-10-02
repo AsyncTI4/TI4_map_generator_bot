@@ -15,18 +15,28 @@ public class ObjectiveHelper {
     public void secondHalfOfPeakStage1(Game game, Player player, int loc) {
         String obj = game.peekAtStage1(loc, player);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-        MessageEmbed embed = po.getRepresentationEmbed();
-        String msg = player.getRepresentationUnfogged() + ", stage 1 public objective at location " + loc + ":";
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), msg, embed);
+        if (po != null) {
+            MessageEmbed embed = po.getRepresentationEmbed();
+            String msg = player.getRepresentationUnfogged() + ", stage 1 public objective at location " + loc + ":";
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), msg, embed);
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find the objective at that location.");
+        }
         report(game, player, "Stage 1", loc);
     }
 
     public void secondHalfOfPeakStage2(Game game, Player player, int loc) {
         String obj = game.peekAtStage2(loc, player);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-        MessageEmbed embed = po.getRepresentationEmbed();
-        String msg = player.getRepresentationUnfogged() + ", stage 2 public objective at location " + loc + ":";
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), msg, embed);
+        if (po != null) {
+            MessageEmbed embed = po.getRepresentationEmbed();
+            String msg = player.getRepresentationUnfogged() + ", stage 2 public objective at location " + loc + ":";
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), msg, embed);
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find the objective at that location.");
+        }
         report(game, player, "Stage 2", loc);
     }
 

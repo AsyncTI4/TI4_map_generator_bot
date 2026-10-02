@@ -3,18 +3,28 @@ package ti4.service.game;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.StatusHelper;
+import ti4.service.fow.LoreService;
 
 @UtilityClass
 public class EndPhaseService {
     public static void EndActionPhase(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        StatusHelper.AnnounceStatusPhase(game);
+        LoreService.showPhaseLore(game, "status"); // before StatusHelper mutates phaseOfGame: END lore reads "action"
+        for (Player player : game.getRealPlayers()) {
+            AeternaLeadersHandler.clearAeternaCommanderActionState(game, player);
+            AeternaUnitsHandler.clearCryptActionState(game, player);
+            AeternaUnitsHandler.clearGraveyardActionState(game, player);
+        }
+        StatusHelper.announceStatusPhase(game);
         if (!game.isOmegaPhaseMode()) {
             StatusHelper.beginScoring(event, game, gameChannel);
         } else {
             StartPhaseService.startStatusHomework(event, game);
         }
-        StatusHelper.HandleStatusPhaseMiddle(event, game, gameChannel);
+        StatusHelper.handleStatusPhaseMiddle(game);
     }
 }

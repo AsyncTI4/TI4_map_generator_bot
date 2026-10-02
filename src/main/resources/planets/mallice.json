@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mallice",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 236,
+            "y": 156
+        }
+    },
     "id": "mallice",
     "tileId": "82b",
     "name": "Mallice",

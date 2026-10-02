@@ -1,0 +1,152 @@
+package ti4.spring.service.statistics.matchmaking.queue;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
+import ti4.spring.context.SpringContext;
+
+@Service
+@AllArgsConstructor
+public class PlayerSearchService {
+
+    private final MatchmakingQueueStore queueStore;
+
+    public static PlayerSearchService get() {
+        return SpringContext.getBean(PlayerSearchService.class);
+    }
+
+    public List<String> searchAndAdd(
+            PlayerSearchCriteria criteria,
+            List<String> existingMemberIds,
+            Set<String> exemptUserIds,
+            Duration hostWait) {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+
+        int targetSize = criteria.maxPlayerCount();
+        int openSlots = targetSize - existingMemberIds.size();
+        if (openSlots <= 0) return List.of();
+
+        MatchmakingQueueLock.LOCK.lock();
+        try {
+            return searchAndAddLocked(criteria, existingMemberIds, exemptUserIds, hostWait, targetSize, openSlots);
+        } finally {
+            MatchmakingQueueLock.LOCK.unlock();
+        }
+    }
+
+    private List<String> searchAndAddLocked(
+            PlayerSearchCriteria criteria,
+            List<String> existingMemberIds,
+            Set<String> exemptUserIds,
+            Duration hostWait,
+            int targetSize,
+            int openSlots) {
+        List<QueuedParty> queued = new ArrayList<>(queueStore.loadQueuedParties());
+        queued.sort(Comparator.comparing(party -> party.party().getQueuedAt()));
+
+        Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData =
+                PlayerMatchmakingDataFactory.buildForParties(queued);
+        List<String> criteriaMemberIds = existingMemberIds.stream()
+                .filter(id -> !exemptUserIds.contains(id))
+                .toList();
+        List<String> exemptMemberIds =
+                existingMemberIds.stream().filter(exemptUserIds::contains).toList();
+        Map<String, PlayerMatchmakingData> hostData = PlayerMatchmakingDataFactory.buildForUsers(
+                criteriaMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks(), hostWait);
+
+        Set<String> takenUserIds = new HashSet<>(existingMemberIds);
+        List<PlayerMatchmakingData> selectedGroup = new ArrayList<>(hostData.values());
+        Set<String> commonTiglRanks = criteria.tigl() ? new HashSet<>(criteria.tiglRanks()) : Set.of();
+
+        List<String> addedUserIds = new ArrayList<>();
+        List<Long> partiesToRemove = new ArrayList<>();
+
+        for (QueuedParty party : queued) {
+            if (addedUserIds.size() >= openSlots) break;
+            if (party.size() > openSlots - addedUserIds.size()) continue;
+            if (party.members().stream().anyMatch(member -> takenUserIds.contains(member.getUserId()))) continue;
+            if (!doesConfigMatch(criteria, party, targetSize)) continue;
+
+            Set<String> partyRanks = partyRanks(party, partyData);
+            Set<String> narrowedRanks = null;
+            if (criteria.tigl()) {
+                narrowedRanks = new HashSet<>(commonTiglRanks);
+                narrowedRanks.retainAll(partyRanks);
+                if (narrowedRanks.isEmpty()) continue;
+            }
+
+            if (!isPartyCompatible(party, partyData, selectedGroup)) continue;
+            if (avoidsAnExemptMember(party, partyData, exemptMemberIds)) continue;
+
+            for (MatchmakingQueueMember member : party.members()) {
+                selectedGroup.add(partyData.get(member));
+                takenUserIds.add(member.getUserId());
+                addedUserIds.add(member.getUserId());
+            }
+            partiesToRemove.add(party.party().getId());
+            if (narrowedRanks != null) commonTiglRanks = narrowedRanks;
+        }
+
+        queueStore.deleteParties(partiesToRemove);
+        return addedUserIds;
+    }
+
+    private static boolean isPartyCompatible(
+            QueuedParty party,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData,
+            List<PlayerMatchmakingData> selectedGroup) {
+        for (MatchmakingQueueMember member : party.members()) {
+            PlayerMatchmakingData candidate = partyData.get(member);
+            for (PlayerMatchmakingData existing : selectedGroup) {
+                if (MatchmakingCompatibilityService.areIncompatible(existing, candidate)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean avoidsAnExemptMember(
+            QueuedParty party,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData,
+            List<String> exemptMemberIds) {
+        for (String exemptId : exemptMemberIds) {
+            List<String> exemptAvoids = UserSettingsManager.get(exemptId).getMatchmakingAvoidList();
+            for (MatchmakingQueueMember member : party.members()) {
+                PlayerMatchmakingData candidate = partyData.get(member);
+                if (exemptAvoids.contains(member.getUserId())
+                        || (candidate != null && candidate.avoidList().contains(exemptId))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean doesConfigMatch(PlayerSearchCriteria criteria, QueuedParty party, int targetSize) {
+        UserSettings settings = party.leaderSettings();
+        if (party.size() > targetSize) return false;
+        if (!settings.getMatchmakingPlayerCounts().contains(String.valueOf(targetSize))) return false;
+        if (Collections.disjoint(criteria.expansions(), settings.getMatchmakingExpansions())) return false;
+        if (Collections.disjoint(criteria.victoryPointGoals(), settings.getMatchmakingVictoryPointGoals())) {
+            return false;
+        }
+        return !Collections.disjoint(criteria.paces(), settings.getMatchmakingPaces());
+    }
+
+    private static Set<String> partyRanks(
+            QueuedParty party, Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData) {
+        PlayerMatchmakingData data = partyData.get(party.members().getFirst());
+        return data == null ? Set.of() : new HashSet<>(data.tiglRanks());
+    }
+}

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ylirk",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 81
+        }
+    },
     "id": "ylirk",
     "tileId": "93new",
     "name": "Ylir Keleres",

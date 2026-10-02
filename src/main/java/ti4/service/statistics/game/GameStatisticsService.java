@@ -41,9 +41,9 @@ public class GameStatisticsService {
                 case FACTION_PERFORMANCE -> FactionPerformanceStatisticsService.showFactionPerformance(event);
                 case COLOUR_WINS -> MostWinningColorStatisticsService.showMostWinningColor(event);
                 case GAME_COUNT -> GameCountStatisticsService.getGameCount(event);
+                case AVERAGE_MMR -> AverageGameMmrStatisticsService.showAverageGameMmr(event);
                 case GAME_MODE_COUNT -> GameModeStatisticsService.showModeCounts(event);
                 case WINNING_PATH -> WinningPathsStatisticsService.showWinningPaths(event);
-                case SUPPORT_WIN_COUNT -> WinningPathsStatisticsService.showWinsWithSupport(event);
                 case SECRET_OBJECTIVE_WIN_CHANCE ->
                     SecretObjectiveWinChanceStatisticsService.showSecretObjectiveWinChance(event);
                 case ENDING_ROUND_PHASE -> EndingRoundPhaseStatisticsService.showEndingRoundPhaseStatistics(event);

@@ -27,7 +27,7 @@ public class PreviewMapTemplate extends Subcommand {
         postMapTemplate(event, mapTemplate, game);
     }
 
-    private void postMapTemplate(GenericInteractionCreateEvent event, String mapTemplate, Game game) {
+    private static void postMapTemplate(GenericInteractionCreateEvent event, String mapTemplate, Game game) {
         if (!Mapper.isValidMapTemplate(mapTemplate)) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid map template: " + mapTemplate);
         }

@@ -62,7 +62,7 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
 
     public String complexityImagePath() {
         String basepath = Storage.getResourcePath() + "/extra/complexity";
-        int complexity = Math.max(Math.min(getComplexity(), 3), 1);
+        int complexity = Math.clamp(getComplexity(), 1, 3);
         return basepath + complexity + ".png";
     }
 

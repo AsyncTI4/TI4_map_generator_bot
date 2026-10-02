@@ -144,12 +144,14 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "edict",
+        "undraftable": true,
         "alternateText": "When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
         "source": "pok"
     },
     {
         "itemCategory": "ABILITY",
         "itemId": "imperia",
+        "undraftable": true,
         "alternateText": "[Franken only] When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool do not increase your fleet limit and cannot be redistributed. While another player's command token is on your command sheet, you can use the ability of that player's commander, if it is unlocked.",
         "source": "pok"
     },
@@ -158,6 +160,68 @@
         "itemId": "hubris",
         "undraftable": true,
         "source": "pok"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "mahactcommander",
+        "undraftable": true,
+        "source": "pok"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "mahact_mech",
+        "undraftable": true,
+        "source": "pok"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "primacy",
+        "undraftable": true,
+        "source": "franken"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "edict_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
+        "source": "franken"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "imperia_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
+        "source": "franken"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "mahactcommander_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
+        "source": "franken"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "mahact_mech_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "optionalSwaps": [
+            "MONUMENT:mahact_monument"
+        ],
+        "source": "franken"
     },
     {
         "itemCategory": "ABILITY",
@@ -306,6 +370,14 @@
     },
     {
         "itemCategory": "BREAKTHROUGH",
+        "itemId": "sardakkbt",
+        "additionalComponents": [
+            "STARTINGTECH:sardakk"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
         "itemId": "titansbt",
         "undraftable": true,
         "source": "thunders_edge"
@@ -318,7 +390,8 @@
             "ABILITY:coalescence"
         ],
         "optionalSwaps": [
-            "BREAKTHROUGH:titansbt"
+            "BREAKTHROUGH:titansbt",
+            "MONUMENT:titans_monument"
         ],
         "source": "pok"
     },
@@ -359,7 +432,8 @@
             "ABILITY:devour"
         ],
         "optionalSwaps": [
-            "HERO:cabalhero"
+            "HERO:cabalhero",
+            "MONUMENT:cabal_monument"
         ],
         "source": "pok"
     },
@@ -371,7 +445,8 @@
         ],
         "optionalSwaps": [
             "TECH:vtx",
-            "AGENT:cabalagent"
+            "AGENT:cabalagent",
+            "MONUMENT:cabal_monument"
         ],
         "alternateText": "[Franken only] When you research a unit upgrade technology, you may return 1 captured unit of that type to ignore all of the technology's prerequisites. If you do not have the Amalgamation ability, you may only have one captured unit of each non-fighter ship type in your play area.",
         "source": "pok"
@@ -457,7 +532,7 @@
     {
         "itemCategory": "FLAGSHIP",
         "itemId": "nomad_flagship",
-        "optionalSwaps": [
+        "additionalComponents": [
             "TECH:m2"
         ],
         "source": "pok"

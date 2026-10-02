@@ -43,7 +43,7 @@ class ReloadCorruptedSaves extends Subcommand {
                         + "\nFailed to reload: " + failedReloadedGames);
     }
 
-    private boolean tryReload(String name) {
+    private static boolean tryReload(String name) {
         Game reloadedGame = null;
         try {
             reloadedGame = GameManager.reload(name);

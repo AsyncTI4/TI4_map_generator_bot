@@ -14,6 +14,7 @@ public class CustomCommand implements ParentCommand {
                     new SoAddToGame(),
                     new AgendaRemoveFromGame(),
                     new ACRemoveFromGame(),
+                    new RelicRemoveFromGame(),
                     new SCAddToGame(),
                     new SCRemoveFromGame(),
                     new PoRemoveFromGame(),

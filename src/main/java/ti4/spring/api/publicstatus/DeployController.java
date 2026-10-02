@@ -34,7 +34,7 @@ public class DeployController {
         return ResponseEntity.accepted().body(Map.of("accepted", true));
     }
 
-    private boolean isLoopback(String remoteAddr) {
+    private static boolean isLoopback(String remoteAddr) {
         return "127.0.0.1".equals(remoteAddr) || "0:0:0:0:0:0:0:1".equals(remoteAddr) || "::1".equals(remoteAddr);
     }
 }

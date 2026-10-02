@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kelgate",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "kelgate",
     "tileId": "er83",
     "name": "Kelgate",

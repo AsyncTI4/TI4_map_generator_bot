@@ -31,6 +31,7 @@ public class HomebrewService {
         HBABSOLRELICSAGENDAS("Absol Relics/Agendas", "Use Absol Relics and Agendas", SourceEmojis.Absol),
         HBABSOLTECHSMECHS("Absol Techs/Mechs", "Use Absol Techs and Mechs", SourceEmojis.Absol),
         HBDSFACTIONS("DS Factions", "Discordant Stars Factions", SourceEmojis.DiscordantStars),
+        HBBRFACTIONS("BR Factions", "Blue Reverie Factions", SourceEmojis.DiscordantStars),
         HBDSEXPLORES(
                 "US Explores/Relics/ACs",
                 "Uncharted Space Explores, Relics and Action Cards",
@@ -38,14 +39,18 @@ public class HomebrewService {
         HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
         HBREDTAPE("Red Tape", "Red Tape mode", null),
         HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null),
+        HBMONUMENTS(
+                "Monuments+",
+                "Faction monuments plus Monuments action cards, agendas, secret objectives, and strategy cards",
+                SourceEmojis.Monuments),
         HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null),
         HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank),
         HBOMEGAPHASE("Omega Phase", "Enable Omega Phase homebrew mode", null),
         HBVOTC("Voices of the Council", "Voices of the Council mode", null);
 
-        final String name;
-        final String description;
-        final TI4Emoji emoji;
+        public final String name;
+        public final String description;
+        public final TI4Emoji emoji;
 
         Homebrew(String name, String description, TI4Emoji emoji) {
             this.name = name;
@@ -54,7 +59,7 @@ public class HomebrewService {
         }
     }
 
-    @ButtonHandler("offerGameHomebrewButtons")
+    @ButtonHandler(value = "offerGameHomebrewButtons", save = false)
     public static void offerGameHomebrewButtons(MessageChannel channel) {
         List<Button> homebrewButtons = new ArrayList<>();
         homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes Homebrew"));
@@ -66,7 +71,7 @@ public class HomebrewService {
                 homebrewButtons);
     }
 
-    @ButtonHandler("getHomebrewButtons")
+    @ButtonHandler(value = "getHomebrewButtons", save = false)
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
 
@@ -82,7 +87,7 @@ public class HomebrewService {
         buttons.add(Buttons.red("setupHomebrewNone", "Remove All Homebrews"));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-        ButtonHelper.deleteMessage(event);
+        // ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), buttons);
     }
 
@@ -91,9 +96,12 @@ public class HomebrewService {
         game.setHomebrewSCMode(false);
         game.setRedTapeMode(false);
         game.setDiscordantStarsMode(false);
+        game.setBlueReverieMode(false);
+        game.setUnchartedSpaceStuff(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
         game.setVotcMode(false);
+        game.setMonumentsMode(false);
         game.setStoredValue("homebrewMode", "");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -103,9 +111,17 @@ public class HomebrewService {
     @ButtonHandler("setupHomebrew_")
     public static void setUpHomebrew(Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        game.setHomebrew(true);
-
         Homebrew type = Homebrew.valueOf(buttonID.split("_")[1]);
+        applyHomebrew(game, event, type);
+    }
+
+    /**
+     * Core per-homebrew apply logic, split out so callers that manage their own message/button
+     * lifecycle (e.g. the FoW setup wizard's toggle buttons) can reuse it without triggering this
+     * button's own delete-the-clicked-button side effect.
+     */
+    public static void applyHomebrew(Game game, ButtonInteractionEvent event, Homebrew type) {
+        game.setHomebrew(true);
         switch (type) {
             case HB444 -> {
                 game.setMaxSOCountPerPlayer(4);
@@ -132,7 +148,7 @@ public class HomebrewService {
             case HBABSOLRELICSAGENDAS -> {
                 game.setAbsolMode(true);
                 game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
-                if (game.isDiscordantStarsMode() && game.getRelicDeckID().contains("ds")) {
+                if (game.isUnchartedSpaceStuff() && game.getRelicDeckID().contains("ds")) {
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
                 } else {
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
@@ -150,9 +166,16 @@ public class HomebrewService {
                         event.getMessageChannel(),
                         "Set the stuff (Relic, Agenda, SCs, Tech, Event) to Ignis Aurora stuff");
             }
+            case HBMONUMENTS -> {
+                game.setMonumentsMode(true);
+                MonumentsService.applyMonuments(game);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Added Monuments+ cards and strategy cards. Each player will receive their faction monument during setup.");
+            }
             case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);
-                if (game.isDiscordantStarsMode()) {
+                if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
                     game.setTechnologyDeckID("techs_ds_absol");
                 } else {
                     game.setTechnologyDeckID("techs_absol");
@@ -162,7 +185,6 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the techs & mechs to Absol stuff.");
             }
             case HBDSEXPLORES -> {
-                game.setDiscordantStarsMode(true);
                 game.setUnchartedSpaceStuff(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
@@ -179,7 +201,7 @@ public class HomebrewService {
                     game.setTechnologyDeckID("techs_ds");
                 }
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Set the explores/action cards/relics to Discordant Stars stuff.");
+                        event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
             }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";
@@ -200,6 +222,10 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Set game to Discordant Stars mode. Only includes factions and planets unless you also click/clicked the Discordant Stars Explores button.");
+            }
+            case HBBRFACTIONS -> {
+                game.setBlueReverieMode(true);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Blue Reverie faction mode.");
             }
             case HBHBSC -> {
                 game.setHomebrewSCMode(true);

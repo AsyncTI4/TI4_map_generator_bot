@@ -23,7 +23,7 @@ import ti4.service.regex.RegexService;
 @UtilityClass
 class MiltyDraftButtonHandlers {
 
-    @ButtonHandler("showMiltyDraft")
+    @ButtonHandler(value = "showMiltyDraft", save = false)
     private void postDraftInfo(ButtonInteractionEvent event, Game game) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MiltyDraftDisplayService.repostDraftInformation(manager, game);
@@ -97,8 +97,13 @@ class MiltyDraftButtonHandlers {
     private void queueMiltyDraftPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         ButtonHelper.deleteMessage(event);
-        if (manager.getCurrentDraftPlayer(game) == null
-                && manager.getCurrentDraftPlayer(game).equals(player)) {
+        Player currentDraftPlayer = manager.getCurrentDraftPlayer(game);
+        if (currentDraftPlayer == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No one is currently up to draft, so queueing a pick is not available.");
+            return;
+        }
+        if (currentDraftPlayer.equals(player)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You are up to draft and you should just do that instead of queueing.");
             return;
@@ -120,7 +125,7 @@ class MiltyDraftButtonHandlers {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    @ButtonHandler("miltyFactionInfo_")
+    @ButtonHandler(value = "miltyFactionInfo_", save = false)
     private void sendAvailableFactionInfo(Game game, Player player, String buttonID) {
         if (player == null) return;
         String whichOnes = buttonID.replace("miltyFactionInfo_", "");

@@ -3,6 +3,7 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -10,17 +11,31 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
@@ -31,7 +46,11 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.planet.AsgardLegendaryService;
+import ti4.service.planet.JotunheimLegendaryService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class EndTurnService {
@@ -53,6 +72,18 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
+        if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
+                && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
+                        .isEmpty()) {
+            ButtonHelperTacticalAction.logTacticalAction(game, player);
+        }
+        game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
+        LostLegciesExploreHandler.resolveBattleworldEndOfTurn(event, game, player);
+        for (Tile tile : game.getTileMap().values()) {
+            TeHelperGeneral.addStationsToPlayArea(event, game, tile);
+        }
+        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", false));
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
@@ -69,8 +100,15 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
+        AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);
+        AeternaLeadersHandler.clearAeternaCommanderActionState(game);
+        AeternaUnitsHandler.clearCryptActionState(game);
+        AeternaUnitsHandler.clearGraveyardActionState(game);
+        RevenantLeadersHandler.clearPurpleLeaderActionState(game);
+        MonumentsDSButtonHandler.clearForbiddenLibraryActionState(game, player);
+        MonumentsDSButtonHandler.clearMirrorforgeActionState(game, player);
         if (player.hasAbility("phantom_energy")) {
-            PhantomEnergyHandler.cleanupEndOfTurn(game, player);
+            TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
         game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");
@@ -81,12 +119,35 @@ public class EndTurnService {
         TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
+        AsgardLegendaryService.clearBifrostBridge(game, player);
+        JotunheimLegendaryService.clear(game, player);
+        game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
+        FracturedRealityAcd2ButtonHandler.clearPendingRolls(game);
+        game.removeStoredValue(LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction());
+        String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
+        if (!fieldTestTech.isEmpty()) {
+            player.removeTech(fieldTestTech);
+            game.removeStoredValue("fieldTestTech" + player.getFaction());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " lost temporary access to their _Field Test_ technology at the end of their turn.");
+        }
+        String proxyTech = game.getStoredValue("netrunnersProxyTech" + player.getFaction());
+        if (!proxyTech.isEmpty()) {
+            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " lost temporary access to their **Proxy Network** copied technology.");
+        }
         game.setActiveSystem("");
     }
 
     public static void pingNextPlayer(
             GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+        MonumentsButtonHandler.offerFireflyReplacement(game, mainPlayer);
         resetStoredValuesEndOfTurn(game, mainPlayer);
 
         var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
@@ -99,6 +160,12 @@ public class EndTurnService {
             buttons.add(Buttons.green("sandbagPref_bot", "Allow the bot"));
             buttons.add(Buttons.red("sandbagPref_manual", "Always manual"));
             MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(), msg, buttons);
+        }
+
+        if (mainPlayer.hasTech("tf-treasurehunters")) {
+            game.shuffleExplores();
+            MessageHelper.sendMessageToChannel(
+                    mainPlayer.getCorrectChannel(), "Shuffled the explore decks due to the treasure hunter ability");
         }
 
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
@@ -149,6 +216,23 @@ public class EndTurnService {
                 Leader hero =
                         ralnel == null ? null : ralnel.getLeader("ralnelhero").orElse(null);
                 if (hero != null) PlayHeroService.playHero(event, game, ralnel, hero);
+            }
+        }
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed) && game.isMuaatManiaMode()) {
+            for (Player player : game.getRealPlayers()) {
+                if (player.getPlanets().contains("styx")) {
+                    if (game.getStoredValue("styxHolderMM").contains(player.getFaction())) {
+                        Integer poIndex = game.addCustomPO("Styx Win", 20);
+                        game.scorePublicObjective(player.getUserID(), poIndex);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " won by holding styx for a round.");
+                        Helper.checkEndGame(game, mainPlayer);
+                        return;
+                    } else {
+                        game.setStoredValue("styxHolderMM", player.getFaction());
+                    }
+                }
             }
         }
 

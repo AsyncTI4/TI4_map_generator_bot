@@ -1,0 +1,28 @@
+[
+    {
+        "alias": "parasite-firm_y",
+        "name": "Neural Parasite Y (Firmament)",
+        "shortName": "Neural\nParasite Y",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "firmament",
+        "source": "franken",
+        "text": "At the start of the status phase, you may place 4 infantry from your reinforcements on a planet you control in your home system.\nFlip this card if the Obsidian faction is in play.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/parasite-firm.jpg?raw=true"
+    },
+    {
+        "alias": "parasite-obs_y",
+        "name": "Neural Parasite Y (Obsidian)",
+        "shortName": "Neural\nParasite Y",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "null",
+        "faction": "obsidian",
+        "source": "franken",
+        "text": "At the start of the status phase, destroy 1 of another player's units on a planet they control in or adjacent to a system that contains your infantry.\nThis technology cannot be researched.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/parasite-obs.jpg?raw=true"
+    }
+]

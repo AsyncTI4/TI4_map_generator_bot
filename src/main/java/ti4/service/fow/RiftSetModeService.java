@@ -241,7 +241,7 @@ public final class RiftSetModeService {
         buttons.add(Buttons.gray("riftsetshowcaptured", "Show captured units", SourceEmojis.Eronous));
     }
 
-    @ButtonHandler("riftsetshowcaptured")
+    @ButtonHandler(value = "riftsetshowcaptured", save = false)
     public static void showCapturedUnits(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         if (!isActive(game)) return;
 
@@ -406,7 +406,7 @@ public final class RiftSetModeService {
                 "# All " + MiscEmojis.GravityRift + " tremble violently!\n" + "## Ships nearby shake as a terrifying "
                         + MiscEmojis.GravityRift + " force builds — danger is imminent.");
         return game.getTileMap().values().stream()
-                .filter(tile -> tile.isGravityRift(game))
+                .filter(tile -> tile.isGravityRift(game, null))
                 .collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package ti4.service.combat;
 
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
@@ -44,6 +45,14 @@ public class CombatStatsService {
         int extraDice = 0;
         if (isEidolonLandwasterMech(unitModel, player)) extraDice++;
         if (isEchoOfAscensionFlagship(unitModel, player)) extraDice++;
+        if (isReliquaryEternalFlagship(unitModel)) {
+            extraDice += (int) player.getLeaders().stream()
+                    .filter(leader -> !leader.isLocked() && !leader.isExhausted())
+                    .map(Leader::getType)
+                    .filter(type -> type != null && !type.isBlank())
+                    .distinct()
+                    .count();
+        }
         numRollsPerUnit += extraDice;
         if (includeDisplayOnlyScaling && isBaseWinnuFlagship(unitModel) && numRollsPerUnit <= 0) {
             if (opponent != null) {
@@ -59,16 +68,24 @@ public class CombatStatsService {
         return new EffectiveCombatStats(numRollsPerUnit, toHit);
     }
 
+    private static boolean isReliquaryEternalFlagship(UnitModel unitModel) {
+        return "revenant_flagship".equals(unitModel.getId());
+    }
+
     private static boolean isEchoOfAscensionFlagship(UnitModel unitModel, Player player) {
         return unitModel.getUnitType() == UnitType.Flagship && player.ownsUnit("tf-echoofascension");
     }
 
     private static boolean isEidolonLandwasterMech(UnitModel unitModel, Player player) {
-        return unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonlandwaster");
+        return player.ownsUnit("tf-eidolonlandwaster")
+                && (unitModel.getUnitType() == UnitType.Mech
+                        || (player.getGame().isMonumentsMode() && "pinktf_monument".equals(unitModel.getId())));
     }
 
     private static boolean isEidolonTerminusMech(UnitModel unitModel, Player player) {
-        return unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonterminus");
+        return player.ownsUnit("tf-eidolonterminus")
+                && (unitModel.getUnitType() == UnitType.Mech
+                        || (player.getGame().isMonumentsMode() && "pinktf_monument".equals(unitModel.getId())));
     }
 
     private static boolean isBaseWinnuFlagship(UnitModel unitModel) {

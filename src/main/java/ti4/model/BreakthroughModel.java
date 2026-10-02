@@ -50,13 +50,13 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public TechnologyType getFirstSynergy() {
         if (synergy == null || synergy.isEmpty()) return TechnologyType.NONE;
-        return synergy.getFirst();
+        return Optional.ofNullable(synergy.getFirst()).orElse(TechnologyType.NONE);
     }
 
     @JsonIgnore
     public TechnologyType getSecondSynergy() {
         if (synergy == null || synergy.size() < 2) return TechnologyType.NONE;
-        return synergy.get(1);
+        return Optional.ofNullable(synergy.get(1)).orElse(TechnologyType.NONE);
     }
 
     public String getNameRepresentation() {
@@ -155,7 +155,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getSynergyEmojis() {
-        if (synergy.size() == 2) {
+        if (synergy != null && synergy.size() == 2) {
             return switch (getFirstSynergy()) {
                 case PROPULSION ->
                     TechEmojis.SynergyPropulsionLeft.toString()

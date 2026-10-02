@@ -14,6 +14,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.emoji.ColorEmojis;
@@ -22,6 +23,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class PlayerStatsService {
@@ -164,6 +167,7 @@ public class PlayerStatsService {
         }
 
         player.addSC(scNumber);
+        GameEventService.commit(game, GameEventType.SC_PICKED, player, Map.of("scNumber", scNumber));
         if (game.isFowMode()) {
             String messageToSend =
                     ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber) + ".";
@@ -193,12 +197,12 @@ public class PlayerStatsService {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                    player.getRepresentation() + " gained " + StringHelper.pluralize(tgCount, "trade good")
                             + " from picking **" + game.getSCName(scNumber) + "**.");
             if (game.isFowMode()) {
-                String messageToSend =
-                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
-                                + (tgCount == 1 ? "" : "s") + " from picking **" + game.getSCName(scNumber) + "**.";
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained "
+                        + StringHelper.pluralize(tgCount, "trade good") + " from picking **" + game.getSCName(scNumber)
+                        + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

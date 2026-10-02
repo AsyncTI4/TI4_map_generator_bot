@@ -9,6 +9,14 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyAppropriationsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -17,7 +25,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -48,6 +58,7 @@ class SpendingButtonHandler {
         Leader playerLeader = player.getLeader("keleresagent").orElse(null);
         if (playerLeader != null && !playerLeader.isExhausted()) {
             playerLeader.setExhausted(true);
+            RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, player, playerLeader);
             String messageText =
                     player.getRepresentation() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
@@ -66,8 +77,7 @@ class SpendingButtonHandler {
             whatIsItFor = buttonID.split("_")[2];
         }
         if (tgLoss > player.getTg()) {
-            String message =
-                    "You don't have " + tgLoss + " trade good" + (tgLoss == 1 ? "" : "s") + ". No change made.";
+            String message = "You don't have " + StringHelper.pluralize(tgLoss, "trade good") + ". No change made.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         } else {
             player.setTg(player.getTg() - tgLoss);
@@ -99,6 +109,10 @@ class SpendingButtonHandler {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
+            if (uH.getTokenList().contains("attachment_polymorphism.png")
+                    && FoWHelper.playerHasShipsInSystem(player, game.getTileFromPlanet(planetName))) {
+                LostLegciesExploreHandler.offerPolymorphism(event, game, player, planetName);
+            }
             if (uH.getTokenList().contains("attachment_facilitylogisticshub.png")) {
                 String msg = player.getRepresentation() + " gained 1 commodity due to exhausting "
                         + Helper.getPlanetRepresentation(planetName, game)
@@ -112,8 +126,7 @@ class SpendingButtonHandler {
                 String msg =
                         player.getRepresentation() + " gained 1 trade good on the _Research Lab_ due to exhausting "
                                 + Helper.getPlanetRepresentation(planetName, game)
-                                + ". It now has " + amountThereNow
-                                + " trade good" + (amountThereNow == 1 ? "" : "s") + " on it.";
+                                + ". It now has " + StringHelper.pluralize(amountThereNow, "trade good") + " on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -155,6 +168,10 @@ class SpendingButtonHandler {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
+                    if ("spendBlacktfCapturedInfantry".equals(butt.getCustomId())
+                            && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
+                        continue;
+                    }
                     if (!Helper.doesListContainButtonID(buttons, butt.getCustomId())) {
                         buttons.add(butt);
                     }
@@ -171,6 +188,10 @@ class SpendingButtonHandler {
     @ButtonHandler("resetSpend")
     public static void resetSpend(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Helper.refreshPlanetsOnTheRevote(player, game);
+        EmergencyAppropriationsLLButtonHandler.clear(game, player);
+        PriorityRequisitionLLButtonHandler.clear(game, player);
+        SharedResourcesLLButtonHandler.clear(game, player);
+        WildlifePreservationLLButtonHandler.clear(game, player);
         String whatIsItFor = "both";
         if (buttonID.split("_").length > 2) {
             whatIsItFor = buttonID.split("_")[2];
@@ -181,6 +202,10 @@ class SpendingButtonHandler {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
             for (ActionRowChildComponentUnion but : buttonRow) {
                 if (but instanceof Button butt) {
+                    if ("spendBlacktfCapturedInfantry".equals(butt.getCustomId())
+                            && !TwilightsFallMonumentsButtonHandler.canSpendBlacktfCapturedInfantry(game, player)) {
+                        continue;
+                    }
                     if (!buttons.contains(butt)) {
                         buttons.add(butt);
                     }
@@ -197,6 +222,8 @@ class SpendingButtonHandler {
     @ButtonHandler("resetProducedThings")
     public static void resetProducedThings(ButtonInteractionEvent event, Player player, Game game) {
         Helper.resetProducedUnits(player, game, event);
+        ThronesThroneHandler.clearSkarnathDiscount(game, player);
+        PriorityRequisitionLLButtonHandler.clear(game, player);
         event.getMessage()
                 .editMessage(Helper.buildProducedUnitsMessage(player, game))
                 .queue(Consumers.nop(), BotLogger::catchRestError);

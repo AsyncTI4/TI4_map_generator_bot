@@ -25,22 +25,23 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.utility.ContainerHelper;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
-import ti4.draft.items.AgentDraftItem;
-import ti4.draft.items.HeroDraftItem;
+import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.discord.ContainerHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
-import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -53,6 +54,7 @@ import ti4.service.game.SetOrderService;
 public class FrankenDraftBagService {
 
     public static final String ACTION_NAME = "frankenDraftAction;";
+    private static final int FACTIONS_PER_CONTAINER = 7;
 
     public static List<Color> getAccents() {
         return new ArrayList<>(List.of(
@@ -77,6 +79,7 @@ public class FrankenDraftBagService {
             DraftCategory.PN,
             DraftCategory.STARTINGTECH,
             DraftCategory.UNIT,
+            DraftCategory.MONUMENT,
             DraftCategory.MAHACTKING);
 
     public static final List<DraftCategory> TFcomponentCategories = List.of(
@@ -108,15 +111,26 @@ public class FrankenDraftBagService {
         }
 
         List<Color> accents = getAccents();
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getRealPlayers()) {
+            ThreadChannel cardsInfoThread = player.getCardsInfoThread();
+            if (cardsInfoThread == null) {
+                BotLogger.warning("Cannot apply Franken draft bag for " + player.getUserName() + " in game "
+                        + game.getName() + " because their cards info thread is null.");
+                continue;
+            }
+
             player.setStoredValue("frankenBuilt", "n");
-            for (DraftCategory category : componentCategories) {
-                MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
-                Container c = postDraftCategoryContainer(player, category);
-                if (c == null) continue;
-                builder.append(c.withAccentColor(accents.getFirst()));
-                Collections.rotate(accents, -1);
-                builder.send();
+            if (game.getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+                frankenDrazDraft.sendPostDraftComponentButtons(player);
+            } else {
+                for (DraftCategory category : componentCategories) {
+                    Container c = postDraftCategoryContainer(player, category);
+                    if (c == null) continue;
+                    MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
+                    builder.append(c.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                    builder.send();
+                }
             }
 
             if (game.isTwilightsFallMode()) {
@@ -129,14 +143,14 @@ public class FrankenDraftBagService {
                 String msg = player.getRepresentation()
                         + ", you should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted."
                         + " Instead of keeping one (or two) of those, you may use these buttons to take one (or two) of these generic technologies.";
-                MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), msg, embeds);
+                MessageHelper.sendMessageToChannelWithEmbeds(cardsInfoThread, msg, embeds);
                 buttons.add(Buttons.green("getTech_wavelength__noPay__comp", "Select Wavelength"));
                 buttons.add(Buttons.green("getTech_antimatter__noPay__comp", "Select Antimatter"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
+                MessageHelper.sendMessageToChannel(cardsInfoThread, "Get Technology", buttons);
+                MessageHelper.sendMessageToChannel(cardsInfoThread, "Get Technology", buttons);
             }
 
-            MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
+            MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
             builder.append(getFrankenPlayerSummaryContainer(player));
             builder.send();
         }
@@ -178,7 +192,7 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder();
         for (DraftCategory cat : DraftCategory.values()) {
             if (bag.getCategoryCount(cat) == 0) continue;
-            sb.append(cat.title(player.getGame()));
+            sb.append(cat.title(player.getGame())).append("\n");
             for (DraftItem item : bag.Contents) {
                 if (item.getItemCategory() != cat) continue;
                 sb.append("> ").append(item.getShortDescription()).append('\n');
@@ -212,9 +226,28 @@ public class FrankenDraftBagService {
         List<Color> accents = getAccents();
         MessageV2Builder builder = new MessageV2Builder(bagChannel);
         for (DraftCategory cat : DraftCategory.values()) {
-            Container c = draftBagCategoryContainer(player, cat);
-            if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
-            Collections.rotate(accents, -1);
+            List<DraftItem> items = player.getCurrentDraftBag().getCategory(cat);
+            if (draft instanceof FrankenDrazDraft
+                    && cat == DraftCategory.FACTION
+                    && items.size() > FACTIONS_PER_CONTAINER) {
+                int containerCount = Math.ceilDiv(items.size(), FACTIONS_PER_CONTAINER);
+                for (int i = 0; i < items.size(); i += FACTIONS_PER_CONTAINER) {
+                    int containerNumber = i / FACTIONS_PER_CONTAINER + 1;
+                    List<DraftItem> containerItems =
+                            items.subList(i, Math.min(i + FACTIONS_PER_CONTAINER, items.size()));
+                    Container c = draftBagCategoryContainer(
+                            player,
+                            DraftCategory.FACTION,
+                            containerItems,
+                            " (" + containerNumber + "/" + containerCount + ")");
+                    if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                }
+            } else {
+                Container c = draftBagCategoryContainer(player, cat, items, "");
+                if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
+                Collections.rotate(accents, -1);
+            }
         }
         builder.send();
 
@@ -265,7 +298,8 @@ public class FrankenDraftBagService {
         updateDraftStatusMessage(game);
     }
 
-    private static Container draftBagCategoryContainer(Player player, DraftCategory cat) {
+    private static Container draftBagCategoryContainer(
+            Player player, DraftCategory cat, List<DraftItem> items, String titleSuffix) {
         Game game = player.getGame();
         int catLimit = FrankenDraft.getItemLimitForCategory(cat, game);
         if (catLimit == 0) return null;
@@ -274,16 +308,19 @@ public class FrankenDraftBagService {
         int amtTaken = player.getDraftHand().getCategoryCount(cat);
         amtTaken += player.getDraftQueue().getCategoryCount(cat);
         String progress = " (" + amtTaken + "/" + catLimit + ")";
-        components.add(TextDisplay.of(cat.title(game) + progress));
+        components.add(TextDisplay.of(cat.title(game) + progress + titleSuffix));
 
-        List<DraftItem> all = player.getCurrentDraftBag().getCategory(cat);
-        if (all.isEmpty()) {
+        if (items.isEmpty()) {
             components.add(TextDisplay.of("There are no items of this category remaining"));
         } else {
             // Add each item to the container
-            for (DraftItem item : all) {
+            for (DraftItem item : items) {
                 if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
-                components.addAll(item.getTextDisplays(game, player, true));
+                components.addAll(item.getTextDisplays(game, player, cat != DraftCategory.FACTION));
+                if (item instanceof FactionDraftItem) {
+                    String buttonID = player.factionButtonChecker() + "frankenFactionComponents;" + item.getItemId();
+                    components.add(ActionRow.of(Buttons.gray(buttonID, "Show Components", item.getItemEmoji())));
+                }
             }
             // Then either...
             if (!DraftItem.isDraftable(player, cat)) {
@@ -292,15 +329,14 @@ public class FrankenDraftBagService {
                 components.add(TextDisplay.of(undraftable));
             } else {
                 // ... Or add buttons to the container
-                List<Button> buttons = getSelectionButtons(player, cat);
+                List<Button> buttons = getSelectionButtons(player, cat, items);
                 if (!buttons.isEmpty()) components.addAll(ActionRow.partitionOf(buttons));
             }
         }
         return Container.of(components);
     }
 
-    private static List<Button> getSelectionButtons(Player player, DraftCategory cat) {
-        List<DraftItem> items = player.getCurrentDraftBag().getCategory(cat);
+    private static List<Button> getSelectionButtons(Player player, DraftCategory cat, List<DraftItem> items) {
         List<Button> buttons = new ArrayList<>();
         boolean draftable = DraftItem.isDraftable(player, cat);
         if (!items.isEmpty()) {
@@ -372,11 +408,7 @@ public class FrankenDraftBagService {
         sb.append("):\n");
         for (DraftItem item : bag.getCategory(cat)) {
             sb.append("> ").append(item.getShortDescription()).append('\n');
-            if (item instanceof AgentDraftItem || item instanceof HeroDraftItem) {
-                sb.append("> - ").append(item.getLongDescription(game)).append('\n');
-            } else {
-                sb.append("> - ").append(item.getLongDescription()).append('\n');
-            }
+            sb.append("> - ").append(item.getLongDescription(game)).append('\n');
         }
         return sb.toString();
     }
@@ -423,7 +455,7 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
+            BagDraft.giveBagToPlayer(bags.get(i), player);
             player.resetDraftQueue();
 
             showPlayerBag(game, player);
@@ -443,24 +475,26 @@ public class FrankenDraftBagService {
         String draftName = "Franken Draft";
         if (draft instanceof InauguralSpliceFrankenDraft) {
             draftName = "Inaugural Splice";
+        } else if (draft instanceof FrankenDrazDraft) {
+            draftName = "FrankenDraz";
         }
 
         String message;
         if (first == next) {
             message = "# " + game.getPing() + " " + draftName + " has started!\n"
-                    + "As a reminder, you will pick " + first + " item" + (first == 1 ? "" : "s") + " from each bag.\n"
+                    + "As a reminder, you will pick " + StringHelper.pluralize(first, "item") + " from each bag.\n"
                     + "After each pick, the draft thread will be recreated. Sometimes Discord will lag while sending long messages, so the buttons may take a few seconds to show up.\n"
                     + "Once you have made your "
-                    + first + " pick" + (first == 1 ? "" : "s")
+                    + StringHelper.pluralize(first, "pick")
                     + ", the bags will automatically be passed once everyone is ready.";
         } else {
             message = "# " + game.getPing() + " " + draftName + " has started!\n"
                     + "As a reminder, for the first bag you pick "
-                    + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
-                    + next + " item" + (next == 1 ? "" : "s") + ".\n"
+                    + StringHelper.pluralize(first, "item") + ", and for all the bags after that you pick "
+                    + StringHelper.pluralize(next, "item") + ".\n"
                     + "After each pick, the draft thread will be recreated. Sometimes Discord will lag while sending long messages, so the buttons may take a few seconds to show up.\n"
                     + "Once you have made your "
-                    + next + " pick" + (next == 1 ? "" : "s") + " (" + first
+                    + StringHelper.pluralize(next, "pick") + " (" + first
                     + " in the first bag), the bags will automatically be passed once everyone is ready.";
         }
 
@@ -543,6 +577,6 @@ public class FrankenDraftBagService {
         long date = game.getLastModifiedDate();
         return game.getActionsChannel()
                 .sendMessage(msg)
-                .onSuccess(m -> GameMessageManager.replace(name, m.getId(), type, date));
+                .onSuccess(m -> GameMessageManager.replace(name, new GameMessage(m.getId(), type, date)));
     }
 }

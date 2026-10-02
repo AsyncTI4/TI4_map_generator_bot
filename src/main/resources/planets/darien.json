@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "darien",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "darien",
     "tileId": "03",
     "name": "Darien",

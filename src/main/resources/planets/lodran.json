@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lodran",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "lodran",
     "tileId": "d110",
     "name": "Lodran",

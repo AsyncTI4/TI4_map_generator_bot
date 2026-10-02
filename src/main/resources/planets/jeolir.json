@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "jeolir",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 207
+        }
+    },
     "id": "jeolir",
     "tileId": "69",
     "name": "Jeol Ir",

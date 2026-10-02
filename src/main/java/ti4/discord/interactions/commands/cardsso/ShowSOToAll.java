@@ -13,14 +13,13 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowSOToAll extends GameStateSubcommand {
 
-    public ShowSOToAll() {
+    ShowSOToAll() {
         super(Constants.SHOW_TO_ALL, "Show a secret objective to all players", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
-                .setRequired(true)
-                .setAutoComplete(true));
+                .setRequired(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.ONLY_PHASE,

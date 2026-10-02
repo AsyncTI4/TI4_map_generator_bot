@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "violence",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "violence",
     "tileId": "er113",
     "name": "Violence",

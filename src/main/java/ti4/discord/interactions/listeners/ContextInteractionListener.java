@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import org.jspecify.annotations.NonNull;
 import ti4.discord.interactions.context.ContextCommand;
 import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.executors.ExecutorServiceManager;
@@ -16,12 +17,12 @@ import ti4.service.game.GameNameService;
 class ContextInteractionListener extends ListenerAdapter implements CommandListener {
 
     @Override
-    public void onMessageContextInteraction(MessageContextInteractionEvent event) {
+    public void onMessageContextInteraction(@NonNull MessageContextInteractionEvent event) {
         onContextInteraction(event);
     }
 
     @Override
-    public void onUserContextInteraction(UserContextInteractionEvent event) {
+    public void onUserContextInteraction(@NonNull UserContextInteractionEvent event) {
         onContextInteraction(event);
     }
 

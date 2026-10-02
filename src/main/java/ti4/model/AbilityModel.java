@@ -137,7 +137,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         return id.contains(searchString)
                 || name.toLowerCase().contains(searchString)
                 || faction.toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString)
+                || (source != null && source.toString().toLowerCase().contains(searchString))
                 || searchTags.contains(searchString);
     }
 

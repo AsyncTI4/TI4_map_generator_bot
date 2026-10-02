@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,29 +15,33 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
+import ti4.spring.service.statistics.matchmaking.SkillTier;
 
 @UtilityClass
 public class GameStatisticsFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
-    private static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
+    public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
     static final String FOG_FILTER = "is_fog";
     static final String HOMEBREW_FILTER = "has_homebrew";
-    private static final String HAS_WINNER_FILTER = "has_winner";
+    public static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
     private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
-    private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
+    public static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
     private static final String STARTED_AFTER_FILTER = "started_after";
+    private static final String SKILL_TIER_FILTER = "skill_tier";
 
     private static final int MINIMUM_ROUND = 3;
     private static final DateTimeFormatter STARTED_AFTER_FILTER_FORMATTER =
@@ -67,11 +72,46 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
         filters.add(new OptionData(
                 OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
+        filters.add(skillTierFilterOption());
         return filters;
+    }
+
+    public static List<OptionData> gameStatsFiltersExcept(String... omittedFilters) {
+        Set<String> omitted = Set.of(omittedFilters);
+        return gameStatsFilters().stream()
+                .filter(filter -> !omitted.contains(filter.getName()))
+                .toList();
+    }
+
+    private static OptionData skillTierFilterOption() {
+        OptionData skillTierOption = new OptionData(
+                OptionType.STRING, SKILL_TIER_FILTER, "Skill of the game, by average player matchmaking rating");
+        for (SkillTier skillTier : SkillTier.values()) {
+            skillTierOption.addChoice(skillTier.getDisplayName() + " (" + skillTier.getLabel() + ")", skillTier.name());
+        }
+        skillTierOption.addChoice(
+                "Exclude " + SkillTier.LOWER.getDisplayName() + " (" + SkillTier.LOWER.getLabel() + ")",
+                SkillTier.EXCLUSION_PREFIX + SkillTier.LOWER.name());
+        return skillTierOption;
     }
 
     public static Predicate<Game> getGamesFilterForWonGame(SlashCommandInteractionEvent event) {
         return getGamesFilter(event, true);
+    }
+
+    // 6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with
+    // winners. Homebrew covers fog, and scenario covers Alliance.
+    public static Predicate<Game> getStandardCompetitiveGamesFilter() {
+        Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(6, game);
+        return playerCountPredicate
+                .and(game -> filterOnVictoryPointGoal(10, game))
+                .and(game -> filterOnFogType(Boolean.FALSE, game))
+                .and(game -> filterOnGalacticEvent(Boolean.FALSE, game))
+                .and(game -> filterOnScenario(Boolean.FALSE, game))
+                .and(game -> filterOnHasWinner(Boolean.TRUE, game))
+                .and(game -> filterOnHomebrew(Boolean.FALSE, game))
+                .and(GameStatisticsFilterer::filterAbortedGames)
+                .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
     public static Predicate<Game> getGamesFilter(SlashCommandInteractionEvent event) {
@@ -94,6 +134,8 @@ public class GameStatisticsFilterer {
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
         LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
+        SkillTier.Selection skillTierFilter =
+                SkillTier.parseSelection(event.getOption(SKILL_TIER_FILTER, null, OptionMapping::getAsString));
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -110,8 +152,24 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnScenario(scenarioFilter, game))
                 .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
                 .and(game -> filterOnStartedAfter(startedAfterDate, game))
+                .and(skillTierPredicate(skillTierFilter))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
+    }
+
+    private static Predicate<Game> skillTierPredicate(SkillTier.Selection skillTierFilter) {
+        if (skillTierFilter == null) {
+            return game -> true;
+        }
+        MatchmakingRatingEventService ratingService = MatchmakingRatingEventService.get();
+        return game -> {
+            List<String> userIds = game.getRealAndEliminatedPlayers().stream()
+                    .map(Player::getUserID)
+                    .toList();
+            // Null when fewer than half the players are rated.
+            SkillTier gameSkillTier = ratingService.getSkillTier(userIds);
+            return gameSkillTier != null && skillTierFilter.matches(gameSkillTier);
+        };
     }
 
     private static LocalDate parseStartedAfterDate(String startedAfterDate, SlashCommandInteractionEvent event) {
@@ -134,6 +192,13 @@ public class GameStatisticsFilterer {
         }
         return game.getWinners().stream()
                 .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
+    }
+
+    public static boolean hasAnyFaction(Game game, Set<String> factionAliases) {
+        return game.getFactions().stream()
+                .filter(faction -> faction != null && !faction.isBlank())
+                .map(faction -> faction.toLowerCase(Locale.ROOT))
+                .anyMatch(factionAliases::contains);
     }
 
     private static boolean filterOnFaction(String factionFilter, Game game) {
@@ -197,7 +262,11 @@ public class GameStatisticsFilterer {
             case "tf" -> game.isTwilightsFallMode();
             case "tedemo" -> game.isThundersEdgeDemo();
             case "noswap" -> game.isNoSwapMode();
-            case "twilightkart" -> game.isTwilightKart();
+            case "twilightds" -> game.isTwilightDS();
+            // isTwilightKart is Deprecated. Once removed, replace with isTkDestroyerCup || isTkNovaCup
+            case Constants.TWILIGHT_KART -> game.isTwilightKart();
+            case Constants.TK_DESTROYER_CUP -> game.isTkDestroyerCup();
+            case Constants.TK_NOVA_CUP -> game.isTkNovaCup();
             default -> false;
         };
     }

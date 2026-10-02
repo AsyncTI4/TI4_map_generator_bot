@@ -1,12 +1,18 @@
 package ti4.game.persistence;
 
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.service.game.MonumentsService;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 class TransientGameInfoUpdater {
@@ -14,14 +20,21 @@ class TransientGameInfoUpdater {
     static void update(Game game) {
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
-            DiscordantStarsHelper.checkTombWorlds(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkTFTerraform(game);
+            DiscordantStarsHelper.checkBRTaranisCrest(game);
             DiscordantStarsHelper.checkSigil(game);
-            DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
+            VeylorUnitHandler.checkVeylorMech(game);
+            VerydithLeadersHandler.checkVerydithCommander(game);
             DiscordantStarsHelper.checkUltimateAuthority(game);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
             TeHelperGeneral.checkTransientInfo(game);
+            for (Player player : game.getRealPlayers()) {
+                CommanderUnlockCheckService.checkPlayer(player, "ta");
+                MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);
+                MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
+            }
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);

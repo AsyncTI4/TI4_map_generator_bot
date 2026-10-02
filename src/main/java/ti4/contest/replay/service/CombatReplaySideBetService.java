@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -39,7 +38,7 @@ public class CombatReplaySideBetService {
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
     private final CombatReplaySideBetPayoutService payoutService;
     private final CombatReplaySideBetUiService sideBetUiService;
-    private final CombatReplayHouseService houseService;
+    private final CombatSideBetAvailabilityService availabilityService;
 
     public boolean shouldShowButtons(CombatCandidateEntity candidate) {
         return sideBetUiService.shouldShowButtons(candidate);
@@ -48,6 +47,11 @@ public class CombatReplaySideBetService {
     public void postSideBetButtonsIfNeeded(
             MessageChannel channel, Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
         sideBetUiService.postSideBetButtonsIfNeeded(channel, game, contest, candidate);
+    }
+
+    public void refreshSideBetSummary(
+            MessageChannel channel, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        sideBetUiService.refreshSummaryMessage(channel, contest, candidate);
     }
 
     public PlacementResult placeSideBet(
@@ -85,25 +89,17 @@ public class CombatReplaySideBetService {
         if (contest.getReplayStartAt() == null || !LocalDateTime.now().isBefore(contest.getReplayStartAt())) {
             return PlacementPersistenceResult.rejected("The side-bet window is closed.");
         }
-        if (settings.isHousesEnabled() && contest.getSideBetMarketPostedAt() == null) {
-            return PlacementPersistenceResult.rejected("The side-bet market is not open yet.");
-        }
-
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
         if (candidate == null || !Boolean.TRUE.equals(candidate.getSideBetCompatible())) {
             return PlacementPersistenceResult.rejected("This combat does not support side bets.");
         }
-        if (!isValidBet(candidate, betType, targetFaction)) {
+        if (!availabilityService.isAvailable(candidate, betType, targetFaction)) {
             return PlacementPersistenceResult.rejected("That side bet is not available for this combat.");
         }
 
-        boolean hacanProtected = hasHacanSideBetProtection(userId);
         CombatReplayLeaderboardEntryEntity entry =
                 leaderboardEntryRepository.findByDiscordUserId(userId).orElse(null);
-        if (entry == null && hacanProtected) {
-            entry = newLeaderboardEntry(userId, userName);
-        }
         if (entry == null) {
             return PlacementPersistenceResult.rejected("You do not have any points to bet.");
         }
@@ -116,10 +112,10 @@ public class CombatReplaySideBetService {
 
         int costPoints = settings.getSideBets().getCostPoints();
         int currentPoints = safeInt(entry.getTotalPoints());
-        if (currentPoints <= 0 && !hacanProtected) {
+        if (currentPoints <= 0) {
             return PlacementPersistenceResult.rejected("You do not have any points to bet.");
         }
-        if (currentPoints < costPoints && !hacanProtected) {
+        if (currentPoints < costPoints) {
             return PlacementPersistenceResult.rejected("You do not have enough points to place that side bet.");
         }
 
@@ -155,7 +151,7 @@ public class CombatReplaySideBetService {
         for (CombatContestSideBetEntity sideBet : sideBets) {
             boolean won = isWinningBet(candidate, sideBet);
             boolean firstResolution = sideBet.getResolvedAt() == null;
-            int profitPoints = payoutService.resolvedProfitPoints(sideBet);
+            int profitPoints = CombatReplaySideBetPayoutService.resolvedProfitPoints(sideBet);
             CombatReplayLeaderboardEntryEntity entry = entriesByUser.get(sideBet.getDiscordUserId());
             sideBet.setResolvedAt(now);
 
@@ -181,6 +177,24 @@ public class CombatReplaySideBetService {
         sideBetRepository.saveAll(sideBets);
         leaderboardEntryRepository.saveAll(entriesByUser.values());
         return new SideBetResolution(resolved, List.copyOf(entriesByUser.values()));
+    }
+
+    public List<ResolvedSideBet> resolvedSideBetsFromFacts(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+        if (candidate == null || replayContest == null || replayContest.getId() == null) return List.of();
+
+        List<ResolvedSideBet> resolved = new ArrayList<>();
+        for (CombatContestSideBetEntity sideBet : sideBetRepository.findByContestId(replayContest.getId())) {
+            if (sideBet.getResolvedAt() == null || !isWinningBet(candidate, sideBet)) continue;
+            resolved.add(new ResolvedSideBet(
+                    sideBet.getDiscordUserId(),
+                    sideBet.getDiscordUserName(),
+                    sideBet.getBetType(),
+                    sideBet.getTargetFaction(),
+                    sideBet.getBetType().label(),
+                    CombatReplaySideBetPayoutService.resolvedProfitPoints(sideBet)));
+        }
+        return resolved;
     }
 
     private Map<String, CombatReplayLeaderboardEntryEntity> loadLeaderboardEntries(
@@ -231,19 +245,13 @@ public class CombatReplaySideBetService {
         }
     }
 
-    private boolean isValidBet(CombatCandidateEntity candidate, CombatSideBetType betType, String targetFaction) {
-        CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
-        if (state == null || !betType.isAvailable(state.destroyerCount())) return false;
-        if (betType == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, targetFaction);
-        return betType != CombatSideBetType.AFB_SKIPPED || isAfbSkippedAvailable(candidate, targetFaction);
-    }
-
     private boolean isWinningBet(CombatCandidateEntity candidate, CombatContestSideBetEntity sideBet) {
         CombatSideState state = CombatSideState.forFaction(candidate, sideBet.getTargetFaction());
         if (state == null) return false;
         CombatSideBetType betType = sideBet.getBetType();
         return switch (betType) {
-            case AFB_SKIPPED -> isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && state.skippedAfb();
+            case AFB_SKIPPED ->
+                availabilityService.isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && state.skippedAfb();
             case AFB_WHIFF -> betType.isAvailable(state.destroyerCount()) && state.afbWhiff();
             case ROUND_ONE_WHIFF -> state.roundOneWhiff();
             case ROUND_ONE_SLAM -> state.roundOneSlam();
@@ -258,39 +266,7 @@ public class CombatReplaySideBetService {
         };
     }
 
-    private boolean hasHacanSideBetProtection(String userId) {
-        return settings.isHousesEnabled() && houseService.houseForUser(userId) == CombatReplayHouse.HACAN;
-    }
-
-    private CombatReplayLeaderboardEntryEntity newLeaderboardEntry(String userId, String userName) {
-        CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-        entry.setDiscordUserId(userId);
-        entry.setDiscordUserName(userName);
-        entry.setTotalPoints(0);
-        entry.setPredictionCount(0);
-        entry.setCorrectPredictions(0);
-        entry.setUpdatedAt(LocalDateTime.now());
-        return entry;
-    }
-
-    public boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String targetFaction) {
-        if (candidate == null || targetFaction == null) return false;
-        CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
-        if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
-        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, targetFaction));
-    }
-
-    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String targetFaction) {
-        if (targetFaction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
-        }
-        if (targetFaction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
-        }
-        return false;
-    }
-
-    private int safeInt(Integer value) {
+    private static int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
 }

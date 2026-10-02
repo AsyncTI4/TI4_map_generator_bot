@@ -47,7 +47,8 @@ class RevealSpecificAgenda extends GameStateSubcommand {
      * @deprecated This needs to be refactored to use {@link AgendaHelper#revealAgenda}'s version
      */
     @Deprecated
-    public void revealAgenda(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String agendaID) {
+    public static void revealAgenda(
+            GenericInteractionCreateEvent event, Game game, MessageChannel channel, String agendaID) {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
         if (uniqueID == null) {

@@ -27,9 +27,6 @@ import ti4.contest.replay.core.CombatCandidateStatus;
                     columnList = "status, pending_resolution_started_at"),
             @Index(name = "idx_combat_candidate_promoted_at", columnList = "promoted_at")
         })
-/**
- * Represents a replay-worthy combat that is being tracked, resolved, promoted, or expired.
- */
 public class CombatCandidateEntity {
 
     @Id
@@ -60,9 +57,6 @@ public class CombatCandidateEntity {
     @Column(name = "promoted_at")
     private LocalDateTime promotedAt;
 
-    @Column(name = "mentak_preview_posted_at")
-    private LocalDateTime mentakPreviewPostedAt;
-
     @Column(name = "game_name", nullable = false)
     private String gameName;
 
@@ -92,9 +86,6 @@ public class CombatCandidateEntity {
 
     @Column(name = "initial_render_snapshot_json", columnDefinition = "TEXT")
     private String initialRenderSnapshotJson;
-
-    @Column(name = "replay_abilities_json", columnDefinition = "TEXT")
-    private String replayAbilitiesJson;
 
     @Column(name = "promotion_score")
     private Double promotionScore;

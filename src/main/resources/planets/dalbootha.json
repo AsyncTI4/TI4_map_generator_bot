@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "dalbootha",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 90
+        }
+    },
     "id": "dalbootha",
     "tileId": "32",
     "name": "Dal Bootha",

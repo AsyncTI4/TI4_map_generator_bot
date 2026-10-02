@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kyr",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 93,
+            "y": 140
+        }
+    },
     "id": "kyr",
     "tileId": "d14",
     "name": "Kyr",

@@ -123,7 +123,15 @@ public class PickStrategyCardService {
                     }
                 }
                 if (held) continue;
+                if (game.isTwilightsFallMode()
+                        && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")
+                        && Helper.getRemainingSCButtons(game, privatePlayer, false)
+                                        .size()
+                                > 1) {
+                    continue;
+                }
                 unpickedStrategyCard = sc;
+                break;
             }
             PlayerStatsService.secondHalfOfPickSC(event, game, privatePlayer, unpickedStrategyCard);
             secondHalfOfSCPick(event, privatePlayer, game, unpickedStrategyCard);
@@ -139,7 +147,11 @@ public class PickStrategyCardService {
 
         if (player.isNpc()) {
             alreadyQueued = "1_2_3_4_5_6_7_8";
+            if (game.isTwilightsFallMode()) {
+                alreadyQueued = "1_3_4_5_8_2_6_7";
+            }
         }
+
         if (!alreadyQueued.isEmpty()) {
             int unpickedStrategyCard = 0;
             for (String scNum : alreadyQueued.split("_")) {

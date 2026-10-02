@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vadarian",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "vadarian",
     "tileId": "d26",
     "name": "Vadarian",

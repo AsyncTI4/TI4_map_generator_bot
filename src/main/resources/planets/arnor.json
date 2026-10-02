@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "arnor",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 138,
+            "y": 91
+        }
+    },
     "id": "arnor",
     "tileId": "36",
     "name": "Arnor",

@@ -15,7 +15,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 class MakeSecretIntoPO extends GameStateSubcommand {
 
-    public MakeSecretIntoPO() {
+    MakeSecretIntoPO() {
         super(Constants.MAKE_SO_INTO_PO, "Make a secret objective into a public objective", true, false);
         addOptions(new OptionData(
                         OptionType.INTEGER,

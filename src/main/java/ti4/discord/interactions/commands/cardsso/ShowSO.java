@@ -16,14 +16,13 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowSO extends GameStateSubcommand {
 
-    public ShowSO() {
+    ShowSO() {
         super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
-                .setRequired(true)
-                .setAutoComplete(true));
+                .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color")
                 .setRequired(true)
                 .setAutoComplete(true));

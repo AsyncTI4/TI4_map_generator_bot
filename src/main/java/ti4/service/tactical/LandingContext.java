@@ -99,7 +99,7 @@ public final class LandingContext {
         return owner == mainPlayer ? "" : (" " + StringUtils.capitalize(owner.getColor()) + " ");
     }
 
-    public String stateDescriptor(UnitState state) {
+    public static String stateDescriptor(UnitState state) {
         return state != UnitState.none ? " " + state.humanDescr() : "";
     }
 }

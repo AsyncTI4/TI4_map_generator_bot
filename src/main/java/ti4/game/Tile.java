@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -22,7 +23,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -39,6 +43,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
+import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
@@ -98,6 +103,9 @@ public class Tile {
         space.getCcList().forEach(tileSpace::addCC);
         space.getControlList().forEach(tileSpace::addControl);
         space.getTokenList().forEach(tileSpace::addToken);
+        if (space instanceof Space oldSpace) {
+            getSpaceUnitHolder().setFowVisionGrant(oldSpace.getFowVisionGrant());
+        }
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -129,10 +137,10 @@ public class Tile {
 
     public static Predicate<Tile> tileMayHaveThundersEdge() {
         return tile -> {
-            if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
+            if (tile.getTileModel().isHyperlane()) return false;
             if (!tile.getPlanetUnitHolders().isEmpty()) return false;
             if (tile.isSupernova()) return false;
-            if (tile.getPosition().contains("frac")) return false;
+            if (tile.isFracture()) return false;
             return !tile.getTileModel().hasWormhole();
         };
     }
@@ -143,17 +151,17 @@ public class Tile {
     }
 
     @Nullable
-    public String getCCPath(String ccID) {
+    public static String getCCPath(String ccID) {
         return Mapper.getCCPath(ccID);
     }
 
     @Nullable
-    public String getAttachmentPath(String tokenID) {
+    public static String getAttachmentPath(String tokenID) {
         return ResourceHelper.getInstance().getAttachmentFile(tokenID);
     }
 
     @Nullable
-    public String getTokenPath(String tokenID) {
+    public static String getTokenPath(String tokenID) {
         return Mapper.getTokenPath(tokenID);
     }
 
@@ -236,10 +244,27 @@ public class Tile {
         }
     }
 
+    /** Read-only view of the fog-vision recipients (held on the space holder); empty means everyone. */
+    @JsonIgnore
+    public Set<String> getFowVisionGrant() {
+        Space space = getSpaceUnitHolder();
+        return space == null ? Collections.emptySet() : space.getFowVisionGrant();
+    }
+
+    /** Replaces the fog-vision recipients; null or empty means everyone. */
+    public void setFowVisionGrant(@Nullable Collection<String> colors) {
+        Space space = getSpaceUnitHolder();
+        if (space != null) space.setFowVisionGrant(colors);
+    }
+
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            return unitHolder.removeToken(tokenID);
+            boolean removed = unitHolder.removeToken(tokenID);
+            if (removed && Mapper.isFowVisionToken(tokenID) && !hasFowVisionToken()) {
+                setFowVisionGrant(null); // a later token placed here starts fresh as "everyone"
+            }
+            return removed;
         }
         return false;
     }
@@ -342,7 +367,7 @@ public class Tile {
                 tileName = tileName.replace(".png", "_xmas.png");
             }
         }
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.warning("Could not find tile: " + tileID);
         }
@@ -417,19 +442,19 @@ public class Tile {
         }
 
         String tileName = Mapper.getTileID(fowTileID);
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        String tilePath = ResourceHelper.getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
         }
         return tilePath;
     }
 
-    public List<Planet> getSpaceStations() {
+    public List<Planet> getSpaceStations(Game game) {
         List<Planet> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
             if (uH instanceof Planet p
                     && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
-                if (!p.isSpaceStation()) continue;
+                if (!p.isSpaceStation(game)) continue;
 
                 planets.add(p);
             }
@@ -555,8 +580,13 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAsteroidField() {
-        if (hasAnyToken("token_asteroids_async.png")) return true;
+        if (hasAnyToken("token_asteroids_async.png", "token_asteroids_zelian.png")) return true;
         return getTileModel().isAsteroidField();
+    }
+
+    @JsonIgnore
+    public boolean isZelianAsteroidField() {
+        return hasAnyToken("token_asteroids_zelian.png");
     }
 
     @JsonIgnore
@@ -567,21 +597,36 @@ public class Tile {
 
     @JsonIgnore
     public boolean isNebula() {
-        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
-            return true;
+        if (hasAnyToken(
+                "token_ds_wound.png",
+                "attachment_superweapon_availyn.png",
+                "token_nebula_async.png",
+                "token_beans_nexus.png")) return true;
         return getTileModel().isNebula();
     }
 
     @JsonIgnore
     public boolean isNebula(Game game) {
-        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
-            return true;
+        if (hasAnyToken(
+                "token_ds_wound.png",
+                "attachment_superweapon_availyn.png",
+                "token_nebula_async.png",
+                "token_beans_nexus.png")) return true;
         if (game != null) {
+            if (MonumentsBRButtonHandler.makesTileNebula(game, this)) {
+                return true;
+            }
             for (Player p : game.getPlayers().values()) {
-                if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
+                if ((p.hasUnlockedBreakthrough("veldyrbt") || p.hasTech("tf-harnessedaurora"))
+                        && p.getHomeSystemTile() == this) {
                     return true;
                 }
             }
+        }
+        if (game != null
+                && game.getPlayers().values().stream()
+                        .anyMatch(p -> ButtonHelper.doesPlayerHaveFSHere("thrones_flagship", p, this))) {
+            return true;
         }
         return getTileModel().isNebula();
     }
@@ -593,8 +638,13 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean isGravityRift(Game game) {
+    public boolean isGravityRift(Game game, Player player) {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
+        if (player != null
+                && player.hasTech("tf-fraactalspikedrives")
+                && !getWormholes(game).isEmpty()) {
+            return true;
+        }
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(game);
     }
 
@@ -609,12 +659,39 @@ public class Tile {
         if (hasAnyToken("token_entropicscar_async.png")) return true;
         if (game != null) {
             for (Player p2 : game.getPlayers().values()) {
-                if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
+                if ((p2.hasUnlockedBreakthrough("nivynbt") || p2.hasTech("tf-singularitypoint"))
+                        && hasAnyToken("token_ds_wound.png")) {
                     return true;
                 }
             }
         }
         return getTileModel().isScar();
+    }
+
+    @JsonIgnore
+    public boolean isFracture() {
+        if (hasAnyToken(Constants.TOKEN_FRACTURE)) return true;
+        TileModel model = getTileModel();
+        if (model != null && model.isFracture()) return true;
+        // Legacy: the frac1-frac7 slots alone used to mean fracture space
+        return position != null && position.startsWith("frac");
+    }
+
+    @JsonIgnore
+    public boolean hasEgress() {
+        TileModel model = getTileModel();
+        if (model == null) return false;
+        if (model.hasEgress()) return true;
+        // Legacy: egress tiles used to be identified by an "egress..." alias
+        return model.getAliases().stream().anyMatch(alias -> alias.startsWith("egress"));
+    }
+
+    @JsonIgnore
+    public boolean hasIngress() {
+        TileModel model = getTileModel();
+        if (model == null) return false;
+        return model.hasIngress();
+        // Legacy: ingress tiles used to be identified by an "ingress..." alias
     }
 
     @JsonIgnore
@@ -630,17 +707,16 @@ public class Tile {
             if (token.contains("beta") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.BETA);
             if (token.contains("gamma")) whs2.add(WormholeModel.Wormhole.GAMMA);
         }
-        String ghostFlagshipColor = null;
+        String ghostFlagshipColor;
         for (Player p : game.getPlayers().values()) {
             if (p.ownsUnit("ghost_flagship")
                     || p.ownsUnit("sigma_creuss_flagship_1")
                     || p.ownsUnit("sigma_creuss_flagship_2")) {
                 ghostFlagshipColor = p.getColor();
-                break;
+                if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+                    whs2.add(WormholeModel.Wormhole.DELTA);
+                }
             }
-        }
-        if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-            whs2.add(WormholeModel.Wormhole.DELTA);
         }
         return whs2;
     }
@@ -671,14 +747,35 @@ public class Tile {
         return false;
     }
 
+    /**
+     * True if this tile carries a fog-vision token (a token whose {@link TokenModel} has
+     * {@code isFowVision}). Deliberately independent of {@link #isAnomaly()} — a fog-vision
+     * marker is not an anomaly and must not gain anomaly movement/combat/ability behaviour.
+     */
     @JsonIgnore
-    public boolean isAnomaly() {
-        return isAnomaly(null);
+    public boolean hasFowVisionToken() {
+        for (UnitHolder uh : unitHolders.values()) {
+            for (String token : uh.getTokenList()) {
+                if (Mapper.isFowVisionToken(token)) return true;
+            }
+        }
+        return false;
     }
 
     @JsonIgnore
-    public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar(game)) {
+    public boolean isAnomaly() {
+        return isAnomaly(null, null);
+    }
+
+    @JsonIgnore
+    public boolean isAnomaly(Game game, Player player) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game, player) || isScar(game)) {
+            return true;
+        }
+        if (game != null
+                && ThronesAbilityHandler.tracesOfRuinIsActive(game)
+                && getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
@@ -856,7 +953,6 @@ public class Tile {
         }
     }
 
-    ///
     /**
      * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
      * present (using display names when available). Used for UI strings and logs.

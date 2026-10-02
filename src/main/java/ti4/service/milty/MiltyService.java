@@ -3,7 +3,9 @@ package ti4.service.milty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +33,6 @@ import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
 public class MiltyService {
-
     public static void offerKeleresSetupButtons(MiltyDraftManager manager, Player player) {
         List<String> flavors = List.of("mentak", "xxcha", "argent");
         List<Button> keleresPresets = new ArrayList<>();
@@ -65,6 +66,10 @@ public class MiltyService {
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
+        game.setStoredValue(
+                Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(
+                        settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.sendTIGLSetupText(game);
         }
@@ -85,8 +90,10 @@ public class MiltyService {
         // Milty Draft Manager Setup --------------------------------------------------------------
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -94,6 +101,7 @@ public class MiltyService {
         }
 
         draftManager.init(sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
         draftManager.setMapTemplate(specs.template.getAlias());
         game.setMapTemplateID(specs.template.getAlias());
         List<String> players = new ArrayList<>(specs.playerIDs);
@@ -114,7 +122,41 @@ public class MiltyService {
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
                 .toList());
-        List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
+        if (specs.sourceConstraints != null && !specs.sourceConstraints.isEmpty()) {
+            Map<ComponentSource, Long> actualBySource = unbannedFactions.stream()
+                    .filter(f -> Mapper.getFaction(f) != null)
+                    .collect(Collectors.groupingBy(
+                            f -> logicalFactionSource(Mapper.getFaction(f).getSource()), Collectors.counting()));
+            long unconstrained = unbannedFactions.stream()
+                    .filter(f -> Mapper.getFaction(f) != null)
+                    .filter(f -> !specs.sourceConstraints.containsKey(
+                            logicalFactionSource(Mapper.getFaction(f).getSource())))
+                    .count();
+            int sumMins = 0, sumMaxes = (int) unconstrained;
+            for (Map.Entry<ComponentSource, int[]> e : specs.sourceConstraints.entrySet()) {
+                int actual = actualBySource.getOrDefault(e.getKey(), 0L).intValue();
+                sumMins += Math.min(e.getValue()[0], actual);
+                sumMaxes += Math.min(e.getValue()[1], actual);
+            }
+            if (sumMins > specs.numFactions) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Faction source minimums sum to **" + sumMins + "**, which exceeds the draft pool size of **"
+                                + specs.numFactions + "**. Reduce the minimums before starting.");
+                return "Could not start milty draft, fix the error and try again";
+            }
+            if (sumMaxes < specs.numFactions) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Faction source maximums sum to **" + sumMaxes
+                                + "**, which is less than the draft pool size of **" + specs.numFactions
+                                + "**. Increase the maximums before starting.");
+                return "Could not start milty draft, fix the error and try again";
+            }
+        }
+
+        List<String> factionDraft = createFactionDraft(
+                specs.numFactions, unbannedFactions, specs.priorityFactions, specs.sourceConstraints);
         draftManager.setFactionDraft(factionDraft);
 
         // validate slice count + sources
@@ -154,39 +196,42 @@ public class MiltyService {
             specs.presetSlices.forEach(draftManager::addSlice);
             MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
-            event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
-                boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
-                if (!slicesCreated) {
-                    String msg = "Generating slices was too hard so I gave up.... Please try again.";
-                    if (specs.numSlices == maxSlices) {
-                        msg += "\n*...and maybe consider asking for fewer slices*";
-                    }
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-                } else {
-                    MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
-                    for (String player : draftManager.getPlayers()) {
-                        Player p = game.getPlayer(player);
-                        game.setStoredValue(p.getUserID() + "queuedMiltyPick", "");
-                        if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
-                            MessageHelper.sendMessageToChannel(
-                                    p.getCardsInfoThread(),
-                                    p.getRepresentation() + " You can queue your choices with these buttons",
-                                    draftManager.getQueueButtons(p, game));
-                        }
-                    }
-                    game.setPhaseOfGame("miltydraft");
-                    // TODO: We should be locking since we're saving
-                    GameManager.save(game, "Milty");
-                    if (game.isThundersEdge()) {
-                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), startMsg);
+            boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (!slicesCreated) {
+                String msg = "Generating slices was too hard so I gave up.... Please try again.";
+                if (specs.numSlices == maxSlices) {
+                    msg += "\n*...and maybe consider asking for fewer slices*";
+                }
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            } else {
+                MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+
+                game.setPhaseOfGame("miltydraft");
+                for (String player : draftManager.getPlayers()) {
+                    Player p = game.getPlayer(player);
+                    game.setStoredValue(p.getUserID() + "queuedMiltyPick", "");
+                }
+                // SPOOKY SAVE
+                GameManager.save(game, "Milty");
+                if (game.isThundersEdge()) {
+                    ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                }
+                for (String player : draftManager.getPlayers()) {
+                    Player p = game.getPlayer(player);
+                    if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentation() + " You can queue your choices with these buttons",
+                                draftManager.getQueueButtons(p, game));
                     }
                 }
-            });
+            }
         }
         return null;
     }
 
-    private static void initDraftOrder(MiltyDraftManager draftManager, List<String> playerIDs, boolean staticOrder) {
+    static void initDraftOrder(MiltyDraftManager draftManager, List<String> playerIDs, boolean staticOrder) {
         List<String> players = new ArrayList<>(playerIDs);
         if (!staticOrder) {
             Collections.shuffle(players);
@@ -203,28 +248,105 @@ public class MiltyService {
         draftManager.setPlayers(players);
     }
 
-    private static List<String> createFactionDraft(
-            int factionCount, List<String> factions, List<String> firstFactions) {
-        List<String> randomOrder = new ArrayList<>(firstFactions);
-        Collections.shuffle(randomOrder);
-        Collections.shuffle(factions);
-        randomOrder.addAll(factions);
-
-        int i = 0;
-        List<String> output = new ArrayList<>();
-        while (output.size() < factionCount) {
-            if (i >= randomOrder.size()) return output;
-            String f = randomOrder.get(i);
-            i++;
-            if (output.contains(f)) continue;
-            if (!factions.contains(f)) continue;
-            output.add(f);
+    /**
+     * Builds the faction draft pool.
+     * - Banned factions are excluded before this is called (not in {@code factions}).
+     * - Priority factions ({@code firstFactions}) bypass source constraints and are added first.
+     * - Per-source constraints cap/guarantee the remaining slots per expansion.
+     * - If constraints is null/empty, falls back to the original unconstrained shuffle.
+     */
+    public static List<String> createFactionDraft(
+            int factionCount,
+            List<String> factions,
+            List<String> firstFactions,
+            Map<ComponentSource, int[]> constraints) {
+        if (constraints == null || constraints.isEmpty()) {
+            List<String> randomOrder = new ArrayList<>(firstFactions);
+            Collections.shuffle(randomOrder);
+            Collections.shuffle(factions);
+            randomOrder.addAll(factions);
+            List<String> output = new ArrayList<>();
+            int i = 0;
+            while (output.size() < factionCount) {
+                if (i >= randomOrder.size()) return output;
+                String f = randomOrder.get(i);
+                i++;
+                if (!output.contains(f) && factions.contains(f)) output.add(f);
+            }
+            return output;
         }
-        return output;
+
+        // Priority factions bypass source constraints; add all eligible ones first
+        List<String> output = new ArrayList<>();
+        for (String pf : firstFactions) {
+            if (factions.contains(pf) && !output.contains(pf)) output.add(pf);
+        }
+
+        // Count priority factions per logical source so effective min/max accounts for them
+        Map<ComponentSource, Integer> priorityCountBySource = new HashMap<>();
+        for (String pf : output) {
+            FactionModel m = Mapper.getFaction(pf);
+            if (m == null) continue;
+            priorityCountBySource.merge(logicalFactionSource(m.getSource()), 1, Integer::sum);
+        }
+
+        // Group remaining factions by logical source
+        Map<ComponentSource, List<String>> bySource = new HashMap<>();
+        List<String> unconstrained = new ArrayList<>();
+        for (String f : factions) {
+            if (output.contains(f)) continue;
+            FactionModel m = Mapper.getFaction(f);
+            if (m == null) continue;
+            ComponentSource logical = logicalFactionSource(m.getSource());
+            if (constraints.containsKey(logical)) {
+                bySource.computeIfAbsent(logical, _ -> new ArrayList<>()).add(f);
+            } else {
+                unconstrained.add(f);
+            }
+        }
+        for (List<String> pool : bySource.values()) Collections.shuffle(pool);
+
+        // Apply effective min/max per source
+        List<String> guaranteed = new ArrayList<>();
+        List<String> available = new ArrayList<>();
+        for (Map.Entry<ComponentSource, List<String>> e : bySource.entrySet()) {
+            int[] range = constraints.get(e.getKey());
+            int priorityCount = priorityCountBySource.getOrDefault(e.getKey(), 0);
+            int effectiveMin = Math.max(0, range[0] - priorityCount);
+            int effectiveMax = Math.max(0, range[1] - priorityCount);
+            List<String> pool = e.getValue();
+            for (int i = 0; i < pool.size(); i++) {
+                if (i < effectiveMin) guaranteed.add(pool.get(i));
+                else if (i < effectiveMax) available.add(pool.get(i));
+                // beyond effectiveMax: excluded from pool
+            }
+        }
+        Collections.shuffle(unconstrained);
+        available.addAll(unconstrained);
+        Collections.shuffle(available);
+
+        // Fill: priority already in output, then guaranteed, then available up to factionCount
+        for (String g : guaranteed) {
+            if (!output.contains(g)) output.add(g);
+        }
+        for (String a : available) {
+            if (output.size() >= factionCount) break;
+            if (!output.contains(a)) output.add(a);
+        }
+
+        return output.subList(0, Math.min(factionCount, output.size()));
+    }
+
+    static ComponentSource logicalFactionSource(ComponentSource source) {
+        return switch (source) {
+            case codex1, codex2, codex3, codex4 -> ComponentSource.pok;
+            default -> source;
+        };
     }
 
     public static void miltySetup(GenericInteractionCreateEvent event, Game game) {
         MiltySettings menu = game.initializeMiltySettings();
+        menu.setRandomSetup(false);
         // TODO: Settings should use a flag for nucleus generation.
         // But for now, trying to keep our settings changes minimal.
         if (event instanceof ButtonInteractionEvent buttonEvent) {

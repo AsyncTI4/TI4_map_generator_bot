@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "benc",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "benc",
     "tileId": "d07",
     "name": "Benc",

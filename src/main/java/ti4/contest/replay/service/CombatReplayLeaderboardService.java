@@ -20,19 +20,14 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayChannels;
-import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.entities.CombatReplayPredictionEntity;
-import ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.contest.replay.repository.CombatReplayPredictionRepository;
-import ti4.contest.replay.service.CombatReplayHouseLedgerService.HouseAbilitySummary;
-import ti4.contest.replay.service.CombatReplayHouseLedgerService.HouseFavorSummary;
-import ti4.contest.replay.service.CombatReplayHouseLedgerService.HouseLeaderboardSummary;
-import ti4.contest.replay.service.CombatReplayHouseLedgerService.HousePredictionSummary;
+import ti4.contest.replay.service.CombatReplayPredictionScorer.BustedPredictionSummary;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.LockedPrediction;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.ScoredPredictions;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.WinningPredictionSummary;
@@ -45,17 +40,16 @@ import ti4.helpers.ThreadGetter;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.FactionEmojis;
 
 /**
- * Manages replay-native prediction locking, scoring, and leaderboard posting.
+ * Manages replay-native prediction locking, individual scoring, and leaderboard posting.
  */
 @Service
 @RequiredArgsConstructor
 public class CombatReplayLeaderboardService {
 
     public static final String LAZAX_MINIGAME_SUBSCRIPTION_MARKER = "-# Lazax Minigame Subscription";
-    public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
+    public static final String LAZAX_MINIGAME_ROLE_NAME = LazaxMinigameRoleHelper.ROLE_NAME;
 
     private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
@@ -69,10 +63,7 @@ public class CombatReplayLeaderboardService {
     private final CombatReplayPredictionRepository replayPredictionRepository;
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
     private final CombatReplaySideBetService sideBetService;
-    private final CombatReplayHouseService houseService;
-    private final CombatReplayHouseLedgerService houseLedgerService;
-    private final CombatReplayHouseFavorService houseFavorService;
-    private final CombatReplayHacanTradeConvoysService hacanTradeConvoysService;
+    private final CombatDoubleOrBustService doubleOrBustService;
 
     public void lockPredictionsAtReplayStart(
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
@@ -112,7 +103,6 @@ public class CombatReplayLeaderboardService {
     public void clearLockedPredictions(Long replayContestId) {
         if (replayContestId == null) return;
         replayPredictionRepository.findByContestId(replayContestId).ifPresent(replayPredictionRepository::delete);
-        houseLedgerService.clearContest(replayContestId);
     }
 
     public void finalizeReplayLeaderboardContest(
@@ -124,11 +114,7 @@ public class CombatReplayLeaderboardService {
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
             postPredictionResultsSummary(game, threadOrChannel, candidate, result, () -> {
-                if (!settings.isHousesEnabled()) {
-                    postSideBetResultsSummary(threadOrChannel, result);
-                }
-                postDelegationFavorAwards(result.housePredictionSummaries());
-                hacanTradeConvoysService.postPostCombatTradeConvoysButtonsIfNeeded(replayContest, candidate);
+                postSideBetResultsSummary(threadOrChannel, result);
                 postParticipantFollowup(game, candidate, threadOrChannel);
                 postSubscriptionPrompt(threadOrChannel);
             });
@@ -137,10 +123,6 @@ public class CombatReplayLeaderboardService {
     }
 
     public boolean postLeaderboard() {
-        if (settings.isHousesEnabled()) {
-            return postHouseLeaderboard();
-        }
-
         List<CombatReplayLeaderboardEntryEntity> topEntries =
                 leaderboardEntryRepository
                         .findTop10ByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
@@ -188,6 +170,15 @@ public class CombatReplayLeaderboardService {
                 + "Correct predictions: `" + correctPredictions + "/" + predictions + "` (" + accuracy + "%)";
     }
 
+    public String pointsCountMessage(User user) {
+        if (user == null) return "Could not identify your Lazax points.";
+        CombatReplayLeaderboardEntryEntity entry =
+                leaderboardEntryRepository.findByDiscordUserId(user.getId()).orElse(null);
+        int points = entry == null ? 0 : safeInt(entry.getTotalPoints());
+        String label = points == 1 ? "point" : "points";
+        return "You have **" + points + "** Lazax " + label + ".";
+    }
+
     private String buildLeaderboardMessage(List<CombatReplayLeaderboardEntryEntity> topEntries) {
         StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
         for (int index = 0; index < topEntries.size(); index++) {
@@ -215,54 +206,6 @@ public class CombatReplayLeaderboardService {
         return message.toString();
     }
 
-    public String pointsCountMessage(User user) {
-        if (user == null) return "Could not identify your Lazax points.";
-        CombatReplayLeaderboardEntryEntity entry =
-                leaderboardEntryRepository.findByDiscordUserId(user.getId()).orElse(null);
-        int points = entry == null ? 0 : safeInt(entry.getTotalPoints());
-        String label = points == 1 ? "point" : "points";
-        return "You have **" + points + "** Lazax " + label + ".";
-    }
-
-    private boolean postHouseLeaderboard() {
-        List<HouseLeaderboardSummary> summaries = houseLedgerService.leaderboardSummaries();
-        if (summaries.isEmpty()) return false;
-
-        TextChannel contestChannel = getContestPublicChannelByName();
-        if (contestChannel == null) return false;
-
-        StringBuilder message = new StringBuilder("## Lazax War Archives Delegation Leaderboard\n");
-        for (int index = 0; index < summaries.size(); index++) {
-            HouseLeaderboardSummary summary = summaries.get(index);
-            int accuracy = summary.predictionCount() == 0
-                    ? 0
-                    : Math.round((100.0f * summary.correctPredictions()) / summary.predictionCount());
-            message.append('`')
-                    .append(index + 1)
-                    .append(".` ")
-                    .append(FactionEmojis.getFactionIcon(summary.house().displayName()))
-                    .append(" ")
-                    .append(houseService.houseRoleMention(summary.house()))
-                    .append(" - **")
-                    .append(summary.totalPoints())
-                    .append("** points (`")
-                    .append(summary.correctPredictions())
-                    .append("/")
-                    .append(summary.predictionCount())
-                    .append("` correct, ")
-                    .append(accuracy)
-                    .append("%, ")
-                    .append(summary.memberCount())
-                    .append(summary.memberCount() == 1 ? " member" : " members")
-                    .append(")");
-            if (index < summaries.size() - 1) {
-                message.append("\n");
-            }
-        }
-        MessageHelper.sendMessageToChannel(contestChannel, message.toString());
-        return true;
-    }
-
     private CombatReplayPredictionEntity buildLockedPredictionSnapshot(
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate, Message message) {
         Map<String, Set<String>> factionsByUser = new HashMap<>();
@@ -283,7 +226,6 @@ public class CombatReplayLeaderboardService {
 
             for (User user : reaction.retrieveUsers().complete()) {
                 if (user.isBot()) continue;
-                houseService.assignHouseIfAbsent(user, message.getGuild());
                 factionsByUser
                         .computeIfAbsent(user.getId(), key -> new HashSet<>())
                         .add(predictedFaction);
@@ -319,15 +261,18 @@ public class CombatReplayLeaderboardService {
         lockedPrediction.setDefenderPredictionCount(defenderPredictions.size());
         lockedPrediction.setAttackerPredictionsJson(writeLockedPredictions(attackerPredictions));
         lockedPrediction.setDefenderPredictionsJson(writeLockedPredictions(defenderPredictions));
+        Set<String> doubleOrBustUserIds = doubleOrBustService.lockedDoubleOrBustUserIds(replayContest.getId());
+        lockedPrediction.setAttackerDoubleOrBustJson(
+                writeStringSet(retainPredictedUserIds(attackerPredictions, doubleOrBustUserIds)));
+        lockedPrediction.setDefenderDoubleOrBustJson(
+                writeStringSet(retainPredictedUserIds(defenderPredictions, doubleOrBustUserIds)));
         return lockedPrediction;
     }
 
     private ScoredContestResult scoreSideBetOnlyContest(
             CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
         SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
-        List<HousePredictionSummary> housePredictionSummaries = buildAndPersistHousePredictionSummaries(
-                candidate, replayContest, null, sideBetResolution.resolvedSideBets());
-        return new ScoredContestResult(0, List.of(), housePredictionSummaries, sideBetResolution.resolvedSideBets());
+        return new ScoredContestResult(0, List.of(), List.of(), sideBetResolution.resolvedSideBets());
     }
 
     private synchronized ScoredContestResult scoreReplayContest(
@@ -349,7 +294,12 @@ public class CombatReplayLeaderboardService {
         List<LockedPrediction> defenderPredictions =
                 readLockedPredictions(lockedPrediction.getDefenderPredictionsJson());
         ScoredPredictions scoredPredictions = CombatReplayPredictionScorer.score(
-                attackerPredictions, defenderPredictions, candidate.getWinnerFaction(), candidate.getAttackerFaction());
+                attackerPredictions,
+                defenderPredictions,
+                readStringSet(lockedPrediction.getAttackerDoubleOrBustJson()),
+                readStringSet(lockedPrediction.getDefenderDoubleOrBustJson()),
+                candidate.getWinnerFaction(),
+                candidate.getAttackerFaction());
 
         List<String> userIds = new ArrayList<>();
         for (LockedPrediction prediction : scoredPredictions.allPredictions()) {
@@ -362,12 +312,15 @@ public class CombatReplayLeaderboardService {
         }
 
         List<ResolvedSideBet> resolvedSideBets = List.of();
-        List<HousePredictionSummary> housePredictionSummaries;
         if (lockedPrediction.getScoredAt() == null) {
             applyContestResult(
                     scoredPredictions.allPredictions(),
                     scoredPredictions.winningPredictions(),
+                    scoredPredictions.losingPredictions(),
                     scoredPredictions.pointsAwarded(),
+                    scoredPredictions.winningDoubleOrBustUserIds(),
+                    scoredPredictions.losingDoubleOrBustUserIds(),
+                    scoredPredictions.bustPenalty(),
                     entriesByUser);
             leaderboardEntryRepository.saveAll(entriesByUser.values());
             SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
@@ -375,66 +328,66 @@ public class CombatReplayLeaderboardService {
                 entriesByUser.put(entry.getDiscordUserId(), entry);
             }
             resolvedSideBets = sideBetResolution.resolvedSideBets();
-            housePredictionSummaries = buildAndPersistHousePredictionSummaries(
-                    candidate, replayContest, scoredPredictions, resolvedSideBets);
             lockedPrediction.setScoredAt(LocalDateTime.now());
             replayPredictionRepository.save(lockedPrediction);
-        } else {
-            housePredictionSummaries = readHousePredictionSummaries(replayContest.getId());
-            if (housePredictionSummaries.isEmpty()) {
-                SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
-                resolvedSideBets = sideBetResolution.resolvedSideBets();
-                housePredictionSummaries = buildAndPersistHousePredictionSummaries(
-                        candidate, replayContest, scoredPredictions, resolvedSideBets);
-            }
         }
 
         return new ScoredContestResult(
                 scoredPredictions.totalPredictions(),
                 CombatReplayPredictionScorer.resultSummaries(
-                        scoredPredictions.winningPredictions(), scoredPredictions.pointsAwarded(), entriesByUser),
-                housePredictionSummaries,
+                        scoredPredictions.winningPredictions(),
+                        scoredPredictions.pointsAwarded(),
+                        scoredPredictions.winningDoubleOrBustUserIds(),
+                        entriesByUser),
+                CombatReplayPredictionScorer.bustedSummaries(
+                        scoredPredictions.losingPredictions(),
+                        scoredPredictions.losingDoubleOrBustUserIds(),
+                        scoredPredictions.bustPenalty(),
+                        entriesByUser),
                 resolvedSideBets);
     }
 
     private void applyContestResult(
             List<LockedPrediction> allPredictions,
             List<LockedPrediction> winningPredictions,
+            List<LockedPrediction> losingPredictions,
             int pointsAwarded,
+            Set<String> winningDoubleOrBustUserIds,
+            Set<String> losingDoubleOrBustUserIds,
+            int bustPenalty,
             Map<String, CombatReplayLeaderboardEntryEntity> entriesByUser) {
         Set<String> winningUserIds = new HashSet<>();
         for (LockedPrediction prediction : winningPredictions) {
             winningUserIds.add(prediction.discordUserId());
+        }
+        Set<String> losingUserIds = new HashSet<>();
+        for (LockedPrediction prediction : losingPredictions) {
+            losingUserIds.add(prediction.discordUserId());
         }
         LocalDateTime now = LocalDateTime.now();
 
         for (LockedPrediction prediction : allPredictions) {
             CombatReplayLeaderboardEntryEntity entry = entriesByUser.computeIfAbsent(
                     prediction.discordUserId(),
-                    ignored -> newLeaderboardEntry(prediction.discordUserId(), prediction.discordUserName()));
+                    _ -> newLeaderboardEntry(prediction.discordUserId(), prediction.discordUserName()));
             entry.setDiscordUserName(prediction.discordUserName());
             entry.setPredictionCount(safeInt(entry.getPredictionCount()) + 1);
             if (winningUserIds.contains(prediction.discordUserId())) {
                 entry.setCorrectPredictions(safeInt(entry.getCorrectPredictions()) + 1);
-                entry.setTotalPoints(safeInt(entry.getTotalPoints()) + pointsAwarded);
+                int bonus = winningDoubleOrBustUserIds.contains(prediction.discordUserId())
+                        ? pointsAwarded * 2
+                        : pointsAwarded;
+                entry.setTotalPoints(safeInt(entry.getTotalPoints()) + bonus);
             } else {
-                entry.setTotalPoints(Math.max(0, safeInt(entry.getTotalPoints()) + WRONG_PREDICTION_PENALTY));
+                int penalty = WRONG_PREDICTION_PENALTY;
+                if (losingUserIds.contains(prediction.discordUserId())
+                        && losingDoubleOrBustUserIds.contains(prediction.discordUserId())) {
+                    penalty -= bustPenalty;
+                }
+                entry.setTotalPoints(Math.max(0, safeInt(entry.getTotalPoints()) + penalty));
             }
             entry.setUpdatedAt(now);
         }
-    }
-
-    private List<HousePredictionSummary> buildAndPersistHousePredictionSummaries(
-            CombatCandidateEntity candidate,
-            CombatReplayContestEntity replayContest,
-            ScoredPredictions scoredPredictions,
-            List<ResolvedSideBet> resolvedSideBets) {
-        return houseLedgerService.buildAndPersistPredictionSummaries(
-                replayContest, scoredPredictions, resolvedSideBets);
-    }
-
-    private List<HousePredictionSummary> readHousePredictionSummaries(Long contestId) {
-        return houseLedgerService.readPredictionSummaries(contestId);
     }
 
     private CombatReplayLeaderboardEntryEntity newLeaderboardEntry(String discordUserId, String discordUserName) {
@@ -442,7 +395,7 @@ public class CombatReplayLeaderboardService {
         entry.setDiscordUserId(discordUserId);
         entry.setDiscordUserName(
                 discordUserName == null || discordUserName.isBlank() ? "Unknown User" : discordUserName);
-        entry.setTotalPoints(0);
+        entry.setTotalPoints(settings.getInitialIndividualPoints());
         entry.setPredictionCount(0);
         entry.setCorrectPredictions(0);
         entry.setUpdatedAt(LocalDateTime.now());
@@ -455,16 +408,6 @@ public class CombatReplayLeaderboardService {
             CombatCandidateEntity candidate,
             ScoredContestResult result,
             Runnable afterPost) {
-        if (settings.isHousesEnabled()) {
-            String message = formatHousePredictionResults(result.housePredictionSummaries());
-            MessageHelper.splitAndSentWithAction(message, threadOrChannel, ignored -> {
-                if (afterPost != null) {
-                    afterPost.run();
-                }
-            });
-            return;
-        }
-
         String winnerDisplay = getWinnerDisplay(game, candidate);
         List<WinningPredictionSummary> winningPredictions = result.winningPredictions();
         String message = "## Prediction Results\n"
@@ -478,109 +421,32 @@ public class CombatReplayLeaderboardService {
         } else {
             StringBuilder winners = new StringBuilder(message).append("\n\n");
             for (WinningPredictionSummary prediction : winningPredictions) {
-                winners.append("<@")
-                        .append(prediction.discordUserId())
-                        .append("> - ")
+                winners.append(getSafeLeaderboardName(prediction.discordUserName()))
+                        .append(" - ")
                         .append(prediction.totalPoints())
                         .append(" points (pred +")
                         .append(prediction.pointsAwarded())
+                        .append(prediction.doubled() ? ", doubled!" : "")
                         .append(")\n");
             }
             message = winners.toString().trim();
         }
-        message = appendHousePredictionResults(message, result.housePredictionSummaries());
-        MessageHelper.splitAndSentWithAction(message, threadOrChannel, ignored -> {
+        if (!result.bustedPredictions().isEmpty()) {
+            StringBuilder withBusted = new StringBuilder(message).append("\n\n");
+            for (BustedPredictionSummary prediction : result.bustedPredictions()) {
+                withBusted
+                        .append(getSafeLeaderboardName(prediction.discordUserName()))
+                        .append(" - -")
+                        .append(prediction.pointsLost())
+                        .append(" points (busted!)\n");
+            }
+            message = withBusted.toString().trim();
+        }
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, _ -> {
             if (afterPost != null) {
                 afterPost.run();
             }
         });
-    }
-
-    private String appendHousePredictionResults(String message, List<HousePredictionSummary> houseSummaries) {
-        if (!settings.isHousesEnabled() || houseSummaries == null || houseSummaries.isEmpty()) return message;
-        return message + "\n\n" + formatHousePredictionResults(houseSummaries);
-    }
-
-    private String formatHousePredictionResults(List<HousePredictionSummary> houseSummaries) {
-        if (houseSummaries == null || houseSummaries.isEmpty()) return "## Delegation Results\nNo delegation results.";
-
-        StringBuilder builder = new StringBuilder("## Delegation Results\n");
-        for (HousePredictionSummary summary : houseSummaries) {
-            builder.append(houseService.houseRoleMention(summary.house()))
-                    .append(" - **")
-                    .append(formatSignedPoints(summary.totalPoints()))
-                    .append("** (`")
-                    .append(summary.correctPredictions())
-                    .append("/")
-                    .append(summary.predictionCount())
-                    .append("` correct)\n")
-                    .append("> Predictions: ")
-                    .append(formatSignedPoints(summary.predictionPoints()))
-                    .append(" points\n")
-                    .append("> Side Bets: ")
-                    .append(formatSignedPoints(summary.sideBetPoints()))
-                    .append(" points\n");
-            for (HouseAbilitySummary abilitySummary : summary.abilitySummaries()) {
-                builder.append("> ")
-                        .append(abilitySummary.label())
-                        .append(": ")
-                        .append(formatSignedPoints(abilitySummary.points()))
-                        .append(" points\n");
-            }
-        }
-        return builder.toString().trim();
-    }
-
-    private void postDelegationFavorAwards(List<HousePredictionSummary> summaries) {
-        if (!settings.isHousesEnabled() || summaries == null || summaries.isEmpty()) return;
-        for (HousePredictionSummary summary : summaries) {
-            TextChannel channel = houseChannel(summary.house());
-            if (channel == null) continue;
-            MessageHelper.sendMessageToChannel(channel, favorAwardMessage(summary));
-        }
-    }
-
-    private String favorAwardMessage(HousePredictionSummary summary) {
-        StringBuilder message = new StringBuilder("## Favor Granted\n")
-                .append(FactionEmojis.getFactionIcon(summary.house().displayName()))
-                .append(" ")
-                .append(summary.house().displayName())
-                .append(" Delegation receives `")
-                .append(formatSignedPoints(summary.favorPoints()))
-                .append("` Favor.\n");
-        List<HouseFavorSummary> favorSummaries = summary.favorSummaries();
-        if (favorSummaries == null || favorSummaries.isEmpty()) {
-            message.append("- `")
-                    .append(formatSignedPoints(summary.favorPoints()))
-                    .append("` from the Custodians sealing this combat's ledger.\n");
-            appendTotalFavorLine(message, summary.house());
-            return message.toString().trim();
-        }
-        for (HouseFavorSummary favorSummary : favorSummaries) {
-            message.append("- `")
-                    .append(formatSignedPoints(favorSummary.favor()))
-                    .append("` from ")
-                    .append(favorSummary.label())
-                    .append(".\n");
-        }
-        appendTotalFavorLine(message, summary.house());
-        return message.toString().trim();
-    }
-
-    private void appendTotalFavorLine(StringBuilder message, CombatReplayHouse house) {
-        message.append("- **Total Favor:** `")
-                .append(houseFavorService.balance(house))
-                .append("`\n");
-    }
-
-    private TextChannel houseChannel(CombatReplayHouse house) {
-        if (JdaService.guildPrimary == null || house == null) return null;
-        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName(house.channelName(), true);
-        if (channels.isEmpty()) {
-            BotLogger.warning("Lazax house channel not found: " + house.channelName());
-            return null;
-        }
-        return channels.getFirst();
     }
 
     private void postSideBetResultsSummary(MessageChannel threadOrChannel, ScoredContestResult result) {
@@ -590,9 +456,8 @@ public class CombatReplayLeaderboardService {
         StringBuilder message = new StringBuilder("## Side Bets\n");
         for (AggregatedSideBetSummary sideBet : aggregatedSideBets) {
             String repeats = sideBet.hitCount() > 1 ? " x" + sideBet.hitCount() : "";
-            message.append("<@")
-                    .append(sideBet.discordUserId())
-                    .append("> - *")
+            message.append(getSafeLeaderboardName(sideBet.discordUserName()))
+                    .append(" - *")
                     .append(sideBet.label())
                     .append("*")
                     .append(repeats)
@@ -613,7 +478,8 @@ public class CombatReplayLeaderboardService {
         return "**" + (candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction()) + "**";
     }
 
-    private void postParticipantFollowup(Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
+    private static void postParticipantFollowup(
+            Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
         if (game == null) return;
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
@@ -626,7 +492,7 @@ public class CombatReplayLeaderboardService {
         MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }
 
-    private void postSubscriptionPrompt(MessageChannel threadOrChannel) {
+    private static void postSubscriptionPrompt(MessageChannel threadOrChannel) {
         String message = "Did you like this? React " + SUBSCRIBE_EMOJI
                 + " to subscribe to more, " + UNSUBSCRIBE_EMOJI
                 + " to opt out if already subscribed.\n"
@@ -685,7 +551,7 @@ public class CombatReplayLeaderboardService {
         return userName.replace("@", "@\u200B");
     }
 
-    private String writeLockedPredictions(List<LockedPrediction> predictions) {
+    private static String writeLockedPredictions(List<LockedPrediction> predictions) {
         try {
             return JsonMapperManager.basic().writeValueAsString(predictions);
         } catch (Exception e) {
@@ -693,7 +559,26 @@ public class CombatReplayLeaderboardService {
         }
     }
 
-    private List<LockedPrediction> readLockedPredictions(String predictionsJson) {
+    private static Set<String> retainPredictedUserIds(List<LockedPrediction> predictions, Set<String> userIds) {
+        if (predictions == null || predictions.isEmpty() || userIds == null || userIds.isEmpty()) return Set.of();
+        Set<String> retained = new HashSet<>();
+        for (LockedPrediction prediction : predictions) {
+            if (userIds.contains(prediction.discordUserId())) {
+                retained.add(prediction.discordUserId());
+            }
+        }
+        return retained;
+    }
+
+    private static String writeStringSet(Set<String> values) {
+        try {
+            return JsonMapperManager.basic().writeValueAsString(values == null ? Set.of() : values);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to write Double or Bust snapshot.", e);
+        }
+    }
+
+    private static List<LockedPrediction> readLockedPredictions(String predictionsJson) {
         if (predictionsJson == null || predictionsJson.isBlank()) return List.of();
         try {
             return JsonMapperManager.basic()
@@ -704,7 +589,17 @@ public class CombatReplayLeaderboardService {
         }
     }
 
-    private List<AggregatedSideBetSummary> aggregateSideBetSummaries(List<ResolvedSideBet> resolvedSideBets) {
+    private static Set<String> readStringSet(String valuesJson) {
+        if (valuesJson == null || valuesJson.isBlank()) return Set.of();
+        try {
+            return new HashSet<>(
+                    JsonMapperManager.basic().readerForListOf(String.class).readValue(valuesJson));
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to read Double or Bust snapshot.", e);
+        }
+    }
+
+    private static List<AggregatedSideBetSummary> aggregateSideBetSummaries(List<ResolvedSideBet> resolvedSideBets) {
         record SideBetKey(String discordUserId, String discordUserName, String label) {}
 
         Map<SideBetKey, AggregatedSideBetSummary> summariesByKey = new LinkedHashMap<>();
@@ -730,12 +625,8 @@ public class CombatReplayLeaderboardService {
         return new ArrayList<>(summariesByKey.values());
     }
 
-    private int safeInt(Integer value) {
+    private static int safeInt(Integer value) {
         return value == null ? 0 : value;
-    }
-
-    private String formatSignedPoints(int points) {
-        return points > 0 ? "+" + points : String.valueOf(points);
     }
 
     private record AggregatedSideBetSummary(
@@ -744,6 +635,6 @@ public class CombatReplayLeaderboardService {
     record ScoredContestResult(
             int totalPredictions,
             List<WinningPredictionSummary> winningPredictions,
-            List<HousePredictionSummary> housePredictionSummaries,
+            List<BustedPredictionSummary> bustedPredictions,
             List<ResolvedSideBet> winningSideBets) {}
 }

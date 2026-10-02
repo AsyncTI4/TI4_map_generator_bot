@@ -45,7 +45,7 @@ public class CombatContestSideBetEntity {
     @Column(name = "target_faction", nullable = false)
     private String targetFaction;
 
-    @Column(name = "offered_profit_points")
+    @Column(name = "offered_profit_points", nullable = false)
     private Integer offeredProfitPoints;
 
     @Column(name = "placed_at", nullable = false)

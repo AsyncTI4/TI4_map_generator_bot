@@ -1,7 +1,7 @@
 package ti4.discord.interactions.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,11 +18,17 @@ class Bounties extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        if (!player.hasAbility("marked_prey")) {
+        if (game.getRealPlayers().stream().noneMatch(p -> p.hasAbility("marked_prey"))) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "You do not have the Marked Prey ability and cannot manage bounties.");
+                    event, "No player in this game has the Marked Prey ability, so there are no bounties.");
             return;
         }
-        ZephyrionBountyButtonHandler.offerBountyButtons(game, player);
+        if (!player.hasAbility("marked_prey")) {
+            String currentBounties = String.join(", ", ZephyrionBountyHandler.getBountiesForPlayer(game));
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Current bounties: " + (currentBounties.isEmpty() ? "none." : currentBounties + "."));
+            return;
+        }
+        ZephyrionBountyHandler.offerBountyButtons(game, player);
     }
 }

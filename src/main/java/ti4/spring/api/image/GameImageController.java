@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.discord.JdaService;
+import ti4.discord.utility.DiscordErrorUtility;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.DisplayType;
-import ti4.helpers.discord.DiscordHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.spring.context.RequestContext;
@@ -41,6 +41,7 @@ public class GameImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @SetupRequestContext(save = false)
     @GetMapping("/attachment-url")
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
@@ -86,7 +87,7 @@ public class GameImageController {
     /**
      * Get the user ID if authenticated, null otherwise.
      */
-    private String getOptionalUserId() {
+    private static String getOptionalUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
             return auth.getName();
@@ -175,7 +176,7 @@ public class GameImageController {
             }
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
-            if (!DiscordHelper.isUnknownMessageError(e)) {
+            if (!DiscordErrorUtility.isUnknownMessageError(e)) {
                 BotLogger.error(
                         "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName,
                         e);
@@ -188,16 +189,16 @@ public class GameImageController {
         return gameAttachmentUrlRefreshService
                 .refreshAttachmentUrl(gameName)
                 .map(ResponseEntity::ok)
-                .orElseGet(this::notFound);
+                .orElseGet(GameImageController::notFound);
     }
 
-    private ResponseEntity<String> notFound() {
+    private static ResponseEntity<String> notFound() {
         return ResponseEntity.notFound().build();
     }
 
     @SetupRequestContext(save = false)
     @PostMapping("/refresh")
-    public ResponseEntity<String> refresh(@PathVariable String gameName) {
+    public static ResponseEntity<String> refresh(@PathVariable String gameName) {
         Game game = RequestContext.getGame();
         MapRenderPipeline.queue(game, null, DisplayType.all, null);
         return ResponseEntity.ok("Queued");

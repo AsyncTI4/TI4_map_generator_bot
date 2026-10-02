@@ -89,7 +89,7 @@ class GameAttachmentUrlRefreshService {
         }
     }
 
-    private TextChannel getChroniclesChannel() {
+    private static TextChannel getChroniclesChannel() {
         if (JdaService.guildPrimary == null) {
             BotLogger.error("Cannot refresh attachment URL because the primary guild is unavailable");
             return null;
@@ -134,7 +134,7 @@ class GameAttachmentUrlRefreshService {
                 .orElse(null);
     }
 
-    private ThreadChannel reopenThread(ThreadChannel threadChannel) {
+    private static ThreadChannel reopenThread(ThreadChannel threadChannel) {
         if (!threadChannel.isArchived()) {
             return threadChannel;
         }

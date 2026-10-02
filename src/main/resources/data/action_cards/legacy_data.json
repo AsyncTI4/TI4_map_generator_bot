@@ -1049,26 +1049,8 @@
         "source": "deprecated"
     },
     {
-        "alias": "rendezvous",
-        "name": "Rendezvous",
-        "phase": "Action",
-        "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
-        "text": "Remove your command token from that system and end your turn.",
-        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
-        "source": "deprecated"
-    },
-    {
         "alias": "foreign_aid",
         "name": "Foreign Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
-        "source": "deprecated"
-    },
-    {
-        "alias": "strategic_assistance",
-        "name": "Strategic Aid",
         "phase": "Action",
         "window": "When you perform a strategic action",
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
@@ -1403,15 +1385,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "sacrifice",
-        "name": "Sacrifice",
-        "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
-        "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
-        "source": "deprecated"
-    },
-    {
         "alias": "classified_weapons_acd2",
         "name": "Classified Weapons",
         "phase": "Action",
@@ -1657,12 +1630,198 @@
         "source": "deprecated"
     },
     {
-        "alias": "strategic_aid",
+        "alias": "strategic_assistance",
         "name": "Strategic Aid",
         "phase": "Action",
         "window": "When you perform a strategic action",
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "collusion",
+        "name": "Collusion",
+        "phase": "Action",
+        "window": "After you resolve the primary ability of your strategy card",
+        "text": "Remove 1 of another player's command tokens from the game board and place it in their strategy pool. Then, gain 1 command token.",
+        "flavorText": "Gambit? The magi laughed. Hardly.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce up to 2 ships of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury. His engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "blackmail",
+        "name": "Blackmail",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "oracle",
+        "name": "Oracle",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
+        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey1",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey2",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey3",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey4",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "final_mission",
+        "name": "Final Mission",
+        "phase": "Action",
+        "window": "After 1 of your non-fighter ships is destroyed",
+        "text": "Choose 1 planet in that unit's system. Destroy 1 ground force and 1 PDS on that planet.",
+        "notes": "You are not required to destroy both to play this card.",
+        "flavorText": "The Exotrireme became a guided missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "void_path",
+        "name": "Void Path",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain planets. You treat that system as if it contains an alpha, beta, and gamma wormhole during this tactical action.",
+        "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we were for ours.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "swindle",
+        "name": "Swindle",
+        "phase": "Action",
+        "window": "When another player gains 2 or more trade goods",
+        "text": "Take 2 of those trade goods and gain 1 trade good.",
+        "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver1",
+        "name": "Outmaneuver",
+        "automationID": "outrun1",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver2",
+        "name": "Outmaneuver",
+        "automationID": "outrun2",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship. \"Zat would've cut us in half,\" he muttered.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver3",
+        "name": "Outmaneuver",
+        "automationID": "outrun3",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "T'esla checked her wingman, relieved to see that he had managed to dodge the flak as well. \"Close in and open fire!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "outmaneuver4",
+        "name": "Outmaneuver",
+        "automationID": "outrun4",
+        "phase": "Action",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
+        "flavorText": "The capital ship's massive cannons were unable to track the brigades of fighters swarming it like insects.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice1",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "Sharsiss exulted. Each puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice2",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice3",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice4",
+        "name": "Sacrifice",
+        "automationID": "sacrifice",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "deprecated"
     }
 ]

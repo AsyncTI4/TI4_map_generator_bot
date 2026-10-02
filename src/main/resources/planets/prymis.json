@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "prymis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "prymis",
     "tileId": "er95",
     "name": "Prymis",

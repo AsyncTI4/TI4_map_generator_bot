@@ -12,6 +12,7 @@ import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
 
 public enum DraftCategory {
+    FACTION,
     ABILITY,
     TECH,
     BREAKTHROUGH,
@@ -30,12 +31,14 @@ public enum DraftCategory {
     DRAFTORDER,
     MAHACTKING,
     UNIT,
+    MONUMENT,
     PLOT;
 
     public String title(Game game) {
         TI4Emoji emoji = emoji(game);
         return "## "
                 + switch (this) {
+                    case FACTION -> "Factions";
                     case ABILITY -> "Abilities";
                     case TECH -> game.isTwilightsFallMode() ? "Abilities" : "Faction Techs";
                     case AGENT -> game.isTwilightsFallMode() ? "Genomes" : "Agents";
@@ -53,6 +56,7 @@ public enum DraftCategory {
                     case DRAFTORDER -> "Drafting Orders";
                     case MAHACTKING -> "Mahact Kings";
                     case UNIT -> "Units";
+                    case MONUMENT -> "Monuments";
                     case BREAKTHROUGH -> "Breakthroughs";
                     case PLOT -> "Plot cards";
                 }
@@ -61,6 +65,7 @@ public enum DraftCategory {
 
     public TI4Emoji emoji(Game game) {
         return switch (this) {
+            case FACTION -> FactionEmojis.Muaat;
             case ABILITY -> MiscEmojis.tf_ability;
             case TECH -> game.isTwilightsFallMode() ? MiscEmojis.tf_ability : TechEmojis.CyberneticPropulsion;
             case AGENT -> game.isTwilightsFallMode() ? MiscEmojis.tf_genome : LeaderEmojis.Agent;
@@ -78,12 +83,13 @@ public enum DraftCategory {
             case DRAFTORDER -> MiltyDraftEmojis.positionUnpicked;
             case MAHACTKING -> FactionEmojis.Mahact;
             case UNIT -> TechEmojis.UnitUpgradeTech;
+            case MONUMENT -> UnitEmojis.Monument;
             case BREAKTHROUGH -> TechEmojis.SynergyAll;
             case PLOT -> FactionEmojis.Firmament;
         };
     }
 
-    public boolean showDescrByDefault() {
+    public static boolean showDescrByDefault() {
         return true;
     }
 }

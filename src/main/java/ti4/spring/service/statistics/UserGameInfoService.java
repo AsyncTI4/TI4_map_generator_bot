@@ -6,11 +6,20 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
+import ti4.settings.users.UserSettingsManager;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.PlayerEntityRepository;
 
@@ -19,6 +28,31 @@ import ti4.spring.service.persistence.PlayerEntityRepository;
 public class UserGameInfoService {
 
     private final PlayerEntityRepository playerEntityRepository;
+
+    @Transactional(readOnly = true)
+    public List<Integer> getUsersThreeFastestDaysToComplete6PlayerGames(String userId) {
+        return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
+                .map(PlayerEntity::getGame)
+                .filter(game -> game.getPlayerCount() == 6)
+                .map(UserGameInfoService::getDaysToComplete)
+                .filter(days -> days > 0)
+                .sorted()
+                .limit(5)
+                .toList();
+    }
+
+    private static int getDaysToComplete(GameEntity game) {
+        return (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
+                .toDays();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasCompletedGameInDays(String userId, int maxDurationDays) {
+        return playerEntityRepository.findAllWithCompletedGamesByUserIdEquals(userId).stream()
+                .map(PlayerEntity::getGame)
+                .map(UserGameInfoService::getDaysToComplete)
+                .anyMatch(days -> days <= maxDurationDays);
+    }
 
     @Transactional(readOnly = true)
     public String getUserGameInfo(List<User> users) {
@@ -111,6 +145,53 @@ public class UserGameInfoService {
             index++;
         }
         return sb.toString();
+    }
+
+    public static int countOngoingGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 0;
+        return (int) managedPlayer.getGames().stream()
+                .filter(managedGame -> !managedGame.isHasEnded())
+                .map(ManagedGame::getGame)
+                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .count();
+    }
+
+    public static int countCompletedGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 0;
+        return (int) managedPlayer.getGames().stream()
+                .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
+                .map(ManagedGame::getGame)
+                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .count();
+    }
+
+    public static boolean isOverStandardGameLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return false;
+        int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
+        int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
+        if (managedPlayer != null) {
+            var userSettings = UserSettingsManager.get(managedPlayer.getId());
+            String trackRecord = userSettings.getTrackRecord();
+            int droppedGames = 0;
+            droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+            droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
+            completedGames += droppedGames;
+        }
+        return ongoingAmount > completedGames + 2;
+    }
+
+    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
+        return game -> {
+            List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
+            return realAndEliminatedPlayers.size() >= 3
+                    && realAndEliminatedPlayers.stream()
+                            .map(Player::getUserID)
+                            .anyMatch(id -> managedPlayer.getId().equals(id));
+        };
+    }
+
+    public static UserGameInfoService get() {
+        return SpringContext.getBean(UserGameInfoService.class);
     }
 
     private static class UserGameStatsAccumulator {

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vorhal",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 151
+        }
+    },
     "id": "vorhal",
     "tileId": "63",
     "name": "Vorhal",

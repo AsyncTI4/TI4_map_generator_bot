@@ -2,6 +2,7 @@ package ti4.contest.cron;
 
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayJanitorService;
 import ti4.cron.CronManager;
 import ti4.logging.BotLogger;
@@ -9,7 +10,7 @@ import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
-public class CombatContestJanitorCron {
+class CombatContestJanitorCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
@@ -22,6 +23,7 @@ public class CombatContestJanitorCron {
 
     private static void runJanitor() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (!CombatContestSettings.isEnabledStatic()) return;
         BotLogger.logCron("Running CombatContestJanitorCron.");
         try {
             SpringContext.getBean(CombatReplayJanitorService.class).runJanitor();

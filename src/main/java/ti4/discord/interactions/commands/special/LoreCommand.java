@@ -19,6 +19,12 @@ class LoreCommand extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "You are not GM in this game.");
             return;
         }
+        if (!LoreService.isLoreEnabled(game)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Lore is only functional in non-FoW games if `lore_mode` is enabled via `/game weird-game-setup`."
+                            + " You can still add/edit lore now, but it will not trigger until then.");
+        }
         LoreService.showLoreButtons(event, null, game);
     }
 }

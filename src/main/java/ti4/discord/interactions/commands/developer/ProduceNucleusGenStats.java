@@ -59,7 +59,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
         runAndPrintData(event, draftSpec, numIterations);
     }
 
-    private void runAndPrintData(GenericInteractionCreateEvent event, DraftSpec draftSpecs, int numIterations) {
+    private static void runAndPrintData(GenericInteractionCreateEvent event, DraftSpec draftSpecs, int numIterations) {
         if (numIterations > 10_000) {
             numIterations = 10_000;
         }

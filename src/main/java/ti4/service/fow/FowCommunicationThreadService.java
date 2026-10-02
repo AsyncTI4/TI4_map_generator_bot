@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
@@ -115,6 +116,27 @@ public class FowCommunicationThreadService {
         return future;
     }
 
+    public static Optional<ThreadChannel> findOpenCommThread(Game game, Player p1, Player p2) {
+        if (!isActive(game) || p1 == null || p2 == null || game.getMainGameChannel() == null) {
+            return Optional.empty();
+        }
+        return game.getMainGameChannel().getThreadChannels().stream()
+                .filter(thread -> !thread.getName().contains(NO_CHAR))
+                .filter(thread -> isThreadForPair(game, thread, p1, p2))
+                .findFirst();
+    }
+
+    private static boolean isThreadForPair(Game game, ThreadChannel thread, Player p1, Player p2) {
+        Matcher matcher = THREAD_NAME_PATTERN.matcher(thread.getName());
+        if (!matcher.find()) {
+            return false;
+        }
+        Player a = game.getPlayerFromColorOrFaction(matcher.group(1));
+        Player b = game.getPlayerFromColorOrFaction(matcher.group(2));
+        return (p1.equals(a) && p2.equals(b)) || (p1.equals(b) && p2.equals(a));
+    }
+
+    // TODO: pair parsing duplicated in findPlayersCommThreads, isThreadForPair, DeleteFOWCommThreads.
     private static Map<ThreadChannel, Player> findPlayersCommThreads(
             Game game, List<ThreadChannel> threads, Player player) {
         Map<ThreadChannel, Player> threadMap = new HashMap<>();
@@ -207,7 +229,7 @@ public class FowCommunicationThreadService {
         return newCommPartners;
     }
 
-    @ButtonHandler("fowComms_")
+    @ButtonHandler(value = "fowComms_", save = false)
     public static void showComms(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String color : buttonID.replace("fowComms_", "").split("-")) {

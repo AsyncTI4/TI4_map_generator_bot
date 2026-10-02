@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.agenda;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -45,7 +46,7 @@ class ChecksAndBalancesButtonHandler {
         } else {
             boolean foundPlayer = false;
             Player privatePlayer = null;
-            List<Player> players = game.getRealPlayers();
+            List<Player> players = new ArrayList<>(game.getRealPlayers());
             if (game.isReverseSpeakerOrder()
                     || !game.getStoredValue("willRevolution").isEmpty()) {
                 Collections.reverse(players);

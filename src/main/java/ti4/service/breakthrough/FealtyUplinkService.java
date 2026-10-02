@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
@@ -25,12 +26,16 @@ import ti4.service.regex.RegexService;
 public class FealtyUplinkService {
 
     private String rep(Game game) {
-        if (game.isTwilightKart()) return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (game.isTwilightKart() || game.isTkDestroyerCup())
+            return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
         return Mapper.getBreakthrough("l1z1xbt").getNameRepresentation();
     }
 
     private String name(Game game) {
-        if (game.isTwilightKart()) return "_" + Mapper.getUnit("tk-fealtycore").getName() + "_";
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        if (game.isTwilightKart() || game.isTkDestroyerCup())
+            return "_" + Mapper.getUnit("tk-fealtycore").getName() + "_";
         return "_" + Mapper.getBreakthrough("l1z1xbt").getName() + "_";
     }
 
@@ -41,6 +46,13 @@ public class FealtyUplinkService {
     }
 
     public void postInitialButtons(Game game, Player player, String planetName) {
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetName);
+        if (unitHolder != null) {
+            boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+            if (containsDMZ) {
+                return;
+            }
+        }
         String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planetName, game);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(

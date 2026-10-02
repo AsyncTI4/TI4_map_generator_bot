@@ -1,0 +1,798 @@
+[
+    {
+        "alias": "ardentia",
+        "factionName": "The Slavers of Ardentia",
+        "homeSystem": "th1",
+        "startingFleet": "1 cr, 2 dd, 5 ff, 2 inf w, 1 inf a, 1 sd w, 1 pds a",
+        "commodities": 3,
+        "factionTech": [
+            "thardentiar",
+            "thardentiag"
+        ],
+        "startingTechOptions": [
+            "hm",
+            "da"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "weyr",
+            "ardentia"
+        ],
+        "abilities": [
+            "seize_command",
+            "borrowed_authority"
+        ],
+        "leaders": [
+            "ardentiaagent",
+            "ardentiacommander",
+            "ardentiahero"
+        ],
+        "promissoryNotes": [
+            "thpnardentia"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "ardentia_flagship",
+            "infantry",
+            "ardentia_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "verydith",
+        "factionName": "The Concord of Verydith",
+        "homeSystem": "th2",
+        "startingFleet": "1 cv, 1 cr, 1 dn, 3 ff, 2 inf v, 1 inf g, 1 inf o, 1 sd v",
+        "commodities": 3,
+        "factionTech": [
+            "thverydithg",
+            "thverydithy"
+        ],
+        "startingTechOptions": [
+            "td",
+            "bs"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "verydith",
+            "graveth",
+            "orsalis"
+        ],
+        "abilities": [
+            "diplomatic_immunity",
+            "mandate_of_presence"
+        ],
+        "leaders": [
+            "verydithagent",
+            "verydithcommander",
+            "verydithhero"
+        ],
+        "promissoryNotes": [
+            "thpnverydith"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "verydith_flagship",
+            "infantry",
+            "verydith_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "veylor",
+        "factionName": "The Synod of Veylor",
+        "homeSystem": "th3",
+        "startingFleet": "2 cv, 1 cr, 3 ff, 1 inf v, 2 inf c, 1 sd c",
+        "commodities": 3,
+        "factionTech": [
+            "thveylory",
+            "thveylorg"
+        ],
+        "startingTech": [
+            "nm",
+            "pi"
+        ],
+        "homePlanets": [
+            "veylorprime",
+            "cindralsstep"
+        ],
+        "abilities": [
+            "lobbyist_dues",
+            "tight_scheduling"
+        ],
+        "leaders": [
+            "veyloragent",
+            "veylorcommander",
+            "veylorhero"
+        ],
+        "promissoryNotes": [
+            "thpnveylor"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "veylor_flagship",
+            "infantry",
+            "veylor_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "myrr",
+        "factionName": "The Wrought of Myrr",
+        "homeSystem": "th4",
+        "startingFleet": "1 cr, 2 dn, 5 ff, 3 inf m, 1 sd m, 1 pds m",
+        "commodities": 2,
+        "factionTech": [
+            "thmyrry",
+            "thmyrrdn"
+        ],
+        "startingTech": [
+            "st"
+        ],
+        "homePlanets": [
+            "myrrserash"
+        ],
+        "abilities": [
+            "factory_lease",
+            "echo_of_the_anvil"
+        ],
+        "leaders": [
+            "myrragent",
+            "myrrcommander",
+            "myrrhero"
+        ],
+        "promissoryNotes": [
+            "thpnmyrri",
+            "thpnmyrrc",
+            "thpnmyrrh"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "myrr_dreadnought",
+            "myrr_flagship",
+            "infantry",
+            "myrr_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "kairn",
+        "factionName": "The Explorers of Kairn",
+        "homeSystem": "th5",
+        "startingFleet": "2 dn, 2 ff, 1 mf d, 1 mf p, 1 sd p, 1 sd d, 1 pds p, 1 pds d",
+        "commodities": 3,
+        "factionTech": [
+            "thkairny",
+            "thkairng"
+        ],
+        "startingTech": [
+            "sdn",
+            "pa"
+        ],
+        "homePlanets": [
+            "kairn",
+            "darnak",
+            "plotyz"
+        ],
+        "abilities": [
+            "shared_discoveries",
+            "colony_outposts"
+        ],
+        "leaders": [
+            "kairnagent",
+            "kairncommander",
+            "kairnhero"
+        ],
+        "promissoryNotes": [
+            "thpnkairn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kairn_flagship",
+            "infantry",
+            "kairn_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "kryxos",
+        "factionName": "The Dominion of Kryxos",
+        "homeSystem": "th6",
+        "startingFleet": "1 dn, 1 cv, 1 cr, 1 dd, 1 ff, 1 mf b, 1 inf chrysali, 1 sd b, 1 pds cu",
+        "commodities": 2,
+        "factionTech": [
+            "thkryxosfs",
+            "thkryxosmf"
+        ],
+        "startingTech": [
+            "aida"
+        ],
+        "homePlanets": [
+            "bruud",
+            "chrysali",
+            "cullspire"
+        ],
+        "abilities": [
+            "battle_tested_designs",
+            "evolved_warforms",
+            "testing_yard"
+        ],
+        "leaders": [
+            "kryxosagent",
+            "kryxoscommander",
+            "kryxoshero"
+        ],
+        "promissoryNotes": [
+            "thpnkryxos"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kryxos_flagship",
+            "infantry",
+            "kryxos_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "arcanum",
+        "factionName": "The Arcanum Ascension",
+        "homeSystem": "th7",
+        "startingFleet": "1 cv, 2 dd, 3 ff, 2 inf t, 1 inf c, 1 inf s, 1 sd t, 1 pds s",
+        "commodities": 3,
+        "factionTech": [
+            "tharcanumry",
+            "tharcanumbg"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "thearcanum",
+            "crythisis",
+            "syphos"
+        ],
+        "abilities": [
+            "ritual_of_ascension",
+            "primordial_secrets",
+            "forbidden_knowledge"
+        ],
+        "leaders": [
+            "arcanumagent",
+            "arcanumcommander",
+            "arcanumhero"
+        ],
+        "promissoryNotes": [
+            "thpnarcanum"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "arcanum_flagship",
+            "infantry",
+            "arcanum_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "xytheris",
+        "factionName": "The Swarm of Xytheris",
+        "homeSystem": "th8",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 6 inf h, 1 sd h, 2 pds h",
+        "commodities": 3,
+        "factionTech": [
+            "thxytherisdd",
+            "thxytherisr"
+        ],
+        "startingTech": [
+            "ps",
+            "amd"
+        ],
+        "homePlanets": [
+            "hiveworld"
+        ],
+        "abilities": [
+            "sting_of_the_hive",
+            "hive_echo"
+        ],
+        "leaders": [
+            "xytherisagent",
+            "xytheriscommander",
+            "xytherishero"
+        ],
+        "promissoryNotes": [
+            "thpnxytheris"
+        ],
+        "units": [
+            "fighter",
+            "xytheris_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "xytheris_flagship",
+            "infantry",
+            "xytheris_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "oblivion",
+        "factionName": "The Covenant of Oblivion",
+        "homeSystem": "th9",
+        "startingFleet": "2 cv, 1 dn, 1 ff, 2 inf n, 2 inf v, 1 sd n",
+        "commodities": 2,
+        "factionTech": [
+            "thoblivionr",
+            "thobliviong"
+        ],
+        "startingTech": [
+            "det",
+            "nm"
+        ],
+        "homePlanets": [
+            "nihlus",
+            "veydra"
+        ],
+        "abilities": [
+            "ignorant_discoveries",
+            "reflections_of_the_void"
+        ],
+        "leaders": [
+            "oblivionagent",
+            "oblivioncommander",
+            "oblivionhero"
+        ],
+        "promissoryNotes": [
+            "thpnoblivion"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "oblivion_flagship",
+            "infantry",
+            "oblivion_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "revenant",
+        "factionName": "The Revenant Glory",
+        "homeSystem": "th10",
+        "startingFleet": "1 cv, 2 cr, 5 ff, 2 inf h, 1 inf t, 1 sd h",
+        "commodities": 4,
+        "factionTech": [
+            "threvenanty",
+            "threvenantr"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "heroh",
+            "thecrypt"
+        ],
+        "abilities": [
+            "commanding_presence",
+            "call_of_the_haunted",
+            "allure_of_darkness"
+        ],
+        "leaders": [
+            "revenantagent",
+            "revenantcommander",
+            "revenanthero"
+        ],
+        "promissoryNotes": [
+            "thpnrevenant"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "revenant_flagship",
+            "infantry",
+            "revenant_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "thrones",
+        "factionName": "The Thrones of Ruin",
+        "homeSystem": "th11",
+        "startingFleet": "1 dn, 1 cv, 5 ff, 1 mf r, 2 inf r, 1 sd r",
+        "commodities": 3,
+        "factionTech": [
+            "ththronesr",
+            "ththronesb"
+        ],
+        "startingTech": [
+            "sar",
+            "amd"
+        ],
+        "homePlanets": [
+            "ruin"
+        ],
+        "abilities": [
+            "thrones_of_ruin",
+            "traces_of_ruin"
+        ],
+        "leaders": [
+            "thronesagent",
+            "thronescommander",
+            "throneshero"
+        ],
+        "promissoryNotes": [
+            "thpnthrones"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "thrones_flagship",
+            "infantry",
+            "thrones_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "aeterna",
+        "factionName": "The Aeterna Reclamation",
+        "homeSystem": "th12",
+        "startingFleet": "1 fs, 1 cv, 4 ff, 1 mf a, 2 inf a, 1 sd a, 1 pds a",
+        "commodities": 4,
+        "factionTech": [
+            "thaeternar",
+            "thaeternasd"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "aeterna"
+        ],
+        "abilities": [
+            "cycle_of_reclamation"
+        ],
+        "leaders": [
+            "aeternaagent",
+            "aeternacommander",
+            "aeternahero"
+        ],
+        "promissoryNotes": [
+            "thpnaeterna"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "aeterna_flagship",
+            "infantry",
+            "aeterna_mech",
+            "pds",
+            "aeterna_spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ponthous",
+        "factionName": "The Ponthous Remnant",
+        "homeSystem": "th13",
+        "startingFleet": "1 cv, 2 dd, 2 ff, 6 inf p, 1 sd p",
+        "commodities": 2,
+        "factionTech": [
+            "thponthousr",
+            "thponthousdd"
+        ],
+        "startingTech": [
+            "sar",
+            "nm"
+        ],
+        "homePlanets": [
+            "ponthous"
+        ],
+        "abilities": [
+            "survivalists",
+            "last_stand",
+            "rallying_cry"
+        ],
+        "leaders": [
+            "ponthousagent",
+            "ponthouscommander",
+            "ponthoushero"
+        ],
+        "promissoryNotes": [
+            "thpnponthous"
+        ],
+        "units": [
+            "fighter",
+            "ponthous_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "ponthous_flagship",
+            "infantry",
+            "ponthous_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "vanguard",
+        "factionName": "The Iron Keep Vanguard",
+        "homeSystem": "th14",
+        "startingFleet": "2 dn, 1 dd, 3 ff, 4 inf ironkeep, 1 sd ironkeep, 1 pds ironkeep",
+        "commodities": 3,
+        "factionTech": [
+            "thvanguardr",
+            "thvanguardy"
+        ],
+        "startingTech": [
+            "dxa"
+        ],
+        "homePlanets": [
+            "ironkeep"
+        ],
+        "abilities": [
+            "interlocking_shields",
+            "shielded_transports",
+            "enhanced_fundamentals"
+        ],
+        "leaders": [
+            "vanguardagent",
+            "vanguardcommander",
+            "vanguardhero"
+        ],
+        "promissoryNotes": [
+            "thpnvanguard"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vanguard_flagship",
+            "infantry",
+            "vanguard_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "scrapyard",
+        "factionName": "The Scrapyard Pack",
+        "homeSystem": "th15",
+        "startingFleet": "",
+        "commodities": 2,
+        "factionTech": [
+            "thscrapyardff",
+            "thscrapyardr"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "junkyard",
+            "scrapheap"
+        ],
+        "abilities": [
+            "custom_rigs",
+            "drive_decoherence",
+            "repurposed_parts"
+        ],
+        "leaders": [
+            "scrapyardagent",
+            "scrapyardcommander",
+            "scrapyardhero"
+        ],
+        "promissoryNotes": [
+            "thpnscrapyard"
+        ],
+        "units": [
+            "scrapyard_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "scrapyard_flagship",
+            "infantry",
+            "scrapyard_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "stoneborn",
+        "factionName": "The Stoneborn Stratum",
+        "homeSystem": "th16a",
+        "startingFleet": "1 cv, 1 dd, 3 ff, 3 mf p, 1 sd p",
+        "commodities": 4,
+        "factionTech": [
+            "thstoneborng",
+            "thstoneborndn"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "petra"
+        ],
+        "abilities": [
+            "fragmentum_unleashed",
+            "adaptive",
+            "trovantous"
+        ],
+        "leaders": [
+            "stonebornagentdormant",
+            "stoneborncommanderdormant",
+            "stonebornherodormant"
+        ],
+        "promissoryNotes": [
+            "thpnstoneborn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "stoneborn_dreadnought",
+            "stoneborn_flagship",
+            "infantry",
+            "stoneborn_mechdormant",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "morpha",
+        "factionName": "The Formless Morpha",
+        "homeSystem": "th17",
+        "startingFleet": "1 dn, 1 cv, 1 dd, 3 ff, 2 inf n, 2 inf m, 1 sd n",
+        "commodities": 3,
+        "factionTech": [
+            "thmorphag",
+            "thmorphacv"
+        ],
+        "startingTech": [
+            "nm",
+            "amd"
+        ],
+        "homePlanets": [
+            "nuclei",
+            "mito"
+        ],
+        "abilities": [
+            "hydromorphic",
+            "hydrospheric_extraction"
+        ],
+        "leaders": [
+            "morphaagent",
+            "morphacommander",
+            "morphahero"
+        ],
+        "promissoryNotes": [
+            "thpnmorpha"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "morpha_carrier",
+            "dreadnought",
+            "morpha_flagship",
+            "infantry",
+            "morpha_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    },
+    {
+        "alias": "thurviali",
+        "factionName": "The Radiant Thurviali",
+        "homeSystem": "th18",
+        "startingFleet": "1 cv, 2 cr, 4 ff, 2 inf g, 1 inf a, 1 mf a, 1 sd g, 1 pds a",
+        "commodities": 4,
+        "factionTech": [
+            "ththurvialig",
+            "ththurvialib"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "ghidah",
+            "amarok"
+        ],
+        "abilities": [
+            "radiant_grafting",
+            "celestial_envoys"
+        ],
+        "leaders": [
+            "thurvialiagent",
+            "thurvialicommander",
+            "thurvialihero"
+        ],
+        "promissoryNotes": [
+            "thpnthurviali"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "thurviali_flagship",
+            "infantry",
+            "thurviali_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "theodisi"
+    }
+]

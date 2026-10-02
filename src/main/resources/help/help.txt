@@ -198,6 +198,7 @@ Cards commands
 /status po_remove_custom objectiveID <- removes custom objective
 /status po_score id <- score existing objective
 /status po_unscore id <- unscore if you scored by mistake
+/status po_unreveal id <- unreveals a public objective, returning it to the staged/peekable objectives and marking all players as having seen it
 /status po_shuffle_back id <- shuffles given objective back into deck, don't use for custom ones, just remove those
 /status cleanup confirmYES <- cleans up all CCs, all unit damage, resets passed status and SC played and SC player selection :) Also increases round number
 /status sc_trade_goods scNumber(optional) tgCount(optional) <- adds Trade goods to unchoose strategy cards, tgCount is total how much it should be on card, when SC is picked, TGs automatically added to user Trade Goods

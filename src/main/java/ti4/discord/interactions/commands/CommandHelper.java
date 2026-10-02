@@ -46,7 +46,7 @@ public class CommandHelper {
     }
 
     static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
-        if (hasRole(event, JdaService.adminRoles)) {
+        if (hasRole(event, JdaService.bothelperRoles)) {
             checkChannel = false;
             checkPlayer = false;
         }

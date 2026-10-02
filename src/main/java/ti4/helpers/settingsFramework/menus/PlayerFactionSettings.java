@@ -21,7 +21,6 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
-import ti4.service.emoji.SourceEmojis;
 import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
@@ -32,9 +31,11 @@ public class PlayerFactionSettings extends SettingsMenu {
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
     private final BooleanSetting presetDraftOrder;
+    private final BooleanSetting dsBrFactionsOnly;
     private ListSetting<Player> gamePlayers;
     private final ListSetting<FactionModel> banFactions;
     private final ListSetting<FactionModel> priFactions;
+    private final FactionSourceSettings factionSourceSettings;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -48,6 +49,7 @@ public class PlayerFactionSettings extends SettingsMenu {
 
         // Initialize Settings to default values
         presetDraftOrder = new BooleanSetting("StaticOrder", "static draft order", false);
+        dsBrFactionsOnly = new BooleanSetting("DsBrFactionsOnly", "limit faction pool to DS and BR", false);
 
         // Initialize values & keys for gamePlayers
         Set<Entry<String, Player>> allPlayers = game.getPlayers().entrySet();
@@ -94,22 +96,31 @@ public class PlayerFactionSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("players"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             presetDraftOrder.initialize(json.get("presetDraftOrder"));
+            dsBrFactionsOnly.initialize(json.get("dsBrFactionsOnly"));
             gamePlayers.initialize(json.get("gamePlayers"));
             banFactions.initialize(json.get("banFactions"));
             priFactions.initialize(json.get("priFactions"));
         }
+
+        factionSourceSettings = new FactionSourceSettings(json, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Overridden Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
+    protected List<SettingsMenu> categories() {
+        return List.of(factionSourceSettings);
+    }
+
+    @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
         ls.add(gamePlayers);
         ls.add(presetDraftOrder);
+        ls.add(dsBrFactionsOnly);
         ls.add(banFactions);
         ls.add(priFactions);
         return ls;
@@ -119,6 +130,12 @@ public class PlayerFactionSettings extends SettingsMenu {
     protected void updateTransientSettings() {
         if (parent instanceof MiltySettings m) {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
+            boolean dsOrBrEnabled =
+                    sources.contains(ComponentSource.ds) || sources.contains(ComponentSource.blue_reverie);
+            dsBrFactionsOnly.setDisabled(!dsOrBrEnabled);
+            if (!dsOrBrEnabled) {
+                dsBrFactionsOnly.setVal(false);
+            }
             List<String> nonDraftable = List.of("obsidian", "neutral", "keleresa", "keleresx");
 
             Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
@@ -138,11 +155,6 @@ public class PlayerFactionSettings extends SettingsMenu {
         String idPrefix = menuAction + "_" + navId() + "_";
         List<Button> ls = new ArrayList<>(super.specialButtons());
 
-        if (parent != null && parent instanceof MiltySettings ms) {
-            if (ms.getSourceSettings().getDiscoStars().isVal())
-                ls.add(Buttons.red(
-                        idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
-        }
         ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
         return ls;
     }
@@ -151,7 +163,6 @@ public class PlayerFactionSettings extends SettingsMenu {
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error =
                 switch (action) {
-                    case "dsFactionsOnly" -> prioritizeDSFactions();
                     case "teFactions" -> prioritizeTEFactions();
                     default -> null;
                 };
@@ -162,19 +173,6 @@ public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private String prioritizeDSFactions() {
-        if (parent != null && parent instanceof MiltySettings ms) {
-            if (!ms.getSourceSettings().getDiscoStars().isVal()) return "Discordant stars is not enabled";
-
-            List<String> newKeys = new ArrayList<>();
-            for (FactionModel model : priFactions.getAllValues().values()) {
-                if (model.getSource() == ComponentSource.ds) newKeys.add(model.getAlias());
-            }
-            priFactions.setKeys(newKeys);
-        }
-        return null;
-    }
-
     private String prioritizeTEFactions() {
         if (parent != null && parent instanceof MiltySettings) {
 

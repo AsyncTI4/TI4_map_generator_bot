@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ordinianc4",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171,
+            "y": 149
+        }
+    },
     "id": "ordinianc4",
     "tileId": "c41",
     "name": "Ordinian Rex",

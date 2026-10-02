@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -44,6 +45,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 /*
  To activate FoW+ mode use /game weird_game_setup fow_plus:True
@@ -74,6 +76,10 @@ public final class FOWPlusService {
             Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
             Pair.of(FOWOption.HIDE_VOTE_ORDER, true),
             Pair.of(FOWOption.STATS_FROM_HS_ONLY, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_FACTION_PN, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_ALLIANCE, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_SFTT, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_MAHACT_CC, true),
             Pair.of(FOWOption.HIDE_EXPLORES, true),
             Pair.of(FOWOption.HIDE_MAP, true),
             Pair.of(FOWOption.HIDE_PLAYER_INFOS, true));
@@ -114,11 +120,10 @@ public final class FOWPlusService {
         }
     }
 
-    // Only allow activating positions player can see
-    public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game)
-                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
-                || game.isWarfareAction();
+    public static boolean canActivatePosition(String position, Player player, Game game, Set<String> visiblePositions) {
+        if (!isActive(game) || game.isWarfareAction()) return true;
+        if (visiblePositions != null) return visiblePositions.contains(position);
+        return FoWHelper.getTilePositionsToShow(game, player).contains(position);
     }
 
     // Hide all 0b tiles from FoW map
@@ -136,7 +141,7 @@ public final class FOWPlusService {
         return new Tile(VOID_TILEID, position);
     }
 
-    @ButtonHandler("blindTileSelection~MDL")
+    @ButtonHandler(value = "blindTileSelection~MDL", save = false)
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
@@ -176,9 +181,9 @@ public final class FOWPlusService {
         event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    // Remove ring buttons player has no tiles they can activate
-    public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
-        Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
+    public static void filterRingButtons(
+            List<Button> ringButtons, Player player, Game game, @Nullable Set<String> visiblePositions) {
+        if (visiblePositions == null) visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
         Tile centerTile = game.getTileByPosition("000");
         if (!visiblePositions.contains("000")
                 || centerTile != null
@@ -194,11 +199,11 @@ public final class FOWPlusService {
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
-                                .size()
-                        + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
-                                .size()
-                        - 2;
+                int leftSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left", visiblePositions)
+                        .size();
+                int rightSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right", visiblePositions)
+                        .size();
+                int availableTiles = Math.max(0, leftSize - 2) + Math.max(0, rightSize - 2);
                 if (availableTiles == 0) {
                     ringButtons.remove(button);
                 }
@@ -229,6 +234,7 @@ public final class FOWPlusService {
         String message = player.getRepresentationUnfoggedNoPing() + " lost " + valueOfUnitsLost + " resources ";
         message += unitEmojis + " to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount() + ".";
         GMService.logPlayerActivity(game, player, message, null, true);
+        GameEventDraft.stageMovement(game, game.getActiveSystem(), unitsGoingToVoid);
         game.getTacticalActionDisplacement().clear();
     }
 

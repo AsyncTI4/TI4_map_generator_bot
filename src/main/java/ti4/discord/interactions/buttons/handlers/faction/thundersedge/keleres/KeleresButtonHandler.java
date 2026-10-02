@@ -45,5 +45,6 @@ class KeleresButtonHandler {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", 2 cruisers and a flagship have been added to "
                         + game.getTileByPosition(game.getActiveSystem()).getRepresentation() + ".");
+        ButtonHelper.checkFleetInEveryTile(player, game);
     }
 }

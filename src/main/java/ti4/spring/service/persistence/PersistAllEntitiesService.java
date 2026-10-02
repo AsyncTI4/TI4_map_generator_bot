@@ -26,14 +26,21 @@ public class PersistAllEntitiesService {
     private final UserEntityRepository userEntityRepository;
 
     public void persistAll() {
+        deleteAllPersistedEntities();
         Map<String, UserEntity> userCache = persistAllUsers();
         persistAllGames(userCache);
     }
 
+    void deleteAllPersistedEntities() {
+        titleEntityRepository.deleteAllInBatch();
+        playerEntityRepository.deleteAllInBatch();
+        gameEntityRepository.deleteAllInBatch();
+        userEntityRepository.deleteAllInBatch();
+        BotLogger.info("Deleted all persisted entities.");
+    }
+
     private Map<String, UserEntity> persistAllUsers() {
         BotLogger.info("Starting persistAllUsers.");
-        userEntityRepository.deleteAllInBatch();
-        BotLogger.info("Deleted all persisted users.");
 
         List<UserEntity> userEntities = GameManager.getManagedPlayers().stream()
                 .map(player -> new UserEntity(player.getId(), player.getName()))
@@ -49,10 +56,6 @@ public class PersistAllEntitiesService {
 
     private void persistAllGames(Map<String, UserEntity> userCache) {
         BotLogger.info("Starting persistAllGames.");
-        titleEntityRepository.deleteAllInBatch();
-        playerEntityRepository.deleteAllInBatch();
-        gameEntityRepository.deleteAllInBatch();
-        BotLogger.info("Deleted all persisted games.");
 
         List<GameEntity> gameEntities = new ArrayList<>();
         List<TitleEntity> titleEntities = new ArrayList<>();
@@ -94,6 +97,7 @@ public class PersistAllEntitiesService {
                         : game.getMinimumTIGLRankAtGameStart().toString());
         gameEntity.setProphecyOfKings(game.isProphecyOfKings());
         gameEntity.setThundersEdge(game.isThundersEdge());
+        gameEntity.setTwilightsFall(game.isTwilightsFallMode());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
 
         var players = gameEntity.getPlayers();
@@ -105,7 +109,7 @@ public class PersistAllEntitiesService {
         return gameEntity;
     }
 
-    private Long getEndedDate(Game game) {
+    private static Long getEndedDate(Game game) {
         long endedDate = game.getEndedDate();
         return endedDate == 0 ? null : endedDate;
     }
@@ -142,7 +146,8 @@ public class PersistAllEntitiesService {
         return userEntityRepository.save(userEntity);
     }
 
-    private List<TitleEntity> toTitleEntities(Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
+    private static List<TitleEntity> toTitleEntities(
+            Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
         List<TitleEntity> titles = new ArrayList<>();
         for (String storedValue : game.getStoredValueMap().keySet()) {
             if (!storedValue.startsWith("TitlesFor")) {

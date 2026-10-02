@@ -18,6 +18,11 @@ import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
 public class RegexHelper {
+    /**
+     * Matches the boundary (0-width position) between a digit & a non-digit character in either direction.
+     * For example, "123abc456def".split(DIGIT_BOUNDARY) == ["123", "abc", "456", "def"]
+     */
+    public static final String DIGIT_BOUNDARY = "(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)";
 
     private static String regexBuilder(String groupname, Collection<String> options) {
         return "(?<" + groupname + ">(" + String.join("|", options) + "))";
@@ -278,8 +283,7 @@ public class RegexHelper {
         } else {
             allACs.addAll(Mapper.getActionCards().keySet());
         }
-        allACs.addAll(
-                player.getActionCards().values().stream().map(Object::toString).toList());
+        allACs.addAll(player.getActionCards().keySet());
         return regexBuilder("ac", allACs);
     }
 

@@ -52,7 +52,7 @@ public final class PositionMapper {
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
-        String positionFile = ResourceHelper.getInstance().getPositionFile(fileName);
+        String positionFile = ResourceHelper.getPositionFile(fileName);
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);
@@ -103,7 +103,7 @@ public final class PositionMapper {
 
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
         int ringCount = game.getRingCount();
-        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        ringCount = Math.clamp(ringCount, RING_MIN_COUNT, RING_MAX_COUNT);
         if (ringCount == RING_MIN_COUNT) {
             x += HORIZONTAL_TILE_SPACING;
         }
@@ -124,7 +124,11 @@ public final class PositionMapper {
                 y += fractureYbump;
             } else if (position.startsWith("frac")) {
                 x -= lower * HORIZONTAL_TILE_SPACING;
-                y -= (fractureYbump - 300) / 2; // always 50
+                if (fractureYbump == 400) {
+                    y -= (400 - 300) / 2; // always 50
+                } else {
+                    y += 250;
+                }
             } else {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 y -= lower * SPACE_FOR_TILE_HEIGHT;
@@ -235,11 +239,11 @@ public final class PositionMapper {
     }
 
     public static Point getUnitOffset() {
-        return new ShipPositionModel().getOffset();
+        return ShipPositionModel.getOffset();
     }
 
     public static Point getAllianceUnitOffset() {
-        return new ShipPositionModel().getAllianceOffset();
+        return ShipPositionModel.getAllianceOffset();
     }
 
     private static String getTileSpaceUnitLayout(String tileId) {

@@ -1,5 +1,6 @@
 package ti4.contest.replay.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -12,14 +13,16 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatSideBetType;
-import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
+import ti4.contest.replay.entities.CombatDoubleOrBustEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.repository.CombatContestSideBetRepository;
+import ti4.contest.replay.repository.CombatDoubleOrBustRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -38,7 +41,9 @@ class CombatReplaySideBetUiService {
     private final CombatContestSettings settings;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatContestSideBetRepository sideBetRepository;
+    private final CombatDoubleOrBustRepository doubleOrBustRepository;
     private final CombatReplaySideBetPayoutService payoutService;
+    private final CombatSideBetAvailabilityService availabilityService;
 
     public boolean shouldShowButtons(CombatCandidateEntity candidate) {
         return candidate != null
@@ -53,20 +58,18 @@ class CombatReplaySideBetUiService {
         ensureSummaryMessage(channel, game, contest);
         postFactionButtons(channel, game, contest, candidate, candidate.getAttackerFaction());
         postFactionButtons(channel, game, contest, candidate, candidate.getDefenderFaction());
+        postDoubleOrBustButton(channel, contest);
     }
 
     private String sideBetPrompt() {
         int maxBets = settings.getSideBets().getMaxBetsPerUser();
-        if (!settings.isHousesEnabled()) {
-            return "## Side Bets\nPlace up to " + maxBets + " side bets before the replay begins.";
-        }
-        return "## Side-Bet Market\nThe battle market is open. Place up to " + maxBets
-                + " side bets before the replay begins.";
+        return "## Side Bets\nPlace up to " + maxBets + " side bets before the replay begins.";
     }
 
     public void refreshSummaryMessage(
             MessageChannel channel, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
-        refreshSummaryMessage(channel, contest, loadReplayGame(candidate));
+        Game game = loadReplayGame(candidate);
+        refreshSummaryMessage(channel, contest, game);
     }
 
     public String renderUserSummary(
@@ -82,46 +85,59 @@ class CombatReplaySideBetUiService {
             String faction) {
         List<Button> buttons = buttonsForFaction(game, contest, candidate, faction);
         if (buttons.isEmpty()) return;
-        MessageHelper.sendMessageToChannelWithButtons(channel, factionSectionTitle(game, faction), buttons);
+        MessageHelper.splitAndSentWithAction(
+                factionSectionTitle(game, faction),
+                channel,
+                buttons,
+                message -> saveSideBetButtonMessageId(contest, candidate, faction, message.getIdLong()));
     }
 
     private List<Button> buttonsForFaction(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction) {
+        return buttonsForFaction(game, contest, candidate, faction, sideBetWindowClosed(contest));
+    }
+
+    private List<Button> buttonsForFaction(
+            Game game,
+            CombatReplayContestEntity contest,
+            CombatCandidateEntity candidate,
+            String faction,
+            boolean disabled) {
         List<Button> buttons = new ArrayList<>();
-        CombatSideState state = CombatSideState.forFaction(candidate, faction);
-        if (state == null) return buttons;
-        for (CombatSideBetType type : CombatSideBetType.values()) {
-            if (!isAvailableForFaction(type, candidate, faction, state)) continue;
+        for (CombatSideBetType type : availabilityService.availableTypes(candidate, faction)) {
             int profitPoints = payoutService.offeredPayout(contest, candidate, type, faction);
-            buttons.add(Buttons.gray(
+            Button button = Buttons.gray(
                     CombatSideBetButtonIds.format(contest.getId(), type, faction),
                     buttonLabel(type, profitPoints),
-                    type.emoji()));
+                    type.emoji());
+            buttons.add(disabled ? button.asDisabled() : button);
         }
         return buttons;
     }
 
-    private boolean isAvailableForFaction(
-            CombatSideBetType type, CombatCandidateEntity candidate, String faction, CombatSideState state) {
-        if (!type.isAvailable(state.destroyerCount())) return false;
-        if (type == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, faction);
-        if (type != CombatSideBetType.AFB_SKIPPED) return true;
-        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
-    }
-
-    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
-        if (candidate == null || faction == null) return false;
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
-        }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
-        }
-        return false;
-    }
-
-    private String buttonLabel(CombatSideBetType type, int profitPoints) {
+    private static String buttonLabel(CombatSideBetType type, int profitPoints) {
         return type.label() + " +" + profitPoints + " pts";
+    }
+
+    private void saveSideBetButtonMessageId(
+            CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction, long messageId) {
+        if (contest == null || candidate == null || faction == null || messageId <= 0) return;
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            contest.setSideBetAttackerButtonMessageId(messageId);
+        } else if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            contest.setSideBetDefenderButtonMessageId(messageId);
+        } else {
+            return;
+        }
+        replayContestRepository.save(contest);
+    }
+
+    private void postDoubleOrBustButton(MessageChannel channel, CombatReplayContestEntity contest) {
+        if (channel == null || contest == null || contest.getId() == null) return;
+        Button button = Buttons.green(CombatDoubleOrBustButtonIds.format(contest.getId()), "Double or Bust");
+        if (sideBetWindowClosed(contest)) button = button.asDisabled();
+        MessageHelper.sendMessageToChannelWithButton(
+                channel, "## Double or Bust\nSet your Double or Bust before the replay begins.", button);
     }
 
     private void ensureSummaryMessage(MessageChannel channel, Game game, CombatReplayContestEntity contest) {
@@ -162,23 +178,30 @@ class CombatReplaySideBetUiService {
 
     private String renderSummaryMessage(Game game, CombatReplayContestEntity contest) {
         List<CombatContestSideBetEntity> sideBets = sideBetRepository.findByContestId(contest.getId());
+        List<CombatDoubleOrBustEntity> doubleOrBusts =
+                doubleOrBustRepository.findByContestIdAndEnabledTrue(contest.getId());
         sideBets.sort(sideBetOrder());
         StringBuilder message = new StringBuilder();
-        if (sideBets.isEmpty()) {
-            message.append("```text\n");
-            message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
-            message.append("----+------------------------------\n");
-            message.append(" -  | Waiting for the first bet\n");
-            message.append("```");
-            return message.toString();
-        }
-
-        Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
         message.append("```text\n");
         message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
         message.append("----+------------------------------\n");
-        for (Map.Entry<String, Long> entry : countsByBet.entrySet()) {
-            message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+        if (sideBets.isEmpty()) {
+            message.append(" -  | No side bets placed\n");
+        } else {
+            Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
+            for (Map.Entry<String, Long> entry :
+                    sortBetCountsByQuantityDesc(countsByBet).entrySet()) {
+                message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+            }
+        }
+
+        message.append("\n");
+        message.append(String.format("%-3s | %s%n", "Qty", "Double or Bust"));
+        message.append("----+------------------------------\n");
+        if (doubleOrBusts.isEmpty()) {
+            message.append(" -  | No Double or Bust entries\n");
+        } else {
+            message.append(String.format("%-3s | People enabled%n", doubleOrBusts.size() + "x"));
         }
         message.append("```");
         return message.toString();
@@ -210,7 +233,7 @@ class CombatReplaySideBetUiService {
         return message.toString().trim();
     }
 
-    private Comparator<CombatContestSideBetEntity> sideBetOrder() {
+    private static Comparator<CombatContestSideBetEntity> sideBetOrder() {
         return Comparator.comparing(
                         CombatContestSideBetEntity::getPlacedAt, Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(CombatContestSideBetEntity::getId, Comparator.nullsLast(Comparator.naturalOrder()));
@@ -222,7 +245,7 @@ class CombatReplaySideBetUiService {
             String label = formatFriendlyBetLabel(game, sideBet, true);
             countsByBet.merge(label, 1L, Long::sum);
         }
-        return sortBetCountsByQuantityDesc(countsByBet);
+        return countsByBet;
     }
 
     private Map<String, Long> summarizeUserBetCounts(List<CombatContestSideBetEntity> sideBets, Game game) {
@@ -234,7 +257,7 @@ class CombatReplaySideBetUiService {
         return countsByBet;
     }
 
-    private Map<String, Long> sortBetCountsByQuantityDesc(Map<String, Long> countsByBet) {
+    private static Map<String, Long> sortBetCountsByQuantityDesc(Map<String, Long> countsByBet) {
         List<Map.Entry<String, Long>> entries = new ArrayList<>(countsByBet.entrySet());
         entries.sort(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())
                 .thenComparing(Map.Entry.comparingByKey()));
@@ -246,11 +269,16 @@ class CombatReplaySideBetUiService {
         return sorted;
     }
 
+    private boolean sideBetWindowClosed(CombatReplayContestEntity contest) {
+        return contest.getReplayStartAt() != null && !LocalDateTime.now().isBefore(contest.getReplayStartAt());
+    }
+
     private String formatFriendlyBetLabel(Game game, CombatContestSideBetEntity sideBet, boolean useShortFactionId) {
         String faction = useShortFactionId
                 ? buttonFactionIdLabel(game, sideBet.getTargetFaction())
                 : buttonFactionDisplayName(game, sideBet.getTargetFaction());
-        return faction + " " + sideBet.getBetType().label() + " +" + payoutService.resolvedProfitPoints(sideBet);
+        String label = faction + " " + sideBet.getBetType().label();
+        return label + " +" + CombatReplaySideBetPayoutService.resolvedProfitPoints(sideBet) + " pts";
     }
 
     private String factionSectionTitle(Game game, String faction) {
@@ -260,7 +288,7 @@ class CombatReplaySideBetUiService {
         return "### " + emoji + " " + label;
     }
 
-    private String buttonFactionIdLabel(Game game, String faction) {
+    private static String buttonFactionIdLabel(Game game, String faction) {
         if (faction == null || faction.isBlank()) return "?";
         if (game == null) return faction;
         Player target = game.getPlayerFromColorOrFaction(faction);
@@ -278,13 +306,13 @@ class CombatReplaySideBetUiService {
                 : target.getFactionModel().getFactionName();
     }
 
-    private String getFactionEmoji(Game game, String faction) {
+    private static String getFactionEmoji(Game game, String faction) {
         if (game == null || faction == null) return "";
         Player target = game.getPlayerFromColorOrFaction(faction);
         return target == null ? "" : target.getFactionEmoji();
     }
 
-    private Game loadReplayGame(CombatCandidateEntity candidate) {
+    private static Game loadReplayGame(CombatCandidateEntity candidate) {
         if (candidate == null || candidate.getGameName() == null) return null;
         if (!GameManager.isValid(candidate.getGameName())) return null;
         return GameManager.getManagedGame(candidate.getGameName()).getGame();

@@ -18,6 +18,9 @@ public interface CombatCandidateRepository extends JpaRepository<CombatCandidate
 
     List<CombatCandidateEntity> findByGameNameAndStatusIn(String gameName, Collection<CombatCandidateStatus> statuses);
 
+    @Query("select distinct c.gameName from CombatCandidateEntity c where c.status in :statuses")
+    List<String> findDistinctGameNamesByStatusIn(@Param("statuses") Collection<CombatCandidateStatus> statuses);
+
     CombatCandidateEntity findFirstByGameNameAndTilePositionAndStatusIn(
             String gameName, String tilePosition, Collection<CombatCandidateStatus> statuses);
 
@@ -43,12 +46,10 @@ public interface CombatCandidateRepository extends JpaRepository<CombatCandidate
             where c.status = :status
               and c.promotionStatus = :promotionStatus
               and c.resolvedAt is not null
-              and c.resolvedAt >= :resolvedAfter
             """)
     List<CombatCandidateEntity> findResolvedPromotionCandidates(
             @Param("status") CombatCandidateStatus status,
-            @Param("promotionStatus") CombatCandidatePromotionStatus promotionStatus,
-            @Param("resolvedAfter") LocalDateTime resolvedAfter);
+            @Param("promotionStatus") CombatCandidatePromotionStatus promotionStatus);
 
     List<CombatCandidateEntity> findByPromotionStatusAndResolvedAtBefore(
             CombatCandidatePromotionStatus promotionStatus, LocalDateTime resolvedAt);

@@ -1,0 +1,39 @@
+[
+    {
+        "id": "obsessiveagent",
+        "faction": "zelian",
+        "type": "agent",
+        "name": "Obsessive Genome",
+        "tfShortName": "Obsessive\nGenome",
+        "tfShrinkName": true,
+        "title": "Silly",
+        "abilityWindow": "After a player gains a unit upgrade",
+        "abilityText": "You may exhaust this card to allow that player to use the PRODUCTION ability of 1 of their units to produce units of that type, reducing the combined cost of the produced units by 2",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilight_ds"
+    },
+    {
+        "id": "developmentagent",
+        "faction": "veldyr",
+        "type": "agent",
+        "name": "Development Genome",
+        "tfShortName": "Development\nGenome",
+        "title": "Silly",
+        "tfShrinkName": true,
+        "abilityWindow": "When a player would resolve the primary or secondary ability of the “Magus” strategy card",
+        "abilityText": "You may exhaust this card to allow that player to ignore any resource or influence costs on that card during this action.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilight_ds"
+    },
+    {
+        "id": "twilighthero",
+        "faction": "veldyr",
+        "type": "hero",
+        "name": "Twilight Protocol",
+        "title": "Veldyr Paradigm",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Draw up to 3 unit upgrades, or take 1 unit upgrade from another player. Then, purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilight_ds"
+    }
+]

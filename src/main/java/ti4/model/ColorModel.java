@@ -3,6 +3,7 @@ package ti4.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +18,8 @@ public class ColorModel implements ModelInterface {
     private String displayName;
     private List<String> aliases;
     private String textColor;
-    private String hue;
+
+    private Set<String> colorCategories;
 
     private Color primaryColor;
     private Color secondaryColor;
@@ -49,8 +51,13 @@ public class ColorModel implements ModelInterface {
         return getPrimaryColor();
     }
 
-    public String getHue() {
-        return (hue == null ? "null" : hue);
+    public Set<String> getColorCategories() {
+        return (colorCategories == null ? Set.of() : colorCategories);
+    }
+
+    @JsonIgnore
+    public boolean isMulti() {
+        return getColorCategories().size() > 1;
     }
 
     @JsonIgnore
@@ -112,8 +119,8 @@ public class ColorModel implements ModelInterface {
                 + name + '\'' + ", displayName='"
                 + displayName + '\'' + ", aliases="
                 + aliases + ", textColor='"
-                + textColor + '\'' + ", hue='"
-                + hue + '\'' + ", primaryColor="
+                + textColor + '\'' + ", colorCategories="
+                + colorCategories + ", primaryColor="
                 + primaryColor + ", secondaryColor="
                 + secondaryColor + ", primaryColorRef='"
                 + primaryColorRef + '\'' + ", secondaryColorRef='"

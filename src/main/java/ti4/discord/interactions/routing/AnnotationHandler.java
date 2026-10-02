@@ -1,6 +1,6 @@
 package ti4.discord.interactions.routing;
 
-import static org.reflections.scanners.Scanners.SubTypes;
+import static org.reflections.scanners.Scanners.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -9,11 +9,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -30,12 +29,14 @@ import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
+import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 
-public final class AnnotationHandler {
+@UtilityClass
+public class AnnotationHandler {
 
     private static final List<Class<?>> classes = new ArrayList<>();
 
@@ -186,7 +187,8 @@ public final class AnnotationHandler {
                                 .getMessage()
                                 .reply(
                                         "The button failed. An exception has been logged for the developers. Please report this to "
-                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
+                                                + getBotBugsChannelLink()
+                                                + " if it doesn't resolve within an hour. Do not press this button again.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
@@ -195,8 +197,9 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The selection failed. An exception has been logged for the developers. Please report this to "
-                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
+                                        "The selection menu failed. An exception has been logged for the developers. Please report this to "
+                                                + getBotBugsChannelLink()
+                                                + " if it doesn't resolve within an hour. Do not ping anyone until that time passes.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
@@ -205,6 +208,8 @@ public final class AnnotationHandler {
                         "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
                                 + "\":",
                         e.getCause());
+                CircuitBreaker.incrementThresholdCount(
+                        "InvocationTargetException in AnnotationHandler for: " + context.getOrigComponentID());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters())
                         .map(param -> param.getType().getSimpleName())
@@ -252,66 +257,87 @@ public final class AnnotationHandler {
      * @param <H> {@link AnnotationHandler#handlers}
      * @param contextClass Which context type to accept parameters based upon
      * @param handlerClass Which handler annotation to look for
-     * @return A map of prefix -> consumer which will
+     * @return A {@link HandlerRegistry} mapping component-ID prefixes to Handler instances.
      */
-    public static <C extends ListenerContext, H extends Annotation> Map<String, Consumer<C>> findKnownHandlers(
+    public static <C extends ListenerContext, H extends Annotation> HandlerRegistry<C> buildHandlerRegistry(
             Class<C> contextClass, Class<H> handlerClass) {
-        Map<String, Consumer<C>> consumers = new HashMap<>();
         try {
             if (!handlers().contains(handlerClass)) {
                 BotLogger.warning(
                         "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return consumers;
+                return new HandlerRegistry<>();
             }
             if (!contexts().contains(contextClass)) {
                 BotLogger.warning(
                         "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return consumers;
+                return new HandlerRegistry<>();
             }
-            for (Class<?> klass : getAllClasses()) {
-                for (Method method : klass.getDeclaredMethods()) {
-                    method.setAccessible(true);
-                    List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
-                    if (handlers.isEmpty()) continue;
 
-                    String methodName = klass.getName() + "." + method.getName();
-                    if (!Modifier.isStatic(method.getModifiers())) {
-                        BotLogger.warning(
-                                "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
-                        continue;
-                    }
-
-                    Function<C, List<Object>> argGetter = getArgs(method, contextClass);
-                    if (argGetter == null) {
-                        continue;
-                    }
-
-                    for (H handler : handlers) {
-                        String val = null;
-                        boolean save = true;
-                        if (handler instanceof ButtonHandler bh) {
-                            val = bh.value();
-                            save = bh.save();
-                        }
-                        if (handler instanceof SelectionHandler sh) val = sh.value();
-                        if (handler instanceof ModalHandler mh) val = mh.value();
-                        if (val == null) continue;
-                        Consumer<C> consumer = buildConsumer(method, argGetter, save);
-                        consumers.put(val, consumer);
-                    }
-                }
-            }
+            var handlerRegistry = new HandlerRegistry<C>();
+            registerHandlers(contextClass, handlerClass, handlerRegistry);
+            BotLogger.info("Registered " + handlerRegistry.getSize() + " handlers of type " + handlerClass.getName());
+            return handlerRegistry;
         } catch (SecurityException e) {
             BotLogger.error(Constants.jazzPing() + " bot cannot read methods in the file.", e);
         } catch (Exception e) {
             BotLogger.error(Constants.jazzPing() + " some other issue registering buttons.", e);
         }
-
-        BotLogger.info("Registered " + consumers.size() + " handlers of type " + handlerClass.getName());
-        return consumers;
+        return new HandlerRegistry<>();
     }
 
-    private static List<Class<?>> getAllClasses() {
+    private static <C extends ListenerContext, H extends Annotation> void registerHandlers(
+            Class<C> contextClass, Class<H> handlerClass, HandlerRegistry<C> handlerRegistry) {
+        for (Class<?> klass : getAllClasses()) {
+            for (Method method : klass.getDeclaredMethods()) {
+                method.setAccessible(true);
+                List<H> annotationList = Arrays.asList(method.getAnnotationsByType(handlerClass));
+                if (annotationList.isEmpty()) continue;
+
+                String methodName = klass.getName() + "." + method.getName();
+                if (!Modifier.isStatic(method.getModifiers())) {
+                    BotLogger.warning(
+                            "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
+                    continue;
+                }
+
+                Function<C, List<Object>> argGetter = getArgs(method, contextClass);
+                if (argGetter == null) {
+                    continue;
+                }
+                List<String> prefixes = new ArrayList<>();
+                for (H handler : annotationList) {
+                    String val = null;
+                    boolean save = true;
+                    if (handler instanceof ButtonHandler bh) {
+                        val = bh.value();
+                        if (prefixes.contains(val)) {
+                            System.out.println(
+                                    "Duplicate button handler prefix `" + val + "` in method `" + methodName + "`.");
+                        }
+                        prefixes.add(val);
+
+                        save = bh.save();
+                    }
+                    if (handler instanceof SelectionHandler sh) {
+                        val = sh.value();
+                        save = sh.save();
+                    }
+                    if (handler instanceof ModalHandler mh) {
+                        val = mh.value();
+                        save = mh.save();
+                    }
+                    if (val == null) continue;
+                    Consumer<C> consumer = buildConsumer(method, argGetter, save);
+
+                    handlerRegistry.register(val, consumer, save);
+                }
+            }
+        }
+    }
+
+    // Package-private (not private) so AnnotationHandlerDuplicateTest can reuse this exact scan. If more
+    // internals end up needing similar test access, extract a proper seam instead of relaxing further.
+    static List<Class<?>> getAllClasses() {
         if (classes.isEmpty()) {
             Reflections reflections = new Reflections(new ConfigurationBuilder()
                     .setUrls(ClasspathHelper.forJavaClassPath())

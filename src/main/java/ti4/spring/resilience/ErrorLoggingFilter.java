@@ -1,5 +1,7 @@
 package ti4.spring.resilience;
 
+import static com.rollbar.api.payload.data.Level.ERROR;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,13 +66,13 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
             if (shouldReportResponseStatus(requestUri, status)) {
                 String body =
                         new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
-                if (!shouldIgnoreReportedStatus(requestUri, status, body)) {
+                if (!shouldIgnoreReportedStatus(requestUri, status)) {
                     String error =
                             String.format("Request to %s returned status %s with body: %s", requestUri, status, body);
                     BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
                     SREStats.incrementWebserverRequestErrorCount();
                     if (status >= START_OF_HTTP_SERVER_ERROR_RANGE) {
-                        RollbarManager.report(com.rollbar.api.payload.data.Level.ERROR, null, error, null);
+                        RollbarManager.report(ERROR, null, error, null);
                     }
                 }
             }
@@ -91,8 +93,8 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                         && statusCode != HttpStatus.FORBIDDEN.value());
     }
 
-    static boolean shouldIgnoreReportedStatus(String requestUri, int statusCode, String body) {
-        return IGNORED_HTTP_ERROR_RULES.stream().anyMatch(rule -> rule.matches(requestUri, statusCode, body));
+    static boolean shouldIgnoreReportedStatus(String requestUri, int statusCode) {
+        return IGNORED_HTTP_ERROR_RULES.stream().anyMatch(rule -> rule.matches(requestUri, statusCode));
     }
 
     private static boolean isAuthenticationNoise(Exception exception) {
@@ -103,7 +105,7 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
 
     private record IgnoredHttpErrorRule(String requestPath, int statusCode) {
 
-        private boolean matches(String requestUri, int responseStatusCode, String body) {
+        private boolean matches(String requestUri, int responseStatusCode) {
             return requestPath.equals(requestUri) && statusCode == responseStatusCode;
         }
     }

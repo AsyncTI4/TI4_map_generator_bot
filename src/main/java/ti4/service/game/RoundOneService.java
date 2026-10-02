@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -21,6 +21,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.image.FileUploadService;
@@ -29,7 +30,11 @@ import ti4.service.leader.UnlockLeaderService;
 @UtilityClass
 public class RoundOneService {
 
-    public static void RoundOne(GenericInteractionCreateEvent event, Game game) {
+    public static void roundOne(GenericInteractionCreateEvent event, Game game) {
+        if (game.isAcd2()) {
+            BotLogger.info(
+                    Constants.privateStaticVoidPing() + " Action Card Deck 2 game has begun: " + game.gameJumpLinks());
+        }
         if (!game.isFowMode()) {
             StringBuilder message =
                     new StringBuilder("Here are the quick reference cards for the factions in this game.");
@@ -52,27 +57,21 @@ public class RoundOneService {
                 MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message.toString(), true, false);
             }
         }
-        if ((game.getStoredValue("useOldPok").isEmpty())
-                && !game.isTwilightsFallMode()
-                && !game.isBaseGameMode()
-                && !game.isHomebrewSCMode()) {
-            game.setStrategyCardSet("te");
-        }
 
-        if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
+        if ((!game.getStoredValue("useOldPok").isEmpty())) {
             game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
             game.resetRelics();
+            game.setThundersEdge(false);
             game.setStrategyCardSet("pok");
-        } else if (!game.isThundersEdge() && !game.isTwilightsFallMode()) {
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
+        } else if (!game.isThundersEdge() && !game.isTwilightsFallMode() && !game.isBaseGameMode()) {
             game.removeRelicFromGame("quantumcore");
             game.removeRelicFromGame("thesilverflame");
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
         }
-        if (game.isThundersEdge() && !game.isTwilightsFallMode()) {
-            game.setupNeutralPlayer();
-            game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-            game.validateAndSetActionCardDeck(event, Mapper.getDeck(getTeActionCardDeckAlias(game)));
-            game.setStrategyCardSet("te");
-        }
+        game.removeOverruleIfPurged();
+        game.setupNeutralPlayer();
+
         if (game.isTwilightsFallMode()) {
             ButtonHelperTwilightsFall.fixMahactColors(game, event);
             game.setupNeutralPlayer();
@@ -139,7 +138,7 @@ public class RoundOneService {
             }
 
             if (player.hasAbility("initiation")) {
-                LunariumAbilityButtonHandler.setFactionSheetCCs(game, player, 1);
+                LunariumAbilityHandler.setFactionSheetCCs(game, player, 1);
             }
 
             if (player.hasAbility("questing_prince")) {
@@ -179,7 +178,7 @@ public class RoundOneService {
                     }
                     if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(
-                                target.getCorrectChannel(),
+                                target.getCardsInfoThread(),
                                 target.getRepresentation() + ", please choose a planet on which to place a Shrine.",
                                 buttons);
                     }

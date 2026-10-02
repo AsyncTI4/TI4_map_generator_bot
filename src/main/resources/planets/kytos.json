@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kytos",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "kytos",
     "tileId": "er95",
     "name": "Kytos",

@@ -14,5 +14,6 @@
     ],
     "shipPositionsType": "TYPE04",
     "tileBack": "fracture",
+    "isFracture": true,
     "source": "thunders_edge"
 }

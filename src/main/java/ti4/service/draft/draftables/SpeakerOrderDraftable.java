@@ -181,7 +181,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
         return null;
     }
 
-    private boolean shouldAlsoSetSeat(DraftManager draftManager) {
+    private static boolean shouldAlsoSetSeat(DraftManager draftManager) {
         return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
     }
 }

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "heska",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "heska",
     "tileId": "er62",
     "name": "Heska",

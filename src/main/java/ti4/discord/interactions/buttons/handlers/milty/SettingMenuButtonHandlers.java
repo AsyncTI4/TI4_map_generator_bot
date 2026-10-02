@@ -4,6 +4,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 
 @UtilityClass
 class SettingMenuButtonHandlers {
@@ -15,6 +17,14 @@ class SettingMenuButtonHandlers {
         String draftSystemNavPart = ".*_draft[._].*";
         if (event.getCustomId().matches(draftSystemNavPart)) {
             game.initializeDraftSystemSettings().parseButtonInput(event);
+            return;
+        }
+        if (BaseGameMiniMiltySettings.isBaseGameMiniMiltyMenuComponent(event.getCustomId())) {
+            game.initializeBaseGameMiniMiltySettings().parseButtonInput(event);
+            return;
+        }
+        if (FrankenSettings.isFrankenMenuComponent(event.getCustomId())) {
+            game.initializeFrankenSettings().parseButtonInput(event);
             return;
         }
 

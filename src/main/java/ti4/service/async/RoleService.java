@@ -38,9 +38,9 @@ public class RoleService {
             return;
         }
         for (ManagedGame managedGame : mapsJoined) {
-            String gameMessage = user.getAsMention() + " has joined the server!";
-            MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), gameMessage);
             Game game = managedGame.getGame();
+            String gameMessage = user.getAsMention() + " has joined the server!";
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
             GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, true);
         }
     }
@@ -58,7 +58,7 @@ public class RoleService {
                     .getManager()
                     .setArchived(false)
                     .queue(
-                            success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
+                            _ -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
                             BotLogger::catchRestError);
         }
 

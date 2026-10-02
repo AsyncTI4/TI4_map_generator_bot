@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.SecretObjectiveHelper;
@@ -45,7 +46,10 @@ public class DrawSecretService {
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         if (player.hasAbility("multitasking")) {
-            LunariumAbilityButtonHandler.offerFactionSheetCCButtons(game, player);
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
         }
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);
@@ -78,6 +82,12 @@ public class DrawSecretService {
                             player.getRepresentation()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
+                if (player.hasAbility("multitasking")) {
+                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+                }
+                if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
+                }
                 SecretObjectiveInfoService.sendSecretObjectiveInfoWithHeaderText(
                         game,
                         player,
@@ -90,7 +100,7 @@ public class DrawSecretService {
                 game.getMainGameChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
-            RoundOneService.RoundOne(event, game);
+            RoundOneService.roundOne(event, game);
         }
     }
 }

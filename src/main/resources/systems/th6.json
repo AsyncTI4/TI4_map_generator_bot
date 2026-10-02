@@ -1,0 +1,39 @@
+{
+    "tileBack": "green",
+    "id": "th6",
+    "name": "Cullspire/Chrysali/Bruud - Kryxos",
+    "aliases": [
+        "th6",
+        "cullspire",
+        "chrysali",
+        "bruud",
+        "kryxos"
+    ],
+    "imagePath": "th6_kryxoshs.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "cullspire",
+        "chrysali",
+        "bruud"
+    ],
+    "source": "theodisi"
+}

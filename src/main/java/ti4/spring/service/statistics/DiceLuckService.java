@@ -73,7 +73,7 @@ public class DiceLuckService {
         return toResultString(usersToDiceLuckAccumulators.values());
     }
 
-    private String toResultString(Iterable<DiceLuckAccumulator> diceLuckAccumulators) {
+    private static String toResultString(Iterable<DiceLuckAccumulator> diceLuckAccumulators) {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (var diceLuckAccumulator : diceLuckAccumulators) {

@@ -17,6 +17,7 @@ import ti4.json.JsonMapperManager;
 import ti4.website.model.WebBorderAnomalies;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebExpeditions;
+import ti4.website.model.WebGameState;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
 import ti4.website.model.WebPlayerArea;
@@ -36,14 +37,18 @@ public class GameWebDataService {
     private final Cache<String, String> webDataCache = createCache();
 
     public String getOrCompute(String gameName) {
-        return webDataCache.get(gameName, this::computeForGameName);
+        return webDataCache.get(gameName, GameWebDataService::computeForGameName);
     }
 
-    public void put(String gameName, Game game) {
-        webDataCache.put(gameName, serialize(game));
+    public String getIfCached(String gameName) {
+        return webDataCache.getIfPresent(gameName);
     }
 
-    private String computeForGameName(String gameName) {
+    public void put(String gameName, String serializedWebData) {
+        webDataCache.put(gameName, serializedWebData);
+    }
+
+    private static String computeForGameName(String gameName) {
         var managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null || managedGame.getGame() == null) {
             throw new IllegalArgumentException("Unknown game: " + gameName);
@@ -69,7 +74,7 @@ public class GameWebDataService {
         }
     }
 
-    private static Map<String, Object> buildWebData(Game game) {
+    public static Map<String, Object> buildWebData(Game game) {
         List<WebPlayerArea> playerDataList = new ArrayList<>();
         for (Player player : game.getRealPlayersNNeutral()) {
             playerDataList.add(WebPlayerArea.fromPlayer(player, game));
@@ -109,6 +114,7 @@ public class GameWebDataService {
 
         Map<String, Object> webData = new LinkedHashMap<>();
         webData.put("versionSchema", 7);
+        webData.put("gameState", WebGameState.fromGame(game));
         webData.put("objectives", webObjectives);
         webData.put("playerData", playerDataList);
         webData.put("lawsInPlay", lawsInPlay);
@@ -122,6 +128,7 @@ public class GameWebDataService {
         webData.put("ringCount", game.getRingCount());
         webData.put("vpsToWin", game.getVp());
         webData.put("gameRound", game.getRound());
+        webData.put("eventSequence", game.getEventSequenceCounter());
         webData.put("gameName", game.getName());
         webData.put("gameCustomName", game.getCustomName());
         webData.put("tableTalkJumpLink", game.getTabletalkJumpLink());

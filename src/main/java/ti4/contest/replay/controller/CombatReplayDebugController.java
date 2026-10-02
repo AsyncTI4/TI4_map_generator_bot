@@ -31,9 +31,6 @@ import tools.jackson.databind.json.JsonMapper;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/contest/replay")
-/**
- * Exposes lightweight admin/debug endpoints for inspecting replay observations, candidates, events, and contests.
- */
 public class CombatReplayDebugController {
 
     private static final JsonMapper MAPPER = JsonMapperManager.basic()
@@ -150,8 +147,7 @@ public class CombatReplayDebugController {
                 settings.getPromotion().isEnabled(),
                 settings.getRuntime().isDevMode(),
                 settings.getRuntime().isTrackAllCombatsAsCandidates(),
-                settings.getRuntime().isImmediatePromotionOnResolve(),
-                settings.isDecoysEnabled());
+                settings.getRuntime().isImmediatePromotionOnResolve());
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
@@ -201,8 +197,7 @@ public class CombatReplayDebugController {
             boolean promotionEnabled,
             boolean devMode,
             boolean trackAllCombatsAsCandidates,
-            boolean immediatePromotionOnResolve,
-            boolean decoysEnabled) {}
+            boolean immediatePromotionOnResolve) {}
 
     private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
 

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sanctuary",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "sanctuary",
     "tileId": "d22",
     "name": "Sanctuary",

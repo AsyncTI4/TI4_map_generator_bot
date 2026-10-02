@@ -50,7 +50,7 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
         // Load JSON if applicable
         if (!(json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText("")))) {
+                || !MENU_ID.equals(json.get("menuId").asString("")))) {
             presetDraftOrder.initialize(json.get("presetDraftOrder"));
 
             if (json.has("orderedPlayerIds")) {

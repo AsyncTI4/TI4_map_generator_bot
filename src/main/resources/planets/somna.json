@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "somna",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 80
+        }
+    },
     "id": "somna",
     "tileId": "s14",
     "name": "Somna",

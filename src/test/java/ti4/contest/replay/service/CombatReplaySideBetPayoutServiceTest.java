@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -40,7 +39,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate(30, 30), CombatSideBetType.WINNER_ONE_HP, "sol");
 
-        assertEquals(35, payout);
+        assertEquals(26, payout);
     }
 
     @Test
@@ -50,31 +49,18 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
-        assertEquals(4, payout);
+        assertEquals(20, payout);
         verifyNoInteractions(eventRepository);
     }
 
     @Test
-    void roundOneOddsIgnoreReplayOnlyWarSunDecoy() {
-        CombatReplayContestEntity contest = oddsContest();
-        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
-                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Warsun, Constants.SPACE, 1)));
-
-        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
-
-        assertEquals(4, payout);
-        verifyNoInteractions(eventRepository);
-    }
-
-    @Test
-    void capsVeryLowOddsRoundOneSlamFromInitialSnapshotAtMaxPayout() {
+    void capsVeryLowOddsRoundOneSlamAfterSelectionBias() {
         CombatReplayContestEntity contest = oddsContest();
         CombatCandidateEntity candidate = snapshotCandidate(4, 1);
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "sol");
 
-        assertEquals(100, payout);
+        assertEquals(50, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -86,8 +72,8 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         int yinPayout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
         int solPayout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "sol");
 
-        assertEquals(75, yinPayout);
-        assertEquals(100, solPayout);
+        assertEquals(12, yinPayout);
+        assertEquals(50, solPayout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -98,7 +84,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
 
-        assertEquals(6, payout);
+        assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -113,8 +99,8 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         int unlockedPayout =
                 service.offeredPayout(contest, unlockedCommanderCandidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
 
-        assertEquals(10, lockedPayout);
-        assertEquals(6, unlockedPayout);
+        assertEquals(4, lockedPayout);
+        assertEquals(4, unlockedPayout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -126,20 +112,6 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
         assertTrue(service.hasAfbUnits(candidate, "sol"));
-        assertEquals(6, payout);
-        verifyNoInteractions(eventRepository);
-    }
-
-    @Test
-    void afbAvailabilityIgnoresReplayOnlyDestroyerDecoy() {
-        CombatReplayContestEntity contest = oddsContest();
-        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
-                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Destroyer, Constants.SPACE, 1)));
-
-        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
-
-        assertFalse(service.hasAfbUnits(candidate, "sol"));
         assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
@@ -163,7 +135,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
-        assertEquals(10, payout);
+        assertEquals(20, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -175,40 +147,24 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
 
-        assertEquals(6, payout);
+        assertEquals(3, payout);
         verifyNoInteractions(eventRepository);
     }
 
     @Test
-    void oneHpPayoutIgnoresReplayOnlyWarSunDecoy() {
-        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
-                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Warsun, Constants.SPACE, 1)));
-
-        int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
-
-        assertEquals(6, payout);
-        verifyNoInteractions(eventRepository);
-    }
-
-    @Test
-    void resolvesOldRowsWithLegacyFixedPayoutAndNewRowsWithLockedSnapshot() {
-        CombatContestSideBetEntity legacy = new CombatContestSideBetEntity();
-        legacy.setBetType(CombatSideBetType.ROUND_ONE_WHIFF);
-
+    void resolvesLockedSideBetPayout() {
         CombatContestSideBetEntity locked = new CombatContestSideBetEntity();
         locked.setBetType(CombatSideBetType.ROUND_ONE_WHIFF);
         locked.setOfferedProfitPoints(17);
 
-        assertEquals(10, service.resolvedProfitPoints(legacy));
-        assertEquals(17, service.resolvedProfitPoints(locked));
+        assertEquals(17, CombatReplaySideBetPayoutService.resolvedProfitPoints(locked));
     }
 
     private CombatCandidateEntity candidate() {
         return candidate(null, null);
     }
 
-    private CombatCandidateEntity candidate(Integer attackerHp, Integer defenderHp) {
+    private static CombatCandidateEntity candidate(Integer attackerHp, Integer defenderHp) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setId(100L);
         candidate.setAttackerFaction("sol");
@@ -318,13 +274,11 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         return candidate;
     }
 
-    private CombatReplayContestEntity oddsContest() {
-        CombatReplayContestEntity contest = new CombatReplayContestEntity();
-        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
-        return contest;
+    private static CombatReplayContestEntity oddsContest() {
+        return new CombatReplayContestEntity();
     }
 
-    private Player player(Game game, String faction) {
+    private static Player player(Game game, String faction) {
         FactionModel model = Mapper.getFaction(faction);
         Player player = game.addPlayer(model.getAlias(), model.getFactionName());
         player.setFaction(game, faction);
@@ -336,7 +290,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         return player;
     }
 
-    private void unlockLeader(Player player, String leaderId) {
+    private static void unlockLeader(Player player, String leaderId) {
         player.addLeader(leaderId);
         player.unsafeGetLeader(leaderId).setLocked(false);
     }
@@ -348,7 +302,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         return tile;
     }
 
-    private String getNextPosition(Game game) {
+    private static String getNextPosition(Game game) {
         for (String position : PositionMapper.getTilePositions()) {
             if (game.getTileByPosition(position) == null) return position;
         }

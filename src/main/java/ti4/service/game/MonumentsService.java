@@ -1,0 +1,478 @@
+package ti4.service.game;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.FactionModel;
+import ti4.model.SecretObjectiveModel;
+import ti4.model.Source.ComponentSource;
+import ti4.model.UnitModel;
+
+@UtilityClass
+public class MonumentsService {
+    private static final String EXHAUSTED_MONUMENT_PREFIX = "exhaustedMonument_";
+    private static final String WINNU_MONUMENT_TRADE_GOODS = "winnuMonumentTradeGoods_";
+    private static final String KYRO_RELIQUARY_ATTACHMENT = "attachment_kyro_monument.png";
+
+    public static int getWinnuMonumentTradeGoodCount(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return 0;
+        }
+        String storedCount = game.getStoredValue(WINNU_MONUMENT_TRADE_GOODS + player.getFaction());
+        if (storedCount.isBlank()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(storedCount);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public static void setWinnuMonumentTradeGoodCount(Game game, Player player, int count) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return;
+        }
+        game.setStoredValue(WINNU_MONUMENT_TRADE_GOODS + player.getFaction(), Integer.toString(Math.max(0, count)));
+    }
+
+    public static void applyMonuments(Game game) {
+        if (!game.isMonumentsMode()) {
+            return;
+        }
+        if (game.isTwilightsFallMode()) {
+            applyTwilightsFallMonuments(game);
+            return;
+        }
+
+        game.setHomebrew(true);
+        game.setStrategyCardSet("monuments");
+
+        List<String> actionCards = Mapper.getActionCards().values().stream()
+                .filter(card -> card.getSource() == ComponentSource.monuments)
+                .map(ActionCardModel::getAlias)
+                .filter(card -> !game.getActionCards().contains(card))
+                .toList();
+        if (!actionCards.isEmpty()) {
+            game.getActionCards().addAll(actionCards);
+            Collections.shuffle(game.getActionCards());
+        }
+
+        List<String> secretObjectives = Mapper.getSecretObjectives().values().stream()
+                .filter(objective -> objective.getSource() == ComponentSource.monuments)
+                .map(SecretObjectiveModel::getAlias)
+                .filter(objective -> !game.getSecretObjectives().contains(objective))
+                .toList();
+        if (!secretObjectives.isEmpty()) {
+            game.getSecretObjectives().addAll(secretObjectives);
+            Collections.shuffle(game.getSecretObjectives());
+        }
+
+        List<String> agendas = Mapper.getAgendas().values().stream()
+                .filter(agenda -> agenda.getSource() == ComponentSource.monuments)
+                .map(AgendaModel::getAlias)
+                .filter(agenda -> !game.getAgendas().contains(agenda))
+                .toList();
+        if (!agendas.isEmpty()) {
+            game.getAgendas().addAll(agendas);
+            Collections.shuffle(game.getAgendas());
+        }
+    }
+
+    public static void applyTwilightsFallMonuments(Game game) {
+        if (!game.isMonumentsMode()) {
+            return;
+        }
+
+        game.setHomebrew(true);
+        game.setStrategyCardSet("monuments_tf");
+
+        List<String> secretObjectives = Mapper.getSecretObjectives().values().stream()
+                .filter(objective -> objective.getSource() == ComponentSource.monuments)
+                .map(SecretObjectiveModel::getAlias)
+                .filter(objective -> !game.getSecretObjectives().contains(objective))
+                .toList();
+        if (!secretObjectives.isEmpty()) {
+            game.getSecretObjectives().addAll(secretObjectives);
+            Collections.shuffle(game.getSecretObjectives());
+        }
+    }
+
+    public static void addFactionMonument(Player player, Game game) {
+        if (!game.isMonumentsMode() || (game.isFrankenGame() && !game.isTwilightsFallMode())) {
+            return;
+        }
+        UnitModel monument = getFactionMonument(player);
+        if (monument != null && !player.ownsUnit(monument.getId())) {
+            player.addOwnedUnitByID(monument.getId());
+            player.setUnitCap("monument", 1);
+        }
+    }
+
+    private static UnitModel getFactionMonument(String factionId) {
+        return Mapper.getUnits().values().stream()
+                .filter(unit -> unit.getSource() == ComponentSource.monuments)
+                .filter(unit -> !"rhodun_monumentback".equals(unit.getId()))
+                .filter(unit -> unit.getFaction().filter(factionId::equals).isPresent())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static UnitModel getFactionMonument(FactionModel faction) {
+        return getFactionMonument(faction.getHomebrewReplacesID().orElse(faction.getAlias()));
+    }
+
+    public static UnitModel getFactionMonument(Player player) {
+        if (player == null) {
+            return null;
+        }
+        if (player.getFactionModel() == null) {
+            return getFactionMonument(player.getFaction());
+        }
+        return getFactionMonument(player.getFactionModel());
+    }
+
+    public static boolean hasMonument(Game game, Player player, String monumentId) {
+        return game != null
+                && player != null
+                && game.isMonumentsMode()
+                && (player.hasUnit(monumentId)
+                        || NekroMonumentService.getCopiedMonuments(game, player).stream()
+                                .anyMatch(monument -> monumentId.equals(monument.getId())));
+    }
+
+    public static boolean hasMonumentOnBoard(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return false;
+        }
+        return game.getTileMap().values().stream().anyMatch(tile -> tile.getUnitHolders().values().stream()
+                .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0));
+    }
+
+    public static boolean isMonumentOnBoard(Game game, Player player, String monumentId) {
+        UnitModel monument = Mapper.getUnit(monumentId);
+        if (game == null
+                || player == null
+                || monument == null
+                || monument.getSource() != ComponentSource.monuments
+                || !game.isMonumentsMode()) {
+            return false;
+        }
+        return isOwnedMonumentOnBoard(game, player, monumentId)
+                || NekroMonumentService.hasCopiedMonument(game, player, monumentId);
+    }
+
+    private static boolean isOwnedMonumentOnBoard(Game game, Player player, String monumentId) {
+        return player.hasUnit(monumentId)
+                && game.getTileMap().values().stream()
+                        .anyMatch(tile -> ButtonHelper.doesPlayerHaveUnitHere(monumentId, player, tile));
+    }
+
+    public static boolean isMonumentExhausted(Game game, Player player, String monumentId) {
+        UnitModel monument = Mapper.getUnit(monumentId);
+        return game != null
+                && player != null
+                && game.isMonumentsMode()
+                && monument != null
+                && monument.getSource() == ComponentSource.monuments
+                && !game.getStoredValue(EXHAUSTED_MONUMENT_PREFIX + player.getFaction() + "_" + monumentId)
+                        .isEmpty();
+    }
+
+    public static boolean isMonumentReady(Game game, Player player, String monumentId) {
+        return game != null
+                && game.isMonumentsMode()
+                && isMonumentOnBoard(game, player, monumentId)
+                && !isMonumentExhausted(game, player, monumentId);
+    }
+
+    public static boolean exhaustMonument(Game game, Player player, String monumentId) {
+        if (!isMonumentReady(game, player, monumentId)) {
+            return false;
+        }
+        game.setStoredValue(EXHAUSTED_MONUMENT_PREFIX + player.getFaction() + "_" + monumentId, "yes");
+        return true;
+    }
+
+    public static boolean readyMonument(Game game, Player player, String monumentId) {
+        UnitModel monument = Mapper.getUnit(monumentId);
+        if (game == null
+                || player == null
+                || !game.isMonumentsMode()
+                || monument == null
+                || monument.getSource() != ComponentSource.monuments
+                || !isMonumentOnBoard(game, player, monumentId)
+                || !isMonumentExhausted(game, player, monumentId)) {
+            return false;
+        }
+        game.removeStoredValue(EXHAUSTED_MONUMENT_PREFIX + player.getFaction() + "_" + monumentId);
+        return true;
+    }
+
+    public static List<UnitModel> getExhaustedMonuments(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return List.of();
+        }
+        return Mapper.getUnits().values().stream()
+                .filter(unit -> unit.getSource() == ComponentSource.monuments)
+                .filter(unit -> isMonumentOnBoard(game, player, unit.getId()))
+                .filter(unit -> isMonumentExhausted(game, player, unit.getId()))
+                .toList();
+    }
+
+    public static void readyMonuments(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return;
+        }
+        Mapper.getUnits().values().stream()
+                .filter(unit -> unit.getSource() == ComponentSource.monuments)
+                .map(UnitModel::getId)
+                .forEach(monumentId ->
+                        game.removeStoredValue(EXHAUSTED_MONUMENT_PREFIX + player.getFaction() + "_" + monumentId));
+    }
+
+    public static Tile getPlayerMonumentTile(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return null;
+        }
+        return game.getTileMap().values().stream()
+                .filter(tile -> tile.getUnitHolders().values().stream()
+                        .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static Planet getPlayerMonumentPlanet(Game game, Player player) {
+        Tile monumentTile = getPlayerMonumentTile(game, player);
+        if (monumentTile == null) {
+            return null;
+        }
+        return monumentTile.getPlanetUnitHolders().stream()
+                .filter(planet -> planet.getUnitCount(UnitType.Monument, player) > 0)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static boolean hasKyroReliquary(Game game, Player player) {
+        return game != null
+                && player != null
+                && game.isMonumentsMode()
+                && (player.hasUnit("kyro_monument")
+                        || NekroMonumentService.getCopiedMonuments(game, player).stream()
+                                .anyMatch(monument -> "kyro_monument".equals(monument.getId())));
+    }
+
+    public static void syncKyroReliquaryAttachment(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return;
+        }
+        boolean hasKyroReliquary = hasKyroReliquary(game, player);
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                boolean hasKyroMonument = hasKyroReliquary
+                        && planet.getUnitKeysForPlayer(player).stream()
+                                .filter(unitKey -> unitKey.unitType() == UnitType.Monument)
+                                .map(player::getUnitFromUnitKey)
+                                .anyMatch(unit -> unit != null
+                                        && ("kyro_monument".equals(unit.getId())
+                                                || ("nekro_monument".equals(unit.getId())
+                                                        && NekroMonumentService.hasCopiedMonument(
+                                                                game, player, "kyro_monument"))));
+                if (hasKyroMonument) {
+                    planet.addToken(KYRO_RELIQUARY_ATTACHMENT);
+                } else {
+                    planet.removeToken(KYRO_RELIQUARY_ATTACHMENT);
+                }
+            }
+        }
+    }
+
+    public static void syncZelianAsteroidFieldToken(Game game) {
+        if (game == null || !game.isMonumentsMode()) {
+            return;
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            boolean hasZelianMonument = game.getRealPlayers().stream()
+                    .anyMatch(player -> tile == getMonumentTile(game, player, "zelian_monument"));
+            if (hasZelianMonument) {
+                tile.getSpaceUnitHolder().addToken("token_asteroids_zelian.png");
+            } else {
+                tile.getSpaceUnitHolder().removeToken("token_asteroids_zelian.png");
+            }
+        }
+    }
+
+    public static Player getMonumentOwner(Game game, String monumentId) {
+        UnitModel monument = Mapper.getUnit(monumentId);
+        if (game == null
+                || monument == null
+                || monument.getSource() != ComponentSource.monuments
+                || !game.isMonumentsMode()) {
+            return null;
+        }
+        return game.getRealPlayers().stream()
+                .filter(player -> player.hasUnit(monumentId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static Tile getMonumentTile(Game game, Player player, String monumentId) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return null;
+        }
+        if (isOwnedMonumentOnBoard(game, player, monumentId)) {
+            return game.getTileMap().values().stream()
+                    .filter(tile -> ButtonHelper.doesPlayerHaveUnitHere(monumentId, player, tile))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return NekroMonumentService.hasCopiedMonument(game, player, monumentId)
+                ? getMonumentTile(game, player, "nekro_monument")
+                : null;
+    }
+
+    public static boolean treatsSystemAsGhotiAnchorpointFrontier(Game game, Player player, Tile tile) {
+        return tile != null
+                && isMonumentOnBoard(game, player, "ghoti_monument")
+                && tile == getMonumentTile(game, player, "ghoti_monument");
+    }
+
+    public static boolean isInOrAdjacentToMonumentSystem(Game game, Player player, String monumentId, Tile tile) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return false;
+        }
+        Tile monumentTile = getMonumentTile(game, player, monumentId);
+        return monumentTile != null
+                && tile != null
+                && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())
+                && (monumentTile == tile
+                        || FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, false)
+                                .contains(tile.getPosition()));
+    }
+
+    public static List<Tile> getTilesInOrAdjacentToPlayerMonument(Game game, Player player) {
+        if (game == null || player == null || !game.isMonumentsMode()) {
+            return List.of();
+        }
+        LinkedHashSet<String> systemPositions = new LinkedHashSet<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().values().stream()
+                    .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0)) {
+                systemPositions.add(tile.getPosition());
+                systemPositions.addAll(
+                        FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
+            }
+        }
+        List<Tile> tiles = new ArrayList<>();
+        for (String position : systemPositions) {
+            Tile tile = game.getTileByPosition(position);
+            if (tile != null
+                    && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())) {
+                tiles.add(tile);
+            }
+        }
+        return tiles;
+    }
+
+    public static List<Button> getPlanetsInOrAdjacentToPlayerMonumentButtons(
+            Game game, Player player, String buttonPrefix) {
+        if (!game.isMonumentsMode()) {
+            return List.of();
+        }
+
+        LinkedHashSet<String> planetNames = new LinkedHashSet<>();
+        for (Tile tile : getTilesInOrAdjacentToPlayerMonument(game, player)) {
+            for (UnitHolder holder : tile.getPlanetUnitHolders()) {
+                planetNames.add(holder.getName());
+            }
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (String planetName : planetNames) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + buttonPrefix + planetName,
+                    Helper.getPlanetRepresentation(planetName, game)));
+        }
+        return buttons;
+    }
+
+    @ButtonHandler("scoreToppleAMonument")
+    public static void scoreToppleAMonument(ButtonInteractionEvent event, Game game, Player player) {
+        if (!game.isMonumentsMode()) {
+            return;
+        }
+        Integer secretIndex = player.getSecretsUnscored().get("tam");
+        if (secretIndex == null) {
+            return;
+        }
+
+        if (SecretObjectiveHelper.scoreSO(event, game, player, secretIndex, player.getCorrectChannel())) {
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public static void recordNaaluMonumentInfantryCommit(Game game, Player player, Tile tile, String planetName) {
+        if (game == null
+                || player == null
+                || tile == null
+                || !game.isMonumentsMode()
+                || !isMonumentOnBoard(game, player, "naalu_monument")
+                || !getTilesInOrAdjacentToPlayerMonument(game, player).contains(tile)) {
+            return;
+        }
+        game.setStoredValue("naaluMonumentCoexistence_" + player.getFaction() + "_" + planetName, "yes");
+    }
+
+    public static boolean canUseNaaluMonumentCoexistence(Game game, Player player, String planetName) {
+        if (game == null
+                || player == null
+                || !game.isMonumentsMode()
+                || !isMonumentOnBoard(game, player, "naalu_monument")
+                || !"yes"
+                        .equals(game.getStoredValue(
+                                "naaluMonumentCoexistence_" + player.getFaction() + "_" + planetName))) {
+            return false;
+        }
+
+        Tile planetTile = game.getTileFromPlanet(planetName);
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        return planetTile != null
+                && planet != null
+                && planet.getUnitCount(UnitType.Infantry, player) > 0
+                && getTilesInOrAdjacentToPlayerMonument(game, player).contains(planetTile)
+                && ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet).stream()
+                        .anyMatch(otherPlayer -> otherPlayer != player);
+    }
+
+    public static void clearNaaluMonumentCoexistence(Game game) {
+        if (game == null || !game.isMonumentsMode()) {
+            return;
+        }
+        for (Player player : game.getRealPlayers()) {
+            for (Tile tile : game.getTileMap().values()) {
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    game.removeStoredValue("naaluMonumentCoexistence_" + player.getFaction() + "_" + planet.getName());
+                }
+            }
+        }
+    }
+}

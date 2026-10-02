@@ -1,0 +1,502 @@
+[
+    {
+        "alias": "diaspora",
+        "factionName": "Diaspora Arborec",
+        "homeSystem": "05",
+        "startingFleet": "3 cr, 2 inf n, 1 mech n, 2 pds n",
+        "commodities": 3,
+        "factionTech": [
+            "ggdiag",
+            "ggdiacr"
+        ],
+        "startingTech": [
+            "dxa"
+        ],
+        "homePlanets": [
+            "nestphar"
+        ],
+        "abilities": [
+            "fruiting_bodies",
+            "megaflora",
+            "dizurga_emissaries"
+        ],
+        "leaders": [
+            "diasporaagent",
+            "diasporacommander",
+            "diasporahero"
+        ],
+        "promissoryNotes": [
+            "ggpndia"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "diaspora_cruiser",
+            "carrier",
+            "dreadnought",
+            "diaspora_flagship",
+            "infantry",
+            "diaspora_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "gamma"
+    },
+    {
+        "alias": "hlr",
+        "factionName": "The H4L1R infocrypt Subnet",
+        "homeSystem": "06",
+        "startingFleet": "1 dd, 1 cv, 2 ff, 4 inf n, sd n",
+        "commodities": 2,
+        "factionTech": [
+            "gghlrg",
+            "gghlry"
+        ],
+      "startingTech": [
+
+      ],
+        "homePlanets": [
+            "0.0.0"
+        ],
+        "abilities": [
+          "cranial_modules",
+          "ghost_prototypes",
+          "legacy_systems"
+        ],
+        "leaders": [
+            "hlragent",
+            "hlrcommander",
+            "hlrhero"
+        ],
+        "promissoryNotes": [
+            "ggpnhlr"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "hlr_flagship",
+            "infantry",
+            "hlr_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Hard",
+        "source": "gamma"
+    },
+    {
+        "alias": "clade",
+        "factionName": "The Neurovoid Clade",
+        "homeSystem": "09",
+        "startingFleet": "1 dd, 2 cv, 3 ff, 3 inf m, sd d",
+        "commodities": 3,
+        "factionTech": [
+            "ggcladedd",
+            "ggcladeg"
+        ],
+        "startingTech": [
+            "st"
+        ],
+        "homePlanets": [
+            "maaluuk",
+            "druaa"
+        ],
+        "abilities": [
+            "cognitive_hazard",
+            "hypnotic_fugue",
+            "quarantine"
+        ],
+        "leaders": [
+            "cladeagent",
+            "cladecommander",
+            "cladehero"
+        ],
+        "promissoryNotes": [
+            "ggpnclade"
+        ],
+        "units": [
+            "fighter",
+            "clade_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "clade_flagship",
+            "infantry",
+            "clade_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Hard",
+        "source": "gamma"
+    },
+    {
+        "alias": "archon",
+        "factionName": "The Archon War Machine",
+        "homeSystem": "14",
+        "startingFleet": "2 cr, 1 cv, 3 ff, 2 inf t, 2 inf r, sd r",
+        "commodities":2,
+        "factionTech": [
+            "ggarchy",
+            "ggarchws"
+        ],
+        "startingTech": [
+            "ps"
+        ],
+        "homePlanets": [
+            "archonren",
+            "archontau"
+        ],
+        "abilities": [
+            "convocation_accords",
+            "righteous_dictat",
+            "political_decree"
+        ],
+        "leaders": [
+            "archonagent",
+            "archoncommander",
+            "archonhero"
+        ],
+        "promissoryNotes": [
+            "ggpnarch"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "archon_flagship",
+            "infantry",
+            "archon_mech",
+            "pds",
+            "spacedock",
+            "archon_warsun"
+        ],
+        "complexity": "Hard",
+        "source": "gamma"
+    },
+    {
+        "alias": "moyin",
+        "factionName": "The Moyin Covenant",
+        "homeSystem": "03",
+        "startingFleet": "1 cr, 1 cv, 3 inf d, sd d, pds d",
+        "commodities": 2,
+        "factionTech": [
+            "ggmoying",
+            "ggmoyinm"
+        ],
+        "startingTech": [
+            "da"
+        ],
+        "homePlanets": [
+            "darien"
+        ],
+        "abilities": [
+            "genetic_experimentation",
+            "biological_horrors",
+            "prohibited_research"
+        ],
+        "leaders": [
+            "moyinagent",
+            "moyincommander",
+            "moyinhero"
+        ],
+        "promissoryNotes": [
+            "ggpnmoyin"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "moyin_flagship",
+            "infantry",
+            "moyin_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "gamma"
+    },
+    {
+        "alias": "veilstrike",
+        "factionName": "The Veilstrike Agitator Cells",
+        "homeSystem": "15",
+        "startingFleet": "1 dd, 2 cv, 3 ff, 3 inf x, sd x",
+        "commodities": 3,
+        "factionTech": [
+            "ggveilstrikeg",
+            "ggveilstriker"
+        ],
+        "startingTech": [
+            "nm"
+        ],
+        "homePlanets": [
+            "retillion",
+            "shalloq"
+        ],
+        "abilities": [
+            "propaganda_engines",
+            "bartering",
+            "covert_operations"
+        ],
+        "leaders": [
+            "veilstrikeagent",
+            "veilstrikecommander",
+            "veilstrikehero"
+        ],
+        "promissoryNotes": [
+            "ggpnveil"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "veilstrike_flagship",
+            "infantry",
+            "veilstrike_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "low",
+        "source": "gamma"
+    },
+    {
+        "alias": "convocation",
+        "factionName": "The Midnight Convocation",
+        "homeSystem": "58",
+        "startingFleet": "2 dd, 1 cv, 4 ff, 4 inf v, sd y",
+        "commodities": 2,
+        "factionTech": [
+            "ggconr",
+            "ggconinf"
+        ],
+        "startingTech": [
+            "st"
+        ],
+        "homePlanets": [
+            "ylir",
+            "valk",
+            "avar"
+        ],
+        "abilities": [
+            "guardians_of_profane_ground",
+            "eternal_vigilance"
+        ],
+        "leaders": [
+            "convocationagent",
+            "convocationcommander",
+            "convocationhero"
+        ],
+        "promissoryNotes": [
+            "ggpncon"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "convocation_flagship",
+            "convocation_infantry",
+            "convocation_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "gamma"
+    },
+    {
+        "alias": "weaveway",
+        "factionName": "The Weaveway",
+        "homeSystem": "56",
+        "startingFleet": "2 cr, 1 cv, 4 inf d, sd",
+        "commodities": 2,
+        "factionTech": [
+            "ggweasd",
+            "ggwear"
+        ],
+        "startingTechAmount": 2,
+        "startingTechOptions": [
+            "amd",
+            "st",
+            "pa"
+        ],
+        "homePlanets": [
+            "thedark"
+        ],
+        "abilities": [
+          "hyperdimensional",
+          "threads_out_of_the_dark"
+        ],
+        "leaders": [
+            "weavewayagent",
+            "weavewaycommander",
+            "weavewayhero"
+        ],
+        "promissoryNotes": [
+            "ggpnaraf",
+            "ggpnaras",
+            "ggpnarah"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "weaveway_flagship",
+            "infantry",
+            "weaveway_mech",
+            "pds",
+            "weaveway_spacedock"
+        ],
+        "complexity": "Hard",
+        "source": "gamma"
+    },
+    {
+        "alias": "initiative",
+        "factionName": "The Keleres Initiative",
+        "homeSystem": "94new",
+        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
+        "commodities": 4,
+        "factionTech": [
+            "gginitr",
+            "gginitpds"
+        ],
+        "startingTech": [
+            "aida",
+            "sdn"
+        ],
+        "homePlanets": [
+            "mollprimusk"
+        ],
+        "abilities": [
+            "winnaran_archive_access",
+            "jurisdiction",
+            "beholden"
+        ],
+        "leaders": [
+            "initiativeagent",
+            "initiativecommander",
+            "initiativehero"
+        ],
+        "promissoryNotes": [
+            "ggpninit"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "initiative_flagship",
+            "infantry",
+            "initiative_mech",
+            "initiative_pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "gamma"
+    },
+    {
+        "alias": "company",
+        "factionName": "The Gray Company",
+        "homeSystem": "10",
+        "startingFleet": "1 dr, 1 cr, 1 cv, 3 ff, 3 inf d, sd d",
+        "commodities": 3,
+        "factionTech": [
+            "ggcompanyy",
+            "ggcompanydn"
+        ],
+        "startingTechAmount": 2,
+        "startingTechOptions": [
+            "amd",
+            "aida",
+            "sdn"
+        ],
+        "homePlanets": [
+            "arcprime",
+            "wrenterra"
+        ],
+        "abilities": [
+            "bounties",
+            "dogs_of_war"
+        ],
+        "leaders": [
+            "companyagent",
+            "companycommander",
+            "companyhero"
+        ],
+        "promissoryNotes": [
+            "ggpncompany"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "company_dreadnought",
+            "company_flagship",
+            "infantry",
+            "company_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "gamma"
+    },
+    {
+        "alias": "industries",
+        "factionName": "Jord Industries",
+        "homeSystem": "01",
+        "startingFleet": "2 cr, 1 dd, 3 ff, 2 inf d, 1 mf d, sd d",
+        "commodities": 3,
+        "factionTech": [
+            "ggindustg",
+            "ggindustry"
+        ],
+        "startingTechAmount": 1,
+        "startingTechOptions": [
+            "ps",
+            "aida",
+            "st",
+            "sdn"
+        ],
+        "homePlanets": [
+            "jord"
+        ],
+        "abilities": [
+            "rapid_industrialization",
+            "corporate_sanctions"
+        ],
+        "leaders": [
+            "industriesagent",
+            "industriescommander",
+            "industrieshero"
+        ],
+        "promissoryNotes": [
+            "ggpnindust"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "industries_flagship",
+            "infantry",
+            "industries_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "gamma"
+    }
+]

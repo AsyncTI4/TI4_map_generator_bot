@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 @Service
 public class ActionCardDeckService {
 
-    public void shuffle(Game game, Player player) {
+    public static void shuffle(Game game, Player player) {
         game.shuffleActionCards();
         String playerRepresentation = player.getRepresentationNoPing();
         MessageHelper.sendMessageToChannel(

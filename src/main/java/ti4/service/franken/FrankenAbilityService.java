@@ -7,6 +7,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
+import ti4.draft.DraftCategory;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
@@ -28,7 +32,13 @@ public class FrankenAbilityService {
                 sb.append("> ").append(abilityID).append(" (player had this ability)");
             } else {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
-                sb.append("> ").append(abilityModel.getRepresentation());
+                sb.append("> ")
+                        .append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                                player.getGame(),
+                                DraftCategory.ABILITY,
+                                abilityID,
+                                abilityModel.getNameRepresentation(),
+                                abilityModel.getRepresentation()));
             }
             sb.append('\n');
             player.addAbility(abilityID);
@@ -62,7 +72,7 @@ public class FrankenAbilityService {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
+                                + ", the bot has automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
                 ButtonHelperHeroes.offerOlradinHeroFlips(player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player);
@@ -85,14 +95,6 @@ public class FrankenAbilityService {
                         "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                                 + " due to the **Teeming** ability.");
             }
-            if ("machine_cult".equalsIgnoreCase(abilityID)) {
-                String unitID = AliasHandler.resolveUnit("mech");
-                player.setUnitCap(unitID, 6);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "Set mech unit maximum to 6 for " + player.getRepresentation()
-                                + ", due to their **Machine Cult** ability.");
-            }
             if ("diplomats".equalsIgnoreCase(abilityID)) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(
@@ -110,6 +112,26 @@ public class FrankenAbilityService {
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                         buttons);
+            }
+            if ("call_of_the_haunted".equalsIgnoreCase(abilityID)) {
+                RevenantAbilityHandler.offerCallOfTheHauntedButtons(player.getGame(), player);
+            }
+            if ("primordial_secrets".equalsIgnoreCase(abilityID)) {
+                ArcanumAbilityHandler.offerPrimordialSecretsButtons(player.getGame(), player);
+            }
+            if ("thrones_of_ruin".equalsIgnoreCase(abilityID)) {
+                ThronesAbilityHandler.getUnplacedThronePlanetButtons(event, player.getGame(), player);
+            }
+            if ("cycle_of_reclamation".equalsIgnoreCase(abilityID)) {
+                player.addRelic("new_moonphase");
+                player.addRelic("waxing_moonphase");
+                player.addRelic("waning_moonphase");
+                player.addRelic("full_moonphase");
+                player.addRelic("lunar_eclipse_moonphase");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + "added the 5 _Moon Phase_ abilities to your play area. (They will appear as relics, they are not)");
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

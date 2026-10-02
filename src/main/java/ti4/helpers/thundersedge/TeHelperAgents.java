@@ -20,6 +20,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -76,7 +77,7 @@ public final class TeHelperAgents {
 
     @ButtonHandler("handleRalNelAgent_")
     private static void handleRalNelAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String part1 = "handleRalNelAgent_" + RegexHelper.acRegex(game);
+        String part1 = "handleRalNelAgent_" + RegexHelper.acRegex(game, player);
         RegexService.runMatcher(part1, buttonID, matcher -> {
             String acID = matcher.group("ac");
             String msg = player.getRepresentation(true, true) + ", please choose the player you wish to give _"
@@ -98,7 +99,8 @@ public final class TeHelperAgents {
     @ButtonHandler("handleRalNelAgentPt2_")
     private static void handleRalNelAgentPart2(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "handleRalNelAgentPt2_" + RegexHelper.acRegex(game) + "_" + RegexHelper.factionRegex(game);
+        String regex =
+                "handleRalNelAgentPt2_" + RegexHelper.acRegex(game, player) + "_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String acID = matcher.group("ac");
             String faction = matcher.group("faction");
@@ -112,7 +114,7 @@ public final class TeHelperAgents {
                 if (game.isFowMode())
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
-                            (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation())
+                            FoWHelper.identityOrColorIfCanSeeStats(game, player, p2, player.getRepresentation())
                                     + " sent an action card to " + p2.getRepresentation(true, true) + ".");
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Error, player2 is null");
@@ -257,7 +259,7 @@ public final class TeHelperAgents {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " exhausted "
+                        player.getRepresentationNoPing() + " exhausted "
                                 + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Z'eu ΩΩ, the Naalu" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                                 + " to remove the just-placed command token from " + tile.getRepresentationForButtons()

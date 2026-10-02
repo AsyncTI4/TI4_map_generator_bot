@@ -1,0 +1,16 @@
+{
+    "tileBack": "green",
+    "id": "th16a",
+    "name": "Petra - Stoneborn",
+    "aliases": [
+        "th16a",
+        "petra"
+    ],
+    "imagePath": "th16a_stonebornhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "petra"
+    ],
+    "source": "theodisi"
+}

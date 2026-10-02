@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
@@ -20,8 +21,10 @@ public class WinningPathPersistenceService {
     public static synchronized void recomputeFile() {
         BotLogger.info("**Recomputing win paths file**");
         Map<String, Map<String, Integer>> data = new HashMap<>();
-        GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null), game -> computeWinPath(game, data));
+        ConsumeGameUtility.consumeAllGames(
+                GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null),
+                game -> computeWinPath(game, data),
+                ExecutionLockType.READ);
         writeData(data);
         BotLogger.info("**Finished recomputing win paths file**");
     }

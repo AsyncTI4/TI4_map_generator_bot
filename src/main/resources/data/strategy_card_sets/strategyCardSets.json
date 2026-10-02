@@ -121,9 +121,34 @@
   {
     "name": "Twilight Fall's Strategy Cards",
     "alias": "twilights_fall_sc",
-    "scIDs": ["tf1", "tf2", "tf3", "tf4", "tf5", "tf6", "tf7", "tf8"],
+    "scIDs": [
+      "tf1",
+      "tf2",
+      "tf3",
+      "tf4",
+      "tf5",
+      "tf6",
+      "tf7",
+      "tf8"
+    ],
     "description": "The 8 strategy cards used in Twilight's Fall",
     "source": "twilights_fall"
+  },
+  {
+    "name": "Pally's Evenfall's Strategy Cards",
+    "alias": "evenfall_sc",
+    "scIDs": [
+      "evenfall1",
+      "evenfall2",
+      "evenfall3",
+      "evenfall4",
+      "evenfall5",
+      "evenfall6",
+      "evenfall7",
+      "evenfall8"
+    ],
+    "description": "The 8 strategy cards used in Pally's Evenfall homebrew",
+    "source": "pally"
   },
   {
     "name": "PBD #100 Strategy Cards",
@@ -406,14 +431,33 @@
   {
     "name": "Twilight Fall's Strategy Cards",
     "alias": "tf",
-    "scIDs": ["tf1", "tf2", "tf3", "tf4", "tf5", "tf6", "tf7", "tf8"],
+    "scIDs": [
+      "tf1",
+      "tf2",
+      "tf3",
+      "tf4",
+      "tf5",
+      "tf6",
+      "tf7",
+      "tf8"
+    ],
     "description": "The 8 strategy cards used in Twilight's Fall",
     "source": "twilights_fall"
   },
   {
     "name": "Twilight Fall: Untangled Space",
     "alias": "untangled_space",
-    "scIDs": ["tf1", "tf2", "tf3", "tf4", "tf5", "tf6", "tf7", "tf8", "us9"],
+    "scIDs": [
+      "tf1",
+      "tf2",
+      "tf3",
+      "tf4",
+      "tf5",
+      "tf6",
+      "tf7",
+      "tf8",
+      "us9"
+    ],
     "description": "Twilight Fall's strategy cards with the Untangled Space 9th card",
     "source": "untangled_space"
   }

@@ -13,11 +13,9 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings();
 
         assertFalse(settings.isProd());
+        assertTrue(settings.isEnabled());
         assertTrue(settings.getRuntime().isDevMode());
-        assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
-        assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        assertEquals(100, settings.getInitialIndividualPoints());
     }
 
     @Test
@@ -25,11 +23,14 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings(false);
 
         assertTrue(settings.isProd());
+        assertFalse(settings.isEnabled());
+        assertFalse(settings.getPromotion().isEnabled());
         assertFalse(settings.getRuntime().isDevMode());
-        assertEquals(900, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(600, settings.getReplayExecution().getSideBetWindowSeconds());
-        assertEquals(900, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(3, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        assertEquals(8, settings.getCandidateSelection().getTargetCandidatesPerHour());
+        assertEquals(86_400, settings.getReplayExecution().getStartDelaySeconds());
+        assertEquals(10, settings.getReplayExecution().getDailyLockHourCentral());
+        assertEquals(0, settings.getReplayExecution().getDailyLockMinuteCentral());
+        assertEquals(100, settings.getInitialIndividualPoints());
     }
 
     @Test
@@ -37,10 +38,8 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings(true);
 
         assertFalse(settings.isProd());
+        assertTrue(settings.isEnabled());
         assertTrue(settings.getRuntime().isDevMode());
-        assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
-        assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        assertEquals(100, settings.getInitialIndividualPoints());
     }
 }

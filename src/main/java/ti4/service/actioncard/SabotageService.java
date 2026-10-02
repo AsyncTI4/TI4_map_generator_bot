@@ -1,7 +1,6 @@
 package ti4.service.actioncard;
 
 import java.util.Calendar;
-import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -9,13 +8,14 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.model.LeaderModel;
-import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
@@ -24,10 +24,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class SabotageService {
 
-    private static final Set<String> SHATTER_CARD_ALIASES = Set.of("tf-shatter1", "tf-shatter2");
-    private static final Set<String> SABOTAGE_CARD_ALIASES = Set.of("sabo1", "sabo2", "sabo3", "sabo4");
-    private static final Set<String> ACD2_SABOTAGE_CARD_ALIASES =
-            Set.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
     private static final Set<String> ALL_SABOTAGE_CARD_ALIASES = Set.of(
             "sabo1",
             "sabo2",
@@ -48,19 +44,12 @@ public class SabotageService {
             return true;
         }
 
-        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
-            return false;
-        }
+        if (!ActionCardHelper.canPlayActionCards(player)) return false;
 
         if (isAffectedByTransparasteel(player, game)) return false;
 
         if (playerHasSabotage(player)) return true;
 
-        if (player.getAcCount() == 0) return false;
-
-        if (game.isAcd2()) return !allAcd2SabotagesAreDiscarded(game, player);
-        if (game.isTwilightsFallMode()) return !allShattersAreDiscarded(game, player);
         return !allSabotagesAreDiscarded(game, player);
     }
 
@@ -101,8 +90,6 @@ public class SabotageService {
     }
 
     public static boolean isSaboAllowed(Game game, Player player) {
-        if (game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) return false;
-        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) return false;
         if (allSabotagesAreDiscarded(game, player)) return false;
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -131,15 +118,12 @@ public class SabotageService {
     }
 
     public static String noSaboReason(Game game, Player player) {
-        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) {
-            return "All _Shatter_ cards are in the discard.";
-        }
-
-        if ((game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) || allSabotagesAreDiscarded(game, player)) {
+        if (allSabotagesAreDiscarded(game, player)) {
+            if (game.isTwilightsFallMode()) return "All _Shatter_ cards are in the discard.";
             return "All _Sabotages_ are in the discard.";
         }
 
-        String playerName = game.isFowMode() ? "Player" : player.getRepresentationNoPing();
+        String playerName = FoWHelper.actorOrAnon(game, player, "Player");
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
             return playerName + " has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation()
@@ -174,33 +158,24 @@ public class SabotageService {
     }
 
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
-
-    private static boolean allShattersAreDiscarded(Game game, Player player) {
-        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
-
-    private static boolean allAcd2SabotagesAreDiscarded(Game game, Player player) {
-        return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+        return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
+                .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
+                .allMatch(alias -> isActionCardNotPlayable(game, player, alias)
+                        && game.getDiscardACStatus().get(alias) != ActionCardHelper.ACStatus.garbozia);
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
-        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
-        if (ActionCardHelper.getGarboziaActionCards(game).containsKey(acAlias)) {
-            return false;
+        ActionCardHelper.ACStatus status = game.getDiscardACStatus().get(acAlias);
+        if (status == ActionCardHelper.ACStatus.garbozia) {
+            return !player.hasPlanet("garbozia");
         }
-        return game.getDiscardActionCards().containsKey(acAlias)
-                || game.getDiscardACStatus().entrySet().stream()
-                        .filter(entry ->
-                                entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
-                        .map(Map.Entry::getKey)
-                        .anyMatch(acAlias::equals);
+        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
+        return game.getDiscardActionCards().containsKey(acAlias) || status != null;
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
-        for (GameMessageManager.GameMessage gameMessage : gameMessages) {
+        for (GameMessage gameMessage : gameMessages) {
             if (ReactionService.checkForSpecificPlayerReact(gameMessage.messageId(), player, game)) continue;
 
             game.getMainGameChannel()

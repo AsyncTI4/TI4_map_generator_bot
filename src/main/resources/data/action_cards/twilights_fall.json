@@ -306,6 +306,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose a player; that player must give you 1 of their abilities.",
+        "notes": "This action card is not affected by someone having bio-synthetic synergy.",
         "source": "twilights_fall"
     },
     {

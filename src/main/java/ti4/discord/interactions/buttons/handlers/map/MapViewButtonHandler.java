@@ -22,7 +22,7 @@ import ti4.service.combat.StartCombatService;
 @UtilityClass
 class MapViewButtonHandler {
 
-    @ButtonHandler("chooseMapView")
+    @ButtonHandler(value = "chooseMapView", save = false)
     public static void chooseMapView(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("checkWHView", "Find Wormholes"));
@@ -40,12 +40,12 @@ class MapViewButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 
-    @ButtonHandler("checkExileView")
+    @ButtonHandler(value = "checkExileView", save = false)
     public static void calculateExileView(ButtonInteractionEvent event, Game game) {
         ButtonHelper.showFeatureType(event, game, DisplayType.exile);
     }
 
-    @ButtonHandler("refreshViewOfSystem_")
+    @ButtonHandler(value = "refreshViewOfSystem_", save = false)
     public static void refreshViewOfSystem(ButtonInteractionEvent event, String buttonID, Game game) {
         String rest = buttonID.replace("refreshViewOfSystem_", "");
         String pos = rest.split("_")[0];

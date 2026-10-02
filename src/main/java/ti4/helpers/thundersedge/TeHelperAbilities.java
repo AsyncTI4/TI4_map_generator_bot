@@ -32,6 +32,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -224,7 +225,9 @@ public final class TeHelperAbilities {
                                 + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                     }
-                    if (player.hasUnit("tk-keshnu") && !player.hasAbility("miniaturization")) continue;
+                    if (player.hasUnit("tk-keshnu")
+                            && !player.hasAbility("miniaturization")
+                            && !player.hasAbility("radiant_grafting_flight")) continue;
                     for (int x = 1; x <= Math.min(1, docks); x++) {
                         String id = player.factionButtonChecker() + "miniLanding_" + activeSystem.getPosition() + "_"
                                 + x + "sd_" + planet.getName();
@@ -238,6 +241,26 @@ public final class TeHelperAbilities {
                         String label = "Land " + x + " Damaged Space Dock On "
                                 + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
+                    }
+                    if (!player.hasAbility("radiant_grafting_flight")) {
+                        continue;
+                    }
+                    for (UnitKey unitKey : activeSystem.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
+                        if (unitKey.unitType() == UnitType.Pds || unitKey.unitType() == UnitType.Spacedock) {
+                            continue;
+                        }
+                        UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                        if (unitModel == null || !unitModel.getIsStructure()) {
+                            continue;
+                        }
+                        int count = activeSystem.getSpaceUnitHolder().getUnitCount(unitKey);
+                        for (int x = 1; x <= Math.min(2, count); x++) {
+                            String id = player.factionButtonChecker() + "miniLanding_" + activeSystem.getPosition()
+                                    + "_" + x + unitKey.unitType().getValue() + "_" + planet.getName();
+                            String label = "Land " + x + " " + unitModel.getName() + " On "
+                                    + Helper.getPlanetRepresentation(planet.getName(), game);
+                            buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
+                        }
                     }
                 }
             }
@@ -375,7 +398,7 @@ public final class TeHelperAbilities {
                 if (!player.unitBelongsToPlayer(uk)) continue;
 
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock, UnitType.Monument).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
                 if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 

@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -42,9 +43,8 @@ public class ZelianHeroService {
         for (Planet p : planetsInSystem) {
             resourcesSum += p.getResources();
         }
-        String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + " trade good"
-                + (resourcesSum == 1 ? "" : "s") + " from _Celestial Impact_ (" + player.getTg()
-                + "->" + (player.getTg() + resourcesSum) + ").";
+        String tgGainMsg = player.getFactionEmoji() + " gained " + StringHelper.pluralize(resourcesSum, "trade good")
+                + " from _Celestial Impact_ (" + player.getTg() + "->" + (player.getTg() + resourcesSum) + ").";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);
         ButtonHelperAbilities.pillageCheck(player, game);

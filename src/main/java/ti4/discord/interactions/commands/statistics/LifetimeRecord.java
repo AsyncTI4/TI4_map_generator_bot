@@ -10,7 +10,7 @@ import ti4.spring.service.statistics.LifeTimeRecordService;
 class LifetimeRecord extends Subcommand {
 
     LifetimeRecord() {
-        super(Constants.LIFETIME_RECORD, "Dice luck and average turn time for all games of specific players");
+        super(Constants.LIFETIME_RECORD, "Dice luck for all games of specific players");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));

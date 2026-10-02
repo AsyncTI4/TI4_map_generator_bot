@@ -21,7 +21,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 class EditTagsButtonHandler {
 
-    @ButtonHandler("editTags~MDL")
+    @ButtonHandler(value = "editTags~MDL", save = false)
     public static void handleEditTags(ButtonInteractionEvent event, Game game) {
         String modalId = "editTags";
         String currentTags = String.join(";", game.getTags());

@@ -14,10 +14,13 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -31,15 +34,18 @@ import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.PromissoryNoteModel;
+import ti4.model.TileModel;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
+import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
-
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
             return false;
@@ -60,9 +66,9 @@ public final class FoWHelper {
     }
 
     public static boolean isPrivateGame(
-            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel2) {
         Channel eventChannel = event == null ? null : event.getChannel();
-        Channel channel = channel_ != null ? channel_ : eventChannel;
+        Channel channel = channel2 != null ? channel2 : eventChannel;
         if (channel == null) {
             return game.isFowMode();
         }
@@ -77,10 +83,201 @@ public final class FoWHelper {
             }
             game = GameManager.getManagedGame(gameName).getGame();
         }
-        if (game.isFowMode() && channel_ != null || event != null) {
+        if (game.isFowMode() && channel2 != null || event != null) {
             return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return false;
+    }
+
+    /**
+     * Shows who did something in a normal game, but hides it under fog. Returns the player's plain
+     * (non-pinging) name when the game isn't fogged, or {@code fogPhrase} when it is — you pass the
+     * placeholder to show instead: {@code "someone"}, {@code "another player"}, or {@code ""} to drop
+     * the actor entirely. Replaces the hand-written
+     * {@code game.isFowMode() ? "someone" : player.getRepresentationNoPing()} so the hide-the-actor
+     * rule lives in one place.
+     *
+     * <p>Only use this where the visible (non-fog) text is the player's normal representation. It does
+     * not fit sites that show something else when unfogged — a Discord username (e.g.
+     * {@code ActionCardHelper.showAll}) or a bare faction emoji (the explore-discovery lines); handle
+     * those directly.
+     */
+    public static String actorOrAnon(Game game, Player player, String fogPhrase) {
+        return game.isFowMode() ? fogPhrase : player.getRepresentationNoPing();
+    }
+
+    /**
+     * Like {@link #actorOrAnon}, but the visible (non-fog) form is the player's compact faction
+     * emoji/color ({@code getFactionEmojiOrColor()}) instead of their full name. Under fog it returns
+     * {@code fogPhrase} — usually a generic word, or the player's raw color for sites that
+     * deliberately reveal color in fog. Replaces
+     * {@code game.isFowMode() ? "<phrase>" : player.getFactionEmojiOrColor()}.
+     */
+    public static String factionEmojiOrAnon(Game game, Player player, String fogPhrase) {
+        return game.isFowMode() ? fogPhrase : player.getFactionEmojiOrColor();
+    }
+
+    /**
+     * Hides identity per-viewer — finer-grained than the game-wide fog flag. Under fog it returns what
+     * {@code viewer} is actually allowed to see about {@code target}: the target's color, or
+     * {@code "???"} if the viewer can't see the target's stats (this respects alliances and promissory
+     * notes, via {@code target.getColorIfCanSeeStats(viewer)}). When not fogged it returns
+     * {@code unfoggedRendering}, which you supply because it varies by site (full representation,
+     * faction name, etc.).
+     *
+     * <p>Use this instead of a plain {@code isFowMode()} check when a message should reveal different
+     * things to different players.
+     */
+    public static String identityOrColorIfCanSeeStats(
+            Game game, Player target, Player viewer, String unfoggedRendering) {
+        return game.isFowMode() ? target.getColorIfCanSeeStats(viewer) : unfoggedRendering;
+    }
+
+    /**
+     * Picks where a public "X happened" announcement should go. In a normal game, if the player isn't
+     * already acting in the shared Actions channel, returns that Actions channel so everyone sees it.
+     * Under fog (or when they're already in the Actions channel) returns the channel the interaction
+     * came from, keeping the message local. Send one message to whatever this returns.
+     *
+     * <p>If the public and local versions need different wording, use {@link #announcePublicOrLocal}
+     * instead. Extracted from the repeated
+     * {@code !game.isFowMode() && event.getChannel() != game.getActionsChannel()} shape in
+     * {@code ExploreService}.
+     */
+    public static MessageChannel actionsChannelOrLocal(Game game, GenericInteractionCreateEvent event) {
+        return shouldAnnouncePublicly(game, event) ? game.getActionsChannel() : event.getMessageChannel();
+    }
+
+    /**
+     * The shared decision behind {@link #actionsChannelOrLocal} and {@link #announcePublicOrLocal}:
+     * announce in the public Actions channel only in a non-fog game where the interaction didn't
+     * already happen there. Always false under fog — the player pressed the button from their own
+     * private channel, so the announcement stays with them.
+     */
+    private static boolean shouldAnnouncePublicly(Game game, GenericInteractionCreateEvent event) {
+        return !game.isFowMode() && event.getChannel() != game.getActionsChannel();
+    }
+
+    /**
+     * Sends an announcement to the right place with the right wording. In a non-fog game not already
+     * in the Actions channel, posts {@code publicMessage} to the public Actions channel; otherwise
+     * posts {@code localMessage} to the interaction's own channel.
+     *
+     * <p>Use this when the public and local versions read differently — e.g. the public one is
+     * prefixed with the finder's faction emoji and the local one is a plain sentence. When both
+     * messages are identical, use {@link #actionsChannelOrLocal} with a single send instead.
+     */
+    public static void announcePublicOrLocal(
+            Game game, GenericInteractionCreateEvent event, String publicMessage, String localMessage) {
+        if (shouldAnnouncePublicly(game, event)) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMessage);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), localMessage);
+        }
+    }
+
+    /**
+     * Builds a "pick a player" button whose label and icon never reveal who the target is under fog.
+     * Normal game: the target's faction short-name plus faction emoji. Fog game: the capitalized color
+     * name (e.g. "Red", via {@link Player#getFactionNameOrColor()}) plus a neutral color-chip icon —
+     * color only, never the faction. {@code style} sets the button color: "gray" (default), "green",
+     * "red", or "blue".
+     *
+     * <p>This replaces several hand-rolled button blocks that had drifted apart (some showed a raw
+     * lowercase color, some varied the non-fog label). The icon comes from
+     * {@link Player#fogSafeEmoji()} — faction emoji when clear, color chip when fogged — matching the
+     * Twilight's Fall action-card buttons.
+     */
+    public static Button fogSafeTargetButton(String buttonId, String style, Player target) {
+        boolean fogged = target.getGame().isFowMode();
+        String label = fogged
+                ? target.getFactionNameOrColor()
+                : target.getFactionModel().getShortName();
+        if (target.getFaction().contains("franken")
+                && !fogged
+                && target.getDisplayName() != null
+                && !target.getDisplayName().isEmpty()) {
+            label = target.getDisplayName();
+        }
+        return styledButton(style, buttonId, label, target.fogSafeEmoji());
+    }
+
+    /**
+     * Per-viewer version of {@link #fogSafeTargetButton(String, String, Player)}, for buttons that
+     * must respect what one specific {@code viewer} is allowed to see (e.g. Psionic Hammer) rather
+     * than just the game-wide fog flag. Under fog the label is
+     * {@code target.getColorIfCanSeeStats(viewer)} — the target's color, or {@code "???"} if this
+     * viewer isn't allowed to see them — with no icon, so it can't leak color to someone who shouldn't
+     * see it. In a normal game it's the faction short-name plus faction emoji, as usual.
+     */
+    public static Button fogSafeTargetButton(String buttonId, String style, Player target, Player viewer) {
+        boolean fogged = target.getGame().isFowMode();
+        String label = fogged
+                ? target.getColorIfCanSeeStats(viewer)
+                : target.getFactionModel().getShortName();
+        String emoji = fogged ? null : target.getFactionEmoji();
+        return styledButton(style, buttonId, label, emoji);
+    }
+
+    /** Dispatch a {@link Buttons} factory by {@code style} ("gray" default, "green", "red", "blue"). */
+    private static Button styledButton(String style, String buttonId, String label, String emoji) {
+        if ("green".equals(style)) return Buttons.green(buttonId, label, emoji);
+        if ("red".equals(style)) return Buttons.red(buttonId, label, emoji);
+        if ("blue".equals(style)) return Buttons.blue(buttonId, label, emoji);
+        return Buttons.gray(buttonId, label, emoji);
+    }
+
+    /**
+     * Tells both the acting player and an affected player about something, with fog handled. Always
+     * sends {@code message} to {@code primary}'s channel. Under fog — where each player is in their
+     * own private channel — it also sends the same message to {@code affected}'s channel (unless
+     * {@code affected} is {@code primary}) so they aren't left out. In a normal game that second send
+     * is skipped, matching the original {@code send(primary…); if (fowMode && affected != primary)
+     * send(affected…);} pattern.
+     */
+    public static void notifyPlayerAndAffectedInFog(Game game, Player primary, Player affected, String message) {
+        notifyPlayerAndAffectedInFog(game, primary, message, affected, message);
+    }
+
+    /**
+     * Same as {@link #notifyPlayerAndAffectedInFog(Game, Player, Player, String)}, but lets the
+     * affected player get a different (usually anonymized) message than the acting player.
+     */
+    public static void notifyPlayerAndAffectedInFog(
+            Game game, Player primary, String primaryMessage, Player affected, String affectedMessage) {
+        MessageHelper.sendMessageToChannel(primary.getCorrectChannel(), primaryMessage);
+        if (game.isFowMode() && affected != primary) {
+            MessageHelper.sendMessageToChannel(affected.getCorrectChannel(), affectedMessage);
+        }
+    }
+
+    /**
+     * Announces a two-player interaction, with fog handled. Under fog, sends a private "you did X"
+     * message to the {@code actor} and a private "X happened to you" message to the {@code affected}
+     * player. In a normal game, sends a single third-person {@code publicMessage} to the actor's
+     * channel. Replaces
+     * {@code if (fowMode) { send(actor, …); send(affected, …); } else { send(actor, publicMsg); }}.
+     *
+     * <p><b>Only use this when the original non-fog message went to the actor's channel.</b> The
+     * non-fog send goes to {@code actor.getCorrectChannel()}, which is not always the public main
+     * channel — in a normal game where players have private channels,
+     * {@link Player#getCorrectChannel()} returns the actor's private channel. If the non-fog message
+     * instead needs to reach the {@code affected} player or the public main channel, keep explicit
+     * routing — this helper would send it to the wrong place.
+     */
+    public static void notifyActorAndAffectedElsePublic(
+            Game game,
+            Player actor,
+            String actorFogMessage,
+            Player affected,
+            String affectedFogMessage,
+            String publicMessage) {
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(actor.getCorrectChannel(), actorFogMessage);
+            MessageHelper.sendMessageToChannel(affected.getCorrectChannel(), affectedFogMessage);
+        } else {
+            MessageHelper.sendMessageToChannel(actor.getCorrectChannel(), publicMessage);
+        }
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
@@ -102,9 +299,10 @@ public final class FoWHelper {
         if (viewingPlayer.getAllianceMembers().contains(player.getFaction())) {
             return true;
         }
-        if ((hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer))
-                && !FOWPlusService.isActive(game)
-                && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)) {
+        if (!FOWPlusService.isActive(game)
+                && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)
+                && (hasPlayersPromInPlayArea(game, player, viewingPlayer)
+                        || hasMahactCCInFleet(game, player, viewingPlayer))) {
             return true;
         }
         initializeFog(game, viewingPlayer, false);
@@ -151,6 +349,8 @@ public final class FoWHelper {
             tilePositionsToShow.addAll(adjacentTiles);
         }
 
+        addFowVisionTiles(game, player, tilePositionsToShow);
+
         String playerSweep = Mapper.getSweepID(player.getColor());
         for (Tile tile : game.getTileMap().values()) {
             if (tile.hasCC(playerSweep)) {
@@ -184,7 +384,79 @@ public final class FoWHelper {
                 tilePositionsToShow.add(tile.getPosition());
             }
         }
+
+        addFowVisionTiles(game, player, tilePositionsToShow);
         return tilePositionsToShow;
+    }
+
+    /**
+     * Fog-vision tokens/tiles reveal a system independent of unit presence. A tile is added to the
+     * player's visible set if it is an intrinsic fog-vision tile (revealed to everyone) or carries a
+     * fog-vision token whose recipient list ({@link Tile#getFowVisionGrant()}; empty = everyone) includes the
+     * player. Only the tile's own position is added — this grants no adjacency or movement.
+     */
+    private static void addFowVisionTiles(Game game, @NotNull Player player, Set<String> tilePositionsToShow) {
+        for (Tile tile : game.getTileMap().values()) {
+            String pos = tile.getPosition();
+            TileModel model = tile.getTileModel(); // null for unknown tile ids (see Tile.isValid)
+            if (model != null && model.isFowVision()) {
+                tilePositionsToShow.add(pos); // intrinsic vision tile: everyone sees it
+                continue;
+            }
+            if (!tile.hasFowVisionToken()) continue; // token presence is the master gate
+            Set<String> grant = tile.getFowVisionGrant();
+            if (grant.isEmpty() || grant.contains(player.getColor())) {
+                tilePositionsToShow.add(pos);
+            }
+        }
+    }
+
+    /**
+     * Whether this tile has ever been revealed to the player, per their persisted fog memory.
+     * <p>
+     * Deliberately keys on position only. It does <b>not</b> compare the remembered tileID against the tile
+     * currently at that position, because tiles get rewritten in place (FlipTileService turns 82a into 82b and
+     * similar), which would turn a legitimately remembered system into a false negative. This matches the
+     * existing precedent in {@link Tile#hasFog(Player)} for Light Fog mode.
+     */
+    public static boolean hasEverSeenTile(@NotNull Player player, String position) {
+        return position != null && player.getFogTiles().containsKey(position);
+    }
+
+    /**
+     * Positions the player can see right now, unioned with every position they have ever seen. Outside fog
+     * everything is known, so this returns the whole map.
+     */
+    public static Set<String> getKnownTilePositions(Game game, @NotNull Player player) {
+        if (!game.isFowMode()) {
+            return new HashSet<>(game.getTileMap().keySet());
+        }
+        Set<String> known = new HashSet<>(getTilePositionsToShow(game, player));
+        known.addAll(player.getFogTiles().keySet());
+        return known;
+    }
+
+    /** Whether the player could know that the system at this position exists. */
+    public static boolean knowsTile(Game game, @NotNull Player player, String position) {
+        if (!game.isFowMode()) return true;
+        return hasEverSeenTile(player, position)
+                || getTilePositionsToShow(game, player).contains(position);
+    }
+
+    /**
+     * Whether the player could know that this planet exists: either they can see (or have seen) the system it
+     * sits in, or they can see the stats of whoever controls it, which discloses that player's planets.
+     * <p>
+     * Callers building a whole list should prefer the batched path in {@code PlanetTargetService}, which
+     * computes the visible-position set once instead of once per planet.
+     */
+    public static boolean knowsPlanetExists(Game game, @NotNull Player player, String planetId) {
+        if (!game.isFowMode()) return true;
+        Tile tile = game.getTileFromPlanet(planetId);
+        if (tile == null) return false;
+        if (knowsTile(game, player, tile.getPosition())) return true;
+        Player owner = game.getPlayerThatControlsPlanet(planetId, true);
+        return owner != null && canSeeStatsOfPlayer(game, owner, player);
     }
 
     public static void updateFog(Game game, Player player) {
@@ -210,22 +482,34 @@ public final class FoWHelper {
         return tile != null && !tile.hasFog(viewingPlayer);
     }
 
-    private static boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
-        boolean hasPromInPA = false;
-        Game game = player.getGame();
-        List<String> promissoriesInPlayArea = viewingPlayer.getPromissoryNotesInPlayArea();
-        for (String prom_ : promissoriesInPlayArea) {
-            if (game.getPNOwner(prom_) == player) {
-                hasPromInPA = true;
-                break;
+    private static boolean hasPlayersPromInPlayArea(
+            @NotNull Game game, @NotNull Player player, @NotNull Player viewingPlayer) {
+        for (String prom_ : viewingPlayer.getPromissoryNotesInPlayArea()) {
+            if (game.getPNOwner(prom_) != player) {
+                continue;
+            }
+            if (!game.getFowOption(revealGateFor(Mapper.getPromissoryNote(prom_)))) {
+                return true;
             }
         }
-        return hasPromInPA;
+        return false;
     }
 
-    private static boolean hasMahactCCInFleet(@NotNull Player player, @NotNull Player viewingPlayer) {
-        List<String> mahactCCs = viewingPlayer.getMahactCC();
-        return mahactCCs.contains(player.getColor());
+    private static FOWOption revealGateFor(PromissoryNoteModel pn) {
+        // Faction-specific homebrew replacements (e.g. Black Spectrum's per-faction Alliance/SftT
+        // cards) keep the alias of the card they replace here, so classify by that when present.
+        String classificationAlias = pn.getHomebrewReplacesID().orElse(pn.getAlias());
+        if (classificationAlias.endsWith("_an")) return FOWOption.HIDE_STATS_VIA_ALLIANCE;
+        if (classificationAlias.endsWith("_sftt")) return FOWOption.HIDE_STATS_VIA_SFTT;
+        return FOWOption.HIDE_STATS_VIA_FACTION_PN;
+    }
+
+    private static boolean hasMahactCCInFleet(
+            @NotNull Game game, @NotNull Player player, @NotNull Player viewingPlayer) {
+        if (game.getFowOption(FOWOption.HIDE_STATS_VIA_MAHACT_CC)) {
+            return false;
+        }
+        return viewingPlayer.getMahactCC().contains(player.getColor());
     }
 
     /**
@@ -239,6 +523,11 @@ public final class FoWHelper {
 
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile) {
+        return getAdjacentTiles(game, position, player, toShow, includeTile, false);
+    }
+
+    public static Set<String> getAdjacentTiles(
+            Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
 
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
@@ -267,11 +556,87 @@ public final class FoWHelper {
             }
         }
 
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false);
+        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false, forDistance);
         adjacentPositions.addAll(wormholeAdjacencies);
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
         adjacentPositions.addAll(otherAdjacencies);
+        AsgardLegendaryService.addBifrostBridgeAdjacencies(game, player, position, adjacentPositions);
+
+        if (player != null
+                && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+                        || player.hasTech("tf-starbasewebway"))
+                && player == game.getActivePlayer()
+                && forDistance
+                && !game.getCurrentActiveSystem().isEmpty()
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(game.getTileByPosition(position))) {
+
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                if (tile.getPosition().equalsIgnoreCase(position)) {
+                    continue;
+                }
+                adjacentPositions.add(tile.getPosition());
+            }
+        }
+
+        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "saar_monument");
+            String spaceDockPosition = game.getStoredValue("saarMonumentSpaceDock_" + player.getFaction());
+            Tile spaceDockTile = game.getTileByPosition(spaceDockPosition);
+
+            if (monumentTile != null
+                    && spaceDockTile != null
+                    && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                            .contains(spaceDockTile)
+                    && (position.equals(monumentTile.getPosition()) || position.equals(spaceDockPosition))) {
+                adjacentPositions.add(
+                        position.equals(monumentTile.getPosition()) ? spaceDockPosition : monumentTile.getPosition());
+            }
+        }
+
+        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "ghemina_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "ghemina_monument");
+
+            if (monumentTile != null) {
+                Set<String> matchingStructureSystems = game.getTileMap().values().stream()
+                        .filter(tile -> tile.getUnitHolders().values().stream()
+                                .flatMap(holder -> holder.getUnitKeysForPlayer(player).stream())
+                                .filter(unitKey -> player.getUnitFromUnitKey(unitKey) != null)
+                                .filter(unitKey ->
+                                        player.getUnitFromUnitKey(unitKey).getIsStructure())
+                                .map(UnitKey::unitType)
+                                .distinct()
+                                .anyMatch(unitType -> tile.getUnitHolders().values().stream()
+                                                .mapToInt(holder -> holder.getUnitCount(unitType, player))
+                                                .sum()
+                                        >= 2))
+                        .map(Tile::getPosition)
+                        .collect(Collectors.toSet());
+
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.addAll(matchingStructureSystems);
+                } else if (matchingStructureSystems.contains(position)) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
+
+        if (forDistance && player != null && MonumentsService.isMonumentOnBoard(game, player, "nivyn_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "nivyn_monument");
+            Tile woundTile = game.getTileMap().values().stream()
+                    .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains("token_ds_wound.png"))
+                    .findFirst()
+                    .orElse(null);
+
+            if (monumentTile != null && woundTile != null) {
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.add(woundTile.getPosition());
+                } else if (position.equals(woundTile.getPosition())) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
 
         // If player has ghoti commander, is active player and has activated a system
         if (player != null
@@ -298,6 +663,8 @@ public final class FoWHelper {
             }
         }
 
+        OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
+
         if (includeTile) {
             adjacentPositions.add(position);
         } else {
@@ -315,9 +682,9 @@ public final class FoWHelper {
         }
 
         Set<Feature> adjToFeatures = EnumSet.noneOf(Feature.class);
-        for (String alias : tile.getTileModel().getAliases()) {
-            if (alias.startsWith("egress")) adjToFeatures.add(Feature.ingress);
-        }
+        if (tile.hasEgress()) adjToFeatures.add(Feature.ingress);
+
+        if (tile.hasIngress()) adjToFeatures.add(Feature.egress);
 
         if (game.isCosmicPhenomenaeMode()) {
             if (tile.isScar(game)) {
@@ -328,6 +695,12 @@ public final class FoWHelper {
         if (game.getActivePlayer() != null
                 && game.getActivePlayer().hasUnlockedBreakthrough("nivynbt")
                 && tile.isScar(game)) {
+            adjToFeatures.add(Feature.egress);
+        }
+
+        if (game.getActivePlayer() != null
+                && game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                && !tile.getWormholes(game).isEmpty()) {
             adjToFeatures.add(Feature.egress);
         }
 
@@ -342,8 +715,11 @@ public final class FoWHelper {
         }
 
         for (Tile t : allTiles) {
-            if (adjToFeatures.contains(Feature.egress)
-                    && t.getTileModel().getAliases().stream().anyMatch(x -> x.startsWith("egress"))) {
+            if (adjToFeatures.contains(Feature.egress) && t.hasEgress()) {
+                adjacentPositions.add(t.getPosition());
+                continue;
+            }
+            if (adjToFeatures.contains(Feature.ingress) && t.hasIngress()) {
                 adjacentPositions.add(t.getPosition());
                 continue;
             }
@@ -509,7 +885,7 @@ public final class FoWHelper {
 
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
         for (String adjPos : getAdjacentTilesAndNotThisTile(game, position, player, false)) {
-            if (game.getTileByPosition(adjPos).isAnomaly(game)) {
+            if (game.getTileByPosition(adjPos).isAnomaly(game, player)) {
                 return true;
             }
         }
@@ -659,6 +1035,11 @@ public final class FoWHelper {
      * Also takes into account player abilities and agendas
      */
     private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
+        return getWormholeAdjacencies(game, position, player, neighbors, false);
+    }
+
+    private static Set<String> getWormholeAdjacencies(
+            Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -708,6 +1089,7 @@ public final class FoWHelper {
         if (player != null
                 && player.hasAbility("sundered")
                 && player == game.getActivePlayer()
+                && forDistance
                 && !game.getCurrentActiveSystem().isEmpty()) {
             Set<String> keepers = new HashSet<>(Set.of("epsilon"));
             if (hasQuantumEntanglement || wh_recon || absol_recon) {
@@ -768,6 +1150,7 @@ public final class FoWHelper {
         if (!hasQuantumEntanglement
                 && !wh_recon
                 && !absol_recon
+                && forDistance
                 && ButtonHelper.isLawInPlay(game, "travel_ban")
                 && !neighbors) {
             wormholeIDs.remove(Constants.ALPHA);
@@ -964,7 +1347,7 @@ public final class FoWHelper {
             if (p2.hasTech("ah") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
                 return true;
             }
-            if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
+            if ((p2.hasAbility("decree") || p2.hasTech("tf-radiantsigils")) && tile.isAnomaly(game, p2)) {
                 List<Tile> tiles = new ArrayList<>();
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));
@@ -1194,6 +1577,20 @@ public final class FoWHelper {
     public static boolean isGameMaster(String userId, Game game) {
         return game.getPlayersWithGMRole().stream()
                 .anyMatch(player -> player.getUserID().equals(userId));
+    }
+
+    public static boolean canSeeWholeMap(Game game, GenericInteractionCreateEvent event) {
+        if (!game.isFowMode() || game.isHasEnded()) {
+            return true;
+        }
+        return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
+    }
+
+    static boolean isGmRoom(Game game, @Nullable Channel channel) {
+        if (channel instanceof ThreadChannel thread) {
+            channel = thread.getParentChannel();
+        }
+        return channel != null && channel.getName().equalsIgnoreCase(game.getName() + "-gm-room");
     }
 
     private enum Feature {

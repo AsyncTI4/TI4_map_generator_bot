@@ -1,0 +1,36 @@
+[
+    {
+        "id": "whitetf_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Arvicon Iudex",
+        "source": "tf_br",
+        "faction": "whitetf",
+        "moveValue": 2,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "After you win a space combat in this system, you may give your opponent 1 of your abilities to take 1 of their abilities."
+    },
+    {
+        "id": "whitetf_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Crystal Sentinel",
+        "source": "tf_br",
+        "faction": "whitetf",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isGroundForce": true,
+        "ability": "When you gain an ability, you may remove this unit from the game board and discard that ability to gain 1 relic."
+    }
+]

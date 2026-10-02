@@ -1,0 +1,136 @@
+[
+    {
+        "alias": "full_moonphase",
+        "name": "Full Moon",
+        "text": "At the end of your turn:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 4 or more to place 1 structure on a planet you control.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "new_moonphase",
+        "name": "New Moon",
+        "text": "ACTION:\n\nExhaust this card to do 1 of the following:\n\nPlace 1 captured neutral unit into a system that contains no other player's ships.\n\nCapture 1 neutral cruiser.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "waxing_moonphase",
+        "name": "Waxing Moon",
+        "text": "At the start of your turn:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 2 or more to draw 2 action cards, then discard 1.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "waning_moonphase",
+        "name": "Waning Moon",
+        "text": "When you pass:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 5 or more to research 1 technology.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "lunar_eclipse_moonphase",
+        "name": "Lunar Eclipse",
+        "text": "When you perform a strategic action:\n\nYou may exhaust this card. Return captured neutral units with a combined cost of 2 or more to gain 1 command token.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "economicboon",
+        "name": "Economic Boon",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the number of planets adjacent to this system. When this card no longer has control tokens on it, discard it. At the start of your turn you can remove any number of control tokens from this card to produce a non-fighter ship with a cost up to the number of tokens removed in a system containing 1 of your space docks.",
+        "notes": "Control-token count is initialized when this Boon is explored.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "naturesboon",
+        "name": "Nature's Boon",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the resource value of that planet + 1. When this card no longer has control tokens on it, discard it. When you activate a system you may remove any number of control tokens from this card & increase the resource value of a planet you control by 1 for each token removed until the end of that tactical action.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "diplomaticboon",
+        "name": "Diplomatic Boon",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the influence value of this planet + 1. When this card no longer has control tokens on it, discard it. At any time you may remove any number of control tokens from this card to place that many fighters in systems that contain your ships or infantry on planets you control.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "cosmicboon",
+        "name": "Cosmic Boon",
+        "text": "Place this card face up in your play area and place control tokens on it equal to the number of systems with no planets adjacent to this system + 1. When this card no longer has control tokens on it, discard it. At the end of your tactical action you may remove 1 control token from this card & explore 1 planet  you control in the active system.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "ancient_radar",
+        "name": "Ancient Radar",
+        "text": "ACTION: Exhaust this card to explore 1 non-home planet you control once as if it were each planet trait.",
+        "flavorText": "*The Kairn didn't know exactly how the radar worked but what he did know is whenever it turned on it always led him to new treasures.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "horn_of_the_abyss",
+        "name": "Horn of the Abyss",
+        "text": "During combat when you destroy 1 or more neutral units you may place a unit of the same type as one of those units in that system.\n\nACTION: You may exhaust this card and place neutral ships with a combined cost of 4 or less in a system that contains no other players ships.",
+        "flavorText": "*The captain of the rebels recognized the Horn immediately. The weight it carried was palpable. Whoever carried this was in charge.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "specialized_augmentations",
+        "name": "Specialized Augmentations",
+        "text": "Your flagships and mechs each roll 1 additional die and apply +2 to those units combat and unit ability rolls.",
+        "flavorText": "*The ancient designs were flawless. How a species so lost in the search for perfection overlooked such designs is a mystery all on its own.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "quantum_entangler",
+        "name": "Quantum Entagler",
+        "text": "ACTION: Select 1 other player. Draw 3 relics and give 1 of them to that player. Then, that player choose 1 to give to you. Then, purge the remaining relic and this card.",
+        "flavorText": "*A sudden jolt in the three relics and it became clear, they were somehow interlinked. Breaking that link would prove costly.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "mutagenhazardous",
+        "name": "Mutagen",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "mutagenindustrial",
+        "name": "Mutagen",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "mutagencultural",
+        "name": "Mutagen",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "mutagenfrontier",
+        "name": "Mutagen",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "isFakeRelic": true,
+        "source": "theodisi"
+    },
+    {
+        "alias": "volatile_mutagenics",
+        "name": "Volatile Mutagenics",
+        "text": "ACTION: Purge this card to reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 2 to gain, readied and unlocked, and return the rest.",
+        "flavorText": "*Test 341738: The new line of stabilized mutagenics prove to be the most potent yet. The High Evolutionary will be most pleased with these results.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "alluringthrone",
+        "name": "Alluring Throne",
+        "text": "When you draw this card, place the Illustrion planet token into a non-home system that is adjacent to a planet you control; gain control of and ready it. After you move 1 of your flagships out of or through Illustrion's system and into a non-home system, you may move the Illustrion token with it.",
+        "flavorText": "*In a moment of pure desperation, a last alliance of Kryxos and Ponthous engineers was able to co-opt the technology of the Chaos Engines to counteract their effects. The plans were lost in the fight, but their result remains.*",
+        "source": "theodisi"
+    }
+]

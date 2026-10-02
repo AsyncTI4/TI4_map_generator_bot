@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ooglee",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 210
+        }
+    },
     "id": "ooglee",
     "tileId": "s10",
     "name": "Ooglee",

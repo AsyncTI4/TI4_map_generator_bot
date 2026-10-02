@@ -10,15 +10,18 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @Getter
 public class Leader {
     private final String id;
-    private String type;
+    private final String type;
 
     @Setter
     private int tgCount;
@@ -49,17 +52,32 @@ public class Leader {
     }
 
     public Leader(String id) {
+        this(id, null);
+    }
+
+    public Leader(String id, String type) {
         this.id = id;
-        if (id.contains(Constants.AGENT)) {
+        this.type = StringUtils.isBlank(type) ? getTypeFromLeaderId(id) : type;
+        if ("agent".equals(this.type)) {
             locked = false;
-            type = Constants.AGENT;
-        } else if (id.contains(Constants.COMMANDER)) {
-            type = Constants.COMMANDER;
-        } else if (id.contains(Constants.HERO)) {
-            type = Constants.HERO;
-        } else if (id.contains(Constants.ENVOY)) {
-            type = Constants.ENVOY;
         }
+    }
+
+    private static String getTypeFromLeaderId(String id) {
+        if (id.contains(Constants.AGENT)) {
+            return Constants.AGENT;
+        }
+        if (id.contains(Constants.COMMANDER)) {
+            return Constants.COMMANDER;
+        }
+        if (id.contains(Constants.HERO)) {
+            return Constants.HERO;
+        }
+        if (id.contains(Constants.ENVOY)) {
+            return Constants.ENVOY;
+        }
+        BotLogger.error("Could not infer Leader type from id: " + id);
+        return null;
     }
 
     @JsonIgnore
@@ -123,8 +141,8 @@ public class Leader {
             return null;
         }
         EmbedBuilder eb = new EmbedBuilder();
-        MessageEmbed modelEmbed =
-                getLeaderModel().get().getRepresentationEmbed(false, false, locked, false, game.isTwilightsFallMode());
+        MessageEmbed modelEmbed = FrankenAlternateTextService.getLeaderEmbed(
+                game, getLeaderModel().get(), false, false, locked, false, game.isTwilightsFallMode());
         eb.copyFrom(modelEmbed);
 
         if (tgCount > 0) {

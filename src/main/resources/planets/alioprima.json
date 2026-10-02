@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "alioprima",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 207
+        }
+    },
     "id": "alioprima",
     "tileId": "71",
     "name": "Alio Prima",

@@ -24,16 +24,20 @@ import ti4.discord.interactions.commands.event.EventCommand;
 import ti4.discord.interactions.commands.explore.ExploreCommand;
 import ti4.discord.interactions.commands.fow.FOWCommand;
 import ti4.discord.interactions.commands.franken.FrankenCommand;
+import ti4.discord.interactions.commands.frankendraz.FrankenDrazCommand;
 import ti4.discord.interactions.commands.game.GameCommand;
 import ti4.discord.interactions.commands.help.HelpCommand;
 import ti4.discord.interactions.commands.installation.InstallationCommand;
 import ti4.discord.interactions.commands.lazax.LazaxCommand;
 import ti4.discord.interactions.commands.leaders.LeaderCommand;
+import ti4.discord.interactions.commands.ll.LostLegaciesCommand;
 import ti4.discord.interactions.commands.map.MapCommand;
 import ti4.discord.interactions.commands.milty.MiltyCommand;
+import ti4.discord.interactions.commands.monuments.MonumentsCommand;
 import ti4.discord.interactions.commands.omega_phase.OmegaPhaseCommand;
 import ti4.discord.interactions.commands.planet.PlanetCommand;
 import ti4.discord.interactions.commands.player.PlayerCommand;
+import ti4.discord.interactions.commands.plot.FrankenCommand2;
 import ti4.discord.interactions.commands.relic.RelicCommand;
 import ti4.discord.interactions.commands.rules.RulesCommand;
 import ti4.discord.interactions.commands.search.FindCommand;
@@ -57,7 +61,6 @@ import ti4.discord.interactions.commands.tokens.RemoveTokenCommand;
 import ti4.discord.interactions.commands.transaction.TransactionCommand;
 import ti4.discord.interactions.commands.uncategorized.AllInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
-import ti4.discord.interactions.commands.uncategorized.PostLazaxSeason1PublicCommand;
 import ti4.discord.interactions.commands.uncategorized.SelectionBoxDemoCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowDistancesCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
@@ -119,12 +122,15 @@ public class SlashCommandManager {
                     new SpecialCommand(),
                     new Special2Command(),
                     new LeaderCommand(),
+                    new LostLegaciesCommand(),
                     new CombatCommand(),
                     new CustomCommand(),
                     new FOWCommand(),
                     new InstallationCommand(),
                     new MiltyCommand(),
+                    new MonumentsCommand(),
                     new FrankenCommand(),
+                    new FrankenDrazCommand(),
                     new CaptureCommand(),
                     new GenericButtonCommand(),
                     new DiscordantStarsCommand(),
@@ -133,9 +139,9 @@ public class SlashCommandManager {
                     new StatisticsCommand2(),
                     new TechCommand(),
                     new BreakthroughCommand(),
+                    new FrankenCommand2(),
                     new PlanetCommand(),
                     new SelectionBoxDemoCommand(),
-                    new PostLazaxSeason1PublicCommand(),
                     new UserCommand(),
                     new LazaxCommand(),
                     new TiglCommand(),

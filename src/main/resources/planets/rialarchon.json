@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rialarchon",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "rialarchon",
     "tileId": "er01",
     "name": "Rial Archon",

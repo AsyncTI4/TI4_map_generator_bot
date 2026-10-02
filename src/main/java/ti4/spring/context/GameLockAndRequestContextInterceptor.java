@@ -38,13 +38,13 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             return false;
         }
 
-        boolean requestContextSetup = setupGameRequestContext(gameName, shouldSaveGame, handler);
-        if (requestContextSetup) lockGame(gameName);
+        if (!shouldSetupGameRequestContext(handler)) return true;
 
+        setupGameRequestContext(gameName, shouldSaveGame);
         return true;
     }
 
-    private String getGameNameFromUri(ServletRequest request) {
+    private static String getGameNameFromUri(ServletRequest request) {
         Object attributes = request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (!(attributes instanceof Map<?, ?> vars)) {
             return null;
@@ -53,7 +53,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return (gameNameObject instanceof String gameName) ? gameName : null;
     }
 
-    private boolean shouldSaveGame(HttpServletRequest request, Object handler) {
+    private static boolean shouldSaveGame(HttpServletRequest request, Object handler) {
         boolean shouldSaveGame = MUTATION_METHODS.contains(request.getMethod());
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
@@ -68,17 +68,25 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return shouldSaveGame;
     }
 
-    private boolean setupGameRequestContext(String gameName, boolean shouldSaveGame, Object handler) {
+    private static boolean shouldSetupGameRequestContext(Object handler) {
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
-            if (annotation != null && !annotation.value()) {
-                return false;
-            }
+            return annotation == null || annotation.value();
         }
-        var game = GameManager.getManagedGame(gameName).getGame();
-        RequestContext.setGame(game);
-        RequestContext.setSaveGame(shouldSaveGame);
         return true;
+    }
+
+    private static void setupGameRequestContext(String gameName, boolean shouldSaveGame) {
+        lockGame(gameName, shouldSaveGame);
+        try {
+            var game = GameManager.getManagedGame(gameName).getGame();
+            if (game == null) throw new RuntimeException("Unable to load game: " + gameName);
+            RequestContext.setGame(game);
+            RequestContext.setSaveGame(shouldSaveGame);
+        } catch (Exception e) {
+            unlockGame(gameName, shouldSaveGame);
+            throw e;
+        }
     }
 
     private static void rejectInactiveMutation(HttpServletResponse response) {
@@ -90,8 +98,8 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         }
     }
 
-    private static void lockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+    private static void lockGame(String gameName, boolean shouldSaveGame) {
+        var lockType = shouldSaveGame ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.lock(gameName, lockType);
     }
 
@@ -103,27 +111,27 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             Exception exception) {
         try {
             var game = RequestContext.getGame();
-            if (game != null) {
-                if (exception == null && RequestContext.shouldSaveGame()) {
-                    if (activeLeaseService.mayMutate()) {
-                        var player = RequestContext.getPlayer();
-                        GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
-                    } else {
-                        BotLogger.warning(
-                                "Skipped web mutation save because this instance no longer owns the active lease. "
-                                        + request.getRequestURI());
-                    }
-                }
+            if (game == null) return;
 
-                unlockGame(game.getName());
+            if (exception == null && RequestContext.shouldSaveGame()) {
+                if (activeLeaseService.mayMutate()) {
+                    var player = RequestContext.getPlayer();
+                    GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
+                } else {
+                    BotLogger.warning(
+                            "Skipped web mutation save because this instance no longer owns the active lease. "
+                                    + request.getRequestURI());
+                }
             }
+
+            unlockGame(game.getName(), RequestContext.shouldSaveGame());
         } finally {
             RequestContext.clearContext();
         }
     }
 
-    private static void unlockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+    private static void unlockGame(String gameName, boolean shouldSaveGame) {
+        var lockType = shouldSaveGame ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.unlock(gameName, lockType);
     }
 }
