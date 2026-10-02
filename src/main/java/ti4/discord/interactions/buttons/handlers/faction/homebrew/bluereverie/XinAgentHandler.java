@@ -1,9 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,10 +10,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.ExhaustLeaderService;
-import ti4.service.strategycard.StrategyCardSecondaryButtonService;
 
 @UtilityClass
 public class XinAgentHandler {

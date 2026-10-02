@@ -228,7 +228,8 @@ public class SarcosaHeroHandler {
 
     private static int getAvailableCancellations(
             Game game, Player neutralPlayer, Tile tile, UnitHolder combatOnHolder, boolean beforeCombatSummary) {
-        String value = game.getStoredValue(getCancellationKey(game, neutralPlayer, tile, combatOnHolder, beforeCombatSummary));
+        String value =
+                game.getStoredValue(getCancellationKey(game, neutralPlayer, tile, combatOnHolder, beforeCombatSummary));
         return value.isBlank() ? 0 : Integer.parseInt(value);
     }
 

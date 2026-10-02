@@ -42,6 +42,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.UydaiHeroService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -663,6 +664,9 @@ public final class FoWHelper {
         }
 
         OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
+        if (!toShow) {
+            UydaiHeroService.addAdjacencies(game, player, position, adjacentPositions);
+        }
 
         if (player != null) {
             for (String tilePosition : game.getTileMap().keySet()) {

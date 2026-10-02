@@ -98,6 +98,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.UydaiHeroService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
@@ -120,6 +121,7 @@ public final class ButtonHelperTacticalAction {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         ScrapyardTechHandler.clearHotswapping(game);
         SarcosaCommanderHandler.clearAdjacency(game, player);
+        UydaiHeroService.clear(game);
         XinCommanderHandler.clearCombat(game);
         QhetAgentHandler.returnTemporaryUnitUpgrades(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
@@ -650,6 +652,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
+        UydaiHeroService.clear(game);
         game.removeStoredValue(ArvaxiLeaderHandler.HERO_ACTIVE_KEY);
         game.removeStoredValue("tnelisCommanderTracker");
         TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);

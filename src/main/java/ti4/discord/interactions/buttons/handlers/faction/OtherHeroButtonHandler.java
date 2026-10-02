@@ -23,6 +23,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.PurgeHeroService;
+import ti4.service.leader.UydaiHeroService;
 import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
@@ -136,8 +137,8 @@ class OtherHeroButtonHandler {
     }
 
     @ButtonHandler("purgeUydaiHero")
-    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        PurgeHeroService.purgeHeroPreamble(event, player, game, "uydaihero", "Londor II, the Uydai hero");
+    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) {
+        UydaiHeroService.purgeHero(event, player, game);
     }
 
     @ButtonHandler("purgeKortaliHero_")
