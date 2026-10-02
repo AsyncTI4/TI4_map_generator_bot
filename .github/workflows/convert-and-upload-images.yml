@@ -38,7 +38,7 @@ jobs:
 
       - name: Convert and upload images and data to S3
         run: |
-          python scripts/convert_and_upload_to_s3.py
+          python scripts/convert_and_upload_to_s3.py --check-size
 
       - name: Report results
         if: always()
