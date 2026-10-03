@@ -34,6 +34,8 @@ class ButtonRuntimeMonitorTest {
         assertThat(rowFor(statistics, "handoff")).contains("5.0ms");
         assertThat(rowFor(statistics, "processing")).contains("76.0ms");
         assertThat(rowFor(statistics, "resolve")).contains("34.0ms");
+        // Above 100ms percentiles use 10ms buckets, so a 161ms press reports as 160ms.
+        assertThat(rowFor(statistics, "total")).contains("10", "161.0ms", "160ms");
         assertThat(rowFor(statistics, "replay-snap")).contains(" 0 ", "-");
         assertThat(rowFor(statistics, "replay-settle")).contains(" 0 ", "-");
     }

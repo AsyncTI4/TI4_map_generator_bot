@@ -38,6 +38,7 @@ class ButtonRuntimeMonitor {
     private long thresholdMissCount;
     private final LatencyHistogram preprocessing = new LatencyHistogram();
     private final LatencyHistogram processing = new LatencyHistogram();
+    private final LatencyHistogram total = new LatencyHistogram();
     private final Map<ButtonPressStage, LatencyHistogram> stages = new EnumMap<>(ButtonPressStage.class);
     private final Map<String, LatencyHistogram> resolveByHandler = new HashMap<>();
 
@@ -90,6 +91,7 @@ class ButtonRuntimeMonitor {
     private void recordTimings(ButtonPressTimeline timeline) {
         preprocessing.record(timeline.getPreprocessingMillis());
         processing.record(timeline.getProcessingMillis());
+        total.record(timeline.getResponseMillis());
         SREStats.recordButtonPreprocessingMillis(timeline.getPreprocessingMillis());
         SREStats.recordButtonProcessingMillis(timeline.getProcessingMillis());
         Map<ButtonPressStage, Long> stageMillis = timeline.getStageMillis();
@@ -185,6 +187,7 @@ class ButtonRuntimeMonitor {
         appendStageRows(table, true);
         appendRow(table, "processing", processing);
         appendStageRows(table, false);
+        appendRow(table, "total", total);
 
         return "Button Processor Statistics: " + timestamp
                 + "\n> Total button presses: " + processedCount
