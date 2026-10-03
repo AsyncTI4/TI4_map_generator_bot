@@ -58,18 +58,22 @@ class ExpeditionWinRateStatisticsService {
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
 
         sb.append("\n**By expedition followed**\n");
-        expeditionFollowStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(e -> sb.append("- ")
-                .append(e.getKey())
-                .append(": ")
-                .append(e.getValue())
-                .append('\n'));
+        expeditionFollowStats.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .forEach(e -> sb.append("- ")
+                        .append(e.getKey())
+                        .append(": ")
+                        .append(e.getValue())
+                        .append('\n'));
 
         sb.append("\n**By number of expeditions completed**\n");
-        expeditionCountStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(entry -> sb.append("- ")
-                .append(entry.getKey())
-                .append(" expeditions: ")
-                .append(entry.getValue())
-                .append('\n'));
+        expeditionCountStats.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .forEach(entry -> sb.append("- ")
+                        .append(entry.getKey())
+                        .append(" expeditions: ")
+                        .append(entry.getValue())
+                        .append('\n'));
         int expeditionCountGameCount = expeditionCountStats.values().stream()
                 .mapToInt(count -> count.total)
                 .sum();

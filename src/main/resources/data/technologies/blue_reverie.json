@@ -90,7 +90,7 @@
         "faction": "atokera",
         "source": "blue_reverie",
         "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action.",
-        "notes": "Not currently automated by the bot."
+        "notes": "Not currently automated by the bot. Use Dicecord `/roll` and Async's `/add_sustain_damage` and `/modify_units` to mimic the desired unit abilities."
     },
     {
         "alias": "dskaltpds",
@@ -150,6 +150,28 @@
         "text": "Steel: Other players cannot look at your hand of action cards, promissory notes, or secret objectives. Other players cannot take or force you to give them your action cards, promissory notes, or secret objectives.\n\nStar: After you commit units to a planet, you may choose for those units to coexist. When a player ends coexistence with your units on a planet, you may look at their hand of action cards, promissory notes, or secret objectives."
     },
     {
+        "alias": "dsxingsteel",
+        "name": "Astromantic Cloak",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "xin",
+        "source": "blue_reverie",
+        "text": "Other players cannot look at your hand of action cards, promissory notes, or secret objectives. Other players cannot take or force you to give them your action cards, promissory notes, or secret objectives."
+    },
+    {
+        "alias": "dsxingstar",
+        "name": "Astromantic Cloak",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "xin",
+        "source": "blue_reverie",
+        "text": "After you commit units to a planet, you may choose for those units to coexist. When a player ends coexistence with your units on a planet, you may look at their hand of action cards, promissory notes, or secret objectives."
+    },
+    {
         "alias": "dsxiny",
         "name": "Veiled Networking",
         "types": [
@@ -161,6 +183,28 @@
         "text": "Steel: During the agenda phase, when an outcome would be resolved, if you voted for or predicted another outcome, you may spend 1 token from your strategy pool to discard the agenda instead; the agenda is resolved with no effect and it is not replaced.\n\nStar: Your blockaded units can produce ships in adjacent systems that contain your command tokens and no other player's ships. Your units cannot lose their unit abilities or text abilities."
     },
     {
+        "alias": "dsxinysteel",
+        "name": "Veiled Networking",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "xin",
+        "source": "blue_reverie",
+        "text": "During the agenda phase, when an outcome would be resolved, if you voted for or predicted another outcome, you may spend 1 token from your strategy pool to discard the agenda instead; the agenda is resolved with no effect and it is not replaced."
+    },
+    {
+        "alias": "dsxinystar",
+        "name": "Veiled Networking",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "xin",
+        "source": "blue_reverie",
+        "text": "Your blockaded units can produce ships in adjacent systems that contain your command tokens and no other player's ships. Your units cannot lose their unit abilities or text abilities."
+    },
+    {
         "alias": "dsbelky",
         "name": "Synchrony Matrix",
         "types": [
@@ -169,7 +213,7 @@
         "requirements": "YY",
         "faction": "belkosea",
         "source": "blue_reverie",
-        "text": "At the end of your turn, you may exhaust this card to ready 1 agent or ability card in your play area."
+        "text": "At any time, you may exhaust this card to ready 1 non-technology component other than a strategy card in your play area."
     },
     {
         "alias": "dsbelkff",
@@ -192,7 +236,8 @@
         "requirements": "B",
         "faction": "toldar",
         "source": "blue_reverie",
-        "text": "After a player activates a system, choose 1 unit on the game board; apply +2 to that unit's Capacity value, if it has one, until the end of this tactical action. "
+        "text": "After a player activates a system, choose 1 unit on the game board; apply +2 to that unit's Capacity value, if it has one, until the end of this tactical action. ",
+        "notes": "Not currently able to be automated."
     },
     {
         "alias": "dstoldr",

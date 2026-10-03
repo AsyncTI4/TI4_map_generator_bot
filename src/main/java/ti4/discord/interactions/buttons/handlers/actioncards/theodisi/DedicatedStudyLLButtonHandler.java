@@ -237,10 +237,13 @@ class DedicatedStudyLLButtonHandler {
                         && !tech.isUnitUpgrade()
                         && tech.getFirstType().toString().equals(type))
                 .toList();
-        return candidates.stream().anyMatch(first -> candidates.stream()
-                .anyMatch(second -> first != second
-                        && first.getRequirements().orElse("").length()
-                                        + second.getRequirements().orElse("").length()
-                                == totalRequirements));
+        return candidates.stream()
+                .anyMatch(first -> candidates.stream()
+                        .anyMatch(second -> first != second
+                                && first.getRequirements().orElse("").length()
+                                                + second.getRequirements()
+                                                        .orElse("")
+                                                        .length()
+                                        == totalRequirements));
     }
 }

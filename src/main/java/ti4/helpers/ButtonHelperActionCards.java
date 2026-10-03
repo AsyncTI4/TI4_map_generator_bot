@@ -43,6 +43,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.fow.PlanetTargetService.UnitHolderTargetSpec;
@@ -946,6 +947,11 @@ public final class ButtonHelperActionCards {
     public static void unexpectedSomeoneElseStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (game.isFowMode() && p2 != null) {
+            FogTokenRemovalService.startFlux(event, game, player, p2);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpectedOtherPerson", p2);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -2807,9 +2813,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReparationsStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, reparationsSpec())) return;
-        var target = PlanetTargetService.resolve(game, player, buttonID, reparationsSpec(), t -> t.owner()
-                .getReadiedPlanets()
-                .contains(t.planetId()));
+        var target = PlanetTargetService.resolve(
+                game,
+                player,
+                buttonID,
+                reparationsSpec(),
+                t -> t.owner().getReadiedPlanets().contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;

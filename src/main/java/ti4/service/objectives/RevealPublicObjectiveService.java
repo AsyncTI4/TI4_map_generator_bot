@@ -14,6 +14,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -27,6 +28,20 @@ import ti4.service.relic.NeuraloopService;
 
 @UtilityClass
 public class RevealPublicObjectiveService {
+
+    private static void sendFogObjectiveProgress(Game game, String objectiveId) {
+        if (!FoWHelper.isFogQol01(game)) return;
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objectiveId, game);
+        PublicObjectiveModel model = Mapper.getPublicObjective(objectiveId);
+        if (threshold <= 0 || model == null) return;
+        for (Player player : game.getRealPlayers()) {
+            int progress =
+                    Math.min(ListPlayerInfoService.getPlayerProgressOnObjective(objectiveId, game, player), threshold);
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "Your progress on **" + model.getName() + "**: " + progress + "/" + threshold + ".");
+        }
+    }
 
     private static final int WHITE_COLOR = 0xFFFFFF;
 
@@ -94,6 +109,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             return;
         }
         // first do cleanup if necessary
@@ -112,6 +128,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
@@ -221,6 +238,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             return objective.getKey();
         }
         // first do cleanup if necessary
@@ -239,6 +257,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(
                         channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
+            sendFogObjectiveProgress(game, objective.getKey());
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + ", it's time for the Status Cleanup Run!");
             if (!game.isFowMode()) {

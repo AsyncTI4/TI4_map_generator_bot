@@ -523,7 +523,9 @@ public final class AgendaHelper {
                                 nextInLine.getPrivateChannel(),
                                 AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n ");
                         MessageHelper.sendMessageToChannelWithButtons(
-                                nextInLine.getPrivateChannel(), "\n " + realIdentity + message, buttons);
+                                nextInLine.getPrivateChannel(),
+                                "\n " + realIdentity + message + ownVoteTotalLine(game, nextInLine),
+                                buttons);
                         player.getCorrectChannel()
                                 .sendMessage("Notified next in line")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -826,7 +828,8 @@ public final class AgendaHelper {
             List<Button> buttons = List.of(vote, abstain, forcedAbstain);
             if (game.isFowMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
-                    MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            nextInLine.getPrivateChannel(), message + ownVoteTotalLine(game, nextInLine), buttons);
                     game.getMainGameChannel()
                             .sendMessage("Voting started. Notified first in line")
                             .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1451,6 +1454,11 @@ public final class AgendaHelper {
             }
         }
         return losers;
+    }
+
+    private static String ownVoteTotalLine(Game game, Player player) {
+        if (!FoWHelper.isFogQol01(game)) return "";
+        return "\nYou have " + getVoteTotal(player, game)[0] + " votes available.";
     }
 
     static int[] getVoteTotal(Player player, Game game) {
@@ -2763,13 +2771,13 @@ public final class AgendaHelper {
             String agendaName2 = agendaName;
             while (!notEmergency) {
                 if ("Emergency Session".equalsIgnoreCase(agendaName2)) {
-                    game.revealAgenda(revealFromBottom);
+                    game.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing()
                                     + " _Emergency Session_ revealed underneath _Covert Legislation_, discarding it.");
                 }
-                String id2 = game.getNextAgenda(revealFromBottom);
+                String id2 = game.getNextAgenda(false);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
                 agendaTarget = agendaDetails2.getTarget();
                 agendaType = agendaDetails2.getType();
@@ -2779,7 +2787,7 @@ public final class AgendaHelper {
                 if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
                         && game.getLaws().isEmpty()) {
                     notEmergency = false;
-                    game.revealAgenda(revealFromBottom);
+                    game.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing() + ", an \"elect law\" agenda (" + agendaName2
@@ -2797,7 +2805,7 @@ public final class AgendaHelper {
                                     + ") was hidden under _Covert Legislation_ when no secret objectives have been scored."
                                     + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                     notEmergency = false;
-                    game.revealAgenda(revealFromBottom);
+                    game.revealAgenda(false);
                     aCount -= 1;
                     game.setStoredValue("agendaCount", aCount + "");
                     revealAgenda(event, revealFromBottom, game, channel);
@@ -2817,10 +2825,6 @@ public final class AgendaHelper {
                         List<MessageEmbed> embeds =
                                 List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
-                        if (revealFromBottom) {
-                            id2 = game.revealAgenda(true);
-                            game.putAgendaBackIntoDeckOnTop(id2);
-                        }
                         game.drawAgenda();
                     }
                 }

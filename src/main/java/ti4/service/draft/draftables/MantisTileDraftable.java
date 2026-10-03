@@ -279,15 +279,19 @@ public class MantisTileDraftable extends Draftable {
             return; // Not sure this needs to be logged anywhere
         }
 
-        cardsInfoChannel.getHistory().retrievePast(10).queue(messages -> messages.stream()
-                .filter(msg -> !msg.isUsingComponentsV2())
-                .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
-                .findFirst()
-                .ifPresentOrElse(
-                        msg -> msg.editMessage(summary.toString()).queue(Consumers.nop(), BotLogger::catchRestError),
-                        () -> cardsInfoChannel
-                                .sendMessage(summary.toString())
-                                .queue(Consumers.nop(), BotLogger::catchRestError)));
+        cardsInfoChannel
+                .getHistory()
+                .retrievePast(10)
+                .queue(messages -> messages.stream()
+                        .filter(msg -> !msg.isUsingComponentsV2())
+                        .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
+                        .findFirst()
+                        .ifPresentOrElse(
+                                msg -> msg.editMessage(summary.toString())
+                                        .queue(Consumers.nop(), BotLogger::catchRestError),
+                                () -> cardsInfoChannel
+                                        .sendMessage(summary.toString())
+                                        .queue(Consumers.nop(), BotLogger::catchRestError)));
     }
 
     @Override

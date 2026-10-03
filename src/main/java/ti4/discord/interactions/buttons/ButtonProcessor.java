@@ -3,9 +3,7 @@ package ti4.discord.interactions.buttons;
 import java.text.DecimalFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,7 +11,6 @@ import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -22,17 +19,13 @@ import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.DisplayType;
-import ti4.helpers.SearchGameHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -186,26 +179,6 @@ public class ButtonProcessor {
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             trackButtonHandler(Constants.GENERIC_BUTTON_ID_PREFIX);
             ReactionService.addReaction(event, game, player);
-        } else if (buttonID.startsWith("autoAssignGroundHits_")) {
-            trackButtonHandler("autoAssignGroundHits_");
-            Tile tile = game.getTileFromPlanet(buttonID.split("_")[1]);
-            if (PonthousAbilityHandler.requiresManualLastStandAssignment(
-                    game,
-                    player,
-                    tile,
-                    tile == null ? null : tile.getUnitHolderFromPlanet(buttonID.split("_")[1]),
-                    event)) {
-                MessageHelper.sendMessageToChannelWithButton(
-                        event.getMessageChannel(),
-                        player.getRepresentationNoPing() + ", assign this hit manually to use _Last Stand_ if needed.",
-                        Buttons.red(
-                                player.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()
-                                        + "_groundcombat",
-                                "Assign Hits"));
-                return;
-            }
-            ButtonHelperModifyUnits.autoAssignGroundCombatHits(
-                    player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
             trackButtonHandler("strategicAction_");
             strategicAction(event, player, buttonID, game, mainGameChannel);
@@ -219,11 +192,6 @@ public class ButtonProcessor {
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 // Don't add anymore cases - use @ButtonHandler
-                case "refreshInfoButtons" -> {
-                    trackButtonHandler("refreshInfoButtons");
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(), null, getRefreshInfoButtons(game));
-                }
                 case "gain_1_comms" -> {
                     trackButtonHandler("gain_1_comms");
                     ButtonHelperStats.gainComms(event, game, player, 1, true);
@@ -309,55 +277,6 @@ public class ButtonProcessor {
                             player,
                             " is " + event.getButton().getLabel().toLowerCase() + ".");
                 }
-                case "searchMyGames" -> {
-                    trackButtonHandler("searchMyGames");
-                    SearchGameHelper.searchGames(
-                            event.getUser(), event, false, false, false, true, false, true, false, false);
-                }
-                case "checkWHView" -> {
-                    trackButtonHandler("checkWHView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
-                }
-                case "checkAnomView" -> {
-                    trackButtonHandler("checkAnomView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
-                }
-                case "checkLegendView" -> {
-                    trackButtonHandler("checkLegendView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
-                }
-                case "checkEmptyView" -> {
-                    trackButtonHandler("checkEmptyView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.empties);
-                }
-                case "checkAetherView" -> {
-                    trackButtonHandler("checkAetherView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
-                }
-                case "checkCannonView" -> {
-                    trackButtonHandler("checkCannonView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
-                }
-                case "checkTraitView" -> {
-                    trackButtonHandler("checkTraitView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.traits);
-                }
-                case "checkTechSkipView" -> {
-                    trackButtonHandler("checkTechSkipView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
-                }
-                case "checkAttachmView" -> {
-                    trackButtonHandler("checkAttachmView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
-                }
-                case "checkShiplessView" -> {
-                    trackButtonHandler("checkShiplessView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
-                }
-                case "checkUnlocked" -> {
-                    trackButtonHandler("checkUnlocked");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
-                }
                 // Don't add anymore cases - use @ButtonHandler
                 default ->
                     MessageHelper.sendMessageToEventChannel(
@@ -417,13 +336,6 @@ public class ButtonProcessor {
         if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
             MessageHelper.sendMessageToChannel(mainGameChannel, player.getFactionEmoji() + " " + message);
         }
-    }
-
-    private static List<Button> getRefreshInfoButtons(Game game) {
-        if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
-        if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
-        if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
-        return Buttons.REFRESH_INFO_BUTTONS;
     }
 
     private static void strategicAction(

@@ -164,8 +164,9 @@ public class MonumentsService {
         if (game == null || player == null || !game.isMonumentsMode()) {
             return false;
         }
-        return game.getTileMap().values().stream().anyMatch(tile -> tile.getUnitHolders().values().stream()
-                .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0));
+        return game.getTileMap().values().stream()
+                .anyMatch(tile -> tile.getUnitHolders().values().stream()
+                        .anyMatch(holder -> holder.getUnitCount(UnitType.Monument, player) > 0));
     }
 
     public static boolean isMonumentOnBoard(Game game, Player player, String monumentId) {

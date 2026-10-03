@@ -201,19 +201,17 @@ public class OnyxxaAbilityHandler {
                         + " command token from your strategy pool with the \"Spend A Strategy Token\" button to do so.");
     }
 
-    public static String stripHolderPrefixIfGrantedAccess(
-            Game game, Message message, Player player, String componentIdWithoutFfcc) {
-        if (game == null || message == null || player == null) return null;
+    public static boolean hasGrantedHolderAccess(Game game, Message message, Player player, String holderFaction) {
+        if (game == null || message == null || player == null) return false;
         for (int scNum : getStrategyCardsOnMessage(message)) {
             String access = game.getStoredValue(getPrimaryAccessKey(game, scNum));
             if (access.isEmpty()) continue;
-            String holderFaction = StringUtils.substringBefore(access, ";");
+            String grantingHolder = StringUtils.substringBefore(access, ";");
             String grantedFactions = StringUtils.substringAfter(access, ";");
-            if (!componentIdWithoutFfcc.startsWith(holderFaction + "_")) continue;
-            if (!("_" + grantedFactions + "_").contains("_" + player.getFaction() + "_")) continue;
-            return componentIdWithoutFfcc.substring(holderFaction.length() + 1);
+            if (!grantingHolder.equals(holderFaction)) continue;
+            if (("_" + grantedFactions + "_").contains("_" + player.getFaction() + "_")) return true;
         }
-        return null;
+        return false;
     }
 
     private static Set<Integer> getStrategyCardsOnMessage(Message message) {

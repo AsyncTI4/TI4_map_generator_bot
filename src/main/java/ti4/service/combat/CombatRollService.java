@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
@@ -42,6 +43,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
@@ -67,6 +70,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyser
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -155,6 +159,7 @@ public class CombatRollService {
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                 if (assignedUnits.stream().anyMatch(a -> a.planet().equals(planet))) {
                     game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
+                    XinCommanderHandler.warnAboutCoexistingUnitsBombardment(game, player, tile, planet, event);
                     secondHalfOfCombatRoll(
                             player, game, event, tile, unitHolderName, CombatRollType.bombardment, false);
                     hasValidBombardment = true;
@@ -652,6 +657,26 @@ public class CombatRollService {
             message += "\n_Mass Hypnosis_ redirected " + massHypnosisHits + " hit" + (massHypnosisHits == 1 ? "" : "s")
                     + " to its owner's ships.";
         }
+        if (rollType == CombatRollType.combatround && SarcosaHeroHandler.isLeviathanCombatant(game, opponent)) {
+            int cancelledHits =
+                    SarcosaHeroHandler.consumeLeviathanCancellations(game, opponent, tile, combatOnHolder, h);
+            if (cancelledHits > 0) {
+                h -= cancelledHits;
+                message =
+                        TOTAL_HITS_LINE_PATTERN.matcher(message).replaceFirst(CombatMessageHelper.displayHitResults(h));
+                if (payload.total() != null) {
+                    CombatRollPayload.RollTotal total = payload.total();
+                    payload = new CombatRollPayload(
+                            payload.header(),
+                            payload.notes(),
+                            payload.modifiers(),
+                            payload.unitRolls(),
+                            new CombatRollPayload.RollTotal(
+                                    total.diceRolled(), h, total.misses(), total.maximumHits()));
+                }
+                message += "\n**Leviathan** canceled " + cancelledHits + " hit" + (cancelledHits == 1 ? "." : "s.");
+            }
+        }
         XytherisAbilityHandler.beginStingOfTheHiveRoll(game, player, tile, rollType, h);
         int round;
         String combatName =
@@ -755,8 +780,8 @@ public class CombatRollService {
                                             "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                                 }
                                 buttons.add(Buttons.green(
-                                        opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName()
-                                                + "_" + h,
+                                        opponent.dummyPlayerSpoof()
+                                                + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                             } else {
                                 if (round2 > round) {
@@ -765,8 +790,8 @@ public class CombatRollService {
                                             "Roll Dice For Combat Round #" + (round + 1)));
                                 }
                                 buttons.add(Buttons.green(
-                                        opponent.factionButtonChecker() + "autoAssignGroundHits_"
-                                                + combatOnHolder.getName() + "_" + h,
+                                        opponent.factionButtonChecker()
+                                                + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s")));
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
@@ -775,8 +800,9 @@ public class CombatRollService {
                                         buttons, game, opponent, tile, combatOnHolder.getName());
 
                                 buttons.add(Buttons.gray(
-                                        opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_"
-                                                + h,
+                                        opponent.factionButtonChecker()
+                                                + CancelGroundHitsButtonId.of(
+                                                        tile.getPosition(), h, combatOnHolder.getName()),
                                         "Cancel a Hit"));
                                 TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                         buttons, game, opponent, tile, "ground", h);
@@ -793,8 +819,8 @@ public class CombatRollService {
                                         + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
                                 buttons = new ArrayList<>();
                                 buttons.add(Buttons.green(
-                                        player.factionButtonChecker() + "autoAssignGroundHits_"
-                                                + combatOnHolder.getName() + "_1",
+                                        player.factionButtonChecker()
+                                                + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), 1),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s")));
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
@@ -802,7 +828,9 @@ public class CombatRollService {
                                 MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
                                         buttons, game, player, tile, combatOnHolder.getName());
                                 buttons.add(Buttons.gray(
-                                        player.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_1",
+                                        player.factionButtonChecker()
+                                                + CancelGroundHitsButtonId.of(
+                                                        tile.getPosition(), 1, combatOnHolder.getName()),
                                         "Cancel a Hit"));
                                 TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                         buttons, game, player, tile, "ground", 1);
@@ -955,7 +983,8 @@ public class CombatRollService {
                                 "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                     }
                     buttons.add(Buttons.green(
-                            opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
+                            opponent.dummyPlayerSpoof()
+                                    + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                             "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                     String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
                             + StringHelper.pluralize(h, "hit") + ".";
@@ -1094,9 +1123,11 @@ public class CombatRollService {
                             } else {
                                 List<Button> buttons2 = new ArrayList<>();
                                 buttons2.add(Buttons.green(
-                                        p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
-                                                + game.getUnitHolderFromPlanet(bombardPlanet)
-                                                        .getName() + "_" + h,
+                                        p2.dummyPlayerSpoof()
+                                                + AutoAssignGroundHitsButtonIds.format(
+                                                        game.getUnitHolderFromPlanet(bombardPlanet)
+                                                                .getName(),
+                                                        h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
@@ -1604,6 +1635,21 @@ public class CombatRollService {
                     mult = 2;
                 }
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                int hitsBeforeLeviathan = hitRolls;
+                hitRolls = SarcosaHeroHandler.doubleFirstRoundLeviathanHits(
+                        game, player, activeSystem, unitHolder, unitModel, rollType, hitRolls);
+                SarcosaHeroHandler.recordLeviathanCancellation(
+                        game, player, activeSystem, unitHolder, unitModel, rollType, hitsBeforeLeviathan);
+                if (hitRolls > hitsBeforeLeviathan) {
+                    maximumHits += numRolls;
+                    resultBuilder
+                            .append(player.getFactionEmoji())
+                            .append(" doubled ")
+                            .append(hitsBeforeLeviathan)
+                            .append(" hit")
+                            .append(hitsBeforeLeviathan == 1 ? "" : "s")
+                            .append(" with **Leviathan**.\n");
+                }
                 if ("kryxos_mech3".equals(unitModel.getId()) && numOfUnit > 0) {
                     int[] hitsPerMech = new int[numOfUnit];
                     int nativeRollCount = numOfUnit * numRollsPerUnit;
@@ -1691,8 +1737,9 @@ public class CombatRollService {
                                         } else {
                                             List<Button> buttons2 = new ArrayList<>();
                                             buttons2.add(Buttons.green(
-                                                    p2.dummyPlayerSpoof() + "autoAssignGroundHits_" + uh.getName() + "_"
-                                                            + hitRolls,
+                                                    p2.dummyPlayerSpoof()
+                                                            + AutoAssignGroundHitsButtonIds.format(
+                                                                    uh.getName(), hitRolls),
                                                     "Auto-assign Hit" + (hitRolls == 1 ? "" : "s") + " For Dummy"));
                                             MessageHelper.sendMessageToChannelWithButtons(
                                                     game.isFowMode()

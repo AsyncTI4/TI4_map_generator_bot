@@ -30,6 +30,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -303,6 +304,15 @@ public final class BreakthroughCommandHelper {
             }
             if ("netrunnersbt".equalsIgnoreCase(bt.getID())) {
                 NetrunnersBreakthroughHandler.offerDataBreachPlacement(game, player);
+            }
+            if ("toldarbt".equalsIgnoreCase(bt.getID())
+                    || "toldarbthonor".equalsIgnoreCase(bt.getID())
+                    || "toldarbtdishonor".equalsIgnoreCase(bt.getID())) {
+                if (player.getHonorCounter() == player.getDishonorCounter()) {
+                    ButtonHelperFactionSpecific.offerToldarBtSideChoice(player);
+                } else {
+                    ButtonHelperFactionSpecific.correctHonorAbilities(player, game);
+                }
             }
             if (FractureService.canFractureEnterPlay(game)) serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);

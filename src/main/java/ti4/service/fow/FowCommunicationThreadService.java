@@ -185,30 +185,39 @@ public class FowCommunicationThreadService {
                         + otherPlayer.getRepresentationNoPing();
                 if (!threadLocked && isHiddenAgenda(game)) {
                     // Reminder of Hidden Agenda mode
-                    threadChannel.getManager().setArchived(false).queue(success -> threadChannel
-                            .sendMessage(
-                                    "⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
-                            .queue(Consumers.nop(), BotLogger::catchRestError));
+                    threadChannel
+                            .getManager()
+                            .setArchived(false)
+                            .queue(success -> threadChannel
+                                    .sendMessage(
+                                            "⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
+                                    .queue(Consumers.nop(), BotLogger::catchRestError));
                 } else if (areAbleToCommunicate && threadLocked) {
                     // Allow talking
-                    threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                    threadChannel
                             .getManager()
-                            .setName(threadName.replace(NO_CHAR, YES_CHAR))
-                            .queue(nameUpdated -> threadChannel
-                                    .sendMessage(notice
-                                            + (areAllowedToTalkInAgenda
-                                                    ? " __may__ communicate in Agenda Phase."
-                                                    : " have regained comms and __may__ communicate."))
-                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
+                            .setArchived(false)
+                            .queue(success -> threadChannel
+                                    .getManager()
+                                    .setName(threadName.replace(NO_CHAR, YES_CHAR))
+                                    .queue(nameUpdated -> threadChannel
+                                            .sendMessage(notice
+                                                    + (areAllowedToTalkInAgenda
+                                                            ? " __may__ communicate in Agenda Phase."
+                                                            : " have regained comms and __may__ communicate."))
+                                            .queue(Consumers.nop(), BotLogger::catchRestError)));
 
                 } else if (!areAbleToCommunicate && !threadLocked) {
                     // Deny talking
-                    threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                    threadChannel
                             .getManager()
-                            .setName(threadName.replace(YES_CHAR, NO_CHAR))
-                            .queue(nameUpdated -> threadChannel
-                                    .sendMessage(notice + " have lost comms and __may not__ communicate.")
-                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
+                            .setArchived(false)
+                            .queue(success -> threadChannel
+                                    .getManager()
+                                    .setName(threadName.replace(YES_CHAR, NO_CHAR))
+                                    .queue(nameUpdated -> threadChannel
+                                            .sendMessage(notice + " have lost comms and __may not__ communicate.")
+                                            .queue(Consumers.nop(), BotLogger::catchRestError)));
                 }
             }
         } finally {
