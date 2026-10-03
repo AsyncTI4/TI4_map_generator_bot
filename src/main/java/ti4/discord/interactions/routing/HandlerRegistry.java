@@ -15,8 +15,9 @@ public class HandlerRegistry<C extends ListenerContext> {
         handlers.put(key, new Handler<>(consumer, shouldSave));
     }
 
-    public boolean isSave(String componentId) {
-        Handler<C> handler = findHandler(componentId);
+    public boolean isSave(String rawComponentId) {
+        Handler<C> handler =
+                findHandler(ComponentIdEnvelope.decode(rawComponentId).handlerId());
         return handler == null || handler.shouldSave();
     }
 
