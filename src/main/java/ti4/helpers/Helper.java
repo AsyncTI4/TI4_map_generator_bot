@@ -3480,24 +3480,12 @@ public final class Helper {
     }
 
     private static void informUserCCOverLimit(Game game, String color, int ccCount) {
-        int limit = 16;
-        if (!game.getStoredValue("ccLimit").isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        Player player = game.getPlayerFromColorOrFaction(color);
+        if (player == null || !game.isCcNPlasticLimit()) {
+            return;
         }
-        if (!game.getStoredValue("ccLimit" + color).isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit" + color));
-        }
-        if (game.getPlayerFromColorOrFaction(color) != null
-                && game.getPlayerFromColorOrFaction(color).hasRelic("endurance_steroids")) {
-            limit += 2;
-        }
-        boolean ccCountIsOver = ccCount > limit;
-        if (ccCountIsOver && game.isCcNPlasticLimit()) {
-            Player player = game.getPlayerFromColorOrFaction(color);
-            if (player == null) {
-                return;
-            }
-
+        int limit = player.getCommandTokenLimit();
+        if (ccCount > limit) {
             String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit
                     + ". Command tokens used: " + ccCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + msg);
