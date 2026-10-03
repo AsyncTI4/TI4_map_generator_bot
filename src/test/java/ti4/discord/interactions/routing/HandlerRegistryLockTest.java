@@ -54,6 +54,31 @@ class HandlerRegistryLockTest extends BaseTi4Test {
         assertThat(wronglyWriteLocked).isEmpty();
     }
 
+    // These used to be switch cases in ButtonProcessor; with no registered route, isSave defaulted to true and
+    // a pure view took the WRITE lock and a full game save.
+    @Test
+    void formerLegacyViewButtonsTakeTheReadLock() {
+        HandlerRegistry<ButtonContext> registry =
+                AnnotationHandler.buildHandlerRegistry(ButtonContext.class, ButtonHandler.class);
+
+        List<String> viewButtons = List.of(
+                "searchMyGames",
+                "refreshInfoButtons",
+                "checkWHView",
+                "checkAnomView",
+                "checkLegendView",
+                "checkEmptyView",
+                "checkAetherView",
+                "checkCannonView",
+                "checkTraitView",
+                "checkTechSkipView",
+                "checkAttachmView",
+                "checkShiplessView",
+                "checkUnlocked");
+
+        assertThat(viewButtons).noneMatch(registry::isSave);
+    }
+
     private static List<String> readOnlyButtonHandlerKeys() {
         List<String> keys = new ArrayList<>();
         for (Class<?> klass : AnnotationHandler.getAllClasses()) {
