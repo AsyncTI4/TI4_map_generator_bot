@@ -118,6 +118,7 @@ public class ButtonProcessor {
 
     private static void log(ButtonInteractionEvent event) {
         BotLogger.logButton(event);
+        // TODO: Check whether Rollbar is still configured and read; if not, drop this per-press metadata.
         RollbarManager.putInteractionMetadata("button", event);
         RollbarManager.put("button_id", event.getButton().getCustomId());
         RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
