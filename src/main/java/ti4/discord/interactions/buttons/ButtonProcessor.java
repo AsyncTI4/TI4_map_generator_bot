@@ -3,9 +3,7 @@ package ti4.discord.interactions.buttons;
 import java.text.DecimalFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,8 +26,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.DisplayType;
-import ti4.helpers.SearchGameHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -196,11 +192,6 @@ public class ButtonProcessor {
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 // Don't add anymore cases - use @ButtonHandler
-                case "refreshInfoButtons" -> {
-                    trackButtonHandler("refreshInfoButtons");
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(), null, getRefreshInfoButtons(game));
-                }
                 case "gain_1_comms" -> {
                     trackButtonHandler("gain_1_comms");
                     ButtonHelperStats.gainComms(event, game, player, 1, true);
@@ -286,55 +277,6 @@ public class ButtonProcessor {
                             player,
                             " is " + event.getButton().getLabel().toLowerCase() + ".");
                 }
-                case "searchMyGames" -> {
-                    trackButtonHandler("searchMyGames");
-                    SearchGameHelper.searchGames(
-                            event.getUser(), event, false, false, false, true, false, true, false, false);
-                }
-                case "checkWHView" -> {
-                    trackButtonHandler("checkWHView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
-                }
-                case "checkAnomView" -> {
-                    trackButtonHandler("checkAnomView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
-                }
-                case "checkLegendView" -> {
-                    trackButtonHandler("checkLegendView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
-                }
-                case "checkEmptyView" -> {
-                    trackButtonHandler("checkEmptyView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.empties);
-                }
-                case "checkAetherView" -> {
-                    trackButtonHandler("checkAetherView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
-                }
-                case "checkCannonView" -> {
-                    trackButtonHandler("checkCannonView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
-                }
-                case "checkTraitView" -> {
-                    trackButtonHandler("checkTraitView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.traits);
-                }
-                case "checkTechSkipView" -> {
-                    trackButtonHandler("checkTechSkipView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
-                }
-                case "checkAttachmView" -> {
-                    trackButtonHandler("checkAttachmView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
-                }
-                case "checkShiplessView" -> {
-                    trackButtonHandler("checkShiplessView");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
-                }
-                case "checkUnlocked" -> {
-                    trackButtonHandler("checkUnlocked");
-                    ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
-                }
                 // Don't add anymore cases - use @ButtonHandler
                 default ->
                     MessageHelper.sendMessageToEventChannel(
@@ -394,13 +336,6 @@ public class ButtonProcessor {
         if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
             MessageHelper.sendMessageToChannel(mainGameChannel, player.getFactionEmoji() + " " + message);
         }
-    }
-
-    private static List<Button> getRefreshInfoButtons(Game game) {
-        if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
-        if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
-        if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
-        return Buttons.REFRESH_INFO_BUTTONS;
     }
 
     private static void strategicAction(
