@@ -61,6 +61,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
@@ -73,6 +74,9 @@ import ti4.service.game.GameUndoNameService;
 
 @UtilityClass
 public class MessageHelper {
+
+    private static final int SECONDS_PER_RATE_LIMITED_CHANNEL_MESSAGE = 2;
+    static final int MAX_MESSAGES_PER_SEND = 20;
 
     public static Consumer<Message> pin() {
         return msg -> msg.pin().queue(Consumers.nop(), error -> {
@@ -723,37 +727,31 @@ public class MessageHelper {
 
         String finalMessageText = messageText;
         List<MessageCreateData> objects = getMessageCreateDataObjects(finalMessageText, sanitizedEmbeds, buttons);
-        Iterator<MessageCreateData> iterator = objects.iterator();
-        while (iterator.hasNext()) {
-            MessageCreateData messageCreateData = iterator.next();
-            if (iterator.hasNext()) { // not last message
-                sendMessageWithRetry(channel, messageCreateData, null, "Failed to send intermediate message", 1);
-            } else { // last message, do action
-                sendMessageWithRetry(
-                        channel,
-                        messageCreateData,
-                        message -> {
-                            updateManagedMessages(finalMessageText, message, gameName);
-                            if (restAction != null) {
-                                restAction.accept(message);
-                            }
-                        },
-                        finalMessageText,
-                        1);
-            }
-        }
+        sendMessagesWithRetry(
+                channel,
+                objects,
+                message -> {
+                    updateManagedMessages(finalMessageText, message, gameName);
+                    if (restAction != null) {
+                        restAction.accept(message);
+                    }
+                },
+                finalMessageText,
+                1);
     }
 
     private static void updateManagedMessages(String text, Message message, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (text == null || message == null || managedGame == null || managedGame.isFowMode()) return;
+        if (text == null || message == null || managedGame == null) return;
+        if (managedGame.isFowMode()) {
+            replaceFogTurnMessage(text, message, managedGame);
+            return;
+        }
 
         String id = message.getId();
         long date = managedGame.getLastModifiedDate();
 
-        if (text.contains("Use buttons to do your turn")
-                || text.contains("Use buttons to end turn")
-                || text.contains("Use the buttons to end turn")) {
+        if (isTurnButtonMessage(text)) {
             String old = GameMessageManager.replace(gameName, new GameMessage(id, GameMessageType.TURN, date));
             if (old != null) {
                 message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -765,22 +763,71 @@ public class MessageHelper {
         }
     }
 
+    private static boolean isTurnButtonMessage(String text) {
+        return text.contains("Use buttons to do your turn")
+                || text.contains("Use buttons to end turn")
+                || text.contains("Use the buttons to end turn");
+    }
+
+    private static void replaceFogTurnMessage(String text, Message message, ManagedGame managedGame) {
+        if (!isTurnButtonMessage(text) || !managedGame.isFogQol01()) return;
+        MessageChannel channel = message.getChannel();
+        GameMessage turnMessage = new GameMessage(
+                message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate(), channel.getId());
+        String old = GameMessageManager.replace(managedGame.getName(), turnMessage);
+        if (old != null) {
+            channel.deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
     public static void sendMessagesWithRetry(
             MessageChannel channel,
             List<MessageCreateData> messageCreateDataList,
             Consumer<Message> successAction,
             String errorHeader,
             int remainingAttempts) {
-        Iterator<MessageCreateData> iterator = messageCreateDataList.iterator();
-        while (iterator.hasNext()) {
-            MessageCreateData messageCreateData = iterator.next();
-            if (iterator.hasNext()) { // not last message
+        if (messageCreateDataList.size() > MAX_MESSAGES_PER_SEND) {
+            BotLogger.warning(channel.getAsMention() + " Output of "
+                    + StringHelper.pluralize(messageCreateDataList.size(), "message") + " was capped at "
+                    + MAX_MESSAGES_PER_SEND + ".");
+        }
+        List<MessageCreateData> cappedMessages = capMessageCount(messageCreateDataList);
+        int lastPosition = cappedMessages.size() - 1;
+        for (int queuePosition = 0; queuePosition <= lastPosition; queuePosition++) {
+            MessageCreateData messageCreateData = cappedMessages.get(queuePosition);
+            if (queuePosition < lastPosition) {
                 sendMessageWithRetry(
-                        channel, messageCreateData, null, "Failed to send intermediate message", remainingAttempts);
-            } else { // last message, do action
-                sendMessageWithRetry(channel, messageCreateData, successAction, errorHeader, remainingAttempts);
+                        channel,
+                        messageCreateData,
+                        null,
+                        "Failed to send intermediate message",
+                        remainingAttempts,
+                        queuePosition);
+            } else {
+                sendMessageWithRetry(
+                        channel, messageCreateData, successAction, errorHeader, remainingAttempts, queuePosition);
             }
         }
+    }
+
+    static List<MessageCreateData> capMessageCount(List<MessageCreateData> messages) {
+        if (messages.size() <= MAX_MESSAGES_PER_SEND) {
+            return messages;
+        }
+        int keptLeadingMessages = MAX_MESSAGES_PER_SEND - 2;
+        int omittedMessages = messages.size() - keptLeadingMessages - 1;
+        List<MessageCreateData> capped = new ArrayList<>(messages.subList(0, keptLeadingMessages));
+        capped.add(new MessageCreateBuilder()
+                .addContent("-# Output truncated: " + StringHelper.pluralize(omittedMessages, "message")
+                        + " omitted to avoid flooding the channel.")
+                .build());
+        capped.add(messages.getLast());
+        return capped;
+    }
+
+    private static long sendTimeoutSecondsForQueuePosition(int queuePosition) {
+        return JdaService.DISCORD_REQUEST_TIMEOUT_SECONDS
+                + (long) queuePosition * SECONDS_PER_RATE_LIMITED_CHANNEL_MESSAGE;
     }
 
     private static void sendMessageWithRetry(
@@ -788,8 +835,10 @@ public class MessageHelper {
             MessageCreateData messageCreateData,
             Consumer<Message> successAction,
             String errorHeader,
-            int remainingAttempts) {
+            int remainingAttempts,
+            int queuePosition) {
         channel.sendMessage(messageCreateData)
+                .timeout(sendTimeoutSecondsForQueuePosition(queuePosition), TimeUnit.SECONDS)
                 .queue(
                         message -> {
                             if (successAction != null) {
@@ -813,7 +862,12 @@ public class MessageHelper {
                                                 channel, errorHeader + " (retrying)", messageCreateData, error),
                                         error);
                                 sendMessageWithRetry(
-                                        channel, messageCreateData, successAction, errorHeader, remainingAttempts - 1);
+                                        channel,
+                                        messageCreateData,
+                                        successAction,
+                                        errorHeader,
+                                        remainingAttempts - 1,
+                                        queuePosition);
                             } else {
                                 BotLogger.error(
                                         getRestActionFailureMessage(channel, errorHeader, messageCreateData, error),

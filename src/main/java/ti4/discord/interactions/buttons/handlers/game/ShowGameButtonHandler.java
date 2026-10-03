@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -12,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.image.MapRenderPipeline;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.fow.MapSegmentService;
@@ -43,8 +45,11 @@ class ShowGameButtonHandler {
                 Buttons.gray(MapSegmentService.withSegment(SHOW_MAP, segment), "Show Map"),
                 Buttons.gray(SHOW_PLAYER_AREAS, "Show Player Stats"),
                 Buttons.gray(MapSegmentService.withSegment(SHOW_FULL_MAP, segment), "Show Full Map"));
-        if (postsInChannel(game, event)) {
+        if (postsInChannel(event)) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            if (REFRESH.equals(event.getComponentId())) {
+                event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
+            }
         } else {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         }
@@ -59,8 +64,8 @@ class ShowGameButtonHandler {
         return false;
     }
 
-    private static boolean postsInChannel(Game game, ButtonInteractionEvent event) {
-        return game.isFowMode() && refreshMapStyle(event).postsInChannelInFog();
+    private static boolean postsInChannel(ButtonInteractionEvent event) {
+        return refreshMapStyle(event).postsInChannel();
     }
 
     private static RefreshMapStyle refreshMapStyle(ButtonInteractionEvent event) {
@@ -70,7 +75,7 @@ class ShowGameButtonHandler {
     private static void showMapPart(
             Game game, ButtonInteractionEvent event, DisplayType part, @Nullable String segment) {
         if (!mayRenderHere(game, event)) return;
-        boolean inChannel = postsInChannel(game, event);
+        boolean inChannel = postsInChannel(event);
         MapRenderPipeline.queue(game, event, part, segment, fileUpload -> {
             if (!inChannel) {
                 MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);

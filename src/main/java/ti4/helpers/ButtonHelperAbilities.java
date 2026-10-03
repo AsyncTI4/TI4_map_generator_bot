@@ -1351,10 +1351,45 @@ public final class ButtonHelperAbilities {
         return null;
     }
 
+    public static boolean canUseCaled(Game game, Player player) {
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        Tile caledSystem = getLocationOfSuperweapon(game, "caled");
+        return activeSystem != null
+                && activeSystem != caledSystem
+                && game.getRealPlayersNNeutral().stream()
+                        .anyMatch(other -> other != player
+                                && !player.getAllianceMembers().contains(other.getFaction())
+                                && FoWHelper.playerHasShipsInSystem(other, activeSystem));
+    }
+
+    public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
+        return game.getRealPlayersNNeutral().stream()
+                .anyMatch(other -> other != player
+                        && other.hasRelic("superweaponglatison")
+                        && tile == getLocationOfSuperweapon(game, "glatison"));
+    }
+
     @ButtonHandler("exhaustSuperweapon_")
     public static void exhaustSuperweapon(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String name = buttonID.split("_")[1];
         String superweapon = "superweapon" + buttonID.split("_")[1];
+        if (!player.hasRelicReady(superweapon)) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            return;
+        }
+        if ("caled".equals(name)) {
+            if (game.getActiveSystem().isBlank()) {
+                MessageHelper.sendEphemeralMessageToEventChannel(event, "Caled requires an active system.");
+                return;
+            }
+            if (buttonID.split("_").length < 3
+                    || !canUseCaled(game, player)
+                    || !game.getActiveSystem().equals(buttonID.split("_")[2])) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event, "Caled cannot target an opposing ship right now.");
+                return;
+            }
+        }
         player.addExhaustedRelic(superweapon);
         Tile tile = getLocationOfSuperweapon(game, name);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -1368,15 +1403,21 @@ public final class ButtonHelperAbilities {
         switch (name) {
             case "grom" -> {
                 for (String adj : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true)) {
-                    buttons.add(Buttons.gray(
-                            "gromPart2_" + adj, game.getTileByPosition(adj).getRepresentationForButtons()));
+                    Tile target = game.getTileByPosition(adj);
+                    if (target != null && FoWHelper.knowsTile(game, player, target.getPosition())) {
+                        buttons.add(Buttons.gray("gromPart2_" + adj, target.getRepresentationForButtons(game, player)));
+                    }
                 }
             }
             case "mors" -> {
                 Set<String> adjPos = FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, true);
                 for (Tile loc : game.getTileMap().values()) {
-                    if (!adjPos.contains(loc.getPosition()))
-                        buttons.add(Buttons.gray("morsPart2_" + loc.getPosition(), loc.getRepresentationForButtons()));
+                    if (!loc.getPosition().equals(tile.getPosition())
+                            && !adjPos.contains(loc.getPosition())
+                            && FoWHelper.knowsTile(game, player, loc.getPosition())) {
+                        buttons.add(Buttons.gray(
+                                "morsPart2_" + loc.getPosition(), loc.getRepresentationForButtons(game, player)));
+                    }
                 }
             }
             case "glatison" -> {
@@ -1412,6 +1453,10 @@ public final class ButtonHelperAbilities {
     public static void morsPart2(Player belk, Game game, String buttonID, ButtonInteractionEvent event) {
         String location = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(location);
+        if (tile == null || !FoWHelper.knowsTile(game, belk, tile.getPosition())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             for (Player player : game.getRealPlayers()) {
@@ -1443,6 +1488,10 @@ public final class ButtonHelperAbilities {
     public static void gromPart2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String location = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(location);
+        if (tile == null || !FoWHelper.knowsTile(game, player, tile.getPosition())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
 
         buttons.add(Buttons.red("getDamageButtons_" + location + "_spacecombat", "Assign Hits"));

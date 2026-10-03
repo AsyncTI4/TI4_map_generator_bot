@@ -20,6 +20,8 @@ import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.BelkoseaAgentService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 
 @UtilityClass
 public class CheckDistanceHelper {
@@ -30,7 +32,13 @@ public class CheckDistanceHelper {
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
-        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game, player) ? 100 : 99;
+        Tile origin = game.getTileByPosition(tilePosition1);
+        return countsRiftsAsNormal
+                        || origin == null
+                        || RealityFieldImpactorService.nullifies(game, origin)
+                        || !origin.isGravityRift(game, player)
+                ? 100
+                : 99;
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
@@ -101,6 +109,7 @@ public class CheckDistanceHelper {
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
                             || (tile.isNebula(game)
+                                    && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
                                     && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                                     && !DreamFactionTechHandler.treatsNebulasAsAdjacent(game, player, tile)
@@ -113,6 +122,7 @@ public class CheckDistanceHelper {
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
+                                    && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
                                     && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
@@ -124,6 +134,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("tf-mr"))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                                    && !BelkoseaAgentService.ignoresOtherShips(game, player, tile)
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && !OnyxxaBreakthroughHandler.canMoveThroughIngressSystem(player, tile)
@@ -139,6 +150,7 @@ public class CheckDistanceHelper {
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
                                     && !tile.isZelianAsteroidField()
+                                    && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
                                     && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasTech("amd")
@@ -155,6 +167,7 @@ public class CheckDistanceHelper {
                 if (!forMap) {
                     if (tile != null
                             && tile.isGravityRift(game, player)
+                            && !RealityFieldImpactorService.nullifies(game, tile)
                             && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                             && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                             && !AsgardLegendaryService.isBifrostBridgeActive(game, player)) {

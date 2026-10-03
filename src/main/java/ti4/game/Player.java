@@ -60,6 +60,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
 import ti4.draft.DraftBag;
@@ -637,11 +638,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (isNpc() || isDummy()) {
             return dummyPlayerSpoof();
         }
-        return "FFCC_" + getFaction() + "_";
+        return ComponentIdEnvelope.ownedBy(getFaction());
     }
 
     public String dummyPlayerSpoof() {
-        return "dummyPlayerSpoof" + getFaction() + "_";
+        return ComponentIdEnvelope.spoofedAs(getFaction());
     }
 
     /** AKA: Has Infantry Revival Ability */
