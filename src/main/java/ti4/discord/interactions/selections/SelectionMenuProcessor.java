@@ -34,17 +34,18 @@ public final class SelectionMenuProcessor {
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String rawComponentID = event.getSelectMenu().getCustomId();
-        ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        HandlerRegistry.Route<SelectionMenuContext> route =
+                registry.resolve(event.getSelectMenu().getCustomId());
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> process(event),
+                () -> process(event, route),
                 lockType);
     }
 
-    private static void process(StringSelectInteractionEvent event) {
+    private static void process(StringSelectInteractionEvent event, HandlerRegistry.Route<SelectionMenuContext> route) {
         SelectionMenuContext context = new SelectionMenuContext(event);
         if (!context.isValid()) {
             BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
@@ -62,7 +63,7 @@ public final class SelectionMenuProcessor {
                         combatReplayService.capturePreInteractionSnapshot(context.getGame()));
             }
             try {
-                resolveSelectionMenu(context);
+                resolveSelectionMenu(context, route);
                 context.save();
             } finally {
                 if (combatReplayService != null) {
@@ -78,8 +79,9 @@ public final class SelectionMenuProcessor {
         }
     }
 
-    private static void resolveSelectionMenu(SelectionMenuContext context) {
-        if (registry.handle(context.getMenuID(), context)) {
+    private static void resolveSelectionMenu(
+            SelectionMenuContext context, HandlerRegistry.Route<SelectionMenuContext> route) {
+        if (route.dispatch(context)) {
             return;
         }
 

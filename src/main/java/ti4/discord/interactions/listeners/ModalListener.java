@@ -59,17 +59,17 @@ public final class ModalListener extends ListenerAdapter {
         event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String rawModalID = event.getModalId();
-        ExecutionLockType lockType = registry.isSave(rawModalID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        HandlerRegistry.Route<ModalContext> route = registry.resolve(event.getModalId());
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(event),
+                () -> handleModal(event, route),
                 lockType);
     }
 
-    private void handleModal(ModalInteractionEvent event) {
+    private void handleModal(ModalInteractionEvent event, HandlerRegistry.Route<ModalContext> route) {
         ModalContext context = new ModalContext(event);
         if (!context.isValid()) {
             BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
@@ -87,7 +87,7 @@ public final class ModalListener extends ListenerAdapter {
                         combatReplayService.capturePreInteractionSnapshot(context.getGame()));
             }
             try {
-                resolveModalInteractionEvent(context);
+                resolveModalInteractionEvent(context, route);
                 context.save();
             } finally {
                 if (combatReplayService != null) {
@@ -103,11 +103,12 @@ public final class ModalListener extends ListenerAdapter {
         }
     }
 
-    private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
+    private void resolveModalInteractionEvent(
+            @Nonnull ModalContext context, HandlerRegistry.Route<ModalContext> route) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 
-        if (registry.handle(modalID, context)) return;
+        if (route.dispatch(context)) return;
 
         if (modalID.startsWith("jmfA_")) {
             // Detect new settings menu navId() to route to the correct handler.
