@@ -101,6 +101,7 @@
         "name": "Evasive",
         "faction": "sarcosa",
         "permanentEffect": "Your units do not exit coexistence unless another player ends coexistence with those units or they are removed from that planet. Other players must spend 2 influence to end coexistence with your units on a planet. ",
+        "notes": "You cannot end your own units coexistence.",
         "source": "blue_reverie"
     },
     {
