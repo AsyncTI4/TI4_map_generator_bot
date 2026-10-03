@@ -41,7 +41,7 @@ class ButtonPressTimeline {
     }
 
     void markCompleted(ButtonPressStage stage, long completedAtMillis) {
-        stageMillis.merge(stage, Math.max(0, completedAtMillis - lastMarkMillis), Long::sum);
+        stageMillis.put(stage, Math.max(0, completedAtMillis - lastMarkMillis));
         lastMarkMillis = completedAtMillis;
     }
 

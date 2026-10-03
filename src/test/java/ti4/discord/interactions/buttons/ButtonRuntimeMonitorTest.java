@@ -33,7 +33,8 @@ class ButtonRuntimeMonitorTest {
         assertThat(rowFor(statistics, "handoff")).contains("5.0ms");
         assertThat(rowFor(statistics, "processing")).contains("76.0ms");
         assertThat(rowFor(statistics, "resolve")).contains("34.0ms");
-        assertThat(rowFor(statistics, "replay")).contains(" 0 ", "-");
+        assertThat(rowFor(statistics, "replay-snap")).contains(" 0 ", "-");
+        assertThat(rowFor(statistics, "replay-settle")).contains(" 0 ", "-");
     }
 
     @Test

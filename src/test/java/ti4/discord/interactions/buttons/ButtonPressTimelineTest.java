@@ -23,23 +23,28 @@ class ButtonPressTimelineTest {
                 .containsEntry(ButtonPressStage.LOG, 1L)
                 .containsEntry(ButtonPressStage.RESOLVE, 34L)
                 .containsEntry(ButtonPressStage.SAVE, 20L)
-                .doesNotContainKey(ButtonPressStage.COMBAT_REPLAY);
+                .doesNotContainKeys(ButtonPressStage.REPLAY_SNAPSHOT, ButtonPressStage.REPLAY_SETTLE);
         assertThat(timeline.getPreprocessingMillis()).isEqualTo(85);
         assertThat(timeline.getProcessingMillis()).isEqualTo(76);
         assertThat(timeline.getResponseMillis()).isEqualTo(161);
     }
 
     @Test
-    void aStageMarkedTwiceAccumulates() {
-        // Combat replay runs once before resolving (snapshot) and once after saving (settle).
+    void combatReplayWorkIsTimedSeparatelyFromTheHandler() {
+        // Combat replay runs once before resolving (snapshot) and once after saving (settle);
+        // neither should be charged to the resolve or save stages around it.
         ButtonPressTimeline timeline = ButtonPressTimeline.received(0, 0);
         timeline.markStarted(0);
-        timeline.markCompleted(ButtonPressStage.COMBAT_REPLAY, 7);
+        timeline.markCompleted(ButtonPressStage.REPLAY_SNAPSHOT, 7);
         timeline.markCompleted(ButtonPressStage.RESOLVE, 20);
         timeline.markCompleted(ButtonPressStage.SAVE, 30);
-        timeline.markCompleted(ButtonPressStage.COMBAT_REPLAY, 33);
+        timeline.markCompleted(ButtonPressStage.REPLAY_SETTLE, 33);
 
-        assertThat(timeline.getStageMillis()).containsEntry(ButtonPressStage.COMBAT_REPLAY, 10L);
+        assertThat(timeline.getStageMillis())
+                .containsEntry(ButtonPressStage.REPLAY_SNAPSHOT, 7L)
+                .containsEntry(ButtonPressStage.RESOLVE, 13L)
+                .containsEntry(ButtonPressStage.SAVE, 10L)
+                .containsEntry(ButtonPressStage.REPLAY_SETTLE, 3L);
     }
 
     @Test

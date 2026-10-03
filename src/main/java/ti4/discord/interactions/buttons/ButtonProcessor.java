@@ -94,7 +94,7 @@ public class ButtonProcessor {
                 CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
                         combatReplayService.capturePreInteractionSnapshot(context.getGame());
                 CombatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
-                timeline.markCompleted(ButtonPressStage.COMBAT_REPLAY);
+                timeline.markCompleted(ButtonPressStage.REPLAY_SNAPSHOT);
             }
             try {
                 resolveButtonInteractionEvent(context);
@@ -105,7 +105,7 @@ public class ButtonProcessor {
 
                 if (combatReplayService != null && context.getGame() != null) {
                     combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
-                    timeline.markCompleted(ButtonPressStage.COMBAT_REPLAY);
+                    timeline.markCompleted(ButtonPressStage.REPLAY_SETTLE);
                 }
             } finally {
                 if (combatReplayService != null) {
