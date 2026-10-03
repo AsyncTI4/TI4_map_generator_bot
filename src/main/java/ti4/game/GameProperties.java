@@ -103,7 +103,7 @@ public class GameProperties {
     private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
-    private boolean injectRulesLinks = true;
+    private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
     private boolean queueSO = true;
