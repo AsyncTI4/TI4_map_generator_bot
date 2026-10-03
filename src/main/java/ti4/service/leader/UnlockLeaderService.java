@@ -21,6 +21,10 @@ public class UnlockLeaderService {
 
     public static void unlockLeader(String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToChannel(getOutputChannel(game, player), "Leader " + leaderID + " not found");
+            return;
+        }
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         String message;
         if (leaderModel != null) {
@@ -34,10 +38,7 @@ public class UnlockLeaderService {
 
     public static void unlockLeader(String leaderID, Game game, Player player, String message) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
-        MessageChannel channel = game.getMainGameChannel();
-        if (game.isFowMode()) {
-            channel = player.getPrivateChannel();
-        }
+        MessageChannel channel = getOutputChannel(game, player);
 
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(channel, "Leader " + leaderID + " not found");
@@ -121,5 +122,12 @@ public class UnlockLeaderService {
         if (playerLeader.isExhausted()) {
             MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
         }
+    }
+
+    private static MessageChannel getOutputChannel(Game game, Player player) {
+        if (game.isFowMode()) {
+            return player.getPrivateChannel();
+        }
+        return game.getMainGameChannel();
     }
 }
