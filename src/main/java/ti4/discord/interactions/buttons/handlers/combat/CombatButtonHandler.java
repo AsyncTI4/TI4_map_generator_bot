@@ -269,8 +269,7 @@ class CombatButtonHandler {
         }
         int originalHits = cancelId.hits();
         int h = originalHits - 1;
-        String planet =
-                cancelId.hasPlanet() ? cancelId.planet() : CancelGroundHitsButtonId.soleGroundForcePlanet(tile, player);
+        String planet = cancelId.planet();
 
         if (originalHits > 0) {
             MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
@@ -280,11 +279,8 @@ class CombatButtonHandler {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
-        if (planet != null) {
-            buttons.add(Buttons.green(
-                    factionChecker + "autoAssignGroundHits_" + planet + "_" + h,
-                    "Auto-assign Hit" + (h == 1 ? "" : "s")));
-        }
+        buttons.add(Buttons.green(
+                factionChecker + "autoAssignGroundHits_" + planet + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -292,8 +288,7 @@ class CombatButtonHandler {
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelGroundHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                 buttons, game, player, tile, "ground", h);
-        String msg2 = player.getRepresentation() + (planet != null ? " you may autoassign " : " please assign ")
-                + StringHelper.pluralize(h, "hit") + ".";
+        String msg2 = player.getRepresentation() + " you may autoassign " + StringHelper.pluralize(h, "hit") + ".";
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))

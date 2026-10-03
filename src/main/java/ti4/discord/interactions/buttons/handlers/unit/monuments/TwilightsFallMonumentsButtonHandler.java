@@ -464,19 +464,20 @@ public class TwilightsFallMonumentsButtonHandler {
         if (remainingHits > 0) {
             switch (hitType[0]) {
                 case "ground" -> {
-                    String planet = hitType.length == 2
-                            ? hitType[1]
-                            : CancelGroundHitsButtonId.soleGroundForcePlanet(tile, player);
-                    if (planet != null) {
+                    boolean knownPlanet = hitType.length == 2;
+                    if (knownPlanet) {
                         buttons.add(Buttons.green(
-                                factionChecker + "autoAssignGroundHits_" + planet + "_" + remainingHits,
+                                factionChecker + "autoAssignGroundHits_" + hitType[1] + "_" + remainingHits,
                                 "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
                     }
                     buttons.add(Buttons.red(
                             "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                             "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
-                    buttons.add(Buttons.gray(
-                            CancelGroundHitsButtonId.of(tile.getPosition(), remainingHits, planet), "Cancel a Hit"));
+                    if (knownPlanet) {
+                        buttons.add(Buttons.gray(
+                                CancelGroundHitsButtonId.of(tile.getPosition(), remainingHits, hitType[1]),
+                                "Cancel a Hit"));
+                    }
                 }
                 case "space" -> {
                     buttons.add(Buttons.green(
