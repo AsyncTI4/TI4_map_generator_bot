@@ -1018,7 +1018,7 @@ public class StartPhaseService {
                     "This is the moment when you should resolve:\n- _Political Stability_\n- _Ancient Burial Sites_\n";
             boolean crownPresent = false, mawPresent = false, neuraloopPresent = false, oraclePresent = false;
             for (Player p : game.getRealPlayers()) {
-                crownPresent |= p.hasRelic("mawofworlds");
+                crownPresent |= p.hasRelic("emphidia");
                 mawPresent |= p.hasRelic("mawofworlds");
                 neuraloopPresent |= p.hasRelic("neuraloop");
                 oraclePresent |= p.hasLeader("naaluHero");

@@ -164,8 +164,8 @@ public class CombatModHelper {
                             tile,
                             player,
                             opponent,
-                            opponentUnitsByQuantity,
                             unitsByQuantity,
+                            opponentUnitsByQuantity,
                             game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
                 String relicName = "specialized_augmentations".equals(relic)
