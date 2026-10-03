@@ -79,6 +79,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.AugersAgent;
 import ti4.service.map.FractureService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
@@ -512,7 +513,7 @@ public class ExploreService {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
-                            "exhaustAgent_augersagent_" + player.getFaction(),
+                            AugersAgent.buttonId(player),
                             "Use Ilyxum Agent on " + player.getColor(),
                             FactionEmojis.augers));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
