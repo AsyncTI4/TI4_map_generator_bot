@@ -203,7 +203,7 @@ public class AddPlanetService {
                             && !player_.getExhaustedPlanets().contains(planet)
                             && "action".equalsIgnoreCase(game.getPhaseOfGame())
                             && ButtonHelper.checkForTechSkips(game, planet)
-                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player_.getTg() + 1)) {
                         player_.exhaustPlanet(planet);
                         MessageHelper.sendMessageToChannel(
                                 player_.getCorrectChannel(),

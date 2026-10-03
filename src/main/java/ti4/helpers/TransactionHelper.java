@@ -410,23 +410,21 @@ public class TransactionHelper {
 
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
-            if ((p1.hasAbility("pillage")
-                            && !game.isTwilightsFallMode()
-                            && !game.getStoredValue("willPillageOwnTransactions" + p1.getFaction())
-                                    .isEmpty())
-                    || (p2.hasAbility("pillage")
-                            && !game.isTwilightsFallMode()
-                            && !game.getStoredValue("willPillageOwnTransactions" + p2.getFaction())
-                                    .isEmpty())) {
-
-            } else {
-                ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
             }
             CommanderUnlockCheckService.checkPlayer(p1, "hacan");
             CommanderUnlockCheckService.checkPlayer(p2, "hacan");
         }
+    }
+
+    static boolean hasOptedOutOfOwnTransactionPillage(Game game, Player player) {
+        return player.hasAbility("pillage")
+                && !game.isTwilightsFallMode()
+                && !game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
+                        .isEmpty();
     }
 
     private static void announceFogRatification(Game game, Player p1, Player p2, String publicSummary) {
