@@ -43,11 +43,19 @@ class MatchDescriber {
 
     static void logFormedMatch(
             MatchedGame game, Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
-        double matchQuality = MatchQualityCalculator.matchQuality(game.members(), playerMatchmakingData);
+        MatchQualityCalculator.Result quality = MatchQualityCalculator.calculate(game.members(), playerMatchmakingData);
+        Duration maxWait = MatchQualityGate.maxQueueWait(game.members(), playerMatchmakingData);
+        double threshold = MatchQualityGate.currentThreshold(maxWait);
+        boolean wouldBlock = MatchQualityGate.wouldBlock(quality.normalized(), maxWait);
         StringBuilder log = new StringBuilder(" Matchmade: ")
                 .append("\n``` • ")
                 .append(threadTitle(game))
-                .append(" — match quality %.1f%%".formatted(matchQuality * 100));
+                .append(" — match quality %.1f%% · balance %.0f%% (gate %.0f%%%s)"
+                        .formatted(
+                                quality.raw() * 100,
+                                quality.normalized() * 100,
+                                threshold * 100,
+                                wouldBlock ? " — WOULD BLOCK" : ""));
         for (MatchmakingQueueMember member : game.members()) {
             log.append("\n  • ").append(describePlayer(playerMatchmakingData.get(member)));
         }
