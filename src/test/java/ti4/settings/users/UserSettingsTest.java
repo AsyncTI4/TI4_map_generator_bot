@@ -37,6 +37,42 @@ class UserSettingsTest {
                 .isEqualTo("Not enough data.");
     }
 
+    @Test
+    void addActiveHourCheckinsAddsBufferedCountsToStoredCounts() {
+        UserSettings settings = new UserSettings();
+        settings.setActiveHours(buildActivity(2, 3, 10));
+        int[] buffered = new int[24];
+        buffered[3] = 4;
+        buffered[23] = 1;
+
+        settings.addActiveHourCheckins(buffered);
+
+        assertThat(settings.getActiveHours()).isEqualTo(buildActivity(2, 3, 14, 23, 3));
+    }
+
+    @Test
+    void addActiveHourCheckinsStartsFromZeroWhenNoHistory() {
+        UserSettings settings = new UserSettings();
+        int[] buffered = new int[24];
+        buffered[0] = 5;
+
+        settings.addActiveHourCheckins(buffered);
+
+        assertThat(settings.getActiveHours()).isEqualTo(buildActivity(0, 0, 5));
+    }
+
+    @Test
+    void addActiveHourCheckinsIsIgnoredWhenTrackingIsOff() {
+        UserSettings settings = new UserSettings();
+        settings.setActivityTracking(false);
+        int[] buffered = new int[24];
+        buffered[0] = 5;
+
+        settings.addActiveHourCheckins(buffered);
+
+        assertThat(settings.getActiveHours()).isNull();
+    }
+
     private static String buildActivity(int base, int... updates) {
         int[] hours = new int[24];
         Arrays.fill(hours, base);
