@@ -82,6 +82,7 @@ import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
+import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
 public class JdaService {
@@ -652,6 +653,7 @@ public class JdaService {
             logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
             logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
             logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
+            logShutdownResult(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline.shutdown());
             logShutdownResult(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline.shutdown());
 
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
