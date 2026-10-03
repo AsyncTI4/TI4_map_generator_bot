@@ -160,7 +160,7 @@ class ButtonRuntimeWarningService {
     }
 
     synchronized double getThresholdMissPercent() {
-        return runtimeSubmissionCount == 0 ? 0 : runtimeThresholdMissCount / (double) runtimeSubmissionCount;
+        return runtimeSubmissionCount == 0 ? 0 : 100.0 * runtimeThresholdMissCount / runtimeSubmissionCount;
     }
 
     private record ThresholdWarningReason(String occurredAt, String buttonRepresentation, String totalRuntime) {}
