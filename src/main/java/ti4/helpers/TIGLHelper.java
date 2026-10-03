@@ -19,17 +19,28 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
+import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.tigl.TiglPlayerRankHistory;
+import ti4.service.tigl.TiglRankHistoryService;
 
 public final class TIGLHelper {
+
+    private static final String RANK_SNAPSHOT_TASK = "tiglRankSnapshot-";
+    public static final String RETRY_RANK_SNAPSHOT_BUTTON = "tiglRetryRankSnapshot";
 
     private enum TIGLLadder {
         STANDARD,
@@ -156,7 +167,10 @@ public final class TIGLHelper {
             if (isBlank(id)) return null;
             String normalizedInput = normalizeRankId(id);
             for (TIGLRank rank : values()) {
-                if (id.equals(rank.toString()) || normalizedInput.equals(normalizeRankId(rank.toString()))) {
+                if (id.equals(rank.toString())
+                        || normalizedInput.equals(normalizeRankId(rank.toString()))
+                        || normalizedInput.equals(normalizeRankId(rank.getName()))
+                        || normalizedInput.equals(normalizeRankId(rank.getShortName()))) {
                     return rank;
                 }
             }
@@ -196,46 +210,161 @@ public final class TIGLHelper {
         return tiglProblem;
     }
 
-    public static void initializeTIGLGame(Game game) {
-        initializeTIGLGame(game, isFracturedTIGLGame(game));
+    public static void initializeTIGLGame(Game game, boolean isFractured) {
+        if (!markAsTIGLGame(game, isFractured)) {
+            return;
+        }
+        initializeRanksAsync(game, game.getTableTalkOrActionsChannel());
     }
 
-    public static void initializeTIGLGame(Game game, boolean isFractured) {
+    public static boolean markAsTIGLGame(Game game, boolean isFractured) {
+        if (!game.canBeCompetitiveTIGLGame(isFractured)) {
+            return false;
+        }
+        boolean wasAlreadyTiglGame = game.isCompetitiveTIGLGame();
         if (isFractured) {
             addFracturedTag(game);
         } else {
             removeFracturedTag(game);
         }
         game.setCompetitiveTIGLGame(true);
-        if (!game.isCompetitiveTIGLGame()) {
-            return;
+        if (!wasAlreadyTiglGame) {
+            sendTIGLSetupText(game);
         }
-        sendTIGLSetupText(game);
-        setTIGLRankSnapshotAtSetup(game, isFractured);
+        return true;
     }
 
-    private static void setTIGLRankSnapshotAtSetup(Game game, boolean isFractured) {
-        // Dummies (the neutral "Dicecord" player) are bot accounts, not league participants - including them
-        // would permanently report the game as having non-hub members and disable rank handling.
-        List<Player> rankedPlayers = game.getPlayers().values().stream()
-                .filter(player -> !player.isDummy())
-                .toList();
-        if (rankedPlayers.isEmpty()) {
-            // getLowestCommonRankBetweenPlayers starts at the *top* rank and walks down, so an empty list would
-            // record Hero/Archon as the game's minimum rank and draw that badge on the map.
+    public static TIGLRank rankAtGameStartFor(Game game, String userId) {
+        Long discordUserId = parseDiscordUserId(userId);
+        if (discordUserId == null) {
+            return TIGLRank.UNRANKED;
+        }
+        try {
+            Map<Long, TiglPlayerRankHistory> histories = TiglRankHistoryService.fetchHistories(List.of(discordUserId));
+            String league = TiglRankHistoryService.leagueFor(isFracturedTIGLGame(game));
+            return TiglRankHistoryService.rankAtTimestamp(
+                            histories.get(discordUserId), league, game.getCreationDateTime())
+                    .map(TIGLHelper::resolveLeagueRankName)
+                    .filter(Objects::nonNull)
+                    .orElse(TIGLRank.UNRANKED);
+        } catch (Exception e) {
+            BotLogger.error(
+                    Constants.lazikPing() + " " + Constants.niuPing() + " TIGL rank lookup failed for user " + userId
+                            + " in game " + game.getName() + ": " + e.getMessage(),
+                    e);
+            return null;
+        }
+    }
+
+    public static boolean isBelowGameRank(Game game, TIGLRank rank) {
+        TIGLRank minimum = game.getMinimumTIGLRankAtGameStart();
+        return minimum != null && rank != null && rank.getIndex() < minimum.getIndex();
+    }
+
+    public static void initializeRanksAsync(Game game, MessageChannel channel) {
+        List<Long> discordUserIds = discordUserIds(game.getRealPlayers());
+        if (!game.isCompetitiveTIGLGame() || discordUserIds.isEmpty()) {
             return;
         }
-        List<User> users = rankedPlayers.stream().map(Player::getUser).toList();
-        if (!allUsersAreMembersOfHubServer(users)) {
-            String message =
-                    "Warning - there are players here who are not members of the AsyncTI4 HUB server. Automatic TIGL rank handling will not work.";
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+        String gameName = game.getName();
+        boolean isFractured = isFracturedTIGLGame(game);
+        ExecutorServiceManager.runAsync(
+                RANK_SNAPSHOT_TASK + gameName, () -> snapshotRanks(gameName, isFractured, discordUserIds, channel));
+    }
+
+    private static void snapshotRanks(
+            String gameName, boolean isFractured, List<Long> discordUserIds, MessageChannel channel) {
+        Map<Long, TiglPlayerRankHistory> histories;
+        try {
+            histories = TiglRankHistoryService.fetchHistories(discordUserIds);
+        } catch (Exception e) {
+            offerRetry(gameName, channel, e);
             return;
         }
-        TIGLRank lowestRank = getLowestCommonRankBetweenPlayers(users, isFractured);
+        ExecutionLockManager.lock(gameName, ExecutionLockType.WRITE);
+        try {
+            recordRanks(gameName, isFractured, histories);
+        } finally {
+            ExecutionLockManager.unlock(gameName, ExecutionLockType.WRITE);
+        }
+    }
+
+    private static void recordRanks(String gameName, boolean isFractured, Map<Long, TiglPlayerRankHistory> histories) {
+        Game game = GameManager.reload(gameName);
+        if (game == null || !game.isCompetitiveTIGLGame()) {
+            return;
+        }
+        List<Player> players = game.getRealPlayers();
+        if (players.isEmpty()) {
+            return;
+        }
+        String league = TiglRankHistoryService.leagueFor(isFractured);
+        long gameStart = game.getCreationDateTime();
+        TIGLRank lowestRank = null;
+        for (Player player : players) {
+            TIGLRank rank = rankAtGameStart(histories, player, league, gameStart);
+            player.setPlayerTIGLRankAtGameStart(rank);
+            if (lowestRank == null || rank.getIndex() < lowestRank.getIndex()) {
+                lowestRank = rank;
+            }
+        }
         game.setMinimumTIGLRankAtGameStart(lowestRank);
-        for (Player player : rankedPlayers) {
-            player.setPlayerTIGLRankAtGameStart(getUsersHighestTIGLRank(player.getUser(), isFractured));
+        GameManager.save(game, "TIGL rank snapshot");
+    }
+
+    private static void offerRetry(String gameName, MessageChannel channel, Exception cause) {
+        BotLogger.error(
+                Constants.lazikPing() + " " + Constants.niuPing() + " TIGL rank lookup failed for game " + gameName
+                        + ": " + cause.getMessage(),
+                cause);
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                "The TIGL league could not be reached, so this game has no ranks recorded yet.",
+                List.of(Buttons.green(RETRY_RANK_SNAPSHOT_BUTTON, "Retry the league lookup"), Buttons.CANCEL));
+    }
+
+    static TIGLRank rankAtGameStart(
+            Map<Long, TiglPlayerRankHistory> histories, Player player, String league, long gameStart) {
+        Long discordUserId = parseDiscordUserId(player.getUserID());
+        if (discordUserId == null) {
+            return TIGLRank.UNRANKED;
+        }
+        return TiglRankHistoryService.rankAtTimestamp(histories.get(discordUserId), league, gameStart)
+                .map(name -> resolveOrReport(name, player))
+                .orElse(TIGLRank.UNRANKED);
+    }
+
+    private static TIGLRank resolveOrReport(String rankName, Player player) {
+        TIGLRank rank = resolveLeagueRankName(rankName);
+        if (rank != null) {
+            return rank;
+        }
+        BotLogger.warning("TIGL rank name \"" + rankName + "\" did not map to a ladder rank, so " + player.getUserName()
+                + " was recorded as Unranked.");
+        return TIGLRank.UNRANKED;
+    }
+
+    static TIGLRank resolveLeagueRankName(String rankName) {
+        TIGLRank direct = TIGLRank.fromString(rankName);
+        if (direct != null) {
+            return direct;
+        }
+        String ladderRank = StringUtils.substringBetween(rankName, "(", ")");
+        return ladderRank == null ? null : TIGLRank.fromString(ladderRank);
+    }
+
+    private static List<Long> discordUserIds(List<Player> players) {
+        return players.stream()
+                .map(player -> parseDiscordUserId(player.getUserID()))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private static Long parseDiscordUserId(String userId) {
+        try {
+            return Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 
@@ -245,7 +374,7 @@ public final class TIGLHelper {
                 + "Please ensure you have all read the TIGL [Code of Conduct](https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0#heading=h.v2yzcvem3ohu)\n"
                 + "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct.\n\n"
                 + "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n and the [Rules Document](https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0)";
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+        MessageHelper.sendMessageToChannel(game.getTableTalkOrActionsChannel(), message);
     }
 
     private static List<TIGLRank> getAllTIGLRanks() {
@@ -327,21 +456,6 @@ public final class TIGLHelper {
             return TIGLRank.UNRANKED;
         }
         return ranks.getLast();
-    }
-
-    private static boolean allUsersAreMembersOfHubServer(List<User> users) {
-        for (User user : users) {
-            // Player.getUser() returns null when JDA can't resolve the id (uncached user, left the server).
-            // Such a player can't be confirmed as a hub member - and dereferencing it here used to NPE.
-            if (user == null) {
-                return false;
-            }
-            Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
-            if (hubMember == null) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private static void promoteUser(User user, TIGLRank toRank) {

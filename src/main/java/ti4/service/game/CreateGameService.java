@@ -50,6 +50,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
+import ti4.service.tigl.TiglSetupService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
 
@@ -142,12 +143,15 @@ public class CreateGameService {
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
+        boolean isTiglGame = TiglSetupService.looksLikeTiglGame(gameFunName);
         if (event.getChannel() instanceof ThreadChannel thread) {
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")
-                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
-                gameFunName = "TIGL " + gameFunName;
-            }
+            isTiglGame = isTiglGame
+                    || TiglSetupService.looksLikeTiglGame(thread.getName())
+                    || CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equals(
+                            thread.getParentChannel().getName());
+        }
+        if (isTiglGame && !StringUtils.startsWithIgnoreCase(gameFunName, "tigl")) {
+            gameFunName = "TIGL " + gameFunName;
         }
 
         // ADD PLAYERS
@@ -241,6 +245,11 @@ public class CreateGameService {
 
         presentSetupToPlayers(newGame);
 
+        if (isTiglGame) {
+            TIGLHelper.markAsTIGLGame(newGame, false);
+            TiglSetupService.postLadderPrompt(newGame, newGame.getTableTalkOrActionsChannel());
+        }
+
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
                 && ("making-new-games".equals(thread.getParentChannel().getName())
@@ -250,11 +259,6 @@ public class CreateGameService {
                         || "making-superfast-games"
                                 .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")
-                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
-                TIGLHelper.initializeTIGLGame(newGame);
-            }
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);

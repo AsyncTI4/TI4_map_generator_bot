@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "discordUserId": 111111111111111111,
+        "currentRanks": { "standard": "Hero", "fractured": "Acolyte", "legacy": "Unranked" },
+        "ranks": [
+          { "date": "2025-12-01", "league": "Standard", "rankName": "Unranked", "duration": 0, "gameId": "" },
+          { "date": "2026-01-15", "league": "Standard", "rankName": "Minister", "duration": 45, "gameId": "pbd1234" },
+          { "date": "2026-03-02", "league": "Standard", "rankName": "Galactic Threat II (Hero)", "duration": 1, "gameId": "pbd5678" },
+          { "date": "2026-04-21", "league": "Fractured", "rankName": "Acolyte", "duration": 12, "gameId": "pbd9012" },
+          { "date": "2026-05-05", "league": "Legacy", "rankName": "Unranked", "duration": 3, "gameId": "" }
+        ]
+      }
+    ]
+  },
+  "problemDetails": { "type": "", "title": "", "status": null, "detail": "", "instance": "" }
+}
