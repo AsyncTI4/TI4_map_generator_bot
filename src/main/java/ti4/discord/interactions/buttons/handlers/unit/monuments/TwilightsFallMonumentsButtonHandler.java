@@ -343,17 +343,7 @@ public class TwilightsFallMonumentsButtonHandler {
         if (!game.isMonumentsMode() || !player.hasUnit("yellowtf_monument")) {
             return false;
         }
-        int commandTokenLimit = 16;
-        if (!game.getStoredValue("ccLimit").isBlank()) {
-            commandTokenLimit = Integer.parseInt(game.getStoredValue("ccLimit"));
-        }
-        if (!game.getStoredValue("ccLimit" + player.getColor()).isBlank()) {
-            commandTokenLimit = Integer.parseInt(game.getStoredValue("ccLimit" + player.getColor()));
-        }
-        if (player.hasRelic("endurance_steroids")) {
-            commandTokenLimit += 2;
-        }
-        return Helper.getCCCount(game, player.getColor()) < commandTokenLimit;
+        return Helper.getCCCount(game, player.getColor()) < player.getCommandTokenLimit();
     }
 
     public static void offerYellowTfMonumentCommandToken(Game game, Player player) {

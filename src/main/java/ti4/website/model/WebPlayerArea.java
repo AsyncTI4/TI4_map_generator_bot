@@ -564,16 +564,8 @@ public class WebPlayerArea {
         if (playerColor == null) {
             return 0;
         }
-        // Default CC limit is 16 in TI4
-        int ccLimit = 16;
-        if (!game.getStoredValue("ccLimit").isEmpty()) {
-            ccLimit = Integer.parseInt(game.getStoredValue("ccLimit"));
-        }
-        if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
-            ccLimit = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
-        }
         int ccCount = Helper.getCCCount(game, playerColor);
-        int remainingReinforcements = ccLimit - ccCount;
+        int remainingReinforcements = player.getCommandTokenLimit() - ccCount;
         return Math.max(0, remainingReinforcements);
     }
 
