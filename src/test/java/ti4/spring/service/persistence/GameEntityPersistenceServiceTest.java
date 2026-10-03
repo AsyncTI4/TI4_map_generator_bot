@@ -1,15 +1,12 @@
 package ti4.spring.service.persistence;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -76,50 +73,5 @@ class GameEntityPersistenceServiceTest {
         // An existing user keeps its real name; a brand new unknown user still gets a row so its players can
         // reference it.
         verify(userEntityRepository).saveAll(List.of(known, unknownNew));
-    }
-
-    @Test
-    void replaceSkipsSnapshotOlderThanTheStoredGame() {
-        GameEntity game = new GameEntity();
-        game.setGameName("pbd1");
-        game.setSyncVersion(5L);
-        when(gameEntityRepository.findSyncVersionByGameName("pbd1")).thenReturn(Optional.of(6L));
-
-        service.replace(new GameEntitySnapshot(game, List.of(new UserEntity("1", "alice")), List.of()));
-
-        // A save that reached the queue after a newer one must not overwrite it.
-        verify(gameEntityRepository, never()).save(any());
-        verify(gameEntityRepository, never()).deleteByGameName(anyString());
-        verify(userEntityRepository, never()).saveAll(any());
-    }
-
-    @Test
-    void replaceWritesSnapshotThatIsNotOlderThanTheStoredGame() {
-        GameEntity game = new GameEntity();
-        game.setGameName("pbd1");
-        game.setSyncVersion(6L);
-        when(gameEntityRepository.findSyncVersionByGameName("pbd1")).thenReturn(Optional.of(6L));
-
-        service.replace(new GameEntitySnapshot(game, List.of(), List.of()));
-
-        verify(gameEntityRepository).save(game);
-    }
-
-    @Test
-    void deleteUnlessNewerKeepsNewerGame() {
-        when(gameEntityRepository.findSyncVersionByGameName("pbd1")).thenReturn(Optional.of(6L));
-
-        service.deleteUnlessNewer("pbd1", 5L);
-
-        verify(gameEntityRepository, never()).deleteByGameName(anyString());
-    }
-
-    @Test
-    void deleteUnlessNewerDeletesOlderOrUnversionedGame() {
-        when(gameEntityRepository.findSyncVersionByGameName("pbd1")).thenReturn(Optional.empty());
-
-        service.deleteUnlessNewer("pbd1", 5L);
-
-        verify(gameEntityRepository).deleteByGameName("pbd1");
     }
 }

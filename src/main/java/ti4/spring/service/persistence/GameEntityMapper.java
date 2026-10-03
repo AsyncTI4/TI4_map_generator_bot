@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GameDatabaseSyncVersion;
 import ti4.helpers.TIGLHelper;
 import ti4.service.map.FractureService;
 
@@ -61,17 +60,11 @@ public class GameEntityMapper {
         gameEntity.setThundersEdge(game.isThundersEdge());
         gameEntity.setTwilightsFall(game.isTwilightsFallMode());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
-        gameEntity.setSyncVersion(syncVersion(game));
 
         for (Player player : game.getRealAndEliminatedPlayers()) {
             gameEntity.getPlayers().add(toPlayerEntity(player, gameEntity, users));
         }
         return gameEntity;
-    }
-
-    public static long syncVersion(Game game) {
-        long version = game.getDatabaseSyncVersion();
-        return version == 0 ? GameDatabaseSyncVersion.next() : version;
     }
 
     private static Long getEndedDate(Game game) {

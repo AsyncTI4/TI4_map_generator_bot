@@ -30,8 +30,7 @@ public class GameDatabaseSyncPipeline {
         if (game == null || DatabasePersistenceGate.isDisabled()) return;
         try {
             if (!GameEntityMapper.shouldPersist(game)) {
-                long syncVersion = GameEntityMapper.syncVersion(game);
-                queue(game.getName(), service -> service.deleteUnlessNewer(game.getName(), syncVersion));
+                queueDelete(game.getName());
                 return;
             }
             GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
