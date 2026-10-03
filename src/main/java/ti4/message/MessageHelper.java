@@ -53,6 +53,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -1281,7 +1282,7 @@ public class MessageHelper {
                 || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(threadName)
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
@@ -1300,7 +1301,7 @@ public class MessageHelper {
         if (messages.isEmpty()) return;
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(threadName)
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(
                             500,
@@ -1327,7 +1328,7 @@ public class MessageHelper {
         }
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(threadName)
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(
                             500,
@@ -1339,7 +1340,7 @@ public class MessageHelper {
                                     error));
         } else if (channel instanceof ThreadChannel thread) {
             if (embeds.size() > 8 && thread.getParentChannel() instanceof TextChannel chan) {
-                chan.createThreadChannel(threadName)
+                chan.createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                         .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                         .queueAfter(
                                 500,

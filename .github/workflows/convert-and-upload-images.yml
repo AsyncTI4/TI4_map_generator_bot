@@ -2,6 +2,12 @@ name: Convert and Upload Images to S3
 
 on:
   workflow_dispatch:
+    inputs:
+      check_size:
+        description: Re-upload files when their size differs from S3
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - master
@@ -37,8 +43,14 @@ jobs:
           aws-region: us-east-1
 
       - name: Convert and upload images and data to S3
+        env:
+          CHECK_SIZE: ${{ inputs.check_size }}
         run: |
-          python scripts/convert_and_upload_to_s3.py
+          if [ "$CHECK_SIZE" = "true" ]; then
+            python scripts/convert_and_upload_to_s3.py --check-size
+          else
+            python scripts/convert_and_upload_to_s3.py
+          fi
 
       - name: Report results
         if: always()

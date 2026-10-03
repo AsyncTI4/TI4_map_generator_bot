@@ -63,6 +63,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButto
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.game.helper.StoredValueHelper;
@@ -131,6 +132,7 @@ import ti4.settings.users.UserSettingsManager;
 public class Player extends PlayerProperties implements StoredValueHelper {
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
+    private static final int DEFAULT_COMMAND_TOKEN_LIMIT = 16;
 
     @Getter
     private final Game game;
@@ -706,9 +708,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         String userName = getUserName().replace("/", "");
-        String threadName = game.isFowMode()
-                ? String.format("%s-cards-info-%s-private", game.getName(), userName)
-                : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
+        String threadName = DiscordThreadUtility.fitThreadName(
+                game.isFowMode()
+                        ? String.format("%s-cards-info-%s-private", game.getName(), userName)
+                        : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName));
 
         ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 
@@ -845,6 +848,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             // return 0;
         }
         return unitCaps.get(unit);
+    }
+
+    public int getCommandTokenLimit() {
+        int limit = DEFAULT_COMMAND_TOKEN_LIMIT;
+        String globalOverride = game.getStoredValue("ccLimit");
+        if (!globalOverride.isBlank()) {
+            limit = Integer.parseInt(globalOverride.trim());
+        }
+        String colorOverride = game.getStoredValue("ccLimit" + getColor());
+        if (!colorOverride.isBlank()) {
+            limit = Integer.parseInt(colorOverride.trim());
+        }
+        if (hasRelic("endurance_steroids")) {
+            limit += 2;
+        }
+        return limit;
     }
 
     public void setUnitCap(String unit, int cap) {
