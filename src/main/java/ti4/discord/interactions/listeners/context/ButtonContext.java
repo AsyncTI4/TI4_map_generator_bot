@@ -12,7 +12,7 @@ public class ButtonContext extends ListenerContext {
 
     @JsonIgnore
     public String getButtonID() {
-        return componentID;
+        return getComponentID();
     }
 
     public ButtonInteractionEvent getEvent() {
@@ -33,13 +33,11 @@ public class ButtonContext extends ListenerContext {
         // Proceed with additional button things
         messageID = event.getMessageId();
 
-        if (componentID.contains("deleteThisButton")) {
-            componentID = componentID.replace("deleteThisButton", "");
+        if (envelope.deleteButton()) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
 
-        if (componentID.contains("deleteThisMessage")) {
-            componentID = componentID.replace("deleteThisMessage", "");
+        if (envelope.deleteMessage()) {
             ButtonHelper.deleteMessage(event);
         }
     }

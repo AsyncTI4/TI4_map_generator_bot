@@ -524,9 +524,10 @@ public class KairnLeadershandler {
                 : PlanetTargetSpec.of(
                                 player.factionButtonChecker() + SELECT_KAIRN_AGENT_PLANET + agentOwner.getFaction())
                         .requiringController()
-                        .where(planet -> planet.getPlanetTypes().stream().anyMatch(trait -> List.of(
-                                        Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)
-                                .contains(trait)));
+                        .where(planet -> planet.getPlanetTypes().stream()
+                                .anyMatch(
+                                        trait -> List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)
+                                                .contains(trait)));
         if (targetSpec != null && PlanetTargetService.handlePlanetPage(event, game, player, buttonID, targetSpec)) {
             return;
         }

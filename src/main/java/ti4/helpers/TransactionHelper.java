@@ -140,7 +140,11 @@ public class TransactionHelper {
     }
 
     private static boolean canTradeSecrets(Player p1, Player p2, boolean blackMarket) {
-        return blackMarket || p1.hasUnlockedBreakthrough("zooidbt") || p2.hasUnlockedBreakthrough("zooidbt");
+        return blackMarket
+                || p1.hasUnlockedBreakthrough("zooidbt")
+                || p2.hasUnlockedBreakthrough("zooidbt")
+                || p1.hasUnlockedBreakthrough("xinbt")
+                || p2.hasUnlockedBreakthrough("xinbt");
     }
 
     static List<Shortfall> findUncoverableItems(Player offerer, Player accepter, boolean blackMarket) {
@@ -406,23 +410,21 @@ public class TransactionHelper {
 
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
-            if ((p1.hasAbility("pillage")
-                            && !game.isTwilightsFallMode()
-                            && !game.getStoredValue("willPillageOwnTransactions" + p1.getFaction())
-                                    .isEmpty())
-                    || (p2.hasAbility("pillage")
-                            && !game.isTwilightsFallMode()
-                            && !game.getStoredValue("willPillageOwnTransactions" + p2.getFaction())
-                                    .isEmpty())) {
-
-            } else {
-                ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
             }
             CommanderUnlockCheckService.checkPlayer(p1, "hacan");
             CommanderUnlockCheckService.checkPlayer(p2, "hacan");
         }
+    }
+
+    static boolean hasOptedOutOfOwnTransactionPillage(Game game, Player player) {
+        return player.hasAbility("pillage")
+                && !game.isTwilightsFallMode()
+                && !game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
+                        .isEmpty();
     }
 
     private static void announceFogRatification(Game game, Player p1, Player p2, String publicSummary) {

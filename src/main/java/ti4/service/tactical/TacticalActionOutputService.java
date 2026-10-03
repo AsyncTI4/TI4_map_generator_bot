@@ -40,6 +40,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 
 @UtilityClass
 public class TacticalActionOutputService {
@@ -396,6 +397,7 @@ public class TacticalActionOutputService {
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
         if (tile.isNebula(game)
+                && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                 && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")

@@ -419,6 +419,12 @@ public class UnitModelValueInjectionService {
             booleans.isStructure(true);
         }
 
+        if (player.hasUnlockedBreakthrough("atokerabt") && unit.getIsStructure()) {
+            integers.combatHitsOn(7, true);
+            integers.combatDieCount(1, true);
+            booleans.isGroundForce(true).sustainDamage(true);
+        }
+
         if (player.getPlanets().contains("muspelheim") && unit.getUnitType() == UnitType.Pds) {
             integers.productionValue(1);
         }

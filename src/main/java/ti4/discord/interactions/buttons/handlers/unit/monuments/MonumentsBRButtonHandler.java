@@ -539,9 +539,12 @@ public class MonumentsBRButtonHandler {
                                 && tile == MonumentsService.getMonumentTile(game, player, "belkosea_monument"));
     }
 
-    public static boolean ignoresFighterCapacity(Game game, Player player, Tile tile) {
-        return hasArmageddonProjectSuperweapon(game, player, "superweaponglatison")
-                && tile == MonumentsService.getMonumentTile(game, player, "belkosea_monument");
+    public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
+        return game != null
+                && game.getRealPlayersNNeutral().stream()
+                        .anyMatch(other -> other != player
+                                && hasArmageddonProjectSuperweapon(game, other, "superweaponglatison")
+                                && tile == MonumentsService.getMonumentTile(game, other, "belkosea_monument"));
     }
 
     public static void addArmageddonProjectCardsInfoButtons(List<Button> buttons, Game game, Player player) {
@@ -643,6 +646,7 @@ public class MonumentsBRButtonHandler {
                 for (String position : FoWHelper.getAdjacentTiles(game, monumentTile.getPosition(), player, true)) {
                     Tile tile = game.getTileByPosition(position);
                     if (tile != null
+                            && FoWHelper.knowsTile(game, player, tile.getPosition())
                             && (tile.getTileModel() == null
                                     || !tile.getTileModel().isHyperlane())) {
                         buttons.add(Buttons.green(
@@ -666,6 +670,7 @@ public class MonumentsBRButtonHandler {
                 for (Tile tile : game.getTileMap().values()) {
                     if (!tile.getPosition().equals(monumentTile.getPosition())
                             && !adjacent.contains(tile.getPosition())
+                            && FoWHelper.knowsTile(game, player, tile.getPosition())
                             && (tile.getTileModel() == null
                                     || !tile.getTileModel().isHyperlane())) {
                         buttons.add(Buttons.green(

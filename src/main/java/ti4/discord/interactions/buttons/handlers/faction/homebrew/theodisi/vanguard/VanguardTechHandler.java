@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -80,7 +81,8 @@ public class VanguardTechHandler {
         List<Button> buttons = groundCombat
                 ? List.of(
                         Buttons.green(
-                                opponent.factionButtonChecker() + "autoAssignGroundHits_" + holder.getName() + "_1",
+                                opponent.factionButtonChecker()
+                                        + AutoAssignGroundHitsButtonIds.format(holder.getName(), 1),
                                 "Auto-Assign Hit"),
                         Buttons.red(
                                 opponent.factionButtonChecker()

@@ -43,11 +43,14 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.JotunheimLegendaryService;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -71,6 +74,15 @@ public class EndTurnService {
         return null;
     }
 
+    private static void sendFogTurnSummary(Game game, Player player) {
+        String summary = game.getStoredValue("currentActionSummary" + player.getFaction());
+        if (summary.isEmpty()) return;
+        String turn = "(Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + ") ";
+        GMService.postToActivityThread(game, turn + player.getRepresentationNoPing() + summary);
+        MessageHelper.sendPrivateMessageToPlayer(player, game, "Your turn summary " + turn + summary);
+        game.removeStoredValue("currentActionSummary" + player.getFaction());
+    }
+
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
         if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
@@ -92,6 +104,8 @@ public class EndTurnService {
                     event,
                     "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
                             + player.getRepresentationNoPing() + ".");
+        } else if (game.getFowOption(FOWOption.GM_TURN_MAP)) {
+            GMService.refreshMapInActivityThread(game);
         }
     }
 
@@ -99,7 +113,8 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    private static void resetStoredValuesEndOfTurn(Game game, Player player) {
+    private static void resetStoredValuesEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        AtokeraHeroButton.returnCommittedShips(event, game, player);
         AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
         AeternaUnitsHandler.clearCryptActionState(game);
@@ -148,7 +163,7 @@ public class EndTurnService {
     public static void pingNextPlayer(
             GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         MonumentsButtonHandler.offerFireflyReplacement(game, mainPlayer);
-        resetStoredValuesEndOfTurn(game, mainPlayer);
+        resetStoredValuesEndOfTurn(event, game, mainPlayer);
 
         var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
 
@@ -299,6 +314,9 @@ public class EndTurnService {
                     game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
                 }
             }
+        }
+        if (FoWHelper.isFogQol01(game)) {
+            sendFogTurnSummary(game, mainPlayer);
         }
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {

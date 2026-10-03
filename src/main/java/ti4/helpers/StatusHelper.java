@@ -48,6 +48,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.PlanetEmojis;
+import ti4.service.fow.FowScoringStatusService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -462,6 +463,10 @@ public final class StatusHelper {
         }
         MessageHelper.sendMessageToChannelWithPersistentReacts(
                 gameChannel, messageText, game, poButtons, GameMessageType.STATUS_SCORING);
+        if (FoWHelper.isFogQol01(game)) {
+            offerEdynCommanderDrawPrivately(game);
+            FowScoringStatusService.postForAllPlayers(game);
+        }
 
         boolean allReacted = true;
         for (Player player : game.getRealPlayers()) {
@@ -870,6 +875,26 @@ public final class StatusHelper {
         }
     }
 
+    private static void offerEdynCommanderDrawPrivately(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (!game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander")
+                    || player.getPrivateChannel() == null) {
+                continue;
+            }
+            List<Button> buttons = List.of(
+                    Buttons.gray(
+                            player.factionButtonChecker() + "edynCommanderSODraw",
+                            "Draw Secret Objective Instead of Scoring Public Objective",
+                            FactionEmojis.edyn),
+                    Buttons.DONE_DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getPrivateChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", you may use Kadryn, the Edyn commander, to draw a secret objective instead of scoring a public objective.",
+                    buttons);
+        }
+    }
+
     private static List<Button> getScoreObjectiveButtons(Game game) {
         return getScoreObjectiveButtons(game, "");
     }
@@ -995,11 +1020,18 @@ public final class StatusHelper {
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged() + " is the one the game is currently waiting on.";
                 }
+                if (FoWHelper.isFogQol01(game)) {
+                    GMService.logPlayerActivity(
+                            game,
+                            player2,
+                            player2.getRepresentationNoPing() + " is blocking the public objective scoring queue.");
+                }
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
                     if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                         game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "Queued");
+                        FowScoringStatusService.refresh(game, player);
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
@@ -1076,8 +1108,16 @@ public final class StatusHelper {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";
                         }
+                        if (FoWHelper.isFogQol01(game)) {
+                            GMService.logPlayerActivity(
+                                    game,
+                                    player2,
+                                    player2.getRepresentationNoPing()
+                                            + " is blocking the secret objective scoring queue.");
+                        }
                         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");
+                            FowScoringStatusService.refresh(game, player);
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
                         int soIndex = Integer.parseInt(soID);

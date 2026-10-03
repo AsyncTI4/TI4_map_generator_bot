@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -175,7 +176,7 @@ public class PonthousAbilityHandler {
             List<Button> hitButtons = new ArrayList<>();
             if (!"space".equals(holder.getName())) {
                 hitButtons.add(Buttons.green(
-                        opponent.factionButtonChecker() + "autoAssignGroundHits_" + holder.getName() + "_" + hits,
+                        opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(holder.getName(), hits),
                         "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
                 hitButtons.add(Buttons.red(
                         opponent.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()

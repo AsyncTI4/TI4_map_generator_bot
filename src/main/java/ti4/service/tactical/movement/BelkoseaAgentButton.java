@@ -13,6 +13,7 @@ public final class BelkoseaAgentButton implements MoveAbilityButton {
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(Buttons.gray("exhaustAgent_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
+        return List.of(Buttons.gray(
+                ctx.player.factionButtonChecker() + "useBelkoseaAgent", "Use Belkosea Agent", FactionEmojis.belkosea));
     }
 }
