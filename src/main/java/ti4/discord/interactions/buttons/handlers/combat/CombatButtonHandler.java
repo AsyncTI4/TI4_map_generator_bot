@@ -262,14 +262,15 @@ class CombatButtonHandler {
 
     @ButtonHandler("cancelGroundHits_")
     public static void cancelGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        boolean interlocking = buttonID.endsWith("_interlocking");
-        if (interlocking && !VanguardAbilitiesHandler.useInterlockingShields(game, player, tile)) {
+        CancelGroundHitsButtonId cancelId = CancelGroundHitsButtonId.parse(buttonID);
+        Tile tile = game.getTileByPosition(cancelId.tilePosition());
+        if (cancelId.interlocking() && !VanguardAbilitiesHandler.useInterlockingShields(game, player, tile)) {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
-        int originalHits = Integer.parseInt(buttonID.split("_")[2]);
+        int originalHits = cancelId.hits();
         int h = originalHits - 1;
+        String planet = cancelId.planet();
 
         if (originalHits > 0) {
             MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
@@ -280,12 +281,12 @@ class CombatButtonHandler {
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
-                factionChecker + AutoAssignGroundHitsButtonIds.format(tile.getPosition(), h),
+                factionChecker + AutoAssignGroundHitsButtonIds.format(planet, h),
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
-        buttons.add(Buttons.gray("cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        buttons.add(Buttons.gray(CancelGroundHitsButtonId.of(tile.getPosition(), h, planet), "Cancel a Hit"));
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelGroundHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                 buttons, game, player, tile, "ground", h);

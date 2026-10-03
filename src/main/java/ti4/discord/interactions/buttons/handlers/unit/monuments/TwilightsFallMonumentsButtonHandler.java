@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -464,16 +465,20 @@ public class TwilightsFallMonumentsButtonHandler {
         if (remainingHits > 0) {
             switch (hitType[0]) {
                 case "ground" -> {
-                    buttons.add(Buttons.green(
-                            factionChecker
-                                    + AutoAssignGroundHitsButtonIds.format(
-                                            (hitType.length == 2 ? hitType[1] : tile.getPosition()), remainingHits),
-                            "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
+                    boolean knownPlanet = hitType.length == 2;
+                    if (knownPlanet) {
+                        buttons.add(Buttons.green(
+                                factionChecker + AutoAssignGroundHitsButtonIds.format(hitType[1], remainingHits),
+                                "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
+                    }
                     buttons.add(Buttons.red(
                             "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                             "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
-                    buttons.add(Buttons.gray(
-                            "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
+                    if (knownPlanet) {
+                        buttons.add(Buttons.gray(
+                                CancelGroundHitsButtonId.of(tile.getPosition(), remainingHits, hitType[1]),
+                                "Cancel a Hit"));
+                    }
                 }
                 case "space" -> {
                     buttons.add(Buttons.green(
