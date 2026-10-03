@@ -140,7 +140,11 @@ public class TransactionHelper {
     }
 
     private static boolean canTradeSecrets(Player p1, Player p2, boolean blackMarket) {
-        return blackMarket || p1.hasUnlockedBreakthrough("zooidbt") || p2.hasUnlockedBreakthrough("zooidbt");
+        return blackMarket
+                || p1.hasUnlockedBreakthrough("zooidbt")
+                || p2.hasUnlockedBreakthrough("zooidbt")
+                || p1.hasUnlockedBreakthrough("xinbt")
+                || p2.hasUnlockedBreakthrough("xinbt");
     }
 
     static List<Shortfall> findUncoverableItems(Player offerer, Player accepter, boolean blackMarket) {

@@ -523,7 +523,9 @@ public final class AgendaHelper {
                                 nextInLine.getPrivateChannel(),
                                 AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n ");
                         MessageHelper.sendMessageToChannelWithButtons(
-                                nextInLine.getPrivateChannel(), "\n " + realIdentity + message, buttons);
+                                nextInLine.getPrivateChannel(),
+                                "\n " + realIdentity + message + ownVoteTotalLine(game, nextInLine),
+                                buttons);
                         player.getCorrectChannel()
                                 .sendMessage("Notified next in line")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -826,7 +828,8 @@ public final class AgendaHelper {
             List<Button> buttons = List.of(vote, abstain, forcedAbstain);
             if (game.isFowMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
-                    MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            nextInLine.getPrivateChannel(), message + ownVoteTotalLine(game, nextInLine), buttons);
                     game.getMainGameChannel()
                             .sendMessage("Voting started. Notified first in line")
                             .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1451,6 +1454,11 @@ public final class AgendaHelper {
             }
         }
         return losers;
+    }
+
+    private static String ownVoteTotalLine(Game game, Player player) {
+        if (!FoWHelper.isFogQol01(game)) return "";
+        return "\nYou have " + getVoteTotal(player, game)[0] + " votes available.";
     }
 
     static int[] getVoteTotal(Player player, Game game) {

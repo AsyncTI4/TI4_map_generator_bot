@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -467,7 +468,7 @@ public class TwilightsFallMonumentsButtonHandler {
                     boolean knownPlanet = hitType.length == 2;
                     if (knownPlanet) {
                         buttons.add(Buttons.green(
-                                factionChecker + "autoAssignGroundHits_" + hitType[1] + "_" + remainingHits,
+                                factionChecker + AutoAssignGroundHitsButtonIds.format(hitType[1], remainingHits),
                                 "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
                     }
                     buttons.add(Buttons.red(
@@ -662,7 +663,7 @@ public class TwilightsFallMonumentsButtonHandler {
         }
         List<Button> buttons = List.of(
                 Buttons.green(
-                        target.factionButtonChecker() + "autoAssignGroundHits_" + combatHolder.getName() + "_1",
+                        target.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(combatHolder.getName(), 1),
                         "Auto-assign Hit"),
                 Buttons.red(
                         "getDamageButtons_" + combatTile.getPosition() + "deleteThis_groundcombat",
@@ -744,7 +745,7 @@ public class TwilightsFallMonumentsButtonHandler {
             }
             List<Button> hitButtons = List.of(
                     Buttons.green(
-                            target.factionButtonChecker() + "autoAssignGroundHits_" + planet.getName() + "_2",
+                            target.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(planet.getName(), 2),
                             "Auto-assign 2 Hits"),
                     Buttons.red(
                             "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",

@@ -48,6 +48,10 @@ import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
+    public static boolean isFogQol01(Game game) {
+        return game.isFowMode() && game.getFowOption(FOWOption.FOG_QOL_01);
+    }
+
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
             return false;

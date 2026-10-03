@@ -45,6 +45,7 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
@@ -1038,7 +1039,7 @@ public class StartPhaseService {
                     Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
-        if (game.isFowMode()) {
+        if (game.isFowMode() && !FoWHelper.isFogQol01(game)) {
             Button draw1AC =
                     Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
             buttons.add(draw1AC);
@@ -1362,7 +1363,7 @@ public class StartPhaseService {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            if (!game.isFowMode()) {
+            if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
 
                 var userSettings = UserSettingsManager.get(p2.getUserID());
                 if (!userSettings.isPrefersPrePassOnSC()) {
@@ -1373,9 +1374,10 @@ public class StartPhaseService {
                         + " Feel free to not do this. **Trade** is never available for this feature due to **Trade** sometimes being mandatory.";
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), preDeclineMsg);
                 for (Integer sc : game.getSCList()) {
-                    if (p2.getSCs().contains(sc)
+                    if (sc <= 0
+                            || p2.getSCs().contains(sc)
                             || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade")
-                            || !scPickedList.contains(sc)) {
+                            || (!game.isFowMode() && !scPickedList.contains(sc))) {
                         continue;
                     }
                     List<Button> scButtons = new ArrayList<>();

@@ -53,12 +53,14 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.unit.AddUnitService;
 
 public final class ButtonHelperSCs {
@@ -290,7 +292,11 @@ public final class ButtonHelperSCs {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Technology**");
             }
             String message = deductCC(game, player, scNum);
-            ReactionService.addReaction(event, game, player, message);
+            if (game.isFowMode()) {
+                reactToStrategyCardMessage(game, player, scNum, message);
+            } else {
+                ReactionService.addReaction(event, game, player, message);
+            }
         }
         Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic Token");
         Button getFleet = Buttons.green("increase_fleet_cc", "Gain 1 Fleet Token");
@@ -480,6 +486,12 @@ public final class ButtonHelperSCs {
                         message +=
                                 " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
                     }
+                }
+                if (FoWHelper.isFogQol01(game)) {
+                    GMService.logPlayerActivity(
+                            game,
+                            player2,
+                            player2.getRepresentationNoPing() + " is blocking the secret objective draw queue.");
                 }
                 game.setStoredValue(key2, game.getStoredValue(key2) + player.getFaction() + "*");
                 break;
@@ -1529,11 +1541,6 @@ public final class ButtonHelperSCs {
         return contains;
     }
 
-    // TODO FoW leak: the scepterE/thardentiag branches below post player.getRepresentationUnfogged() to the
-    // shared SC-follow channel unconditionally (no isFowMode() guard), and the closing reaction always uses the
-    // real player.getFactionEmoji() instead of Helper.getPlayerReactionEmoji()'s fog-safe randomized emoji.
-    // These buttons are offered in FoW games too (see PlayStrategyCardService), so this is reachable. Needs the
-    // same private-channel treatment already applied to MindsieveService/StoneEmbraceService.
     @ButtonHandler("scepterE_follow_")
     @ButtonHandler("mahactA_follow_")
     @ButtonHandler("thardentiag_follow_")
@@ -1549,6 +1556,11 @@ public final class ButtonHelperSCs {
             } catch (NumberFormatException e2) {
                 setStatus = false;
             }
+        }
+        if (setStatus && game.isFowMode() && buttonID.contains("mahact")) {
+            FogTokenRemovalService.startMahactAgent(event, game, player, scNum);
+            ButtonHelper.deleteMessage(event);
+            return;
         }
         if (setStatus) {
             if (!player.getFollowedSCs().contains(scNum)) {
@@ -1606,6 +1618,11 @@ public final class ButtonHelperSCs {
                             + Helper.getSCName(scNum, game) + ".");
             player.exhaustTech("thardentiag");
         }
+        if (game.isFowMode()) {
+            reactToStrategyCardMessage(game, player, scNum, null);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
         if (channel instanceof ThreadChannel) {
@@ -1618,6 +1635,14 @@ public final class ButtonHelperSCs {
                     "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with `/player cc`.");
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void reactToStrategyCardMessage(Game game, Player player, int scNum, String message) {
+        StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), scNum)
+                .ifPresentOrElse(
+                        scMessage ->
+                                ReactionService.addReaction(player, false, message, null, scMessage.messageId(), game),
+                        () -> MessageHelper.sendPrivateMessageToPlayer(player, game, message));
     }
 
     @ButtonHandler("sc_no_follow_")

@@ -29,6 +29,7 @@ import ti4.model.UnitModel;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -471,6 +472,13 @@ public final class RiftUnitsHelper {
         }
         String tilePosition = buttonID.replace("getRiftButtons_", "");
         Tile tile = game.getTileByPosition(tilePosition);
+        if (RealityFieldImpactorService.nullifies(game, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " ignores the gravity-rift effects in "
+                            + tile.getRepresentation() + " due to _Reality-Field Impactor_.");
+            return;
+        }
         MessageChannel channel = player.getCorrectChannel();
         if (player.hasAbility("celestial_guides")) {
             MessageHelper.sendMessageToChannel(

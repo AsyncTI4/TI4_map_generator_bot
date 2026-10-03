@@ -19,6 +19,7 @@ import ti4.message.GameMessage;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
+import ti4.service.fow.FowAutoDeclineService;
 import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -39,7 +40,7 @@ public class FastScFollowCron {
 
         List<String> gameNames = GameManager.getManagedGames().stream()
                 .filter(not(ManagedGame::isHasEnded))
-                .filter(ManagedGame::isFastScFollowMode)
+                .filter(managedGame -> managedGame.isFastScFollowMode() || managedGame.isFogQol01())
                 .map(ManagedGame::getName)
                 .toList();
         ConsumeGameUtility.consumeGames(gameNames, FastScFollowCron::handleFastScFollow, ExecutionLockType.WRITE);
@@ -49,9 +50,16 @@ public class FastScFollowCron {
 
     private static void handleFastScFollow(Game game) {
         try {
-            handleFastScFollowMode(game);
-            GameManager.save(
-                    game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
+            boolean changed = false;
+            if (game.isFastSCFollowMode()) {
+                handleFastScFollowMode(game);
+                changed = true;
+            }
+            changed |= FowAutoDeclineService.resolveDue(game, FastScFollowCron::handleSecretObjectiveDrawOrder);
+            if (changed) {
+                GameManager.save(
+                        game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
         }

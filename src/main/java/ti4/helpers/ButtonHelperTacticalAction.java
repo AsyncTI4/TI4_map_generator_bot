@@ -102,6 +102,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UydaiHeroService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -125,6 +126,7 @@ public final class ButtonHelperTacticalAction {
         UydaiHeroService.clear(game);
         XinCommanderHandler.clearCombat(game);
         QhetAgentHandler.returnTemporaryUnitUpgrades(game);
+        RealityFieldImpactorService.clear(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
         RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);

@@ -70,6 +70,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyser
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -779,8 +780,8 @@ public class CombatRollService {
                                             "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                                 }
                                 buttons.add(Buttons.green(
-                                        opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName()
-                                                + "_" + h,
+                                        opponent.dummyPlayerSpoof()
+                                                + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                             } else {
                                 if (round2 > round) {
@@ -789,8 +790,8 @@ public class CombatRollService {
                                             "Roll Dice For Combat Round #" + (round + 1)));
                                 }
                                 buttons.add(Buttons.green(
-                                        opponent.factionButtonChecker() + "autoAssignGroundHits_"
-                                                + combatOnHolder.getName() + "_" + h,
+                                        opponent.factionButtonChecker()
+                                                + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s")));
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
@@ -818,8 +819,8 @@ public class CombatRollService {
                                         + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
                                 buttons = new ArrayList<>();
                                 buttons.add(Buttons.green(
-                                        player.factionButtonChecker() + "autoAssignGroundHits_"
-                                                + combatOnHolder.getName() + "_1",
+                                        player.factionButtonChecker()
+                                                + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), 1),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s")));
                                 buttons.add(Buttons.red(
                                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
@@ -982,7 +983,8 @@ public class CombatRollService {
                                 "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                     }
                     buttons.add(Buttons.green(
-                            opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
+                            opponent.dummyPlayerSpoof()
+                                    + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                             "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                     String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
                             + StringHelper.pluralize(h, "hit") + ".";
@@ -1121,9 +1123,11 @@ public class CombatRollService {
                             } else {
                                 List<Button> buttons2 = new ArrayList<>();
                                 buttons2.add(Buttons.green(
-                                        p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
-                                                + game.getUnitHolderFromPlanet(bombardPlanet)
-                                                        .getName() + "_" + h,
+                                        p2.dummyPlayerSpoof()
+                                                + AutoAssignGroundHitsButtonIds.format(
+                                                        game.getUnitHolderFromPlanet(bombardPlanet)
+                                                                .getName(),
+                                                        h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
@@ -1733,8 +1737,9 @@ public class CombatRollService {
                                         } else {
                                             List<Button> buttons2 = new ArrayList<>();
                                             buttons2.add(Buttons.green(
-                                                    p2.dummyPlayerSpoof() + "autoAssignGroundHits_" + uh.getName() + "_"
-                                                            + hitRolls,
+                                                    p2.dummyPlayerSpoof()
+                                                            + AutoAssignGroundHitsButtonIds.format(
+                                                                    uh.getName(), hitRolls),
                                                     "Auto-assign Hit" + (hitRolls == 1 ? "" : "s") + " For Dummy"));
                                             MessageHelper.sendMessageToChannelWithButtons(
                                                     game.isFowMode()
