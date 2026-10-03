@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class ButtonHelperModifyUnitsTest extends BaseTi4Test {
@@ -465,6 +466,31 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.setFactionEmoji("a");
         player.setColor(color);
         return player;
+    }
+
+    @Test
+    void testUnitCanSustainDamage_WarSun_WithoutSchematics() {
+        Player player = createPlayerWithDuraniumArmor(game, "red");
+
+        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("warsun")));
+    }
+
+    @Test
+    void testUnitCanSustainDamage_WarSun_SchematicsRemovesSustain() {
+        Player player = createPlayerWithDuraniumArmor(game, "red");
+        game.addLaw("schematics", null);
+
+        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("warsun")));
+        // Schematics only affects war suns
+        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("dreadnought")));
+    }
+
+    @Test
+    void testUnitCanSustainDamage_WarSunWithoutSustainInModel_NotGrantedSustain() {
+        Player player = createPlayerWithDuraniumArmor(game, "red");
+
+        // Homebrew war suns like Sentinel I have no SUSTAIN DAMAGE; the war sun base type alone must not grant it
+        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("archon_warsun")));
     }
 
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {
