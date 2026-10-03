@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
-import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -23,7 +21,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
@@ -40,7 +37,7 @@ public abstract class ListenerContext {
     protected final ComponentIdEnvelope envelope;
     protected final Game game;
     protected Player player;
-    protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
+    protected MessageChannel privateChannel, mainGameChannel;
     final GenericInteractionCreateEvent event;
 
     @Setter
@@ -147,13 +144,6 @@ public abstract class ListenerContext {
             return;
         }
 
-        actionsChannel = null;
-        for (TextChannel textChannel_ : JdaService.jda.getTextChannels()) {
-            if (textChannel_.getName().equals(gameName + Constants.ACTIONS_CHANNEL_SUFFIX)) {
-                actionsChannel = textChannel_;
-                break;
-            }
-        }
         creationEndTime = System.currentTimeMillis();
     }
 
