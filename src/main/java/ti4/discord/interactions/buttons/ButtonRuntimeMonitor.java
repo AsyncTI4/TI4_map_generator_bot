@@ -4,7 +4,9 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,6 +25,7 @@ class ButtonRuntimeMonitor {
     private static final long PAUSE_AFTER_WARNING_SECONDS =
             Duration.ofMinutes(5).toSeconds();
     private static final String STATISTICS_ROW_FORMAT = "%-15s %7s %8s %7s %7s%n";
+    private static final int SLOWEST_HANDLER_COUNT = 5;
 
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
@@ -36,6 +39,7 @@ class ButtonRuntimeMonitor {
     private final LatencyHistogram preprocessing = new LatencyHistogram();
     private final LatencyHistogram processing = new LatencyHistogram();
     private final Map<ButtonPressStage, LatencyHistogram> stages = new EnumMap<>(ButtonPressStage.class);
+    private final Map<String, LatencyHistogram> resolveByHandler = new HashMap<>();
 
     synchronized void recordQueued() {
         queuedCount++;
@@ -88,10 +92,17 @@ class ButtonRuntimeMonitor {
         processing.record(timeline.getProcessingMillis());
         SREStats.recordButtonPreprocessingMillis(timeline.getPreprocessingMillis());
         SREStats.recordButtonProcessingMillis(timeline.getProcessingMillis());
-        timeline.getStageMillis().forEach((stage, millis) -> {
+        Map<ButtonPressStage, Long> stageMillis = timeline.getStageMillis();
+        stageMillis.forEach((stage, millis) -> {
             stages.computeIfAbsent(stage, _ -> new LatencyHistogram()).record(millis);
             SREStats.recordButtonStageMillis(stage.getShortName(), millis);
         });
+        Long resolveMillis = stageMillis.get(ButtonPressStage.RESOLVE);
+        timeline.getHandlerId()
+                .filter(_ -> resolveMillis != null)
+                .ifPresent(handlerId -> resolveByHandler
+                        .computeIfAbsent(handlerId, _ -> new LatencyHistogram())
+                        .record(resolveMillis));
     }
 
     private void warnSlowButton(ButtonInteractionEvent event, ButtonPressTimeline timeline) {
@@ -181,7 +192,48 @@ class ButtonRuntimeMonitor {
                 + notRunCount + " not run (game busy or bot paused)"
                 + "\n> Threshold misses: " + decimalFormatter.format(thresholdMissPercent) + "% ("
                 + thresholdMissCount + ")"
-                + "\n```\n" + table + "```";
+                + "\n```\n" + table + "```"
+                + formatSlowestHandlers();
+    }
+
+    private String formatSlowestHandlers() {
+        List<Map.Entry<String, LatencyHistogram>> slowestHandlers = resolveByHandler.entrySet().stream()
+                .sorted(Comparator.comparingLong((Map.Entry<String, LatencyHistogram> entry) ->
+                                entry.getValue().totalMillis())
+                        .reversed())
+                .limit(SLOWEST_HANDLER_COUNT)
+                .toList();
+        if (slowestHandlers.isEmpty()) {
+            return "";
+        }
+
+        int nameWidth = slowestHandlers.stream()
+                .mapToInt(entry -> entry.getKey().length())
+                .max()
+                .orElse(0);
+        nameWidth = Math.max(nameWidth, "handler".length());
+        String rowFormat = "%-" + nameWidth + "s %6s %7s %8s %7s%n";
+
+        StringBuilder table = new StringBuilder();
+        table.append(String.format(rowFormat, "handler", "count", "total", "mean", "p95"));
+        for (Map.Entry<String, LatencyHistogram> entry : slowestHandlers) {
+            LatencyHistogram histogram = entry.getValue();
+            table.append(String.format(
+                    rowFormat,
+                    entry.getKey(),
+                    histogram.count(),
+                    formatTotalMillis(histogram.totalMillis()),
+                    String.format("%.1fms", histogram.meanMillis()),
+                    histogram.percentileMillis(0.95) + "ms"));
+        }
+        return "\nMost total resolve time:\n```\n" + table + "```";
+    }
+
+    private static String formatTotalMillis(long totalMillis) {
+        if (totalMillis < 1000) {
+            return totalMillis + "ms";
+        }
+        return String.format("%.1fs", totalMillis / 1000.0);
     }
 
     private void appendStageRows(StringBuilder table, boolean preprocessingStages) {

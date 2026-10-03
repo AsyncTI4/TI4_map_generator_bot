@@ -34,6 +34,8 @@ public class ButtonProcessor {
     private static final HandlerRegistry<ButtonContext> registry =
             AnnotationHandler.buildHandlerRegistry(ButtonContext.class, ButtonHandler.class);
     private static final ButtonRuntimeMonitor runtimeMonitor = new ButtonRuntimeMonitor();
+    private static final String DISABLED_HANDLER_ID = "(combat replay disabled)";
+    private static final String UNROUTED_HANDLER_ID = "(unrouted)";
 
     public static void checkButtonHandlersSetup() {
         if (registry.getSize() == 0) {
@@ -88,8 +90,8 @@ public class ButtonProcessor {
                 timeline.markCompleted(ButtonPressStage.REPLAY_SNAPSHOT);
             }
             try {
-                resolveButtonInteractionEvent(context, route);
-                timeline.markCompleted(ButtonPressStage.RESOLVE);
+                String handlerId = resolveButtonInteractionEvent(context, route);
+                timeline.markResolved(handlerId);
 
                 context.save();
                 timeline.markCompleted(ButtonPressStage.SAVE);
@@ -145,19 +147,21 @@ public class ButtonProcessor {
                         || buttonID.startsWith("combatReplayDebug_"));
     }
 
-    private static void resolveButtonInteractionEvent(
+    private static String resolveButtonInteractionEvent(
             ButtonContext context, HandlerRegistry.Route<ButtonContext> route) {
         ButtonInteractionEvent event = context.getEvent();
 
         // Skip combat replay buttons when the feature is disabled
-        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(context.getButtonID())) return;
-        if (route.dispatch(context)) return;
+        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(context.getButtonID()))
+            return DISABLED_HANDLER_ID;
+        if (route.dispatch(context)) return route.key();
 
         context.setShouldSave(false);
         BotLogger.error(
                 new LogOrigin(event, context),
                 "Unrouted button: `" + context.getButtonID() + "`. This could just be a stale button.");
         MessageHelper.sendMessageToEventChannel(event, "We couldn't resolve what to do with this button.");
+        return UNROUTED_HANDLER_ID;
     }
 
     public static String getButtonProcessingStatistics() {

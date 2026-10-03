@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.DateTimeHelper;
 
@@ -12,6 +13,7 @@ class ButtonPressTimeline {
     private long startedAtMillis;
     private long lastMarkMillis;
     private long finishedAtMillis;
+    private String handlerId;
 
     private ButtonPressTimeline(long discordCreatedAtMillis, long receivedAtMillis) {
         this.discordCreatedAtMillis = discordCreatedAtMillis;
@@ -45,6 +47,15 @@ class ButtonPressTimeline {
         lastMarkMillis = completedAtMillis;
     }
 
+    void markResolved(String handlerId) {
+        markResolved(handlerId, now());
+    }
+
+    void markResolved(String handlerId, long resolvedAtMillis) {
+        this.handlerId = handlerId;
+        markCompleted(ButtonPressStage.RESOLVE, resolvedAtMillis);
+    }
+
     void markFinished() {
         markFinished(now());
     }
@@ -55,6 +66,10 @@ class ButtonPressTimeline {
 
     Map<ButtonPressStage, Long> getStageMillis() {
         return Map.copyOf(stageMillis);
+    }
+
+    Optional<String> getHandlerId() {
+        return Optional.ofNullable(handlerId);
     }
 
     long getDiscordCreatedAtMillis() {

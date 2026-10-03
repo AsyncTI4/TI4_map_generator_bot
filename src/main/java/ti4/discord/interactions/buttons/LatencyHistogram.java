@@ -23,6 +23,10 @@ class LatencyHistogram {
         return count;
     }
 
+    long totalMillis() {
+        return totalMillis;
+    }
+
     double meanMillis() {
         return count == 0 ? 0 : totalMillis / (double) count;
     }
