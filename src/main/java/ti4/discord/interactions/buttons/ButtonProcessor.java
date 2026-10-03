@@ -153,10 +153,11 @@ public class ButtonProcessor {
         if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(context.getButtonID())) return;
         if (route.dispatch(context)) return;
 
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                "Button " + ButtonHelper.getButtonRepresentation(event.getButton())
-                        + " pressed. This button does not do anything.");
+        context.setShouldSave(false);
+        BotLogger.error(
+                new LogOrigin(event, context),
+                "Unrouted button: `" + context.getButtonID() + "`. This could just be a stale button.");
+        MessageHelper.sendMessageToEventChannel(event, "We couldn't resolve what to do with this button.");
     }
 
     public static String getButtonProcessingStatistics() {
