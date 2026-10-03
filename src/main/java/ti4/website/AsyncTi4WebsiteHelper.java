@@ -1,7 +1,6 @@
 package ti4.website;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -14,7 +13,6 @@ import ti4.settings.GlobalSettings;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.websocket.WebSocketNotifier;
-import ti4.website.model.WebsiteOverlay;
 
 @UtilityClass
 public class AsyncTi4WebsiteHelper {
@@ -61,27 +59,6 @@ public class AsyncTi4WebsiteHelper {
         try {
             SpringContext.getBean(WebSocketNotifier.class).notifyGameRefresh(gameId);
         } catch (Exception ignored) {
-        }
-    }
-
-    public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
-        if (!uploadsEnabled()) return;
-        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
-        if (bucket == null || bucket.isEmpty()) {
-            BotLogger.error("S3 bucket not configured.");
-            return;
-        }
-
-        try {
-            String json = JsonMapperManager.basic().writeValueAsString(overlays);
-
-            putObjectInBucket(
-                    String.format("overlays/%s/%s.json", gameId, gameId),
-                    AsyncRequestBody.fromString(json),
-                    "application/json",
-                    "no-cache, no-store, must-revalidate");
-        } catch (Exception e) {
-            BotLogger.error("Could not put overlay to web server", e);
         }
     }
 
