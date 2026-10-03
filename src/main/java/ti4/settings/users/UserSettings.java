@@ -29,6 +29,7 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+    private boolean fogMapOnTurnStart;
     private RefreshMapStyle refreshMapStyle = RefreshMapStyle.COMBINED;
     private String activeHours;
     private boolean hasAnsweredSurvey;

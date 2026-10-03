@@ -3358,6 +3358,10 @@ public class ButtonHelper {
                             + ", you may redistribute command tokens with these buttons after picking up a command token from the game board.",
                     redistributeButton);
         }
+        resolveAfterCommandTokenRemoved(game, player, tile);
+    }
+
+    public static void resolveAfterCommandTokenRemoved(Game game, Player player, Tile tile) {
         for (Player toldar : game.getRealPlayers()) {
             if (doesPlayerHaveFSHere("toldar_flagship", toldar, tile)) {
                 if (player == toldar) {

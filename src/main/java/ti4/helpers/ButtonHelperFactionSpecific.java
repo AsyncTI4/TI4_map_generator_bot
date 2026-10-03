@@ -1202,7 +1202,11 @@ public final class ButtonHelperFactionSpecific {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Construction**");
             }
             String message = ButtonHelperSCs.deductCC(game, player, scNum);
-            ReactionService.addReaction(event, game, player, message);
+            if (game.isFowMode()) {
+                ButtonHelperSCs.reactToStrategyCardMessage(game, player, scNum, message);
+            } else {
+                ReactionService.addReaction(event, game, player, message);
+            }
         }
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
