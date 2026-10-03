@@ -90,6 +90,7 @@ import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -4089,7 +4090,8 @@ public class ButtonHelper {
         }
     }
 
-    public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
+    public static void findOrCreateThreadWithMessage(Game game, String requestedThreadName, String message) {
+        String threadName = DiscordThreadUtility.fitThreadName(requestedThreadName);
         TextChannel channel = game.getMainGameChannel();
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {

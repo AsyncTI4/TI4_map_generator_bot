@@ -69,6 +69,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButto
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -2901,6 +2902,6 @@ public class StartCombatService {
             }
             sb.append(specialCombatTitle != null ? specialCombatTitle : "");
         }
-        return sb.toString();
+        return DiscordThreadUtility.fitThreadName(sb.toString());
     }
 }
