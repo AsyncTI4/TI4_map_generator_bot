@@ -48,6 +48,9 @@ public class TestBedStateResolver {
             "pns",
             "pnsInPlay",
             "sosScored",
+            "posScored",
+            "fragments",
+            "breakthroughs",
             "exhaustedTechs",
             "purgedTechs",
             "exhaustedRelics");
@@ -121,11 +124,26 @@ public class TestBedStateResolver {
             case "pns" -> joinSorted(seat.getPromissoryNotes().keySet());
             case "pnsInPlay" -> joinSorted(seat.getPromissoryNotesInPlayArea());
             case "sosScored" -> joinSorted(seat.getSecretsScored().keySet());
+            case "fragments" -> joinSorted(seat.getFragments());
+            case "breakthroughs" ->
+                joinSorted(seat.getBreakthroughIDs().stream()
+                        .map(id -> id + ":" + breakthroughState(seat, id))
+                        .toList());
+            case "posScored" ->
+                joinSorted(seat.getGame().getScoredPublicObjectives().entrySet().stream()
+                        .filter(entry -> entry.getValue().contains(seat.getUserID()))
+                        .map(Map.Entry::getKey)
+                        .toList());
             case "exhaustedTechs" -> joinSorted(seat.getExhaustedTechs());
             case "purgedTechs" -> joinSorted(seat.getPurgedTechs());
             case "exhaustedRelics" -> joinSorted(seat.getExhaustedRelics());
             default -> "<unknown " + field + ">";
         };
+    }
+
+    private static String breakthroughState(Player seat, String id) {
+        if (!seat.isBreakthroughUnlocked(id)) return "locked";
+        return seat.isBreakthroughExhausted(id) ? "exhausted" : "unlocked";
     }
 
     private static String leaderState(Leader leader) {

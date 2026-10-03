@@ -25,6 +25,7 @@ public class TestBedService {
     static final String TEST_BED_KEY = "testBed";
     static final String ACTING_AS_PREFIX = "testBedActingAs_";
     static final String REAL_PLAYERS_KEY = "testBedRealPlayers";
+    public static final String FOLLOW_TURN = "@turn";
     public static final String VIRTUAL_SEAT_ID_PREFIX = "90000000000000";
     private static final Set<Integer> SAVE_FORMAT_SEPARATORS = Set.of((int) ',', (int) ':', (int) '\n');
 
@@ -126,10 +127,32 @@ public class TestBedService {
         }
     }
 
+    static String rawActingAs(Game game, String userId) {
+        return game.getStoredValue(ACTING_AS_PREFIX + userId);
+    }
+
+    static void restoreActingAs(Game game, String userId, String raw) {
+        if (raw.isEmpty()) {
+            game.removeStoredValue(ACTING_AS_PREFIX + userId);
+        } else {
+            store(game, ACTING_AS_PREFIX + userId, raw);
+        }
+    }
+
+    public static void followTurn(Game game, String userId) {
+        store(game, ACTING_AS_PREFIX + userId, FOLLOW_TURN);
+    }
+
+    public static boolean isFollowingTurn(Game game, String userId) {
+        return FOLLOW_TURN.equals(game.getStoredValue(ACTING_AS_PREFIX + userId));
+    }
+
     @Nullable
     public static Player getActingAs(Game game, String userId) {
         String faction = game.getStoredValue(ACTING_AS_PREFIX + userId);
-        return faction.isEmpty() ? null : game.getPlayerFromColorOrFaction(faction);
+        if (faction.isEmpty()) return null;
+        if (FOLLOW_TURN.equals(faction)) return game.getActivePlayer();
+        return game.getPlayerFromColorOrFaction(faction);
     }
 
     @Nullable

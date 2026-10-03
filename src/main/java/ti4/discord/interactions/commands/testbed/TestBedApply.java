@@ -89,10 +89,10 @@ class TestBedApply extends GameStateSubcommand {
             MessageHelper.replyToMessage(
                     event,
                     "Pick a `preset` or attach a `file`. Shipped presets: "
-                            + TestBedPresetService.loadShippedPresets().keySet());
+                            + TestBedPresetService.loadPresets().keySet());
             return null;
         }
-        TestBedPreset preset = TestBedPresetService.getShippedPreset(name);
+        TestBedPreset preset = TestBedPresetService.getPreset(name);
         if (preset == null) MessageHelper.replyToMessage(event, "No shipped preset named `" + name + "`.");
         return preset;
     }

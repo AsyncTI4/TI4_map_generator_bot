@@ -22,6 +22,9 @@ public class TestBedPreset {
     private Seat defaults;
     private String start = "setup";
     private List<String> combat = new ArrayList<>();
+    private List<String> revealedObjectives = new ArrayList<>();
+    private List<String> laws = new ArrayList<>();
+    private Map<String, List<String>> tokens = new LinkedHashMap<>();
     private List<TestBedScript.Shortcut> shortcuts = new ArrayList<>();
 
     public List<Seat> allSeats() {
@@ -48,6 +51,10 @@ public class TestBedPreset {
         private Leaders leaders;
         private Map<String, String> units = new LinkedHashMap<>();
         private List<String> planets;
+        private List<String> pns;
+        private List<String> scoredObjectives;
+        private List<String> fragments;
+        private String breakthrough;
 
         public boolean hasRandomFaction() {
             return faction == null || faction.isBlank() || "random".equalsIgnoreCase(faction);

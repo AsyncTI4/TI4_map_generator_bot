@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -37,6 +39,8 @@ import ti4.service.turn.StartTurnService;
 public final class TestBedScriptRunner {
 
     private static final int HISTORY_SIZE = 50;
+    private static final String CARDS_INFO_LAST_TEXT = "You may whisper to people from here";
+    private static final long CARDS_INFO_POLL_MILLIS = 1000;
     private static final long POLL_MILLIS = 2000;
     private static final int MAX_DETAIL = 160;
 
@@ -55,7 +59,10 @@ public final class TestBedScriptRunner {
     private final GenericInteractionCreateEvent origin;
     private final Member developer;
     private final MessageChannel reportChannel;
-    private final boolean quiet;
+
+    @Nullable
+    private final Consumer<String> onDone;
+
     private final boolean resetFirst;
     private final List<Result> results = new ArrayList<>();
     private final Map<String, Long> baselines = new HashMap<>();
@@ -67,7 +74,7 @@ public final class TestBedScriptRunner {
             String title,
             TestBedScript script,
             GenericInteractionCreateEvent origin,
-            boolean quiet,
+            @Nullable Consumer<String> onDone,
             boolean resetFirst) {
         this.gameName = game.getName();
         this.title = title;
@@ -75,37 +82,119 @@ public final class TestBedScriptRunner {
         this.origin = origin;
         this.developer = origin.getMember();
         this.reportChannel = origin.getMessageChannel();
-        this.quiet = quiet;
+        this.onDone = onDone;
         this.resetFirst = resetFirst;
     }
 
-    public static void start(
-            Game game, TestBedScript script, GenericInteractionCreateEvent origin, boolean resetFirst) {
-        String title = script.getName() == null ? "custom" : script.getName();
-        TestBedScriptRunner runner = new TestBedScriptRunner(game, title, script, origin, false, resetFirst);
-        ExecutorServiceManager.runAsync("test bed script " + title, runner::runAndReport);
+    public static void start(Game game, TestBedScript script, GenericInteractionCreateEvent origin) {
+        TestBedScriptRunner runner =
+                new TestBedScriptRunner(game, titleOf(script), script, origin, null, script.getPreset() != null);
+        ExecutorServiceManager.runAsync("test bed script " + runner.title, runner::runAndReport);
     }
 
-    public static void startShortcut(Game game, String label, List<Step> steps, GenericInteractionCreateEvent origin) {
+    public static void startSuite(Game game, List<TestBedScript> scripts, GenericInteractionCreateEvent origin) {
+        ExecutorServiceManager.runAsync("test bed suite in " + game.getName(), () -> runSuite(game, scripts, origin));
+    }
+
+    public static void startShortcut(
+            Game game, String label, List<Step> steps, GenericInteractionCreateEvent origin, Consumer<String> onDone) {
         TestBedScript script = new TestBedScript();
         script.setName(label);
         script.setSteps(steps);
-        TestBedScriptRunner runner = new TestBedScriptRunner(game, label, script, origin, true, false);
+        TestBedScriptRunner runner = new TestBedScriptRunner(game, label, script, origin, onDone, false);
         ExecutorServiceManager.runAsync("test bed shortcut " + label, runner::runAndReport);
     }
 
+    private static String titleOf(TestBedScript script) {
+        return script.getName() == null ? "custom" : script.getName();
+    }
+
     private void runAndReport() {
+        runSafely();
+        if (onDone != null) {
+            onDone.accept(shortSummary());
+        } else {
+            report();
+        }
+    }
+
+    private void runSafely() {
         try {
             run();
         } catch (Exception e) {
             BotLogger.error("Test bed script " + title + " stopped", e);
             add(-1, "runner", Status.FAIL, "no exception", e.getClass().getSimpleName() + ": " + e.getMessage());
         }
-        if (quiet) {
-            reportQuietly();
-        } else {
-            report();
+    }
+
+    private static void runSuite(Game game, List<TestBedScript> scripts, GenericInteractionCreateEvent origin) {
+        String stamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        StringBuilder discord = new StringBuilder("## Test bed suite in `")
+                .append(game.getName())
+                .append("`\n");
+        StringBuilder markdown = new StringBuilder("# Test bed suite in ")
+                .append(game.getName())
+                .append(" (")
+                .append(stamp)
+                .append(")\n");
+        for (TestBedScript script : scripts) {
+            String reason = suiteSkipReason(game, script);
+            if (reason != null) {
+                discord.append("⏭️ `")
+                        .append(titleOf(script))
+                        .append("`: ")
+                        .append(reason)
+                        .append('\n');
+                continue;
+            }
+            TestBedScriptRunner runner = new TestBedScriptRunner(game, titleOf(script), script, origin, null, true);
+            runner.runSafely();
+            discord.append(runner.countOf(Status.FAIL) == 0 ? "✅ `" : "❌ `")
+                    .append(runner.title)
+                    .append("`: ")
+                    .append(runner.countOf(Status.PASS))
+                    .append(" passed, ")
+                    .append(runner.countOf(Status.FAIL))
+                    .append(" failed")
+                    .append(runner.firstFailure())
+                    .append('\n');
+            markdown.append('\n').append(runner.markdownSection());
         }
+        MessageHelper.sendMessageToChannel(origin.getMessageChannel(), discord.toString());
+        String fileName = "suite-" + game.getName() + "-" + stamp + ".md";
+        MessageHelper.sendFileUploadToChannel(
+                origin.getMessageChannel(),
+                FileUpload.fromData(markdown.toString().getBytes(StandardCharsets.UTF_8), fileName));
+    }
+
+    @Nullable
+    static String suiteSkipReason(Game game, TestBedScript script) {
+        if (script.getPreset() == null) return "no preset";
+        TestBedPreset preset = TestBedPresetService.getPreset(script.getPreset());
+        if (preset == null) return "unknown preset";
+        if (preset.getFog() != null && preset.getFog() != game.isFowMode()) {
+            return preset.getFog() ? "needs a fog game" : "needs a normal game";
+        }
+        return null;
+    }
+
+    private String firstFailure() {
+        return results.stream()
+                .filter(result -> result.status() == Status.FAIL)
+                .findFirst()
+                .map(result -> " (first: " + abbreviate(result.step()) + ")")
+                .orElse("");
+    }
+
+    private String shortSummary() {
+        long failed = countOf(Status.FAIL);
+        if (failed == 0) return "done.";
+        StringBuilder line = new StringBuilder().append(failed).append(" step(s) failed");
+        results.stream()
+                .filter(result -> result.status() == Status.FAIL)
+                .forEach(result ->
+                        line.append("\n❌ ").append(result.step()).append(": ").append(abbreviate(result.actual())));
+        return line.toString();
     }
 
     private void run() {
@@ -165,19 +254,15 @@ public final class TestBedScriptRunner {
                         Status.FAIL,
                         "a game set up with `" + script.getPreset() + "`",
                         "this game was set up with `" + (applied.isEmpty() ? "something else" : applied)
-                                + "`; run again with `reset:true` or in a new game");
+                                + "`; run it in a new game");
                 return false;
             }
-            add(
-                    0,
-                    label,
-                    Status.INFO,
-                    "",
-                    "already applied; earlier runs may have changed the game (use `reset:true`)");
+            add(0, label, Status.INFO, "", "already applied; earlier runs may have changed the game");
             return true;
         }
-        TestBedPreset preset = TestBedPresetService.getShippedPreset(script.getPreset());
+        TestBedPreset preset = TestBedPresetService.getPreset(script.getPreset());
         List<String> warnings = new ArrayList<>();
+        Map<String, Long> before = latestCardsInfoIds(game);
         boolean done = TestBedPress.runLocked(
                 game, locked -> warnings.addAll(TestBedApplyService.apply(locked, preset, origin)));
         if (!done) {
@@ -190,8 +275,43 @@ public final class TestBedScriptRunner {
                 Status.INFO,
                 "",
                 warnings.isEmpty() ? "applied" : "applied; " + warnings);
+        waitForCardsInfo(before);
         settle(null);
         return true;
+    }
+
+    private Map<String, Long> latestCardsInfoIds(Game game) {
+        Map<String, Long> latest = new HashMap<>();
+        for (Player player : game.getPlayers().values()) {
+            String threadId = player.getCardsInfoThreadID();
+            if (threadId == null || threadId.isBlank()) continue;
+            ThreadChannel thread = origin.getJDA().getThreadChannelById(threadId);
+            if (thread != null) latest.put(threadId, latestMessageId(thread));
+        }
+        return latest;
+    }
+
+    private void waitForCardsInfo(Map<String, Long> before) {
+        long deadline = System.currentTimeMillis() + script.getTimeoutSeconds() * 1000L;
+        List<String> late = new ArrayList<>();
+        for (Player player : current().getRealPlayers()) {
+            MessageChannel thread = scopeChannel(current(), player.getFaction() + ":cards-info");
+            if (thread == null) continue;
+            long after = before.getOrDefault(thread.getId(), 0L);
+            while (!cardsInfoArrived(thread, after) && System.currentTimeMillis() < deadline) {
+                TestBedPress.sleep(CARDS_INFO_POLL_MILLIS);
+            }
+            if (!cardsInfoArrived(thread, after)) late.add(player.getFaction());
+        }
+        if (!late.isEmpty()) {
+            add(0, "cards info", Status.INFO, "", "still arriving for " + late + "; hand buttons may be missing");
+        }
+    }
+
+    private static boolean cardsInfoArrived(MessageChannel thread, long after) {
+        return thread.getHistory().retrievePast(TestBedPress.HISTORY_SIZE).complete().stream()
+                .anyMatch(message ->
+                        message.getIdLong() > after && message.getContentRaw().contains(CARDS_INFO_LAST_TEXT));
     }
 
     private void recordBaselines() {
@@ -558,21 +678,6 @@ public final class TestBedScriptRunner {
         return results.stream().filter(result -> result.status() == status).count();
     }
 
-    private void reportQuietly() {
-        long failed = countOf(Status.FAIL);
-        StringBuilder line = new StringBuilder("Shortcut **").append(title).append("**: ");
-        if (failed == 0) {
-            line.append("done.");
-        } else {
-            line.append(failed).append(" step(s) failed");
-            results.stream().filter(result -> result.status() == Status.FAIL).forEach(result -> line.append("\n❌ ")
-                    .append(result.step())
-                    .append(": ")
-                    .append(abbreviate(result.actual())));
-        }
-        MessageHelper.sendEphemeralMessageToEventChannel(origin, line.toString());
-    }
-
     private void report() {
         String stamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
         StringBuilder discord = new StringBuilder("## Test bed script `")
@@ -584,16 +689,6 @@ public final class TestBedScriptRunner {
                 .append(" ❌ ")
                 .append(countOf(Status.SKIP))
                 .append(" ⏭️\n");
-        StringBuilder markdown = new StringBuilder("# Test bed script `")
-                .append(title)
-                .append("` in ")
-                .append(gameName)
-                .append(" (")
-                .append(stamp)
-                .append(")\n\n");
-        if (script.getDescription() != null)
-            markdown.append(script.getDescription()).append("\n\n");
-        markdown.append("| # | Step | Result | Expected | Actual |\n|---|---|---|---|---|\n");
         for (Result result : results) {
             discord.append(icon(result.status())).append(' ');
             if (result.index() > 0) discord.append(result.index()).append(". ");
@@ -606,6 +701,21 @@ public final class TestBedScriptRunner {
                         .append('`');
             }
             discord.append('\n');
+        }
+        MessageHelper.sendMessageToChannel(reportChannel, discord.toString());
+        String markdown =
+                "# Test bed script `" + title + "` in " + gameName + " (" + stamp + ")\n\n" + markdownSection();
+        String fileName = "script-" + title + "-" + gameName + "-" + stamp + ".md";
+        MessageHelper.sendFileUploadToChannel(
+                reportChannel, FileUpload.fromData(markdown.getBytes(StandardCharsets.UTF_8), fileName));
+    }
+
+    private String markdownSection() {
+        StringBuilder markdown = new StringBuilder("## `").append(title).append("`\n\n");
+        if (script.getDescription() != null)
+            markdown.append(script.getDescription()).append("\n\n");
+        markdown.append("| # | Step | Result | Expected | Actual |\n|---|---|---|---|---|\n");
+        for (Result result : results) {
             markdown.append("| ")
                     .append(result.index())
                     .append(" | ")
@@ -618,10 +728,7 @@ public final class TestBedScriptRunner {
                     .append(result.actual().replace("|", "/"))
                     .append(" |\n");
         }
-        MessageHelper.sendMessageToChannel(reportChannel, discord.toString());
-        String fileName = "script-" + title + "-" + gameName + "-" + stamp + ".md";
-        MessageHelper.sendFileUploadToChannel(
-                reportChannel, FileUpload.fromData(markdown.toString().getBytes(StandardCharsets.UTF_8), fileName));
+        return markdown.toString();
     }
 
     private static String icon(Status status) {

@@ -60,6 +60,7 @@ public class TestBedApplyService {
         }
         AddTileListService.finishSetup(game, event);
         Helper.setOrder(game);
+        TestBedComponentService.applyGameState(game, preset, warnings);
         for (SeatPlan plan : plans) {
             if (!plan.player().isRealPlayer()) continue;
             applyHand(game, plan.player(), plan.seat(), event, warnings);
@@ -220,14 +221,28 @@ public class TestBedApplyService {
                         player, AliasHandler.resolvePlanet(planet.toLowerCase()), game, event, false);
             }
         }
+        TestBedComponentService.applySeatComponents(game, player, seat, warnings);
+    }
+
+    private static boolean giveActionCard(Game game, Player player, String id) {
+        if (player.getActionCards().containsKey(id)) return true;
+        Integer discardNumber = game.getDiscardActionCards().get(id);
+        if (discardNumber != null) return game.pickActionCard(player.getUserID(), discardNumber);
+        for (Player holder : game.getRealPlayers()) {
+            Integer handNumber = holder.getActionCards().get(id);
+            if (handNumber == null) continue;
+            holder.removeActionCard(handNumber);
+            game.getActionCards().add(id);
+        }
+        if (!game.getActionCards().contains(id)) return false;
+        game.drawSpecificActionCard(id, player.getUserID());
+        return true;
     }
 
     private static void drawActionCards(Game game, Player player, @Nullable CardPick pick, List<String> warnings) {
         if (pick == null) return;
         for (String id : pick.ids()) {
-            if (game.getActionCards().contains(id)) {
-                game.drawSpecificActionCard(id, player.getUserID());
-            } else {
+            if (!giveActionCard(game, player, id)) {
                 warnings.add(player.getFaction() + ": action card `" + id + "` is not in this game's deck.");
             }
         }

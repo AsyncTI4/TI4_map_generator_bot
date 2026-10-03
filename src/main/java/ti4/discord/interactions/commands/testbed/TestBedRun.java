@@ -21,17 +21,15 @@ import tools.jackson.core.JacksonException;
 class TestBedRun extends GameStateSubcommand {
 
     static final String SCRIPT = "script";
+    static final String ALL = "all";
     private static final String FILE = "file";
-    private static final String STOP_ON_FAIL = "stop_on_fail";
-    private static final String RESET = "reset";
 
     TestBedRun() {
-        super("run", "Run a test bed script: press buttons as seats and check the results", false, false);
+        super("run", "Run a test bed script (or `all`): press buttons as seats and check the results", false, false);
         addOptions(
-                new OptionData(OptionType.STRING, SCRIPT, "Shipped script").setAutoComplete(true),
-                new OptionData(OptionType.ATTACHMENT, FILE, "Your own script .json (overrides script)"),
-                new OptionData(OptionType.BOOLEAN, STOP_ON_FAIL, "Stop at the first failing step"),
-                new OptionData(OptionType.BOOLEAN, RESET, "Reset the test bed first and apply the script's preset"));
+                new OptionData(OptionType.STRING, SCRIPT, "Shipped script, or `all` for every script")
+                        .setAutoComplete(true),
+                new OptionData(OptionType.ATTACHMENT, FILE, "Your own script .json (overrides script)"));
     }
 
     @Override
@@ -44,6 +42,15 @@ class TestBedRun extends GameStateSubcommand {
                     event, "Refused: " + nonDeveloper.getUserName() + " is in this game and is not a developer.");
             return;
         }
+        if (event.getOption(FILE) == null && ALL.equals(event.getOption(SCRIPT, null, OptionMapping::getAsString))) {
+            List<TestBedScript> scripts =
+                    List.copyOf(TestBedScriptService.loadScripts().values());
+            MessageHelper.replyToMessage(
+                    event,
+                    "Running " + scripts.size() + " scripts, each from a fresh reset. The summary follows here.");
+            TestBedScriptRunner.startSuite(game, scripts, event);
+            return;
+        }
         TestBedScript script = readScript(event);
         if (script == null) return;
         List<String> errors = TestBedScriptService.validate(script);
@@ -51,26 +58,18 @@ class TestBedRun extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "The script is invalid:\n- " + String.join("\n- ", errors));
             return;
         }
-        boolean resetFirst = event.getOption(RESET, false, OptionMapping::getAsBoolean);
-        if (resetFirst && script.getPreset() == null) {
-            MessageHelper.replyToMessage(event, "`reset:true` needs a script with a `preset` to apply afterwards.");
-            return;
-        }
-        boolean presetWillApply = script.getPreset() != null
-                && (resetFirst || game.getRealPlayers().isEmpty());
-        if (!TestBedService.isTestBed(game) && !presetWillApply) {
+        if (!TestBedService.isTestBed(game) && script.getPreset() == null) {
             MessageHelper.replyToMessage(
-                    event,
-                    "This game is not a test bed. Use a script with a `preset` in a fresh game, or apply one first.");
+                    event, "This game is not a test bed. Use a script with a `preset`, or apply a preset first.");
             return;
         }
-        OptionMapping stopOnFail = event.getOption(STOP_ON_FAIL);
-        if (stopOnFail != null) script.setStopOnFail(stopOnFail.getAsBoolean());
         MessageHelper.replyToMessage(
                 event,
                 "Running script **" + (script.getName() == null ? "custom" : script.getName()) + "** ("
-                        + script.getSteps().size() + " steps). The report follows in this channel.");
-        TestBedScriptRunner.start(game, script, event, resetFirst);
+                        + script.getSteps().size() + " steps"
+                        + (script.getPreset() == null ? "" : ", starting from a fresh `" + script.getPreset() + "`")
+                        + "). The report follows here.");
+        TestBedScriptRunner.start(game, script, event);
     }
 
     @Nullable
@@ -82,10 +81,10 @@ class TestBedRun extends GameStateSubcommand {
             MessageHelper.replyToMessage(
                     event,
                     "Pick a `script` or attach a `file`. Shipped scripts: "
-                            + TestBedScriptService.loadShippedScripts().keySet());
+                            + TestBedScriptService.loadScripts().keySet());
             return null;
         }
-        TestBedScript script = TestBedScriptService.getShippedScript(name);
+        TestBedScript script = TestBedScriptService.getScript(name);
         if (script == null) MessageHelper.replyToMessage(event, "No shipped script named `" + name + "`.");
         return script;
     }

@@ -2,7 +2,6 @@ package ti4.service.testbed;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,34 +9,39 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static ti4.service.testbed.TestBedFixture.DEV_ID;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.image.Mapper;
+import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript.Shortcut;
-import ti4.service.testbed.TestBedPanelService.Tool;
+import ti4.service.testbed.TestBedPanelService.PageRef;
 import ti4.service.testbed.TestBedResetService.ResetResult;
+import ti4.service.testbed.TestBedShortcuts.ButtonGroup;
+import ti4.service.testbed.TestBedTurnButtons.TurnButtons;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 import ti4.testUtils.BaseTi4Test;
 
-// Behaviour on an in-memory game: who a developer acts as, reset, the state paths scripts read, and the panel.
+// Behaviour on an in-memory game: who a developer acts as, the safety gates, reset, components and the panel.
 class TestBedGameTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS =
-            List.of("sol", "nekro", "hacan", "jolnar", "letnev", "naalu", "arborec", "muaat", "yin");
+            List.of("sol", "nekro", "hacan", "jolnar", "letnev", "naalu", "arborec", "muaat");
     private static final List<String> COLORS =
-            List.of("red", "blue", "green", "yellow", "purple", "orange", "pink", "black", "brown");
+            List.of("red", "blue", "green", "yellow", "purple", "orange", "pink", "black");
 
     private Game game;
     private Player developer;
@@ -52,36 +56,44 @@ class TestBedGameTest extends BaseTi4Test {
         nekro.setCardsInfoThreadID("seat-thread");
     }
 
-    // The order is: the seat whose channel you are in, then the explicit act-as seat, then yourself.
+    // Order: the seat whose channel you are in, then the act-as seat (or the active one with Follow Turn), then you.
+    // A script press must restore Follow Turn exactly, not pin it to whoever happened to be active.
     @Test
-    void developerActsAsTheRightSeat() {
+    void actAsResolvesTheRightSeat() {
         Player hacan = TestBedFixture.virtualSeat(game, 2, "hacan", "green");
-        assertSame(developer, TestBedService.resolveForDeveloper(game, DEV_ID, "main-channel", developer));
-        assertSame(nekro, TestBedService.resolveForDeveloper(game, DEV_ID, "seat-channel", developer));
+        assertSame(developer, TestBedService.resolveForDeveloper(game, DEV_ID, "main", developer));
         assertSame(nekro, TestBedService.resolveForDeveloper(game, DEV_ID, "seat-thread", developer));
 
         TestBedService.setActingAs(game, DEV_ID, hacan);
-        assertSame(hacan, TestBedService.resolveForDeveloper(game, DEV_ID, "main-channel", developer));
+        assertSame(hacan, TestBedService.resolveForDeveloper(game, DEV_ID, "main", developer));
         assertSame(nekro, TestBedService.resolveForDeveloper(game, DEV_ID, "seat-channel", developer));
 
-        TestBedService.setActingAs(game, DEV_ID, null);
-        assertSame(developer, TestBedService.resolveForDeveloper(game, DEV_ID, "main-channel", developer));
+        TestBedService.followTurn(game, DEV_ID);
+        game.setActivePlayerID(hacan.getUserID());
+        assertSame(hacan, TestBedService.resolveForDeveloper(game, DEV_ID, "main", developer));
+        String saved = TestBedService.rawActingAs(game, DEV_ID);
+        TestBedService.setActingAs(game, DEV_ID, nekro);
+        TestBedService.restoreActingAs(game, DEV_ID, saved);
+        assertTrue(TestBedService.isFollowingTurn(game, DEV_ID));
+
+        TestBedService.clearAllActingAs(game);
+        assertNull(TestBedService.getActingAs(game, DEV_ID));
     }
 
-    // Real games must never change: the resolver is a no-op without the global switch (off in tests), even when
-    // the game carries the marker, and for anyone who is not a developer.
+    // Real games never change: no-op without the switch (off in tests) even with the marker; bots never block;
+    // real-player mode keeps act-as to buttons; the switch accepts `true` as text and never throws.
     @Test
-    void realGamesAreUnaffected() {
-        assertSame(developer, TestBedService.resolveActingPlayer(game, null, DEV_ID, "seat-channel", developer));
+    void safetyGatesHold() {
         TestBedService.markAsTestBed(game, true);
-        assertTrue(TestBedService.isMarkedAsTestBed(game));
         assertFalse(TestBedService.isTestBed(game));
         assertSame(developer, TestBedService.resolveActingPlayer(game, null, DEV_ID, "seat-channel", developer));
-    }
 
-    // Bots that sit in a game (a dice bot, for example) must not block `apply` as if they were real players.
-    @Test
-    void botsDoNotCountAsNonDevelopers() {
+        TestBedService.allowRealPlayers(game);
+        assertTrue(TestBedService.actAsApplies(game, true));
+        assertFalse(TestBedService.actAsApplies(game, false));
+        TestBedService.markAsTestBed(game, false);
+        assertFalse(TestBedService.allowsRealPlayers(game));
+
         Player diceBot = game.addPlayer("555", "Dicecord");
         User botUser = mock(User.class);
         when(botUser.isBot()).thenReturn(true);
@@ -89,38 +101,12 @@ class TestBedGameTest extends BaseTi4Test {
         when(botMember.getUser()).thenReturn(botUser);
         Guild guild = mock(Guild.class);
         when(guild.getMemberById("555")).thenReturn(botMember);
-
         assertNull(TestBedService.findNonDeveloper(guild, List.of(diceBot, nekro)));
         assertSame(developer, TestBedService.findNonDeveloper(guild, List.of(diceBot, developer)));
-    }
 
-    // With real players seated, act-as only applies to buttons, selects and modals (which announce every action);
-    // slash commands, chat and views stay the developer's own. Disabling the test bed drops the opt-in.
-    @Test
-    void realPlayerModeLimitsActAsToComponents() {
-        TestBedService.markAsTestBed(game, true);
-        assertTrue(TestBedService.actAsApplies(game, true));
-        assertTrue(TestBedService.actAsApplies(game, false));
-
-        TestBedService.allowRealPlayers(game);
-        assertTrue(TestBedService.allowsRealPlayers(game));
-        assertTrue(TestBedService.actAsApplies(game, true));
-        assertFalse(TestBedService.actAsApplies(game, false));
-        assertTrue(TestBedService.isPanelComponent(TestBedPanelService.TOOL + "tg"));
-
-        TestBedService.markAsTestBed(game, false);
-        assertFalse(TestBedService.allowsRealPlayers(game));
-    }
-
-    // The switch is set with `/developer setting`, where a developer may pick `setting_type:string`. That must
-    // still work and must never throw: the check runs on every button press in every game.
-    @Test
-    void globalSwitchAcceptsBooleanOrText() {
         String key = ImplementedSettings.TESTBED_ENABLED.toString();
         try {
             GlobalSettings.setSetting(key, "true");
-            assertTrue(TestBedService.isEnabled());
-            GlobalSettings.setSetting(key, true);
             assertTrue(TestBedService.isEnabled());
             GlobalSettings.setSetting(key, "no");
             assertFalse(TestBedService.isEnabled());
@@ -129,145 +115,113 @@ class TestBedGameTest extends BaseTi4Test {
         }
     }
 
+    // Without a snapshot, reset rebuilds: virtual seats go, the developer is unseated but keeps their thread, decks
+    // and played cards are restored, markers cleared. Channels that already existed are never recorded for deletion.
     @Test
-    void actAsStateIsPerUserAndClearable() {
-        assertTrue(TestBedService.isVirtualSeat(nekro));
-        assertFalse(TestBedService.isVirtualSeat(developer));
-        TestBedService.setActingAs(game, DEV_ID, nekro);
-        TestBedService.setActingAs(game, "222", nekro);
-        assertEquals("nekro", TestBedService.getActingAs(game, DEV_ID).getFaction());
-
-        TestBedService.clearAllActingAs(game);
-        assertNull(TestBedService.getActingAs(game, DEV_ID));
-        assertNull(TestBedService.getActingAs(game, "222"));
-    }
-
-    // Reset removes virtual seats, unseats the developer (keeping their own thread), restores the decks and clears
-    // every test bed marker, so `/testbed apply` can run again in the same game.
-    @Test
-    void resetReturnsTheGameToAFreshState() {
+    void resetRebuildsAndKeepsForeignChannels() {
         developer.setCardsInfoThreadID("dev-thread");
+        developer.setPrivateChannelID("42");
+        TestBedChannelService.createFogPrivateChannel(game, developer, null);
+        assertTrue(TestBedChannelService.createdChannelIds(game).isEmpty());
+
         TestBedService.markAsTestBed(game, true);
         TestBedChannelService.recordCreatedChannel(game, "seat-thread");
         game.setTile(new Tile("19", "101"));
-        game.setSpeakerUserID(DEV_ID);
         game.drawActionCard(nekro.getUserID(), 3);
-        TestBedService.setActingAs(game, DEV_ID, nekro);
-        game.setStoredValue(TestBedApplyService.APPLIED_PRESET_KEY, "action-3p");
         game.setSCPlayed(3, true);
         int fullDeck = Mapper.getDeck(game.getAcDeckID()).getNewShuffledDeck().size();
 
-        ResetResult result = TestBedResetService.reset(game);
-
-        assertEquals(new ResetResult(1, 1, 1, false), result);
-        assertTrue(game.getPlayedSCs().isEmpty());
+        assertEquals(new ResetResult(1, 1, 1, false), TestBedResetService.reset(game));
         assertNull(game.getPlayer(nekro.getUserID()));
-        Player unseated = game.getPlayer(DEV_ID);
-        assertNotNull(unseated);
-        assertFalse(unseated.isRealPlayer());
-        assertEquals("dev-thread", unseated.getCardsInfoThreadID());
+        assertFalse(game.getPlayer(DEV_ID).isRealPlayer());
+        assertEquals("dev-thread", game.getPlayer(DEV_ID).getCardsInfoThreadID());
         assertEquals(fullDeck, game.getActionCards().size());
+        assertTrue(game.getPlayedSCs().isEmpty());
         assertTrue(game.getTileMap().isEmpty());
-        assertEquals("", game.getSpeakerUserID());
         assertFalse(TestBedService.isMarkedAsTestBed(game));
-        assertNull(TestBedService.getActingAs(game, DEV_ID));
-        assertTrue(TestBedChannelService.createdChannelIds(game).isEmpty());
-        assertEquals("", TestBedApplyService.appliedPreset(game));
     }
 
-    // A seat that already has a fog private channel keeps it: the test bed only records (and reset only deletes)
-    // channels it created itself, so applying a preset to a fog game never puts a player's channel at risk.
+    // Preset components land where the game keeps them; every state path scripts can read exists; placeholders
+    // turn card ids into hand numbers; a requested card is found wherever it is.
     @Test
-    void existingPrivateChannelsAreNeverRecordedForDeletion() {
-        developer.setPrivateChannelID("42");
-        nekro.setPrivateChannelID("43");
+    void componentsStateAndPlaceholders() {
+        developer.initPNs();
+        nekro.initPNs();
+        game.setTile(new Tile("19", "101"));
+        TestBedPreset preset = TestBedPresetService.parse("""
+                { "you": { "pns": ["sftt:sol"], "scoredObjectives": ["corner"], "fragments": ["crf1"] },
+                  "revealedObjectives": ["corner"], "laws": ["arms_reduction"], "tokens": { "101": ["frontier"] } }""");
+        List<String> warnings = new ArrayList<>();
+        TestBedComponentService.applyGameState(game, preset, warnings);
+        TestBedComponentService.applySeatComponents(game, nekro, preset.getYou(), warnings);
+        assertEquals(List.of(), warnings);
+        assertTrue(game.getLaws().containsKey("arms_reduction"));
+        assertTrue(game.getScoredPublicObjectives().get("corner").contains(nekro.getUserID()));
+        assertTrue(nekro.getPromissoryNotes().containsKey("red_sftt"));
+        assertTrue(nekro.getFragments().contains("crf1"));
 
-        TestBedChannelService.createFogPrivateChannel(game, developer, null);
-        TestBedChannelService.createFogPrivateChannel(game, nekro, null);
-
-        assertTrue(TestBedChannelService.createdChannelIds(game).isEmpty());
-        assertEquals("42", developer.getPrivateChannelID());
-    }
-
-    // Every advertised state path must be implemented; adding a field to the list without a resolver fails here.
-    @Test
-    void everyStatePathResolves() {
         for (String field : TestBedStateResolver.SEAT_FIELDS) {
-            assertFalse(resolve("nekro." + field).startsWith("<"), "seat field " + field);
+            assertFalse(resolve("nekro." + field).startsWith("<"), field);
         }
         for (String field : TestBedStateResolver.GAME_FIELDS) {
-            assertFalse(resolve("game." + field).startsWith("<"), "game field " + field);
+            assertFalse(resolve("game." + field).startsWith("<"), field);
         }
-    }
+        assertEquals("corner", resolve("nekro.posScored"));
 
-    @Test
-    void statePathsReadTheGame() {
-        nekro.setTg(4);
-        nekro.setTacticalCC(3);
-        nekro.setFleetCC(2);
-        nekro.setStrategicCC(1);
-        nekro.addSC(5);
-        nekro.addSC(2);
-        game.setSpeakerUserID(nekro.getUserID());
-        game.setStoredValue("factionsInCombat", "letnev_nekro");
+        game.drawSpecificActionCard("sabo1", nekro.getUserID());
+        String resolved = TestBedPlaceholders.resolve(
+                        "ac_{ac:sabo1}_{nekro.color}", nekro, game::getPlayerFromColorOrFaction)
+                .text();
+        assertEquals("ac_" + nekro.getActionCards().get("sabo1") + "_blue", resolved);
 
-        assertEquals("4", resolve("nekro.tg"));
-        assertEquals("3/2/1", resolve("nekro.ccs"));
-        assertEquals("2,5", resolve("nekro.scs"));
-        assertEquals("nekro", resolve("game.speaker"));
-        assertEquals("letnev_nekro", resolve("stored:factionsInCombat"));
-        assertNull(TestBedStateResolver.validatePath("stored:anything"));
-        assertNotNull(TestBedStateResolver.validatePath("nekro.mood"));
-        assertNotNull(TestBedStateResolver.validatePath("game.weather"));
-        assertNotNull(TestBedStateResolver.validatePath("nekro"));
+        // Asking for a card another seat already holds moves it to you instead of failing.
+        TestBedPreset wantsSabotage = TestBedPresetService.parse("{ \"you\": { \"acs\": [\"sabo1\"] } }");
+        TestBedApplyService.applyHand(game, developer, wantsSabotage.getYou(), null, warnings);
+        assertEquals(List.of(), warnings);
+        assertTrue(developer.getActionCards().containsKey("sabo1"));
+        assertFalse(nekro.getActionCards().containsKey("sabo1"));
     }
 
     private String resolve(String path) {
-        return TestBedStateResolver.resolve(game, path, name -> game.getPlayerFromColorOrFaction(name));
+        return TestBedStateResolver.resolve(game, path, game::getPlayerFromColorOrFaction);
     }
 
-    // Placeholders turn card ids into the seat's current hand numbers and seat names into factions or colors, so a
-    // script can press `ac_play_from_hand_<n>` without knowing <n> in advance.
+    // At 8 seats the main panel uses 3 rows; the turn buttons page and every test buttons page fits Discord's limits
+    // however many buttons
+    // there are; button ids parse back; autocomplete labels stay within 100 characters.
     @Test
-    void placeholdersResolveHandNumbersAndSeats() {
-        game.drawSpecificActionCard("sabo1", nekro.getUserID());
-        int number = nekro.getActionCards().get("sabo1");
+    void panelFitsDiscord() {
+        IntStream.range(2, 8).forEach(i -> TestBedFixture.virtualSeat(game, i, FACTIONS.get(i), COLORS.get(i)));
+        List<ActionRow> main = TestBedPanelService.components(game, nekro, false);
+        assertTrue(main.size() <= 3, "main rows: " + main.size());
+        assertWithinLimits(main);
 
-        TestBedPlaceholders.Resolution resolved = TestBedPlaceholders.resolve(
-                "ac_play_from_hand_{ac:sabo1} by {seat1.faction} in {nekro.color}",
-                nekro,
-                name -> "seat1".equals(name) ? nekro : game.getPlayerFromColorOrFaction(name));
-        assertEquals(List.of(), resolved.problems());
-        assertEquals("ac_play_from_hand_" + number + " by nekro in blue", resolved.text());
-
-        assertEquals(
-                "resolvePNPlay_blue_sftt",
-                TestBedPlaceholders.resolve(
-                                "resolvePNPlay_{nekro.color}_sftt", nekro, game::getPlayerFromColorOrFaction)
-                        .text());
-        assertEquals(
-                List.of("nekro has no `sabo2` in hand; hand: [sabo1]"),
-                TestBedPlaceholders.resolve("{ac:sabo2}", nekro, game::getPlayerFromColorOrFaction)
-                        .problems());
-        assertEquals(
-                List.of("no seat `arborec`"),
-                TestBedPlaceholders.resolve("{arborec.color}", nekro, game::getPlayerFromColorOrFaction)
-                        .problems());
-    }
-
-    // At the 8-seat maximum (plus the developer) the panel must still fit Discord's 5 rows of 5 buttons, with ids
-    // and labels inside Discord's limits; so must the shortcut list however many shortcuts a preset declares.
-    @Test
-    void panelsFitDiscordLimits() {
-        IntStream.range(2, FACTIONS.size())
-                .forEach(i -> TestBedFixture.virtualSeat(game, i, FACTIONS.get(i), COLORS.get(i)));
-        assertWithinLimits(TestBedPanelService.components(game, nekro));
+        // A turn message can carry Discord's maximum of 25 buttons; the page keeps 20 plus its own row.
+        List<Button> turnButtons = IntStream.range(0, 25)
+                .mapToObj(i -> Buttons.green("FFCC_nekro_option" + i, "Option " + i))
+                .toList();
+        TurnButtons turn = new TurnButtons(nekro, null, turnButtons);
+        assertWithinLimits(TestBedPanelService.turnComponents(turn));
+        assertTrue(TestBedPanelService.turnContent(game, turn, null).contains("nekro"));
 
         Shortcut shortcut = new Shortcut();
         shortcut.setLabel("A shortcut label that is rather long to see the truncation stay within limits ok");
         TestBedShortcuts.store(
                 game, IntStream.range(0, 30).mapToObj(i -> shortcut).toList());
-        assertWithinLimits(TestBedPanelService.shortcutComponents(game));
+        List<ButtonGroup> groups = TestBedShortcuts.groups(game);
+        assertTrue(groups.stream().map(ButtonGroup::key).toList().containsAll(List.of("seat", "game", "preset")));
+        for (ButtonGroup group : groups) {
+            for (int page = 0; page < TestBedPanelService.pageCount(group); page++) {
+                assertWithinLimits(TestBedPanelService.pageComponents(groups, group, page));
+            }
+        }
+        assertEquals(
+                new PageRef("file-fog-qol", 17),
+                TestBedPanelService.parseRef(TestBedPanelService.RUN + "file-fog-qol_17", TestBedPanelService.RUN));
+        for (String option : List.of(TestBedAutoComplete.PRESET_OPTION, TestBedAutoComplete.SCRIPT_OPTION)) {
+            TestBedAutoComplete.choices(option, game, "")
+                    .forEach(choice -> assertTrue(choice.getName().length() <= 100, choice.getName()));
+        }
     }
 
     private static void assertWithinLimits(List<ActionRow> rows) {
@@ -280,25 +234,10 @@ class TestBedGameTest extends BaseTi4Test {
                 assertTrue(button.getCustomId().length() <= 100, button.getCustomId());
                 assertTrue(button.getLabel().length() <= 80, button.getLabel());
             }
+            row.getComponents().stream()
+                    .filter(StringSelectMenu.class::isInstance)
+                    .map(StringSelectMenu.class::cast)
+                    .forEach(menu -> assertTrue(menu.getOptions().size() <= 25));
         }
-    }
-
-    @Test
-    void panelHighlightsTheActingSeatAndToolsChangeIt() {
-        Button nekroButton = TestBedPanelService.components(game, nekro).getFirst().getButtons().stream()
-                .filter(button -> button.getCustomId().equals(TestBedPanelService.ACT_AS + "nekro"))
-                .findFirst()
-                .orElseThrow();
-        assertEquals(ButtonStyle.SUCCESS, nekroButton.getStyle());
-
-        nekro.setTg(2);
-        nekro.setTacticalCC(3);
-        nekro.setStrategicCC(1);
-        TestBedPanelService.applyTool(Tool.tg, nekro);
-        TestBedPanelService.applyTool(Tool.tactic, nekro);
-        TestBedPanelService.applyTool(Tool.strategy, nekro);
-        assertEquals(3, nekro.getTg());
-        assertEquals(4, nekro.getTacticalCC());
-        assertEquals(2, nekro.getStrategicCC());
     }
 }

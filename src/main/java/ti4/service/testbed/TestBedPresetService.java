@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.image.Mapper;
@@ -32,6 +34,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class TestBedPresetService {
 
     public static final String PRESET_FOLDER = "testbed";
+    public static final String LOCAL_FOLDER = PRESET_FOLDER + "/local";
     public static final String HOME_UNIT_LOCATION = "home";
     public static final List<String> DEFAULT_HOME_POSITIONS = List.of("301", "304", "307", "310", "313", "316");
     public static final String DEFAULT_MAP_STRING = "{18} 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36"
@@ -39,6 +42,7 @@ public class TestBedPresetService {
 
     private static final int MAX_SEATS = 8;
     private static final Set<String> LEADER_TYPES = Set.of("agent", "commander", "hero", "envoy");
+    public static final List<String> BREAKTHROUGH_STATES = List.of("unlocked", "exhausted");
     private static final Pattern CCS_PATTERN = Pattern.compile("\\d+/\\d+/\\d+");
     private static final Set<String> EMPTY_MAP_TILES = Set.of("0", "-1");
 
@@ -59,23 +63,48 @@ public class TestBedPresetService {
         return STRICT_MAPPER.writeValueAsString(value);
     }
 
-    public static Map<String, TestBedPreset> loadShippedPresets() {
-        Map<String, TestBedPreset> presets = new TreeMap<>();
-        for (Path file : shippedPresetFiles()) {
+    private static volatile Map<String, TestBedPreset> presets;
+
+    public static Map<String, TestBedPreset> loadPresets() {
+        Map<String, TestBedPreset> cached = presets;
+        if (cached == null) {
+            cached = Collections.unmodifiableMap(readPresets(allPresetFiles()));
+            presets = cached;
+        }
+        return cached;
+    }
+
+    static Map<String, TestBedPreset> readPresets(List<Path> files) {
+        Map<String, TestBedPreset> read = new TreeMap<>();
+        for (Path file : files) {
             String fileName = file.getFileName().toString().replaceFirst("\\.json$", "");
             try {
                 TestBedPreset preset = parse(Files.readString(file));
-                presets.put(preset.getName() == null ? fileName : preset.getName(), preset);
+                read.put(preset.getName() == null ? fileName : preset.getName(), preset);
             } catch (IOException | JacksonException e) {
                 BotLogger.error("Could not read test bed preset " + file, e);
             }
         }
-        return presets;
+        return read;
+    }
+
+    public static void clearCache() {
+        presets = null;
+    }
+
+    static List<Path> allPresetFiles() {
+        List<Path> files = new ArrayList<>(shippedPresetFiles());
+        files.addAll(localPresetFiles());
+        return files;
+    }
+
+    static List<Path> localPresetFiles() {
+        return jsonFilesIn(LOCAL_FOLDER + "/presets");
     }
 
     @Nullable
-    public static TestBedPreset getShippedPreset(String name) {
-        return loadShippedPresets().get(name);
+    public static TestBedPreset getPreset(String name) {
+        return loadPresets().get(name);
     }
 
     static List<Path> shippedPresetFiles() {
@@ -113,6 +142,10 @@ public class TestBedPresetService {
         merged.setLeaders(firstNonNull(seat.getLeaders(), defaults.getLeaders()));
         merged.setUnits(seat.getUnits().isEmpty() ? defaults.getUnits() : seat.getUnits());
         merged.setPlanets(firstNonNull(seat.getPlanets(), defaults.getPlanets()));
+        merged.setPns(firstNonNull(seat.getPns(), defaults.getPns()));
+        merged.setScoredObjectives(firstNonNull(seat.getScoredObjectives(), defaults.getScoredObjectives()));
+        merged.setFragments(firstNonNull(seat.getFragments(), defaults.getFragments()));
+        merged.setBreakthrough(firstNonNull(seat.getBreakthrough(), defaults.getBreakthrough()));
         return merged;
     }
 
@@ -141,6 +174,7 @@ public class TestBedPresetService {
             errors.add("`combat` needs `start` to be `action`.");
         }
         validateSeatIdentities(seats, errors);
+        validateGameState(preset, errors);
         TestBedScriptService.validateShortcuts(
                 preset.getShortcuts(), TestBedScriptService.knownSeatNames(preset), errors);
         validateHandContents(preset.getDefaults(), "defaults", errors);
@@ -231,6 +265,50 @@ public class TestBedPresetService {
             validateIds(seat.getLeaders().getUnlock(), isLeader, label, "leader", errors);
             validateIds(seat.getLeaders().getExhaust(), isLeader, label, "leader", errors);
         }
+        validateIds(seat.getPns(), TestBedPresetService::isPromissoryNoteEntry, label, "promissory note", errors);
+        validateIds(seat.getScoredObjectives(), Mapper::isValidPublicObjective, label, "public objective", errors);
+        validateIds(seat.getFragments(), Mapper::isValidExplore, label, "relic fragment", errors);
+        if (seat.getBreakthrough() != null && !BREAKTHROUGH_STATES.contains(seat.getBreakthrough())) {
+            errors.add(label + ": `breakthrough` must be one of " + BREAKTHROUGH_STATES + ".");
+        }
+    }
+
+    private static boolean isPromissoryNoteEntry(String entry) {
+        int colon = entry.indexOf(':');
+        if (colon < 0) return Mapper.isValidPromissoryNote(entry);
+        return colon > 0 && colon < entry.length() - 1;
+    }
+
+    private static void validateGameState(TestBedPreset preset, List<String> errors) {
+        validateIds(
+                preset.getRevealedObjectives(), Mapper::isValidPublicObjective, "preset", "public objective", errors);
+        validateIds(
+                preset.getLaws(),
+                law -> Mapper.isValidAgenda(StringUtils.substringBefore(law, ":")),
+                "preset",
+                "law",
+                errors);
+        for (Map.Entry<String, List<String>> entry : preset.getTokens().entrySet()) {
+            String where = entry.getKey();
+            if (!PositionMapper.isTilePositionValid(where)
+                    && !Mapper.isValidPlanet(AliasHandler.resolvePlanet(where.toLowerCase()))) {
+                errors.add("preset: `tokens` target `" + where + "` is neither a tile position nor a planet.");
+            }
+            validateIds(entry.getValue(), TestBedPresetService::isKnownToken, "preset", "token", errors);
+        }
+        for (Seat seat : preset.allSeats()) {
+            if (seat.getScoredObjectives() == null) continue;
+            for (String objective : seat.getScoredObjectives()) {
+                if (!preset.getRevealedObjectives().contains(objective)) {
+                    errors.add("Objective `" + objective + "` is scored but not in `revealedObjectives`.");
+                }
+            }
+        }
+    }
+
+    static boolean isKnownToken(String token) {
+        return Mapper.getAttachmentImagePath(token) != null
+                || Mapper.getTokenID(AliasHandler.resolveToken(token)) != null;
     }
 
     private static void validateCardIds(

@@ -26,7 +26,8 @@ format reference. This file covers how you work with it.
    beside it: fixed factions, specific card ids for anything checked, and `start` as late as possible (`action`,
    with `sc`, `units`, `leaders`, `combat`), so the script does not replay setup. Set `"fog"` when the feature is
    fog-only.
-4. **Write the script** in `src/main/resources/data/testbed/scripts/<behaviour>.json`: a precondition check, the
+4. **Write the script** in `src/main/resources/data/testbed/scripts/<behaviour>.json` (shared) or
+   `data/testbed/local/scripts/` (only for the developer, ignored by git): a precondition check, the
    presses, then the checks. Rules below.
 5. **Validate:** `mvn -o test -Dtest=TestBedDataTest`. It parses and validates every shipped preset and script:
    seat names against fixed-faction presets, verbs, scopes, state paths, card ids, and Discord id limits. Fix every
@@ -41,6 +42,10 @@ format reference. This file covers how you work with it.
     the faction check should apply (guard tests); without it the check is skipped.
   - Ids built from values (`"strategicAction_" + sc`, `"sc_follow_" + sc`) are written with concrete values.
   - If an id is built from something you cannot know in advance, use `press` with a stable id prefix, or say so.
+- **Get the component into play through the preset.** The table "Set up any component" in
+  `DEVELOPER_TESTBED.md` lists a preset field for each kind (cards, notes, objectives, laws, tokens, fragments,
+  breakthroughs). If one is missing, add the field (`TestBedPreset.Seat`, `TestBedComponentService`,
+  `TestBedPresetService` validation, a test) rather than working around it in steps.
 - **Played components use placeholders.** Hand cards have buttons numbered at draw time
   (`ac_play_from_hand_<n>`, `so_score_hand_<n>`): write `ac_play_from_hand_{ac:<id>}` and give the card in the
   preset or a `do: hand` step first; validation fails otherwise. For color-based ids use `{<seat>.color}`
@@ -55,7 +60,8 @@ format reference. This file covers how you work with it.
   listed path is not implemented. Many features keep their state in game stored values, which `stored:<key>` can
   read: find the key in the code.
 - **Message checks second,** with short stable fragments taken from the code's message strings, never whole
-  sentences, emoji or mentions. Use `count` for "exactly once". In fog scripts add
+  sentences, emoji or mentions. Names often render as emoji (strategy cards do), so match the fixed text
+  around them. Use `count` for "exactly once". In fog scripts add
   `{ "expect": { "in": "main", "noFactionLeak": true } }` after anything that could announce publicly.
 - **One behaviour, small and deterministic.** A precondition check first; `stopOnFail: true` when later steps
   depend on earlier ones; no checks that depend on dice rolls or random draws.
@@ -67,6 +73,19 @@ format reference. This file covers how you work with it.
   that on the step before them when the action posts a lot. Crons and timers need a `wait`.
 - **Use ids, not labels, for buttons whose label carries state** (`End Turn (+1 ability)`, `Tactical Action (3)`).
 - JSON cannot hold comments: put intent in `description` and `note` steps.
+
+## Adding test buttons
+
+When a developer wants a button in the panel for their feature (not a full test), add a **test button**:
+- **Prefer JSON.** Personal buttons go in `src/main/resources/data/testbed/local/shortcuts/<feature>.json`
+  (ignored by git); buttons the team should keep go in `data/testbed/shortcuts/` (`shared.json` or
+  `<feature>.json`). One file is one group in the panel. Each button is a `label` plus script `steps`; set
+  `"fog": true|false` when it only makes sense in one kind of game.
+- **Java only for logic** that steps cannot express: add `new JavaShortcut("<group>", "<id>", "<label>",
+  (game, seat, event) -> "<status line>")` to `TestBedFeatureShortcuts.SHORTCUTS`. `seat` may be `null`; return a
+  status line, never post messages yourself. No comments in the Java (AGENTS.md).
+- Validate with `mvn -o test -Dtest=TestBedDataTest` (every file is its own case; ids must be unique per group,
+  labels at most 80 characters). Tell the developer to run `/testbed reload` to pick the file up.
 
 ## Extending the framework
 
@@ -81,8 +100,8 @@ Only when a script genuinely needs it, and say so in the hand-over:
 
 End with a short message to the developer containing:
 1. **What the script tests,** in one sentence, and the file path.
-2. **How to run it:** "`/testbed run script:<name> reset:true` in a test-bed game, or `/testbed run script:<name>` in
-   a new normal (or fog) game" (`file:` for an attachment).
+2. **How to run it:** "`/testbed run script:<name>` in a test-bed or new normal (or fog) game; it resets and
+   applies its preset first" (`file:` for an attachment; `script:all` runs every shipped script).
 3. **What a pass looks like:** the steps that must be ✅, and which message or state each one proves.
 4. **Button ids used,** each with the file and line it came from.
 5. **Not covered:** anything the script cannot check that needs a manual look.

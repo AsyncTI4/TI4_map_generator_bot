@@ -30,9 +30,10 @@ class TestBedPanel extends GameStateSubcommand {
         }
         Player target = TestBedService.resolveActingPlayerForComponent(
                 game, event, game.getPlayer(event.getUser().getId()));
+        boolean following = TestBedService.isFollowingTurn(game, event.getUser().getId());
         event.getHook()
-                .sendMessage(TestBedPanelService.content(game, target, null))
-                .setComponents(TestBedPanelService.components(game, target))
+                .sendMessage(TestBedPanelService.content(game, target, following, null))
+                .setComponents(TestBedPanelService.components(game, target, following))
                 .setEphemeral(true)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }

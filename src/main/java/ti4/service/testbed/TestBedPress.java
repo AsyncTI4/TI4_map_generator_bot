@@ -1,6 +1,7 @@
 package ti4.service.testbed;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.ExecutionLockManager;
@@ -121,7 +124,7 @@ public class TestBedPress {
         return prefixMatch;
     }
 
-    private static void sleep(long millis) {
+    static void sleep(long millis) {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -135,7 +138,9 @@ public class TestBedPress {
         Message carrier = channel.sendMessage("[test bed] press `" + buttonId + "` as " + seat.getFaction())
                 .setComponents(ActionRow.of(button))
                 .complete();
-        return press(game, developer, seat, carrier, button);
+        PressResult result = press(game, developer, seat, carrier, button);
+        carrier.delete().queue(Consumers.nop(), Consumers.nop());
+        return result;
     }
 
     enum Match {
@@ -160,21 +165,15 @@ public class TestBedPress {
         return withoutCheck.substring(withoutCheck.indexOf('_') + 1);
     }
 
-    private static PressResult press(Game game, Member developer, Player seat, Message message, Button button) {
+    public static PressResult press(Game game, Member developer, Player seat, Message message, Button button) {
         String developerId = developer.getId();
-        Player previous = TestBedService.getActingAs(game, developerId);
-        String previousFaction = previous == null ? null : previous.getFaction();
+        String previous = TestBedService.rawActingAs(game, developerId);
         runLocked(game, locked -> TestBedService.setActingAs(locked, developerId, seat));
         Recorder recorder = new Recorder();
         try {
             ButtonProcessor.processNow(standInEvent(message, button, developer, recorder));
         } finally {
-            runLocked(
-                    game,
-                    locked -> TestBedService.setActingAs(
-                            locked,
-                            developerId,
-                            previousFaction == null ? null : locked.getPlayerFromColorOrFaction(previousFaction)));
+            runLocked(game, locked -> TestBedService.restoreActingAs(locked, developerId, previous));
         }
         return new PressResult(true, "pressed `" + button.getLabel() + "` (`" + button.getCustomId() + "`)", recorder);
     }
@@ -248,7 +247,7 @@ public class TestBedPress {
                 message.getInteractionMetadata() == null
                         ? null
                         : message.getInteractionMetadata().getIntegrationOwners();
-            case "getHook" -> hook(self, message.getJDA(), recorder);
+            case "getHook" -> hook(self, message, recorder);
             case "replyModal" -> {
                 recorder.modal(((Modal) args[0]).getId());
                 yield noOpAction(method.getReturnType(), message.getJDA(), recorder);
@@ -257,6 +256,7 @@ public class TestBedPress {
             case "hashCode" -> System.identityHashCode(self);
             case "equals" -> args[0] == self;
             default -> {
+                if (isMessageEdit(name)) yield editRealMessage(method, args, message, recorder);
                 if (method.isDefault()) yield InvocationHandler.invokeDefault(self, method, args);
                 recordText(recorder, args);
                 if (!name.startsWith("reply") && !name.startsWith("defer") && !name.startsWith("edit")) {
@@ -267,7 +267,8 @@ public class TestBedPress {
         };
     }
 
-    private static InteractionHook hook(ButtonInteraction interaction, JDA jda, Recorder recorder) {
+    private static InteractionHook hook(ButtonInteraction interaction, Message message, Recorder recorder) {
+        JDA jda = message.getJDA();
         InteractionHook[] self = new InteractionHook[1];
         self[0] = (InteractionHook) Proxy.newProxyInstance(
                 InteractionHook.class.getClassLoader(),
@@ -280,11 +281,57 @@ public class TestBedPress {
                     if ("toString".equals(name)) return "TestBedInteractionHook";
                     if ("hashCode".equals(name)) return System.identityHashCode(proxy);
                     if ("equals".equals(name)) return args[0] == proxy;
+                    if (isMessageEdit(name)) return editRealMessage(method, args, message, recorder);
+                    if ("deleteOriginal".equals(name)) return message.delete();
+                    if ("retrieveOriginal".equals(name)) {
+                        return message.getChannel().retrieveMessageById(message.getId());
+                    }
                     recordText(recorder, args);
                     if (returnsSelf(method, proxy)) return proxy;
                     return defaultValue(method, jda, recorder);
                 });
         return self[0];
+    }
+
+    private static boolean isMessageEdit(String name) {
+        return name.startsWith("editOriginal") || name.startsWith("editMessage") || name.startsWith("editComponents");
+    }
+
+    private static Object editRealMessage(Method method, @Nullable Object[] args, Message message, Recorder recorder)
+            throws Throwable {
+        recordText(recorder, args);
+        String messageMethod = method.getName()
+                .replace("editOriginal", "editMessage")
+                .replace("editComponents", "editMessageComponents");
+        Method target =
+                MethodUtils.getMatchingAccessibleMethod(Message.class, messageMethod, method.getParameterTypes());
+        if (target == null) {
+            recorder.unsupported(method.getName());
+            return defaultValue(method, message.getJDA(), recorder);
+        }
+        return delegatingAction(method.getReturnType(), invoke(target, message, args));
+    }
+
+    private static Object delegatingAction(Class<?> type, Object real) {
+        if (type.isInstance(real)) return real;
+        return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type}, (proxy, method, args) -> {
+            Method target = MethodUtils.getMatchingAccessibleMethod(
+                    real.getClass(), method.getName(), method.getParameterTypes());
+            if (target == null) {
+                if (method.isDefault()) return InvocationHandler.invokeDefault(proxy, method, args);
+                return method.getReturnType().isInstance(proxy) ? proxy : null;
+            }
+            Object result = invoke(target, real, args);
+            return result == real ? proxy : result;
+        });
+    }
+
+    private static Object invoke(Method target, Object receiver, @Nullable Object[] args) throws Throwable {
+        try {
+            return target.invoke(receiver, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 
     private static Object defaultValue(Method method, JDA jda, Recorder recorder) {

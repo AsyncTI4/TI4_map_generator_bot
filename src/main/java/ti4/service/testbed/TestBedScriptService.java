@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,23 +39,48 @@ public class TestBedScriptService {
         return TestBedPresetService.parse(json, TestBedScript.class);
     }
 
-    public static Map<String, TestBedScript> loadShippedScripts() {
-        Map<String, TestBedScript> scripts = new TreeMap<>();
-        for (Path file : shippedScriptFiles()) {
+    private static volatile Map<String, TestBedScript> scripts;
+
+    public static Map<String, TestBedScript> loadScripts() {
+        Map<String, TestBedScript> cached = scripts;
+        if (cached == null) {
+            cached = Collections.unmodifiableMap(readScripts(allScriptFiles()));
+            scripts = cached;
+        }
+        return cached;
+    }
+
+    static Map<String, TestBedScript> readScripts(List<Path> files) {
+        Map<String, TestBedScript> read = new TreeMap<>();
+        for (Path file : files) {
             String fileName = file.getFileName().toString().replaceFirst("\\.json$", "");
             try {
                 TestBedScript script = parse(Files.readString(file));
-                scripts.put(script.getName() == null ? fileName : script.getName(), script);
+                read.put(script.getName() == null ? fileName : script.getName(), script);
             } catch (IOException | JacksonException e) {
                 BotLogger.error("Could not read test bed script " + file, e);
             }
         }
-        return scripts;
+        return read;
+    }
+
+    public static void clearCache() {
+        scripts = null;
+    }
+
+    static List<Path> allScriptFiles() {
+        List<Path> files = new ArrayList<>(shippedScriptFiles());
+        files.addAll(localScriptFiles());
+        return files;
+    }
+
+    static List<Path> localScriptFiles() {
+        return TestBedPresetService.jsonFilesIn(TestBedPresetService.LOCAL_FOLDER + "/scripts");
     }
 
     @Nullable
-    public static TestBedScript getShippedScript(String name) {
-        return loadShippedScripts().get(name);
+    public static TestBedScript getScript(String name) {
+        return loadScripts().get(name);
     }
 
     static List<Path> shippedScriptFiles() {
@@ -65,7 +91,7 @@ public class TestBedScriptService {
         List<String> errors = new ArrayList<>();
         TestBedPreset preset = null;
         if (script.getPreset() != null) {
-            preset = TestBedPresetService.getShippedPreset(script.getPreset());
+            preset = TestBedPresetService.getPreset(script.getPreset());
             if (preset == null) errors.add("Unknown preset `" + script.getPreset() + "`.");
         }
         if (script.getSteps().isEmpty()) errors.add("The script has no `steps`.");

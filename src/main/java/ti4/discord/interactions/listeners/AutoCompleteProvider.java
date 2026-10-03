@@ -87,8 +87,7 @@ import ti4.service.map.MapPresetService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
-import ti4.service.testbed.TestBedPresetService;
-import ti4.service.testbed.TestBedScriptService;
+import ti4.service.testbed.TestBedAutoComplete;
 import ti4.service.testbed.TestBedService;
 import ti4.settings.GlobalSettings;
 
@@ -1504,16 +1503,14 @@ class AutoCompleteProvider {
 
     private static void resolveTestBedAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
-        Set<String> names =
-                switch (optionName) {
-                    case "preset" -> TestBedPresetService.loadShippedPresets().keySet();
-                    case "script" -> TestBedScriptService.loadShippedScripts().keySet();
-                    default -> null;
-                };
-        if (names == null) return;
-        String enteredValue = event.getFocusedOption().getValue();
-        event.replyChoices(mapTo25ChoicesThatContain(names, enteredValue))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        Game game = GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame()
+                : null;
+        List<Command.Choice> choices = TestBedAutoComplete.choices(
+                optionName, game, event.getFocusedOption().getValue());
+        if (choices == null) return;
+        event.replyChoices(choices).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveFrankenAutoComplete(
