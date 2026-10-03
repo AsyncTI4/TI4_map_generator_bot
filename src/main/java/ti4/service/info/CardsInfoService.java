@@ -420,6 +420,9 @@ public class CardsInfoService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
+        if (player.hasTechReady("dsbelky")) {
+            buttons.add(Buttons.gray("exhaustTech_dsbelky", "Use Synchrony Matrix", TechEmojis.CyberneticTech));
+        }
         if (player.hasTechReady("dsuydag")) {
             buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
         }
@@ -436,6 +439,12 @@ public class CardsInfoService {
         if (player.hasRelicReady("superweaponmors")) {
             buttons.add(Buttons.gray(
                     "exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
+        }
+        if (player.hasRelicReady("superweaponcaled")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "exhaustSuperweapon_caled_" + game.getActiveSystem(),
+                    "Use Caled",
+                    FactionEmojis.belkosea));
         }
         if (player.hasRelicReady("superweaponglatison")) {
             buttons.add(Buttons.gray(

@@ -40,6 +40,7 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -464,6 +465,7 @@ public class CombatModHelper {
                 Player activePlayer = game.getActivePlayer();
                 if (onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
+                        && !RealityFieldImpactorService.nullifies(game, tile)
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
@@ -486,6 +488,7 @@ public class CombatModHelper {
                 if (game.isCosmicPhenomenaeMode()
                         && onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
+                        && !RealityFieldImpactorService.nullifies(game, tile)
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
@@ -853,7 +856,7 @@ public class CombatModHelper {
                     if (game.getStoredValue(combatName).isEmpty()) {
                         round = 0;
                     } else {
-                        round = Integer.parseInt(game.getStoredValue(combatName)) - 1;
+                        round = Integer.parseInt(game.getStoredValue(combatName));
                     }
                     scalingCount += round;
                 }

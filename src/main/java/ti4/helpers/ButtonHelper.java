@@ -2314,28 +2314,33 @@ public class ButtonHelper {
 
     public static void sendAllAgentsAndAbilitiesToReady(GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Buttons.green(
+                    "belkoseaYellowTechReady_planet_" + planet,
+                    "Ready " + Helper.getPlanetRepresentation(planet, player.getGame())));
+        }
         for (String ability : player.getExhaustedPlanetsAbilities()) {
-            buttons.add(Buttons.green("belkoseaYellowTechReady_planet_", "Ready " + ability + " Ability"));
+            buttons.add(Buttons.green("belkoseaYellowTechReady_ability_" + ability, "Ready " + ability + " Ability"));
         }
         String msg = "Please choose a component to ready.";
 
         for (String relic : player.getExhaustedRelics()) {
-            if (relic.contains("superweapon")) {
-                buttons.add(Buttons.green(
-                        "belkoseaYellowTechReady_relic_" + relic,
-                        "Ready " + Mapper.getRelic(relic).getName()));
-            }
-            if (relic.contains("titanprototype") || relic.contains("absol_jr")) {
-                buttons.add(Buttons.green(
-                        "belkoseaYellowTechReady_agent_" + relic,
-                        "Ready " + Mapper.getRelic(relic).getName()));
-            }
+            buttons.add(Buttons.green(
+                    "belkoseaYellowTechReady_relic_" + relic,
+                    "Ready " + Mapper.getRelic(relic).getName() + " Relic"));
         }
         for (Leader leader : player.getLeaders()) {
-            if (leader.isExhausted() && leader.getId().contains("agent")) {
+            if (leader.isExhausted()) {
                 buttons.add(Buttons.green(
-                        "belkoseaYellowTechReady_agent_" + leader.getId(),
-                        "Ready " + Mapper.getLeader(leader.getId()).getName() + " (Agent)"));
+                        "belkoseaYellowTechReady_leader_" + leader.getId(),
+                        "Ready " + Mapper.getLeader(leader.getId()).getName() + " Leader"));
+            }
+        }
+        for (String breakthrough : player.getBreakthroughIDs()) {
+            if (player.isBreakthroughUnlocked(breakthrough) && player.isBreakthroughExhausted(breakthrough)) {
+                buttons.add(Buttons.green(
+                        "belkoseaYellowTechReady_breakthrough_" + breakthrough,
+                        "Ready " + Mapper.getBreakthrough(breakthrough).getName() + " Breakthrough"));
             }
         }
         for (UnitModel monument : MonumentsService.getExhaustedMonuments(player.getGame(), player)) {
@@ -4424,9 +4429,6 @@ public class ButtonHelper {
                         fightersIgnored += 4;
                         fleetCap += 2;
                     }
-                    if (token.contains("glatison")) {
-                        fightersIgnored += 5;
-                    }
                 }
             }
 
@@ -4468,9 +4470,6 @@ public class ButtonHelper {
                 && MonumentsService.isMonumentOnBoard(game, player, "mykomentori_monument")
                 && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "mykomentori_monument", tile)) {
             fightersIgnored += 3;
-        }
-        if (MonumentsBRButtonHandler.ignoresFighterCapacity(game, player, tile)) {
-            fightersIgnored += 5;
         }
         int ignoredFs = 0;
         int xytherisPdsInSpace = 0;
@@ -4979,6 +4978,7 @@ public class ButtonHelper {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        BlueReverieHelper.checkXinHarmony(game);
         deleteMessage(event);
     }
 
@@ -7251,23 +7251,25 @@ public class ButtonHelper {
 
     public static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
         String unitBaseType = unitModel.getBaseType();
-        return unitModel.getSustainDamage()
-                || ("warsun".equalsIgnoreCase(unitBaseType) && !isLawInPlay(game, "schematics"))
-                || ("mech".equalsIgnoreCase(unitBaseType)
-                        && !game.getLaws().containsKey("articles_war")
-                        && player.hasUnit("nomad_mech"))
-                || ("mech".equalsIgnoreCase(unitBaseType)
-                        && (player.ownsUnit("purpletf_mech")
-                                || player.hasUnit("naaz_voltron")
-                                || doesPlayerHaveFSHere("nekro_flagship", player, tile)
-                                || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
-                || (!player.isActivePlayer()
-                        && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                || (player.hasRelic("metalivoidshielding")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
+        return !ButtonHelperAbilities.removesSustainDamage(game, player, tile)
+                && !MonumentsBRButtonHandler.removesSustainDamage(game, player, tile)
+                && (unitModel.getSustainDamage()
+                        || ("warsun".equalsIgnoreCase(unitBaseType) && !isLawInPlay(game, "schematics"))
+                        || ("mech".equalsIgnoreCase(unitBaseType)
+                                && !game.getLaws().containsKey("articles_war")
+                                && player.hasUnit("nomad_mech"))
+                        || ("mech".equalsIgnoreCase(unitBaseType)
+                                && (player.ownsUnit("purpletf_mech")
+                                        || player.hasUnit("naaz_voltron")
+                                        || doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                                        || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
+                        || (!player.isActivePlayer()
+                                && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
+                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                        || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
+                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                        || (player.hasRelic("metalivoidshielding")
+                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase())));
     }
 
     @ButtonHandler("startThalnos_")

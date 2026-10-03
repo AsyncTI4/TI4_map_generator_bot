@@ -17,6 +17,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.game.MonumentsService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import ti4.service.unit.UnitModelValueInjectionService;
 
 /**
@@ -64,6 +65,7 @@ public class CombatUnitSelectionHelper {
         // In Cosmic Phenomena, asteroid fields keep fighters out of space combat unless the player has FF2.
         if (context.player().getGame().isCosmicPhenomenaeMode()
                 && context.tile().isAsteroidField()
+                && !RealityFieldImpactorService.nullifies(context.player().getGame(), context.tile())
                 && !context.player().hasFF2Tech()) {
             return filterUnits(selectedUnits, unit -> unit.getUnitType() != UnitType.Fighter);
         }
