@@ -88,7 +88,7 @@ public class JdaService {
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
-    private static final int DISCORD_REQUEST_TIMEOUT_SECONDS = 60;
+    public static final int DISCORD_REQUEST_TIMEOUT_SECONDS = 60;
     private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
             // User is playing a game, listening to Spotify, etc.
             CacheFlag.ACTIVITY,
