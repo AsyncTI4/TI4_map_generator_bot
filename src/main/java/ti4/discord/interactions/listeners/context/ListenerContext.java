@@ -37,8 +37,6 @@ public abstract class ListenerContext {
     private final long creationStartTime;
     private final long creationEndTime;
     protected boolean contextIsValid = true;
-    protected final String origComponentID;
-    protected String componentID;
     protected final ComponentIdEnvelope envelope;
     protected final Game game;
     protected Player player;
@@ -56,7 +54,16 @@ public abstract class ListenerContext {
         return contextIsValid;
     }
 
+    public String getComponentID() {
+        return envelope.handlerId();
+    }
+
+    public String getOrigComponentID() {
+        return envelope.rawId();
+    }
+
     private boolean allowsNonPlayerInteraction() {
+        String componentID = getComponentID();
         return "showGameAgain".equalsIgnoreCase(componentID)
                 || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
                 || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX);
@@ -66,9 +73,7 @@ public abstract class ListenerContext {
         creationStartTime = System.currentTimeMillis();
 
         this.event = event;
-        origComponentID = compID;
         envelope = ComponentIdEnvelope.decode(compID);
-        componentID = envelope.handlerId();
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         game = GameManager.isValid(gameName)

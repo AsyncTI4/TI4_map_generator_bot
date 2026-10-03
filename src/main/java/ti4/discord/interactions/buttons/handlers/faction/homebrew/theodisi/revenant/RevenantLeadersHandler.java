@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -817,7 +818,7 @@ public class RevenantLeadersHandler {
                     "Manually Assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
         } else {
             hitButtons.add(Buttons.green(
-                    opponent.factionButtonChecker() + "autoAssignGroundHits_" + holder.getName() + "_" + hits,
+                    opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(holder.getName(), hits),
                     "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
             hitButtons.add(Buttons.red(
                     opponent.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()

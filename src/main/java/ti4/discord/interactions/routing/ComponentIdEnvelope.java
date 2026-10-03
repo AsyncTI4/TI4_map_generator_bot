@@ -4,7 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.image.Mapper;
 
 public record ComponentIdEnvelope(
-        String ownerFaction, String spoofedFaction, boolean deleteButton, boolean deleteMessage, String handlerId) {
+        String rawId,
+        String ownerFaction,
+        String spoofedFaction,
+        boolean deleteButton,
+        boolean deleteMessage,
+        String handlerId) {
 
     private static final String OWNER_PREFIX = "FFCC_";
     private static final String SPOOF_PREFIX = "dummyPlayerSpoof";
@@ -20,7 +25,7 @@ public record ComponentIdEnvelope(
     }
 
     public static ComponentIdEnvelope decode(String rawId) {
-        if (rawId == null) return new ComponentIdEnvelope(null, null, false, false, null);
+        if (rawId == null) return new ComponentIdEnvelope(null, null, null, false, false, null);
 
         String ownerFaction = null;
         String spoofedFaction = null;
@@ -38,7 +43,7 @@ public record ComponentIdEnvelope(
         boolean deleteButton = rest.contains(DELETE_BUTTON_MARKER);
         boolean deleteMessage = rest.contains(DELETE_MESSAGE_MARKER);
         String handlerId = rest.replace(DELETE_BUTTON_MARKER, "").replace(DELETE_MESSAGE_MARKER, "");
-        return new ComponentIdEnvelope(ownerFaction, spoofedFaction, deleteButton, deleteMessage, handlerId);
+        return new ComponentIdEnvelope(rawId, ownerFaction, spoofedFaction, deleteButton, deleteMessage, handlerId);
     }
 
     private static String leadingFaction(String idAfterPrefix) {
