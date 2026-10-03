@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -227,7 +228,9 @@ public class RevenantTechHandler {
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                     "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
-                    factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
+                    factionChecker
+                            + CancelGroundHitsButtonId.of(tile.getPosition(), remainingHits, combatOnHolder.getName()),
+                    "Cancel a Hit"));
             assignmentMessage = cancellationMessage + "\n" + player.getRepresentation() + " may autoassign "
                     + remainingHits + " hit" + (remainingHits == 1 ? "" : "s") + ".";
         } else {

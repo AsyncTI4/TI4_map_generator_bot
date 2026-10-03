@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -112,13 +113,15 @@ public class VanguardAbilitiesHandler {
 
         buttons.add(Buttons.gray(
                 player.factionButtonChecker()
-                        + cancelType
-                        + "_"
-                        + tile.getPosition()
-                        + "_"
-                        + remainingHits
-                        + "_interlocking",
+                        + interlockingCancelId(cancelType, tile, remainingHits, combat.unitHolderName()),
                 "Use Interlocking Shields"));
+    }
+
+    private static String interlockingCancelId(String cancelType, Tile tile, int remainingHits, String combatHolder) {
+        if (CancelGroundHitsButtonId.PREFIX.equals(cancelType + "_")) {
+            return CancelGroundHitsButtonId.interlockingOf(tile.getPosition(), remainingHits, combatHolder);
+        }
+        return cancelType + "_" + tile.getPosition() + "_" + remainingHits + "_interlocking";
     }
 
     public static boolean useInterlockingShields(Game game, Player player, Tile tile) {

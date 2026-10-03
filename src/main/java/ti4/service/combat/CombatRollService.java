@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.FracturedRealityAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
@@ -798,8 +799,9 @@ public class CombatRollService {
                                         buttons, game, opponent, tile, combatOnHolder.getName());
 
                                 buttons.add(Buttons.gray(
-                                        opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_"
-                                                + h,
+                                        opponent.factionButtonChecker()
+                                                + CancelGroundHitsButtonId.of(
+                                                        tile.getPosition(), h, combatOnHolder.getName()),
                                         "Cancel a Hit"));
                                 TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                         buttons, game, opponent, tile, "ground", h);
@@ -825,7 +827,9 @@ public class CombatRollService {
                                 MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
                                         buttons, game, player, tile, combatOnHolder.getName());
                                 buttons.add(Buttons.gray(
-                                        player.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_1",
+                                        player.factionButtonChecker()
+                                                + CancelGroundHitsButtonId.of(
+                                                        tile.getPosition(), 1, combatOnHolder.getName()),
                                         "Cancel a Hit"));
                                 TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                                         buttons, game, player, tile, "ground", 1);

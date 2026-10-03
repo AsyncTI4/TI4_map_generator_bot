@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -463,15 +464,19 @@ public class TwilightsFallMonumentsButtonHandler {
         if (remainingHits > 0) {
             switch (hitType[0]) {
                 case "ground" -> {
-                    buttons.add(Buttons.green(
-                            factionChecker + "autoAssignGroundHits_"
-                                    + (hitType.length == 2 ? hitType[1] : tile.getPosition()) + "_" + remainingHits,
-                            "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
+                    String planet = hitType.length == 2
+                            ? hitType[1]
+                            : CancelGroundHitsButtonId.soleGroundForcePlanet(tile, player);
+                    if (planet != null) {
+                        buttons.add(Buttons.green(
+                                factionChecker + "autoAssignGroundHits_" + planet + "_" + remainingHits,
+                                "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
+                    }
                     buttons.add(Buttons.red(
                             "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                             "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
                     buttons.add(Buttons.gray(
-                            "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
+                            CancelGroundHitsButtonId.of(tile.getPosition(), remainingHits, planet), "Cancel a Hit"));
                 }
                 case "space" -> {
                     buttons.add(Buttons.green(
