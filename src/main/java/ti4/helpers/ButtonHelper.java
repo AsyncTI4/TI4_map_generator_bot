@@ -7258,8 +7258,8 @@ public class ButtonHelper {
         String unitBaseType = unitModel.getBaseType();
         return !ButtonHelperAbilities.removesSustainDamage(game, player, tile)
                 && !MonumentsBRButtonHandler.removesSustainDamage(game, player, tile)
+                && !("warsun".equalsIgnoreCase(unitBaseType) && isLawInPlay(game, "schematics"))
                 && (unitModel.getSustainDamage()
-                        || ("warsun".equalsIgnoreCase(unitBaseType) && !isLawInPlay(game, "schematics"))
                         || ("mech".equalsIgnoreCase(unitBaseType)
                                 && !game.getLaws().containsKey("articles_war")
                                 && player.hasUnit("nomad_mech"))
