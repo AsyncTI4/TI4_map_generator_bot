@@ -19,6 +19,7 @@ import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
+import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -126,6 +127,13 @@ public final class ModalListener extends ListenerAdapter {
                 return;
             }
             game.initializeMiltySettings().parseInput(context);
+            return;
         }
+
+        context.setShouldSave(false);
+        BotLogger.error(
+                new LogOrigin(context.getEvent(), context),
+                "Unrouted modal: `" + modalID + "`. This could just be a stale modal.");
+        MessageHelper.sendMessageToEventChannel(context.getEvent(), "We couldn't resolve what to do with this modal.");
     }
 }

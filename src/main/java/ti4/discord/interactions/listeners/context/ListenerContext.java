@@ -193,6 +193,7 @@ public abstract class ListenerContext {
     }
 
     public void save() {
+        if (!shouldSave) return;
         if (game != null) {
             GameManager.save(game, EventAuditService.getReason(getEvent()));
         }

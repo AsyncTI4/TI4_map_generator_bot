@@ -17,6 +17,7 @@ import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
+import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
 
@@ -99,6 +100,12 @@ public final class SelectionMenuProcessor {
                 return;
             }
         }
+
+        context.setShouldSave(false);
+        BotLogger.error(
+                new LogOrigin(event, context),
+                "Unrouted selection menu: `" + context.getMenuID() + "`. This could just be a stale selection menu.");
+        MessageHelper.sendMessageToEventChannel(event, "We couldn't resolve what to do with this selection.");
     }
 
     @SelectionHandler("jmfA_")
