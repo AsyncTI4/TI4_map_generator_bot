@@ -1,12 +1,12 @@
 package ti4.discord.interactions.buttons;
 
-import java.text.DecimalFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.AsyncTI4DiscordBot;
 import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -44,7 +44,7 @@ public class ButtonProcessor {
 
     private static final HandlerRegistry<ButtonContext> registry =
             AnnotationHandler.buildHandlerRegistry(ButtonContext.class, ButtonHandler.class);
-    private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
+    private static final ButtonRuntimeMonitor runtimeMonitor = new ButtonRuntimeMonitor();
 
     public static void checkButtonHandlersSetup() {
         if (registry.getSize() == 0) {
@@ -53,11 +53,17 @@ public class ButtonProcessor {
     }
 
     public static void queue(ButtonInteractionEvent event) {
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(event);
+        runtimeMonitor.recordQueued();
         String gameName = GameNameService.getGameNameFromChannel(event);
         String componentId = event.getButton().getCustomId();
         ExecutionLockType lockType = registry.isSave(componentId) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
+                eventToString(event, gameName),
+                gameName,
+                event.getMessageChannel(),
+                () -> process(event, timeline),
+                lockType);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -67,18 +73,20 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonInteractionEvent event) {
-        long processStartTime = System.currentTimeMillis();
+    private static void process(ButtonInteractionEvent event, ButtonPressTimeline timeline) {
+        timeline.markStarted();
+        runtimeMonitor.recordStarted();
 
         ButtonContext context = new ButtonContext(event);
-        if (!context.isValid()) return;
+        timeline.markCompleted(ButtonPressStage.CONTEXT);
+        if (!context.isValid()) {
+            runtimeMonitor.recordInvalid();
+            return;
+        }
 
-        long beforeTime = System.currentTimeMillis();
         log(event);
-        long logRuntime = System.currentTimeMillis() - beforeTime;
+        timeline.markCompleted(ButtonPressStage.LOG);
 
-        long resolveRuntime = 0;
-        long saveRuntime = 0;
         try {
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
@@ -86,18 +94,18 @@ public class ButtonProcessor {
                 CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
                         combatReplayService.capturePreInteractionSnapshot(context.getGame());
                 CombatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+                timeline.markCompleted(ButtonPressStage.REPLAY_SNAPSHOT);
             }
             try {
-                beforeTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
-                resolveRuntime = System.currentTimeMillis() - beforeTime;
+                timeline.markCompleted(ButtonPressStage.RESOLVE);
 
-                beforeTime = System.currentTimeMillis();
                 context.save();
-                saveRuntime = System.currentTimeMillis() - beforeTime;
+                timeline.markCompleted(ButtonPressStage.SAVE);
 
                 if (combatReplayService != null && context.getGame() != null) {
                     combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
+                    timeline.markCompleted(ButtonPressStage.REPLAY_SETTLE);
                 }
             } finally {
                 if (combatReplayService != null) {
@@ -110,15 +118,10 @@ public class ButtonProcessor {
             RollbarManager.clear();
         }
 
-        long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();
-        runtimeWarningService.submitNewRuntime(
-                event,
-                processStartTime,
-                System.currentTimeMillis(),
-                contextCreationRuntime,
-                logRuntime,
-                resolveRuntime,
-                saveRuntime);
+        timeline.markFinished();
+        if (!AsyncTI4DiscordBot.isUnstable()) {
+            runtimeMonitor.submit(event, timeline);
+        }
     }
 
     private static void log(ButtonInteractionEvent event) {
@@ -350,17 +353,6 @@ public class ButtonProcessor {
     }
 
     public static String getButtonProcessingStatistics() {
-        var decimalFormatter = new DecimalFormat("#.##");
-        double thresholdMissPercent = runtimeWarningService.getThresholdMissPercent();
-        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
-                + "\n> Total button presses: "
-                + runtimeWarningService.getRuntimeSubmissionCount()
-                + "\n> Threshold misses: "
-                + decimalFormatter.format(thresholdMissPercent) + "% ("
-                + runtimeWarningService.getRuntimeThresholdMissCount() + ")"
-                + "\n> Average preprocessing time: "
-                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
-                + "\n> Average processing time: "
-                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms";
+        return runtimeMonitor.formatStatistics(DateTimeHelper.getCurrentTimestamp());
     }
 }
