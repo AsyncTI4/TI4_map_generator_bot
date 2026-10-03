@@ -43,7 +43,7 @@ public class ZephyrionBreakthroughHandler {
     public static void zephyrionbtRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("zephyrionbtRes_", "");
         String opponentFaction = buttonID;
-        String agentID = UnusedAgentHelper.getUnusedAgent(game, Set.of(ComponentSource.balacasi));
+        String agentID = UnusedAgentHelper.getUnusedAgent(game, Set.of(ComponentSource.wftv));
 
         List<Button> buttons = new ArrayList<>();
         if (agentID != null) {

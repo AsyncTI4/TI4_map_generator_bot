@@ -262,7 +262,7 @@ public class CommanderUnlockCheckService {
             // BR
             case "atokera", "belkosea", "pharadn", "qhet", "toldar", "uydai", "kaltrim" -> shouldBeUnlocked = true;
 
-            // Balacasi
+            // Whispers from the Void
             case "arvaxi", "kalora" -> shouldBeUnlocked = true;
             case "lunarium" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier", false) >= 4);

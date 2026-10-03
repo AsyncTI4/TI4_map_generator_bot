@@ -6,7 +6,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "ACTION: Place this card face-up in your play area. While this card is in your play area, other players or components cannot take or force you to give, show or discard action cards from your hand. If you activate a system that contains 1 or more of the Arvaxi player's units, return this card to the Arvaxi player."
     },
     {
@@ -15,7 +15,7 @@
         "faction": "xan",
         "color": "",
         "playArea": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "At the start of a space combat: You may choose up to 3 of your opponents’ ships that have SUSTAIN DAMAGE to become damaged. Then, return this card to the Xan player."
     },
     {
@@ -25,7 +25,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": true,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "If you are not the Kalora player, place this card face up in your play area. You may use the Kalora’s PRIMORDIAL faction ability. Both you and the Kalora player consider yourself as first to score an objective if no player other than each other has scored that objective. If you activate a system containing 1 or more of Kalora’s units, return this card to the Kalora player."
     },
     {
@@ -35,7 +35,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "When the Onyxxa player performs a strategic action: Spend a command token from your strategy pool and place this card face up in your play area. During this action, you resolve the primary ability of that strategy card instead of the secondary, and you resolve abilities before the Onyxxa player. At the start of the status phase, return this card to the Onyxxa player."
     },
     {
@@ -44,7 +44,7 @@
         "faction": "lunarium",
         "color": "",
         "playArea": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "At the end of the status phase, draw 1 secret objective. Then, return this card to the Lunarium player."
     },
     {
@@ -53,7 +53,7 @@
         "faction": "tyris",
         "color": "",
         "playArea": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "After you perform an action, you may perform a non-strategic action. Return this card to the Tyris player at the end of your turn."
     },
     {
@@ -62,7 +62,7 @@
         "faction": "vyserix",
         "color": "",
         "playArea": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "At the end of a tactical action: Remove up to 3 of your ground forces from the active system and place them on planets you control. Then, return this card to the Vyserix player."
     },
     {
@@ -71,7 +71,7 @@
         "faction": "zephyrion",
         "color": "",
         "playArea": false,
-        "source": "balacasi",
+        "source": "wftv",
         "text": "After a system is activated: Choose up to 3 non-fighter ships you control; during this action, those units gain SPACE CANNON 5. Return this card to the Zephyrion player at the end of the action."
     }
 ]

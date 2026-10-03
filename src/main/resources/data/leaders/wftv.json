@@ -8,7 +8,7 @@
         "abilityWindow": "After a player discards an action card other than “Sabotage”:",
         "abilityText": "You may exhaust this card to allow a different player to spend 3 influence to take that action card from the discard pile.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "arvaxicommander",
@@ -19,7 +19,7 @@
         "abilityWindow": "After you win a combat:",
         "abilityText": "You may force your opponent to give you 1 action card from their hand.",
         "unlockCondition": "Discard an action card after you win a combat",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "arvaxihero",
@@ -31,7 +31,7 @@
         "abilityWindow": "At the start of a space combat that you are participating in:",
         "abilityText": "You may purge this card. If you do, during this combat, each of your ships for which you have researched its unit upgrade technology rolls 1 additional die.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "xanagent",
@@ -43,7 +43,7 @@
         "abilityText": "You may exhaust this card to repair up to 2 units participating in that combat.",
         "unlockCondition": "Always Unlocked",
         "flavourText": "Admiral Noro Weba was almost knocked off his feet with the blast, but the hull held. “All batteries fire!” He said as his own forces fired relentlessly into the fray.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "xancommander",
@@ -55,7 +55,7 @@
         "abilityText": "You may move 1 of your structures from a system that doesn't contain 1 of your command tokens onto 1 of those planets.",
         "unlockCondition": "Have damaged units with a combined cost of at least 12",
         "flavourText": "Meraldo smiled as the last of the outer walls were assembled. In less than a week a Citadel had been disassembled, moved and reassembled on a planet light years away from Thar. Very ahead of schedule, he thought, very ahead.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "xanhero",
@@ -67,7 +67,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "ACTION: Gain 1 trade good for each damaged unit on the game board. Then, repair all of your damaged units and choose any number of other players. For each chosen player, repair all of their damaged units that are in or adjacent to a system that contains 1 of your space docks.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "kaloraagent",
@@ -78,7 +78,7 @@
         "abilityWindow": "At the end of a space combat:",
         "abilityText": "You may exhaust this card to allow a player that was participating in that combat to gain 1 command token.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "kaloracommander",
@@ -89,7 +89,7 @@
         "abilityWindow": "When 1 or more of your units use BOMBARDMENT:",
         "abilityText": "You may use the BOMBARDMENT ability of any of your units in adjacent systems.",
         "unlockCondition": "Retreat from a space combat",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "kalorahero",
@@ -101,7 +101,7 @@
         "abilityWindow": "After another player commits units to a planet you control that is not in another player's home system:",
         "abilityText": "You may purge this card to return all committed units to space and place 5 infantry from your reinforcements on that planet.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "lunariumagent",
@@ -112,7 +112,7 @@
         "abilityWindow": "When 1 or more of a player’s units use PRODUCTION: ",
         "abilityText": "You may exhaust this card to apply +1 to the total PRODUCTION value of those units and reduce the combined cost of the produced units by 1.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "lunariumcommander",
@@ -123,7 +123,7 @@
         "abilityWindow": "After you score a secret objective:",
         "abilityText": "Draw 1 secret objective.",
         "unlockCondition": "Have 4 carriers on the game board",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "lunariumhero",
@@ -135,7 +135,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place this card face up in your play area. During the status phase of this round, you may score any number of your unscored status phase secret objectives that you satisfy the requirements for. At the end of the status phase, purge this card. ",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "onyxxaagent",
@@ -146,7 +146,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card to choose a player. That player may move 1 of their ships into an adjacent system that doesn’t contain any other player's ships. If the ship started this action in a system that contains that player's command token, they place a command token from their reinforcements into the target system.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "onyxxacommander",
@@ -157,7 +157,7 @@
         "abilityWindow": "",
         "abilityText": "After you draw a relic, gain 1 command token. After you gain control of a planet in The Fracture that was controlled by a player other than Onyxxa, gain 1 relic.",
         "unlockCondition": "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "onyxxahero",
@@ -169,7 +169,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Move up to 1 ship from each system that contains 1 or more of your ships into an adjacent system. Then, resolve space combat in each system that contains both yours and another player's ships and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "tyrisagent",
@@ -180,7 +180,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card to place 1 frontier token in a system that does not contain a planet.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "tyriscommander",
@@ -191,7 +191,7 @@
         "abilityWindow": "",
         "abilityText": "ACTION: Spend 1 token from your strategy pool to place 1 mech on a planet you control.\nWhen a public objective is revealed: You may place 1 infantry on a planet you control.",
         "unlockCondition": "Have 5 infantry that are not in or adjacent to your home system",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "tyrishero",
@@ -203,7 +203,7 @@
         "abilityWindow": "At the start of your turn:",
         "abilityText": "You may purge this card. If you do, during this turn you may perform any number of actions.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "vyserixagent",
@@ -214,7 +214,7 @@
         "abilityWindow": "When a player places or produces fighters or destroyers in a system",
         "abilityText": "You may exhaust this card. That player may place any number of those units in adjacent systems containing 1 or more of their units.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "vyserixcommander",
@@ -225,7 +225,7 @@
         "abilityWindow": "When you research a non-unit upgrade technology: ",
         "abilityText": "Gain 1 trade good per planet you control that has a technology specialty of that technology's colour.",
         "unlockCondition": "Control 3 planets with technology specialties.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "vyserixhero",
@@ -237,7 +237,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Attach this card to 1 non-home planet on the game board that does not have a technology specialty. This planet is treated as having all four technology specialties. You ignore your SCATTERED LEGIONS faction ability on this planet. If you control that planet, you may place 1 PDS on that planet.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "zephyrionagent",
@@ -249,7 +249,7 @@
         "abilityText": "Exhaust this card and choose another player. Choose a ship type with a bounty token on that player’s faction sheet that costs 4 or less. That player must destroy 1 of their ships of that type from a system containing 1 of their command tokens, if able. That player gains trade goods equal to the destroyed ship’s cost, plus 1 for each unit removed due to capacity.",
         "notes": "The destroyed ship must be in a system containing that player’s command token. If no such ship exists, nothing happens.",
         "unlockCondition": "Always Unlocked",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "zephyrioncommander",
@@ -260,7 +260,7 @@
         "abilityWindow": "When 1 or more of your units make rolls for SPACE CANNON:",
         "abilityText": "For each result of 10, before applying modifiers, produce 1 additional hit.",
         "unlockCondition": " Have 7 Units that have SPACE CANNON on the game board",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "id": "zephyrionhero",
@@ -272,6 +272,6 @@
         "abilityWindow": "After you destroy a unit with a bounty token on its unit space during combat:",
         "abilityText": "You may purge this card. If you do, if it was a flagship or War Sun, gain 1 victory point; otherwise, place all units of that type from your reinforcements in systems that contain 1 or more of your ships.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "balacasi"
+        "source": "wftv"
     }
 ]

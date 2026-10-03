@@ -24,7 +24,7 @@ public class FactionSourceSettings extends SettingsMenu {
             ComponentSource.blue_reverie,
             ComponentSource.thunders_edge,
             ComponentSource.ignis_aurora,
-            ComponentSource.balacasi,
+            ComponentSource.wftv,
             ComponentSource.beans,
             ComponentSource.theodisi);
 
@@ -56,7 +56,7 @@ public class FactionSourceSettings extends SettingsMenu {
         int brCount = countFactions(ComponentSource.blue_reverie);
         int teCount = countFactions(ComponentSource.thunders_edge);
         int ignisCount = countFactions(ComponentSource.ignis_aurora);
-        int balacasiCount = countFactions(ComponentSource.balacasi);
+        int wftvCount = countFactions(ComponentSource.wftv);
         int beansCount = countFactions(ComponentSource.beans);
         int lostLegaciesCount = countFactions(ComponentSource.theodisi);
 
@@ -75,10 +75,10 @@ public class FactionSourceSettings extends SettingsMenu {
                 "Whispers from the Void factions",
                 0,
                 0,
-                balacasiCount,
-                balacasiCount,
+                wftvCount,
+                wftvCount,
                 0,
-                balacasiCount,
+                wftvCount,
                 1);
         deepreaches = new IntegerRangeSetting(
                 "FactionDeepReaches", "Deep Reaches factions", 0, 0, beansCount, beansCount, 0, beansCount, 1);
@@ -154,7 +154,7 @@ public class FactionSourceSettings extends SettingsMenu {
             case blue_reverie -> blueReverie;
             case thunders_edge -> thundersEdge;
             case ignis_aurora -> ignisAurora;
-            case balacasi -> whispers;
+            case wftv -> whispers;
             case beans -> deepreaches;
             case theodisi -> lostLegacies;
             default -> null;

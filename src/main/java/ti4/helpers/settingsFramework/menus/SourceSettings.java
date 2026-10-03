@@ -197,7 +197,7 @@ public class SourceSettings extends SettingsMenu {
         if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
-        if (whispers.isVal()) sources.add(ComponentSource.balacasi);
+        if (whispers.isVal()) sources.add(ComponentSource.wftv);
         if (deepreaches.isVal()) sources.add(ComponentSource.beans);
         if (lostLegacies.isVal()) sources.add(ComponentSource.theodisi);
         return sources;
