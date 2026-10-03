@@ -586,7 +586,7 @@ class GameLoadService {
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(parseBooleanOrDefault(info, false));
                 case Constants.OMEGA_PHASE_MODE -> game.setOmegaPhaseMode(parseBooleanOrDefault(info, false));
                 case Constants.HOMEBREW_SC_MODE -> game.setHomebrewSCMode(parseBooleanOrDefault(info, false));
-                case Constants.INJECT_RULES_LINKS -> game.setInjectRulesLinks(parseBooleanOrDefault(info, false));
+                case Constants.INJECT_RULES_LINKS_V2 -> game.setInjectRulesLinks(parseBooleanOrDefault(info, false));
                 case Constants.SPIN_MODE -> {
                     String value = "false".equalsIgnoreCase(info) ? "OFF" : info;
                     game.setSpinMode(value);
