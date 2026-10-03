@@ -266,7 +266,8 @@ public class PlayStrategyCardService {
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
 
         // Trade Primary
-        if (scModel.usesAutomationForSCID("pok5trade")) {
+        if (scModel.usesAutomationForSCID("pok5trade")
+                && !OnyxxaAbilityHandler.isDetachmentCard(game, player, scToPlay)) {
             TradeStrategyCardService.doPrimary(game, event, player);
         }
 
@@ -665,7 +666,8 @@ public class PlayStrategyCardService {
             List<Button> scButtons) {
         String stratCardName = Helper.getSCName(scToPlay, game);
         List<Player> playersToReact = new ArrayList<>();
-        if (!OnyxxaAbilityHandler.handleDetachmentOnPlay(game, player, scToPlay)) {
+        boolean isDetachmentCard = OnyxxaAbilityHandler.isDetachmentCard(game, player, scToPlay);
+        if (!isDetachmentCard) {
             playersToReact.add(player);
             player.addFollowedSC(scToPlay, event);
         }
@@ -737,7 +739,15 @@ public class PlayStrategyCardService {
                 .sendMessage(toSend)
                 .queue(
                         message -> handleScMessageResponse(
-                                message, game, player, scToPlay, playRound, scModel, scButtons, playersToReact),
+                                message,
+                                game,
+                                player,
+                                scToPlay,
+                                playRound,
+                                scModel,
+                                scButtons,
+                                playersToReact,
+                                isDetachmentCard),
                         BotLogger::catchRestError);
     }
 
@@ -749,10 +759,14 @@ public class PlayStrategyCardService {
             int playRound,
             StrategyCardModel scModel,
             List<Button> scButtons,
-            List<Player> playersToReact) {
+            List<Player> playersToReact,
+            boolean isDetachmentCard) {
         long messageCreationTime = message.getTimeCreated().toInstant().toEpochMilli();
         StrategyCardMessageService.replaceStrategyCardMessage(
                 game.getName(), message.getId(), playRound, scToPlay, messageCreationTime);
+        if (isDetachmentCard) {
+            OnyxxaAbilityHandler.sendDetachmentReminder(game, player, scToPlay);
+        }
         for (Player reactingPlayer : playersToReact) {
             Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, reactingPlayer, message);
             message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
