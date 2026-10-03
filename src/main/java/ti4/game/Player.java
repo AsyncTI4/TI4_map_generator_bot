@@ -63,6 +63,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButto
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.game.helper.StoredValueHelper;
@@ -706,9 +707,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         String userName = getUserName().replace("/", "");
-        String threadName = game.isFowMode()
-                ? String.format("%s-cards-info-%s-private", game.getName(), userName)
-                : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
+        String threadName = DiscordThreadUtility.fitThreadName(
+                game.isFowMode()
+                        ? String.format("%s-cards-info-%s-private", game.getName(), userName)
+                        : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName));
 
         ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 

@@ -29,7 +29,6 @@ import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -54,6 +53,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -1282,7 +1282,7 @@ public class MessageHelper {
                 || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(fitThreadName(threadName))
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
@@ -1301,7 +1301,7 @@ public class MessageHelper {
         if (messages.isEmpty()) return;
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(fitThreadName(threadName))
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(
                             500,
@@ -1328,7 +1328,7 @@ public class MessageHelper {
         }
         if (channel instanceof TextChannel) {
             channel.asTextChannel()
-                    .createThreadChannel(fitThreadName(threadName))
+                    .createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                     .queueAfter(
                             500,
@@ -1340,7 +1340,7 @@ public class MessageHelper {
                                     error));
         } else if (channel instanceof ThreadChannel thread) {
             if (embeds.size() > 8 && thread.getParentChannel() instanceof TextChannel chan) {
-                chan.createThreadChannel(fitThreadName(threadName))
+                chan.createThreadChannel(DiscordThreadUtility.fitThreadName(threadName))
                         .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                         .queueAfter(
                                 500,
@@ -1360,10 +1360,6 @@ public class MessageHelper {
                 sendMessageToChannelWithEmbeds(channel, null, embeds);
             }
         }
-    }
-
-    private static String fitThreadName(String threadName) {
-        return StringUtils.abbreviate(threadName, Channel.MAX_NAME_LENGTH);
     }
 
     public static void sendMessageEmbedsToCardsInfoThread(Player player, String message, List<MessageEmbed> embeds) {
