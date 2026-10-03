@@ -314,44 +314,7 @@ public class StartTurnService {
                 }
             }
         }
-        if (game.getStoredValue("ExtremeDuress").equalsIgnoreCase(player.getColor()) && player.hasUnplayedSCs()) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2.getPlayableActionCards().contains("extremeduress")) {
-                    game.removeStoredValue("ExtremeDuress");
-                    TeHelperActionCards.autoResolveExtremeDuress(event, game, player, p2);
-                }
-            }
-        }
-        if (game.getStoredValue("Crisis Target").equalsIgnoreCase(player.getColor())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2.getPlayableActionCards().contains("crisis")) {
-                    game.removeStoredValue("Crisis Target");
-                    ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
-                    List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete These (If Crisis Was Sabo'd)"));
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation() + ", please resolve _Crisis_.",
-                            buttons2);
-                }
-            }
-        }
-        if (game.getStoredValue("Stasis Target").equalsIgnoreCase(player.getColor())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2.getPlayableActionCards().contains("tf-stasis")) {
-                    game.removeStoredValue("Stasis Target");
-                    ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
-                    List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(ButtonHelper.getEndTurnButton(game, player));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete These (If Stasis Was Sabo'd)"));
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation() + ", please resolve _Stasis_.",
-                            buttons2);
-                }
-            }
-        }
+        TeHelperActionCards.resolvePresetTurnStartCards(event, game, player);
 
         if (goingToPass) {
             PassService.passPlayerForRound(event, game, player, true);
