@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnos
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
@@ -1573,6 +1574,11 @@ public class StartCombatService {
         if (thunderbirdProtocolP1 != null) buttons.add(thunderbirdProtocolP1);
         Button thunderbirdProtocolP2 = PonthousTechHandler.getThunderbirdProtocolButton(game, p2, tile);
         if (thunderbirdProtocolP2 != null) buttons.add(thunderbirdProtocolP2);
+
+        Button impulseCoreP1 = YinImpulseCoreButtonHandler.getImpulseCoreButton(p1, tile);
+        if (impulseCoreP1 != null) buttons.add(impulseCoreP1);
+        Button impulseCoreP2 = YinImpulseCoreButtonHandler.getImpulseCoreButton(p2, tile);
+        if (impulseCoreP2 != null) buttons.add(impulseCoreP2);
 
         // Aeterna Hero
         if (!tile.isHomeSystem() && p1.hasLeaderUnlocked("aeternahero")) {
