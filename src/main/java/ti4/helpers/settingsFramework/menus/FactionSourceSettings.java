@@ -71,15 +71,7 @@ public class FactionSourceSettings extends SettingsMenu {
         ignisAurora = new IntegerRangeSetting(
                 "FactionIgnis", "Ignis Aurora factions", 0, 0, ignisCount, ignisCount, 0, ignisCount, 1);
         whispers = new IntegerRangeSetting(
-                "FactionWhispers",
-                "Whispers from the Void factions",
-                0,
-                0,
-                wftvCount,
-                wftvCount,
-                0,
-                wftvCount,
-                1);
+                "FactionWhispers", "Whispers from the Void factions", 0, 0, wftvCount, wftvCount, 0, wftvCount, 1);
         deepreaches = new IntegerRangeSetting(
                 "FactionDeepReaches", "Deep Reaches factions", 0, 0, beansCount, beansCount, 0, beansCount, 1);
         lostLegacies = new IntegerRangeSetting(
