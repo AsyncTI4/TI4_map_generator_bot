@@ -56,6 +56,18 @@ class ButtonPressTimelineTest {
 
         assertThat(timeline.getStageMillis()).doesNotContainKey(ButtonPressStage.RESOLVE);
         assertThat(timeline.getProcessingMillis()).isEqualTo(490);
+        assertThat(timeline.getHandlerId()).isEmpty();
+    }
+
+    @Test
+    void markResolvedTimesTheResolveStageAndRemembersTheHandler() {
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(0, 0);
+        timeline.markStarted(0);
+        timeline.markCompleted(ButtonPressStage.LOG, 3);
+        timeline.markResolved("reacted_", 45);
+
+        assertThat(timeline.getStageMillis()).containsEntry(ButtonPressStage.RESOLVE, 42L);
+        assertThat(timeline.getHandlerId()).contains("reacted_");
     }
 
     @Test
