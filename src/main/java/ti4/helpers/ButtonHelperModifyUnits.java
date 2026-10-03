@@ -87,6 +87,12 @@ public final class ButtonHelperModifyUnits {
 
     private static int getNumberOfSustainableUnits(
             Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
+        Tile tile = getTile(game, unitHolder);
+        if (tile != null
+                && (ButtonHelperAbilities.removesSustainDamage(game, player, tile)
+                        || MonumentsBRButtonHandler.removesSustainDamage(game, player, tile))) {
+            return 0;
+        }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int sustains = 0;
         Player mentak = Helper.getPlayerFromUnit(game, "mentak_mech");
@@ -166,6 +172,16 @@ public final class ButtonHelperModifyUnits {
             }
         }
         return sustains + metali;
+    }
+
+    private static Tile getTile(Game game, UnitHolder unitHolder) {
+        if (unitHolder instanceof Planet planet) {
+            return game.getTileFromPlanet(planet.getName());
+        }
+        return game.getTileMap().values().stream()
+                .filter(tile -> tile.getSpaceUnitHolder() == unitHolder)
+                .findFirst()
+                .orElse(null);
     }
 
     public static void autoAssignAntiFighterBarrageHits(
@@ -2852,7 +2868,7 @@ public final class ButtonHelperModifyUnits {
             buttons = getOpposingUnitsToHit(player, game, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    player.getCorrectChannel(),
                     player.getRepresentation(false, false)
                             + " has chosen to destroy one of opposing ships using the _Caled_ Superweapon ability."
                             + " Note that the bot did not check if a straight line unimpeded by anomalies existed between the _Caled_ system and the active system.");
@@ -2882,7 +2898,8 @@ public final class ButtonHelperModifyUnits {
                     + ", your opponent used _Assault Cannon_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                cause.contains("caled") ? player.getCorrectChannel() : event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("domnaStepOne_")

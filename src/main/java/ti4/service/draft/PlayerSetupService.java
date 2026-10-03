@@ -566,6 +566,13 @@ public class PlayerSetupService {
                     "Select the Throne planet you would like to place in your home system:");
             ThronesAbilityHandler.getUnplacedThronePlanetButtons(event, game, player);
         }
+        if (player.hasAbility("matters_of_state")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", please choose which side you want your starting balance token to be on.",
+                    ButtonHelper.getBalanceButtons(player));
+        }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {

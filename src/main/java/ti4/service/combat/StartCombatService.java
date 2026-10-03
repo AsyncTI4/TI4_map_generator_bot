@@ -2135,14 +2135,14 @@ public class StartCombatService {
             }
         }
 
-        if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
+        if (p2.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p2) && !game.isFowMode()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
                     FactionEmojis.belkosea));
         }
-        if (p1.hasRelicReady("superweaponcaled")) {
+        if (p1.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p1)) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),

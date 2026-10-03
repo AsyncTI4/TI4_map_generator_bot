@@ -107,6 +107,10 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("startIntrigueCard")
     public static void startIntrigueCard(Game game, Player player, ButtonInteractionEvent event) {
+        if (!player.hasAbility("intrigue")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "intrigueCardOn", null);
         if (player.getStrategicCC() < 1 && !player.hasRelicReady("emelpar")) {
             MessageHelper.sendMessageToChannel(
@@ -124,10 +128,18 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("intrigueCardOn")
     public static void intrigueCardOn(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (!player.hasAbility("intrigue")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
 
         String activePlayerFaction = buttonID.split("_")[1];
-        if (!activePlayerFaction.equalsIgnoreCase(player.getFaction())) {
-            Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
+        Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
+        if (p2 == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (p2 != player) {
             List<Button> buttons2 = new ArrayList<>();
             if (game.isFowMode()) {
                 // "Has units on it" is hidden state and cannot narrow the fog list; non-home is a public map
@@ -232,6 +244,10 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("intrigueCardResolve")
     public static void intrigueCardResolve(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (!player.hasAbility("intrigue")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         String activePlayerFaction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
         String card = buttonID.split("_")[2];
@@ -348,6 +364,7 @@ public final class ButtonHelperFactionSpecific {
                         buttons);
             }
         }
+        BlueReverieHelper.checkXinHarmony(game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -632,6 +649,84 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
+        if (!hasUnlockedToldarBreakthrough(player)) {
+            return;
+        }
+
+        if (player.getDishonorCounter() > player.getHonorCounter()) {
+            if (player.hasBreakthrough("toldarbt")) {
+                flipToldarBreakthrough(player, "toldarbt", "toldarbtdishonor");
+            }
+            if (player.hasBreakthrough("toldarbthonor")) {
+                flipToldarBreakthrough(player, "toldarbthonor", "toldarbtdishonor");
+            }
+        }
+
+        if (player.getHonorCounter() > player.getDishonorCounter()) {
+            if (player.hasBreakthrough("toldarbt")) {
+                flipToldarBreakthrough(player, "toldarbt", "toldarbthonor");
+            }
+            if (player.hasBreakthrough("toldarbtdishonor")) {
+                flipToldarBreakthrough(player, "toldarbtdishonor", "toldarbthonor");
+            }
+        }
+    }
+
+    private static boolean hasUnlockedToldarBreakthrough(Player player) {
+        return player.isBreakthroughUnlocked("toldarbt")
+                || player.isBreakthroughUnlocked("toldarbthonor")
+                || player.isBreakthroughUnlocked("toldarbtdishonor");
+    }
+
+    private static void flipToldarBreakthrough(Player player, String currentBreakthrough, String nextBreakthrough) {
+        if (!player.changeBreakthrough(currentBreakthrough, nextBreakthrough)) {
+            return;
+        }
+        String side = "toldarbthonor".equals(nextBreakthrough) ? "Honor" : "Dishonor";
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " flipped _Shameix's Bane_ to its " + side + " side.",
+                Mapper.getBreakthrough(nextBreakthrough).getRepresentationEmbed());
+    }
+
+    public static void offerToldarBtSideChoice(Player player) {
+        if (!player.hasBreakthrough("toldarbt")
+                || !player.isBreakthroughUnlocked("toldarbt")
+                || player.getHonorCounter() != player.getDishonorCounter()) {
+            return;
+        }
+
+        List<Button> buttons = List.of(
+                Buttons.green(player.factionButtonChecker() + "chooseToldarBtSide_honor", "Use Honor Side"),
+                Buttons.red(player.factionButtonChecker() + "chooseToldarBtSide_dishonor", "Use Dishonor Side"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the starting side of _Shameix's Bane_.",
+                buttons);
+    }
+
+    @ButtonHandler("chooseToldarBtSide_")
+    public static void chooseToldarBtSide(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        if (!player.hasBreakthrough("toldarbt")
+                || !player.isBreakthroughUnlocked("toldarbt")
+                || player.getHonorCounter() != player.getDishonorCounter()) {
+            ButtonHelper.deleteMessage(event);
+            correctHonorAbilities(player, game);
+            return;
+        }
+
+        String side = buttonID.substring("chooseToldarBtSide_".length());
+        String selectedBreakthrough = "honor".equalsIgnoreCase(side) ? "toldarbthonor" : "toldarbtdishonor";
+
+        if (player.changeBreakthrough("toldarbt", selectedBreakthrough)) {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " chose the " + side + " side of _Shameix's Bane_.",
+                    Mapper.getBreakthrough(selectedBreakthrough).getRepresentationEmbed());
+        }
+
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("sardakkbtRes")

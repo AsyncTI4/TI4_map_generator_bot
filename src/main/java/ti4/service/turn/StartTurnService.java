@@ -579,6 +579,10 @@ public class StartTurnService {
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
             startButtons.add(ThronesThroneHandler.getCineronButton(player));
         }
+        if (player.hasTechReady("dsbelky")) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "exhaustTech_dsbelky", "Use Synchrony Matrix", TechEmojis.CyberneticTech));
+        }
         if (!doneActionThisTurn
                 && player.hasPlanet("alfheim")
                 && !player.getExhaustedPlanetsAbilities().contains("alfheim")) {

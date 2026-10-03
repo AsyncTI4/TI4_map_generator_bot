@@ -389,21 +389,18 @@ public final class ButtonHelperAgents {
     @ButtonHandler("belkoseaYellowTechReady_")
     public static void belkoseaYellowTechReady(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        if (!player.hasTech("dsbelky") || !player.getExhaustedTechs().contains("dsbelky")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         buttonID = buttonID.replace("belkoseaYellowTechReady_", "");
         String thing = buttonID.split("_")[0];
         String detail = buttonID.replace(thing + "_", "");
         String msg = player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready " + detail + ".";
-        if ("agent".equalsIgnoreCase(thing)) {
-            String agent = detail;
-            Leader playerLeader = player.getLeader(agent).orElse(null);
+        if ("leader".equalsIgnoreCase(thing)) {
+            Leader playerLeader = player.getLeader(detail).orElse(null);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             if (playerLeader == null) {
-                if (agent.contains("titanprototype")) {
-                    player.removeExhaustedRelic("titanprototype");
-                }
-                if (agent.contains("absol")) {
-                    player.removeExhaustedRelic("absol_jr");
-                }
                 return;
             }
             RefreshLeaderService.refreshLeader(player, playerLeader, game);
@@ -418,8 +415,16 @@ public final class ButtonHelperAgents {
                             + (monument == null ? detail : monument.getName() + " Monument") + ".");
         } else {
             if ("planet".equalsIgnoreCase(thing)) {
+                player.refreshPlanet(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            } else if ("ability".equalsIgnoreCase(thing)) {
                 player.removeExhaustedAbility(detail);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            } else if ("breakthrough".equalsIgnoreCase(thing)) {
+                if (player.isBreakthroughUnlocked(detail) && player.isBreakthroughExhausted(detail)) {
+                    player.setBreakthroughExhausted(detail, false);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                }
             } else {
                 player.removeExhaustedRelic(detail);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
