@@ -175,6 +175,20 @@ class TestBedGameTest extends BaseTi4Test {
         assertEquals("", TestBedApplyService.appliedPreset(game));
     }
 
+    // A seat that already has a fog private channel keeps it: the test bed only records (and reset only deletes)
+    // channels it created itself, so applying a preset to a fog game never puts a player's channel at risk.
+    @Test
+    void existingPrivateChannelsAreNeverRecordedForDeletion() {
+        developer.setPrivateChannelID("42");
+        nekro.setPrivateChannelID("43");
+
+        TestBedChannelService.createFogPrivateChannel(game, developer, null);
+        TestBedChannelService.createFogPrivateChannel(game, nekro, null);
+
+        assertTrue(TestBedChannelService.createdChannelIds(game).isEmpty());
+        assertEquals("42", developer.getPrivateChannelID());
+    }
+
     // Every advertised state path must be implemented; adding a field to the list without a resolver fails here.
     @Test
     void everyStatePathResolves() {
