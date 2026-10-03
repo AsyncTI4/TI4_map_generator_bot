@@ -8,10 +8,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -158,21 +158,22 @@ public class ImageHelper {
                 .build();
 
         try {
-            HttpResponse<InputStream> response =
-                    EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofInputStream());
+            HttpResponse<byte[]> response =
+                    EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-            try (InputStream inputStream = response.body()) {
-                if (response.statusCode() != 200) {
-                    BotLogger.error("Failed to read image. URL: " + imageUrl + " Status: " + response.statusCode());
-                    return null;
-                }
-
-                BufferedImage image = ImageIO.read(inputStream);
-                if (image == null) {
-                    BotLogger.error("ImageIO could not decode stream from: " + imageUrl);
-                }
-                return image;
+            if (response.statusCode() != 200) {
+                BotLogger.error("Failed to read image. URL: " + imageUrl + " Status: " + response.statusCode());
+                return null;
             }
+
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(response.body()));
+            if (image == null) {
+                String contentType =
+                        response.headers().firstValue("Content-Type").orElse("no content type");
+                BotLogger.error("ImageIO could not decode " + response.body().length + " bytes (" + contentType
+                        + ") from: " + imageUrl);
+            }
+            return image;
         } catch (HttpTimeoutException e) {
             BotLogger.spammyerror("Timeout fetching image: " + imageUrl);
         } catch (IOException e) {
