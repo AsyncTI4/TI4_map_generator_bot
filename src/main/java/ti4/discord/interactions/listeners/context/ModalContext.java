@@ -14,10 +14,13 @@ import ti4.service.event.EventAuditService;
 @Getter
 public class ModalContext extends ListenerContext {
 
-    private String modalID;
     private String messageID;
     private Map<String, String> values;
     private Map<String, List<String>> listValues;
+
+    public String getModalID() {
+        return getComponentID();
+    }
 
     public ModalInteractionEvent getEvent() {
         if (event instanceof ModalInteractionEvent modal) return modal;
@@ -33,7 +36,6 @@ public class ModalContext extends ListenerContext {
         if (!isValid()) return; // super failed
 
         // Proceed with additional context
-        modalID = componentID; // ID after checking faction
         messageID = event.getId();
         values = new HashMap<>();
         listValues = new HashMap<>();
@@ -50,6 +52,7 @@ public class ModalContext extends ListenerContext {
     }
 
     public void save(ButtonInteractionEvent event) {
+        String componentID = getComponentID();
         boolean skippableButton = componentID.contains("ultimateUndo")
                 || "showGameAgain".equalsIgnoreCase(componentID)
                 || "cardsInfo".equalsIgnoreCase(componentID)

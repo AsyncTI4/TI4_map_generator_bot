@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -221,7 +222,7 @@ public class RevenantTechHandler {
         String assignmentMessage;
         if (combatOnHolder instanceof Planet) {
             buttons.add(Buttons.green(
-                    factionChecker + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + remainingHits,
+                    factionChecker + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), remainingHits),
                     "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")));
             buttons.add(Buttons.red(
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",

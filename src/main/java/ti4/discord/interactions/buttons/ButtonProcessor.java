@@ -13,7 +13,6 @@ import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -22,12 +21,10 @@ import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -186,26 +183,6 @@ public class ButtonProcessor {
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             trackButtonHandler(Constants.GENERIC_BUTTON_ID_PREFIX);
             ReactionService.addReaction(event, game, player);
-        } else if (buttonID.startsWith("autoAssignGroundHits_")) {
-            trackButtonHandler("autoAssignGroundHits_");
-            Tile tile = game.getTileFromPlanet(buttonID.split("_")[1]);
-            if (PonthousAbilityHandler.requiresManualLastStandAssignment(
-                    game,
-                    player,
-                    tile,
-                    tile == null ? null : tile.getUnitHolderFromPlanet(buttonID.split("_")[1]),
-                    event)) {
-                MessageHelper.sendMessageToChannelWithButton(
-                        event.getMessageChannel(),
-                        player.getRepresentationNoPing() + ", assign this hit manually to use _Last Stand_ if needed.",
-                        Buttons.red(
-                                player.factionButtonChecker() + "getDamageButtons_" + tile.getPosition()
-                                        + "_groundcombat",
-                                "Assign Hits"));
-                return;
-            }
-            ButtonHelperModifyUnits.autoAssignGroundCombatHits(
-                    player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
             trackButtonHandler("strategicAction_");
             strategicAction(event, player, buttonID, game, mainGameChannel);

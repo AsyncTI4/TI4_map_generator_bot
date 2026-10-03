@@ -72,6 +72,17 @@ class ComponentIdEnvelopeTest extends BaseTi4Test {
     }
 
     @Test
+    void rawIdIsKeptVerbatimAlongsideTheDecodedParts() {
+        // ListenerContext derives both getOrigComponentID() and getComponentID() from the envelope alone.
+        String raw = "FFCC_pi_hacan_redistributeCCButtons_deleteThisMessage";
+
+        ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(raw);
+
+        assertThat(envelope.rawId()).isEqualTo(raw);
+        assertThat(envelope.handlerId()).isEqualTo("redistributeCCButtons_");
+    }
+
+    @Test
     void builtPrefixesRoundTrip() {
         assertThat(ComponentIdEnvelope.decode(ComponentIdEnvelope.ownedBy("pi_keleresm") + "gain_CC")
                         .ownerFaction())

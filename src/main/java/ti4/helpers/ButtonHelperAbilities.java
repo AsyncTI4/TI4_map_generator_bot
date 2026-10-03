@@ -24,7 +24,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.PillageButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -910,27 +912,27 @@ public final class ButtonHelperAbilities {
                 myko.getCorrectChannel(), msg.append(".").toString());
     }
 
-    @ButtonHandler("pillage_")
+    @ButtonHandler(PillageButtonIds.PREFIX)
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("pillage_", "");
-        String colorPlayer = buttonID.split("_")[0];
-        String checkedStatus = buttonID.split("_")[1];
-        Player pillaged = game.getPlayerFromColorOrFaction(colorPlayer);
+        PillageButtonIds.Parsed pillage = PillageButtonIds.parse(buttonID);
+        Player pillaged = game.getPlayerFromColorOrFaction(pillage.targetColor());
         if (pillaged == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Could not find player, please resolve manually.");
             return;
         }
-        if (checkedStatus.contains("unchecked")) {
+        if (pillage.stage() == PillageButtonIds.Stage.UNCHECKED) {
             List<Button> buttons = new ArrayList<>();
             String message2 =
                     "Please confirm this is a valid **Pillage** opportunity and that you wish to **Pillage**.";
             buttons.add(Buttons.red(
-                    player.factionButtonChecker() + "pillage_" + pillaged.getColor() + "_checked",
+                    player.factionButtonChecker()
+                            + PillageButtonIds.format(pillaged.getColor(), PillageButtonIds.Stage.TRADE_GOOD),
                     "Pillage 1 Trade Good"));
             if (pillaged.getCommodities() > 0) {
                 buttons.add(Buttons.red(
-                        player.factionButtonChecker() + "pillage_" + pillaged.getColor() + "_checkedcomm",
+                        player.factionButtonChecker()
+                                + PillageButtonIds.format(pillaged.getColor(), PillageButtonIds.Stage.COMMODITY),
                         "Pillage 1 Commodity"));
             }
             buttons.add(Buttons.green(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
@@ -970,7 +972,7 @@ public final class ButtonHelperAbilities {
 
             String pillagedMessage =
                     "Arrr, " + pillaged.getRepresentationUnfogged() + ", it do seem ye have been **Pillage**'d ";
-            if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
+            if (pillaged.getCommodities() > 0 && pillage.stage() == PillageButtonIds.Stage.COMMODITY) {
                 pillagedMessage += ", so your worthless commodities went from " + pillaged.getCommodities() + " to "
                         + (pillaged.getCommodities() - 1) + ".";
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
@@ -2068,7 +2070,7 @@ public final class ButtonHelperAbilities {
                     continue;
                 }
                 Player pillager = neighbor;
-                String factionChecker = "FFCC_" + pillager.getFaction() + "_";
+                String factionChecker = ComponentIdEnvelope.ownedBy(pillager.getFaction());
                 List<Button> buttons = new ArrayList<>();
                 String playerIdent = player.getRepresentationNoPing();
                 player.getDisplayName();
@@ -2081,18 +2083,18 @@ public final class ButtonHelperAbilities {
                         + playerIdent
                         + ". Please check this is a valid **Pillage** opportunity, and use buttons to resolve.";
                 buttons.add(Buttons.red(
-                        factionChecker + "pillage_" + player.getColor() + "_unchecked",
+                        factionChecker + PillageButtonIds.format(player.getColor(), PillageButtonIds.Stage.UNCHECKED),
                         "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
                 buttons.add(Buttons.green(
-                        factionChecker + "declinePillage_" + player.getColor(), "Decline Pillage Window"));
+                        factionChecker + PillageButtonIds.formatDecline(player.getColor()), "Decline Pillage Window"));
                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
             }
         }
     }
 
-    @ButtonHandler("declinePillage_")
+    @ButtonHandler(PillageButtonIds.DECLINE_PREFIX)
     public static void declinePillage(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Player pillaged = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        Player pillaged = game.getPlayerFromColorOrFaction(PillageButtonIds.parseDeclinedColor(buttonID));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " officially declined to **Pillage** "

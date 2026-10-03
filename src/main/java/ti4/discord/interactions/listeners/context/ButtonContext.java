@@ -12,7 +12,7 @@ public class ButtonContext extends ListenerContext {
 
     @JsonIgnore
     public String getButtonID() {
-        return componentID;
+        return getComponentID();
     }
 
     public ButtonInteractionEvent getEvent() {
