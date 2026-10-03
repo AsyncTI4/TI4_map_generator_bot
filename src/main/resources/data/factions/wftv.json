@@ -43,7 +43,7 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "xan",
@@ -89,7 +89,7 @@
             "xan_warsun"
         ],
         "complexity": "Moderate",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "kalora",
@@ -134,7 +134,7 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "lunarium",
@@ -180,7 +180,7 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "onyxxa",
@@ -224,7 +224,7 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "tyris",
@@ -270,7 +270,7 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "vyserix",
@@ -316,7 +316,7 @@
             "spacedock"
         ],
         "complexity": "Moderate",
-        "source": "balacasi"
+        "source": "wftv"
     },
     {
         "alias": "zephyrion",
@@ -361,6 +361,6 @@
             "spacedock"
         ],
         "complexity": "Low",
-        "source": "balacasi"
+        "source": "wftv"
     }
 ]

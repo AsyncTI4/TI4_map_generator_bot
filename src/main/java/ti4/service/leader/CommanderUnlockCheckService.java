@@ -266,7 +266,7 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = game.getPlanetsPlayerIsCoexistingOn(player).size() >= 2;
             case "xin" -> shouldBeUnlocked = BlueReverieHelper.hasXinCommanderUnlock(player, game);
 
-            // Balacasi
+            // Whispers from the Void
             case "arvaxi", "kalora" -> shouldBeUnlocked = true;
             case "lunarium" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier", false) >= 4);

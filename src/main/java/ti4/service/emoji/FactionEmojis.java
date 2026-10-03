@@ -114,7 +114,7 @@ public enum FactionEmojis implements TI4Emoji {
     sarcosa,
     xin, //
 
-    // balacasi
+    // wftv
     arvaxi,
     xan,
     kalora,
