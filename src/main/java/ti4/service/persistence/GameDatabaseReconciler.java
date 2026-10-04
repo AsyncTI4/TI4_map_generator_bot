@@ -68,6 +68,11 @@ public class GameDatabaseReconciler {
             }
             for (String persistedGameName : persistedStates.keySet()) {
                 if (existingGameNames.contains(persistedGameName)) continue;
+                if (gameFileExists(persistedGameName)) {
+                    discrepancies.add(
+                            persistedGameName + ": game file is unloadable or corrupt, so its rows were kept");
+                    continue;
+                }
                 discrepancies.add(repair(
                         persistedGameName,
                         "in the database but has no game file",
@@ -127,6 +132,10 @@ public class GameDatabaseReconciler {
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {
         return Storage.getGameFile(gameName + Constants.TXT).lastModified() > timestamp;
+    }
+
+    private static boolean gameFileExists(String gameName) {
+        return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
     private static Game loadGame(ManagedGame managedGame) {

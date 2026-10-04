@@ -1,6 +1,8 @@
 package ti4.game.persistence;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +22,7 @@ import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
 import ti4.service.persistence.GameDatabaseSyncPipeline;
@@ -32,6 +35,7 @@ public class GameManager {
     private static final Set<String> gameNames = ConcurrentHashMap.newKeySet();
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Long> reportedCorruptFileVersions = new ConcurrentHashMap<>();
     private static final AtomicInteger latestPbdNumber = new AtomicInteger();
 
     private static final CountDownLatch gameNamesLoadedLatch = new CountDownLatch(1);
@@ -59,10 +63,12 @@ public class GameManager {
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
+                Map<String, GameLoadResult.Corrupt> corruptGames = new ConcurrentHashMap<>();
                 try (ExecutorService executorService =
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
-                    gameNames.forEach(name -> executorService.submit(() -> getManagedGame(name)));
+                    gameNames.forEach(name -> executorService.submit(() -> buildManagedGame(name, corruptGames)));
                 }
+                reportCorruptGamesFoundAtWarmup(corruptGames);
                 warmupFinishedLatch.countDown();
                 BotLogger.info("FINISHED BUILDING MANAGED GAMES");
                 if (JdaService.jda != null) {
@@ -75,13 +81,57 @@ public class GameManager {
         });
     }
 
+    private static void buildManagedGame(String gameName, Map<String, GameLoadResult.Corrupt> corruptGames) {
+        switch (GameLoadService.tryLoad(gameName)) {
+            case GameLoadResult.Loaded(Game game) ->
+                gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
+            case GameLoadResult.Corrupt corrupt -> corruptGames.put(gameName, corrupt);
+            case GameLoadResult.Missing() -> {}
+        }
+    }
+
+    private static void reportCorruptGamesFoundAtWarmup(Map<String, GameLoadResult.Corrupt> corruptGames) {
+        if (corruptGames.isEmpty()) return;
+        corruptGames.forEach(GameManager::markCorruptVersionReported);
+        List<String> corruptGameNames = corruptGames.keySet().stream().sorted().toList();
+        String firstCorruptGameName = corruptGameNames.getFirst();
+        BotLogger.error(
+                "Could not load " + StringHelper.pluralize(corruptGameNames.size(), "corrupt game file")
+                        + " at startup: " + String.join(", ", corruptGameNames)
+                        + ". A bothelper can run `/bothelper reload_game` on each to restore it from its latest undo."
+                        + " The stack trace is from " + firstCorruptGameName + ".",
+                corruptGames.get(firstCorruptGameName).cause());
+    }
+
     @Nullable
     static Game get(String gameName) {
-        Game game = GameLoadService.load(gameName);
-        if (game == null) {
-            handleManagedGameRemoval(gameName);
+        return switch (GameLoadService.tryLoad(gameName)) {
+            case GameLoadResult.Loaded(Game game) -> game;
+            case GameLoadResult.Corrupt corrupt -> {
+                reportCorruptGame(gameName, corrupt);
+                yield null;
+            }
+            case GameLoadResult.Missing() -> {
+                handleManagedGameRemoval(gameName);
+                yield null;
+            }
+        };
+    }
+
+    private static void reportCorruptGame(String gameName, GameLoadResult.Corrupt corrupt) {
+        if (markCorruptVersionReported(gameName, corrupt)) {
+            BotLogger.error(corruptGameMessage(gameName), corrupt.cause());
         }
-        return game;
+    }
+
+    private static boolean markCorruptVersionReported(String gameName, GameLoadResult.Corrupt corrupt) {
+        Long previouslyReportedVersion = reportedCorruptFileVersions.put(gameName, corrupt.fileLastModified());
+        return !Objects.equals(previouslyReportedVersion, corrupt.fileLastModified());
+    }
+
+    private static String corruptGameMessage(String gameName) {
+        return "The game file for " + gameName + " is corrupt and could not be loaded."
+                + " A bothelper can run `/bothelper reload_game` to restore it from its latest undo.";
     }
 
     private static void handleManagedGameRemoval(String gameName) {
@@ -164,12 +214,14 @@ public class GameManager {
     @Nullable
     public static Game reload(String gameName) {
         waitFor(gameNamesLoadedLatch);
-        Game game = GameLoadService.load(gameName);
+        GameLoadResult loadResult = GameLoadService.tryLoad(gameName);
+        Game game = loadResult instanceof GameLoadResult.Loaded(Game loadedGame)
+                ? loadedGame
+                : GameUndoService.loadUndoForMissingGame(gameName);
         if (game == null) {
-            game = GameUndoService.loadUndoForMissingGame(gameName);
-        }
-        if (game == null) {
-            handleManagedGameRemoval(gameName);
+            if (loadResult instanceof GameLoadResult.Missing) {
+                handleManagedGameRemoval(gameName);
+            }
             return null;
         }
         handleMissingMatchingManagedGame(game);
@@ -198,14 +250,25 @@ public class GameManager {
     public static ManagedGame getManagedGame(String gameName) {
         if (!isValid(gameName)) return null;
         waitFor(gameNamesLoadedLatch);
-        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> {
-            Game game = GameLoadService.load(gameName);
-            if (game == null) {
+        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(loadForManagedGame(gameName)));
+    }
+
+    private static Game loadForManagedGame(String gameName) {
+        return switch (GameLoadService.tryLoad(gameName)) {
+            case GameLoadResult.Loaded(Game game) -> game;
+            case GameLoadResult.Corrupt corrupt -> {
+                reportCorruptGame(gameName, corrupt);
+                throw new IllegalStateException(corruptGameMessage(gameName));
+            }
+            case GameLoadResult.Missing() -> {
                 BotLogger.error("Failed to load ManagedGame for " + gameName + ".");
                 throw new IllegalStateException("Failed to load ManagedGame for " + gameName);
             }
-            return new ManagedGame(game);
-        });
+        };
+    }
+
+    public static boolean isCorrupt(String gameName) {
+        return GameLoadService.tryLoad(gameName) instanceof GameLoadResult.Corrupt;
     }
 
     public static List<ManagedGame> getManagedGames() {
