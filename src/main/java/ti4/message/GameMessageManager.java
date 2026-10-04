@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.StringHelper;
 import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 import ti4.settings.GlobalSettings;
@@ -97,11 +98,13 @@ public class GameMessageManager {
         write(gameName, "add a reaction to", service -> service.addReaction(gameName, faction, messageId));
     }
 
-    // TODO: Remove this one-time GameMessages.json import (and GAME_MESSAGES_IMPORTED_TO_DATABASE) once every
-    // environment has logged "Imported N game messages"; then delete pm_json/GameMessages.json.
+    // TODO: Remove this one-time GameMessages.json import, its developer subcommand, and
+    // GAME_MESSAGES_IMPORTED_TO_DATABASE once every environment has run it; then delete pm_json/GameMessages.json.
     @Deprecated(forRemoval = true, since = "2026-10")
-    public static void importLegacyFile() {
-        if (ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE.getAsBoolean(false)) return;
+    public static String importLegacyFile() {
+        if (ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE.getAsBoolean(false)) {
+            return LEGACY_GAME_MESSAGES_FILE + " was already imported into the database. Nothing to do.";
+        }
         try {
             LegacyGameMessages legacy =
                     PersistenceManager.readObjectFromJsonFile(LEGACY_GAME_MESSAGES_FILE, LegacyGameMessages.class);
@@ -109,10 +112,14 @@ public class GameMessageManager {
                     ? 0
                     : SpringContext.getBean(GameMessageService.class).importMissing(legacy.gameNameToMessages());
             GlobalSettings.setSetting(ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE, true);
-            BotLogger.info("Imported " + imported + " game messages from " + LEGACY_GAME_MESSAGES_FILE
-                    + " into the database.");
+            String result = "Imported " + StringHelper.pluralize(imported, "game message") + " from "
+                    + LEGACY_GAME_MESSAGES_FILE + " into the database.";
+            BotLogger.info(result);
+            return result;
         } catch (Exception e) {
             BotLogger.error("Failed to import " + LEGACY_GAME_MESSAGES_FILE + " into the database.", e);
+            return "Failed to import " + LEGACY_GAME_MESSAGES_FILE + " into the database: " + e.getMessage()
+                    + ". See the bot log; it is safe to run again.";
         }
     }
 

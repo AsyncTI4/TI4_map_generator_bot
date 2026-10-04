@@ -17,7 +17,6 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.migration.DataMigrationManager;
 import ti4.logging.BotLogger;
 import ti4.logging.RollbarManager;
-import ti4.message.GameMessageManager;
 import ti4.settings.GlobalSettings;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.jda.JdaLifecycleService;
@@ -55,8 +54,7 @@ public class AsyncTI4DiscordBot {
         SelectionMenuProcessor.checkSelectionMenuHandlersSetup();
         ModalListener.checkModalHandlersSetup();
         BotLogger.info("FINISHED WARMING INTERACTION HANDLERS");
-        activeLeaseService.beginLeaseParticipation(
-                GameMessageManager::importLegacyFile, AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
+        activeLeaseService.beginLeaseParticipation(AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
         JdaService.registerAndStartCronJobs();
         JdaService.markProcessReady();
     }
