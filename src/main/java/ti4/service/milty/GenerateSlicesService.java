@@ -6,13 +6,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.ListUtils;
 import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -22,7 +25,23 @@ import ti4.settings.GlobalSettings;
 @UtilityClass
 class GenerateSlicesService {
 
-    public static boolean generateSlices(
+    record Result(boolean slicesCreated, @Nullable String impossibleReason) {
+
+        private static Result impossible(String reason) {
+            return new Result(false, reason);
+        }
+
+        private static Result attempted(boolean slicesCreated) {
+            return new Result(slicesCreated, null);
+        }
+
+        String impossibleSettingsMessage(int sliceCount) {
+            return "These slice settings can't produce " + StringHelper.pluralize(sliceCount, "slice") + ": "
+                    + impossibleReason + ". Adjust the slice settings and try again.";
+        }
+    }
+
+    public static Result generateSlices(
             GenericInteractionCreateEvent event, MiltyDraftManager draftManager, MiltyDraftSpec specs) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
@@ -33,39 +52,24 @@ class GenerateSlicesService {
                     new LogOrigin(event),
                     "Map template " + mapTemplate.getAlias()
                             + " is a nucleus template, but nucleus generation is not supported here.");
-            return false;
+            return Result.attempted(false);
         }
         List<List<Boolean>> adjMatrix = getAdjMatrix(mapTemplate);
-        int bluePerPlayer = mapTemplate.bluePerPlayer();
-        int redPerPlayer = mapTemplate.redPerPlayer();
 
         boolean slicesCreated = false;
         int i = 0;
         Map<String, Integer> reasons = new HashMap<>();
         Function<String, Integer> addReason = reason -> reasons.put(reason, reasons.getOrDefault(reason, 0) + 1);
 
-        List<MiltyDraftTile> allTiles = draftManager.getBlue();
-        allTiles.addAll(draftManager.getRed());
-        int totalWHs = (int) allTiles.stream()
-                .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
-                .count();
-        int extraWHs = Math.min(totalWHs - 1, (int) (sliceCount * 1.5));
-        if (specs.playerIDs.size() == 1) extraWHs = 0; // disable the behavior if there's only 1 player
-        if (specs.playerIDs.size() == 2) extraWHs = 3; // lessen the behavior if there's 2 players
-        if (!specs.extraWHs) extraWHs = 0;
+        int extraWHs = requiredExtraWormholes(draftManager, specs);
+        List<List<MiltyDraftTile>> partitionedTiles = partitionIntoTiers(draftManager, mapTemplate);
 
-        // Partition blue tiles to split them up into "tiers" so that slices get 1 good tile, 1 medium tile, and 1 meh
-        // tile
-        List<MiltyDraftTile> blue = draftManager.getBlue();
-        blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
-        int bluePerPartition = Math.ceilDiv(blue.size(), bluePerPlayer);
-        List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>(ListUtils.partition(blue, bluePerPartition));
-
-        // Partition RED tiles into "tiers" so that slices don't get dumb stuff like 2 supernovae, 2 rifts, etc
-        List<MiltyDraftTile> red = draftManager.getRed();
-        red.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
-        int redPerPartition = Math.ceilDiv(red.size(), redPerPlayer);
-        partitionedTiles.addAll(ListUtils.partition(red, redPerPartition));
+        Optional<String> impossibility =
+                SliceFeasibility.findImpossibility(partitionedTiles, sliceCount, extraWHs, specs);
+        if (impossibility.isPresent()) {
+            draftManager.clear();
+            return Result.impossible(impossibility.get());
+        }
 
         // how long do we sit here generating slices?
         long quitDiff = 60L * 1000L * 1000L * 1000L;
@@ -148,7 +152,37 @@ class GenerateSlicesService {
             }
             BotLogger.warning(new LogOrigin(event), sb.toString());
         }
-        return slicesCreated;
+        return Result.attempted(slicesCreated);
+    }
+
+    static int requiredExtraWormholes(MiltyDraftManager draftManager, MiltyDraftSpec specs) {
+        int sliceCount = specs.numSlices;
+        List<MiltyDraftTile> allTiles = draftManager.getBlue();
+        allTiles.addAll(draftManager.getRed());
+        int totalWHs = (int) allTiles.stream()
+                .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
+                .count();
+        int extraWHs = Math.min(totalWHs - 1, (int) (sliceCount * 1.5));
+        if (specs.playerIDs.size() == 1) extraWHs = 0; // disable the behavior if there's only 1 player
+        if (specs.playerIDs.size() == 2) extraWHs = 3; // lessen the behavior if there's 2 players
+        if (!specs.extraWHs) extraWHs = 0;
+        return extraWHs;
+    }
+
+    static List<List<MiltyDraftTile>> partitionIntoTiers(MiltyDraftManager draftManager, MapTemplateModel mapTemplate) {
+        // Partition blue tiles to split them up into "tiers" so that slices get 1 good tile, 1 medium tile, and 1 meh
+        // tile
+        List<MiltyDraftTile> blue = draftManager.getBlue();
+        blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
+        int bluePerPartition = Math.ceilDiv(blue.size(), mapTemplate.bluePerPlayer());
+        List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>(ListUtils.partition(blue, bluePerPartition));
+
+        // Partition RED tiles into "tiers" so that slices don't get dumb stuff like 2 supernovae, 2 rifts, etc
+        List<MiltyDraftTile> red = draftManager.getRed();
+        red.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
+        int redPerPartition = Math.ceilDiv(red.size(), mapTemplate.redPerPlayer());
+        partitionedTiles.addAll(ListUtils.partition(red, redPerPartition));
+        return partitionedTiles;
     }
 
     private static MiltyDraftSlice assembleOneSlice(

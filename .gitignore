@@ -36,3 +36,7 @@ scripts/**/__pycache__/
 /ti4-bkup-cleaned/
 /.claude/settings.local.json
 /.claude/workfiles/
+
+# Developer test bed: personal presets, scripts and test buttons stay local (see DEVELOPER_TESTBED.md)
+src/main/resources/data/testbed/local/*
+!src/main/resources/data/testbed/local/README.md

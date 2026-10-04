@@ -1,0 +1,14 @@
+{
+  "name": "fog-smoke",
+  "description": "Fog game: hands reach every seat and starting the strategy phase leaks no faction into the main channel.",
+  "preset": "fog-4p",
+  "settleSeconds": 3,
+  "steps": [
+    { "do": "hand", "as": "all", "hand": { "tg": 5 } },
+    { "expect": { "state": "seat1.tg", "equals": "5" } },
+    { "expect": { "state": "you.tg", "equals": "5" } },
+    { "do": "startPhase", "value": "strategy" },
+    { "expect": { "state": "game.phase", "equals": "strategy" } },
+    { "expect": { "in": "main", "noFactionLeak": true } }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "fog-4p",
+  "description": "Fog game: you plus three virtual seats, each with its own private channel; stops at setup.",
+  "fog": true,
+  "you": { "faction": "random" },
+  "seats": [{}, {}, {}],
+  "defaults": { "acs": 3, "sos": 1, "tg": 2 },
+  "start": "setup"
+}

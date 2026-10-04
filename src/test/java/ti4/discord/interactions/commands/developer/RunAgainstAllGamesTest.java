@@ -1,37 +1,32 @@
 package ti4.discord.interactions.commands.developer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
-import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.testUtils.BaseTi4Test;
+import org.junit.jupiter.api.Test;
+import ti4.game.persistence.ManagedGame;
 
-class RunAgainstAllGamesTest extends BaseTi4Test {
+class RunAgainstAllGamesTest {
 
-    private static void seat(Game game, String faction, String... planets) {
-        Player player = game.addPlayer(faction + "-user", faction);
-        player.setFaction(faction);
-        player.setColor(COLORS.get(game.getPlayers().size() - 1));
-        player.getPlanets().addAll(List.of(planets));
+    @Test
+    void onlyGamesNotFlaggedAsEndedThatStillHaveAnEndDateAreTouched() {
+        List<ManagedGame> games = List.of(
+                managedGame("reopened", false, 5_000L),
+                managedGame("ended", true, 5_000L),
+                managedGame("active", false, 0L),
+                // Flagged as ended without a date: left alone, this command only clears stale dates.
+                managedGame("ended-without-date", true, 0L));
+
+        assertThat(RunAgainstAllGames.unendedGamesWithAnEndDate(games)).containsExactly("reopened");
     }
 
-    private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "orange");
-
-    private static Player anchoredAt(Game game, String position) {
-        Player player = game.addPlayer("user-" + position, "user");
-        player.setFaction("keleres");
-        player.setColor("red");
-        player.setPlayerStatsAnchorPosition(position);
-        return player;
-    }
-
-    private static Game gameWithTiles(String... tileIds) {
-        Game game = new Game();
-        int position = 101;
-        for (String tileId : tileIds) {
-            game.setTile(new Tile(tileId, Integer.toString(position)));
-            position++;
-        }
-        return game;
+    private static ManagedGame managedGame(String name, boolean hasEnded, long endedDate) {
+        ManagedGame managedGame = mock(ManagedGame.class);
+        when(managedGame.getName()).thenReturn(name);
+        when(managedGame.isHasEnded()).thenReturn(hasEnded);
+        when(managedGame.getEndedDate()).thenReturn(endedDate);
+        return managedGame;
     }
 }

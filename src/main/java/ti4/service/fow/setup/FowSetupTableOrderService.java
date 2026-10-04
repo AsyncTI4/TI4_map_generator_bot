@@ -23,6 +23,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
+import ti4.service.testbed.TestBedService;
 
 /** TABLE_ORDER step of the FoW setup wizard: seat order (manual or dice) and the speaker pick. */
 final class FowSetupTableOrderService {
@@ -236,7 +237,8 @@ final class FowSetupTableOrderService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Dice haven't been configured yet.");
             return;
         }
-        Player player = game.getPlayer(event.getUser().getId());
+        Player player = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
         if (player == null || !player.isRealPlayer()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only real players in this game can roll.");
             return;

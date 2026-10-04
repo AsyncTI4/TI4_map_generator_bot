@@ -87,6 +87,8 @@ import ti4.service.map.MapPresetService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
+import ti4.service.testbed.TestBedAutoComplete;
+import ti4.service.testbed.TestBedService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -118,6 +120,7 @@ class AutoCompleteProvider {
                 case Constants.SEARCH, "search2" -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN2 -> resolvePlotAutoComplete(event, optionName);
+                case "testbed" -> resolveTestBedAutoComplete(event, optionName);
             }
             if (event.isAcknowledged()) return;
         }
@@ -1375,7 +1378,8 @@ class AutoCompleteProvider {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Game game = GameManager.getManagedGame(gameName).getGame();
-                Player viewer = game.getPlayer(event.getUser().getId());
+                Player viewer = TestBedService.resolveActingPlayer(
+                        game, event, game.getPlayer(event.getUser().getId()));
                 boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
                 Map<String, Integer> discardActionCardIDs = game.getDiscardActionCards();
                 List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
@@ -1495,6 +1499,22 @@ class AutoCompleteProvider {
                     default -> Collections.emptyList();
                 };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void resolveTestBedAutoComplete(
+            @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
+        if (!TestBedService.isEnabled() || !TestBedService.isDeveloper(event.getMember())) {
+            event.replyChoices(List.of()).queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        Game game = GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame()
+                : null;
+        List<Command.Choice> choices = TestBedAutoComplete.choices(
+                optionName, game, event.getFocusedOption().getValue());
+        if (choices == null) return;
+        event.replyChoices(choices).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveFrankenAutoComplete(

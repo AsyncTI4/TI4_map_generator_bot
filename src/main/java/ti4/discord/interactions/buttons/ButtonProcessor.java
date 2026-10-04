@@ -11,11 +11,11 @@ import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.HandlerRegistry;
+import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
@@ -52,6 +52,26 @@ public class ButtonProcessor {
                 event.getMessageChannel(),
                 () -> process(event, route, timeline),
                 lockType);
+    }
+
+    public static void processNow(ButtonInteractionEvent event) {
+        long now = System.currentTimeMillis();
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(now, now);
+        runtimeMonitor.recordQueued();
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        HandlerRegistry.Route<ButtonContext> route =
+                registry.resolve(event.getButton().getCustomId());
+        if (gameName == null) {
+            process(event, route, timeline);
+            return;
+        }
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        ExecutionLockManager.lock(gameName, lockType);
+        try {
+            process(event, route, timeline);
+        } finally {
+            ExecutionLockManager.unlock(gameName, lockType);
+        }
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -114,17 +134,11 @@ public class ButtonProcessor {
     }
 
     private static void log(ButtonInteractionEvent event) {
-        // TODO: These timings are temporary to track down any spikes...
-        int warningThresholdSeconds = 1;
-        new TimedRunnable("ButtonProcessor BotLogger log", warningThresholdSeconds, () -> BotLogger.logButton(event))
-                .run();
-
-        new TimedRunnable("ButtonProcessor Rollbar setup", warningThresholdSeconds, () -> {
-                    RollbarManager.putInteractionMetadata("button", event);
-                    RollbarManager.put("button_id", event.getButton().getCustomId());
-                    RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-                })
-                .run();
+        BotLogger.logButton(event);
+        // TODO: Check whether Rollbar is still configured and read; if not, drop this per-press metadata.
+        RollbarManager.putInteractionMetadata("button", event);
+        RollbarManager.put("button_id", event.getButton().getCustomId());
+        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
         UserActiveHourRecorder.record(event.getUser().getId());
     }

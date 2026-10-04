@@ -20,6 +20,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
+import ti4.service.testbed.TestBedService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 
@@ -98,7 +99,8 @@ public class ShowGameService {
         if (!game.isFowMode()) {
             return false;
         }
-        Player player = game.getPlayer(event.getUser().getId());
+        Player player = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
         MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         return !event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
                 && game.getRealPlayers().contains(player)
@@ -126,7 +128,8 @@ public class ShowGameService {
                     event.getMessageChannel(),
                     "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
-            Player player = game.getPlayer(event.getUser().getId());
+            Player player = TestBedService.resolveActingPlayer(
+                    game, event, game.getPlayer(event.getUser().getId()));
             MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
             if (!event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
                     && game.getRealPlayers().contains(player)

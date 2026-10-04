@@ -103,7 +103,7 @@ public class GameProperties {
     private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
-    private boolean injectRulesLinks = true;
+    private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
     private boolean queueSO = true;
@@ -229,6 +229,11 @@ public class GameProperties {
 
     public boolean hasFullPriorityTrackMode() {
         return priorityTrackMode == PriorityTrackMode.FULL;
+    }
+
+    public void reopen() {
+        hasEnded = false;
+        endedDate = 0;
     }
 
     // Misc Helpers

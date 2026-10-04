@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface StandaloneTitleEntityRepository extends JpaRepository<StandaloneTitleEntity, Long> {
 
-    @Query("SELECT t FROM StandaloneTitleEntity t JOIN FETCH t.user WHERE t.user.id = :userId")
-    List<StandaloneTitleEntity> findByUserIdWithUser(@Param("userId") String userId);
+    @Query("SELECT new ti4.spring.service.persistence.EarnedTitle(t.title, t.source) FROM StandaloneTitleEntity t"
+            + " WHERE t.user.id = :userId")
+    List<EarnedTitle> findEarnedTitlesByUserId(@Param("userId") String userId);
 }

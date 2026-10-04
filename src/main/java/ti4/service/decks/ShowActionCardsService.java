@@ -23,6 +23,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.GMService;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class ShowActionCardsService {
@@ -86,7 +87,8 @@ public class ShowActionCardsService {
     }
 
     private static Player viewer(Game game, GenericInteractionCreateEvent event) {
-        return game.getPlayer(event.getUser().getId());
+        return TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
     }
 
     private static String getActionCardDiscardPileText(Game game, Player viewer, boolean showFullText) {

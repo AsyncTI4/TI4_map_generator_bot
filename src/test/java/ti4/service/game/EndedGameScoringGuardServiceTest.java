@@ -42,10 +42,13 @@ class EndedGameScoringGuardServiceTest {
     void sendPromptIfGameEndedAutoClearsEndedFlagWhenNoOneHasReachedPointGoal() {
         var game = new Game();
         game.setHasEnded(true);
+        game.setEndedDate(1_000L);
 
         boolean blocked = EndedGameScoringGuardService.sendPromptIfGameEnded(game, null);
 
         assertThat(blocked).isFalse();
         assertThat(game.isHasEnded()).isFalse();
+        // A reopened game must not keep its end date, or the title query still treats it as ended.
+        assertThat(game.getEndedDate()).isZero();
     }
 }
