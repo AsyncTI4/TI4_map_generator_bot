@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -443,7 +444,15 @@ public class JdaService {
 
     public static void updatePresence() {
         long activeGames = GameManager.getActiveGameCount();
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(activeGames + " games of Async TI4"));
+        setPresence(OnlineStatus.ONLINE, Activity.playing(activeGames + " games of Async TI4"));
+    }
+
+    public static void setPresence(OnlineStatus status, Activity activity) {
+        JDA currentJda = jda;
+        if (currentJda == null) return;
+        Presence presence = currentJda.getPresence();
+        if (presence == null) return;
+        presence.setPresence(status, activity);
     }
 
     /**

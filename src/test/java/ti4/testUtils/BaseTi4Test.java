@@ -29,16 +29,33 @@ public class BaseTi4Test {
     private static final int GLOBAL_BEFORE_ALL_WAIT_THRESHOLD_SECONDS = 30;
     private static final CountDownLatch setupCountDownLatch = new CountDownLatch(1);
     private static final AtomicBoolean setupStarted = new AtomicBoolean(false);
+    private static volatile Throwable setupFailure;
     private static final JDA mockJda = mock(JDA.class);
     private static final Guild mockGuild = mock(Guild.class);
 
     @BeforeAll
     public static void beforeAll() throws InterruptedException {
         if (setupStarted.compareAndSet(false, true)) {
-            globalBeforeAll();
+            runGlobalSetup();
         }
         if (!setupCountDownLatch.await(GLOBAL_BEFORE_ALL_WAIT_THRESHOLD_SECONDS, TimeUnit.SECONDS)) {
             throw new AssertionError("Setup timed out");
+        }
+        if (setupFailure != null) {
+            throw new AssertionError("Global test setup failed in an earlier test class", setupFailure);
+        }
+    }
+
+    // The latch is released even when setup throws, so every later test class fails fast with the original cause
+    // instead of each one waiting out GLOBAL_BEFORE_ALL_WAIT_THRESHOLD_SECONDS.
+    private static void runGlobalSetup() {
+        try {
+            globalBeforeAll();
+        } catch (RuntimeException | Error e) {
+            setupFailure = e;
+            throw e;
+        } finally {
+            setupCountDownLatch.countDown();
         }
     }
 
@@ -73,6 +90,10 @@ public class BaseTi4Test {
         ApplicationEmojiService.spoofEmojis();
 
         GameManager.warmup();
-        setupCountDownLatch.countDown();
+        // warmup() builds the ManagedGames and then updates the bot presence on a background thread. Block until
+        // that has finished: otherwise the background task can run while a later test class has swapped
+        // JdaService.jda for its own (unstubbed) mock or nulled it, and tests can run against a half-built
+        // GameManager. awaitWarmup() gives up after GameManager's warmup timeout rather than hanging the suite.
+        GameManager.awaitWarmup();
     }
 }

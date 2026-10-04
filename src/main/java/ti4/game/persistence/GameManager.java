@@ -54,7 +54,7 @@ public class GameManager {
             JdaService.shutdown();
         }
 
-        JdaService.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
+        JdaService.setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
 
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
@@ -63,16 +63,18 @@ public class GameManager {
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> getManagedGame(name)));
                 }
-                warmupFinishedLatch.countDown();
                 BotLogger.info("FINISHED BUILDING MANAGED GAMES");
-                if (JdaService.jda != null) {
-                    JdaService.updatePresence();
-                }
+                JdaService.updatePresence();
+                warmupFinishedLatch.countDown();
             } catch (Exception e) {
                 BotLogger.critical("Failed during GameManager warmup. Shutting down.", e);
                 JdaService.shutdown();
             }
         });
+    }
+
+    public static void awaitWarmup() {
+        waitFor(warmupFinishedLatch);
     }
 
     @Nullable
