@@ -8,6 +8,7 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.testbed.TestBedService;
 
 class PrivateCommunicationsCheck extends GameStateSubcommand {
 
@@ -31,7 +32,8 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
             return;
         }
 
-        Player commandUser = game.getPlayer(event.getUser().getId());
+        Player commandUser = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
         if (commandUser == null) {
             MessageHelper.replyToMessage(event, "You are not a player in this game.");
             return;

@@ -72,6 +72,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class MessageHelper {
@@ -926,13 +927,17 @@ public class MessageHelper {
             String successText) {
         if (messageText == null || messageText.isEmpty()) return true; // blank message counts as a success
         User user = player == null ? null : JdaService.jda.getUserById(player.getUserID());
-        if (user == null) {
+        if (player == null || (user == null && !TestBedService.isVirtualSeatInTestBed(game, player))) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
         } else {
             MessageChannel privateChannel = player.getPrivateChannel();
             if (!game.isFowMode()) {
                 privateChannel = player.getCardsInfoThread();
+            }
+            if (privateChannel == null && user == null) {
+                sendMessageToChannel(feedbackChannel, failText);
+                return false;
             }
             if (privateChannel == null) {
                 sendMessageToUser(game.getName() + " " + messageText, user, feedbackChannel, failText);

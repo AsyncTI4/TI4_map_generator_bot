@@ -50,6 +50,7 @@ import ti4.discord.interactions.commands.statistics.StatisticsCommand;
 import ti4.discord.interactions.commands.statistics.StatisticsCommand2;
 import ti4.discord.interactions.commands.status.StatusCommand;
 import ti4.discord.interactions.commands.tech.TechCommand;
+import ti4.discord.interactions.commands.testbed.TestBedCommand;
 import ti4.discord.interactions.commands.tf.TwilightFallCommand;
 import ti4.discord.interactions.commands.tigl.TiglCommand;
 import ti4.discord.interactions.commands.tokens.AddCCCommand;
@@ -110,6 +111,7 @@ public class SlashCommandManager {
                     new RulesCommand(),
                     new AdminCommand(),
                     new DeveloperCommand(),
+                    new TestBedCommand(),
                     new BothelperCommand(),
                     new PlayerCommand(),
                     new GameCommand(),

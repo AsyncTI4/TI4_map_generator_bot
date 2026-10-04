@@ -14,6 +14,7 @@ import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.HandlerRegistry;
+import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
@@ -55,6 +56,26 @@ public class ButtonProcessor {
                 event.getMessageChannel(),
                 () -> process(event, route, timeline),
                 lockType);
+    }
+
+    public static void processNow(ButtonInteractionEvent event) {
+        long now = System.currentTimeMillis();
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(now, now);
+        runtimeMonitor.recordQueued();
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        HandlerRegistry.Route<ButtonContext> route =
+                registry.resolve(event.getButton().getCustomId());
+        if (gameName == null) {
+            process(event, route, timeline);
+            return;
+        }
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        ExecutionLockManager.lock(gameName, lockType);
+        try {
+            process(event, route, timeline);
+        } finally {
+            ExecutionLockManager.unlock(gameName, lockType);
+        }
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {

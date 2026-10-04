@@ -39,6 +39,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.GameNameService;
+import ti4.service.testbed.TestBedService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 import ti4.spring.service.statistics.UserGameInfoService;
@@ -185,6 +186,16 @@ class MessageListener extends ListenerAdapter {
     }
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {
+        Player player = getAuthorPlayer(event, game);
+        return TestBedService.resolveActingPlayer(
+                game,
+                event.getMember(),
+                event.getAuthor().getId(),
+                event.getChannel().getId(),
+                player);
+    }
+
+    private static Player getAuthorPlayer(MessageReceivedEvent event, Game game) {
         Player player = game.getPlayer(event.getAuthor().getId());
         if (!game.isCommunityMode()) {
             return player;
