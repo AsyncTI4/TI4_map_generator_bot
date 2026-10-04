@@ -26,13 +26,19 @@ public class ActiveLeaseService {
     private final AtomicBoolean draining = new AtomicBoolean(false);
     private final AtomicBoolean ready = new AtomicBoolean(false);
     private final AtomicBoolean leaseParticipationEnabled = new AtomicBoolean(false);
+    private volatile Runnable beforeActivation = () -> {};
     private volatile Runnable onLeaseAcquired = () -> {};
 
     public void beginLeaseParticipation(Runnable onLeaseAcquired) {
+        beginLeaseParticipation(() -> {}, onLeaseAcquired);
+    }
+
+    public void beginLeaseParticipation(Runnable beforeActivation, Runnable onLeaseAcquired) {
+        this.beforeActivation = Objects.requireNonNull(beforeActivation);
         this.onLeaseAcquired = Objects.requireNonNull(onLeaseAcquired);
         leaseParticipationEnabled.set(true);
 
-        boolean acquired = tryAcquireLease(onLeaseAcquired);
+        boolean acquired = tryAcquireLease();
         if (acquired) {
             BotLogger.info("Acquired active lease for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         } else {
@@ -45,17 +51,7 @@ public class ActiveLeaseService {
             return false;
         }
 
-        setActive(true);
-        setDraining(false);
-        onLeaseAcquired.run();
-        return true;
-    }
-
-    private boolean tryAcquireLease(Runnable onLeaseAcquired) {
-        if (!activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
-            return false;
-        }
-
+        beforeActivation.run();
         setActive(true);
         setDraining(false);
         onLeaseAcquired.run();

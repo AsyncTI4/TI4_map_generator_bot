@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -35,6 +37,24 @@ class ActiveLeaseServiceTest {
             assertThat(service.isReady()).isTrue();
             gameManager.verify(GameManager::warmup, times(1));
         }
+    }
+
+    @Test
+    void beforeActivationRunsWhileTheLeaseIsHeldButBeforeTheInstanceServesTraffic() throws Exception {
+        // Work that must finish before presses are handled (e.g. importing legacy data) runs here.
+        ActiveLeaseRepository repository = mock(ActiveLeaseRepository.class);
+        when(repository.findById("discord-bot")).thenReturn(Optional.empty());
+        ActiveLeaseTransactionService activeLeaseTransactionService = mock(ActiveLeaseTransactionService.class);
+        when(activeLeaseTransactionService.tryAcquireLease(any())).thenReturn(true);
+        ActiveLeaseService service =
+                new ActiveLeaseService(repository, leaseProperties(), activeLeaseTransactionService);
+        List<String> events = new ArrayList<>();
+
+        service.beginLeaseParticipation(
+                () -> events.add("before activation, active=" + service.isActive()),
+                () -> events.add("lease acquired, active=" + service.isActive()));
+
+        assertThat(events).containsExactly("before activation, active=false", "lease acquired, active=true");
     }
 
     @Test
