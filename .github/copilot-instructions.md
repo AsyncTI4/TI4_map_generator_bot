@@ -195,6 +195,7 @@ Scheduled tasks live in `ti4.cron.*`. They are started by `JdaService` after bot
 - Tests extend `BaseTi4Test` which calls `globalBeforeAll()` once to initialize `Mapper`, `TileHelper`, `AliasHandler`, `PositionMapper`, `SelectionManager`, and spoof emojis.
 - JUnit 5; run with `mvn test`.
 - No Discord connection is made during tests (`JdaService.testingMode = true`).
+- `*DatabaseTest` classes run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI sets it and provides a Postgres 16 service container. To run them locally, see "Database Tests" in `CONTRIBUTING.md` (use a separate `tibot_test` database: the tests drop and recreate their tables).
 
 ---
 
