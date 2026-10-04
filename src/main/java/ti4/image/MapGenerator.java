@@ -66,6 +66,7 @@ import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedService;
 import ti4.settings.GlobalSettings;
+import ti4.spring.api.overlay.MapOverlayService;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
 
@@ -820,11 +821,19 @@ public class MapGenerator implements AutoCloseable {
         try {
             String testing = System.getenv("TESTING");
             if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-                AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
+                saveWebsiteOverlays();
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
             }
         } catch (Exception e) {
             BotLogger.error("Failed to send to game info to website", e);
+        }
+    }
+
+    private void saveWebsiteOverlays() {
+        try {
+            MapOverlayService.getBean().saveOverlays(game.getName(), websiteOverlays);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to save website overlays", e);
         }
     }
 
