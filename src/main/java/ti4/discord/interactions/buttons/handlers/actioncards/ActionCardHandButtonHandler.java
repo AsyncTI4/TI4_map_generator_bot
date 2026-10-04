@@ -166,7 +166,7 @@ class ActionCardHandButtonHandler {
             if (player.hasUnexhaustedLeader("cymiaeagent")) {
                 List<Button> buttons2 = new ArrayList<>();
                 Button hacanButton =
-                        Buttons.gray(CymiaeAgent.buttonId(player), "Use Cymiae Agent", FactionEmojis.cymiae);
+                        Buttons.gray(CymiaeAgent.buttonId(player, player), "Use Cymiae Agent", FactionEmojis.cymiae);
                 buttons2.add(hacanButton);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),

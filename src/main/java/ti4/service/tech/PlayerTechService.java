@@ -845,7 +845,8 @@ public class PlayerTechService {
             }
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(MirvedaAgent.buttonId(player), "Use Mirveda Agent", FactionEmojis.mirveda));
+                buttons.add(Buttons.gray(
+                        MirvedaAgent.buttonId(player, player), "Use Mirveda Agent", FactionEmojis.mirveda));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
@@ -1140,7 +1141,7 @@ public class PlayerTechService {
                     Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
-            buttons.add(Buttons.red(VeldyrAgent.buttonId(player), "Use Veldyr Agent", FactionEmojis.veldyr));
+            buttons.add(Buttons.red(VeldyrAgent.buttonId(player, player), "Use Veldyr Agent", FactionEmojis.veldyr));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             buttons.add(Buttons.gray("yinCommanderStep1_", "Remove Infantry via Yin Commander", FactionEmojis.Yin));

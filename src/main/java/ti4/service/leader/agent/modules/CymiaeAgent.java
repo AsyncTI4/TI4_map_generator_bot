@@ -11,8 +11,8 @@ public final class CymiaeAgent extends TargetedAgent {
 
     public static final String ID = "cymiaeagent";
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
+    public static String buttonId(Player owner, Player target) {
+        return AgentButtonIds.formatOwned(owner, ID, target.getFaction());
     }
 
     @Override

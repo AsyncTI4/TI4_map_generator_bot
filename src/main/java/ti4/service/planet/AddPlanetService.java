@@ -562,7 +562,8 @@ public class AddPlanetService {
                 && player.hasUnexhaustedLeader("vaylerianagent")
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green(VaylerianAgent.buttonId(player), "Use Vaylerian Agent", FactionEmojis.vaylerian));
+            buttons.add(Buttons.green(
+                    VaylerianAgent.buttonId(player, player), "Use Vaylerian Agent", FactionEmojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged() + " you may use "
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

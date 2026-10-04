@@ -11,8 +11,8 @@ public final class MentakAgent extends TargetedAgent {
 
     public static final String ID = "mentakagent";
 
-    public static String buttonId(Player pillaged) {
-        return AgentButtonIds.format(ID, pillaged.getFaction());
+    public static String buttonId(Player owner, Player pillaged) {
+        return AgentButtonIds.formatOwned(owner, ID, pillaged.getFaction());
     }
 
     @Override

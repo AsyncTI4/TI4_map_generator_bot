@@ -592,23 +592,6 @@ public final class ButtonHelperAgents {
                 unitButtons);
     }
 
-    @ButtonHandler("vaylerianAgent_")
-    public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        ActionCardHelper.drawActionCards(p2, 1);
-
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    p2.getFactionEmojiOrColor() + " gained 1 action card from using "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Yvin Korduul, the Vaylerian"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        }
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("exhaustAgent_")
     public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game game, Player player) {
         if (AgentLifecycle.resolveWithModule(buttonID, event, game, player)) {
@@ -622,7 +605,7 @@ public final class ButtonHelperAgents {
         }
         // Leader playerLeader = player.getLeaderByIdPreferReadied(agent).orElse(null);
         Leader playerLeader = player.getLeader(agent).orElse(null);
-        if (playerLeader == null) {
+        if (playerLeader == null || AgentLifecycle.refuseIfExhausted(event, player, playerLeader)) {
             return;
         }
         AgentLifecycle.exhaust(game, player, playerLeader, agent);
@@ -1459,7 +1442,9 @@ public final class ButtonHelperAgents {
                 if (preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
                     Player edyn2 = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
                     Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[0]);
-                    exhaustAgent("exhaustAgent_edynagent", event, game, edyn2);
+                    if (!AgentLifecycle.use(game, edyn2, "edynagent", "", event)) {
+                        return false;
+                    }
                     game.setStoredValue("edynAgentPreset", "");
                     game.setStoredValue(
                             "edynAgentInAction",
@@ -1562,7 +1547,9 @@ public final class ButtonHelperAgents {
                 }
             }
         } else {
-            exhaustAgent("exhaustAgent_lanefiragent", event, game, player);
+            if (!AgentLifecycle.use(game, player, "lanefiragent", "", event)) {
+                return;
+            }
             if (buttonID.contains("frontier")) {
                 String cardChosen = game.drawExplore(Constants.FRONTIER);
                 String pos = buttonID.split("_")[3];
@@ -2232,14 +2219,14 @@ public final class ButtonHelperAgents {
         return gloryTiles;
     }
 
-    public static List<Button> getSardakkAgentButtons(Game game) {
+    public static List<Button> getSardakkAgentButtons(Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetId = planet.getName();
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
 
-            String buttonID = SardakkAgent.planetButtonId(game.getActiveSystem(), planetId);
+            String buttonID = SardakkAgent.planetButtonId(player, game.getActiveSystem(), planetId);
             buttons.add(Buttons.green(buttonID, "Use N'orr Agent on " + planetRepresentation, FactionEmojis.Sardakk));
         }
         return buttons;

@@ -14,8 +14,8 @@ public final class AugersAgent extends TargetedAgent {
     public static final String ID = "augersagent";
     private static final int TRADE_GOODS_GAINED = 2;
 
-    public static String buttonId(Player explorer) {
-        return AgentButtonIds.format(ID, explorer.getFaction());
+    public static String buttonId(Player owner, Player explorer) {
+        return AgentButtonIds.formatOwned(owner, ID, explorer.getFaction());
     }
 
     @Override

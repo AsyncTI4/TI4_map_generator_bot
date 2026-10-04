@@ -918,8 +918,8 @@ public class StartTurnService {
                         FactionEmojis.florzen));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                startButtons.add(Buttons.gray(
-                        factionChecker + VadenAgent.buttonId(player), "Use Vaden Agent", FactionEmojis.vaden));
+                startButtons.add(
+                        Buttons.gray(VadenAgent.buttonId(player, player), "Use Vaden Agent", FactionEmojis.vaden));
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
                 startButtons.add(Buttons.gray(

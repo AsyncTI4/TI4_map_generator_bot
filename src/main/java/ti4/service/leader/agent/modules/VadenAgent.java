@@ -13,8 +13,8 @@ public final class VadenAgent extends TargetedAgent {
 
     public static final String ID = "vadenagent";
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
+    public static String buttonId(Player owner, Player target) {
+        return AgentButtonIds.formatOwned(owner, ID, target.getFaction());
     }
 
     @Override

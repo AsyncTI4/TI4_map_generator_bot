@@ -513,7 +513,7 @@ public class ExploreService {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
-                            AugersAgent.buttonId(player),
+                            AugersAgent.buttonId(p2, player),
                             "Use Ilyxum Agent on " + player.getColor(),
                             FactionEmojis.augers));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));

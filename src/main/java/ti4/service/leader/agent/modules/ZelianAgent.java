@@ -24,8 +24,8 @@ public final class ZelianAgent extends TargetedAgent {
 
     public static final String ID = "zelianagent";
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
+    public static String buttonId(Player owner, Player target) {
+        return AgentButtonIds.formatOwned(owner, ID, target.getFaction());
     }
 
     @Override
