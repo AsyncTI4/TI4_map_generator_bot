@@ -11,19 +11,18 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
-import ti4.service.leader.agent.AgentTargets;
 import ti4.service.leader.agent.AgentUse;
 
-public final class WinnuAgent implements AgentModule<Player> {
+public final class LunariumAgent implements AgentModule<Player> {
 
-    public static final String ID = "winnuagent";
+    public static final String ID = "lunariumagent";
 
     static String buttonId(Player owner) {
         return AgentButtonIds.formatOwned(owner, ID);
     }
 
     public static Button offer(Player owner) {
-        return Buttons.red(buttonId(owner), AgentNames.offerVerb(owner, ID) + "Winnu Agent", FactionEmojis.Winnu);
+        return Buttons.red(buttonId(owner), AgentNames.offerVerb(owner, ID) + "Lunarium Agent", FactionEmojis.lunarium);
     }
 
     @Override
@@ -33,27 +32,18 @@ public final class WinnuAgent implements AgentModule<Player> {
 
     @Override
     public String displayName() {
-        return "Berekar Berekon, the Winnu";
+        return "Gu'la Ma, the Lunarium";
     }
 
     @Override
     public Optional<Player> decode(Game game, Player user, String payload) {
-        return AgentTargets.playerOrSelf(game, user, payload);
-    }
-
-    @Override
-    public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + " to use on "
-                + use.payload().getRepresentationNoPing() + ".";
+        return Optional.of(user);
     }
 
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
-        Player spender = use.payload();
-        spender.addSpentThing(ID);
-        if (spender != use.user()) {
-            return AgentOutcome.none();
-        }
-        return AgentOutcome.none().withPressedMessageEdit(Helper.buildSpentThingsMessage(spender, use.game(), "res"));
+        Player user = use.user();
+        user.addSpentThing(ID);
+        return AgentOutcome.none().withPressedMessageEdit(Helper.buildSpentThingsMessage(user, use.game(), "res"));
     }
 }

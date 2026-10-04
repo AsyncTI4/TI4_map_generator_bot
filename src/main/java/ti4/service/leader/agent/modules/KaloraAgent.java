@@ -6,24 +6,25 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Helper;
+import ti4.helpers.ButtonHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
-import ti4.service.leader.agent.AgentTargets;
+import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
 
-public final class WinnuAgent implements AgentModule<Player> {
+public final class KaloraAgent implements AgentModule<Player> {
 
-    public static final String ID = "winnuagent";
+    public static final String ID = "kaloraagent";
 
     static String buttonId(Player owner) {
         return AgentButtonIds.formatOwned(owner, ID);
     }
 
     public static Button offer(Player owner) {
-        return Buttons.red(buttonId(owner), AgentNames.offerVerb(owner, ID) + "Winnu Agent", FactionEmojis.Winnu);
+        return Buttons.gray(
+                buttonId(owner), AgentNames.offerVerb(owner, ID) + "Valzor, the Kalora Agent", FactionEmojis.kalora);
     }
 
     @Override
@@ -33,27 +34,20 @@ public final class WinnuAgent implements AgentModule<Player> {
 
     @Override
     public String displayName() {
-        return "Berekar Berekon, the Winnu";
+        return "Valzor, the Kalora";
     }
 
     @Override
     public Optional<Player> decode(Game game, Player user, String payload) {
-        return AgentTargets.playerOrSelf(game, user, payload);
-    }
-
-    @Override
-    public String exhaustAnnouncement(AgentUse<Player> use) {
-        return use.user().getRepresentation() + " has exhausted " + use.agentName() + " to use on "
-                + use.payload().getRepresentationNoPing() + ".";
+        return Optional.of(user);
     }
 
     @Override
     public AgentOutcome resolve(AgentUse<Player> use) {
-        Player spender = use.payload();
-        spender.addSpentThing(ID);
-        if (spender != use.user()) {
-            return AgentOutcome.none();
-        }
-        return AgentOutcome.none().withPressedMessageEdit(Helper.buildSpentThingsMessage(spender, use.game(), "res"));
+        Player user = use.user();
+        return AgentOutcome.of(Message.withButtons(
+                user,
+                user.getRepresentationUnfogged() + ", please use the buttons to gain 1 command token.",
+                ButtonHelper.getGainCCButtons(user)));
     }
 }

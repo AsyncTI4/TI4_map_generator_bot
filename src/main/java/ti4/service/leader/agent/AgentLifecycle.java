@@ -41,19 +41,41 @@ public class AgentLifecycle {
             String buttonId, GenericInteractionCreateEvent event, Game game, Player player) {
         AgentButtonIds.Parsed parsed = AgentButtonIds.parse(buttonId);
         Optional<AgentModule<?>> module = AgentModules.find(parsed.agentId());
-        module.ifPresent(found -> resolve(found, parsed, event, game, player));
+        module.ifPresent(found -> resolve(found, parsed, event, game, player, true));
         return module.isPresent();
     }
 
-    private static <P> void resolve(
+    public static boolean use(
+            Game game, Player player, String agentId, String payload, GenericInteractionCreateEvent event) {
+        AgentModule<?> module = AgentModules.find(agentId)
+                .orElseThrow(() -> new IllegalArgumentException("No agent module for " + agentId));
+        return resolve(module, new AgentButtonIds.Parsed(agentId, payload), event, game, player, false);
+    }
+
+    public static boolean refuseIfExhausted(GenericInteractionCreateEvent event, Player player, Leader leader) {
+        if (!leader.isExhausted()) {
+            return false;
+        }
+        String message = leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId())
+                + " is already exhausted, so it cannot be used again until it is readied.";
+        if (event == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
+        } else {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, message);
+        }
+        return true;
+    }
+
+    private static <P> boolean resolve(
             AgentModule<P> module,
             AgentButtonIds.Parsed parsed,
             GenericInteractionCreateEvent event,
             Game game,
-            Player player) {
-        Leader leader = player.getLeader(parsed.agentId()).orElse(null);
-        if (leader == null) {
-            return;
+            Player player,
+            boolean pressedAgentButton) {
+        Leader leader = player.getLeaderByIdPreferReadied(parsed.agentId()).orElse(null);
+        if (leader == null || refuseIfExhausted(event, player, leader)) {
+            return false;
         }
         P payload = module.decode(game, player, parsed.payload()).orElse(null);
         if (payload == null) {
@@ -61,14 +83,19 @@ public class AgentLifecycle {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
-            return;
+            return false;
         }
 
         exhaust(game, player, leader, parsed.agentId());
         AgentUse<P> use = AgentUse.of(module, game, player, leader, parsed.agentId(), payload, event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), module.exhaustAnnouncement(use));
-        deliver(module.resolve(use), event, player);
-        finish(event, game, player, parsed.agentId());
+        deliver(module.resolve(use), event, player, pressedAgentButton);
+        if (pressedAgentButton) {
+            finish(event, game, player, parsed.agentId());
+        } else {
+            offerTemporalCommandSuite(game, player, parsed.agentId());
+        }
+        return true;
     }
 
     public static void exhaust(Game game, Player player, Leader leader, String agentId) {
@@ -99,12 +126,15 @@ public class AgentLifecycle {
         offerTemporalCommandSuite(game, player, agentId);
     }
 
-    private static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent event, Player user) {
+    private static void deliver(
+            AgentOutcome outcome, GenericInteractionCreateEvent event, Player user, boolean pressedAgentButton) {
         for (AgentOutcome.Message message : outcome.messages()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     channelFor(message, event, user), message.text(), new ArrayList<>(message.buttons()));
         }
-        if (outcome.pressedMessageEdit() != null && event instanceof ButtonInteractionEvent buttonEvent) {
+        if (pressedAgentButton
+                && outcome.pressedMessageEdit() != null
+                && event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent
                     .getMessage()
                     .editMessage(outcome.pressedMessageEdit())

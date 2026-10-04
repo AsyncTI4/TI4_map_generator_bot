@@ -4,13 +4,16 @@ import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Helper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.agent.AgentModule;
+import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentTargets;
@@ -27,8 +30,15 @@ public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
 
     public record PlaceOnPlanet(Tile tile, String planet) implements Choice {}
 
-    public static String planetButtonId(String position, String planet) {
-        return AgentButtonIds.format(ID, position, planet);
+    static String planetButtonId(Player owner, String position, String planet) {
+        return AgentButtonIds.formatOwned(owner, ID, position, planet);
+    }
+
+    public static Button offer(Player owner, String position, String planet, String planetRepresentation) {
+        return Buttons.green(
+                planetButtonId(owner, position, planet),
+                AgentNames.offerVerb(owner, ID) + "N'orr Agent on " + planetRepresentation,
+                FactionEmojis.Sardakk);
     }
 
     @Override

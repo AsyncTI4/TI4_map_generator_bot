@@ -1,9 +1,13 @@
 package ti4.service.leader.agent.modules;
 
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -14,8 +18,15 @@ public final class AugersAgent extends TargetedAgent {
     public static final String ID = "augersagent";
     private static final int TRADE_GOODS_GAINED = 2;
 
-    public static String buttonId(Player explorer) {
-        return AgentButtonIds.format(ID, explorer.getFaction());
+    static String buttonId(Player owner, Player explorer) {
+        return AgentButtonIds.formatOwned(owner, ID, explorer.getFaction());
+    }
+
+    public static Button offer(Player owner, Player explorer) {
+        return Buttons.green(
+                buttonId(owner, explorer),
+                AgentNames.offerVerb(owner, ID) + "Ilyxum Agent on " + explorer.getColor(),
+                FactionEmojis.augers);
     }
 
     @Override

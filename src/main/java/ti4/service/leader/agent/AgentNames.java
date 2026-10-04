@@ -1,6 +1,7 @@
 package ti4.service.leader.agent;
 
 import lombok.experimental.UtilityClass;
+import ti4.game.Player;
 
 @UtilityClass
 public class AgentNames {
@@ -16,5 +17,13 @@ public class AgentNames {
             return displayName + " agent";
         }
         return "Clever Clever " + displayName + "/Yssaril agent";
+    }
+
+    public static String offerVerb(Player owner, String agentId) {
+        return holdsOnlyAYssarilCopy(owner, agentId) ? "Use Clever Clever " : "Use ";
+    }
+
+    private static boolean holdsOnlyAYssarilCopy(Player owner, String agentId) {
+        return !owner.hasLeader(agentId) && owner.hasLeader(YSSARIL_AGENT);
     }
 }

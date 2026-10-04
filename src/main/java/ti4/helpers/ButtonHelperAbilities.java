@@ -1009,10 +1009,7 @@ public final class ButtonHelperAbilities {
             }
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + MentakAgent.buttonId(pillaged),
-                        "Use Mentak Agent",
-                        FactionEmojis.Mentak));
+                buttons.add(MentakAgent.offer(player, pillaged));
                 buttons.add(Buttons.red("deleteButtons", "Done"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -1027,10 +1024,7 @@ public final class ButtonHelperAbilities {
                         && p2.hasUnexhaustedLeader("yssarilagent")
                         && player.hasLeader("mentakagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            p2.factionButtonChecker() + MentakAgent.buttonId(pillaged),
-                            "Use Mentak Agent",
-                            FactionEmojis.Mentak));
+                    buttons.add(MentakAgent.offer(p2, pillaged));
                     buttons.add(Buttons.red("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),

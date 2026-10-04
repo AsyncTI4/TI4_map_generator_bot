@@ -374,7 +374,7 @@ public class TacticalActionService {
                     MiscEmojis.WHalpha));
         }
         if (player.hasUnexhaustedLeader("sardakkagent")) {
-            buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
+            buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game, player));
         }
         if (player.hasUnexhaustedLeader("nomadagentmercer")) {
             buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));

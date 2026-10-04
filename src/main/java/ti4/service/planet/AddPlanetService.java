@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -562,7 +563,7 @@ public class AddPlanetService {
                 && player.hasUnexhaustedLeader("vaylerianagent")
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green(VaylerianAgent.buttonId(player), "Use Vaylerian Agent", FactionEmojis.vaylerian));
+            buttons.add(VaylerianAgent.offer(player, player).withStyle(ButtonStyle.SUCCESS));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged() + " you may use "
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

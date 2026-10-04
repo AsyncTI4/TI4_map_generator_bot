@@ -453,7 +453,7 @@ public class CardsInfoService {
         }
         MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
-            buttons.add(Buttons.gray(VaylerianAgent.buttonId(), "Use Vaylerian Agent", FactionEmojis.vaylerian));
+            buttons.add(VaylerianAgent.offer(player));
         }
         if (player.ownsUnit("ghost_mech")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0

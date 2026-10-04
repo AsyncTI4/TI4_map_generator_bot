@@ -59,7 +59,6 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.relic.BookOfLatviniaService;
@@ -694,13 +693,7 @@ public class ComponentActionHelper {
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeaderService.exhaustLeader(
-                                    game, p1, p1.getLeader(buttonID).orElse(null));
-                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
-                        } else {
-                            ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
-                        }
+                        ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
                     }
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(

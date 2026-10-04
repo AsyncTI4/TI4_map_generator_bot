@@ -1,9 +1,13 @@
 package ti4.service.leader.agent.modules;
 
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -14,8 +18,15 @@ public final class NokarAgent extends TargetedAgent {
 
     public static final String ID = "nokaragent";
 
-    public static String buttonId(Player target) {
-        return AgentButtonIds.format(ID, target.getFaction());
+    static String buttonId(Player owner, Player target) {
+        return AgentButtonIds.formatOwned(owner, ID, target.getFaction());
+    }
+
+    public static Button offer(Player owner) {
+        return Buttons.gray(
+                buttonId(owner, owner),
+                AgentNames.offerVerb(owner, ID) + "Nokar Agent to Place 1 Destroyer",
+                FactionEmojis.nokar);
     }
 
     @Override
