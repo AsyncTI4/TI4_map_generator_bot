@@ -206,8 +206,8 @@ public class AnonymousCommsService {
         }
 
         boolean typedInConversation = senderThread.getId().equals(source.getId());
-        if (!typedInConversation) post(senderThread, "📤 **You → " + colorName(receiver) + ":** " + body);
-        Message delivered = post(receiverThread, colorName(sender) + ": " + body);
+        if (!typedInConversation) post(senderThread, "📤 **You:** " + body);
+        Message delivered = post(receiverThread, ColorEmojis.getColorEmoji(sender.getColor()) + " " + body);
         notifyInbox(receiver, receiverInbox, sender, body, delivered);
         if (!typedInConversation) {
             post(source, "📤 Sent to " + colorName(receiver) + " · " + senderThread.getAsMention());
@@ -327,12 +327,17 @@ public class AnonymousCommsService {
                     .setAutoArchiveDuration(duration)
                     .complete();
             game.setStoredValue(key, created.getId());
-            post(created, intro);
+            post(created, withMemberTags(game, owner, intro));
             return created;
         } catch (Exception e) {
             BotLogger.error("Could not create anonymous comms thread " + name, e);
             return null;
         }
+    }
+
+    private static String withMemberTags(Game game, Player owner, String intro) {
+        String tags = (owner.getPing() + " " + GMService.gmPing(game)).trim();
+        return tags.isEmpty() ? intro : tags + "\n" + intro;
     }
 
     @Nullable

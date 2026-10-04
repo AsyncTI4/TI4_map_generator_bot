@@ -294,7 +294,7 @@ public final class TestBedScriptRunner {
         Map<String, Long> latest = new HashMap<>();
         for (Player player : game.getPlayers().values()) {
             String threadId = player.getCardsInfoThreadID();
-            if (threadId == null || threadId.isBlank()) continue;
+            if (threadId == null || threadId.isBlank() || "null".equals(threadId)) continue;
             ThreadChannel thread = origin.getJDA().getThreadChannelById(threadId);
             if (thread != null) latest.put(threadId, latestMessageId(thread));
         }
