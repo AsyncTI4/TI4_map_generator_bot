@@ -7,12 +7,44 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.service.leader.agent.modules.AugersAgent;
+import ti4.service.leader.agent.modules.BentorAgent;
+import ti4.service.leader.agent.modules.CymiaeAgent;
+import ti4.service.leader.agent.modules.GledgeAgent;
+import ti4.service.leader.agent.modules.HyperAgent;
+import ti4.service.leader.agent.modules.KhraskAgent;
+import ti4.service.leader.agent.modules.KortaliAgent;
+import ti4.service.leader.agent.modules.KyroAgent;
+import ti4.service.leader.agent.modules.MentakAgent;
+import ti4.service.leader.agent.modules.MirvedaAgent;
+import ti4.service.leader.agent.modules.NokarAgent;
 import ti4.service.leader.agent.modules.SardakkAgent;
+import ti4.service.leader.agent.modules.VadenAgent;
+import ti4.service.leader.agent.modules.VaylerianAgent;
+import ti4.service.leader.agent.modules.VeldyrAgent;
+import ti4.service.leader.agent.modules.WinnuAgent;
+import ti4.service.leader.agent.modules.ZelianAgent;
 
 @UtilityClass
 public class AgentModules {
 
-    public static final List<AgentModule<?>> ALL = List.of(new AugersAgent(), new SardakkAgent());
+    public static final List<AgentModule<?>> ALL = List.of(
+            new AugersAgent(),
+            new SardakkAgent(),
+            new BentorAgent(),
+            new CymiaeAgent(),
+            new GledgeAgent(),
+            new HyperAgent(),
+            new KhraskAgent(),
+            new KortaliAgent(),
+            new KyroAgent(),
+            new MentakAgent(),
+            new MirvedaAgent(),
+            new NokarAgent(),
+            new VadenAgent(),
+            new VaylerianAgent(),
+            new VeldyrAgent(),
+            new WinnuAgent(),
+            new ZelianAgent());
 
     private static final Map<String, AgentModule<?>> BY_ID = indexById(ALL);
 

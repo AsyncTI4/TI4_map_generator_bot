@@ -10,15 +10,23 @@ public record AgentUse<P>(
         Player user,
         Leader exhaustedLeader,
         String agentId,
-        String displayName,
+        String agentName,
         P payload,
         GenericInteractionCreateEvent event) {
 
-    public boolean viaYssaril() {
-        return AgentNames.isYssarilCopy(exhaustedLeader.getId(), agentId);
+    public static <P> AgentUse<P> of(
+            AgentModule<P> module,
+            Game game,
+            Player user,
+            Leader exhaustedLeader,
+            String agentId,
+            P payload,
+            GenericInteractionCreateEvent event) {
+        String agentName = module.cardName(AgentNames.isYssarilCopy(exhaustedLeader.getId(), agentId));
+        return new AgentUse<>(game, user, exhaustedLeader, agentId, agentName, payload, event);
     }
 
-    public String agentName() {
-        return AgentNames.cardName(displayName, viaYssaril());
+    public boolean viaYssaril() {
+        return AgentNames.isYssarilCopy(exhaustedLeader.getId(), agentId);
     }
 }

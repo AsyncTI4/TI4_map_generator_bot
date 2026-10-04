@@ -79,6 +79,6 @@ class AugersAgentTest extends BaseTi4Test {
     }
 
     private AgentUse<Player> use(Leader exhaustedLeader) {
-        return new AgentUse<>(game, augers, exhaustedLeader, AugersAgent.ID, module.displayName(), explorer, null);
+        return AgentUse.of(module, game, augers, exhaustedLeader, AugersAgent.ID, explorer, null);
     }
 }

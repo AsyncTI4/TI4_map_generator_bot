@@ -103,6 +103,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.KortaliAgent;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -2018,18 +2019,14 @@ public class StartCombatService {
                 && !p1.getFragments().isEmpty()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
-                    "Use Kortali Agent",
-                    FactionEmojis.kortali));
+                    factionChecker + KortaliAgent.buttonId(p1), "Use Kortali Agent", FactionEmojis.kortali));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent")
                 && isGroundCombat
                 && !p2.getFragments().isEmpty()) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
-                    "Use Kortali Agent",
-                    FactionEmojis.kortali));
+                    factionChecker + KortaliAgent.buttonId(p2), "Use Kortali Agent", FactionEmojis.kortali));
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {
