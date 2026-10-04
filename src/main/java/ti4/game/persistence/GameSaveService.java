@@ -613,7 +613,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + game.isHomebrewSCMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.INJECT_RULES_LINKS_V2 + " " + game.isInjectRulesLinks());
+        writer.write(Constants.INJECT_RULES_LINKS + " " + game.isInjectRulesLinks());
         writer.write(System.lineSeparator());
         writer.write(Constants.SPIN_MODE + " " + game.getSpinMode());
         writer.write(System.lineSeparator());

@@ -1664,7 +1664,6 @@ public final class Constants {
     public static final String PLANET_FLAVOUR_TEXT = "planet_flavour_text";
     public static final String SOURCE = "source";
     public static final String INJECT_RULES_LINKS = "inject_rules_links";
-    public static final String INJECT_RULES_LINKS_V2 = "inject_rules_links_v2";
     public static final String FACTION_DISPLAY_NAME = "faction_display_name";
     public static final String USER = "user";
     public static final String SHOW_MAP_SETUP = "show_map_setup";
