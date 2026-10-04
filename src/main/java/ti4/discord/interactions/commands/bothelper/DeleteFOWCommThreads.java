@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.bothelper;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -12,6 +13,7 @@ import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.GameNameService;
 
@@ -39,6 +41,13 @@ class DeleteFOWCommThreads extends Subcommand {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "This is not a FOW game.");
             return;
+        }
+
+        List<String> anonymousThreads = AnonymousCommsService.deleteAllThreads(game);
+        if (!anonymousThreads.isEmpty()) {
+            GameManager.save(game, "Deleted anonymous comms threads");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Deleted anonymous comms threads: " + String.join(", ", anonymousThreads));
         }
 
         FowCommunicationThreadService.getGameThreadChannels(game).thenAccept(threads -> {

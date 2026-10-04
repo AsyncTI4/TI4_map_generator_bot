@@ -46,6 +46,10 @@ public class FowCommunicationThreadService {
     }
 
     public static void checkNewCommPartners(Game game, Player player) {
+        if (AnonymousCommsService.isActive(game)) {
+            AnonymousCommsService.refreshPartners(game);
+            return;
+        }
         if (!isActive(game)) return;
 
         Set<String> checkedPairs = new HashSet<>();
@@ -84,7 +88,7 @@ public class FowCommunicationThreadService {
         return game.getPhaseOfGame().startsWith("agenda") && game.isHiddenAgendaMode();
     }
 
-    private static Set<Player> getCommPartners(Game game, Player player) {
+    static Set<Player> getCommPartners(Game game, Player player) {
         if (areAllowedToTalkInAgenda(game)) {
             Set<Player> allPlayers = new HashSet<>(game.getRealPlayers());
             allPlayers.remove(player);

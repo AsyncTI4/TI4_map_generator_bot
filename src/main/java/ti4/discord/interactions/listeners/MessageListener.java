@@ -36,6 +36,7 @@ import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.GameNameService;
@@ -121,6 +122,7 @@ class MessageListener extends ListenerAdapter {
                 reportInterestingMessages(message);
 
                 if (isValidGameMessage) {
+                    if (handleAnonymousComms(event, message, gameName)) return;
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
@@ -279,6 +281,24 @@ class MessageListener extends ListenerAdapter {
                 })
                 .run();
 
+        return true;
+    }
+
+    private static boolean handleAnonymousComms(MessageReceivedEvent event, Message message, String gameName) {
+        if (!AnonymousCommsService.isCommsThread(event.getChannel())) {
+            return false;
+        }
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null || !managedGame.isFowMode()) {
+            return false;
+        }
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                    Game game = managedGame.getGame();
+                    if (AnonymousCommsService.handleMessage(game, getPlayer(event, game), message)) {
+                        GameManager.save(game, "Anonymous comms");
+                    }
+                })
+                .run();
         return true;
     }
 
