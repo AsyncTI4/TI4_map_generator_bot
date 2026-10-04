@@ -209,9 +209,13 @@ public class AnonymousCommsService {
             return true;
         }
 
+        Message delivered = post(receiverThread, ColorEmojis.getColorEmoji(sender.getColor()) + " " + body);
+        if (delivered == null) {
+            post(source, "Your message could not be delivered to " + colorName(receiver) + ". Please try again.");
+            return false;
+        }
         boolean typedInConversation = senderThread.getId().equals(source.getId());
         if (!typedInConversation) post(senderThread, "📤 **You:** " + body);
-        Message delivered = post(receiverThread, ColorEmojis.getColorEmoji(sender.getColor()) + " " + body);
         notifyInbox(receiver, receiverInbox, sender, body, delivered);
         if (!typedInConversation) {
             post(source, "📤 Sent to " + colorName(receiver) + " · " + senderThread.getAsMention());
