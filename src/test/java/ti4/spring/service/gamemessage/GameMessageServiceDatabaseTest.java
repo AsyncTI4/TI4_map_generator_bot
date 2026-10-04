@@ -133,7 +133,7 @@ class GameMessageServiceDatabaseTest {
 
     @Test
     void concurrentReplacesIntoAnEmptyGameLeaveOneMessage() throws InterruptedException {
-        // A row lock can't serialize inserts when no row exists yet; the per-game advisory lock must.
+        // A row lock can't serialize inserts when no row exists yet; the per-game lock must.
         runConcurrently(8, i -> service.replace(GAME, new GameMessage("m" + i, GameMessageType.TURN, i)));
 
         assertThat(service.getAll(GAME, GameMessageType.TURN)).hasSize(1);

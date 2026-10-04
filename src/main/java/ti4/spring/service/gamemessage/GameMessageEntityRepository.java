@@ -1,6 +1,5 @@
 package ti4.spring.service.gamemessage;
 
-import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,11 +9,6 @@ import ti4.message.GameMessageType;
 
 interface GameMessageEntityRepository extends JpaRepository<GameMessageEntity, Long> {
 
-    @Query(
-            value = "select count(*) from (select pg_advisory_xact_lock(hashtext(:gameName))) as game_lock",
-            nativeQuery = true)
-    long lockGameUntilTransactionEnds(@Param("gameName") String gameName);
-
     List<GameMessageEntity> findByGameNameOrderByIdAsc(String gameName);
 
     List<GameMessageEntity> findByGameNameAndTypeOrderByIdAsc(String gameName, GameMessageType type);
@@ -22,8 +16,8 @@ interface GameMessageEntityRepository extends JpaRepository<GameMessageEntity, L
     List<GameMessageEntity> findByTypeOrderByIdAsc(GameMessageType type);
 
     @Modifying
-    @Query("delete from GameMessageEntity message where message.gameName in :gameNames")
-    int deleteByGameNames(@Param("gameNames") Collection<String> gameNames);
+    @Query("delete from GameMessageEntity message where message.gameName = :gameName")
+    int deleteByGameName(@Param("gameName") String gameName);
 
     @Modifying
     @Query("delete from GameMessageEntity message"

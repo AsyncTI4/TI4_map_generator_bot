@@ -1,14 +1,10 @@
 package ti4.message;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -26,18 +22,13 @@ public class GameMessageManager {
     @Deprecated(forRemoval = true, since = "2026-10")
     private static final String LEGACY_GAME_MESSAGES_FILE = "GameMessages.json";
 
-    private static final int WRITE_LOCK_EXPIRE_AFTER_ACCESS_MINUTES = 20;
-    private static final Cache<String, ReentrantLock> gameWriteLocks = Caffeine.newBuilder()
-            .expireAfterAccess(WRITE_LOCK_EXPIRE_AFTER_ACCESS_MINUTES, TimeUnit.MINUTES)
-            .build();
-
     public static void add(String gameName, GameMessage gameMessage) {
-        write(gameName, "add", service -> service.add(gameName, gameMessage));
+        run("add", service -> service.add(gameName, gameMessage));
     }
 
     @Nullable
     public static String replace(String gameName, GameMessage gameMessage) {
-        return write(gameName, "replace", service -> service.replace(gameName, gameMessage), Optional.<String>empty())
+        return call("replace", service -> service.replace(gameName, gameMessage), Optional.<String>empty())
                 .orElse(null);
     }
 
@@ -46,7 +37,7 @@ public class GameMessageManager {
     }
 
     public static void removeAfter(String gameName, long gameSaveTime) {
-        write(gameName, "roll back", service -> service.removeSavedAfter(gameName, gameSaveTime));
+        run("roll back", service -> service.removeSavedAfter(gameName, gameSaveTime));
     }
 
     public static Optional<String> remove(String gameName, GameMessageType type) {
@@ -54,11 +45,11 @@ public class GameMessageManager {
     }
 
     public static Optional<String> remove(String gameName, GameMessageType type, @Nullable String key) {
-        return write(gameName, "remove", service -> service.remove(gameName, type, key), Optional.empty());
+        return call("remove", service -> service.remove(gameName, type, key), Optional.empty());
     }
 
     public static void remove(String gameName, String messageId) {
-        write(gameName, "remove", service -> service.remove(gameName, messageId));
+        run("remove", service -> service.remove(gameName, messageId));
     }
 
     public static Optional<GameMessage> getOne(String gameName, GameMessageType type) {
@@ -90,11 +81,11 @@ public class GameMessageManager {
     }
 
     public static void addReaction(String gameName, String faction, GameMessageType type, String key) {
-        write(gameName, "add a reaction to", service -> service.addReaction(gameName, faction, type, key));
+        run("add a reaction to", service -> service.addReaction(gameName, faction, type, key));
     }
 
     public static void addReaction(String gameName, String faction, String messageId) {
-        write(gameName, "add a reaction to", service -> service.addReaction(gameName, faction, messageId));
+        run("add a reaction to", service -> service.addReaction(gameName, faction, messageId));
     }
 
     // TODO: Remove this one-time GameMessages.json import (run via /developer custom_command on 2026-10-04) and
@@ -122,32 +113,14 @@ public class GameMessageManager {
         }
     }
 
-    private static void write(String gameName, String action, Consumer<GameMessageService> operation) {
-        write(
-                gameName,
+    private static void run(String action, Consumer<GameMessageService> operation) {
+        call(
                 action,
                 service -> {
                     operation.accept(service);
                     return null;
                 },
                 null);
-    }
-
-    private static <T> T write(String gameName, String action, Function<GameMessageService, T> operation, T fallback) {
-        if (gameName == null) {
-            return call(action, operation, fallback);
-        }
-        ReentrantLock lock = gameWriteLocks.get(gameName, _ -> new ReentrantLock());
-        lock.lock();
-        try {
-            return call(action, operation, fallback);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private static void run(String action, Consumer<GameMessageService> operation) {
-        write(null, action, operation);
     }
 
     private static <T> T call(String action, Function<GameMessageService, T> operation, T fallback) {
