@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1514,6 +1515,24 @@ public final class Helper {
     }
 
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
+        String message = buildSpentThingsMessage(player, game, resOrInfOrBoth, false);
+        if (message.length() <= Message.MAX_CONTENT_LENGTH) {
+            return message;
+        }
+        return buildSpentThingsMessage(player, game, resOrInfOrBoth, true);
+    }
+
+    private static String buildSpentThingsMessage(
+            Player player, Game game, String resOrInfOrBoth, boolean withoutPlanetEmojis) {
+        Function<String, String> planetWithResourcesAndInfluence = withoutPlanetEmojis
+                ? planet -> getPlanetRepresentation(planet, game)
+                : planet -> getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
+        Function<String, String> planetWithResources = withoutPlanetEmojis
+                ? planet -> getPlanetRepresentation(planet, game)
+                : planet -> getPlanetRepresentationPlusEmojiPlusResources(planet, game);
+        Function<String, String> planetWithInfluence = withoutPlanetEmojis
+                ? planet -> getPlanetRepresentation(planet, game)
+                : planet -> getPlanetRepresentationPlusEmojiPlusInfluence(planet, game);
         List<String> spentThings = player.getSpentThingsThisWindow();
         StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " exhausted the following: \n");
         int res = 0;
@@ -1566,7 +1585,7 @@ public final class Helper {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName));
                 if (planet != null) {
                     msg.append("> Used _Nature's Boon_ for ")
-                            .append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game))
+                            .append(planetWithResourcesAndInfluence.apply(planetName))
                             .append('\n');
                     if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         inf += planet.getResources();
@@ -1631,23 +1650,23 @@ public final class Helper {
                     }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             res += planet.getMaxResInf();
                         } else {
                             if (countInfluenceAsResources) {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                msg.append(planetWithResourcesAndInfluence.apply(thing))
                                         .append(" (using its higher value due to _Emergency Appropriations_)\n");
                                 resourceValue = planet.getMaxResInf();
                             } else if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                msg.append(planetWithResourcesAndInfluence.apply(thing))
                                         .append('\n');
                             } else {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game));
+                                msg.append(planetWithResources.apply(thing));
                                 if (resourceDonor != null) {
                                     msg.append(" (counting as ")
                                             .append(resourceValue)
@@ -1659,27 +1678,25 @@ public final class Helper {
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                            msg.append(planetWithResourcesAndInfluence.apply(thing))
                                     .append('\n');
                             inf += planet.getMaxResInf();
                         } else {
                             if (countResourcesAsInfluence) {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                msg.append(planetWithResourcesAndInfluence.apply(thing))
                                         .append(" (using its higher value due to _Wildlife Preservation_)\n");
                                 inf += planet.getMaxResInf();
                             } else {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
-                                        .append('\n');
+                                msg.append(planetWithInfluence.apply(thing)).append('\n');
                                 inf += planet.getInfluence();
                             }
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
-                        msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                .append('\n');
+                        msg.append(planetWithResourcesAndInfluence.apply(thing)).append('\n');
                         if (xxchaHero) {
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
@@ -1688,8 +1705,7 @@ public final class Helper {
                             res += planet.getMaxResInf();
                         }
                     } else {
-                        msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                .append('\n');
+                        msg.append(planetWithResourcesAndInfluence.apply(thing)).append('\n');
                         if (xxchaHero) {
                             inf += planet.getSumResourcesInfluence();
                             res += planet.getSumResourcesInfluence();
