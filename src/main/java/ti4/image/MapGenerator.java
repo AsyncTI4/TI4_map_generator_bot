@@ -66,7 +66,6 @@ import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
 import ti4.spring.api.overlay.MapOverlayService;
-import ti4.spring.context.SpringContext;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
 
@@ -828,7 +827,7 @@ public class MapGenerator implements AutoCloseable {
 
     private void saveWebsiteOverlays() {
         try {
-            SpringContext.getBean(MapOverlayService.class).saveOverlays(game.getName(), websiteOverlays);
+            MapOverlayService.getBean().saveOverlays(game.getName(), websiteOverlays);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to save website overlays", e);
         }
