@@ -731,7 +731,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (parentChannel == null && !game.isHasEnded()) {
             BotLogger.warning(
                     new LogOrigin(this),
-                    "`Player.getCardsInfoThread`: parent channel is null for game: " + game.getName());
+                    "`Player.getCardsInfoThreadParentChannel`: parent channel is null for game: " + game.getName());
         }
         return parentChannel;
     }

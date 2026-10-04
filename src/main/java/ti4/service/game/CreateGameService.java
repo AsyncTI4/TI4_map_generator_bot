@@ -138,7 +138,8 @@ public class CreateGameService {
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
 
         // ADD PLAYERS TO ROLE
-        CompletableFuture<Void> roleAssignments = assignRoleToMembers(guild, role, members, missingMembers);
+        Map<Member, CompletableFuture<Void>> roleAssignments =
+                assignRoleToMembers(guild, role, members, missingMembers);
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
@@ -224,7 +225,7 @@ public class CreateGameService {
         // Create Cards Info Threads
         Map<Player, ThreadChannel> cardsInfoThreads = createCardsInfoThreads(newGame);
 
-        roleAssignments.join();
+        List<Member> membersWithoutRole = awaitRoleAssignments(roleAssignments, newGame);
         introductionToBotMapUpdatesThread(newGame);
         introductionForNewPlayers(newGame);
         cardsInfoThreads.forEach(Player::sendCardsInfoThreadGreeting);
@@ -234,6 +235,7 @@ public class CreateGameService {
                 + "\n> " + chatChannel.getAsMention()
                 + "\n> " + actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
+        reportMembersWithoutRole(event, membersWithoutRole, newGame);
 
         reportNewGameCreated(newGame);
 
@@ -265,20 +267,38 @@ public class CreateGameService {
         return newGame;
     }
 
-    private static CompletableFuture<Void> assignRoleToMembers(
+    private static Map<Member, CompletableFuture<Void>> assignRoleToMembers(
             Guild guild, Role role, List<Member> members, List<Member> missingMembers) {
-        CompletableFuture<?>[] assignments = members.stream()
-                .filter(member -> !missingMembers.contains(member))
-                .map(member -> assignRole(guild, role, member))
-                .toArray(CompletableFuture[]::new);
-        return CompletableFuture.allOf(assignments);
+        Map<Member, CompletableFuture<Void>> assignments = new LinkedHashMap<>();
+        for (Member member : members) {
+            if (missingMembers.contains(member)) continue;
+            assignments.put(member, guild.addRoleToMember(member, role).submit());
+        }
+        return assignments;
     }
 
-    private static CompletableFuture<Void> assignRole(Guild guild, Role role, Member member) {
-        return guild.addRoleToMember(member, role).submit().exceptionally(error -> {
-            BotLogger.error("Could not give " + member.getEffectiveName() + " the " + role.getName() + " role.", error);
-            return null;
+    static List<Member> awaitRoleAssignments(Map<Member, CompletableFuture<Void>> assignments, Game game) {
+        List<Member> membersWithoutRole = new ArrayList<>();
+        assignments.forEach((member, assignment) -> {
+            Throwable failure = assignment.handle((ignored, error) -> error).join();
+            if (failure == null) return;
+            membersWithoutRole.add(member);
+            BotLogger.error(
+                    new LogOrigin(game),
+                    "Could not give " + member.getEffectiveName() + " the " + game.getName() + " role.",
+                    failure);
         });
+        return membersWithoutRole;
+    }
+
+    private static void reportMembersWithoutRole(
+            GenericInteractionCreateEvent event, List<Member> membersWithoutRole, Game game) {
+        if (membersWithoutRole.isEmpty()) return;
+        String mentions = membersWithoutRole.stream().map(Member::getAsMention).collect(Collectors.joining(", "));
+        String message = mentions + ", the bot couldn't give you the **" + game.getName()
+                + "** role, so you can't see the game channels yet. Press **Locate My Game** to try again.";
+        Button locateGame = Buttons.green("pingGame_" + game.getName(), "Locate My Game");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, List.of(locateGame));
     }
 
     private static Map<Player, ThreadChannel> createCardsInfoThreads(Game game) {
