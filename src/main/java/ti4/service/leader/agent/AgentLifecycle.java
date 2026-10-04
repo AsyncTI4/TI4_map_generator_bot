@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -55,9 +56,8 @@ public class AgentLifecycle {
             return;
         }
         P payload = module.decode(game, player, parsed.payload()).orElse(null);
-        String agentName =
-                AgentNames.cardName(module.displayName(), AgentNames.isYssarilCopy(leader.getId(), parsed.agentId()));
         if (payload == null) {
+            String agentName = module.cardName(AgentNames.isYssarilCopy(leader.getId(), parsed.agentId()));
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
@@ -65,10 +65,9 @@ public class AgentLifecycle {
         }
 
         exhaust(game, player, leader, parsed.agentId());
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getRepresentation() + " has exhausted " + agentName + ".");
-        AgentUse<P> use = new AgentUse<>(game, player, leader, parsed.agentId(), module.displayName(), payload, event);
-        deliver(module.resolve(use));
+        AgentUse<P> use = AgentUse.of(module, game, player, leader, parsed.agentId(), payload, event);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), module.exhaustAnnouncement(use));
+        deliver(module.resolve(use), event, player);
         finish(event, game, player, parsed.agentId());
     }
 
@@ -100,11 +99,25 @@ public class AgentLifecycle {
         offerTemporalCommandSuite(game, player, agentId);
     }
 
-    private static void deliver(AgentOutcome outcome) {
+    private static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent event, Player user) {
         for (AgentOutcome.Message message : outcome.messages()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    message.recipient().getCorrectChannel(), message.text(), message.buttons());
+                    channelFor(message, event, user), message.text(), new ArrayList<>(message.buttons()));
         }
+        if (outcome.pressedMessageEdit() != null && event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent
+                    .getMessage()
+                    .editMessage(outcome.pressedMessageEdit())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    private static MessageChannel channelFor(
+            AgentOutcome.Message message, GenericInteractionCreateEvent event, Player user) {
+        if (!message.goesToPressedChannel()) {
+            return message.recipient().getCorrectChannel();
+        }
+        return event != null ? event.getMessageChannel() : user.getCorrectChannel();
     }
 
     private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent) {

@@ -86,6 +86,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRel
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -163,6 +164,7 @@ import ti4.service.game.GameColorsService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.modules.KhraskAgent;
 import ti4.service.map.SystemPickerService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
@@ -795,8 +797,7 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("khraskagent")
                 && (whatIsItFor.contains("inf") || whatIsItFor.contains("both"))) {
-            buttons.add(Buttons.gray(
-                    "exhaustAgent_khraskagent_" + player.getFaction(), "Use Khrask Agent", FactionEmojis.khrask));
+            buttons.add(Buttons.gray(KhraskAgent.buttonId(player), "Use Khrask Agent", FactionEmojis.khrask));
         }
         if (player.hasAbility("diplomats")
                 && !ButtonHelperAbilities.getDiplomatButtons(game, player).isEmpty()) {
@@ -3981,7 +3982,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForAgentSelection(Game game, String agent) {
-        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
+        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, AgentButtonIds.format(agent), null);
     }
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}

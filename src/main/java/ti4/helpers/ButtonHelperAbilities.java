@@ -53,6 +53,7 @@ import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.MentakAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
@@ -1009,7 +1010,7 @@ public final class ButtonHelperAbilities {
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
+                        player.factionButtonChecker() + MentakAgent.buttonId(pillaged),
                         "Use Mentak Agent",
                         FactionEmojis.Mentak));
                 buttons.add(Buttons.red("deleteButtons", "Done"));
@@ -1027,7 +1028,7 @@ public final class ButtonHelperAbilities {
                         && player.hasLeader("mentakagent")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
-                            "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
+                            p2.factionButtonChecker() + MentakAgent.buttonId(pillaged),
                             "Use Mentak Agent",
                             FactionEmojis.Mentak));
                     buttons.add(Buttons.red("deleteButtons", "Done"));

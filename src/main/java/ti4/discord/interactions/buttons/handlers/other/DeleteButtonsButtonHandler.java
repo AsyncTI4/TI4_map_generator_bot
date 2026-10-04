@@ -55,6 +55,8 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.GledgeAgent;
+import ti4.service.leader.agent.modules.WinnuAgent;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -342,7 +344,7 @@ class DeleteButtonsButtonHandler {
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
+                    buttons.add(Buttons.red(WinnuAgent.buttonId(), "Use Winnu Agent", FactionEmojis.Winnu));
                 }
                 if (player.hasUnexhaustedLeader("lunariumagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
@@ -357,10 +359,7 @@ class DeleteButtonsButtonHandler {
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_gledgeagent_" + player.getFaction(),
-                            "Use Gledge Agent",
-                            FactionEmojis.gledge));
+                    buttons.add(Buttons.red(GledgeAgent.buttonId(player), "Use Gledge Agent", FactionEmojis.gledge));
                 }
 
                 if (player.hasUnexhaustedLeader("ghotiagent")) {

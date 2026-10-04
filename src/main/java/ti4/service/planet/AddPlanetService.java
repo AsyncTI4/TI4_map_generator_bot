@@ -48,6 +48,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.modules.VaylerianAgent;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -561,10 +562,7 @@ public class AddPlanetService {
                 && player.hasUnexhaustedLeader("vaylerianagent")
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green(
-                    "exhaustAgent_vaylerianagent_" + player.getFaction(),
-                    "Use Vaylerian Agent",
-                    FactionEmojis.vaylerian));
+            buttons.add(Buttons.green(VaylerianAgent.buttonId(player), "Use Vaylerian Agent", FactionEmojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged() + " you may use "
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
