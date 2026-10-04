@@ -1,22 +1,16 @@
 package ti4.helpers;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.service.game.ManagedGameService;
-import ti4.spring.context.SpringContext;
-import ti4.spring.service.persistence.StandaloneTitleEntityRepository;
+import ti4.spring.service.title.PlayerTitleService;
 
 @UtilityClass
 public class TitlesHelper {
@@ -25,26 +19,14 @@ public class TitlesHelper {
         HashMap<String, String> gameHistory = new HashMap<>();
         Map<String, Integer> titles = new HashMap<>();
 
-        Predicate<ManagedGame> thisPlayerIsInGame = game -> game.getPlayer(userId) != null;
-        List<ManagedGame> games = GameManager.getManagedGames().stream()
-                .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
-
-        for (var managedGame : games) {
-            var game = managedGame.getGame();
-            String titlesForPlayer = game.getStoredValue("TitlesFor" + userId);
-            if (titlesForPlayer.isEmpty()) {
-                continue;
-            }
-            Arrays.stream(titlesForPlayer.split("_")).forEach(title -> {
-                if (!title.isEmpty() && !"**".equalsIgnoreCase(title)) {
-                    addTitle(titles, gameHistory, title, game.getName());
-                }
-            });
-        }
-
-        addStandaloneTitles(userId, titles, gameHistory);
+        PlayerTitleService playerTitleService = PlayerTitleService.getBean();
+        playerTitleService.getEndedGameTitles(userId).stream()
+                .filter(earned -> !earned.title().isBlank() && !"**".equals(earned.title()))
+                .sorted(Comparator.comparing(earned -> ManagedGameService.getGameNameForSorting(earned.source())))
+                .forEach(earned -> addTitle(titles, gameHistory, earned.title(), earned.source()));
+        playerTitleService
+                .getStandaloneTitles(userId)
+                .forEach(earned -> addTitle(titles, gameHistory, earned.title(), earned.source()));
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
@@ -73,15 +55,6 @@ public class TitlesHelper {
         }
 
         return sb;
-    }
-
-    private static void addStandaloneTitles(
-            String userId, Map<String, Integer> titles, HashMap<String, String> gameHistory) {
-        for (var standaloneTitle :
-                SpringContext.getBean(StandaloneTitleEntityRepository.class).findByUserIdWithUser(userId)) {
-            var title = standaloneTitle.getTitle();
-            addTitle(titles, gameHistory, title, standaloneTitle.getSource());
-        }
     }
 
     private static void addTitle(
