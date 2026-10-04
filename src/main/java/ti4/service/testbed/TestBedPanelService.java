@@ -157,6 +157,12 @@ public class TestBedPanelService {
             sb.append("No buttons for **")
                     .append(turn.active().getFaction())
                     .append("** in their channel's latest messages.");
+        } else if (turn.combat() && turn.pressAs() != null) {
+            sb.append("Combat buttons in ")
+                    .append(turn.message().getChannel().getAsMention())
+                    .append("; pressing one counts as **")
+                    .append(turn.pressAs().getFaction())
+                    .append("**. Switch seats to roll for the other side.");
         } else {
             sb.append("The bot's latest buttons for **")
                     .append(turn.active().getFaction())

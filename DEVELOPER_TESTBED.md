@@ -46,7 +46,9 @@ Writing scripts with an AI agent: point it at [TESTBED_AGENT_GUIDE.md](TESTBED_A
 - **Turn Buttons** shows the buttons of the bot's latest message for the active player (Tactical Action, play a
   strategy card, Pass, End Turn, …), as they appear in the channel. Pressing one presses the real button as the
   active player; the page then shows the next buttons, so you can play turns without scrolling. Buttons that open
-  a form (modal) still need the button in the channel.
+  a form (modal) still need the button in the channel. Buttons a real player would only see in an ephemeral reply
+  (Component Action, scoring a secret, …) are re-posted in that seat's own channel (cards-info thread, or private
+  channel in fog), marked 🧪, so the panel and scripts can press them.
 - **Test Buttons** opens the test buttons page: pick a group, page with ◀ ▶, **Back** to the panel. Results show
   in the panel's status line.
 
@@ -80,6 +82,20 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 
 Still missing something? Add a Java test button that sets it up, or add a preset field: the model is
 `TestBedPreset.Seat`, applying it is `TestBedComponentService`, validation is `TestBedPresetService`.
+
+## Combat
+
+A preset's `combat` positions open the real combat thread on apply (see `2p-combat`). From there:
+
+- **Panel:** **Turn Buttons** also shows the newest buttons in the combat thread of the seat you act as. Pressing
+  one counts as that seat; switch seats to roll for the other side.
+- **Fog threads:** clicking a button in a seat's own copy of a combat thread (in its private channel) acts as that
+  seat, without switching act-as.
+- **Scripts:** the scope `<seat>:combat` is that seat's newest combat thread, for `press` and `expect`.
+- **Fixed dice:** set the stored value `testBedDice` to space-separated results, e.g. `10 10 1`. Presses made by
+  the test bed (panel, scripts, test buttons) use them in order; leftovers wait for the next press, and an empty
+  list goes back to random. Buttons you click yourself in Discord still roll random dice. `2p-combat` has
+  **Next dice all hit / all miss** test buttons; `combat-roll` is the example script.
 
 ## Add a test button
 
@@ -193,8 +209,8 @@ something the stand-in click only fakes: check that step by hand once. When it p
 `data/testbed/local/scripts/` or share it in `data/testbed/scripts/`; `/testbed run script:all` runs it with the
 others.
 
-**Not possible yet:** filling in modals, select menus, combat-thread messages, reactions, slash commands, and
-anything decided by dice.
+**Not possible yet:** filling in modals, select menus, typing messages into combat threads, reactions and slash
+commands. Dice can be fixed with `testBedDice` ([Combat](#combat)).
 
 ## Your own files
 

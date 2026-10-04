@@ -1,0 +1,13 @@
+{
+  "name": "combat-roll",
+  "description": "2p-combat: both seats roll space combat in the combat thread with fixed dice (all 1s), so neither scores a hit.",
+  "preset": "2p-combat",
+  "steps": [
+    { "label": "Next dice all miss", "do": "setStored", "key": "testBedDice", "value": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" },
+    { "label": "Letnev rolls", "as": "you", "in": "you:combat", "press": "Roll Space Combat" },
+    { "expect": { "in": "you:combat", "contains": "Total hits 0" } },
+    { "label": "Nekro rolls", "as": "seat1", "in": "seat1:combat", "press": "Roll Space Combat" },
+    { "expect": { "in": "seat1:combat", "contains": "Total hits 0", "count": 2 } },
+    { "label": "Clear fixed dice", "do": "removeStored", "key": "testBedDice" }
+  ]
+}

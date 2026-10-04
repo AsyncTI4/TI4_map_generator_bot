@@ -329,7 +329,7 @@ public final class TestBedScriptRunner {
         List<String> scopes = new ArrayList<>(List.of("main", "actions"));
         for (Player player : game.getRealPlayers()) {
             String seat = player.getFaction();
-            scopes.addAll(List.of(seat, seat + ":private", seat + ":cards-info"));
+            scopes.addAll(List.of(seat, seat + ":private", seat + ":cards-info", seat + ":combat"));
         }
         if (game.isFowMode()) scopes.add("gm");
         for (String scope : scopes) {
@@ -374,7 +374,8 @@ public final class TestBedScriptRunner {
             return add(index, step.describe(), Status.FAIL, "seat `" + step.getAs() + "`", "no such seat");
         PressResult result;
         if (step.getPressId() != null) {
-            MessageChannel channel = step.getIn() != null ? scopeChannel(game, step.getIn()) : ownChannel(game, seat);
+            MessageChannel channel =
+                    step.getIn() != null ? scopeChannel(game, step.getIn()) : TestBedPress.ownChannel(game, seat);
             if (channel == null) return add(index, step.describe(), Status.FAIL, "a channel for the carrier", "none");
             result = TestBedPress.pressById(game, developer, seat, channel, step.getPressId());
         } else {
@@ -408,11 +409,6 @@ public final class TestBedScriptRunner {
         List<MessageChannel> channels = new ArrayList<>();
         if (channel != null) channels.add(channel);
         return channels;
-    }
-
-    @Nullable
-    private static MessageChannel ownChannel(Game game, Player seat) {
-        return game.isFowMode() ? seat.getPrivateChannel() : seat.getCardsInfoThread();
     }
 
     private Status doAction(int index, Step step) {
@@ -630,9 +626,11 @@ public final class TestBedScriptRunner {
                 Player seat = seat(game, colon < 0 ? scope : scope.substring(0, colon));
                 if (seat == null) return null;
                 if (colon < 0) return seat.getCorrectChannel();
-                return "private".equals(scope.substring(colon + 1))
-                        ? seat.getPrivateChannel()
-                        : seat.getCardsInfoThread();
+                return switch (scope.substring(colon + 1)) {
+                    case "private" -> seat.getPrivateChannel();
+                    case "combat" -> TestBedCombatThreads.latest(game, seat);
+                    default -> seat.getCardsInfoThread();
+                };
             }
         }
     }

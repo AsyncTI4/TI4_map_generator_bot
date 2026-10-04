@@ -177,7 +177,7 @@ class TestBedPanelButtonHandler {
     }
 
     private static void showTurn(GenericInteractionCreateEvent event, Game game, @Nullable String status) {
-        TurnButtons turn = TestBedTurnButtons.find(game);
+        TurnButtons turn = TestBedTurnButtons.find(game, event.getUser().getId());
         ((IDeferrableCallback) event)
                 .getHook()
                 .editOriginal(TestBedPanelService.turnContent(game, turn, status))

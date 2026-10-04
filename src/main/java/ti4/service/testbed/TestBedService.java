@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.JdaService;
 import ti4.game.Game;
@@ -107,7 +108,18 @@ public class TestBedService {
         Member member = guild == null ? null : guild.getMemberById(userId);
         User user =
                 member != null ? member.getUser() : JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
+        if (user == null) user = retrieveUser(userId);
         return user != null && user.isBot();
+    }
+
+    @Nullable
+    private static User retrieveUser(String userId) {
+        if (JdaService.jda == null || !userId.matches("\\d{17,20}")) return null;
+        try {
+            return JdaService.jda.retrieveUserById(userId).complete();
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     public static boolean isVirtualSeat(Player player) {
@@ -251,11 +263,20 @@ public class TestBedService {
     @Nullable
     private static Player seatOwningChannel(Game game, @Nullable String channelId) {
         if (channelId == null) return null;
+        String parentId = parentOfThread(channelId);
         for (Player player : game.getRealPlayers()) {
             if (channelId.equals(player.getPrivateChannelID()) || channelId.equals(player.getCardsInfoThreadID())) {
                 return player;
             }
+            if (parentId != null && parentId.equals(player.getPrivateChannelID())) return player;
         }
         return null;
+    }
+
+    @Nullable
+    private static String parentOfThread(String channelId) {
+        if (JdaService.jda == null) return null;
+        ThreadChannel thread = JdaService.jda.getThreadChannelById(channelId);
+        return thread == null ? null : thread.getParentChannel().getId();
     }
 }

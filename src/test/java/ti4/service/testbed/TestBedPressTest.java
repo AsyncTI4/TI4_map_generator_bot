@@ -3,16 +3,20 @@ package ti4.service.testbed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -20,13 +24,19 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import ti4.service.testbed.TestBedPress.Recorder;
 import ti4.testUtils.BaseTi4Test;
 
@@ -106,6 +116,76 @@ class TestBedPressTest extends BaseTi4Test {
         event.getHook().editOriginal("Choose a system").setComponents(List.of()).queue();
         verify(edit).setComponents(List.of());
         verify(edit).queue();
+    }
+
+    // A real player sees these buttons in an ephemeral reply; the stand-in cannot send one, so it re-posts the
+    // message in the seat's own channel with the exact same button ids (FFCC prefix included).
+    @Test
+    void ephemeralButtonsAreRepostedWithIdenticalIds() {
+        Recorder recorder = new Recorder();
+        MessageChannel seatChannel = mock(MessageChannel.class);
+        MessageCreateAction create = mock(MessageCreateAction.class);
+        Message reposted = mock(Message.class);
+        when(reposted.getJumpUrl()).thenReturn("https://discord.com/channels/1/2/3");
+        when(create.complete()).thenReturn(reposted);
+        ArgumentCaptor<MessageCreateData> sent = ArgumentCaptor.forClass(MessageCreateData.class);
+        when(seatChannel.sendMessage(sent.capture())).thenReturn(create);
+        Button generic = Button.secondary("FFCC_nekro_componentActionRes_generic_", "Generic Component Action");
+
+        ButtonInteractionEvent event = TestBedPress.standInEvent(
+                message, passButton, developer, recorder, new TestBedPress.Repost(seatChannel, "nekro"));
+        MessageCreateData menu = new MessageCreateBuilder()
+                .setContent("Choose a component action")
+                .setComponents(ActionRow.of(generic))
+                .build();
+        event.getHook().setEphemeral(true).sendMessage(menu).queue();
+
+        List<Button> buttons = sent.getValue().getComponentTree().findAll(Button.class);
+        assertEquals(
+                List.of("FFCC_nekro_componentActionRes_generic_"),
+                buttons.stream().map(Button::getCustomId).toList());
+        assertTrue(sent.getValue().getContent().endsWith("Choose a component action"));
+        assertEquals(List.of("https://discord.com/channels/1/2/3"), recorder.reposts());
+        assertEquals(List.of("Choose a component action"), recorder.replies());
+    }
+
+    // event.reply(...) goes through deferReply(); its success callback gets the hook, as with a real reply.
+    @Test
+    void ephemeralReplyWithButtonsIsRepostedAndCallsBack() {
+        Recorder recorder = new Recorder();
+        MessageChannel seatChannel = mock(MessageChannel.class);
+        MessageCreateAction create = mock(MessageCreateAction.class);
+        when(create.complete()).thenReturn(mock(Message.class));
+        when(seatChannel.sendMessage(any(MessageCreateData.class))).thenReturn(create);
+        ButtonInteractionEvent event = TestBedPress.standInEvent(
+                message, passButton, developer, recorder, new TestBedPress.Repost(seatChannel, "nekro"));
+
+        AtomicReference<Object> callback = new AtomicReference<>();
+        event.reply("Pick a card")
+                .setEphemeral(true)
+                .addComponents(ActionRow.of(Button.primary("FFCC_nekro_ac_play_from_hand_12", "Sabotage")))
+                .queue(callback::set);
+
+        verify(seatChannel).sendMessage(any(MessageCreateData.class));
+        assertTrue(callback.get() instanceof InteractionHook);
+    }
+
+    // Plain ephemeral text stays a recorded reply; nothing is posted.
+    @Test
+    void ephemeralTextIsNotReposted() {
+        Recorder recorder = new Recorder();
+        MessageChannel seatChannel = mock(MessageChannel.class);
+        ButtonInteractionEvent event = TestBedPress.standInEvent(
+                message, passButton, developer, recorder, new TestBedPress.Repost(seatChannel, "nekro"));
+
+        event.getHook()
+                .setEphemeral(true)
+                .sendMessage("these buttons are for someone else")
+                .queue();
+
+        verify(seatChannel, never()).sendMessage(any(MessageCreateData.class));
+        assertEquals(List.of("these buttons are for someone else"), recorder.replies());
+        assertEquals(List.of(), recorder.reposts());
     }
 
     // Guard for JDA upgrades: every no-argument method answers without being "unsupported", and JDA's own helper
