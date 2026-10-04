@@ -7,8 +7,8 @@ public final class GledgeAgent extends SpendModifierAgent {
 
     public static final String ID = "gledgeagent";
 
-    public static String buttonId(Player spender) {
-        return AgentButtonIds.format(ID, spender.getFaction());
+    public static String buttonId(Player owner, Player spender) {
+        return AgentButtonIds.formatOwned(owner, ID, spender.getFaction());
     }
 
     @Override

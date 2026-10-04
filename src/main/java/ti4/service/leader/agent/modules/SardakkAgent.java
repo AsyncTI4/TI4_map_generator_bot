@@ -27,8 +27,8 @@ public final class SardakkAgent implements AgentModule<SardakkAgent.Choice> {
 
     public record PlaceOnPlanet(Tile tile, String planet) implements Choice {}
 
-    public static String planetButtonId(String position, String planet) {
-        return AgentButtonIds.format(ID, position, planet);
+    public static String planetButtonId(Player owner, String position, String planet) {
+        return AgentButtonIds.formatOwned(owner, ID, position, planet);
     }
 
     @Override

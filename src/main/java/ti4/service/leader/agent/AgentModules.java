@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.service.leader.agent.modules.AugersAgent;
 import ti4.service.leader.agent.modules.BentorAgent;
 import ti4.service.leader.agent.modules.CymiaeAgent;
+import ti4.service.leader.agent.modules.ExhaustOnlyAgent;
 import ti4.service.leader.agent.modules.GledgeAgent;
 import ti4.service.leader.agent.modules.HyperAgent;
+import ti4.service.leader.agent.modules.KaloraAgent;
 import ti4.service.leader.agent.modules.KhraskAgent;
 import ti4.service.leader.agent.modules.KortaliAgent;
 import ti4.service.leader.agent.modules.KyroAgent;
+import ti4.service.leader.agent.modules.LunariumAgent;
 import ti4.service.leader.agent.modules.MentakAgent;
 import ti4.service.leader.agent.modules.MirvedaAgent;
 import ti4.service.leader.agent.modules.NokarAgent;
@@ -27,24 +31,29 @@ import ti4.service.leader.agent.modules.ZelianAgent;
 @UtilityClass
 public class AgentModules {
 
-    public static final List<AgentModule<?>> ALL = List.of(
-            new AugersAgent(),
-            new SardakkAgent(),
-            new BentorAgent(),
-            new CymiaeAgent(),
-            new GledgeAgent(),
-            new HyperAgent(),
-            new KhraskAgent(),
-            new KortaliAgent(),
-            new KyroAgent(),
-            new MentakAgent(),
-            new MirvedaAgent(),
-            new NokarAgent(),
-            new VadenAgent(),
-            new VaylerianAgent(),
-            new VeldyrAgent(),
-            new WinnuAgent(),
-            new ZelianAgent());
+    public static final List<AgentModule<?>> ALL = Stream.<AgentModule<?>>concat(
+                    Stream.<AgentModule<?>>of(
+                            new AugersAgent(),
+                            new SardakkAgent(),
+                            new BentorAgent(),
+                            new CymiaeAgent(),
+                            new GledgeAgent(),
+                            new HyperAgent(),
+                            new KhraskAgent(),
+                            new KortaliAgent(),
+                            new KyroAgent(),
+                            new MentakAgent(),
+                            new MirvedaAgent(),
+                            new NokarAgent(),
+                            new VadenAgent(),
+                            new VaylerianAgent(),
+                            new VeldyrAgent(),
+                            new WinnuAgent(),
+                            new KaloraAgent(),
+                            new LunariumAgent(),
+                            new ZelianAgent()),
+                    ExhaustOnlyAgent.ALL.stream())
+            .toList();
 
     private static final Map<String, AgentModule<?>> BY_ID = indexById(ALL);
 

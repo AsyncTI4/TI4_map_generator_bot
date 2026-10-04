@@ -34,7 +34,7 @@ class AugersAgentTest extends BaseTi4Test {
 
     @Test
     void offersTheLegacyButtonIdForTheExplorer() {
-        assertThat(AugersAgent.buttonId(explorer)).isEqualTo("exhaustAgent_augersagent_pi_hacan");
+        assertThat(AugersAgent.buttonId(augers, explorer)).isEqualTo("FFCC_augers_exhaustAgent_augersagent_pi_hacan");
     }
 
     @Test

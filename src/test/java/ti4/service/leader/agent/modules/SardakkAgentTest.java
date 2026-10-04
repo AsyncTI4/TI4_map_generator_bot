@@ -40,7 +40,8 @@ class SardakkAgentTest extends BaseTi4Test {
 
     @Test
     void offersTheLegacyCombatButtonId() {
-        assertThat(SardakkAgent.planetButtonId("101", "lodor")).isEqualTo("exhaustAgent_sardakkagent_101_lodor");
+        assertThat(SardakkAgent.planetButtonId(sardakk, "101", "lodor"))
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_101_lodor");
     }
 
     @Test

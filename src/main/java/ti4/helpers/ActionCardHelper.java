@@ -2317,7 +2317,8 @@ public class ActionCardHelper {
                     player, game, "Played action card " + CardEmojis.getACEmoji(game) + ": _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
-            Button cymiaeButton = Buttons.gray(CymiaeAgent.buttonId(player), "Use Cymiae Agent", FactionEmojis.cymiae);
+            Button cymiaeButton =
+                    Buttons.gray(CymiaeAgent.buttonId(player, player), "Use Cymiae Agent", FactionEmojis.cymiae);
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()

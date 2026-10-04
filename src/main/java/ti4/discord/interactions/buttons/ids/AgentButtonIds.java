@@ -3,6 +3,8 @@ package ti4.discord.interactions.buttons.ids;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
+import ti4.game.Player;
 
 public final class AgentButtonIds {
 
@@ -16,6 +18,10 @@ public final class AgentButtonIds {
             return PREFIX + agentId;
         }
         return PREFIX + agentId + SEPARATOR + String.join(SEPARATOR, payloadSegments);
+    }
+
+    public static String formatOwned(Player owner, String agentId, String... payloadSegments) {
+        return ComponentIdEnvelope.ownedBy(owner.getFaction()) + format(agentId, payloadSegments);
     }
 
     public static Parsed parse(String id) {

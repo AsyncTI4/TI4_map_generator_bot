@@ -20,7 +20,7 @@ public final class ZelianAgentButton implements PostMovementAbilityButton {
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return List.of(
-                Buttons.gray(ZelianAgent.buttonId(ctx.player()), "Use Zelian Agent Yourself", FactionEmojis.zelian));
+        return List.of(Buttons.gray(
+                ZelianAgent.buttonId(ctx.player(), ctx.player()), "Use Zelian Agent Yourself", FactionEmojis.zelian));
     }
 }

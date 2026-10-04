@@ -14,8 +14,8 @@ public final class WinnuAgent implements AgentModule<Player> {
 
     public static final String ID = "winnuagent";
 
-    public static String buttonId() {
-        return AgentButtonIds.format(ID);
+    public static String buttonId(Player owner) {
+        return AgentButtonIds.formatOwned(owner, ID);
     }
 
     @Override

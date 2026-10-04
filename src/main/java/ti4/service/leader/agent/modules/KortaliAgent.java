@@ -15,8 +15,8 @@ public final class KortaliAgent extends TargetedAgent {
 
     public static final String ID = "kortaliagent";
 
-    public static String buttonId(Player opponent) {
-        return AgentButtonIds.format(ID, opponent.getColor());
+    public static String buttonId(Player owner, Player opponent) {
+        return AgentButtonIds.formatOwned(owner, ID, opponent.getColor());
     }
 
     @Override
