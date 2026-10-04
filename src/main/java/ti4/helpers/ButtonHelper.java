@@ -1704,23 +1704,21 @@ public class ButtonHelper {
                     "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the Quietus (the Rebellion flagship) is in an active Breach.");
         }
 
-        if (!game.isFowMode()) {
-            if (game.isTwilightsFallMode()) {
-                boolean sent = false;
-                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                    if (p2.hasTech("tf-smotheringpresence")) {
-                        for (String tilePos :
-                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), p2, false, true)) {
-                            Tile t2 = game.getTileByPosition(tilePos);
-                            for (UnitHolder uH : t2.getUnitHolders().values()) {
-                                if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
-                                        || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                                    if (!sent) {
-                                        sent = true;
-                                        MessageHelper.sendMessageToChannel(
-                                                player.getCorrectChannel(),
-                                                "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work when next to another player's structure when they have smothering presence, like this tile is.");
-                                    }
+        if (game.isTwilightsFallMode()) {
+            boolean sent = false;
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.hasTech("tf-smotheringpresence")) {
+                    for (String tilePos :
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), p2, false, true)) {
+                        Tile t2 = game.getTileByPosition(tilePos);
+                        for (UnitHolder uH : t2.getUnitHolders().values()) {
+                            if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
+                                    || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+                                if (!sent) {
+                                    sent = true;
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCorrectChannel(),
+                                            "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work when next to another player's structure when they have smothering presence, like this tile is.");
                                 }
                             }
                         }
