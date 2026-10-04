@@ -927,7 +927,7 @@ public class MessageHelper {
             String successText) {
         if (messageText == null || messageText.isEmpty()) return true; // blank message counts as a success
         User user = player == null ? null : JdaService.jda.getUserById(player.getUserID());
-        if (player == null || (user == null && !TestBedService.isVirtualSeat(player))) {
+        if (player == null || (user == null && !TestBedService.isVirtualSeatInTestBed(game, player))) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
         } else {

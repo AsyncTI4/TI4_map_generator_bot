@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.helpers.URLReaderHelper;
 import ti4.message.MessageHelper;
 import ti4.model.TestBedScript;
@@ -35,11 +34,10 @@ class TestBedRun extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Player nonDeveloper = TestBedService.findNonDeveloper(
-                event.getGuild(), game.getPlayers().values());
-        if (nonDeveloper != null) {
-            MessageHelper.replyToMessage(
-                    event, "Refused: " + nonDeveloper.getUserName() + " is in this game and is not a developer.");
+        String refusal = TestBedService.destructiveCommandRefusal(
+                event.getGuild(), game, game.getPlayers().values());
+        if (refusal != null) {
+            MessageHelper.replyToMessage(event, refusal);
             return;
         }
         if (event.getOption(FILE) == null && ALL.equals(event.getOption(SCRIPT, null, OptionMapping::getAsString))) {

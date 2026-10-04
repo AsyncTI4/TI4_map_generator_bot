@@ -93,6 +93,16 @@ public class TestBedService {
                 .orElse(null);
     }
 
+    @Nullable
+    public static String destructiveCommandRefusal(@Nullable Guild guild, Game game, Collection<Player> players) {
+        if (allowsRealPlayers(game)) {
+            return "Refused: this game was enabled with real players. Run `/testbed disable` first.";
+        }
+        Player nonDeveloper = findNonDeveloper(guild, players);
+        if (nonDeveloper == null) return null;
+        return "Refused: " + nonDeveloper.getUserName() + " is in this game and is not a developer.";
+    }
+
     private static boolean isBot(@Nullable Guild guild, String userId) {
         Member member = guild == null ? null : guild.getMemberById(userId);
         User user =
@@ -102,6 +112,10 @@ public class TestBedService {
 
     public static boolean isVirtualSeat(Player player) {
         return isVirtualSeatId(player.getUserID());
+    }
+
+    public static boolean isVirtualSeatInTestBed(Game game, Player player) {
+        return isVirtualSeat(player) && isTestBed(game);
     }
 
     static boolean isVirtualSeatId(@Nullable String userId) {

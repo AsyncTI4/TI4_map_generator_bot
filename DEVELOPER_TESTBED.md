@@ -287,7 +287,8 @@ Every step may also have a `label` for the report.
   `{<seat>.color}`. Seat placeholders resolve first, so they can sit inside card ones: `{pn:{hacan.color}_sftt}`.
 - **Semantics:** `do: hand` sets `tg`, `commodities`, `ccs` and `breakthrough`, and adds cards, techs, units,
   planets, notes, fragments, scored objectives and leader changes. `press` prefers an exact id or label over an
-  id prefix, so `ac_play_from_hand_1` never presses card 12. Presses wait for their button and positive checks
+  id prefix, and a prefix never stops inside a number, so `ac_play_from_hand_1` never presses card 12. `press`
+  skips disabled buttons (`pressId` does not). Presses wait for their button and positive checks
   retry until `timeoutSeconds`; `notContains` and `noFactionLeak` run once after `settleSeconds`.
 
 ## Safety

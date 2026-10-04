@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
@@ -36,6 +37,7 @@ public class TestBedShortcuts {
     public static final String PRESET_GROUP = "Preset";
     static final String FILE_KEY_PREFIX = "file-";
     static final String LOCAL_KEY_PREFIX = "local-";
+    static final int MAX_KEY_LENGTH = 40;
     private static final int MAX_DUMP_LENGTH = 1500;
     private static final String NO_SEAT = "Pick a seat to act as first.";
 
@@ -120,7 +122,8 @@ public class TestBedShortcuts {
     }
 
     static String keyOf(String groupName) {
-        return groupName.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9-]", "-");
+        String key = groupName.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9-]", "-");
+        return StringUtils.left(key, MAX_KEY_LENGTH);
     }
 
     static List<LoadedGroup> fileGroups() {

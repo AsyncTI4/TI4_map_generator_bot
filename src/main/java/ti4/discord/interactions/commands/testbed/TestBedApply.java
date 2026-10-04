@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.helpers.URLReaderHelper;
 import ti4.message.MessageHelper;
 import ti4.model.TestBedPreset;
@@ -63,12 +62,8 @@ class TestBedApply extends GameStateSubcommand {
             return "Refused: this game already has seated factions. Use a freshly created game, or `/testbed reset`"
                     + " first if this is a test bed.";
         }
-        Player nonDeveloper = TestBedService.findNonDeveloper(
-                event.getGuild(), game.getPlayers().values());
-        if (nonDeveloper != null) {
-            return "Refused: " + nonDeveloper.getUserName() + " has joined and does not have the developer role.";
-        }
-        return null;
+        return TestBedService.destructiveCommandRefusal(
+                event.getGuild(), game, game.getPlayers().values());
     }
 
     @Nullable

@@ -1503,6 +1503,10 @@ class AutoCompleteProvider {
 
     private static void resolveTestBedAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
+        if (!TestBedService.isEnabled() || !TestBedService.isDeveloper(event.getMember())) {
+            event.replyChoices(List.of()).queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
         String gameName = GameNameService.getGameNameFromChannel(event);
         Game game = GameManager.isValid(gameName)
                 ? GameManager.getManagedGame(gameName).getGame()

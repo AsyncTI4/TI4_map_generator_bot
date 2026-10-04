@@ -114,6 +114,10 @@ public class TestBedPress {
                     channel.getHistory().retrievePast(HISTORY_SIZE).complete()) {
                 for (Button button : message.getComponentTree().findAll(Button.class)) {
                     if (button.getCustomId() == null) continue;
+                    if (button.isDisabled()) {
+                        seen.add(button.getLabel() + " (`" + button.getCustomId() + "`, disabled)");
+                        continue;
+                    }
                     Match match = match(button, labelOrId);
                     if (match == Match.EXACT) return new Found(message, button);
                     if (match == Match.PREFIX && prefixMatch == null) prefixMatch = new Found(message, button);
@@ -155,8 +159,15 @@ public class TestBedPress {
         if (labelOrId.equalsIgnoreCase(button.getLabel()) || labelOrId.equals(id) || labelOrId.equals(withoutFaction)) {
             return Match.EXACT;
         }
-        if (id.startsWith(labelOrId) || withoutFaction.startsWith(labelOrId)) return Match.PREFIX;
+        if (isPrefixOf(labelOrId, id) || isPrefixOf(labelOrId, withoutFaction)) return Match.PREFIX;
         return Match.NONE;
+    }
+
+    private static boolean isPrefixOf(String prefix, String id) {
+        if (prefix.isEmpty() || !id.startsWith(prefix)) return false;
+        boolean splitsNumber =
+                Character.isDigit(prefix.charAt(prefix.length() - 1)) && Character.isDigit(id.charAt(prefix.length()));
+        return !splitsNumber;
     }
 
     private static String withoutFactionCheck(String id) {
@@ -167,13 +178,21 @@ public class TestBedPress {
 
     public static PressResult press(Game game, Member developer, Player seat, Message message, Button button) {
         String developerId = developer.getId();
-        String previous = TestBedService.rawActingAs(game, developerId);
-        runLocked(game, locked -> TestBedService.setActingAs(locked, developerId, seat));
         Recorder recorder = new Recorder();
+        ExecutionLockManager.lock(game.getName(), ExecutionLockType.WRITE);
         try {
-            ButtonProcessor.processNow(standInEvent(message, button, developer, recorder));
+            String[] previous = {""};
+            runLocked(game, locked -> {
+                previous[0] = TestBedService.rawActingAs(locked, developerId);
+                TestBedService.setActingAs(locked, developerId, seat);
+            });
+            try {
+                ButtonProcessor.processNow(standInEvent(message, button, developer, recorder));
+            } finally {
+                runLocked(game, locked -> TestBedService.restoreActingAs(locked, developerId, previous[0]));
+            }
         } finally {
-            runLocked(game, locked -> TestBedService.restoreActingAs(locked, developerId, previous));
+            ExecutionLockManager.unlock(game.getName(), ExecutionLockType.WRITE);
         }
         return new PressResult(true, "pressed `" + button.getLabel() + "` (`" + button.getCustomId() + "`)", recorder);
     }

@@ -43,7 +43,9 @@ public class TestBedTurnButtons {
                     .filter(button -> button.getCustomId() != null)
                     .toList();
             if (buttons.stream().anyMatch(button -> button.getCustomId().startsWith(prefix))) {
-                return new TurnButtons(active, message, buttons);
+                List<Button> enabled =
+                        buttons.stream().filter(button -> !button.isDisabled()).toList();
+                return new TurnButtons(active, message, enabled);
             }
         }
         return new TurnButtons(active, null, List.of());
