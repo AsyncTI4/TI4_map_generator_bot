@@ -6,23 +6,26 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.http.HttpStatus;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.website.model.WebsiteOverlay;
 
 class MapOverlayControllerTest {
 
-    private static final String OVERLAYS_JSON = "[{\"boxXYWH\":[10,4910,90,90],\"title\":\"Discordant Stars\"}]";
+    private static final MapOverlayResponse OVERLAYS = new MapOverlayResponse(
+            List.of(new WebsiteOverlay("Discordant Stars", null, List.of(10, 4910, 90, 90))), 1_759_500_000_000L);
 
     @Test
     void returnsStoredOverlaysForNonFowGame() {
         MapOverlayService service = mock(MapOverlayService.class);
         ManagedGame managedGame = mock(ManagedGame.class);
         when(managedGame.isFowMode()).thenReturn(false);
-        when(service.getOverlaysJson("pbd11223")).thenReturn(Optional.of(OVERLAYS_JSON));
+        when(service.getOverlays("pbd11223")).thenReturn(Optional.of(OVERLAYS));
 
         try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
             gameManager.when(() -> GameManager.getManagedGame("pbd11223")).thenReturn(managedGame);
@@ -30,7 +33,7 @@ class MapOverlayControllerTest {
             var response = new MapOverlayController(service).get("pbd11223");
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).isEqualTo(OVERLAYS_JSON);
+            assertThat(response.getBody()).isEqualTo(OVERLAYS);
         }
     }
 
@@ -39,7 +42,7 @@ class MapOverlayControllerTest {
         MapOverlayService service = mock(MapOverlayService.class);
         ManagedGame managedGame = mock(ManagedGame.class);
         when(managedGame.isFowMode()).thenReturn(false);
-        when(service.getOverlaysJson("pbd11223")).thenReturn(Optional.empty());
+        when(service.getOverlays("pbd11223")).thenReturn(Optional.empty());
 
         try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
             gameManager.when(() -> GameManager.getManagedGame("pbd11223")).thenReturn(managedGame);

@@ -1,6 +1,7 @@
 package ti4.spring.api.overlay;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import ti4.json.JsonMapperManager;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.website.model.WebsiteOverlay;
+import tools.jackson.core.type.TypeReference;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +30,21 @@ public class MapOverlayService {
         mapOverlayDataRepository.save(data);
     }
 
-    Optional<String> getOverlaysJson(String gameName) {
+    Optional<MapOverlayResponse> getOverlays(String gameName) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
         if (!GameManager.isValid(gameName)) return Optional.empty();
-        return mapOverlayDataRepository.findById(gameName).map(MapOverlayData::getOverlaysJson);
+        return mapOverlayDataRepository.findById(gameName).map(MapOverlayService::toResponse);
+    }
+
+    private static MapOverlayResponse toResponse(MapOverlayData data) {
+        List<WebsiteOverlay> overlays =
+                JsonMapperManager.basic().readValue(data.getOverlaysJson(), new TypeReference<>() {});
+        return new MapOverlayResponse(overlays, toEpochMs(data.getUpdatedAt()));
+    }
+
+    private static long toEpochMs(LocalDateTime updatedAt) {
+        if (updatedAt == null) return 0;
+        return updatedAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static MapOverlayService getBean() {

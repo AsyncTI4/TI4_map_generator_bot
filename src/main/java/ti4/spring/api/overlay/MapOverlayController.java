@@ -21,15 +21,15 @@ public class MapOverlayController {
 
     @SetupRequestContext(false)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> get(@PathVariable String gameName) {
+    public ResponseEntity<MapOverlayResponse> get(@PathVariable String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null || managedGame.isFowMode()) {
             return ResponseEntity.notFound().build();
         }
         return mapOverlayService
-                .getOverlaysJson(gameName)
-                .map(json ->
-                        ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(json))
+                .getOverlays(gameName)
+                .map(overlays ->
+                        ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(overlays))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
