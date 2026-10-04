@@ -171,6 +171,11 @@ public final class TestBedScriptRunner {
     static String suiteSkipReason(Game game, TestBedScript script) {
         if (script.getPreset() == null) return "no preset";
         TestBedPreset preset = TestBedPresetService.getPreset(script.getPreset());
+        return gameModeMismatch(game, preset);
+    }
+
+    @Nullable
+    private static String gameModeMismatch(Game game, @Nullable TestBedPreset preset) {
         if (preset == null) return "unknown preset";
         if (preset.getFog() != null && preset.getFog() != game.isFowMode()) {
             return preset.getFog() ? "needs a fog game" : "needs a normal game";
@@ -261,6 +266,11 @@ public final class TestBedScriptRunner {
             return true;
         }
         TestBedPreset preset = TestBedPresetService.getPreset(script.getPreset());
+        String mismatch = gameModeMismatch(game, preset);
+        if (mismatch != null) {
+            add(0, label, Status.FAIL, "a game the preset fits", mismatch);
+            return false;
+        }
         List<String> warnings = new ArrayList<>();
         Map<String, Long> before = latestCardsInfoIds(game);
         boolean done = TestBedPress.runLocked(
@@ -444,13 +454,19 @@ public final class TestBedScriptRunner {
                 game.updateActivePlayer(seat);
                 StartTurnService.turnStart(origin, game, seat);
             }
-            case "actAs" ->
-                TestBedService.setActingAs(
-                        game,
-                        developer.getId(),
-                        TestBedScriptService.YOU.equals(step.getAs()) ? null : seat(game, step.getAs()));
+            case "actAs" -> {
+                boolean you = TestBedScriptService.YOU.equals(step.getAs());
+                Player seat = you ? null : seat(game, step.getAs());
+                if (!you && seat == null) {
+                    problems.add("no seat `" + step.getAs() + "`");
+                    return;
+                }
+                TestBedService.setActingAs(game, developer.getId(), seat);
+            }
             case "hand" -> {
-                for (Player seat : seats(game, step.getAs())) {
+                List<Player> targets = seats(game, step.getAs());
+                if (targets.isEmpty()) problems.add("no seat `" + step.getAs() + "`");
+                for (Player seat : targets) {
                     TestBedApplyService.applyHand(game, seat, step.getHand(), origin, problems);
                 }
             }

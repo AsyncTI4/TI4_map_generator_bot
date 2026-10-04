@@ -129,6 +129,10 @@ class TestBedGameTest extends BaseTi4Test {
         game.setTile(new Tile("19", "101"));
         game.drawActionCard(nekro.getUserID(), 3);
         game.setSCPlayed(3, true);
+        TestBedComponentService.applyGameState(
+                game,
+                TestBedPresetService.parse("{ \"revealedObjectives\": [\"corner\"], \"laws\": [\"arms_reduction\"] }"),
+                new ArrayList<>());
         int fullDeck = Mapper.getDeck(game.getAcDeckID()).getNewShuffledDeck().size();
 
         assertEquals(new ResetResult(1, 1, 1, false), TestBedResetService.reset(game));
@@ -138,6 +142,10 @@ class TestBedGameTest extends BaseTi4Test {
         assertEquals(fullDeck, game.getActionCards().size());
         assertTrue(game.getPlayedSCs().isEmpty());
         assertTrue(game.getTileMap().isEmpty());
+        // Preset laws and objectives must not survive the rebuild once the test bed marker is gone
+        assertTrue(game.getLaws().isEmpty());
+        assertFalse(game.getRevealedPublicObjectives().containsKey("corner"));
+        assertTrue(game.getAgendas().contains("arms_reduction"));
         assertFalse(TestBedService.isMarkedAsTestBed(game));
     }
 

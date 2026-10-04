@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -24,6 +25,7 @@ import ti4.service.fow.CreateFoWGameService;
 public class TestBedChannelService {
 
     static final String CREATED_CHANNELS_KEY = "testBedChannels";
+    static final String GRANTED_GM_KEY = "testBedGrantedGm";
     private static final String CHANNEL_SEPARATOR = "_";
     private static final long SEAT_CHANNEL_PERMISSIONS =
             Permission.VIEW_CHANNEL.getRawValue() | Permission.PIN_MESSAGES.getRawValue();
@@ -53,13 +55,31 @@ public class TestBedChannelService {
     }
 
     public static boolean grantGameMasterRole(Game game, Member developer) {
-        List<Role> roles = game.getGuild().getRolesByName(game.getName() + " GM", true);
-        if (roles.isEmpty()) return false;
-        Role gmRole = roles.getFirst();
+        Role gmRole = gameMasterRole(game);
+        if (gmRole == null) return false;
         if (!developer.getRoles().contains(gmRole)) {
             game.getGuild().addRoleToMember(developer, gmRole).queue(Consumers.nop(), BotLogger::catchRestError);
+            TestBedService.store(game, GRANTED_GM_KEY, developer.getId());
         }
         return true;
+    }
+
+    public static void revokeGrantedGameMasterRole(Game game) {
+        String developerId = game.getStoredValue(GRANTED_GM_KEY);
+        game.removeStoredValue(GRANTED_GM_KEY);
+        Role gmRole = gameMasterRole(game);
+        if (developerId.isBlank() || gmRole == null) return;
+        game.getGuild()
+                .removeRoleFromMember(UserSnowflake.fromId(developerId), gmRole)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @Nullable
+    private static Role gameMasterRole(Game game) {
+        Guild guild = game.getGuild();
+        if (guild == null) return null;
+        List<Role> roles = guild.getRolesByName(game.getName() + " GM", true);
+        return roles.isEmpty() ? null : roles.getFirst();
     }
 
     public static void shareCardsInfoThread(Player seat, String developerId) {

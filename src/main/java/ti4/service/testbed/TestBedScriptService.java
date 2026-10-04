@@ -93,6 +93,10 @@ public class TestBedScriptService {
         if (script.getPreset() != null) {
             preset = TestBedPresetService.getPreset(script.getPreset());
             if (preset == null) errors.add("Unknown preset `" + script.getPreset() + "`.");
+            if (preset != null) {
+                TestBedPresetService.validate(preset)
+                        .forEach(error -> errors.add("Preset `" + script.getPreset() + "`: " + error));
+            }
         }
         if (script.getSteps().isEmpty()) errors.add("The script has no `steps`.");
         if (script.getSettleSeconds() < 0) errors.add("`settleSeconds` may not be negative.");

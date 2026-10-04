@@ -2,6 +2,7 @@ package ti4.service.testbed;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,6 +16,7 @@ public class TestBedResetService {
     public static ResetResult reset(Game game) {
         List<String> deletedChannelIds = TestBedChannelService.createdChannelIds(game);
         int missingChannels = TestBedChannelService.deleteCreatedChannels(game);
+        TestBedChannelService.revokeGrantedGameMasterRole(game);
         int virtualSeats = (int) game.getRealPlayers().stream()
                 .filter(TestBedService::isVirtualSeat)
                 .count();
@@ -65,5 +67,21 @@ public class TestBedResetService {
         game.setSecretObjectives(
                 new ArrayList<>(Mapper.getDeck(game.getSoDeckID()).getNewShuffledDeck()));
         game.setRelics(new ArrayList<>(Mapper.getDeck(game.getRelicDeckID()).getNewShuffledDeck()));
+        removeLaws(game);
+        unrevealObjectives(game);
+    }
+
+    private static void removeLaws(Game game) {
+        new ArrayList<>(game.getLaws().keySet()).forEach(game::removeLaw);
+        game.resetAgendas();
+    }
+
+    private static void unrevealObjectives(Game game) {
+        for (Map.Entry<String, Integer> objective :
+                new ArrayList<>(game.getRevealedPublicObjectives().entrySet())) {
+            if (Mapper.getPublicObjective(objective.getKey()) == null) continue;
+            game.shuffleObjectiveBackIntoDeck(objective.getValue());
+            game.getScoredPublicObjectives().remove(objective.getKey());
+        }
     }
 }
