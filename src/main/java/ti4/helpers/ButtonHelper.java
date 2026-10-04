@@ -87,6 +87,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButto
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -7073,41 +7074,40 @@ public class ButtonHelper {
             int x,
             boolean reverse,
             boolean remove) {
-        String action = "unitTactical" + (remove ? "Remove" : "Move");
+        String action = remove ? UnitPickButtonIds.TACTICAL_REMOVE : UnitPickButtonIds.TACTICAL_MOVE;
         String labelStart = reverse ? "Un-move" : "Move";
         Buttons.ButtonColor color = reverse ? Buttons.ButtonColor.red : Buttons.ButtonColor.green;
-        String idSuffix = reverse ? "reverse" : null;
-        return buildUnitPickButton(player, action, idSuffix, tile, uh, state, unitKey, x, labelStart, color);
+        return buildUnitPickButton(player, action, reverse, tile, uh, state, unitKey, x, labelStart, color);
     }
 
     private static Button buildRepairUnitButton(
             Player player, Tile tile, UnitHolder uh, UnitState state, UnitKey unitKey, int x) {
-        String action = "repairDamage";
+        String action = UnitPickButtonIds.REPAIR_DAMAGE;
         String labelStart = "Repair";
         Buttons.ButtonColor color = Buttons.ButtonColor.green;
-        return buildUnitPickButton(player, action, null, tile, uh, state, unitKey, x, labelStart, color);
+        return buildUnitPickButton(player, action, false, tile, uh, state, unitKey, x, labelStart, color);
     }
 
     public static Button buildAssignHitButton(
             Player player, Tile tile, UnitHolder uh, UnitState state, UnitKey unitKey, int x, boolean sustain) {
-        String action = sustain ? "assignDamage" : "assignHits";
+        String action = sustain ? UnitPickButtonIds.ASSIGN_DAMAGE : UnitPickButtonIds.ASSIGN_HITS;
         String labelStart = sustain ? "Sustain" : "Destroy";
         Buttons.ButtonColor color = sustain ? Buttons.ButtonColor.gray : Buttons.ButtonColor.red;
-        return buildUnitPickButton(player, action, null, tile, uh, state, unitKey, x, labelStart, color);
+        return buildUnitPickButton(player, action, false, tile, uh, state, unitKey, x, labelStart, color);
     }
 
     private static Button buildRemoveButton(
             Player player, Tile tile, UnitHolder uh, UnitState state, UnitKey unitKey, int x) {
-        String action = "assignHits";
+        String action = UnitPickButtonIds.ASSIGN_HITS;
         String labelStart = "Remove";
         Buttons.ButtonColor color = Buttons.ButtonColor.red;
-        return buildUnitPickButton(player, action, null, tile, uh, state, unitKey, x, labelStart, color);
+        return buildUnitPickButton(player, action, false, tile, uh, state, unitKey, x, labelStart, color);
     }
 
     private static Button buildUnitPickButton(
             Player player,
             String action,
-            String idSuffix,
+            boolean reverse,
             Tile tile,
             UnitHolder uh,
             UnitState state,
@@ -7123,26 +7123,14 @@ public class ButtonHelper {
                 ? " from " + Helper.getPlanetRepresentationNoResInf(p.getName(), player.getGame())
                 : "";
         String colorName = (player.unitBelongsToPlayer(key)) ? "" : " (" + key.getColor() + ")";
-
-        // id parts
-        List<String> idParts = new ArrayList<>();
         if (player.isDummy() || player.isNpc()) {
-            idParts.add(player.dummyPlayerSpoof() + action);
             labelStart = "(For Dummy) " + labelStart;
-        } else {
-            idParts.add(player.factionButtonChecker() + action);
         }
-        idParts.add(tile.getPosition());
-        idParts.add(Integer.toString(amt));
-        idParts.add(key.asyncID());
 
-        if (state != UnitState.none) idParts.add(state.name());
-        if (uh instanceof Planet p) idParts.add(p.getName());
-        idParts.add(key.getColor());
-        if (idSuffix != null) idParts.add(idSuffix);
-
+        String holderPlanet = uh instanceof Planet p ? p.getName() : null;
+        String buttonID = player.factionButtonChecker()
+                + UnitPickButtonIds.format(action, tile.getPosition(), amt, key, state, holderPlanet, reverse);
         String buttonLabel = labelStart + " " + amt + " " + stateStr + unitName + planetName + colorName;
-        String buttonID = String.join("_", idParts);
 
         return switch (style) {
             case blue -> Buttons.blue(buttonID, buttonLabel, key.unitEmoji());
@@ -7248,12 +7236,18 @@ public class ButtonHelper {
             }
         }
         buttons.add(Buttons.gray(
-                player.factionButtonChecker() + "assignHits_" + tile.getPosition() + "_AllShips", "Remove All Ships"));
+                player.factionButtonChecker() + assignHitsBulkId(tile, UnitPickButtonIds.BulkCommand.ALL_SHIPS),
+                "Remove All Ships"));
         buttons.add(Buttons.gray(
-                player.factionButtonChecker() + "assignHits_" + tile.getPosition() + "_All", "Remove All Units"));
+                player.factionButtonChecker() + assignHitsBulkId(tile, UnitPickButtonIds.BulkCommand.ALL),
+                "Remove All Units"));
         buttons.add(Buttons.blue("deleteButtons", "Done Removing/Sustaining Units"));
         if (buttons.size() >= 24 && !limitOne) return null;
         return buttons;
+    }
+
+    private static String assignHitsBulkId(Tile tile, UnitPickButtonIds.BulkCommand command) {
+        return UnitPickButtonIds.formatBulk(UnitPickButtonIds.ASSIGN_HITS, tile.getPosition(), command);
     }
 
     public static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
