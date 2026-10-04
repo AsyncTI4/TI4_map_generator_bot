@@ -31,6 +31,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -43,7 +44,6 @@ public class TestBedPress {
 
     static final int HISTORY_SIZE = 25;
     private static final long SEARCH_RETRY_MILLIS = 2000;
-    private static final String FACTION_CHECK_PREFIX = "FFCC_";
 
     public static final class Recorder {
         private final List<String> replies = new ArrayList<>();
@@ -160,9 +160,9 @@ public class TestBedPress {
     }
 
     private static String withoutFactionCheck(String id) {
-        if (!id.startsWith(FACTION_CHECK_PREFIX)) return id;
-        String withoutCheck = id.substring(FACTION_CHECK_PREFIX.length());
-        return withoutCheck.substring(withoutCheck.indexOf('_') + 1);
+        String owner = ComponentIdEnvelope.decode(id).ownerFaction();
+        if (owner == null) return id;
+        return id.substring(ComponentIdEnvelope.ownedBy(owner).length());
     }
 
     public static PressResult press(Game game, Member developer, Player seat, Message message, Button button) {

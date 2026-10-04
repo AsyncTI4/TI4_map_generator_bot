@@ -65,6 +65,10 @@ class TestBedPressTest extends BaseTi4Test {
         assertEquals(
                 TestBedPress.Match.PREFIX,
                 TestBedPress.match(Button.danger("ac_play_from_hand_12", "(12) Sabotage"), "ac_play_from_hand_1"));
+        // Faction ids may contain underscores (pi_hacan); the whole faction must be stripped, not just "pi_"
+        assertEquals(
+                TestBedPress.Match.EXACT,
+                TestBedPress.match(Button.danger("FFCC_pi_hacan_turnEnd", "End Turn"), "turnEnd"));
     }
 
     // The stand-in looks like a real press on that message, by the developer, in that channel, and captures replies

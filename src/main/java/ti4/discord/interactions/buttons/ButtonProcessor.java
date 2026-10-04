@@ -59,7 +59,8 @@ public class ButtonProcessor {
     }
 
     public static void processNow(ButtonInteractionEvent event) {
-        ButtonPressTimeline timeline = ButtonPressTimeline.received(event);
+        long now = System.currentTimeMillis();
+        ButtonPressTimeline timeline = ButtonPressTimeline.received(now, now);
         runtimeMonitor.recordQueued();
         String gameName = GameNameService.getGameNameFromChannel(event);
         HandlerRegistry.Route<ButtonContext> route =
