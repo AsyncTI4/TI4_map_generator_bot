@@ -27,6 +27,7 @@ class TrueSkillMatchmakingRatingService {
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
 
+    static final double MAX_CALIBRATED_RATING_CHANGE_PER_GAME = 0.40;
     static final int RECENT_GAMES_WINDOW = 10;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
@@ -60,7 +61,7 @@ class TrueSkillMatchmakingRatingService {
                 ranks[i] = gamePlayer.rank();
             }
 
-            Map<IPlayer, Rating> newRatings = CALCULATOR.calculateNewRatings(gameInfo, teams, ranks);
+            Map<IPlayer, Rating> newRatings = calculateNewRatings(gameInfo, teams, ranks, trueSkillPlayerToRating);
             trueSkillPlayerToRating.putAll(newRatings);
             recordRecentRatings(gamePlayers, userIdToTrueSkillPlayer, trueSkillPlayerToRating, recentRatingsByUserId);
         }
@@ -107,7 +108,7 @@ class TrueSkillMatchmakingRatingService {
             Rating startRating =
                     trackedPlayer == null ? null : trueSkillPlayerToRating.get(userIdToTrueSkillPlayer.get(userId));
 
-            Map<IPlayer, Rating> newRatings = CALCULATOR.calculateNewRatings(gameInfo, teams, ranks);
+            Map<IPlayer, Rating> newRatings = calculateNewRatings(gameInfo, teams, ranks, trueSkillPlayerToRating);
             trueSkillPlayerToRating.putAll(newRatings);
 
             if (trackedPlayer != null) {
@@ -121,6 +122,28 @@ class TrueSkillMatchmakingRatingService {
             }
         }
         return history;
+    }
+
+    private static Map<IPlayer, Rating> calculateNewRatings(
+            GameInfo gameInfo, List<ITeam> teams, int[] ranks, Map<IPlayer, Rating> currentRatings) {
+        Map<IPlayer, Rating> newRatings = new HashMap<>(CALCULATOR.calculateNewRatings(gameInfo, teams, ranks));
+        newRatings.replaceAll((player, newRating) -> capCalibratedChange(currentRatings.get(player), newRating));
+        return newRatings;
+    }
+
+    static Rating capCalibratedChange(Rating currentRating, Rating newRating) {
+        if (currentRating.getStandardDeviation() > SIGMA_CALIBRATION_THRESHOLD) {
+            return newRating;
+        }
+        double change = newRating.getConservativeRating() - currentRating.getConservativeRating();
+        if (Math.abs(change) <= MAX_CALIBRATED_RATING_CHANGE_PER_GAME) {
+            return newRating;
+        }
+        double excess = change - Math.copySign(MAX_CALIBRATED_RATING_CHANGE_PER_GAME, change);
+        return new Rating(
+                newRating.getMean() - excess,
+                newRating.getStandardDeviation(),
+                newRating.getConservativeStandardDeviationMultiplier());
     }
 
     private static void recordRecentRatings(
