@@ -98,7 +98,7 @@ public class GameMessageManager {
         write(gameName, "add a reaction to", service -> service.addReaction(gameName, faction, messageId));
     }
 
-    // TODO: Remove this one-time GameMessages.json import, its developer subcommand, and
+    // TODO: Remove this one-time GameMessages.json import (run via /developer custom_command on 2026-10-04) and
     // GAME_MESSAGES_IMPORTED_TO_DATABASE once every environment has run it; then delete pm_json/GameMessages.json.
     @Deprecated(forRemoval = true, since = "2026-10")
     public static String importLegacyFile() {
