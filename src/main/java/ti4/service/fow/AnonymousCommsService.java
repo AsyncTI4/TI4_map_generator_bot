@@ -80,6 +80,8 @@ public class AnonymousCommsService {
     private static final int MODAL_MESSAGE_LIMIT = 1900;
     private static final int BUTTONS_PER_ROW = 5;
     private static final int MAX_ROWS = 5;
+    // TODO: in-memory only and the cron registers on first touch, so after a restart quiet threads fall back to
+    // Discord's 24h auto-archive until the next relay; persisting activity needs startup registration in JdaService.
     private static final Map<String, ThreadActivity> LAST_ACTIVITY = new ConcurrentHashMap<>();
     private static final AtomicBoolean CRON_REGISTERED = new AtomicBoolean();
 
@@ -171,7 +173,10 @@ public class AnonymousCommsService {
     }
 
     static String colorFromReplyButton(String buttonId) {
-        return StringUtils.removeEnd(StringUtils.removeStart(buttonId, REPLY_PREFIX), MODAL_SUFFIX);
+        String withoutPrefix = buttonId.startsWith(REPLY_PREFIX) ? buttonId.substring(REPLY_PREFIX.length()) : buttonId;
+        return withoutPrefix.endsWith(MODAL_SUFFIX)
+                ? withoutPrefix.substring(0, withoutPrefix.length() - MODAL_SUFFIX.length())
+                : withoutPrefix;
     }
 
     @Nullable
