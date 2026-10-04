@@ -25,6 +25,14 @@ class TestBedCombatThreadsTest {
         assertFalse(TestBedCombatThreads.isCombatThread(game, "pbd7-cards-info-someone-private"));
     }
 
+    // The panel decides whether a combat is still going by looking at the system named in the thread.
+    @Test
+    void readsTheSystemFromTheThreadName() {
+        assertEquals("101", TestBedCombatThreads.systemPosition("pbd7-round-1-system-101-turn-1-letnev-vs-nekro"));
+        assertEquals("305", TestBedCombatThreads.systemPosition("pbd7-round-2-system-305-turn-3-red-vs-blue-private"));
+        assertEquals(null, TestBedCombatThreads.systemPosition("pbd7-comms-blue-private"));
+    }
+
     // testBedDice holds space-separated results; anything that is not 1-10 is skipped.
     @Test
     void readsForcedDiceFromTheStoredValue() {

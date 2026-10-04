@@ -22,6 +22,7 @@ import ti4.service.testbed.TestBedPress.PressResult;
 public class TestBedTurnButtons {
 
     public static final int MAX_BUTTONS = 20;
+    public static final int MAX_COMBAT_BUTTONS = 15;
     private static final long MAX_SETTLE_MILLIS = 2000;
     private static final long POLL_MILLIS = 250;
 
@@ -37,7 +38,7 @@ public class TestBedTurnButtons {
         }
 
         public List<Button> shown() {
-            return buttons.subList(0, Math.min(buttons.size(), MAX_BUTTONS));
+            return buttons.subList(0, Math.min(buttons.size(), combat ? MAX_COMBAT_BUTTONS : MAX_BUTTONS));
         }
     }
 
@@ -51,7 +52,7 @@ public class TestBedTurnButtons {
             if (isNewer(candidate, newest)) newest = candidate;
         }
         Player combatSeat = combatSeat(game, developerId, active);
-        ThreadChannel combatThread = TestBedCombatThreads.latest(game, combatSeat);
+        ThreadChannel combatThread = TestBedCombatThreads.latestOngoing(game, combatSeat);
         Message combatMessage = combatThread == null ? null : latestWithButtons(combatThread);
         if (isNewer(combatMessage, newest)) {
             return new TurnButtons(active, combatMessage, enabledButtons(combatMessage), combatSeat, true);

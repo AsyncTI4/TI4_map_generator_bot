@@ -29,6 +29,8 @@ public class TestBedPanelService {
     public static final String BACK = PREFIX + "back";
     public static final String GROUP_SELECT = PREFIX + "group";
     public static final String TURN_PRESS = PREFIX + "turnPress_";
+    public static final String TURN_ACT_AS = PREFIX + "turnActAs_";
+    private static final int MAX_COMBAT_SEATS = 5;
     public static final int PAGE_SIZE = 15;
 
     public enum Tool {
@@ -175,15 +177,31 @@ public class TestBedPanelService {
         return sb.toString();
     }
 
-    public static List<ActionRow> turnComponents(TurnButtons turn) {
+    public static List<ActionRow> turnComponents(Game game, TurnButtons turn) {
         List<Button> shown = new ArrayList<>();
         List<Button> buttons = turn.shown();
         for (int i = 0; i < buttons.size(); i++) {
             shown.add(buttons.get(i).withCustomId(TURN_PRESS + i));
         }
         List<ActionRow> rows = new ArrayList<>(rowsOf(shown));
+        List<Button> seats = turn.combat() ? combatSeatButtons(game, turn) : List.of();
+        if (!seats.isEmpty()) rows.add(ActionRow.of(seats));
         rows.add(ActionRow.of(Buttons.gray(TOOL + Tool.turn.name(), Tool.refresh.label), Buttons.blue(BACK, "Back")));
         return rows;
+    }
+
+    private static List<Button> combatSeatButtons(Game game, TurnButtons turn) {
+        String threadName = turn.message().getChannel().getName();
+        List<Button> seats = new ArrayList<>();
+        for (Player seat : game.getRealPlayers()) {
+            String side = game.isFowMode() ? seat.getColor() : seat.getFaction();
+            if (!threadName.contains("-" + side + "-") && !threadName.endsWith("-" + side)) continue;
+            String id = TURN_ACT_AS + seat.getFaction();
+            String label = "Roll as " + seat.getFaction();
+            seats.add(seat == turn.pressAs() ? Buttons.green(id, label) : Buttons.gray(id, label));
+            if (seats.size() == MAX_COMBAT_SEATS) break;
+        }
+        return seats;
     }
 
     private static StringSelectMenu groupSelect(List<ButtonGroup> groups, ButtonGroup current) {
