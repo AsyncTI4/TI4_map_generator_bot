@@ -2,6 +2,7 @@ package ti4.spring.api.dashboard;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +155,7 @@ class DashboardService {
 
     PlayerDashboardResponse.TitleSummary getTitleSummary(String userId) {
         record TitleBuilder(int count, Set<String> gameIds) {}
-        Map<String, TitleBuilder> titleToData = new java.util.HashMap<>();
+        Map<String, TitleBuilder> titleToData = new HashMap<>();
 
         playerTitleService.getEndedGameTitles(userId).stream()
                 .filter(earned -> !earned.title().isBlank() && !"**".equals(earned.title()))
