@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -135,10 +138,7 @@ public class CreateGameService {
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
 
         // ADD PLAYERS TO ROLE
-        for (Member member : members) {
-            if (missingMembers.contains(member)) continue; // skip members who aren't on the new server yet
-            guild.addRoleToMember(member, role).complete();
-        }
+        CompletableFuture<Void> roleAssignments = assignRoleToMembers(guild, role, members, missingMembers);
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
@@ -220,16 +220,14 @@ public class CreateGameService {
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
-        introductionToBotMapUpdatesThread(newGame);
-        introductionForNewPlayers(newGame);
 
         // Create Cards Info Threads
-        for (Player player : newGame.getPlayers().values()) {
-            if (player.isNpc() || player.isDummy()) {
-                continue;
-            }
-            player.getCardsInfoThread();
-        }
+        Map<Player, ThreadChannel> cardsInfoThreads = createCardsInfoThreads(newGame);
+
+        roleAssignments.join();
+        introductionToBotMapUpdatesThread(newGame);
+        introductionForNewPlayers(newGame);
+        cardsInfoThreads.forEach(Player::sendCardsInfoThreadGreeting);
 
         // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " + role.getName()
@@ -265,6 +263,31 @@ public class CreateGameService {
         }
 
         return newGame;
+    }
+
+    private static CompletableFuture<Void> assignRoleToMembers(
+            Guild guild, Role role, List<Member> members, List<Member> missingMembers) {
+        CompletableFuture<?>[] assignments = members.stream()
+                .filter(member -> !missingMembers.contains(member))
+                .map(member -> assignRole(guild, role, member))
+                .toArray(CompletableFuture[]::new);
+        return CompletableFuture.allOf(assignments);
+    }
+
+    private static CompletableFuture<Void> assignRole(Guild guild, Role role, Member member) {
+        return guild.addRoleToMember(member, role).submit().exceptionally(error -> {
+            BotLogger.error("Could not give " + member.getEffectiveName() + " the " + role.getName() + " role.", error);
+            return null;
+        });
+    }
+
+    private static Map<Player, ThreadChannel> createCardsInfoThreads(Game game) {
+        Map<Player, ThreadChannel> threads = new LinkedHashMap<>();
+        for (Player player : game.getPlayers().values()) {
+            ThreadChannel thread = player.createCardsInfoThread();
+            if (thread != null) threads.put(player, thread);
+        }
+        return threads;
     }
 
     public static void presentSetupToPlayers(Game game) {
