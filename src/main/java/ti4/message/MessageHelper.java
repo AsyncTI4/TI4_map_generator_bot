@@ -722,8 +722,7 @@ public class MessageHelper {
         buttons = sanitizeButtons(buttons, channel);
 
         String gameName = GameNameService.getGameNameFromChannel(channel);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame != null && !managedGame.isInjectRules()) {
+        if (shouldInjectRules(GameManager.getManagedGame(gameName))) {
             messageText = injectRules(messageText);
         }
 
@@ -1430,6 +1429,10 @@ public class MessageHelper {
             BotLogger.warning(sb.toString());
         }
         return newButtons;
+    }
+
+    static boolean shouldInjectRules(ManagedGame managedGame) {
+        return managedGame != null && managedGame.isInjectRules() && !managedGame.isFowMode();
     }
 
     private static String injectRules(String message) {
