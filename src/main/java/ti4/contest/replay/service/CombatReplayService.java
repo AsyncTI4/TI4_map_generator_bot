@@ -31,6 +31,7 @@ import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -728,7 +729,7 @@ public class CombatReplayService {
         if (buttonId.startsWith("autoAssignSpaceHits_") || buttonId.startsWith("autoAssignSpaceCannonOffenceHits_")) {
             return true;
         }
-        if (!buttonId.startsWith("assignHits_") && !buttonId.startsWith("assignDamage_")) return false;
+        if (UnitPickButtonIds.hitAssignmentPosition(buttonId).isEmpty()) return false;
         String assignHitsType =
                 game.getStoredValue(player.getFaction() + "latestAssignHits").toLowerCase();
         return "spacecombat".equals(assignHitsType) || "pds".equals(assignHitsType);
@@ -1039,8 +1040,10 @@ public class CombatReplayService {
 
     private String getTilePosition(String buttonId) {
         String sanitized = ComponentIdEnvelope.decode(buttonId).handlerId();
-        String[] parts = sanitized.split("_");
-        return parts.length > 1 ? parts[1] : "";
+        return UnitPickButtonIds.hitAssignmentPosition(sanitized).orElseGet(() -> {
+            String[] parts = sanitized.split("_");
+            return parts.length > 1 ? parts[1] : "";
+        });
     }
 
     private static double safeRatio(double weaker, double stronger) {
