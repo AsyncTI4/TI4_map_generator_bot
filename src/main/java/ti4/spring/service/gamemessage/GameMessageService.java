@@ -22,6 +22,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageType;
+import ti4.spring.context.SpringContext;
 
 @Service
 @RequiredArgsConstructor
@@ -212,5 +213,9 @@ public class GameMessageService {
 
     private static Predicate<GameMessageEntity> sameTypeAndKey(GameMessageType type, String key) {
         return message -> message.getType() == type && Objects.equals(message.getMessageKey(), key);
+    }
+
+    public static GameMessageService getBean() {
+        return SpringContext.getBean(GameMessageService.class);
     }
 }

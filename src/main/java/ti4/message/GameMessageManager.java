@@ -18,7 +18,6 @@ import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.gamemessage.GameMessageService;
 
 @UtilityClass
@@ -110,7 +109,7 @@ public class GameMessageManager {
                     PersistenceManager.readObjectFromJsonFile(LEGACY_GAME_MESSAGES_FILE, LegacyGameMessages.class);
             int imported = legacy == null || legacy.gameNameToMessages() == null
                     ? 0
-                    : SpringContext.getBean(GameMessageService.class).importMissing(legacy.gameNameToMessages());
+                    : GameMessageService.getBean().importMissing(legacy.gameNameToMessages());
             GlobalSettings.setSetting(ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE, true);
             String result = "Imported " + StringHelper.pluralize(imported, "game message") + " from "
                     + LEGACY_GAME_MESSAGES_FILE + " into the database.";
@@ -153,7 +152,7 @@ public class GameMessageManager {
 
     private static <T> T call(String action, Function<GameMessageService, T> operation, T fallback) {
         try {
-            return operation.apply(SpringContext.getBean(GameMessageService.class));
+            return operation.apply(GameMessageService.getBean());
         } catch (Exception e) {
             BotLogger.error("Failed to " + action + " game messages.", e);
             return fallback;
