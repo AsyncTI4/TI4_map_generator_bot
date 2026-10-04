@@ -50,7 +50,7 @@ public class Source {
         lost_star_charts_of_ixth,
         flagshipping,
         promises_promises,
-        balacasi,
+        wftv,
         viability_patch,
         beans,
         endlesst,
@@ -98,6 +98,7 @@ public class Source {
         untangled_space,
         combosloth,
         newdawn,
+        deepreaches,
 
         // eronous' stuff
         eronous,
@@ -191,7 +192,7 @@ public class Source {
                 case absol -> SourceEmojis.Absol;
                 case ds -> SourceEmojis.DiscordantStars;
                 case uncharted_space -> SourceEmojis.UnchartedSpace;
-                case blue_reverie -> SourceEmojis.DiscordantStars;
+                case blue_reverie -> SourceEmojis.BlueReverie;
                 case eronous, riftset -> SourceEmojis.Eronous;
                 case admins -> FactionEmojis.AdminsFaction;
                 case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
@@ -203,6 +204,7 @@ public class Source {
                 case lazax -> FactionEmojis.Lazax;
                 case salliance -> SourceEmojis.StrategicAlliance;
                 case monuments -> SourceEmojis.Monuments;
+                case deepreaches -> SourceEmojis.DeepReaches;
                 case tk_destroyer_cup -> SourceEmojis.TwilightKart;
                 case tk_nova_cup -> SourceEmojis.TkNovaCup;
                 case twilight_ds -> SourceEmojis.DiscordantStars;

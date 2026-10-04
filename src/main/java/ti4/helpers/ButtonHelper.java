@@ -81,13 +81,16 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunar
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -2313,28 +2316,33 @@ public class ButtonHelper {
 
     public static void sendAllAgentsAndAbilitiesToReady(GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Buttons.green(
+                    "belkoseaYellowTechReady_planet_" + planet,
+                    "Ready " + Helper.getPlanetRepresentation(planet, player.getGame())));
+        }
         for (String ability : player.getExhaustedPlanetsAbilities()) {
-            buttons.add(Buttons.green("belkoseaYellowTechReady_planet_", "Ready " + ability + " Ability"));
+            buttons.add(Buttons.green("belkoseaYellowTechReady_ability_" + ability, "Ready " + ability + " Ability"));
         }
         String msg = "Please choose a component to ready.";
 
         for (String relic : player.getExhaustedRelics()) {
-            if (relic.contains("superweapon")) {
-                buttons.add(Buttons.green(
-                        "belkoseaYellowTechReady_relic_" + relic,
-                        "Ready " + Mapper.getRelic(relic).getName()));
-            }
-            if (relic.contains("titanprototype") || relic.contains("absol_jr")) {
-                buttons.add(Buttons.green(
-                        "belkoseaYellowTechReady_agent_" + relic,
-                        "Ready " + Mapper.getRelic(relic).getName()));
-            }
+            buttons.add(Buttons.green(
+                    "belkoseaYellowTechReady_relic_" + relic,
+                    "Ready " + Mapper.getRelic(relic).getName() + " Relic"));
         }
         for (Leader leader : player.getLeaders()) {
-            if (leader.isExhausted() && leader.getId().contains("agent")) {
+            if (leader.isExhausted()) {
                 buttons.add(Buttons.green(
-                        "belkoseaYellowTechReady_agent_" + leader.getId(),
-                        "Ready " + Mapper.getLeader(leader.getId()).getName() + " (Agent)"));
+                        "belkoseaYellowTechReady_leader_" + leader.getId(),
+                        "Ready " + Mapper.getLeader(leader.getId()).getName() + " Leader"));
+            }
+        }
+        for (String breakthrough : player.getBreakthroughIDs()) {
+            if (player.isBreakthroughUnlocked(breakthrough) && player.isBreakthroughExhausted(breakthrough)) {
+                buttons.add(Buttons.green(
+                        "belkoseaYellowTechReady_breakthrough_" + breakthrough,
+                        "Ready " + Mapper.getBreakthrough(breakthrough).getName() + " Breakthrough"));
             }
         }
         for (UnitModel monument : MonumentsService.getExhaustedMonuments(player.getGame(), player)) {
@@ -3352,6 +3360,10 @@ public class ButtonHelper {
                             + ", you may redistribute command tokens with these buttons after picking up a command token from the game board.",
                     redistributeButton);
         }
+        resolveAfterCommandTokenRemoved(game, player, tile);
+    }
+
+    public static void resolveAfterCommandTokenRemoved(Game game, Player player, Tile tile) {
         for (Player toldar : game.getRealPlayers()) {
             if (doesPlayerHaveFSHere("toldar_flagship", toldar, tile)) {
                 if (player == toldar) {
@@ -4078,7 +4090,8 @@ public class ButtonHelper {
         }
     }
 
-    public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
+    public static void findOrCreateThreadWithMessage(Game game, String requestedThreadName, String message) {
+        String threadName = DiscordThreadUtility.fitThreadName(requestedThreadName);
         TextChannel channel = game.getMainGameChannel();
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
@@ -4423,9 +4436,6 @@ public class ButtonHelper {
                         fightersIgnored += 4;
                         fleetCap += 2;
                     }
-                    if (token.contains("glatison")) {
-                        fightersIgnored += 5;
-                    }
                 }
             }
 
@@ -4467,9 +4477,6 @@ public class ButtonHelper {
                 && MonumentsService.isMonumentOnBoard(game, player, "mykomentori_monument")
                 && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "mykomentori_monument", tile)) {
             fightersIgnored += 3;
-        }
-        if (MonumentsBRButtonHandler.ignoresFighterCapacity(game, player, tile)) {
-            fightersIgnored += 5;
         }
         int ignoredFs = 0;
         int xytherisPdsInSpace = 0;
@@ -4978,6 +4985,7 @@ public class ButtonHelper {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        BlueReverieHelper.checkXinHarmony(game);
         deleteMessage(event);
     }
 
@@ -5121,6 +5129,9 @@ public class ButtonHelper {
         }
         if (player.hasRelic("absol_tyrantslament") && !player.hasUnit("tyrantslament")) {
             endButtons.add(Buttons.green("deployTyrant", "Deploy The Tyrant's Lament", SourceEmojis.Absol));
+        }
+        if (player.hasRelicReady("kadlinsstaff")) {
+            endButtons.add(BlueReverieRelicHandler.getKadlinButton(player));
         }
         if (player.getPathTokenCounter() > 4) {
             endButtons.add(Buttons.green(
@@ -7247,23 +7258,25 @@ public class ButtonHelper {
 
     public static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
         String unitBaseType = unitModel.getBaseType();
-        return unitModel.getSustainDamage()
-                || ("warsun".equalsIgnoreCase(unitBaseType) && !isLawInPlay(game, "schematics"))
-                || ("mech".equalsIgnoreCase(unitBaseType)
-                        && !game.getLaws().containsKey("articles_war")
-                        && player.hasUnit("nomad_mech"))
-                || ("mech".equalsIgnoreCase(unitBaseType)
-                        && (player.ownsUnit("purpletf_mech")
-                                || player.hasUnit("naaz_voltron")
-                                || doesPlayerHaveFSHere("nekro_flagship", player, tile)
-                                || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
-                || (!player.isActivePlayer()
-                        && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                || (player.hasRelic("metalivoidshielding")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
+        return !ButtonHelperAbilities.removesSustainDamage(game, player, tile)
+                && !MonumentsBRButtonHandler.removesSustainDamage(game, player, tile)
+                && !("warsun".equalsIgnoreCase(unitBaseType) && isLawInPlay(game, "schematics"))
+                && (unitModel.getSustainDamage()
+                        || ("mech".equalsIgnoreCase(unitBaseType)
+                                && !game.getLaws().containsKey("articles_war")
+                                && player.hasUnit("nomad_mech"))
+                        || ("mech".equalsIgnoreCase(unitBaseType)
+                                && (player.ownsUnit("purpletf_mech")
+                                        || player.hasUnit("naaz_voltron")
+                                        || doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                                        || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
+                        || (!player.isActivePlayer()
+                                && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
+                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                        || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
+                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                        || (player.hasRelic("metalivoidshielding")
+                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase())));
     }
 
     @ButtonHandler("startThalnos_")
@@ -7523,7 +7536,7 @@ public class ButtonHelper {
             List<Button> buttons = new ArrayList<>();
             String factionChecker = "FFCC_" + opponent.getFaction() + "_";
             buttons.add(Buttons.green(
-                    factionChecker + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
+                    factionChecker + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                     "Auto-assign Hit" + (h == 1 ? "" : "s")));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);

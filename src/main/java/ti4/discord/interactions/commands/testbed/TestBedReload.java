@@ -26,8 +26,9 @@ class TestBedReload extends Subcommand {
             reply.append(" All valid.");
         } else {
             reply.append(' ').append(report.problems().size()).append(" problem(s):");
-            report.problems().stream().limit(MAX_LISTED).forEach(problem -> reply.append("\n- ")
-                    .append(problem));
+            report.problems().stream()
+                    .limit(MAX_LISTED)
+                    .forEach(problem -> reply.append("\n- ").append(problem));
             if (report.problems().size() > MAX_LISTED) reply.append("\n- …");
         }
         MessageHelper.replyToMessage(event, reply.toString());

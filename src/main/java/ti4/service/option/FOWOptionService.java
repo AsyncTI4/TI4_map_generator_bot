@@ -62,6 +62,14 @@ public class FOWOptionService {
                 FOWOptionCategory.GAME,
                 "New transactions",
                 "Use the offer/accept transaction model instead of the legacy direct-send flow"),
+        FOG_QOL_01(
+                FOWOptionCategory.GAME,
+                "Fog QoL 01",
+                "Fog quality-of-life helpers: pre-decline strategy cards, auto status action cards, private reminders, GM waiting-on info"),
+        GM_TURN_MAP(
+                FOWOptionCategory.GAME,
+                "GM turn map",
+                "Post the unfogged map to the GM activity log at the end of every turn"),
 
         // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
@@ -214,6 +222,10 @@ public class FOWOptionService {
                             : Buttons.green(
                                     "fowOption_" + selectedCategory + "_true_" + option,
                                     "Enable " + option.getTitle()));
+        }
+
+        if (selectedCategory == FOWOptionCategory.GAME) {
+            optionButtons.add(Buttons.blue("gmQolSettings~MDL", "Fog QoL 01 settings..."));
         }
 
         // An ActionRow holds at most 5 buttons, and the message at most 5 rows - one of which is the category row.

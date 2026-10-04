@@ -87,6 +87,12 @@ public final class ButtonHelperModifyUnits {
 
     private static int getNumberOfSustainableUnits(
             Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
+        Tile tile = getTile(game, unitHolder);
+        if (tile != null
+                && (ButtonHelperAbilities.removesSustainDamage(game, player, tile)
+                        || MonumentsBRButtonHandler.removesSustainDamage(game, player, tile))) {
+            return 0;
+        }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int sustains = 0;
         Player mentak = Helper.getPlayerFromUnit(game, "mentak_mech");
@@ -119,20 +125,11 @@ public final class ButtonHelperModifyUnits {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
-        if (mentakFS != null && mentakFS != player) {
-            if (unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
-                return 0;
-            }
-            Tile t = game.getTileFromPlanet(unitHolder.getName());
-            for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, t.getPosition(), player, false)) {
-                if (game.getTileByPosition(adjPos)
-                                .getUnitHolders()
-                                .get("space")
-                                .getUnitCount(UnitType.Flagship, mentakFS.getColor())
-                        > 0) {
-                    return 0;
-                }
-            }
+        if (space
+                && mentakFS != null
+                && mentakFS != player
+                && hasFlagshipInOrAdjacentToSystem(game, player, tile, unitHolder, mentakFS)) {
+            return 0;
         }
         int metali = 0;
 
@@ -166,6 +163,36 @@ public final class ButtonHelperModifyUnits {
             }
         }
         return sustains + metali;
+    }
+
+    private static boolean hasFlagshipInOrAdjacentToSystem(
+            Game game, Player player, Tile tile, UnitHolder unitHolder, Player flagshipOwner) {
+        String color = flagshipOwner.getColor();
+        if (unitHolder.getUnitCount(UnitType.Flagship, color) > 0) {
+            return true;
+        }
+        if (tile == null) {
+            return false;
+        }
+        for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+            Tile adjTile = game.getTileByPosition(adjPos);
+            if (adjTile == null) continue;
+            UnitHolder adjSpace = adjTile.getSpaceUnitHolder();
+            if (adjSpace != null && adjSpace.getUnitCount(UnitType.Flagship, color) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Tile getTile(Game game, UnitHolder unitHolder) {
+        if (unitHolder instanceof Planet planet) {
+            return game.getTileFromPlanet(planet.getName());
+        }
+        return game.getTileMap().values().stream()
+                .filter(tile -> tile.getSpaceUnitHolder() == unitHolder)
+                .findFirst()
+                .orElse(null);
     }
 
     public static void autoAssignAntiFighterBarrageHits(
@@ -1038,6 +1065,17 @@ public final class ButtonHelperModifyUnits {
                     && game.getStoredValue("mahactHeroTarget").isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
+                        game.getActivePlayer().getRepresentation() + ", your opponent has finished assigning hits.");
+            }
+            if (!justSummarizing
+                    && !player.isActivePlayer()
+                    && FoWHelper.isFogQol01(game)
+                    && game.getActivePlayer() != null
+                    && player.isRealPlayer()
+                    && game.getStoredValue("mahactHeroTarget").isEmpty()) {
+                MessageHelper.sendPrivateMessageToPlayer(
+                        game.getActivePlayer(),
+                        game,
                         game.getActivePlayer().getRepresentation() + ", your opponent has finished assigning hits.");
             }
         }
@@ -2574,8 +2612,7 @@ public final class ButtonHelperModifyUnits {
                     AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), "1 ff");
                     successMessage = producedOrPlaced + " 1 " + UnitEmojis.fighter + " in tile "
                             + tile.getRepresentationForButtons(game, player) + ".";
-                }
-                if ("2ff".equalsIgnoreCase(unitLong)) {
+                } else if ("2ff".equalsIgnoreCase(unitLong)) {
                     AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), "2 ff");
                     successMessage = producedOrPlaced + " 2 " + UnitEmojis.fighter + " in tile "
                             + tile.getRepresentationForButtons(game, player) + ".";
@@ -2852,7 +2889,7 @@ public final class ButtonHelperModifyUnits {
             buttons = getOpposingUnitsToHit(player, game, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    player.getCorrectChannel(),
                     player.getRepresentation(false, false)
                             + " has chosen to destroy one of opposing ships using the _Caled_ Superweapon ability."
                             + " Note that the bot did not check if a straight line unimpeded by anomalies existed between the _Caled_ system and the active system.");
@@ -2882,7 +2919,8 @@ public final class ButtonHelperModifyUnits {
                     + ", your opponent used _Assault Cannon_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                cause.contains("caled") ? player.getCorrectChannel() : event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("domnaStepOne_")

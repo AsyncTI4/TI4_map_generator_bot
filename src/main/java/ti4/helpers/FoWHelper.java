@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -41,11 +42,16 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.UydaiHeroService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
+    public static boolean isFogQol01(Game game) {
+        return game.isFowMode() && game.getFowOption(FOWOption.FOG_QOL_01);
+    }
+
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
             return false;
@@ -664,6 +670,17 @@ public final class FoWHelper {
         }
 
         OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
+        if (!toShow) {
+            UydaiHeroService.addAdjacencies(game, player, position, adjacentPositions);
+        }
+
+        if (player != null) {
+            for (String tilePosition : game.getTileMap().keySet()) {
+                if (SarcosaCommanderHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
+                    adjacentPositions.add(tilePosition);
+                }
+            }
+        }
 
         if (includeTile) {
             adjacentPositions.add(position);

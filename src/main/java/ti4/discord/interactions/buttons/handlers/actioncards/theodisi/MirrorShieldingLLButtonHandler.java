@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -145,13 +147,13 @@ public class MirrorShieldingLLButtonHandler {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                opponent.factionButtonChecker() + "autoAssignGroundHits_" + planetName + "_" + hits,
+                opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(planetName, hits),
                 "Auto-Assign Hit" + (hits == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                 "Manually Assign Hit" + (hits == 1 ? "" : "s")));
         buttons.add(Buttons.gray(
-                opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_" + hits,
+                opponent.factionButtonChecker() + CancelGroundHitsButtonId.of(tile.getPosition(), hits, planetName),
                 "Cancel a Hit"));
 
         MessageHelper.sendMessageToChannelWithButtons(

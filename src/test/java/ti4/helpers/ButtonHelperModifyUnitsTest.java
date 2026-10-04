@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class ButtonHelperModifyUnitsTest extends BaseTi4Test {
@@ -436,6 +437,89 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         assertTrue(actualMessage.contains("Would destroy 1 <fighter>"));
     }
 
+    // Fourth Moon II (sigma_mentak_flagship_2): "Other players' ships in or adjacent to this system cannot use
+    // SUSTAIN DAMAGE." Resolving the tile used to go through getTileFromPlanet("space"), which returned null and
+    // threw a NullPointerException for every space combat while another player owned this flagship.
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_SigmaMentakFlagshipInSameSystem_NoSustain() {
+        Game mentakGame = new Game();
+        Player player = createSustainingDreadnoughtFleet(mentakGame);
+        placeSigmaMentakFlagship(mentakGame, createSigmaMentakPlayer(mentakGame), "101");
+
+        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                player, mentakGame, mentakGame.getTileByPosition("101"), 1, null, true, false);
+
+        assertFalse(actualMessage.contains("Would sustain"));
+        assertTrue(actualMessage.contains("Would destroy 1 <dreadnought>"));
+    }
+
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_SigmaMentakFlagshipAdjacent_NoSustain() {
+        Game mentakGame = new Game();
+        Player player = createSustainingDreadnoughtFleet(mentakGame);
+        placeSigmaMentakFlagship(mentakGame, createSigmaMentakPlayer(mentakGame), "102");
+
+        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                player, mentakGame, mentakGame.getTileByPosition("101"), 1, null, true, false);
+
+        assertFalse(actualMessage.contains("Would sustain"));
+        assertTrue(actualMessage.contains("Would destroy 1 <dreadnought>"));
+    }
+
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_SigmaMentakFlagshipFarAway_SustainsNormally() {
+        Game mentakGame = new Game();
+        Player player = createSustainingDreadnoughtFleet(mentakGame);
+        placeSigmaMentakFlagship(mentakGame, createSigmaMentakPlayer(mentakGame), "104");
+
+        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                player, mentakGame, mentakGame.getTileByPosition("101"), 1, null, true, false);
+
+        assertTrue(actualMessage.contains("Would sustain 1 <dreadnought>"));
+        assertFalse(actualMessage.contains("Would destroy"));
+    }
+
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_SigmaMentakFlagshipOwnerItself_SustainsNormally() {
+        Game mentakGame = new Game();
+        createSustainingDreadnoughtFleet(mentakGame);
+        Player mentak = createSigmaMentakPlayer(mentakGame);
+        mentak.addOwnedUnitByID("dreadnought");
+        placeSigmaMentakFlagship(mentakGame, mentak, "102");
+        mentakGame.getTileByPosition("102").addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Dreadnought, "blue"), 1);
+
+        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                mentak, mentakGame, mentakGame.getTileByPosition("102"), 1, null, true, false);
+
+        assertTrue(actualMessage.contains("Would sustain 1 <"));
+        assertFalse(actualMessage.contains("Would destroy"));
+    }
+
+    private static Player createSustainingDreadnoughtFleet(Game game) {
+        Player player = createPlayer(game, "red");
+        player.addOwnedUnitByID("dreadnought");
+
+        Tile combatTile = new Tile("19", "101");
+        game.setTile(combatTile);
+        combatTile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Dreadnought, "red"), 2);
+        game.setTile(new Tile("20", "102"));
+        game.setTile(new Tile("21", "104"));
+        return player;
+    }
+
+    private static Player createSigmaMentakPlayer(Game game) {
+        Player mentak = game.addPlayer("303", "mentakUser");
+        mentak.setFaction("mentak");
+        mentak.setColor("blue");
+        mentak.addOwnedUnitByID("sigma_mentak_flagship_2");
+        return mentak;
+    }
+
+    private static void placeSigmaMentakFlagship(Game game, Player mentak, String position) {
+        game.getTileByPosition(position)
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, mentak.getColor()), 1);
+    }
+
     private static Player createSpaceCannonTarget(Game game) {
         Player player = createPlayer(game, "red");
         player.addOwnedUnitByID("fighter");
@@ -465,6 +549,31 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.setFactionEmoji("a");
         player.setColor(color);
         return player;
+    }
+
+    @Test
+    void testUnitCanSustainDamage_WarSun_WithoutSchematics() {
+        Player player = createPlayerWithDuraniumArmor(game, "red");
+
+        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("warsun")));
+    }
+
+    @Test
+    void testUnitCanSustainDamage_WarSun_SchematicsRemovesSustain() {
+        Player player = createPlayerWithDuraniumArmor(game, "red");
+        game.addLaw("schematics", null);
+
+        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("warsun")));
+        // Schematics only affects war suns
+        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("dreadnought")));
+    }
+
+    @Test
+    void testUnitCanSustainDamage_WarSunWithoutSustainInModel_NotGrantedSustain() {
+        Player player = createPlayerWithDuraniumArmor(game, "red");
+
+        // Homebrew war suns like Sentinel I have no SUSTAIN DAMAGE; the war sun base type alone must not grant it
+        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("archon_warsun")));
     }
 
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {

@@ -197,8 +197,11 @@ public class MiltyService {
             MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), startMsg);
-            boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
-            if (!slicesCreated) {
+            GenerateSlicesService.Result result = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (result.impossibleReason() != null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), result.impossibleSettingsMessage(specs.numSlices));
+            } else if (!result.slicesCreated()) {
                 String msg = "Generating slices was too hard so I gave up.... Please try again.";
                 if (specs.numSlices == maxSlices) {
                     msg += "\n*...and maybe consider asking for fewer slices*";

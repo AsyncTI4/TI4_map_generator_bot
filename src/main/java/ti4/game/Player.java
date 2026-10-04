@@ -51,6 +51,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
@@ -59,8 +60,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.game.helper.StoredValueHelper;
@@ -129,6 +132,7 @@ import ti4.settings.users.UserSettingsManager;
 public class Player extends PlayerProperties implements StoredValueHelper {
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
+    private static final int DEFAULT_COMMAND_TOKEN_LIMIT = 16;
 
     @Getter
     private final Game game;
@@ -636,11 +640,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (isNpc() || isDummy()) {
             return dummyPlayerSpoof();
         }
-        return "FFCC_" + getFaction() + "_";
+        return ComponentIdEnvelope.ownedBy(getFaction());
     }
 
     public String dummyPlayerSpoof() {
-        return "dummyPlayerSpoof" + getFaction() + "_";
+        return ComponentIdEnvelope.spoofedAs(getFaction());
     }
 
     /** AKA: Has Infantry Revival Ability */
@@ -704,9 +708,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         String userName = getUserName().replace("/", "");
-        String threadName = game.isFowMode()
-                ? String.format("%s-cards-info-%s-private", game.getName(), userName)
-                : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
+        String threadName = DiscordThreadUtility.fitThreadName(
+                game.isFowMode()
+                        ? String.format("%s-cards-info-%s-private", game.getName(), userName)
+                        : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName));
 
         ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 
@@ -843,6 +848,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             // return 0;
         }
         return unitCaps.get(unit);
+    }
+
+    public int getCommandTokenLimit() {
+        int limit = DEFAULT_COMMAND_TOKEN_LIMIT;
+        String globalOverride = game.getStoredValue("ccLimit");
+        if (!globalOverride.isBlank()) {
+            limit = Integer.parseInt(globalOverride.trim());
+        }
+        String colorOverride = game.getStoredValue("ccLimit" + getColor());
+        if (!colorOverride.isBlank()) {
+            limit = Integer.parseInt(colorOverride.trim());
+        }
+        if (hasRelic("endurance_steroids")) {
+            limit += 2;
+        }
+        return limit;
     }
 
     public void setUnitCap(String unit, int cap) {
@@ -3273,10 +3294,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unit) {
+        if (isSarcosaNeutralControl() && unit != null) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null && neutral.unitBelongsToPlayer(unit)) {
+                return neutral.getUnitFromAsyncID(unit.asyncID());
+            }
+        }
         return getUnitFromAsyncID(unit.asyncID());
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
+        if (isSarcosaNeutralControl()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null) {
+                return neutral.getUnitFromAsyncID(asyncID);
+            }
+        }
         // TODO: Maybe this sort can be better, idk
         return getUnitsByAsyncID(asyncID).stream()
                 .min(UnitModel::sortFactionUnitsFirst)
@@ -3287,7 +3320,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unit == null) {
             return false;
         }
+        if (isSarcosaNeutralControl()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            return neutral != null && neutral.unitBelongsToPlayer(unit);
+        }
         return getColor().equals(AliasHandler.resolveColor(unit.colorID()));
+    }
+
+    private boolean isSarcosaNeutralControl() {
+        return SarcosaHeroHandler.isControllingNeutralUnits(game, this);
     }
 
     public boolean removeTempMod(TemporaryCombatModifierModel tempMod) {

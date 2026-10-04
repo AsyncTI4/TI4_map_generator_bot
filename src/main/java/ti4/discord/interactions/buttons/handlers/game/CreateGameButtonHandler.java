@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +36,6 @@ import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.JoinBlocker;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
@@ -278,9 +276,6 @@ public class CreateGameButtonHandler {
 
         StringBuilder activityList = new StringBuilder();
 
-        var userIds = members.stream().map(Member::getId).toList();
-        Map<String, Long> userIdsToAverageTurnTimes =
-                AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
         int playerNumber = 1;
         for (Member member : members) {
             String mention = ping ? member.getUser().getAsMention() : member.getEffectiveName();

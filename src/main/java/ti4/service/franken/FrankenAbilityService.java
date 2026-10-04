@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.draft.DraftCategory;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Constants;
@@ -132,6 +133,13 @@ public class FrankenAbilityService {
                         player.getCorrectChannel(),
                         player.getRepresentation()
                                 + "added the 5 _Moon Phase_ abilities to your play area. (They will appear as relics, they are not)");
+            }
+            if ("matters_of_state".equalsIgnoreCase(abilityID)) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", please choose which side you want your starting balance token to be on.",
+                        ButtonHelper.getBalanceButtons(player));
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

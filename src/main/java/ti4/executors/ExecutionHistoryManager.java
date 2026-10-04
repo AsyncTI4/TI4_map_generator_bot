@@ -25,7 +25,7 @@ public final class ExecutionHistoryManager {
     private static Runnable wrapWithExecutionHistory(TimedRunnable timedRunnable) {
         return () -> {
             int id = EXECUTION_COUNTER.incrementAndGet();
-            executionStartTimes.put(id, new Execution(timedRunnable.getName(), Instant.now()));
+            executionStartTimes.put(id, new Execution(timedRunnable.getName(), Instant.now(), Thread.currentThread()));
             RollbarManager.clear();
             RollbarManager.put("task_name", timedRunnable.getName());
             try {
@@ -46,8 +46,10 @@ public final class ExecutionHistoryManager {
             var elapsedMinutes = elapsedDuration.toMinutes();
             var elapsedSeconds = elapsedDuration.toSeconds() % 60;
             if (elapsedMinutes >= 2) {
-                BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds
-                        + " seconds: " + execution.name);
+                BotLogger.error(
+                        "A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds
+                                + " seconds: " + execution.name,
+                        captureCurrentStack(execution.thread));
             } else if (elapsedMinutes == 1
                     && CircuitBreaker.incrementThresholdCount("Task running longer than 1 minute: " + execution.name)) {
                 BotLogger.warning("Incremented circuit breaker threshold. Task name: " + execution.name);
@@ -55,5 +57,17 @@ public final class ExecutionHistoryManager {
         }
     }
 
-    private record Execution(String name, Instant startTime) {}
+    private static Throwable captureCurrentStack(Thread thread) {
+        var snapshot = new LongRunningTaskSnapshot(thread);
+        snapshot.setStackTrace(thread.getStackTrace());
+        return snapshot;
+    }
+
+    private static final class LongRunningTaskSnapshot extends Throwable {
+        private LongRunningTaskSnapshot(Thread thread) {
+            super("Current stack of " + thread + " (" + thread.getState() + ")", null, false, true);
+        }
+    }
+
+    private record Execution(String name, Instant startTime, Thread thread) {}
 }

@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
@@ -28,6 +29,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -38,10 +40,55 @@ public class ListTechService {
     private static final Pattern R = Pattern.compile("R");
     private static final Pattern G = Pattern.compile("G");
     private static final Pattern X = Pattern.compile("X");
+    private static final String PROPAGATION_CHOICE = "propagationChoice_";
 
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        acquireATechWithResources(event, game, player, true, buttonID.contains("first") || !buttonID.contains("_"));
+        boolean first = buttonID.contains("first") || !buttonID.contains("_");
+        if (FoWHelper.isFogQol01(game) && player.hasAbility("propagation") && player.getPrivateChannel() != null) {
+            game.setStoredValue(PROPAGATION_CHOICE + player.getFaction(), "open");
+            offerPropagationChoice(player, first);
+            return;
+        }
+        acquireATechWithResources(event, game, player, true, first);
+    }
+
+    private static void offerPropagationChoice(Player player, boolean first) {
+        String checker = player.factionButtonChecker();
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getPrivateChannel(),
+                player.getRepresentationUnfogged()
+                        + ", with **Propagation** you may gain 3 command tokens instead of researching a technology."
+                        + " Choose one.",
+                List.of(
+                        Buttons.green(
+                                checker + "propagationResearch_" + (first ? "first" : "again"),
+                                "Research a Technology"),
+                        Buttons.gray(
+                                checker + "propagationGainCC",
+                                "Gain 3 Command Tokens instead (Propagation)",
+                                FactionEmojis.Nekro)));
+    }
+
+    @ButtonHandler("propagationResearch_")
+    public void propagationResearch(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        if (!consumePropagationChoice(game, player)) return;
+        acquireATechWithResources(event, game, player, true, buttonID.endsWith("first"));
+    }
+
+    @ButtonHandler("propagationGainCC")
+    public void propagationGainCommandTokens(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        if (!consumePropagationChoice(game, player)) return;
+        ButtonHelperSCs.nekroFollowTech(game, player, event);
+    }
+
+    private static boolean consumePropagationChoice(Game game, Player player) {
+        String key = PROPAGATION_CHOICE + player.getFaction();
+        if (game.getStoredValue(key).isEmpty()) return false;
+        game.removeStoredValue(key);
+        return true;
     }
 
     @ButtonHandler("acquireATech")

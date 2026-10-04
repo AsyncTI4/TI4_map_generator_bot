@@ -297,7 +297,7 @@
         "name": "Custom Rigs",
         "faction": "scrapyard",
         "window": "During setup:",
-        "windowEffect": "Choose 2 \"Custom Rig\" cards to gain. Your units of that type gian those effects and adjust their printed values by those amounts.",
+        "windowEffect": "Choose 2 \"Custom Rig\" cards to gain. Your units of that type gain those effects and adjust their printed values by those amounts.",
         "source": "theodisi"
     },
     {

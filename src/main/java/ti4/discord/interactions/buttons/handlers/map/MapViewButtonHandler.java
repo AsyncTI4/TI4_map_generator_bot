@@ -40,9 +40,64 @@ class MapViewButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 
+    @ButtonHandler(value = "checkWHView", save = false)
+    public static void showWormholes(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
+    }
+
+    @ButtonHandler(value = "checkAnomView", save = false)
+    public static void showAnomalies(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
+    }
+
+    @ButtonHandler(value = "checkLegendView", save = false)
+    public static void showLegendaries(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
+    }
+
+    @ButtonHandler(value = "checkEmptyView", save = false)
+    public static void showEmpties(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.empties);
+    }
+
     @ButtonHandler(value = "checkExileView", save = false)
     public static void calculateExileView(ButtonInteractionEvent event, Game game) {
         ButtonHelper.showFeatureType(event, game, DisplayType.exile);
+    }
+
+    @ButtonHandler(value = "checkAetherView", save = false)
+    public static void showAetherstreamable(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
+    }
+
+    @ButtonHandler(value = "checkCannonView", save = false)
+    public static void showSpaceCannon(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
+    }
+
+    @ButtonHandler(value = "checkTraitView", save = false)
+    public static void showTraits(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.traits);
+    }
+
+    @ButtonHandler(value = "checkTechSkipView", save = false)
+    public static void showTechSkips(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
+    }
+
+    @ButtonHandler(value = "checkAttachmView", save = false)
+    public static void showAttachments(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
+    }
+
+    @ButtonHandler(value = "checkShiplessView", save = false)
+    public static void showShipless(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
+    }
+
+    @ButtonHandler(value = "checkUnlocked", save = false)
+    public static void showUnlocked(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
     }
 
     @ButtonHandler(value = "refreshViewOfSystem_", save = false)

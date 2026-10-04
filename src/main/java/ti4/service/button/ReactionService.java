@@ -2,6 +2,7 @@ package ti4.service.button;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ public class ReactionService {
     private static final Pattern CARDS_PATTERN = Pattern.compile("card\\s(.*)");
     private static final long STRATEGY_CARD_FALLBACK_REPLY_DELAY_SECONDS = 1;
     private static final long STRATEGY_CARD_THREAD_REPLY_DELAY_SECONDS = 10;
+    private static final String FOW_STATUS_DONE = "fowStatusDone";
 
     public static void addReaction(
             ButtonInteractionEvent event,
@@ -56,13 +58,9 @@ public class ReactionService {
 
                 if (game.isFowMode() && !sendPublic) {
                     MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                    if (text.contains("ready for")) {
-                        String factionReady = game.getStoredValue("fowStatusDone");
-                        if (factionReady == null || !factionReady.contains(player.getFaction())) {
-                            GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
-                            game.setStoredValue(
-                                    "fowStatusDone", (factionReady == null ? "" : factionReady) + player.getFaction());
-                        }
+                    if (text.contains("ready for") && !isFowStatusDone(game, player)) {
+                        GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+                        markFowStatusDone(game, player);
                     }
                     return;
                 }
@@ -105,13 +103,9 @@ public class ReactionService {
 
         if (game.isFowMode() && !sendPublic) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-            if (text.contains("ready for")) {
-                String factionReady = game.getStoredValue("fowStatusDone");
-                if (factionReady == null || !factionReady.contains(player.getFaction())) {
-                    GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
-                    game.setStoredValue(
-                            "fowStatusDone", (factionReady == null ? "" : factionReady) + player.getFaction());
-                }
+            if (text.contains("ready for") && !isFowStatusDone(game, player)) {
+                GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+                markFowStatusDone(game, player);
             }
             return;
         }
@@ -169,6 +163,18 @@ public class ReactionService {
         if (game.isFowMode() && !sendPublic) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, text);
         }
+    }
+
+    public static boolean isFowStatusDone(Game game, Player player) {
+        String done = game.getStoredValue(FOW_STATUS_DONE);
+        if (!done.isEmpty() && !done.contains(",")) {
+            return done.contains(player.getFaction());
+        }
+        return Arrays.asList(done.split(",")).contains(player.getFaction());
+    }
+
+    private static void markFowStatusDone(Game game, Player player) {
+        game.setStoredValue(FOW_STATUS_DONE, game.getStoredValue(FOW_STATUS_DONE) + "," + player.getFaction());
     }
 
     public static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {

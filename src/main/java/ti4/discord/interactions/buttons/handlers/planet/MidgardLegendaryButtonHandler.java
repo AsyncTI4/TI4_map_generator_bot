@@ -44,7 +44,10 @@ public class MidgardLegendaryButtonHandler {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits, boolean combat) {
         if (!combat) return;
         StartCombatService.CurrentCombat combatContext = StartCombatService.getCurrentCombat(game);
-        if (combatContext == null || "space".equals(combatContext.unitHolderName())) return;
+        if (combatContext == null
+                || combatContext.tilePosition() == null
+                || combatContext.unitHolderName() == null
+                || "space".equals(combatContext.unitHolderName())) return;
         Set<Player> eligiblePlayers = destroyedUnits.stream()
                 .filter(unit -> unit.uh() instanceof Planet)
                 .filter(unit -> combatContext.tilePosition().equals(unit.tile().getPosition()))

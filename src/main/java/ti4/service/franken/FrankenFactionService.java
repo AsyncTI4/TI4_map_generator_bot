@@ -19,8 +19,9 @@ import ti4.service.game.MonumentsService;
 @UtilityClass
 public class FrankenFactionService {
     private static Stream<String> getFactionUnits(FactionModel faction) {
-        return faction.getUnits().stream().filter(u -> faction.getAlias()
-                .equals(Mapper.getUnit(u).getFaction().orElse(null)));
+        return faction.getUnits().stream()
+                .filter(u ->
+                        faction.getAlias().equals(Mapper.getUnit(u).getFaction().orElse(null)));
     }
 
     private static void removeFactionComponents(

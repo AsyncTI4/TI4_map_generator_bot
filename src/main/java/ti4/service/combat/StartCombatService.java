@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnos
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
@@ -36,6 +37,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -67,6 +69,7 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButto
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -220,6 +223,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
         }
@@ -270,6 +274,7 @@ public class StartCombatService {
             UnitHolder unitHolder,
             Tile tile) {
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -1571,6 +1576,11 @@ public class StartCombatService {
         Button thunderbirdProtocolP2 = PonthousTechHandler.getThunderbirdProtocolButton(game, p2, tile);
         if (thunderbirdProtocolP2 != null) buttons.add(thunderbirdProtocolP2);
 
+        Button impulseCoreP1 = YinImpulseCoreButtonHandler.getImpulseCoreButton(p1, tile);
+        if (impulseCoreP1 != null) buttons.add(impulseCoreP1);
+        Button impulseCoreP2 = YinImpulseCoreButtonHandler.getImpulseCoreButton(p2, tile);
+        if (impulseCoreP2 != null) buttons.add(impulseCoreP2);
+
         // Aeterna Hero
         if (!tile.isHomeSystem() && p1.hasLeaderUnlocked("aeternahero")) {
             buttons.add(AeternaLeadersHandler.getGravecallButton(game, p1, tile));
@@ -1659,6 +1669,8 @@ public class StartCombatService {
         if (commanderUnitHolder != null && tile.getUnitHolders().containsKey(commanderUnitHolder)) {
             ScrapyardLeaderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
             ScrapyardLeaderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
+            XinCommanderHandler.addCommanderButton(buttons, game, p1, tile, commanderUnitHolder);
+            XinCommanderHandler.addCommanderButton(buttons, game, p2, tile, commanderUnitHolder);
         }
 
         if (isSpaceCombat) {
@@ -2130,14 +2142,14 @@ public class StartCombatService {
             }
         }
 
-        if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
+        if (p2.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p2) && !game.isFowMode()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
                     FactionEmojis.belkosea));
         }
-        if (p1.hasRelicReady("superweaponcaled")) {
+        if (p1.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p1)) {
             String factionChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
@@ -2890,6 +2902,6 @@ public class StartCombatService {
             }
             sb.append(specialCombatTitle != null ? specialCombatTitle : "");
         }
-        return sb.toString();
+        return DiscordThreadUtility.fitThreadName(sb.toString());
     }
 }

@@ -31,6 +31,7 @@ import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -722,7 +723,8 @@ public class CombatReplayService {
     }
 
     private boolean isSpaceCombatHitAssignment(Game game, Player player, ButtonInteractionEvent event) {
-        String buttonId = stripFactionChecker(event.getButton().getCustomId());
+        String buttonId =
+                ComponentIdEnvelope.decode(event.getButton().getCustomId()).handlerId();
         if (buttonId.startsWith("autoAssignSpaceHits_") || buttonId.startsWith("autoAssignSpaceCannonOffenceHits_")) {
             return true;
         }
@@ -1036,16 +1038,9 @@ public class CombatReplayService {
     }
 
     private String getTilePosition(String buttonId) {
-        String sanitized = stripFactionChecker(buttonId).replace("deleteThis", "");
+        String sanitized = ComponentIdEnvelope.decode(buttonId).handlerId();
         String[] parts = sanitized.split("_");
         return parts.length > 1 ? parts[1] : "";
-    }
-
-    private String stripFactionChecker(String buttonId) {
-        if (!buttonId.startsWith("FFCC_")) return buttonId;
-        int secondUnderscore = buttonId.indexOf('_', 5);
-        if (secondUnderscore < 0) return buttonId;
-        return buttonId.substring(secondUnderscore + 1);
     }
 
     private static double safeRatio(double weaker, double stronger) {

@@ -170,7 +170,11 @@ public class MiltyRandomSetupService {
         } else if (specs.presetSlices != null) {
             specs.presetSlices.forEach(draftManager::addSlice);
         } else {
-            slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            GenerateSlicesService.Result result = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (result.impossibleReason() != null) {
+                return result.impossibleSettingsMessage(specs.numSlices);
+            }
+            slicesCreated = result.slicesCreated();
         }
         if (!slicesCreated) {
             return "Generating slices was too hard so I gave up.... Please try again.";

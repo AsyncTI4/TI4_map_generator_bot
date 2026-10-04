@@ -22,7 +22,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
-import ti4.spring.websocket.WebSocketNotifier;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
+import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
 public class GameManager {
@@ -90,6 +91,7 @@ public class GameManager {
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
         LoreService.evictGameLore(gameName);
+        GameDatabaseSyncPipeline.queueDelete(gameName);
     }
 
     public static boolean isValid(String gameName) {
@@ -105,7 +107,10 @@ public class GameManager {
         if (!GameSaveService.save(game, reason)) {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
-        WebSocketNotifier.notifyGameStateChange(game);
+        GameWebStatePipeline.queue(game);
+        // TODO: Queued after the file write lock is released, so two concurrent saves of one game can reach the
+        // database out of order and leave the older state until the next save or the nightly reconciliation.
+        GameDatabaseSyncPipeline.queueSync(game);
 
         gameNames.add(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
@@ -136,6 +141,7 @@ public class GameManager {
 
     private static Game handleUndo(Game undo) {
         handleMissingMatchingManagedGame(undo);
+        GameDatabaseSyncPipeline.queueSync(undo);
         return undo;
     }
 
@@ -161,9 +167,13 @@ public class GameManager {
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
-            handleUndo(game);
+        }
+        if (game == null) {
+            handleManagedGameRemoval(gameName);
+            return null;
         }
         handleMissingMatchingManagedGame(game);
+        GameDatabaseSyncPipeline.queueSync(game);
         return game;
     }
 

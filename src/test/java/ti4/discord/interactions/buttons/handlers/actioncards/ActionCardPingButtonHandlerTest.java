@@ -294,8 +294,9 @@ class ActionCardPingButtonHandlerTest extends BaseTi4Test {
                         Constants.AC_PING_ROUTE + "local_player_" + msgId + "_" + target.getFaction());
 
                 mh.verify(() -> MessageHelper.sendMessageToChannel(
-                        eq(actorChannel), argThat(msg -> PlanetTargetService.messagePool().stream()
-                                .anyMatch(msg::contains))));
+                        eq(actorChannel),
+                        argThat(msg ->
+                                PlanetTargetService.messagePool().stream().anyMatch(msg::contains))));
             }
             verify(event.getHook().deleteOriginal()).queue(any(), any());
         }

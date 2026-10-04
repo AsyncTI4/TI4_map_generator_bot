@@ -28,6 +28,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
@@ -65,6 +66,7 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
+        DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
         if (setup && "ponthous".equalsIgnoreCase(planet)) {
             // Setup exhausts Ponthous without opening its optional ready-planet window.
@@ -201,7 +203,7 @@ public class AddPlanetService {
                             && !player_.getExhaustedPlanets().contains(planet)
                             && "action".equalsIgnoreCase(game.getPhaseOfGame())
                             && ButtonHelper.checkForTechSkips(game, planet)
-                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player_.getTg() + 1)) {
                         player_.exhaustPlanet(planet);
                         MessageHelper.sendMessageToChannel(
                                 player_.getCorrectChannel(),

@@ -50,6 +50,9 @@ import ti4.service.unit.RemoveUnitService;
 public class TeHelperActionCards {
 
     public static final String EXTREME_DURESS_AUTO_RESOLVING = "ExtremeDuressAutoResolving";
+    private static final String EXTREME_DURESS = "ExtremeDuress";
+    private static final String CRISIS_TARGET = "Crisis Target";
+    private static final String STASIS_TARGET = "Stasis Target";
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static void nop() {}
@@ -157,12 +160,88 @@ public class TeHelperActionCards {
                     "Could not find that player. Please resolve _Extreme Duress_ manually.");
             return;
         }
-        game.removeStoredValue("ExtremeDuress");
+        game.removeStoredValue(EXTREME_DURESS);
         sendExtremeDuressResolutionButtons(target, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " played _Extreme Duress_ on " + target.getRepresentationNoPing() + ".");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void resolvePresetTurnStartCards(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (resolvePresetCrisis(event, game, player)) {
+            return;
+        }
+        resolvePresetStartOfTurnCards(event, game, player);
+    }
+
+    private static boolean resolvePresetCrisis(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.getStoredValue(CRISIS_TARGET).equalsIgnoreCase(player.getColor())) {
+            return false;
+        }
+        Player crisisPlayer = findPlayerHoldingCard(game, "crisis");
+        if (crisisPlayer == null) {
+            return false;
+        }
+        game.removeStoredValue(CRISIS_TARGET);
+        ActionCardHelper.playAC(event, game, crisisPlayer, "crisis", game.getMainGameChannel());
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
+        buttons.add(Buttons.green("crisisSabotaged_" + player.getColor(), "Delete These (If Crisis Was Sabo'd)"));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentation() + ", please resolve _Crisis_.", buttons);
+        return true;
+    }
+
+    @ButtonHandler("crisisSabotaged_")
+    private static void crisisSabotaged(Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        Player target = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (target != null) {
+            resolvePresetStartOfTurnCards(event, game, target);
+        }
+    }
+
+    private static void resolvePresetStartOfTurnCards(GenericInteractionCreateEvent event, Game game, Player player) {
+        resolvePresetExtremeDuress(event, game, player);
+        resolvePresetStasis(event, game, player);
+    }
+
+    private static void resolvePresetExtremeDuress(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.getStoredValue(EXTREME_DURESS).equalsIgnoreCase(player.getColor()) || !player.hasUnplayedSCs()) {
+            return;
+        }
+        Player duressPlayer = findPlayerHoldingCard(game, "extremeduress");
+        if (duressPlayer != null) {
+            game.removeStoredValue(EXTREME_DURESS);
+            autoResolveExtremeDuress(event, game, player, duressPlayer);
+        }
+    }
+
+    private static void resolvePresetStasis(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.getStoredValue(STASIS_TARGET).equalsIgnoreCase(player.getColor())) {
+            return;
+        }
+        Player stasisPlayer = findPlayerHoldingCard(game, "tf-stasis");
+        if (stasisPlayer == null) {
+            return;
+        }
+        game.removeStoredValue(STASIS_TARGET);
+        ActionCardHelper.playAC(event, game, stasisPlayer, "tf-stasis", game.getMainGameChannel());
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(ButtonHelper.getEndTurnButton(game, player));
+        buttons.add(Buttons.green("deleteButtons", "Delete These (If Stasis Was Sabo'd)"));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentation() + ", please resolve _Stasis_.", buttons);
+    }
+
+    private static Player findPlayerHoldingCard(Game game, String actionCardId) {
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.getPlayableActionCards().contains(actionCardId)) {
+                return p2;
+            }
+        }
+        return null;
     }
 
     public static void autoResolveExtremeDuress(

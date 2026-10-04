@@ -114,8 +114,9 @@ class CombatModifierTest extends BaseTi4Test {
                     tile, tile.getUnitHolders().get("space"), bastion, null, CombatRollType.combatround, testGame);
             List<NamedCombatModifierModel> extraRolls = getExtraRolls(bastion, neutral, tile, units);
             Assertions.assertTrue(
-                    extraRolls.stream().anyMatch(mod -> "classified_weapons_mod"
-                            .equals(mod.getModifier().getAlias())),
+                    extraRolls.stream()
+                            .anyMatch(mod -> "classified_weapons_mod"
+                                    .equals(mod.getModifier().getAlias())),
                     "Classified Weapons modifier was not collected");
 
             List<NamedCombatModifierModel> classifiedOnly = extraRolls.stream()
@@ -155,9 +156,9 @@ class CombatModifierTest extends BaseTi4Test {
         try {
             var units = CombatRollService.getUnitsInCombat(
                     tile, tile.getUnitHolders().get("space"), bastion, null, CombatRollType.combatround, testGame);
-            Assertions.assertTrue(
-                    getExtraRolls(bastion, neutral, tile, units).stream().noneMatch(mod -> "classified_weapons_mod"
-                            .equals(mod.getModifier().getAlias())));
+            Assertions.assertTrue(getExtraRolls(bastion, neutral, tile, units).stream()
+                    .noneMatch(mod ->
+                            "classified_weapons_mod".equals(mod.getModifier().getAlias())));
         } finally {
             testGame.removeStoredValue("classifiedWeapons");
         }

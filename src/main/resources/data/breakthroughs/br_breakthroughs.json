@@ -97,14 +97,38 @@
     },
     {
         "alias": "toldarbt",
-        "name": "Dyrun's War-Bell",
-        "shortName": "Dyrun's\nWar-Bell",
+        "name": "Shameix's Bane",
+        "shortName": "Shameix's\nBane",
         "faction": "toldar",
         "synergy": [
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "If you have more Dishonor than Honor, flip this card. During each round of combat, up to 1 hit you cancel is instead produced against your opponent’s units. \nIf you have more Honor than Dishonor, flip this card. Once per round of combat, you may produce 1 hit against your units to produce 1 hit against your opponent’s units.",
+        "text": "If you have more Dishonor than Honor, flip this card. Players with more victory points than you must give you 1 promissory note to activate a system that contains your units, and cannot use abilities to cancel your action cards.\n\nIf you have more Honor than Dishonor, flip this card. Players with fewer victory points than you must give you 1 promissory note to activate a system that contains your units, and cannot use abilities to cancel your action cards.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "toldarbthonor",
+        "name": "Shameix's Bane",
+        "shortName": "Shameix's\nBane",
+        "faction": "toldar",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "If you have more Dishonor than Honor, flip this card. Players with more victory points than you must give you 1 promissory note to activate a system that contains your units, and cannot use abilities to cancel your action cards.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "toldarbtdishonor",
+        "name": "Shameix's Bane",
+        "shortName": "Shameix's\nBane",
+        "faction": "toldar",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "If you have more Honor than Dishonor, flip this card. Players with fewer victory points than you must give you 1 promissory note to activate a system that contains your units, and cannot use abilities to cancel your action cards.",
         "source": "blue_reverie"
     }
 ]

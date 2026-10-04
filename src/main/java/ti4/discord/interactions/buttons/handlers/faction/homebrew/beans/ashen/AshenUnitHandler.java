@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -502,8 +503,11 @@ public class AshenUnitHandler {
                     } else {
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green(
-                                p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
-                                        + game.getUnitHolderFromPlanet(planet).getName() + "_" + hits,
+                                p2.dummyPlayerSpoof()
+                                        + AutoAssignGroundHitsButtonIds.format(
+                                                game.getUnitHolderFromPlanet(planet)
+                                                        .getName(),
+                                                hits),
                                 "Auto-assign Hit" + (hits == 1 ? "" : "s") + " For Dummy"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),

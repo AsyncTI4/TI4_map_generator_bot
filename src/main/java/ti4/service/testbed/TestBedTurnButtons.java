@@ -93,8 +93,9 @@ public class TestBedTurnButtons {
         if (result.recorder().modalId() != null) {
             status.append(" It opens a form the panel cannot fill in; use the button in the channel.");
         }
-        result.recorder().replies().stream().findFirst().ifPresent(reply -> status.append(" Reply: ")
-                .append(reply));
+        result.recorder().replies().stream()
+                .findFirst()
+                .ifPresent(reply -> status.append(" Reply: ").append(reply));
         return status.toString();
     }
 }

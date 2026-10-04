@@ -357,56 +357,58 @@ public final class Helper {
                         .append(player.getRepresentation(false, false))
                         .append('\n');
             }
-
-            String poMessage = "";
-            String soMessage = CardEmojis.SecretObjective + " ";
-            String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
-            String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
-            if (po.isEmpty() || "Queued".equalsIgnoreCase(po) || "None".equalsIgnoreCase(po)) {
-                poMessage += CardEmojis.Public1 + " ";
-                if (!game.isOmegaPhaseMode()) {
-                    poMessage += CardEmojis.Public2 + " ";
-                }
-                if (po.isEmpty()) {
-                    poMessage += "❓";
-                }
-                if ("Queued".equalsIgnoreCase(po)) {
-                    poMessage += "Queued";
-                }
-                if ("None".equalsIgnoreCase(po)) {
-                    poMessage += "🙅";
-                }
-            } else {
-                poMessage = CardEmojis.Public1 + " ✅ ";
-                for (String poObj : game.getRevealedPublicObjectives().keySet()) {
-                    if (Mapper.getPublicObjective(poObj) != null) {
-                        if (Mapper.getPublicObjective(poObj).getName().equalsIgnoreCase(po)) {
-                            if (Mapper.getPublicObjective(poObj).getPoints() == 2) {
-                                poMessage = CardEmojis.Public2 + " ✅ ";
-                            }
-                        }
-                    }
-                }
-                poMessage += po;
-            }
-            if (so.isEmpty() || "Queued".equalsIgnoreCase(so) || "None".equalsIgnoreCase(so)) {
-                if (so.isEmpty()) {
-                    soMessage += "❓";
-                }
-                if ("Queued".equalsIgnoreCase(so)) {
-                    soMessage += "Queued";
-                }
-                if ("None".equalsIgnoreCase(so)) {
-                    soMessage += "🙅";
-                }
-            } else {
-                soMessage += " ✅ " + so;
-            }
-            rep.append("> ").append(poMessage).append('\n');
-            rep.append("> ").append(soMessage).append('\n');
+            rep.append(getPlayerScoringStatus(game, player));
         }
 
         return rep.toString();
+    }
+
+    public static String getPlayerScoringStatus(Game game, Player player) {
+        String poMessage = "";
+        String soMessage = CardEmojis.SecretObjective + " ";
+        String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+        String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+        if (po.isEmpty() || "Queued".equalsIgnoreCase(po) || "None".equalsIgnoreCase(po)) {
+            poMessage += CardEmojis.Public1 + " ";
+            if (!game.isOmegaPhaseMode()) {
+                poMessage += CardEmojis.Public2 + " ";
+            }
+            if (po.isEmpty()) {
+                poMessage += "❓";
+            }
+            if ("Queued".equalsIgnoreCase(po)) {
+                poMessage += "Queued";
+            }
+            if ("None".equalsIgnoreCase(po)) {
+                poMessage += "🙅";
+            }
+        } else {
+            poMessage = CardEmojis.Public1 + " ✅ ";
+            for (String poObj : game.getRevealedPublicObjectives().keySet()) {
+                if (Mapper.getPublicObjective(poObj) != null) {
+                    if (Mapper.getPublicObjective(poObj).getName().equalsIgnoreCase(po)) {
+                        if (Mapper.getPublicObjective(poObj).getPoints() == 2) {
+                            poMessage = CardEmojis.Public2 + " ✅ ";
+                        }
+                    }
+                }
+            }
+            poMessage += po;
+        }
+        if (so.isEmpty() || "Queued".equalsIgnoreCase(so) || "None".equalsIgnoreCase(so)) {
+            if (so.isEmpty()) {
+                soMessage += "❓";
+            }
+            if ("Queued".equalsIgnoreCase(so)) {
+                soMessage += "Queued";
+            }
+            if ("None".equalsIgnoreCase(so)) {
+                soMessage += "🙅";
+            }
+        } else {
+            soMessage += " ✅ " + so;
+        }
+        return "> " + poMessage + '\n' + "> " + soMessage + '\n';
     }
 
     public static void resolvePOScoringQueue(Game game, GenericInteractionCreateEvent event) {
@@ -3478,24 +3480,12 @@ public final class Helper {
     }
 
     private static void informUserCCOverLimit(Game game, String color, int ccCount) {
-        int limit = 16;
-        if (!game.getStoredValue("ccLimit").isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        Player player = game.getPlayerFromColorOrFaction(color);
+        if (player == null || !game.isCcNPlasticLimit()) {
+            return;
         }
-        if (!game.getStoredValue("ccLimit" + color).isEmpty()) {
-            limit = Integer.parseInt(game.getStoredValue("ccLimit" + color));
-        }
-        if (game.getPlayerFromColorOrFaction(color) != null
-                && game.getPlayerFromColorOrFaction(color).hasRelic("endurance_steroids")) {
-            limit += 2;
-        }
-        boolean ccCountIsOver = ccCount > limit;
-        if (ccCountIsOver && game.isCcNPlasticLimit()) {
-            Player player = game.getPlayerFromColorOrFaction(color);
-            if (player == null) {
-                return;
-            }
-
+        int limit = player.getCommandTokenLimit();
+        if (ccCount > limit) {
             String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit
                     + ". Command tokens used: " + ccCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + msg);

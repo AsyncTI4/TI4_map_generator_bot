@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -97,7 +98,7 @@ public class AshenPromissoryHandler {
 
         List<Button> buttons = List.of(
                 Buttons.green(
-                        player.factionButtonChecker() + "autoAssignGroundHits_" + planet + "_" + remainingHits,
+                        player.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(planet, remainingHits),
                         "Auto-assign Hit" + (remainingHits == 1 ? "" : "s")),
                 Buttons.red(
                         "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",

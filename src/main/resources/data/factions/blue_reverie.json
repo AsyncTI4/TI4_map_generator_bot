@@ -48,7 +48,7 @@
         "alias": "pharadn",
         "factionName": "Pharadn Order",
         "homeSystem": "br2",
-        "startingFleet": "1 cv,2 ff,8 inf p, 1 sd p, 2 cr",
+        "startingFleet": "1 cr, 1 dn, 1 cv, 2 ff, 8 inf p, 1 sd p",
         "commodities": 2,
         "factionTech": [
             "dspharinf",
@@ -92,7 +92,7 @@
         "alias": "qhet",
         "factionName": "Qhet Republic",
         "homeSystem": "br3",
-        "startingFleet": "1 cv,2 ff,3 inf q, 1 sd q, 2 cr",
+        "startingFleet": "1 cv, 2 ff, 3 inf q, 1 sd q, 2 cr",
         "commodities": 2,
         "factionTech": [
             "dsqhetinf",
