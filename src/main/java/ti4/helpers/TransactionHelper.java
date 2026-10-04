@@ -1663,7 +1663,7 @@ public class TransactionHelper {
                 + p1.getRepresentationNoPing() + ":\n" + offerText
                 + "\n**[Accept or reject the offer here](" + jumpUrl + ")**";
         if (AnonymousCommsService.isActive(game)) {
-            announceInAnonymousConversation(game, p2, p1, pointer);
+            AnonymousCommsService.postToConversationLater(game, p2, p1, pointer);
             return;
         }
         FowCommunicationThreadService.findOpenCommThread(game, p1, p2)

@@ -292,14 +292,14 @@ class MessageListener extends ListenerAdapter {
         if (managedGame == null || !managedGame.isFowMode()) {
             return false;
         }
+        boolean[] handled = {false};
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
                     Game game = managedGame.getGame();
-                    if (AnonymousCommsService.handleMessage(game, getPlayer(event, game), message)) {
-                        GameManager.save(game, "Anonymous comms");
-                    }
+                    handled[0] = AnonymousCommsService.handleMessage(game, getPlayer(event, game), message);
+                    if (handled[0]) GameManager.save(game, "Anonymous comms");
                 })
                 .run();
-        return true;
+        return handled[0];
     }
 
     private static boolean handleWhispers(MessageReceivedEvent event, Message message, String gameName) {

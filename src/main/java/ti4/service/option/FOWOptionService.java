@@ -284,7 +284,10 @@ public class FOWOptionService {
     }
 
     private static void disableConflictingCommsOption(Game game, FOWOption enabled) {
-        if (enabled == FOWOption.ANONYMOUS_COMMS) game.setFowOption(FOWOption.MANAGED_COMMS, false);
+        if (enabled == FOWOption.ANONYMOUS_COMMS) {
+            game.setFowOption(FOWOption.MANAGED_COMMS, false);
+            AnonymousCommsService.offerManagedThreadCleanup(game);
+        }
         if (enabled == FOWOption.MANAGED_COMMS) game.setFowOption(FOWOption.ANONYMOUS_COMMS, false);
     }
 

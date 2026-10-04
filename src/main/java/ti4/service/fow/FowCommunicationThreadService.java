@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -118,6 +120,23 @@ public class FowCommunicationThreadService {
                         future::completeExceptionally);
 
         return future;
+    }
+
+    public static void deleteManagedThreads(Game game, MessageChannel feedback) {
+        getGameThreadChannels(game).thenAccept(threads -> {
+            for (ThreadChannel thread : threads) {
+                if (!THREAD_NAME_PATTERN.matcher(thread.getName()).find()) continue;
+                String threadName = thread.getName();
+                thread.delete()
+                        .onErrorFlatMap(err -> {
+                            MessageHelper.sendMessageToChannel(
+                                    feedback, "Error deleting thread: " + threadName + " : " + err.getMessage());
+                            return null;
+                        })
+                        .queueAfter(1, TimeUnit.SECONDS);
+                MessageHelper.sendMessageToChannel(feedback, "Deleted thread: " + threadName);
+            }
+        });
     }
 
     public static Optional<ThreadChannel> findOpenCommThread(Game game, Player p1, Player p2) {

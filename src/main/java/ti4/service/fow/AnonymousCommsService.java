@@ -36,6 +36,9 @@ import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
 import ti4.discord.utility.DiscordThreadUtility;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
+import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -45,7 +48,6 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class AnonymousCommsService {
@@ -63,6 +65,7 @@ public class AnonymousCommsService {
     private static final String MODAL_SUFFIX = "~MDL";
     private static final String REPLY_RESOLVE_PREFIX = "anonCommsReplyResolve_";
     private static final String SETTINGS_RESOLVE = "anonCommsSettingsResolve";
+    private static final String DELETE_MANAGED_BUTTON = "anonCommsDeleteManaged";
     private static final String MESSAGE_INPUT = "message";
     private static final String HOURS_INPUT = "hours";
     private static final String PARTNER_SEPARATOR = "-";
@@ -108,7 +111,8 @@ public class AnonymousCommsService {
         List<String> attachments = message.getAttachments().stream()
                 .map(Message.Attachment::getUrl)
                 .toList();
-        return handleTyped(game, sender, thread, message.getContentRaw(), attachments, message.getReferencedMessage());
+        handleTyped(game, sender, thread, message.getContentRaw(), attachments, message.getReferencedMessage());
+        return true;
     }
 
     public static boolean handleTyped(
@@ -456,10 +460,43 @@ public class AnonymousCommsService {
 
     public static boolean postToConversation(Game game, Player owner, Player partner, String text) {
         ThreadChannel thread = partnerThread(game, owner, partner);
-        if (thread == null) return false;
-        post(thread, text);
+        if (thread == null || post(thread, text) == null) return false;
         touch(game, thread);
         return true;
+    }
+
+    public static void postToConversationLater(Game game, Player owner, Player partner, String text) {
+        String gameName = game.getName();
+        String ownerFaction = owner.getFaction();
+        String partnerFaction = partner.getFaction();
+        ExecutorServiceManager.runAsync(
+                "anonymous comms post",
+                ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                    ManagedGame managedGame = GameManager.getManagedGame(gameName);
+                    if (managedGame == null) return;
+                    Game current = managedGame.getGame();
+                    Player currentOwner = current.getPlayerFromColorOrFaction(ownerFaction);
+                    Player currentPartner = current.getPlayerFromColorOrFaction(partnerFaction);
+                    if (currentOwner == null || currentPartner == null) return;
+                    if (!postToConversation(current, currentOwner, currentPartner, text)) {
+                        MessageHelper.sendMessageToChannel(currentOwner.getCorrectChannel(), text);
+                    }
+                    GameManager.save(current, "Anonymous comms");
+                }));
+    }
+
+    public static void offerManagedThreadCleanup(Game game) {
+        MessageHelper.sendMessageToChannelWithButton(
+                GMService.getGMChannel(game),
+                "Anonymous comms is on. Any managed comm threads from before still show which Discord user plays"
+                        + " which color to the players in them.",
+                Buttons.red(DELETE_MANAGED_BUTTON, "Delete Managed Comm Threads"));
+    }
+
+    @ButtonHandler(value = DELETE_MANAGED_BUTTON, save = false)
+    public static void deleteManagedThreads(ButtonInteractionEvent event, Game game) {
+        FowCommunicationThreadService.deleteManagedThreads(game, event.getChannel());
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static String threadState(Game game, Player owner, Player partner) {
@@ -495,8 +532,7 @@ public class AnonymousCommsService {
     }
 
     public static int hideHours(Game game) {
-        int minimum = TestBedService.isTestBed(game) ? 0 : 1;
-        return clampHours(parseHours(game.getStoredValue(HIDE_HOURS_KEY)), minimum);
+        return clampHours(parseHours(game.getStoredValue(HIDE_HOURS_KEY)), 0);
     }
 
     static int clampHours(@Nullable Integer hours, int minimum) {

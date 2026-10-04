@@ -1,9 +1,6 @@
 package ti4.discord.interactions.commands.bothelper;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -50,25 +47,6 @@ class DeleteFOWCommThreads extends Subcommand {
                     event.getChannel(), "Deleted anonymous comms threads: " + String.join(", ", anonymousThreads));
         }
 
-        FowCommunicationThreadService.getGameThreadChannels(game).thenAccept(threads -> {
-            for (ThreadChannel thread : threads) {
-                Matcher matcher = FowCommunicationThreadService.THREAD_NAME_PATTERN.matcher(thread.getName());
-                if (!matcher.find()) {
-                    continue;
-                }
-
-                String threadName = thread.getName();
-                thread.delete()
-                        .onSuccess(v -> {})
-                        .onErrorFlatMap(err -> {
-                            MessageHelper.sendMessageToChannel(
-                                    event.getChannel(),
-                                    "Error deleting thread: " + threadName + " : " + err.getMessage());
-                            return null;
-                        })
-                        .queueAfter(1, TimeUnit.SECONDS);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Deleted thread: " + threadName);
-            }
-        });
+        FowCommunicationThreadService.deleteManagedThreads(game, event.getChannel());
     }
 }

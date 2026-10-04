@@ -166,7 +166,11 @@ class TestBedPressTest extends BaseTi4Test {
                 .addComponents(ActionRow.of(Button.primary("FFCC_nekro_ac_play_from_hand_12", "Sabotage")))
                 .queue(callback::set);
 
-        verify(seatChannel).sendMessage(any(MessageCreateData.class));
+        ArgumentCaptor<MessageCreateData> sent = ArgumentCaptor.forClass(MessageCreateData.class);
+        verify(seatChannel).sendMessage(sent.capture());
+        assertTrue(
+                sent.getValue().getContent().endsWith("Pick a card"),
+                sent.getValue().getContent());
         assertTrue(callback.get() instanceof InteractionHook);
     }
 
