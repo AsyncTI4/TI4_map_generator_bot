@@ -16,15 +16,19 @@ class CustomCommand extends Subcommand {
     // can be replaced with the next custom purpose.
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        if (!ActiveLeaseService.isCurrentProcessReady()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "This instance isn't ready (starting up or draining), so the migration was not run.");
+            return;
+        }
         MessageHelper.sendMessageToEventChannel(
                 event, "Pausing interactions while GameMessages.json is imported into the database...");
-        boolean wasReady = ActiveLeaseService.isCurrentProcessReady();
         ActiveLeaseService.setCurrentProcessReady(false);
         String result;
         try {
             result = GameMessageManager.importLegacyFile();
         } finally {
-            ActiveLeaseService.setCurrentProcessReady(wasReady);
+            ActiveLeaseService.setCurrentProcessReady(true);
         }
         MessageHelper.sendMessageToEventChannel(event, result + "\nInteractions resumed.");
     }
