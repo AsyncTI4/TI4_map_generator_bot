@@ -2,10 +2,14 @@ package ti4.service.leader.agent.modules;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -15,8 +19,13 @@ public final class KortaliAgent extends TargetedAgent {
 
     public static final String ID = "kortaliagent";
 
-    public static String buttonId(Player owner, Player opponent) {
+    static String buttonId(Player owner, Player opponent) {
         return AgentButtonIds.formatOwned(owner, ID, opponent.getColor());
+    }
+
+    public static Button offer(Player owner, Player opponent) {
+        return Buttons.gray(
+                buttonId(owner, opponent), AgentNames.offerVerb(owner, ID) + "Kortali Agent", FactionEmojis.kortali);
     }
 
     @Override

@@ -345,23 +345,21 @@ class DeleteButtonsButtonHandler {
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red(WinnuAgent.buttonId(player), "Use Winnu Agent", FactionEmojis.Winnu));
+                    buttons.add(WinnuAgent.offer(player));
                 }
                 if (player.hasUnexhaustedLeader("lunariumagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(
-                            Buttons.red(LunariumAgent.buttonId(player), "Use Lunarium Agent", FactionEmojis.lunarium));
+                    buttons.add(LunariumAgent.offer(player));
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red(
-                            GledgeAgent.buttonId(player, player), "Use Gledge Agent", FactionEmojis.gledge));
+                    buttons.add(GledgeAgent.offer(player));
                 }
 
                 if (player.hasUnexhaustedLeader("ghotiagent")) {

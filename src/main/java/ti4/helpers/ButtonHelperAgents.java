@@ -2226,8 +2226,7 @@ public final class ButtonHelperAgents {
             String planetId = planet.getName();
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
 
-            String buttonID = SardakkAgent.planetButtonId(player, game.getActiveSystem(), planetId);
-            buttons.add(Buttons.green(buttonID, "Use N'orr Agent on " + planetRepresentation, FactionEmojis.Sardakk));
+            buttons.add(SardakkAgent.offer(player, game.getActiveSystem(), planetId, planetRepresentation));
         }
         return buttons;
     }

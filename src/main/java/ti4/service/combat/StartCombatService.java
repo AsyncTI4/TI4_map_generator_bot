@@ -2017,12 +2017,12 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && isGroundCombat
                 && !p1.getFragments().isEmpty()) {
-            buttons.add(Buttons.gray(KortaliAgent.buttonId(p2, p1), "Use Kortali Agent", FactionEmojis.kortali));
+            buttons.add(KortaliAgent.offer(p2, p1));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent")
                 && isGroundCombat
                 && !p2.getFragments().isEmpty()) {
-            buttons.add(Buttons.gray(KortaliAgent.buttonId(p1, p2), "Use Kortali Agent", FactionEmojis.kortali));
+            buttons.add(KortaliAgent.offer(p1, p2));
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {

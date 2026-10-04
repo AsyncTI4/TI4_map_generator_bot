@@ -4,6 +4,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -12,6 +13,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -23,9 +26,18 @@ import ti4.service.unit.RemoveUnitService;
 public final class ZelianAgent extends TargetedAgent {
 
     public static final String ID = "zelianagent";
+    private static final String YOURSELF = "Yourself";
 
-    public static String buttonId(Player owner, Player target) {
+    static String buttonId(Player owner, Player target) {
         return AgentButtonIds.formatOwned(owner, ID, target.getFaction());
+    }
+
+    public static Button offer(Player owner, Player target) {
+        String onWhom = target == owner ? " " + YOURSELF : " on " + target.getColor();
+        return Buttons.gray(
+                buttonId(owner, target),
+                AgentNames.offerVerb(owner, ID) + "Zelian Agent" + onWhom,
+                FactionEmojis.zelian);
     }
 
     @Override
@@ -62,7 +74,7 @@ public final class ZelianAgent extends TargetedAgent {
 
     private static void offerLandingIfUsedOnSelf(AgentUse<Player> use, Player target, Tile tile) {
         if (!(use.event() instanceof ButtonInteractionEvent buttonEvent)
-                || !buttonEvent.getButton().getLabel().contains("Yourself")) {
+                || !buttonEvent.getButton().getLabel().contains(YOURSELF)) {
             return;
         }
         List<Button> landingButtons = TacticalActionService.getLandingTroopsButtons(use.game(), target, tile);

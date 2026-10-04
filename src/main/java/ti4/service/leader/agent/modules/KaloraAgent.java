@@ -1,11 +1,15 @@
 package ti4.service.leader.agent.modules;
 
 import java.util.Optional;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentModule;
+import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
@@ -14,8 +18,13 @@ public final class KaloraAgent implements AgentModule<Player> {
 
     public static final String ID = "kaloraagent";
 
-    public static String buttonId(Player owner) {
+    static String buttonId(Player owner) {
         return AgentButtonIds.formatOwned(owner, ID);
+    }
+
+    public static Button offer(Player owner) {
+        return Buttons.gray(
+                buttonId(owner), AgentNames.offerVerb(owner, ID) + "Valzor, the Kalora Agent", FactionEmojis.kalora);
     }
 
     @Override

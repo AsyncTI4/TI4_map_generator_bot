@@ -5,6 +5,7 @@ import java.util.Optional;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
 import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -14,6 +15,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentNames;
 import ti4.service.leader.agent.AgentOutcome;
@@ -33,12 +35,22 @@ public final class VaylerianAgent implements AgentModule<VaylerianAgent.Choice> 
 
     public record PickTarget() implements Choice {}
 
-    public static String buttonId(Player owner) {
+    static String buttonId(Player owner) {
         return AgentButtonIds.formatOwned(owner, ID);
     }
 
-    public static String buttonId(Player owner, Player target) {
+    static String buttonId(Player owner, Player target) {
         return AgentButtonIds.formatOwned(owner, ID, target.getFaction());
+    }
+
+    public static Button offer(Player owner) {
+        return Buttons.gray(
+                buttonId(owner), AgentNames.offerVerb(owner, ID) + "Vaylerian Agent", FactionEmojis.vaylerian);
+    }
+
+    public static Button offer(Player owner, Player target) {
+        return Buttons.gray(
+                buttonId(owner, target), AgentNames.offerVerb(owner, ID) + "Vaylerian Agent", FactionEmojis.vaylerian);
     }
 
     @Override

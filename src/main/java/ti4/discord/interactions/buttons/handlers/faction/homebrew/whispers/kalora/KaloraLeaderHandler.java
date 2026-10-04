@@ -6,7 +6,6 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.apache.commons.lang3.tuple.Pair;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -14,7 +13,6 @@ import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.modules.KaloraAgent;
 
 @UtilityClass
@@ -22,7 +20,7 @@ public class KaloraLeaderHandler {
 
     public static void offerKaloraAgentButtons(Player player, String msg) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray(KaloraAgent.buttonId(player), "Use Valzor, the Kalora Agent", FactionEmojis.kalora));
+        buttons.add(KaloraAgent.offer(player));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 msg
