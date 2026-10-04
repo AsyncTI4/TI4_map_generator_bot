@@ -113,3 +113,9 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   in. `SlashCommandLimitsTest` now fails the build first. Before adding a subcommand, check
   the parent's current count â€” if it is full, put the command under a different parent
   rather than freeing a slot.
+- **Reach Spring beans through a static `getBean()` on the bean's own class.** Non-Spring
+  code (static helpers, listeners, commands) should call `MyService.getBean()`, not
+  `SpringContext.getBean(MyService.class)` directly. Give the service
+  `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
+  (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
+  new code and when touching existing call sites.
