@@ -23,7 +23,9 @@ import ti4.spring.service.gamemessage.GameMessageService;
 @UtilityClass
 public class GameMessageManager {
 
+    @Deprecated(forRemoval = true, since = "2026-10")
     private static final String LEGACY_GAME_MESSAGES_FILE = "GameMessages.json";
+
     private static final int WRITE_LOCK_EXPIRE_AFTER_ACCESS_MINUTES = 20;
     private static final Cache<String, ReentrantLock> gameWriteLocks = Caffeine.newBuilder()
             .expireAfterAccess(WRITE_LOCK_EXPIRE_AFTER_ACCESS_MINUTES, TimeUnit.MINUTES)
@@ -95,6 +97,9 @@ public class GameMessageManager {
         write(gameName, "add a reaction to", service -> service.addReaction(gameName, faction, messageId));
     }
 
+    // TODO: Remove this one-time GameMessages.json import (and GAME_MESSAGES_IMPORTED_TO_DATABASE) once every
+    // environment has logged "Imported N game messages"; then delete pm_json/GameMessages.json.
+    @Deprecated(forRemoval = true, since = "2026-10")
     public static void importLegacyFile() {
         if (ImplementedSettings.GAME_MESSAGES_IMPORTED_TO_DATABASE.getAsBoolean(false)) return;
         try {
@@ -148,5 +153,6 @@ public class GameMessageManager {
         }
     }
 
+    @Deprecated(forRemoval = true, since = "2026-10")
     private record LegacyGameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 }

@@ -146,6 +146,7 @@ public class GameMessageService {
         }
     }
 
+    @Deprecated(forRemoval = true, since = "2026-10")
     public int importMissing(Map<String, List<GameMessage>> messagesByGame) {
         int imported = 0;
         for (Map.Entry<String, List<GameMessage>> game : messagesByGame.entrySet()) {
