@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
@@ -307,11 +308,16 @@ public class MiltyDraftManager {
 
     @JsonIgnore
     public void doMiltyPick(GenericInteractionCreateEvent event, Game game, String buttonID, Player player) {
+        if (applyMiltyPick(event, game, buttonID, player)) {
+            ButtonHelper.updateMap(game, event);
+        }
+    }
+
+    private boolean applyMiltyPick(GenericInteractionCreateEvent event, Game game, String buttonID, Player player) {
         String userId = player.getUserID();
         MessageChannel mainGameChannel = game.getMainGameChannel();
         if (draftIndex >= draftOrder.size()) {
-            FinishDraftService.finishDraft(event, this, game);
-            return;
+            return FinishDraftService.finishDraft(event, this, game);
         }
         if (getCurrentDraftPlayer() == null || !userId.equals(getCurrentDraftPlayer())) {
             if (event instanceof ButtonInteractionEvent bevent) {
@@ -324,7 +330,7 @@ public class MiltyDraftManager {
                         .sendMessage("Something went wrong")
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            return;
+            return false;
         }
 
         boolean auto = buttonID.startsWith("miltyAuto_");
@@ -355,7 +361,7 @@ public class MiltyDraftManager {
             } else {
                 event.getMessageChannel().sendMessage(errorMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            return;
+            return false;
         }
 
         // Send success message
@@ -384,8 +390,9 @@ public class MiltyDraftManager {
             MiltyService.offerKeleresSetupButtons(this, player);
         }
 
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -407,10 +414,10 @@ public class MiltyDraftManager {
             }
 
             if (fauxPlayerPick != null) {
-                doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
+                mapChanged |= applyMiltyPick(event, game, fauxPlayerPick, nextDrafter);
             } else {
                 if (getQueuedPick(nextDrafter, game) != null) {
-                    doMiltyPick(event, game, getQueuedPick(nextDrafter, game), nextDrafter);
+                    mapChanged |= applyMiltyPick(event, game, getQueuedPick(nextDrafter, game), nextDrafter);
                 } else {
                     MiltyDraftDisplayService.updateDraftInformation(event, this, game, category);
                     MiltyDraftDisplayService.pingCurrentDraftPlayer(this, game, false);
@@ -428,9 +435,10 @@ public class MiltyDraftManager {
             MessageHelper.sendMessageToChannel(
                     mainGameChannel,
                     game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
-            FinishDraftService.finishDraft(event, this, game);
+            mapChanged |= FinishDraftService.finishDraft(event, this, game);
             game.updateActivePlayer(null);
         }
+        return mapChanged;
     }
 
     private String getQueuedPick(Player player, Game game) {

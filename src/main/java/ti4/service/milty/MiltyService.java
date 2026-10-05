@@ -180,8 +180,9 @@ public class MiltyService {
         }
 
         game.clearTileMap();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             // Ignore
         }
@@ -230,6 +231,9 @@ public class MiltyService {
                     }
                 }
             }
+        }
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
         }
         return null;
     }
