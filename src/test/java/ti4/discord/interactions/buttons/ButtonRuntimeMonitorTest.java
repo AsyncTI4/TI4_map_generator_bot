@@ -93,6 +93,20 @@ class ButtonRuntimeMonitorTest {
     }
 
     @Test
+    void handlerMaxRevealsASingleSlowPressThatP95Hides() {
+        // The jwds_ case: 58 presses whose mean and p95 fit both "one 39 s press" and "all ~800 ms".
+        ButtonRuntimeMonitor monitor = new ButtonRuntimeMonitor();
+        for (int i = 0; i < 57; i++) monitor.submit(event, pressResolvedBy("jwds_", 150));
+        when(event.getButton().getLabel()).thenReturn("Pick Slice");
+        monitor.submit(event, pressResolvedBy("jwds_", 39_123));
+
+        String statistics = monitor.formatStatistics("now");
+
+        assertThat(rowFor(statistics, "handler")).endsWith(" max");
+        assertThat(rowFor(statistics, "jwds_")).contains(" 150ms ").endsWith(" 39123ms");
+    }
+
+    @Test
     void onlyTheTopFiveHandlersAreListedWithFullNames() {
         ButtonRuntimeMonitor monitor = new ButtonRuntimeMonitor();
         for (int handler = 1; handler <= 7; handler++) {

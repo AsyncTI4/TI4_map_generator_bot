@@ -45,6 +45,17 @@ class LatencyHistogramTest {
     }
 
     @Test
+    void maxIsTheExactLargestValueNotItsBucket() {
+        LatencyHistogram histogram = new LatencyHistogram();
+        histogram.record(20);
+        histogram.record(38_765);
+        histogram.record(150);
+
+        assertThat(histogram.maxMillis()).isEqualTo(38_765);
+        assertThat(histogram.percentileMillis(1.0)).isEqualTo(38_000);
+    }
+
+    @Test
     void largerValuesRoundDownToTheirBucket() {
         LatencyHistogram histogram = new LatencyHistogram();
         histogram.record(257);
