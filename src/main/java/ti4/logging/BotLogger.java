@@ -134,7 +134,7 @@ public class BotLogger {
         logToChannel(null, message, null, LogSeverity.Error);
     }
 
-    public static void spammyerror(@Nonnull String message) {
+    public static void spammyError(@Nonnull String message) {
         logToChannel(null, message, null, LogSeverity.SpammyError);
     }
 
