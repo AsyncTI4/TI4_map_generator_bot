@@ -2,6 +2,7 @@ package ti4.image;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -88,6 +90,9 @@ public class MapGenerator implements AutoCloseable {
     private static final int CORNER_MARGIN = 20;
     private static final int CORNER_TOP = 60;
     private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
+    private static final String EASTER_EGG_NAME = "A wild brainchild";
+    private static final int EASTER_EGG_ODDS = 200;
+    private static final Color EASTER_EGG_TEXT = new Color(255, 200, 0);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -862,23 +867,34 @@ public class MapGenerator implements AutoCloseable {
         return framed && MapSegment.isFractureSeparate(game) ? MapSegment.MAIN : null;
     }
 
+    static boolean isEasterEggRoll(int roll) {
+        return roll == 0;
+    }
+
     private void drawSegmentLabel() {
         String label = segmentLabel(mapFrame != null);
         if (label == null) {
             return;
         }
-        graphics.setFont(Storage.getFont64());
-        DrawingUtil.superDrawString(
-                graphics,
-                "Map: " + label,
-                width / 2,
-                110,
-                Color.WHITE,
-                HorizontalAlign.Center,
-                VerticalAlign.Center,
-                stroke4,
-                Color.BLACK);
+        if (isSectorTitle(label) && isEasterEggRoll(ThreadLocalRandom.current().nextInt(EASTER_EGG_ODDS))) {
+            String text = "Map: " + EASTER_EGG_NAME + "!";
+            Font big = Storage.getFont80();
+            Font font = graphics.getFontMetrics(big).stringWidth(text) < width - 40 ? big : Storage.getFont64();
+            drawSegmentTitle(text, font, EASTER_EGG_TEXT, stroke4, Color.BLACK);
+        } else {
+            drawSegmentTitle("Map: " + label, Storage.getFont64(), Color.WHITE, stroke4, Color.BLACK);
+        }
         graphics.setFont(Storage.getFont32());
+    }
+
+    private boolean isSectorTitle(String label) {
+        return shownSegment != null && !shownSegment.isFracture() && label.equals(shownSegment.name());
+    }
+
+    private void drawSegmentTitle(String text, Font font, Color color, Stroke stroke, Color outline) {
+        graphics.setFont(font);
+        DrawingUtil.superDrawString(
+                graphics, text, width / 2, 110, color, HorizontalAlign.Center, VerticalAlign.Center, stroke, outline);
     }
 
     private void drawImage() {

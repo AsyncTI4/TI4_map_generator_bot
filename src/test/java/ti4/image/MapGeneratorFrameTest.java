@@ -51,6 +51,13 @@ class MapGeneratorFrameTest extends BaseTi4Test {
     }
 
     @Test
+    void segmentTitleIsSwappedForTheEasterEggOnlyOnARollOfZero() {
+        assertTrue(MapGenerator.isEasterEggRoll(0));
+        assertFalse(MapGenerator.isEasterEggRoll(1));
+        assertFalse(MapGenerator.isEasterEggRoll(199));
+    }
+
+    @Test
     void nonFogMapKeepsTheClassicRingBasedCanvas() {
         try (MapGenerator generator = render(game, DisplayType.map, null)) {
             assertEquals(Math.max(1000, MapGenerator.getMapWidth(game)), generator.imageWidth());
