@@ -1,9 +1,6 @@
 package ti4.discord.interactions.buttons;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
 import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
@@ -24,8 +21,7 @@ import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
-import ti4.settings.users.UserSettings;
-import ti4.settings.users.UserSettingsManager;
+import ti4.settings.users.UserActiveHourRecorder;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
@@ -144,11 +140,7 @@ public class ButtonProcessor {
         RollbarManager.put("button_id", event.getButton().getCustomId());
         RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
-        User user = event.getUser();
-        UserSettings userSettings = UserSettingsManager.get(user.getId());
-        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
-        userSettings.addActiveHour(currentHourUTC);
-        UserSettingsManager.save(userSettings);
+        UserActiveHourRecorder.record(event.getUser().getId());
     }
 
     private static boolean isCombatReplayButton(String buttonID) {

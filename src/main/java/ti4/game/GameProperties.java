@@ -231,6 +231,11 @@ public class GameProperties {
         return priorityTrackMode == PriorityTrackMode.FULL;
     }
 
+    public void reopen() {
+        hasEnded = false;
+        endedDate = 0;
+    }
+
     // Misc Helpers
     public String getID() {
         return name;

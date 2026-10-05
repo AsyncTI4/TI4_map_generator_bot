@@ -1,6 +1,9 @@
 package ti4.model.metadata;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +16,10 @@ import ti4.logging.BotLogger;
 public class AutoPingMetadataManager {
 
     private static final String AUTO_PING_FILE = "AutoPing.json";
+    private static final Duration MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS = Duration.ofMinutes(1);
+    private static final Cache<String, Boolean> recentlyDelayedGameNames = Caffeine.newBuilder()
+            .expireAfterWrite(MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS)
+            .build();
 
     public static synchronized void setupAutoPing(String gameName) {
         AutoPings autoPings = readFile();
@@ -42,7 +49,14 @@ public class AutoPingMetadataManager {
         persistFile(autoPings);
     }
 
-    public static synchronized void delayPing(String gameName) {
+    public static void delayPing(String gameName) {
+        if (recentlyDelayedGameNames.asMap().putIfAbsent(gameName, Boolean.TRUE) != null) {
+            return;
+        }
+        persistDelayedPing(gameName);
+    }
+
+    private static synchronized void persistDelayedPing(String gameName) {
         AutoPings autoPings = readFile();
         if (autoPings == null) {
             return;

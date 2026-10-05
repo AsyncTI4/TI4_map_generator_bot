@@ -2304,9 +2304,9 @@ public final class Helper {
                                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
-                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
-                                .contains(tile)
-                        && player.hasTech("tf-mr")) {
+                if (player.hasTech("tf-mr")
+                        && tile.containsPlayersUnitsWithKeyCondition(
+                                player, unit -> unit.unitType() == UnitType.Warsun)) {
                     productionValueTotal += 5;
                 }
             }

@@ -80,7 +80,7 @@ class ButtonRuntimeMonitor {
         runtimeWarningCount++;
         if (runtimeWarningCount >= RUNTIME_WARNING_COUNT_THRESHOLD) {
             pauseWarningsUntil = now.plusSeconds(PAUSE_AFTER_WARNING_SECONDS);
-            BotLogger.spammyerror(formatPauseWarningMessage());
+            BotLogger.spammyError(formatPauseWarningMessage());
             runtimeWarningCount = 0;
             thresholdWarningReasons.clear();
         }

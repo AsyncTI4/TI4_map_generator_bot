@@ -32,7 +32,7 @@ class EndGameButtonHandler {
 
     @ButtonHandler(EndedGameScoringGuardService.CONTINUE_PLAYING_BUTTON_ID)
     public static void continuePlayingAfterEnd(ButtonInteractionEvent event, Game game) {
-        game.setHasEnded(false);
+        game.reopen();
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "This game's ended flag has been cleared. You may continue playing.");
         ButtonHelper.deleteMessage(event);
