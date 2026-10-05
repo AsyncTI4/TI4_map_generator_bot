@@ -1446,7 +1446,7 @@ public class MessageHelper {
                 if ("bombardment".equals(keyWord) && message.contains("Tactical Bombardment")) continue;
                 if ("production".equals(keyWord) && message.contains("Monopolize Production")) continue;
                 if (copy.indexOf(keyWord) > -1) {
-                    String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
+                    String replace = "](https://www.tirules2.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
                     int firstIndex = copy.indexOf(keyWord);
                     int lastIndex = firstIndex + keyWord.length() + 1;
                     copy.insert(firstIndex, "[");
