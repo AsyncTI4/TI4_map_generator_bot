@@ -47,6 +47,18 @@ class TestBedPanelButtonHandler {
         showMain(event, game, "Now acting as " + (actingAs == null ? "yourself" : actingAs.getFaction()) + ".");
     }
 
+    @ButtonHandler(TestBedPanelService.TURN_ACT_AS)
+    public static void turnActAs(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!isAllowed(event, game, event.getButton().getLabel())) return;
+        Player seat = game.getPlayerFromColorOrFaction(buttonID.substring(TestBedPanelService.TURN_ACT_AS.length()));
+        if (seat == null) {
+            showTurn(event, game, "That seat is no longer in the game.");
+            return;
+        }
+        TestBedService.setActingAs(game, event.getUser().getId(), seat);
+        showTurn(event, game, "Now acting as " + seat.getFaction() + ".");
+    }
+
     @ButtonHandler(TestBedPanelService.TOOL)
     public static void tool(ButtonInteractionEvent event, Game game, String buttonID) {
         if (!isAllowed(event, game, event.getButton().getLabel())) return;
@@ -177,11 +189,11 @@ class TestBedPanelButtonHandler {
     }
 
     private static void showTurn(GenericInteractionCreateEvent event, Game game, @Nullable String status) {
-        TurnButtons turn = TestBedTurnButtons.find(game);
+        TurnButtons turn = TestBedTurnButtons.find(game, event.getUser().getId());
         ((IDeferrableCallback) event)
                 .getHook()
                 .editOriginal(TestBedPanelService.turnContent(game, turn, status))
-                .setComponents(TestBedPanelService.turnComponents(turn))
+                .setComponents(TestBedPanelService.turnComponents(game, turn))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

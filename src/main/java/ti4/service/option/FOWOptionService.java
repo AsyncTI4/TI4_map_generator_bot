@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
@@ -54,6 +55,10 @@ public class FOWOptionService {
                 FOWOptionCategory.GAME,
                 "Allow comms in agenda",
                 "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
+        ANONYMOUS_COMMS(
+                FOWOptionCategory.GAME,
+                "Anonymous comms",
+                "Bot-relayed comms that hide who plays which color; replaces Managed comms"),
         STATUS_SUMMARY(
                 FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
@@ -226,6 +231,9 @@ public class FOWOptionService {
 
         if (selectedCategory == FOWOptionCategory.GAME) {
             optionButtons.add(Buttons.blue("gmQolSettings~MDL", "Fog QoL 01 settings..."));
+            if (game.getFowOption(FOWOption.ANONYMOUS_COMMS)) {
+                optionButtons.add(Buttons.blue(AnonymousCommsService.SETTINGS_BUTTON, "Anonymous comms settings..."));
+            }
         }
 
         // An ActionRow holds at most 5 buttons, and the message at most 5 rows - one of which is the category row.
@@ -272,6 +280,15 @@ public class FOWOptionService {
         } else {
             game.setFowOption(option, value);
         }
+        if (value) disableConflictingCommsOption(game, option);
+    }
+
+    private static void disableConflictingCommsOption(Game game, FOWOption enabled) {
+        if (enabled == FOWOption.ANONYMOUS_COMMS) {
+            game.setFowOption(FOWOption.MANAGED_COMMS, false);
+            AnonymousCommsService.offerManagedThreadCleanup(game);
+        }
+        if (enabled == FOWOption.MANAGED_COMMS) game.setFowOption(FOWOption.ANONYMOUS_COMMS, false);
     }
 
     @ButtonHandler("fowOptionCategory_")
