@@ -10,23 +10,27 @@ import ti4.game.persistence.ManagedGame;
 
 class RunAgainstAllGamesTest {
 
-    @Test
-    void onlyGamesNotFlaggedAsEndedThatStillHaveAnEndDateAreTouched() {
-        List<ManagedGame> games = List.of(
-                managedGame("reopened", false, 5_000L),
-                managedGame("ended", true, 5_000L),
-                managedGame("active", false, 0L),
-                // Flagged as ended without a date: left alone, this command only clears stale dates.
-                managedGame("ended-without-date", true, 0L));
+    private static final List<ManagedGame> GAMES = List.of(
+            managedGame("on-active", true, false),
+            managedGame("on-ended", true, true),
+            managedGame("off-active", false, false),
+            managedGame("off-ended", false, true));
 
-        assertThat(RunAgainstAllGames.unendedGamesWithAnEndDate(games)).containsExactly("reopened");
+    @Test
+    void shouldOnlyTouchUnfinishedGamesWithRulesLinksOnByDefault() {
+        assertThat(RunAgainstAllGames.gamesWithRulesLinksOn(GAMES, false)).containsExactly("on-active");
     }
 
-    private static ManagedGame managedGame(String name, boolean hasEnded, long endedDate) {
+    @Test
+    void shouldIncludeEndedGamesWhenAsked() {
+        assertThat(RunAgainstAllGames.gamesWithRulesLinksOn(GAMES, true)).containsExactly("on-active", "on-ended");
+    }
+
+    private static ManagedGame managedGame(String name, boolean injectRules, boolean hasEnded) {
         ManagedGame managedGame = mock(ManagedGame.class);
         when(managedGame.getName()).thenReturn(name);
+        when(managedGame.isInjectRules()).thenReturn(injectRules);
         when(managedGame.isHasEnded()).thenReturn(hasEnded);
-        when(managedGame.getEndedDate()).thenReturn(endedDate);
         return managedGame;
     }
 }

@@ -17,46 +17,50 @@ import ti4.message.MessageHelper;
 class RunAgainstAllGames extends Subcommand {
 
     private static final String DRY_RUN_OPTION = "dry_run";
+    private static final String INCLUDE_ENDED_OPTION = "include_ended";
 
     RunAgainstAllGames() {
-        super("run_against_all_games", "Clears the end date of every game that isn't flagged as ended.");
-        addOptions(new OptionData(
-                OptionType.BOOLEAN, DRY_RUN_OPTION, "Report what would change without saving anything."));
+        super("run_against_all_games", "Turns off rules link injection in every game that has it on.");
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, DRY_RUN_OPTION, "Report what would change without saving anything."),
+                new OptionData(OptionType.BOOLEAN, INCLUDE_ENDED_OPTION, "Also turn it off in games that have ended."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean dryRun = event.getOption(DRY_RUN_OPTION, false, OptionMapping::getAsBoolean);
+        boolean includeEnded = event.getOption(INCLUDE_ENDED_OPTION, false, OptionMapping::getAsBoolean);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Clearing end dates on games that aren't flagged as ended"
+                "Turning off rules links in " + (includeEnded ? "all" : "unfinished") + " games"
                         + (dryRun ? " (dry run, nothing will be saved)." : "."));
 
         List<String> changedGames = new ArrayList<>();
         ConsumeGameUtility.consumeGames(
-                unendedGamesWithAnEndDate(GameManager.getManagedGames()),
+                gamesWithRulesLinksOn(GameManager.getManagedGames(), includeEnded),
                 game -> {
-                    if (game.isHasEnded() || game.getEndedDate() == 0) {
+                    if (!game.isInjectRulesLinks()) {
                         return;
                     }
                     changedGames.add(game.getName());
                     if (!dryRun) {
-                        game.setEndedDate(0);
-                        GameManager.save(game, "Cleared the end date of a game that isn't ended.");
+                        game.setInjectRulesLinks(false);
+                        GameManager.save(game, "Turned off rules links.");
                     }
                 },
                 dryRun ? ExecutionLockType.READ : ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                (dryRun ? "[DRY RUN] Would clear " : "Cleared ") + "the end date of "
+                (dryRun ? "[DRY RUN] Would turn off " : "Turned off ") + "rules links in "
                         + StringHelper.pluralize(changedGames.size(), "game") + " out of "
                         + GameManager.getGameCount() + ": " + String.join(", ", changedGames));
     }
 
-    static List<String> unendedGamesWithAnEndDate(List<ManagedGame> managedGames) {
+    static List<String> gamesWithRulesLinksOn(List<ManagedGame> managedGames, boolean includeEnded) {
         return managedGames.stream()
-                .filter(managedGame -> !managedGame.isHasEnded() && managedGame.getEndedDate() != 0)
+                .filter(ManagedGame::isInjectRules)
+                .filter(managedGame -> includeEnded || !managedGame.isHasEnded())
                 .map(ManagedGame::getName)
                 .toList();
     }

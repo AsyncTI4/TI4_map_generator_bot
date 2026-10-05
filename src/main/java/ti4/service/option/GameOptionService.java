@@ -69,7 +69,7 @@ public class GameOptionService {
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel,
-                "Link rules terms such as \"tactical action\" and \"production\" in bot messages to their entries on tirules.com?\n-# Click to toggle.",
+                "Link rules terms such as \"tactical action\" and \"production\" in bot messages to their entries on tirules2.com?\n-# Click to toggle.",
                 buttons);
     }
 }
