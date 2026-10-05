@@ -11,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -154,8 +155,9 @@ public class MiltyRandomSetupService {
                                 ? "\n - True Random Galaxy is enabled, so tile slots will roll red/blue independently."
                                 : ""));
         game.clearTileMap();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             // Ignore
         }
@@ -164,6 +166,28 @@ public class MiltyRandomSetupService {
             p.getCardsInfoThread();
         }
 
+        String sliceError = createSlices(event, draftManager, specs, trueRandomGalaxy);
+        if (sliceError == null) {
+            assignRandomPicks(draftManager, specs);
+            presetRandomKeleresFlavorIfNeeded(draftManager, game);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
+            mapChanged |= FinishDraftService.finishDraft(event, draftManager, game);
+            applyRandomGalacticEvents(event, game, randomEventCount);
+            game.updateActivePlayer(null);
+        }
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
+        return sliceError;
+    }
+
+    private static String createSlices(
+            GenericInteractionCreateEvent event,
+            MiltyDraftManager draftManager,
+            MiltyDraftSpec specs,
+            boolean trueRandomGalaxy) {
         boolean slicesCreated = true;
         if (trueRandomGalaxy) {
             slicesCreated = generateTrueRandomGalaxySlices(draftManager, specs);
@@ -179,15 +203,6 @@ public class MiltyRandomSetupService {
         if (!slicesCreated) {
             return "Generating slices was too hard so I gave up.... Please try again.";
         }
-
-        assignRandomPicks(draftManager, specs);
-        presetRandomKeleresFlavorIfNeeded(draftManager, game);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
-        FinishDraftService.finishDraft(event, draftManager, game);
-        applyRandomGalacticEvents(event, game, randomEventCount);
-        game.updateActivePlayer(null);
         return null;
     }
 
