@@ -3,6 +3,8 @@ package ti4.image;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -148,6 +150,87 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(takenName, segments.getFirst().name(), "the GM keeps the name");
         assertEquals(FAR_SOUTH, segments.get(1).positions());
         assertNotEquals(takenName, segments.get(1).name(), "the automatic sector moved to another name");
+    }
+
+    private String sectorAt(String position) {
+        return MapSegment.all(game).stream()
+                .filter(segment -> segment.positions().contains(position))
+                .findFirst()
+                .orElseThrow()
+                .name();
+    }
+
+    @Test
+    void renamingAStoredSegmentKeepsItsShapeAndMovesTheDefault() {
+        MapSegment.put(game, MapSegment.cluster("core", "000", 2));
+        MapSegment.setDefault(game, "core");
+
+        assertNull(MapSegment.rename(game, "core", "home"));
+        assertEquals(List.of(MapSegment.cluster("home", "000", 2)), MapSegment.stored(game));
+        assertEquals("home", MapSegment.defaultSegment(game).orElseThrow().name());
+    }
+
+    @Test
+    void renamedAutomaticSectorKeepsItsNameAsItGrows() {
+        MapSegment.setAutoSectors(game, true);
+        assertNull(MapSegment.rename(game, sectorAt("000"), "home"));
+        assertEquals("home", sectorAt("000"));
+
+        // 201 joins the core to 301; the bigger renamed core keeps its name over the unnamed 301 sector.
+        game.setTile(new Tile("21", "201"));
+        assertEquals(List.of("home"), names());
+        assertTrue(MapSegment.dormantNames(game).isEmpty());
+    }
+
+    @Test
+    void mergedSectorsShowTheBiggerNameAndTheOtherReturnsOnASplit() {
+        MapSegment.setAutoSectors(game, true);
+        MapSegment.rename(game, sectorAt("000"), "home");
+        MapSegment.rename(game, sectorAt("301"), "outpost");
+
+        game.setTile(new Tile("21", "201"));
+        assertEquals(List.of("home"), names());
+        assertEquals(List.of(new MapSegment.Dormant("outpost", "home")), MapSegment.dormantNames(game));
+
+        game.removeTile("201");
+        assertEquals("home", sectorAt("000"));
+        assertEquals("outpost", sectorAt("301"));
+        assertTrue(MapSegment.dormantNames(game).isEmpty());
+    }
+
+    @Test
+    void renamingAMergedSectorToAHiddenNameAbsorbsIt() {
+        MapSegment.setAutoSectors(game, true);
+        MapSegment.rename(game, sectorAt("000"), "home");
+        MapSegment.rename(game, sectorAt("301"), "outpost");
+        game.setTile(new Tile("21", "201"));
+
+        assertNull(MapSegment.rename(game, "home", "outpost"));
+        assertEquals(List.of("outpost"), names());
+        assertTrue(MapSegment.dormantNames(game).isEmpty());
+        assertEquals(1, game.getStoredValue("fowMapSectorNames").split(";").length);
+    }
+
+    @Test
+    void removingARenamedSectorGivesItAnAutomaticNameAgain() {
+        MapSegment.setAutoSectors(game, true);
+        MapSegment.rename(game, sectorAt("000"), "home");
+
+        assertTrue(MapSegment.remove(game, "home"));
+        assertTrue(SectorNames.NAMES.contains(sectorAt("000")));
+    }
+
+    @Test
+    void renameRejectsInvalidReservedAndTakenNames() {
+        MapSegment.setAutoSectors(game, true);
+        String core = sectorAt("000");
+        String outpost = sectorAt("301");
+
+        assertNotNull(MapSegment.rename(game, core, "Bad Name"));
+        assertNotNull(MapSegment.rename(game, core, MapSegment.MAIN));
+        assertNotNull(MapSegment.rename(game, core, outpost));
+        assertNotNull(MapSegment.rename(game, "nothing-here", "home"));
+        assertEquals(core, sectorAt("000"));
     }
 
     @Test
