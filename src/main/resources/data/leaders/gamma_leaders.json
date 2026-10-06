@@ -271,7 +271,6 @@
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
-
     {
         "id": "initiativeagent",
         "faction": "initiative",
@@ -371,6 +370,40 @@
         "abilityName": "Strategic Roadmap",
         "abilityWindow": "ACTION: Players each ready up to 1 planet they control, and immediately vote on this card as if it were an agenda and you were the speaker.",
         "abilityText": "For: The Jord player gains 2 technologies. Each other player researches 1 technology.\nAgainst: The Jord player places 1 infantry from their reinforcements on each planet they control that contains a structure. Then, each player readies each planet they control that contains a structure. \nWhen this agenda would be discarded, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "gamma"
+    },
+    {
+        "id": "Ironhullagent",
+        "faction": "ironhull",
+        "type": "agent",
+        "name": "Lorroth Calamex",
+        "title": "",
+        "abilityWindow": "Action",
+        "abilityText": "Exhaust this card and choose a planet another player controls. That player may allow you to capture up to 2 infantry from that planet; they gain 1 trade good for each infantry captured.",
+        "unlockCondition": "Always Unlocked",
+        "source": "gamma"
+    },
+    {
+        "id": "ironhullcommander",
+        "faction": "ironhull",
+        "type": "commander",
+        "name": "Warchief Moonshriek",
+        "title": "",
+        "abilityWindow": "At the beginning of a combat:",
+        "abilityText": "Each of your Carriers and Destroyers without BOMBARDMENT gains BOMBARDMENT 8.",
+        "unlockCondition": "Have 2 Thrall tokens on the game board.",
+        "source": "gamma"
+    },
+    {
+        "id": "ironhullhero",
+        "faction": "ironhull",
+        "type": "hero",
+        "name": "Groth Slagheart",
+        "title": "",
+        "abilityName": "The Stars Weep",
+        "abilityWindow": "ACTION:",
+        "abilityText": "When you commit ground forces to another player's planet, you may gain control of that planet and force your opponent's units to enter coexistence. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     }

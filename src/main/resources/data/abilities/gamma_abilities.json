@@ -239,5 +239,22 @@
         "window": "When you produce fighters or infantry units",
         "windowEffect": "you produce only 1 for its cost instead of 2.",
         "source": "gamma"
+    },
+    {
+        "id": "thralldom",
+        "name": "Thralldom",
+        "faction": "Ironhull",
+        "permanentEffect": "You capture infantry you destroy. A planet can have up to 2 Thrall tokens, increasing its resource and influence values by 1 for each of those tokens.",
+        "window": "When you exhaust a planet,",
+        "windowEffect": "you may return any number of captured infantry to place or move 1 Thrall token onto that planet for every 4 infantry returned. ",
+        "source": "gamma"
+    },
+    {
+        "id": "breakout",
+        "name": "Breakout",
+        "faction": "Ironhull",
+        "window": "At the start of a ground combat on a planet with 1 or more Thrall tokens",
+        "windowEffect": "the active player may remove any number of those tokens to place 4 infantry from their reinforcements on that planet for each token removed.",
+        "source": "gamma"
     }
 ]
