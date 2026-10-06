@@ -356,7 +356,7 @@ public class FrankenDraftBagService {
         List<ContainerChildComponent> components = new ArrayList<>();
         components.add(TextDisplay.of(cat.title(game)));
 
-        List<DraftItem> all = player.getDraftHand().getCategory(cat);
+        List<DraftItem> all = player.getDraftHand().getDistinctCategory(cat);
         if (all.isEmpty()) {
             return null;
         } else {
@@ -372,7 +372,7 @@ public class FrankenDraftBagService {
     }
 
     private static List<Button> getApplyButtons(Player player, DraftCategory cat) {
-        List<DraftItem> items = player.getDraftHand().getCategory(cat);
+        List<DraftItem> items = player.getDraftHand().getDistinctCategory(cat);
         List<Button> buttons = new ArrayList<>();
 
         List<String> appliedItems = player.getStoredList("appliedFrankenItems");
