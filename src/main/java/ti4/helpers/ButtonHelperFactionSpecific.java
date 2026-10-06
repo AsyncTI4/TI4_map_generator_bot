@@ -2989,9 +2989,20 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("passMalevolencyTo")
     public static void passMalevolencyTo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Integer malevolencyIndex = player.getPromissoryNotes().get("malevolency");
+        if (malevolencyIndex == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you do not have _Malevolency_ in your hand to pass.");
+            return;
+        }
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String id = "naaluHeroSend_" + p2.getFaction() + "_"
-                + player.getPromissoryNotes().get("malevolency");
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve the neighbor, please pass _Malevolency_ manually.");
+            return;
+        }
+        String id = "naaluHeroSend_" + p2.getFaction() + "_" + malevolencyIndex;
         ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, event);
     }
 
