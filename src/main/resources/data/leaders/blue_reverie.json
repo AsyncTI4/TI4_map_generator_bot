@@ -8,6 +8,7 @@
         "abilityWindow": "When a player draws a card",
         "abilityText": "You may exhaust this card to allow that player to place that card on the bottom of corresponding deck and draw another card from the top of that deck instead. If that player is another player, gain 1 commodity.",
         "unlockCondition": "Always Unlocked",
+        "notes": "`/game place_drawable_card` lets you choose the deck, enter the card ID, then choose top or bottom for its deck.",
         "source": "blue_reverie"
     },
     {
@@ -83,7 +84,7 @@
         "type": "agent",
         "name": "Drift-Yol Khas",
         "title": "The Rat",
-        "abilityWindow": "ACTION",
+        "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card to allow 1 player to place up to 2 neutral destroyers or 1 neutral cruiser in a system that is in or adjacent to a system that contains their units; resolve space combat in that system.",
         "unlockCondition": "Always Unlocked",
         "source": "blue_reverie"
@@ -290,8 +291,8 @@
         "name": "Cardossa Flight",
         "title": "Pirate Queen",
         "abilityName": "Todlys Unbound - The Leviathan",
-        "abilityWindow": "ACTION:",
-        "abilityText": "Exhaust this card to place 1 neutral war sun in a system that contains neutral units or move 1 neutral ship to an adjacent system; resolve space combat in that system. Neutral war suns have the abilities on the Leviathan ability card.",
+        "abilityWindow": "When you pass:",
+        "abilityText": "When you pass, you may place 1 neutral war sun in a system that contains neutral units. Then, for each secret objective you have scored, you may resolve 1 tactical action as if you control all neutral units, instead of your own.\nNeutral war suns have the abilities on the Leviathan ability card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "blue_reverie"
     },

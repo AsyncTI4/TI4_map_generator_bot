@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.game.Game;
@@ -121,7 +120,7 @@ public class MiltyDraftHelper {
         Point hs = tilePositions.getFirst();
 
         List<String> tileStrings = new ArrayList<>();
-        tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
+        tileStrings.add(ResourceHelper.getTileFile("00_green.png"));
         tileStrings.addAll(
                 slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 
@@ -306,6 +305,7 @@ public class MiltyDraftHelper {
             sources.add(ComponentSource.thunders_edge);
         }
         initDraftTiles(manager, sources);
+        EchoesOfYggdrasilService.addTiles(game, manager);
     }
 
     private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
@@ -410,7 +410,7 @@ public class MiltyDraftHelper {
         return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
-    public static void buildPartialMap(Game game, GenericInteractionCreateEvent event) throws Exception {
+    public static boolean buildPartialMap(Game game) throws Exception {
         MiltyDraftManager manager = game.getMiltyDraftManager();
 
         String mapTemplate = manager.getMapTemplate();
@@ -424,7 +424,7 @@ public class MiltyDraftHelper {
             mapTemplate = defaultTemplate.getAlias();
         }
 
-        MapTemplateHelper.buildPartialMapFromMiltyData(game, event, mapTemplate);
+        return MapTemplateHelper.buildPartialMapFromMiltyData(game, mapTemplate);
     }
 
     public static void buildMap(Game game) throws Exception {

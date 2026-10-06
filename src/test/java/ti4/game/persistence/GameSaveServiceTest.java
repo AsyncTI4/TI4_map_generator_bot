@@ -2,9 +2,12 @@ package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.GameStats;
+import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.testUtils.BaseTi4Test;
 
 class GameSaveServiceTest extends BaseTi4Test {
@@ -34,6 +37,35 @@ class GameSaveServiceTest extends BaseTi4Test {
             assertThat(reloaded.getGameStats().getActionCardPlays())
                     .extracting(GameStats.ActionCardPlay::getPlayerId)
                     .containsOnly(player.getStatsTrackedUserID());
+        }
+    }
+
+    @Test
+    void shouldRoundTripFowVisionGrant() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            Tile tile = game.getTileMap().values().iterator().next();
+            String position = tile.getPosition();
+            tile.addToken(Constants.TOKEN_FOWVISION_PNG, Constants.SPACE);
+            tile.setFowVisionGrant(List.of("red", "blue"));
+
+            assertThat(GameSaveService.save(game, "test")).isTrue();
+
+            Tile reloaded = harness.load().getTileByPosition(position);
+            assertThat(reloaded.hasFowVisionToken()).isTrue();
+            assertThat(reloaded.getFowVisionGrant()).containsExactly("red", "blue");
+        }
+    }
+
+    @Test
+    void shouldRoundTripRulesLinksOptIn() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setInjectRulesLinks(true);
+
+            assertThat(GameSaveService.save(game, "test")).isTrue();
+
+            assertThat(harness.load().isInjectRulesLinks()).isTrue();
         }
     }
 }

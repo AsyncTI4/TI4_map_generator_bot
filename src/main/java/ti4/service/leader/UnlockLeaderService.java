@@ -2,9 +2,8 @@ package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -22,6 +21,10 @@ public class UnlockLeaderService {
 
     public static void unlockLeader(String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToChannel(getOutputChannel(game, player), "Leader " + leaderID + " not found");
+            return;
+        }
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         String message;
         if (leaderModel != null) {
@@ -35,10 +38,7 @@ public class UnlockLeaderService {
 
     public static void unlockLeader(String leaderID, Game game, Player player, String message) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
-        MessageChannel channel = game.getMainGameChannel();
-        if (game.isFowMode()) {
-            channel = player.getPrivateChannel();
-        }
+        MessageChannel channel = getOutputChannel(game, player);
 
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(channel, "Leader " + leaderID + " not found");
@@ -115,9 +115,6 @@ public class UnlockLeaderService {
         if ("revenanthero".equals(leaderID)) {
             RevenantLeadersHandler.offerRevenantHeroChoices(game, player);
         }
-        if (player.hasUnit("revenant_mech")) {
-            RevenantUnitsHandler.doRevenantMechCheck(game, player);
-        }
         if ("verydithcommander".equals(leaderID)) {
             VerydithLeadersHandler.checkVerydithCommander(game);
         }
@@ -125,5 +122,12 @@ public class UnlockLeaderService {
         if (playerLeader.isExhausted()) {
             MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
         }
+    }
+
+    private static MessageChannel getOutputChannel(Game game, Player player) {
+        if (game.isFowMode()) {
+            return player.getPrivateChannel();
+        }
+        return game.getMainGameChannel();
     }
 }

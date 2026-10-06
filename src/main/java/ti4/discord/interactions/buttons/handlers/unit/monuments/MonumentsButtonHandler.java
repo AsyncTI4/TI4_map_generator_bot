@@ -54,7 +54,6 @@ public class MonumentsButtonHandler {
     private static final String USE_QANOJ = "useQanojShieldArray";
     private static final String USE_YIN_MONUMENT = "useYinMonument";
     private static final String SELECT_YIN_MONUMENT_DESTINATION = "selectYinMonumentDestination_";
-
     // Sector KVD-14
     public static void gainKVDTradeGoods(Game game, Player acPlayer, String actionCardTitle) {
         if (!game.isMonumentsMode()) {
@@ -1175,7 +1174,7 @@ public class MonumentsButtonHandler {
                                 + "_MonumentUnits_" + detail;
                         if (!sender.getTransactionItems().contains(item)) {
                             buttons.add(Buttons.green(
-                                    "offerToTransact_MonumentUnits_" + sender.getFaction() + "_" + receiver.getFaction()
+                                    "offerToTransact_MonumentUnits_" + sender.getColor() + "_" + receiver.getColor()
                                             + "_" + detail,
                                     "Trade " + stateText + unit.getName() + " in "
                                             + tile.getRepresentationForButtons(game, sender),

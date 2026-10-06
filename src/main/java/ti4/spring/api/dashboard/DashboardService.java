@@ -2,6 +2,7 @@ package ti4.spring.api.dashboard;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,9 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.TIGLHelper;
 import ti4.image.Mapper;
 import ti4.model.EventModel;
+import ti4.service.game.ManagedGameService;
+import ti4.spring.service.persistence.EarnedTitle;
+import ti4.spring.service.title.PlayerTitleService;
 
 @RequiredArgsConstructor
 @Service
@@ -33,6 +37,7 @@ import ti4.model.EventModel;
 class DashboardService {
 
     private final PlayerAggregatesService playerAggregatesService;
+    private final PlayerTitleService playerTitleService;
 
     /**
      * Builds the full dashboard response for a player.
@@ -82,7 +87,7 @@ class DashboardService {
         String latestTiglRank =
                 getLatestTiglRankAtGameStart(userId, playerGames).orElse(null);
 
-        PlayerDashboardResponse.TitleSummary titleSummary = getTitleSummary(userId, playerGames);
+        PlayerDashboardResponse.TitleSummary titleSummary = getTitleSummary(userId);
         PlayerDashboardResponse.DiceLuckSummary diceLuckSummary = getDiceLuckSummary(userId, playerGames);
 
         int gamesPlayed = playerGames.size();
@@ -148,41 +153,23 @@ class DashboardService {
                 .findFirst();
     }
 
-    private static PlayerDashboardResponse.TitleSummary getTitleSummary(String userId, List<ManagedGame> playerGames) {
+    PlayerDashboardResponse.TitleSummary getTitleSummary(String userId) {
         record TitleBuilder(int count, Set<String> gameIds) {}
-        Map<String, TitleBuilder> titleToData = new java.util.HashMap<>();
+        Map<String, TitleBuilder> titleToData = new HashMap<>();
 
-        for (ManagedGame managedGame : playerGames) {
-            if (!managedGame.isHasEnded()) {
-                continue;
-            }
-
-            Game game = managedGame.getGame();
-            if (game == null) {
-                continue;
-            }
-
-            String stored = game.getStoredValue("TitlesFor" + userId);
-            if (stored.isEmpty()) {
-                continue;
-            }
-
-            Arrays.stream(stored.split("_"))
-                    .map(String::trim)
-                    .filter(title -> !title.isEmpty() && !"**".equals(title))
-                    .forEach(title -> {
-                        TitleBuilder current = titleToData.get(title);
-                        if (current == null) {
-                            LinkedHashSet<String> gameIds = new LinkedHashSet<>();
-                            gameIds.add(game.getName());
-                            titleToData.put(title, new TitleBuilder(1, gameIds));
-                            return;
-                        }
-                        LinkedHashSet<String> gameIds = new LinkedHashSet<>(current.gameIds());
-                        gameIds.add(game.getName());
-                        titleToData.put(title, new TitleBuilder(current.count() + 1, gameIds));
-                    });
-        }
+        playerTitleService.getEndedGameTitles(userId).stream()
+                .filter(earned -> !earned.title().isBlank() && !"**".equals(earned.title()))
+                .sorted(Comparator.comparing(
+                                (EarnedTitle earned) -> ManagedGameService.getGameNameForSorting(earned.source()))
+                        .reversed())
+                .forEach(earned -> titleToData.merge(
+                        earned.title(),
+                        new TitleBuilder(1, new LinkedHashSet<>(List.of(earned.source()))),
+                        (current, added) -> {
+                            LinkedHashSet<String> gameIds = new LinkedHashSet<>(current.gameIds());
+                            gameIds.addAll(added.gameIds());
+                            return new TitleBuilder(current.count() + 1, gameIds);
+                        }));
 
         List<PlayerDashboardResponse.TitleItem> titleItems = titleToData.entrySet().stream()
                 .map(entry -> new PlayerDashboardResponse.TitleItem(

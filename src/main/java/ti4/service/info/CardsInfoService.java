@@ -15,20 +15,26 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
@@ -80,6 +86,11 @@ public class CardsInfoService {
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
         }
+        if (MonumentsService.isMonumentOnBoard(game, player, "lanefir_monument")
+                && game.getStoredValue("lanefirMonumentUsed_" + player.getFaction())
+                        .isEmpty()) {
+            buttons.add(MonumentsDSButtonHandler.getForbiddenLibraryButton(player));
+        }
         if (game.isMonumentsMode()
                 && player.hasUnit("bluetf_monument")
                 && MonumentsService.isMonumentOnBoard(game, player, "bluetf_monument")) {
@@ -92,6 +103,14 @@ public class CardsInfoService {
         }
         if (game.isMonumentsMode() && player.hasUnit("yellowtf_monument")) {
             buttons.add(TwilightsFallMonumentsButtonHandler.getYellowTfMonumentStatusButton(game, player));
+        }
+        if (game.isMonumentsMode()
+                && (player.hasUnit("keleres_monument")
+                        || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument"))) {
+            buttons.add(MonumentsTEButtonHandler.getKeleresMonumentStatusButton(game, player));
+        }
+        if (MonumentsService.hasMonument(game, player, "firmament_monument")) {
+            buttons.add(MonumentsTEButtonHandler.getEpiphanyControlTokensButton(game, player));
         }
         if (game.isMonumentsMode() && player.hasUnit("nekro_monument")) {
             buttons.add(NekroMonumentService.getCopyMonumentButton(player));
@@ -123,20 +142,17 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
         }
-        if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "useRevArcanumAgent_other",
-                    "Use Revenant Arcanum Agent",
-                    FactionEmojis.revenant));
-        }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
         }
         if (player.hasLeader("myrragent")) {
             buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
         }
-        if (player.hasAbility("shared_discoveries")) {
+        if (KairnAbilityHandler.canOfferSharedDiscoveriesCardsInfoButton(game, player)) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
+        }
+        if (player.hasUnlockedBreakthrough("kairnbt")) {
+            buttons.add(KairnBreakthroughHandler.getRelicsCardsInfoButton(player));
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
             buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));
@@ -348,10 +364,16 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }
         if (player.hasUnexhaustedLeader("belkoseaagent")) {
-            buttons.add(Buttons.gray("getAgentSelection_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useBelkoseaAgent", "Use Belkosea Agent", FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("qhetagent")) {
-            buttons.add(Buttons.gray("getAgentSelection_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
+            buttons.add(
+                    Buttons.gray(player.factionButtonChecker() + "useQhetAgent", "Use Qhet Agent", FactionEmojis.qhet));
+        }
+        if (player.hasUnexhaustedLeader("xinagent")) {
+            buttons.add(
+                    Buttons.gray(player.factionButtonChecker() + "useXinAgent", "Use Xin Agent", FactionEmojis.xin));
         }
         if (player.hasAbility("hired_guns")) {
             buttons.add(Buttons.gray("fakeHiredGuns", "Sell Ships Via Hired Guns", FactionEmojis.nokar));
@@ -398,6 +420,9 @@ public class CardsInfoService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
+        if (player.hasTechReady("dsbelky")) {
+            buttons.add(Buttons.gray("exhaustTech_dsbelky", "Use Synchrony Matrix", TechEmojis.CyberneticTech));
+        }
         if (player.hasTechReady("dsuydag")) {
             buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
         }
@@ -415,10 +440,17 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
         }
+        if (player.hasRelicReady("superweaponcaled")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "exhaustSuperweapon_caled_" + game.getActiveSystem(),
+                    "Use Caled",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasRelicReady("superweaponglatison")) {
             buttons.add(Buttons.gray(
                     "exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
         }
+        MonumentsBRButtonHandler.addArmageddonProjectCardsInfoButtons(buttons, game, player);
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }
@@ -486,14 +518,17 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("revenantagent")) {
             buttons.add(RevenantLeadersHandler.getRevenantAgentButton(player));
         }
+        if (player.hasUnexhaustedLeader("revenantscrapyardagent")) {
+            buttons.add(RevenantLeadersHandler.getRevScrapyardCardsInfoButton(game, player));
+        }
+        if (player.hasUnexhaustedLeader("revenantstonebornagent")) {
+            buttons.add(RevenantLeadersHandler.getRevStratumCardsInfoButton(player));
+        }
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
-            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(game, player));
+            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(player));
         }
-        if (player.hasUnexhaustedLeader("revenantxytherisagent")) {
-            buttons.add(RevenantLeadersHandler.getRevXytherisCardsInfoButton(player));
-        }
-        if (player.hasLeaderUnlocked("revenantthroneshero")) {
-            buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
+        if (player.hasLeaderUnlocked("revenantmyrrhero")) {
+            buttons.add(RevenantLeadersHandler.getRevMyrrHeroButton(player));
         }
         if (player.hasPlanet("cineron")
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
@@ -502,11 +537,26 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("verydithagent")) {
             buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
         }
-        if (player.hasRelicReady("economicboon") && player.getExhaustedPlanets().size() > 0) {
-            buttons.add(LostLegaciesRelicHandler.getEconomicBoonCardsInfoButton(player));
+        if (player.hasUnexhaustedLeader("thurvialiagent")) {
+            buttons.add(ThurvialiLeadersHandler.getHopeCardsInfoButton(player));
         }
-        if (MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
-            buttons.add(MonumentsButtonHandler.getSaarMonumentButton(player));
+        Button doubleDragonsDeploy = ThurvialiUnitHandler.getDoubleDragonsDeployButton(game, player);
+        if (doubleDragonsDeploy != null) {
+            buttons.add(doubleDragonsDeploy);
+        }
+        Button diplomaticBoonButton = LostLegaciesRelicHandler.getDiplomaticBoonCardsInfoButton(game, player);
+        if (diplomaticBoonButton != null) buttons.add(diplomaticBoonButton);
+        if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
+                buttons.add(MonumentsButtonHandler.getSaarMonumentButton(player));
+            }
+            if (MonumentsService.isMonumentOnBoard(game, player, "edyn_monument")
+                    && MonumentsService.isMonumentReady(game, player, "edyn_monument")) {
+                buttons.add(MonumentsDSButtonHandler.getTwilightThroneButton(player));
+            }
+            if (MonumentsService.hasMonument(game, player, "rhodun_monumentback")) {
+                buttons.add(MonumentsDSButtonHandler.getReliquatFlipButton(player));
+            }
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

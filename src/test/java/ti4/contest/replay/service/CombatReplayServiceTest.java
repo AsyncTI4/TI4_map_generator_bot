@@ -296,7 +296,7 @@ class CombatReplayServiceTest {
         verify(candidateRepository, times(1)).findByGameNameAndStatusIn(any(), any());
     }
 
-    private CombatReplayService service(CombatCandidateRepository candidateRepository) {
+    private static CombatReplayService service(CombatCandidateRepository candidateRepository) {
         return new CombatReplayService(
                 new CombatContestSettings(),
                 mock(CombatObservationRepository.class),
@@ -307,7 +307,7 @@ class CombatReplayServiceTest {
                 mock(CombatSideBetAvailabilityService.class));
     }
 
-    private CombatObservationEntity observation(
+    private static CombatObservationEntity observation(
             Long id,
             LocalDateTime startedAt,
             String gameName,
@@ -337,26 +337,26 @@ class CombatReplayServiceTest {
         return observation;
     }
 
-    private CombatCandidateEntity candidate(String attackerFaction, String defenderFaction) {
+    private static CombatCandidateEntity candidate(String attackerFaction, String defenderFaction) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setAttackerFaction(attackerFaction);
         candidate.setDefenderFaction(defenderFaction);
         return candidate;
     }
 
-    private Game game(String name) {
+    private static Game game(String name) {
         Game game = new Game();
         game.setName(name);
         return game;
     }
 
-    private Player player(Game game, String faction) {
+    private static Player player(Game game, String faction) {
         Player player = new Player(faction + "-user", faction, game);
         player.setFaction(faction);
         return player;
     }
 
-    private CombatReplayService.InitialCombatStats initialStats(
+    private static CombatReplayService.InitialCombatStats initialStats(
             double attackerStrength, double defenderStrength, double attackerHp, double defenderHp) {
         return new CombatReplayService.InitialCombatStats(attackerStrength, defenderStrength, attackerHp, defenderHp);
     }

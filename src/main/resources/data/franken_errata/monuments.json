@@ -1,0 +1,123 @@
+[
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "mahact_monument",
+        "undraftable": true,
+        "alternateText": "[Franken Only] At the start of the status phase, you may place 1 player's control token on your primacy ability that has a command token in this unit's system.",
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "titans_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "cabal_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "crimson_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "firmament_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "obsidian_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "ralnel_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "gledge_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "kollecc_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "nivyn_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "vaden_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "belkosea_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "toldar_monumenthonor",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "toldar_monumentdishonor",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "uydai_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "xin_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "kaltrim_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "zelian_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "sarcosa_monument",
+        "undraftable": true,
+        "source": "monuments"
+    },
+    {
+        "itemCategory": "MONUMENT",
+        "itemId": "mykomentori_monument",
+        "undraftable": true,
+        "source": "monuments"
+    }
+]

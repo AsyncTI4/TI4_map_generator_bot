@@ -16,13 +16,14 @@ import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 public final class PlayerPreferenceHelper {
 
     @ButtonHandler(value = "offerPlayerPref", save = false)
-    public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
+    public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.getACEmoji(player)));
         buttons.add(Buttons.gray("playerPref_afkTimes", "AFK Times"));
@@ -33,6 +34,12 @@ public final class PlayerPreferenceHelper {
         if (player.getUserSettings().isShowTransactables())
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
         else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
+        buttons.add(Buttons.gray("playerPref_refreshMapStyle", "Refresh Map Style"));
+        if (FoWHelper.isFogQol01(game)) {
+            if (player.getUserSettings().isFogMapOnTurnStart())
+                buttons.add(Buttons.gray("playerPref_fogTurnMapOff", "Stop posting my fog map at turn start"));
+            else buttons.add(Buttons.gray("playerPref_fogTurnMapOn", "Post my fog map at turn start"));
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose the thing you wish to change.",
@@ -77,7 +84,44 @@ public final class PlayerPreferenceHelper {
                 UserSettingsManager.save(settings);
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
             }
+            case "refreshMapStyle" -> offerRefreshMapStyles(player);
+            case "fogTurnMapOn" -> setFogMapOnTurnStart(player, true);
+            case "fogTurnMapOff" -> setFogMapOnTurnStart(player, false);
         }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void setFogMapOnTurnStart(Player player, boolean enabled) {
+        UserSettings settings = player.getUserSettings();
+        settings.setFogMapOnTurnStart(enabled);
+        UserSettingsManager.save(settings);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
+    }
+
+    private static void offerRefreshMapStyles(Player player) {
+        RefreshMapStyle current = player.getUserSettings().getRefreshMapStyle();
+        List<Button> buttons = new ArrayList<>();
+        for (RefreshMapStyle style : RefreshMapStyle.values()) {
+            String id = "playerPrefRefreshStyle_" + style.getValue();
+            buttons.add(style == current ? Buttons.green(id, style.getLabel()) : Buttons.gray(id, style.getLabel()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation() + ", what should the Refresh Map button show you? This applies to all your"
+                        + " games. The green button is your current choice.",
+                buttons);
+    }
+
+    @ButtonHandler(value = "playerPrefRefreshStyle_", save = false)
+    public static void resolveRefreshMapStyle(Player player, ButtonInteractionEvent event, String buttonID) {
+        RefreshMapStyle.fromValue(buttonID.replace("playerPrefRefreshStyle_", ""))
+                .ifPresent(style -> {
+                    UserSettings settings = player.getUserSettings();
+                    settings.setRefreshMapStyle(style);
+                    UserSettingsManager.save(settings);
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(), "Refresh Map style set to: " + style.getLabel());
+                });
         ButtonHelper.deleteMessage(event);
     }
 

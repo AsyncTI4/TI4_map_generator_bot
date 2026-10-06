@@ -73,7 +73,7 @@ class GameLoadService {
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
             .build();
-    private static final Pattern PATTERN = Pattern.compile("—");
+    private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
     static List<String> loadGameNames() {
@@ -248,6 +248,9 @@ class GameLoadService {
                 }
                 if (ENDTOKENS.equals(data)) {
                     break;
+                }
+                if (tile != null && data.startsWith(FOW_VISION_GRANT + " ")) {
+                    tile.setFowVisionGrant(Helper.getListFromCSV(data.substring(FOW_VISION_GRANT.length() + 1)));
                 }
             }
         }
@@ -549,6 +552,7 @@ class GameLoadService {
                 case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(parseBooleanOrDefault(info, false));
                 case Constants.QUEUE_SO -> game.setQueueSO(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_BUBBLES -> game.setShowBubbles(parseBooleanOrDefault(info, false));
+                // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
@@ -571,7 +575,11 @@ class GameLoadService {
                 case Constants.BASE_GAME_MODE -> game.setBaseGameMode(parseBooleanOrDefault(info, false));
                 case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(parseBooleanOrDefault(info, false));
                 case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(parseBooleanOrDefault(info, false));
+                // setTwilightKart is Deprecated. Once removed, remove this case
                 case Constants.TWILIGHT_KART -> game.setTwilightKart(parseBooleanOrDefault(info, false));
+                case Constants.TK_DESTROYER_CUP -> game.setTkDestroyerCup(parseBooleanOrDefault(info, false));
+                case Constants.TK_NOVA_CUP -> game.setTkNovaCup(parseBooleanOrDefault(info, false));
+                case Constants.TF_BR -> game.setTfBr(parseBooleanOrDefault(info, false));
                 case Constants.TWILIGHT_DS -> game.setTwilightDS(parseBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(parseBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(parseBooleanOrDefault(info, false));
@@ -931,6 +939,7 @@ class GameLoadService {
                     player.setCommoditiesBase(Math.max(0, Integer.parseInt(tokenizer.nextToken())));
                 case Constants.COMMODITIES -> player.loadCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STASIS_FIGHTERS -> player.setStasisFighters(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AUTO_SABO_PASS_MEDIAN ->
                     player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CAPTURE -> {
@@ -1073,7 +1082,7 @@ class GameLoadService {
                         String tileID = system[1];
                         String label = system[2];
                         if (label != null)
-                            label = PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
+                            label = EM_DASH_PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
                         player.addFogTile(tileID, position, label);
                     }
                 }

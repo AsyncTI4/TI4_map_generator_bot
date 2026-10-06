@@ -191,7 +191,7 @@ public final class CombatMessageHelper {
                     : "remaining " + groupDice + (groupDice == 1 ? " die" : " dice");
             String modifierLabel = groupModifier > 0 ? "+" + groupModifier : Integer.toString(groupModifier);
             int threshold = Math.max(1, toHit - groupModifier);
-            String hitLabel = threshold <= 1 ? "always hits" : "hits on **" + threshold + "**";
+            String hitLabel = threshold == 1 ? "always hits" : "hits on **" + threshold + "**";
             groups.add(hitLabel + " for " + diceLabel + " (" + modifierLabel + " mods)");
             groupStart = groupEnd;
         }

@@ -8,9 +8,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
@@ -52,6 +52,27 @@ public class AddUnitService {
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
             checkFleetCapacity(tile, color, game);
         }
+    }
+
+    public static void addUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, List<RemovedUnit> removedUnits) {
+        for (RemovedUnit unit : removedUnits) {
+            unit.uh().addUnitsWithStates(unit.unitKey(), unit.states());
+
+            tile = FlipTileService.flipTileIfNeeded(tile, game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(
+                    event, tile, unit.uh().getName(), game);
+            Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, unit.unitKey(), unit.uh().getName(), player, unit.getTotalRemoved());
+        }
+        String unitList = String.join(
+                ", ",
+                removedUnits.stream()
+                        .map(unit -> unit.unitKey() + " " + unit.getTotalRemoved())
+                        .toList());
+        handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
     }
 
     public static void addUnits(
@@ -243,13 +264,28 @@ public class AddUnitService {
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
         }
+        if (unitKey.unitType() == UnitType.Monument) {
+            MonumentsService.syncKyroReliquaryAttachment(game, player);
+            MonumentsService.syncZelianAsteroidFieldToken(game);
+        }
 
         if (!(event instanceof ButtonInteractionEvent buttonEvent)
                 || !buttonEvent.getComponentId().contains("place_")) {
             MonumentsButtonHandler.offerCenotaph(game, player, tile, unitKey, location, amount);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones", "crystellum");
+                player,
+                "dream",
+                "myrr",
+                "natau",
+                "oblivion",
+                "revenantxytheris",
+                "thrones",
+                "crystellum",
+                "scrapyard",
+                "thurviali",
+                "sarcosa",
+                "xin");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

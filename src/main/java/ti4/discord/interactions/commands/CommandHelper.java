@@ -33,6 +33,7 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class CommandHelper {
@@ -120,7 +121,9 @@ public class CommandHelper {
         if (player != null) {
             return player;
         }
-        return getPlayerFromGame(game, event.getMember(), event.getUser().getId());
+        String userId = event.getUser().getId();
+        return TestBedService.resolveActingPlayer(
+                game, event.getMember(), userId, null, getPlayerFromGame(game, event.getMember(), userId));
     }
 
     @Nullable

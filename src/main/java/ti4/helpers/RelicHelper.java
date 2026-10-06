@@ -11,11 +11,15 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -90,8 +94,23 @@ public class RelicHelper {
         drawRelicAndNotify(player, event, game, 0, false);
     }
 
+    public static void drawRelicAndNotifyIgnoringKairnBreakthrough(
+            Player player, GenericInteractionCreateEvent event, Game game) {
+        drawRelicAndNotify(player, event, game, 0, false, true);
+    }
+
     public static void drawRelicAndNotify(
             Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
+        drawRelicAndNotify(player, event, game, position, checked, false);
+    }
+
+    private static void drawRelicAndNotify(
+            Player player,
+            GenericInteractionCreateEvent event,
+            Game game,
+            int position,
+            boolean checked,
+            boolean ignoreKairnBreakthrough) {
         if (!checked
                 && (player.hasAbility("data_leak")
                         || (player.getPromissoryNotes().containsKey("dspnflor")
@@ -131,11 +150,12 @@ public class RelicHelper {
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
+        WhiteTfUnitHandler.resolveMonumentRelicDraw(event, game, player);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
             OnyxxaLeaderHandler.onDrawRelic(player);
         }
-
+        KairnBreakthroughHandler.offerRelicGainPrompts(game, player, relicID);
         if (checked) game.shuffleRelics();
     }
 
@@ -186,6 +206,7 @@ public class RelicHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Triad \"planet\" card to your play area.");
             }
+            case "gedustation" -> BlueReverieRelicHandler.offerGeduStationPlacement(game, player);
 
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
@@ -276,6 +297,7 @@ public class RelicHelper {
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
             }
             case "thetriad" -> p1.removePlanet("triad");
+            case "gedustation" -> p1.removePlanet("gedustation");
             case "obsidian", "absol_obsidian" -> {
                 if (p1.getSoScored() > p1.getMaxSOCount()) {
                     // do something for 4 scored secrets
@@ -323,12 +345,12 @@ public class RelicHelper {
             return;
         }
 
-        String p1 = sender.getRepresentation();
-        String p2 = receiver.getRepresentation();
+        String p1 = sender.getRepresentationNoPing();
+        String p2 = receiver.getRepresentationNoPing();
         String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment"
                 + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() && !(event instanceof ButtonInteractionEvent)) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor", "kairn");

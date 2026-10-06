@@ -24,32 +24,50 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.QhetAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -73,6 +91,7 @@ import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
@@ -80,8 +99,10 @@ import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.UydaiHeroService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -97,6 +118,17 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        ThurvialiUnitHandler.destroyBlockadedFlightStructures(event, game, player);
+        ScrapyardAbilitiesHandler.resolveEndOfTacticalAction(game, player, event);
+        ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        ScrapyardTechHandler.clearHotswapping(game);
+        SarcosaCommanderHandler.clearAdjacency(game, player);
+        UydaiHeroService.clear(game);
+        XinCommanderHandler.clearCombat(game);
+        QhetAgentHandler.returnTemporaryUnitUpgrades(game);
+        RealityFieldImpactorService.clear(game);
+        LostLegaciesRelicHandler.clearNaturesBoon(game, player);
+        RevenantLeadersHandler.resolvePendingRevVerydithAgent(game, player, event);
         RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
@@ -143,10 +175,15 @@ public final class ButtonHelperTacticalAction {
                                 + " agent to place 1 space dock for 2 trade goods or 2 commodities",
                         buttons);
             }
-            if (player.hasAbility("miniaturization") || player.hasUnit("tk-keshnu")) {
+            if (player.hasAbility("miniaturization")
+                    || player.hasUnit("tk-keshnu")
+                    || player.hasAbility("radiant_grafting_flight")) {
                 String msg = player.getRepresentation()
                         + ", you may use _Miniaturization_ to land any of your structures in the space area onto planets you control in this system.";
-                if (player.hasUnit("tk-keshnu")) {
+                if (player.hasAbility("radiant_grafting_flight")) {
+                    msg = player.getRepresentation()
+                            + ", you may use _Radiant Grafting: Flight_ to land any of your structures in space areas onto planets you control in their respective systems.";
+                } else if (player.hasUnit("tk-keshnu")) {
                     msg = player.getRepresentation() + ", you may land any of your " + UnitEmojis.pds + " "
                             + FactionEmojis.Ralnel + " _Kesh Nu_ units onto planets you control in this system.";
                 }
@@ -175,7 +212,9 @@ public final class ButtonHelperTacticalAction {
                                 + ", you may exhaust _Discovery_ to explore a frontier token in a planetless system containing your ships.",
                         NatauDoctrineHandler.getUseDiscoveryButton(player));
             }
-            if (player.hasTech("thkairny") && player.hasTechReady("thkairny")) {
+            if (player.hasTech("thkairny")
+                    && player.hasTechReady("thkairny")
+                    && !KairnTechHandler.hasUsedSurveyorsLens(game, player)) {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCorrectChannel(),
                         player.getRepresentation()
@@ -198,8 +237,11 @@ public final class ButtonHelperTacticalAction {
                                 + ", you have _Colony Outposts_ and explored a planet during this tactical action.\nYou may spend a strategy token to find an attachment in that planet's exploration deck and attach it to that planet:",
                         KairnAbilityHandler.offerColonyOutposts(player));
             }
+            Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+            if (!activeSystem.isHomeSystem() && player.getCommodities() >= 1) {
+                KairnAbilityHandler.offerSharedDiscoveries(game, player);
+            }
             if (player.ownsUnit("kairn_mech")) {
-                Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
                 if (activeSystem != null) {
                     List<Button> excavatorPlanets = new ArrayList<>();
                     for (Planet planet : activeSystem.getPlanetUnitHolders()) {
@@ -253,6 +295,7 @@ public final class ButtonHelperTacticalAction {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                                 if (player.getPlanets().contains(planet.getName())) {
                                     control = true;
+                                    break;
                                 }
                             }
                         }
@@ -260,6 +303,7 @@ public final class ButtonHelperTacticalAction {
                             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                                 if (player.getPlanets().contains(planet.getName())) {
                                     control = true;
+                                    break;
                                 }
                             }
                         }
@@ -275,6 +319,7 @@ public final class ButtonHelperTacticalAction {
             }
             resetStoredValuesForTacticalAction(game);
         }
+        MonumentsTEButtonHandler.offerRalNelMonumentStructureMove(game, player);
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         CrystellumTechHandler.clearResonanceDrive(game);
@@ -289,13 +334,20 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
+        game.removeStoredValue("vanguardReinforce" + player.getFaction());
         game.removeStoredValue("safeHarborUsed");
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
+        SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
     }
 
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         endOfTacticalActionThings(player, game, event);
+
+        if (SarcosaHeroHandler.consumeNeutralTacticalActionContinuation(game, player)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
 
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
@@ -440,6 +492,9 @@ public final class ButtonHelperTacticalAction {
             TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
+        if (unitsWereMoved && player.hasUnexhaustedLeader("myrragent")) {
+            MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
+        }
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(
                     player,
@@ -506,6 +561,8 @@ public final class ButtonHelperTacticalAction {
             OblivionAbilityHandler.offerReflectionPlacement(event, game, player, tile);
             MyrrTechHandler.offerSegmentedStructuring(event, game, player, tile);
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
+            MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
+            MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
         }
     }
 
@@ -589,6 +646,8 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static void resetStoredValuesForTacticalAction(Game game) {
+        VanguardUnitHandler.clearBulwarkSustain(game);
+        VanguardBreakthroughHandler.clearTrainingDummiesState(game);
         game.setNaaluAgent(false);
         game.setWarfareAction(false);
         game.setL1Hero(false);
@@ -596,6 +655,8 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
+        UydaiHeroService.clear(game);
+        game.removeStoredValue(ArvaxiLeaderHandler.HERO_ACTIVE_KEY);
         game.removeStoredValue("tnelisCommanderTracker");
         TwilightsFallMonumentsButtonHandler.clearBlueTfMonumentCapacity(game);
         TwilightsFallMonumentsButtonHandler.clearOrangeTfMonumentMechs(game);
@@ -603,6 +664,7 @@ public final class ButtonHelperTacticalAction {
         MonumentsService.clearNaaluMonumentCoexistence(game);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("ASN" + player.getFaction());
+            game.removeStoredValue("dihmohnCyclotron_" + player.getFaction());
         }
         game.removeStoredValue("planetsTakenThisRound");
         game.removeStoredValue("hiredGunsInPlay");
@@ -784,21 +846,123 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
+        SarcosaCommanderHandler.offerAdjacencySelection(game, player);
+        ThurvialiLeadersHandler.offerMendingLightButtons(game, tile);
+        VanguardUnitHandler.offerBulwarkButton(game, player);
+        ScrapyardAbilitiesHandler.offerActivationRigButtons(game, player);
+        ScrapyardUnitHandler.offerFuelCellButton(game, player);
+        ScrapyardTechHandler.offerHotswapping(game, tile, player);
+        LostLegaciesRelicHandler.offerNaturesBoon(game, player);
+        if (player.hasPlanet("jotunheim")
+                && !player.getExhaustedPlanetsAbilities().contains("jotunheim")) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you may exhaust _Hrungnir's Husk_.",
+                    Buttons.green(
+                            player.factionButtonChecker() + "planetAbilityExhaust_jotunheim",
+                            "Use Hrungnir's Husk",
+                            PlanetEmojis.getPlanetEmojiOrNull("jotunheim")));
+        }
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {
                     MonumentsButtonHandler.sendRevenantCircuitButtons(game, tile, monumentOwner);
                 }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "firmament_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "firmament_monument")) {
+                    MonumentsTEButtonHandler.placeEpiphanyControlToken(game, monumentOwner, player);
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "obsidian_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "obsidian_monument")
+                        && monumentOwner.isOtherPlayerPuppeted(player)) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", the puppeted player " + player.getRepresentationNoPing()
+                                    + " has activated the system containing _Epiphany Hollow_. You may replace 2 infantry on a planet they control with your infantry, they enter coexistence.",
+                            MonumentsTEButtonHandler.sendEpiphanyHollowButton(monumentOwner, player));
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "cymiae_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "cymiae_monument")
+                        && player != monumentOwner) {
+                    ActionCardHelper.sendACDiscardButtons(player);
+
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + ", you activated the system containing _Jatta's Palace_ and must now discard an action card, if able.\n"
+                                    + "-# Buttons to discard were sent to your `#cards-info`.");
+                }
+                if (monumentOwner == player
+                        && MonumentsService.isMonumentOnBoard(game, player, "dihmohn_monument")
+                        && MonumentsService.isMonumentReady(game, player, "dihmohn_monument")) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + ", you may exhaust _Flotilla Cyclotron_ to give units in "
+                                    + MonumentsService.getMonumentTile(game, player, "dihmohn_monument")
+                                            .getRepresentation()
+                                    + " +1 to their move values until the end of your tactical action.",
+                            MonumentsDSButtonHandler.offerCyclotronButton(player));
+                }
+                if (monumentOwner == player && MonumentsService.isMonumentOnBoard(game, player, "ghoti_monument")) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "This is a reminder that "
+                                    + MonumentsService.getMonumentTile(game, player, "ghoti_monument")
+                                            .getRepresentation()
+                                    + " may be treated as having no planets during movement.");
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "lizho_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "lizho_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", " + player.getRepresentationNoPing()
+                                    + " activated the system containing _Nightfall Fortress_. "
+                                    + "You may either remove 1 other player's token from this system, or gain 1 command token.",
+                            MonumentsDSButtonHandler.getNightfallButtons(player, monumentOwner, game, tile));
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "rhodun_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "rhodun_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", " + (player == monumentOwner ? " you " : player.getRepresentation())
+                                    + " activated the system containing _Vault of New Phrad_ and thus may flip it.",
+                            MonumentsDSButtonHandler.getVaultFlipButtons(monumentOwner));
+                }
+                if (monumentOwner != player
+                        && MonumentsService.isMonumentOnBoard(game, monumentOwner, "kaltrim_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "kaltrim_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " you must spend 1 command token from one of your pools to activate this system.",
+                            ButtonHelper.getLoseCCButtons(player));
+                }
+                if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "xin_monument")
+                        && tile == MonumentsService.getMonumentTile(game, monumentOwner, "xin_monument")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            monumentOwner.getCorrectChannel(),
+                            monumentOwner.getRepresentation()
+                                    + ", " + (player == monumentOwner ? " you" : player.getRepresentationNoPing())
+                                    + " activated the system containing _Celestial Court_, and thus may either gain or flip 1 balance token.",
+                            ButtonHelper.getBalanceButtons(monumentOwner));
+                }
             }
         }
-        KairnAbilityHandler.remindSharedDiscoveries(game, tile, player);
+        Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
+        if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
+            ScrapyardLeaderHandler.sendRikkaButtons(player, agentOwner);
+        }
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
-        RevenantLeadersHandler.openRevXytherisAgentWindow(game, player);
-        MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         ThronesTechHandler.offerRiftTouchedBastion(game, tile);
         game.setStoredValue("lastActiveSystem", pos);
@@ -881,7 +1045,7 @@ public final class ButtonHelperTacticalAction {
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')
-                        .append(player.getRepresentationUnfogged())
+                        .append(player.getRepresentationNoPing())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
                         .append(String.join(", ", mentions));
                 if (mentions.size() > 1 && totalDice > 0) {
@@ -906,7 +1070,7 @@ public final class ButtonHelperTacticalAction {
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + ", you can use buttons to resolve "
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "I48S, the L1Z1Z" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + "I48S, the L1Z1X" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, if you so wish.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button3);
         }
@@ -1147,13 +1311,7 @@ public final class ButtonHelperTacticalAction {
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
         }
-        List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();
-        if (!planetUnitHolders.isEmpty()
-                && planetUnitHolders.stream()
-                        .anyMatch(planet -> player.getPlanetsAllianceMode().contains(planet.getName())
-                                && planet.getAttachments().contains("attachment_kairnoutpost.png"))) {
-            KairnPromissoryHandler.offerArchaeologicalOutpostExplore(player, game, tile);
-        }
+        KairnPromissoryHandler.offerArchaeologicalOutpostExplore(game, tile);
 
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(
@@ -1202,7 +1360,7 @@ public final class ButtonHelperTacticalAction {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {
-            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
+            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds, UnitType.Monument));
         }
         if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
             movableFromPlanets.add(UnitType.Pds);
@@ -1238,7 +1396,12 @@ public final class ButtonHelperTacticalAction {
                         continue;
                     }
                 }
-                if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.unitType()))) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                boolean isFlightStructure =
+                        player.hasAbility("radiant_grafting_flight") && unitModel != null && unitModel.getIsStructure();
+                if (unitHolder instanceof Planet
+                        && !movableFromPlanets.contains(unitKey.unitType())
+                        && !isFlightStructure) continue;
 
                 List<Integer> states = unitHolder.getUnitsByState().get(unitKey);
                 for (UnitState state : UnitState.values()) {

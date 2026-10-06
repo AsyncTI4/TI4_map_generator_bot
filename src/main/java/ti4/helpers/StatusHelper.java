@@ -16,9 +16,11 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -46,6 +48,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.PlanetEmojis;
+import ti4.service.fow.FowScoringStatusService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -165,6 +168,7 @@ public final class StatusHelper {
         game.setPhaseOfGame("statusScoring");
         VeylorAbilitiesHandler.returnUnassignedTightSchedulingAgendas(game);
         VerydithPromissoryHandler.returnPactRenewedAtStartOfStatus(game);
+        RevenantPromissoryHandler.returnRebrithAtStartOfStatus(game);
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
@@ -459,6 +463,10 @@ public final class StatusHelper {
         }
         MessageHelper.sendMessageToChannelWithPersistentReacts(
                 gameChannel, messageText, game, poButtons, GameMessageType.STATUS_SCORING);
+        if (FoWHelper.isFogQol01(game)) {
+            offerEdynCommanderDrawPrivately(game);
+            FowScoringStatusService.postForAllPlayers(game);
+        }
 
         boolean allReacted = true;
         for (Player player : game.getRealPlayers()) {
@@ -509,6 +517,7 @@ public final class StatusHelper {
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
             NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
+        MonumentsPoKButtonHandler.sendSpireOfIxthButtons(game);
 
         for (Player player : game.getRealPlayers()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
@@ -632,7 +641,6 @@ public final class StatusHelper {
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
         sendNeuralParasiteButtons(game);
-        sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
         SowingReapingService.resolveTheReaping(game);
 
@@ -640,7 +648,7 @@ public final class StatusHelper {
         resolveSolFlagship(game);
     }
 
-    private static void sendRemoveBreachButtons(Game game) {
+    public static void sendRemoveBreachButtons(Game game) {
         Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
         Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {
@@ -867,6 +875,26 @@ public final class StatusHelper {
         }
     }
 
+    private static void offerEdynCommanderDrawPrivately(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (!game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander")
+                    || player.getPrivateChannel() == null) {
+                continue;
+            }
+            List<Button> buttons = List.of(
+                    Buttons.gray(
+                            player.factionButtonChecker() + "edynCommanderSODraw",
+                            "Draw Secret Objective Instead of Scoring Public Objective",
+                            FactionEmojis.edyn),
+                    Buttons.DONE_DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getPrivateChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", you may use Kadryn, the Edyn commander, to draw a secret objective instead of scoring a public objective.",
+                    buttons);
+        }
+    }
+
     private static List<Button> getScoreObjectiveButtons(Game game) {
         return getScoreObjectiveButtons(game, "");
     }
@@ -992,11 +1020,18 @@ public final class StatusHelper {
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged() + " is the one the game is currently waiting on.";
                 }
+                if (FoWHelper.isFogQol01(game)) {
+                    GMService.logPlayerActivity(
+                            game,
+                            player2,
+                            player2.getRepresentationNoPing() + " is blocking the public objective scoring queue.");
+                }
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
                     if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                         game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "Queued");
+                        FowScoringStatusService.refresh(game, player);
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
@@ -1073,8 +1108,16 @@ public final class StatusHelper {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";
                         }
+                        if (FoWHelper.isFogQol01(game)) {
+                            GMService.logPlayerActivity(
+                                    game,
+                                    player2,
+                                    player2.getRepresentationNoPing()
+                                            + " is blocking the secret objective scoring queue.");
+                        }
                         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
                             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");
+                            FowScoringStatusService.refresh(game, player);
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
                         int soIndex = Integer.parseInt(soID);

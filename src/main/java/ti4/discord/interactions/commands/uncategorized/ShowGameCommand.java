@@ -37,12 +37,15 @@ public class ShowGameCommand extends GameStateCommand {
                                 OptionType.STRING,
                                 Constants.DISPLAY_TYPE,
                                 "Show map in specific format. all, map, stats")
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.MAP_SEGMENT, "Fog of War: which part of the map to show")
                         .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        String segment = event.getOption(Constants.MAP_SEGMENT, null, OptionMapping::getAsString);
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
@@ -53,6 +56,7 @@ public class ShowGameCommand extends GameStateCommand {
                         game,
                         event,
                         displayType,
+                        segment,
                         fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else {
@@ -67,6 +71,6 @@ public class ShowGameCommand extends GameStateCommand {
         if (displayType == null) {
             displayType = DisplayType.all;
         }
-        ShowGameService.simpleShowGame(game, event, displayType);
+        ShowGameService.simpleShowGame(game, event, displayType, segment);
     }
 }

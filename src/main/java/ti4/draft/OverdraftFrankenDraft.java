@@ -10,6 +10,7 @@ public class OverdraftFrankenDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
+        if (category == DraftCategory.MONUMENT) return getConfiguredMonumentLimit();
         return getItemLimitForCategory(category);
     }
 

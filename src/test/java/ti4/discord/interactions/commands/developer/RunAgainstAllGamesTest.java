@@ -1,36 +1,36 @@
 package ti4.discord.interactions.commands.developer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
-import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.testUtils.BaseTi4Test;
+import org.junit.jupiter.api.Test;
+import ti4.game.persistence.ManagedGame;
 
-class RunAgainstAllGamesTest extends BaseTi4Test {
+class RunAgainstAllGamesTest {
 
-    private static void seat(Game game, String faction, String... planets) {
-        Player player = game.addPlayer(faction + "-user", faction);
-        player.setFaction(faction);
-        player.setColor(COLORS.get(game.getPlayers().size() - 1));
-        player.getPlanets().addAll(List.of(planets));
+    private static final List<ManagedGame> GAMES = List.of(
+            managedGame("on-active", true, false),
+            managedGame("on-ended", true, true),
+            managedGame("off-active", false, false),
+            managedGame("off-ended", false, true));
+
+    @Test
+    void shouldOnlyTouchUnfinishedGamesWithRulesLinksOnByDefault() {
+        assertThat(RunAgainstAllGames.gamesWithRulesLinksOn(GAMES, false)).containsExactly("on-active");
     }
 
-    private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "orange");
-
-    private static Player anchoredAt(Game game, String position) {
-        Player player = game.addPlayer("user-" + position, "user");
-        player.setFaction("keleres");
-        player.setColor("red");
-        player.setPlayerStatsAnchorPosition(position);
-        return player;
+    @Test
+    void shouldIncludeEndedGamesWhenAsked() {
+        assertThat(RunAgainstAllGames.gamesWithRulesLinksOn(GAMES, true)).containsExactly("on-active", "on-ended");
     }
 
-    private static Game gameWithTiles(String... tileIds) {
-        Game game = new Game();
-        int position = 101;
-        for (String tileId : tileIds) {
-            game.setTile(new Tile(tileId, Integer.toString(position++)));
-        }
-        return game;
+    private static ManagedGame managedGame(String name, boolean injectRules, boolean hasEnded) {
+        ManagedGame managedGame = mock(ManagedGame.class);
+        when(managedGame.getName()).thenReturn(name);
+        when(managedGame.isInjectRules()).thenReturn(injectRules);
+        when(managedGame.isHasEnded()).thenReturn(hasEnded);
+        return managedGame;
     }
 }

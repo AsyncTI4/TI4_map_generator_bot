@@ -1,7 +1,9 @@
 package ti4.discord.interactions.commands.map;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -36,7 +38,11 @@ public class AddBorderAnomaly extends GameStateSubcommand {
 
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE).getAsString();
         BorderAnomalyModel.BorderAnomalyType anomalyType =
-                new BorderAnomalyModel().getBorderAnomalyTypeFromString(anomalyTypeString);
+                BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyTypeString);
+        if (anomalyType == null) {
+            sendUnknownTypeMessage(event, anomalyTypeString);
+            return;
+        }
 
         StringBuilder sb = new StringBuilder();
         int amountAdded = 0;
@@ -56,6 +62,15 @@ public class AddBorderAnomaly extends GameStateSubcommand {
         }
         sb.append(anomalyType.getName()).append(" anomalies added: ").append(amountAdded);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    static void sendUnknownTypeMessage(SlashCommandInteractionEvent event, String anomalyTypeString) {
+        String validTypes = Arrays.stream(BorderAnomalyModel.BorderAnomalyType.values())
+                .map(BorderAnomalyModel.BorderAnomalyType::getName)
+                .collect(Collectors.joining(", "));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Unknown border anomaly type `" + anomalyTypeString + "`. Valid types: " + validTypes + ".");
     }
 
     public static Set<Integer> resolveDirections(SlashCommandInteractionEvent event) {

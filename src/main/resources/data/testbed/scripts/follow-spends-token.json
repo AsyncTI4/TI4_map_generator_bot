@@ -1,0 +1,16 @@
+{
+  "name": "follow-spends-token",
+  "description": "Following Politics costs Hacan one strategy token; Jol-Nar cannot end Sol's turn.",
+  "preset": "action-3p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "hacan.ccs", "equals": "3/3/2" } },
+    { "as": "sol", "press": "strategicAction_3" },
+    { "expect": { "state": "game.playedScs", "contains": "3" } },
+    { "as": "hacan", "press": "sc_follow_3" },
+    { "expect": { "state": "hacan.ccs", "equals": "3/3/1" } },
+    { "as": "jolnar", "pressId": "FFCC_sol_turnEnd" },
+    { "expect": { "ephemeral": "these buttons are for someone else" } },
+    { "expect": { "state": "game.activePlayer", "equals": "sol" } }
+  ]
+}

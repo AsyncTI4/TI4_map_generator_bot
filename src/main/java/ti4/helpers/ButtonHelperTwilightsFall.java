@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -65,6 +66,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 public final class ButtonHelperTwilightsFall {
+
+    private static final Pattern WS_UNIT_ALIAS_PATTERN = Pattern.compile("\\bws\\b");
 
     private static boolean checkForQueuedSplicePick(Player privatePlayer, Game game) {
         String alreadyQueued = game.getStoredValue(privatePlayer.getFaction() + "splicequeue");
@@ -288,8 +291,9 @@ public final class ButtonHelperTwilightsFall {
             draft.setSlice(mslice);
         }
 
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -308,6 +312,9 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         game.setShowMapSetup(false);
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
     }
 
     @ButtonHandler("startFrankenMantisBuild")
@@ -324,6 +331,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
 
+        boolean mapChanged = false;
         try {
             // Ensure map template is set
             String mapTemplate = game.getMapTemplateID();
@@ -339,7 +347,7 @@ public final class ButtonHelperTwilightsFall {
             }
 
             // Place draft tiles
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -347,6 +355,9 @@ public final class ButtonHelperTwilightsFall {
         // Send buttons for map build
         MantisMapBuildContext mapBuildContext = FrankenMapBuildContextHelper.createContext(game);
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
     }
 
     private static boolean setPositionAndSendHomeFleetButtons(Game game, Player player) {
@@ -435,7 +446,7 @@ public final class ButtonHelperTwilightsFall {
         if (tile != null) {
             String unitList = Mapper.getFaction(factionFleet).getStartingFleet();
             if (game.isFrankenGame() && "muaat".equalsIgnoreCase(factionFleet) && !hasFactionWarsunUpgrade(player)) {
-                unitList = unitList.replaceFirst("\\bws\\b", "flagship");
+                unitList = WS_UNIT_ALIAS_PATTERN.matcher(unitList).replaceFirst("flagship");
             }
             AddUnitService.addUnitsToDefaultLocations(event, tile, game, player.getColor(), unitList);
 
@@ -459,6 +470,17 @@ public final class ButtonHelperTwilightsFall {
                 .anyMatch(unit -> "warsun".equalsIgnoreCase(unit.getBaseType()));
     }
 
+    public static Player spliceInitiator(Game game, Player fallback) {
+        if (game.isFowMode()) {
+            Player initiator = game.getPlayerFromColorOrFaction(game.getStoredValue("spliceInitiator"));
+            if (initiator != null) {
+                return initiator;
+            }
+        }
+        Player active = game.getActivePlayer();
+        return active == null ? fallback : active;
+    }
+
     // @ButtonHandler("initiateASplice_")
     public static void initiateASplice(
             GenericInteractionCreateEvent event,
@@ -471,6 +493,7 @@ public final class ButtonHelperTwilightsFall {
             spliceType = buttonID.split("_")[1];
         }
         game.setStoredValue("spliceType", spliceType);
+        game.setStoredValue("spliceInitiator", startPlayer.getFaction());
         if (!game.getStoredValue("reverseSpliceOrder").isEmpty()) {
             game.removeStoredValue("reverseSpliceOrder");
         } else {
@@ -812,7 +835,10 @@ public final class ButtonHelperTwilightsFall {
     @ButtonHandler("fixMahactColors")
     public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
         for (Player player : game.getRealPlayers()) {
-            String factionColor = player.getFaction().replace("tf", "");
+            String factionColor = player.getFaction().replace("tf", "").replace("tknova", "");
+            if ("white".equalsIgnoreCase(factionColor)) {
+                factionColor = "lgy";
+            }
             if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
                 Player p2 = game.getPlayerFromColorOrFaction(factionColor);
                 if (p2 != null) {
@@ -851,18 +877,18 @@ public final class ButtonHelperTwilightsFall {
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
         } else {
-            String savedSpliceCards = "";
+            StringBuilder savedSpliceCards = new StringBuilder();
             for (String card : game.getStoredValue("savedSpliceCards").split("_")) {
                 if (card.isEmpty() || card.equalsIgnoreCase(cardID)) {
                     continue;
                 }
-                if (savedSpliceCards.isEmpty()) {
-                    savedSpliceCards = card;
+                if (savedSpliceCards.length() == 0) {
+                    savedSpliceCards = new StringBuilder(card);
                 } else {
-                    savedSpliceCards = savedSpliceCards + "_" + card;
+                    savedSpliceCards.append("_").append(card);
                 }
             }
-            game.setStoredValue("savedSpliceCards", savedSpliceCards);
+            game.setStoredValue("savedSpliceCards", savedSpliceCards.toString());
             if (remove) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -989,16 +1015,13 @@ public final class ButtonHelperTwilightsFall {
                     sendPlayerSpliceOptions(game, participants.getFirst());
                 }
             } else {
-                Player activeP = game.getActivePlayer();
-                if (activeP == null) {
-                    activeP = player;
-                }
+                Player activeP = spliceInitiator(game, player);
                 if (game.isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             activeP.getCorrectChannel(), activeP.getRepresentation() + ", the splice is complete.");
                 } else {
-                    List<String> cards = ButtonHelperTwilightsFall.getSpliceCards(game);
-                    List<MessageEmbed> embeds = ButtonHelperTwilightsFall.getSpliceEmbeds(game, type, cards, null);
+                    List<String> cards = getSpliceCards(game);
+                    List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, null);
                     MessageHelper.sendMessageToChannelWithEmbeds(
                             activeP.getCorrectChannel(),
                             activeP.getRepresentation()
@@ -1007,13 +1030,15 @@ public final class ButtonHelperTwilightsFall {
                 }
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                     Player p2 = game.getActivePlayer();
-                    if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
+                    if (p2 != null
+                            && game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
                         EndTurnService.endTurnAndUpdateMap(event, game, p2);
                     }
                     game.setStoredValue("endTurnWhenSpliceEnds", "");
                 }
                 game.removeStoredValue("Reverse Splice");
                 game.removeStoredValue("willParticipateInSplice");
+                game.removeStoredValue("spliceInitiator");
             }
             ButtonHelper.deleteMessage(event);
         }
@@ -1240,7 +1265,7 @@ public final class ButtonHelperTwilightsFall {
     }
 
     public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
-        List<String> cards = getDeckForSplicing(game, type, 100, true);
+        List<String> cards = getDeckForSplicing(game, type, 200, true);
         if (cards.isEmpty()) {
             String messageText = "There are no more cards in the " + type + " deck.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
@@ -1390,7 +1415,7 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String unit : player.getUnitsOwned()) {
-                if (unit.contains("tf_") || (!unit.contains("tf-") && !unit.contains("tk-"))) {
+                if (!Mapper.getUnit(unit).getIsUpgrade()) {
                     continue;
                 }
                 buttons.add(Buttons.red(

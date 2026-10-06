@@ -46,6 +46,7 @@ final class GameOptionButtonHandler {
     @ButtonHandler("disableAidReacts")
     public static void disableAidReact(ButtonInteractionEvent event, Game game) {
         game.setBotFactionReacts(false);
+        game.setBotColorReacts(false);
         game.setBotStratReacts(false);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "Reaction icons have been disabled. Use `/game options` to change this.");
@@ -76,6 +77,18 @@ final class GameOptionButtonHandler {
     public static void showOwnedPNsInPlayerArea_turnOFF(ButtonInteractionEvent event, Game game) {
         game.setShowOwnedPNsInPlayerArea(false);
         event.editButton(GameOptionService.showOwnedPNs_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("injectRulesLinks_turnON")
+    public static void injectRulesLinks_turnON(ButtonInteractionEvent event, Game game) {
+        game.setInjectRulesLinks(true);
+        event.editButton(GameOptionService.rulesLinks_ON).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("injectRulesLinks_turnOFF")
+    public static void injectRulesLinks_turnOFF(ButtonInteractionEvent event, Game game) {
+        game.setInjectRulesLinks(false);
+        event.editButton(GameOptionService.rulesLinks_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("anonDeclare_")

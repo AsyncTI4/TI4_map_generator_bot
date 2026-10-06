@@ -122,12 +122,14 @@ final class FrankenDrazFactionHelper {
         Map<DraftCategory, List<DraftItem>> byCategory =
                 items.stream().collect(Collectors.groupingBy(DraftItem::getItemCategory));
         StringBuilder summary = new StringBuilder();
-        byCategory.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> summary.append("\n> ")
-                .append(entry.getKey())
-                .append(": ")
-                .append(entry.getValue().stream()
-                        .map(DraftItem::getShortDescription)
-                        .collect(Collectors.joining(", "))));
+        byCategory.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> summary.append("\n> ")
+                        .append(entry.getKey())
+                        .append(": ")
+                        .append(entry.getValue().stream()
+                                .map(DraftItem::getShortDescription)
+                                .collect(Collectors.joining(", "))));
         return summary.toString();
     }
 

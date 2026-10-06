@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -37,6 +38,7 @@ import ti4.service.emoji.TI4Emoji;
 
 public class FactionDraftable extends SinglePickDraftable {
 
+    private static final Pattern KELERES_SUFFIX_PATTERN = Pattern.compile("eleres.*$");
     private List<String> draftFactions = new ArrayList<>();
     private String keleresFlavor;
 
@@ -143,7 +145,7 @@ public class FactionDraftable extends SinglePickDraftable {
             String factionName = faction.getFactionName();
             if (factionName.toLowerCase().contains("keleres")) {
                 // Chop off any suffix
-                factionName = factionName.replaceAll("eleres.*$", "eleres");
+                factionName = KELERES_SUFFIX_PATTERN.matcher(factionName).replaceAll("eleres");
             }
             String choiceKey = factionAlias;
             String buttonText = factionName;
@@ -451,7 +453,7 @@ public class FactionDraftable extends SinglePickDraftable {
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, buttons);
     }
 
-    private String getKeleresSummaryString(FactionModel flavorFaction) {
+    private static String getKeleresSummaryString(FactionModel flavorFaction) {
         FactionModel keleres =
                 Mapper.getFaction("keleres" + flavorFaction.getAlias().charAt(0));
 
@@ -481,7 +483,7 @@ public class FactionDraftable extends SinglePickDraftable {
         return String.join("\n", summaryParts);
     }
 
-    private void sendFactionInfo(DraftManager draftManager, String playerUserId, List<String> informFactions) {
+    private static void sendFactionInfo(DraftManager draftManager, String playerUserId, List<String> informFactions) {
         if (informFactions != null && !informFactions.isEmpty()) {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             List<FactionModel> factions = new ArrayList<>();
@@ -492,15 +494,12 @@ public class FactionDraftable extends SinglePickDraftable {
                 }
             }
 
-            boolean first = true;
             List<MessageEmbed> embeds =
                     factions.stream().map(FactionModel::fancyEmbed).toList();
-            for (MessageEmbed e : embeds) {
-                String message = "";
-                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions.";
-                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                first = false;
-            }
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", here is an overview of the factions.",
+                    embeds);
             Game game = player.getGame();
             if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
                 List<MessageEmbed> teEmbeds = new ArrayList<>();
@@ -513,14 +512,11 @@ public class FactionDraftable extends SinglePickDraftable {
                         teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
                     }
                 }
-                first = true;
-                for (MessageEmbed e : teEmbeds) {
-                    String message = "";
-                    if (first)
-                        message = player.getRepresentationUnfogged()
-                                + ", here is an overview of the faction breakthroughs.";
-                    MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                    first = false;
+                if (!teEmbeds.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithEmbeds(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.",
+                            teEmbeds);
                 }
             }
         }

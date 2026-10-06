@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.helpers.FoWHelper;
 
 @Getter
 public class ManagedGame {
@@ -31,6 +32,7 @@ public class ManagedGame {
     private final boolean colorReactMode;
     private final boolean stratReactMode;
     private final boolean fastScFollowMode;
+    private final boolean fogQol01;
     private final boolean injectRules;
     private final long creationDateTime;
     private final long lastModifiedDate;
@@ -57,6 +59,7 @@ public class ManagedGame {
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
         fastScFollowMode = game.isFastSCFollowMode();
+        fogQol01 = FoWHelper.isFogQol01(game);
         injectRules = game.isInjectRulesLinks();
         creationDateTime = game.getCreationDateTime();
         lastModifiedDate = game.getLastModifiedDate();

@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 class SCAddToGame extends GameStateSubcommand {
 
     public SCAddToGame() {
-        super(Constants.ADD_SC_TO_GAME, "Add a Stategy Card # to the game", true, true);
+        super(Constants.ADD_SC_TO_GAME, "Add a Strategy Card # to the game", true, true);
         addOptions(
                 new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to add").setRequired(true));
     }

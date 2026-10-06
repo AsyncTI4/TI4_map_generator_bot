@@ -20,7 +20,8 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -35,15 +36,22 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TileModel;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.UydaiHeroService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
+    public static boolean isFogQol01(Game game) {
+        return game.isFowMode() && game.getFowOption(FOWOption.FOG_QOL_01);
+    }
+
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
             return false;
@@ -191,6 +199,12 @@ public final class FoWHelper {
         String label = fogged
                 ? target.getFactionNameOrColor()
                 : target.getFactionModel().getShortName();
+        if (target.getFaction().contains("franken")
+                && !fogged
+                && target.getDisplayName() != null
+                && !target.getDisplayName().isEmpty()) {
+            label = target.getDisplayName();
+        }
         return styledButton(style, buttonId, label, target.fogSafeEmoji());
     }
 
@@ -341,6 +355,8 @@ public final class FoWHelper {
             tilePositionsToShow.addAll(adjacentTiles);
         }
 
+        addFowVisionTiles(game, player, tilePositionsToShow);
+
         String playerSweep = Mapper.getSweepID(player.getColor());
         for (Tile tile : game.getTileMap().values()) {
             if (tile.hasCC(playerSweep)) {
@@ -374,7 +390,31 @@ public final class FoWHelper {
                 tilePositionsToShow.add(tile.getPosition());
             }
         }
+
+        addFowVisionTiles(game, player, tilePositionsToShow);
         return tilePositionsToShow;
+    }
+
+    /**
+     * Fog-vision tokens/tiles reveal a system independent of unit presence. A tile is added to the
+     * player's visible set if it is an intrinsic fog-vision tile (revealed to everyone) or carries a
+     * fog-vision token whose recipient list ({@link Tile#getFowVisionGrant()}; empty = everyone) includes the
+     * player. Only the tile's own position is added — this grants no adjacency or movement.
+     */
+    private static void addFowVisionTiles(Game game, @NotNull Player player, Set<String> tilePositionsToShow) {
+        for (Tile tile : game.getTileMap().values()) {
+            String pos = tile.getPosition();
+            TileModel model = tile.getTileModel(); // null for unknown tile ids (see Tile.isValid)
+            if (model != null && model.isFowVision()) {
+                tilePositionsToShow.add(pos); // intrinsic vision tile: everyone sees it
+                continue;
+            }
+            if (!tile.hasFowVisionToken()) continue; // token presence is the master gate
+            Set<String> grant = tile.getFowVisionGrant();
+            if (grant.isEmpty() || grant.contains(player.getColor())) {
+                tilePositionsToShow.add(pos);
+            }
+        }
     }
 
     /**
@@ -527,6 +567,7 @@ public final class FoWHelper {
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
         adjacentPositions.addAll(otherAdjacencies);
+        AsgardLegendaryService.addBifrostBridgeAdjacencies(game, player, position, adjacentPositions);
 
         if (player != null
                 && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
@@ -560,6 +601,49 @@ public final class FoWHelper {
             }
         }
 
+        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "ghemina_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "ghemina_monument");
+
+            if (monumentTile != null) {
+                Set<String> matchingStructureSystems = game.getTileMap().values().stream()
+                        .filter(tile -> tile.getUnitHolders().values().stream()
+                                .flatMap(holder -> holder.getUnitKeysForPlayer(player).stream())
+                                .filter(unitKey -> player.getUnitFromUnitKey(unitKey) != null)
+                                .filter(unitKey ->
+                                        player.getUnitFromUnitKey(unitKey).getIsStructure())
+                                .map(UnitKey::unitType)
+                                .distinct()
+                                .anyMatch(unitType -> tile.getUnitHolders().values().stream()
+                                                .mapToInt(holder -> holder.getUnitCount(unitType, player))
+                                                .sum()
+                                        >= 2))
+                        .map(Tile::getPosition)
+                        .collect(Collectors.toSet());
+
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.addAll(matchingStructureSystems);
+                } else if (matchingStructureSystems.contains(position)) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
+
+        if (forDistance && player != null && MonumentsService.isMonumentOnBoard(game, player, "nivyn_monument")) {
+            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "nivyn_monument");
+            Tile woundTile = game.getTileMap().values().stream()
+                    .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains("token_ds_wound.png"))
+                    .findFirst()
+                    .orElse(null);
+
+            if (monumentTile != null && woundTile != null) {
+                if (position.equals(monumentTile.getPosition())) {
+                    adjacentPositions.add(woundTile.getPosition());
+                } else if (position.equals(woundTile.getPosition())) {
+                    adjacentPositions.add(monumentTile.getPosition());
+                }
+            }
+        }
+
         // If player has ghoti commander, is active player and has activated a system
         if (player != null
                 && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
@@ -586,6 +670,17 @@ public final class FoWHelper {
         }
 
         OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
+        if (!toShow) {
+            UydaiHeroService.addAdjacencies(game, player, position, adjacentPositions);
+        }
+
+        if (player != null) {
+            for (String tilePosition : game.getTileMap().keySet()) {
+                if (SarcosaCommanderHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
+                    adjacentPositions.add(tilePosition);
+                }
+            }
+        }
 
         if (includeTile) {
             adjacentPositions.add(position);
@@ -1499,6 +1594,20 @@ public final class FoWHelper {
     public static boolean isGameMaster(String userId, Game game) {
         return game.getPlayersWithGMRole().stream()
                 .anyMatch(player -> player.getUserID().equals(userId));
+    }
+
+    public static boolean canSeeWholeMap(Game game, GenericInteractionCreateEvent event) {
+        if (!game.isFowMode() || game.isHasEnded()) {
+            return true;
+        }
+        return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
+    }
+
+    static boolean isGmRoom(Game game, @Nullable Channel channel) {
+        if (channel instanceof ThreadChannel thread) {
+            channel = thread.getParentChannel();
+        }
+        return channel != null && channel.getName().equalsIgnoreCase(game.getName() + "-gm-room");
     }
 
     private enum Feature {

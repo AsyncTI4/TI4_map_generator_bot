@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -21,8 +23,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -212,6 +216,9 @@ public class ActionCardHelper {
                 if (location != null) {
                     sb.append("\nLOCATION: ").append(location.getRepresentationForButtons());
                 }
+                if (MonumentsBRButtonHandler.hasArmageddonProjectSuperweapon(player.getGame(), player, id)) {
+                    sb.append("\nCopied by Armageddon Project");
+                }
                 sb.append('\n');
             }
 
@@ -385,6 +392,7 @@ public class ActionCardHelper {
                         .append(actionCard.getRepresentationJustText((game)))
                         .append('\n');
                 if (actionCard.getNotes() != null) {
+                    // isTwilightKart is Deprecated. remove entire if-statement once isTwilightKart is removed
                     if (game != null && game.isTwilightKart() && "tf-starflare".equalsIgnoreCase(actionCard.getID())) {
                         continue;
                     }
@@ -819,10 +827,12 @@ public class ActionCardHelper {
         MonumentsButtonHandler.gainKVDTradeGoods(game, player, actionCardTitle);
 
         if (actionCardIsCancelable) {
-            Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
-            if (empy != null
-                    && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
-                    && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+            for (Player empy : game.getRealPlayers()) {
+                if (!empy.hasUnit("empyrean_mech")
+                        || !ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
+                        || ButtonHelper.isLawInPlay(game, "articles_war")) {
+                    continue;
+                }
                 Button empyButton = Buttons.gray(
                         "sabotage_empy_" + actionCardTitle + "_" + player.getFaction(),
                         "Cancel " + actionCardTitle + " With Watcher",
@@ -876,6 +886,11 @@ public class ActionCardHelper {
                 }
             }
         }
+        Consumer<Message> pingPrompt = game.isFowMode()
+                ? sentMessage ->
+                        ActionCardPingButtonHandler.sendPingPrompt(player, sentMessage.getId(), actionCardTitle)
+                : null;
+
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true, game);
         if (!game.isFowMode() && event instanceof ButtonInteractionEvent bEvent) {
             if (bEvent.getChannel().getName().toLowerCase().contains("-vs-")) {
@@ -891,7 +906,8 @@ public class ActionCardHelper {
                         getCombatReplayTrackedEvent(actionCard));
 
         if (actionCardIsSabotageOrShatter) {
-            MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                    mainGameChannel, message, Collections.singletonList(acEmbed), null, pingPrompt);
             if (game.isWildWildGalaxyMode()) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -905,7 +921,8 @@ public class ActionCardHelper {
             String automationID = actionCard.getAutomationID();
 
             if (!actionCardIsCancelable) {
-                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                        mainGameChannel, message, Collections.singletonList(acEmbed), null, pingPrompt);
             } else {
                 if (SabotageService.isSaboAllowed(game, player)) {
                     String cancelName = "Sabotage";
@@ -917,9 +934,17 @@ public class ActionCardHelper {
                             player.factionButtonChecker() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
                             "Pause Timer While Waiting For " + cancelName));
                     MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
-                            mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
+                            mainGameChannel,
+                            message,
+                            game,
+                            player,
+                            Collections.singletonList(acEmbed),
+                            buttons,
+                            true,
+                            pingPrompt);
                 } else {
-                    MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+                    MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                            mainGameChannel, message, Collections.singletonList(acEmbed), null, pingPrompt);
                     StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
                     if (!game.isFowMode()) {
                         boolean instinctTraining = false, watcher = false, triune = false;
@@ -1496,6 +1521,17 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("scorched_earth".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveScorchedEarth", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("fractured_reality".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFracturedReality", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("propaganda_te".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePropagandaTe", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1604,6 +1640,11 @@ public class ActionCardHelper {
 
             if ("refugees".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRefugees", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("concord".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveConcord", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -2613,7 +2654,7 @@ public class ActionCardHelper {
                 player.getRepresentationUnfogged() + ", use buttons to retrieve an action card from the discard pile.");
     }
 
-    public static void pickACardFromDiscardStep1(Game game, Player player, String buttonPrefix, String message) {
+    private static void pickACardFromDiscardStep1(Game game, Player player, String buttonPrefix, String message) {
         pickACardFromDiscardStep1(game, player, buttonPrefix, message, player.getCardsInfoThread());
     }
 

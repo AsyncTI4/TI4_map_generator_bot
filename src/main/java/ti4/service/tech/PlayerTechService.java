@@ -21,16 +21,17 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -92,7 +93,7 @@ public class PlayerTechService {
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
         if (gainedTech) {
-            ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
+            WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
@@ -122,7 +123,7 @@ public class PlayerTechService {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners");
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners", "revenantvanguard");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -289,6 +290,14 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "ththurvialig" -> {
+                ThurvialiTechHandler.resolveRestructuring(game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "ththurvialib" -> {
+                ThurvialiTechHandler.resolveMutualism(game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             case "tharcanumbg" -> {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -469,15 +478,12 @@ public class PlayerTechService {
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
             case "bazephy" -> ZephyrionBountyHandler.offerBountyButtons(game, player);
-            case "tf-mercenarycaptains" -> {
-                TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
-            }
-            case "tf-radiantsigils" -> {
+            case "tf-mercenarycaptains" -> TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
+            case "tf-radiantsigils" ->
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
                                 + " unfortunately at this time I am too lazy to offer an elegant solution to this tech. Use ./add_token token:sigil tile_name: to add the sigil, and /remove_token if you're moving it from somewhere.");
-            }
             case "tf-oracularalgorithms" -> {
                 List<Button> buttons = new ArrayList<>();
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
@@ -638,7 +644,7 @@ public class PlayerTechService {
                     AddUnitService.addUnits(event, game.getMecatolTile(), game, player.getColor(), "inf mr");
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
+                            player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Lazax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, game, player);
                 } else {
                     MessageHelper.sendMessageToChannel(
@@ -673,9 +679,8 @@ public class PlayerTechService {
                         event.getMessageChannel(), "Please choose a planet to explore.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
-            case "betaro" -> { // Resource Optimization
+            case "betaro" -> // Resource Optimization
                 TaFactionTechHandler.resolveResOp(event, game, player);
-            }
             case "tharcanumpmg" -> { // Power Word: Miracle
                 ArcanumPrimordialTechHandler.resolvePowerWordMiracle(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -818,9 +823,8 @@ public class PlayerTechService {
         player.addTech(techID);
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
-        ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         if (isResearch) {
-            ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
+            MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
         }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
@@ -829,7 +833,6 @@ public class PlayerTechService {
         }
         if (techM.isUnitUpgrade()) {
             if (isResearch) {
-                KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
                 UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(techID);
                 if (player.hasPlayablePromissoryInHand("thpnkryxos")
                         && !player.ownsPromissoryNote("thpnkryxos")
@@ -1084,6 +1087,7 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        buttons.addAll(ArcanumUnitHandler.getRuneboundPrerequisiteSkipButtons(game, player, tech, payType));
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
         }

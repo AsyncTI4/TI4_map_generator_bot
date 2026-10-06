@@ -61,7 +61,7 @@ public class HeroDraftItem extends DraftItem {
         if (leader != null) {
             if (game.isTwilightsFallMode()) {
                 return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
-                        + leader.getTFAbilityWindow() + "* " + leader.getTFAbilityText();
+                        + leader.getTFAbilityWindowIfAble() + "* " + leader.getTFAbilityTextIfAble();
             } else {
                 return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
                         + leader.getAbilityWindow() + "* " + leader.getAbilityText();

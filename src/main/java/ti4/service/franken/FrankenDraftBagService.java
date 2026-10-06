@@ -79,6 +79,7 @@ public class FrankenDraftBagService {
             DraftCategory.PN,
             DraftCategory.STARTINGTECH,
             DraftCategory.UNIT,
+            DraftCategory.MONUMENT,
             DraftCategory.MAHACTKING);
 
     public static final List<DraftCategory> TFcomponentCategories = List.of(
@@ -235,7 +236,10 @@ public class FrankenDraftBagService {
                     List<DraftItem> containerItems =
                             items.subList(i, Math.min(i + FACTIONS_PER_CONTAINER, items.size()));
                     Container c = draftBagCategoryContainer(
-                            player, cat, containerItems, " (" + containerNumber + "/" + containerCount + ")");
+                            player,
+                            DraftCategory.FACTION,
+                            containerItems,
+                            " (" + containerNumber + "/" + containerCount + ")");
                     if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
                     Collections.rotate(accents, -1);
                 }
@@ -352,7 +356,7 @@ public class FrankenDraftBagService {
         List<ContainerChildComponent> components = new ArrayList<>();
         components.add(TextDisplay.of(cat.title(game)));
 
-        List<DraftItem> all = player.getDraftHand().getCategory(cat);
+        List<DraftItem> all = player.getDraftHand().getDistinctCategory(cat);
         if (all.isEmpty()) {
             return null;
         } else {
@@ -368,7 +372,7 @@ public class FrankenDraftBagService {
     }
 
     private static List<Button> getApplyButtons(Player player, DraftCategory cat) {
-        List<DraftItem> items = player.getDraftHand().getCategory(cat);
+        List<DraftItem> items = player.getDraftHand().getDistinctCategory(cat);
         List<Button> buttons = new ArrayList<>();
 
         List<String> appliedItems = player.getStoredList("appliedFrankenItems");

@@ -20,7 +20,7 @@ import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
-public class CollaborativeResearchLLButtonHandler {
+class CollaborativeResearchLLButtonHandler {
     private static final String RESOLVE = "resolveCollaborativeResearch";
     private static final String TARGET = "collaborativeResearchTarget_";
     private static final String OWNER_SPEND = "collaborativeResearchOwnerSpend";

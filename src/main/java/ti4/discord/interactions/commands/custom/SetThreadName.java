@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.utility.DiscordThreadUtility;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
@@ -29,9 +30,11 @@ class SetThreadName extends Subcommand {
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
             if (GameManager.isValid(gameName)) {
-                manager.setName(gameName + "-" + name).queue(Consumers.nop(), BotLogger::catchRestError);
+                manager.setName(DiscordThreadUtility.fitThreadName(gameName + "-" + name))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
-                manager.setName(name).queue(Consumers.nop(), BotLogger::catchRestError);
+                manager.setName(DiscordThreadUtility.fitThreadName(name))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Run this command in the thread you are changing");

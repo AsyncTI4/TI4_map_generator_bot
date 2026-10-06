@@ -647,7 +647,11 @@ class GameSaveService {
         writeStrLine(writer, Constants.GENOME_DECK_ID, game.getGenomeSpliceDeckID());
         writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
         writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
+        // isTwilightKart is Deprecated. Once removed, remove this line
         writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
+        writeBoolLine(writer, Constants.TK_DESTROYER_CUP, game.isTkDestroyerCup());
+        writeBoolLine(writer, Constants.TK_NOVA_CUP, game.isTkNovaCup());
+        writeBoolLine(writer, Constants.TF_BR, game.isTfBr());
         writeBoolLine(writer, Constants.TWILIGHT_DS, game.isTwilightDS());
 
         writer.write(Constants.BAG_DRAFT + " "
@@ -984,6 +988,8 @@ class GameSaveService {
 
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
+            writer.write(Constants.STASIS_FIGHTERS + " " + player.getStasisFighters());
+            writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
 
@@ -1264,6 +1270,10 @@ class GameSaveService {
 
         writer.write(TOKENS);
         writer.write(System.lineSeparator());
+        if (!tile.getFowVisionGrant().isEmpty()) {
+            writer.write(FOW_VISION_GRANT + " " + String.join(",", tile.getFowVisionGrant()));
+            writer.write(System.lineSeparator());
+        }
 
         writer.write(ENDTOKENS);
         writer.write(System.lineSeparator());

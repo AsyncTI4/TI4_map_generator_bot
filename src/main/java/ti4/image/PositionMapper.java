@@ -52,7 +52,7 @@ public final class PositionMapper {
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
-        String positionFile = ResourceHelper.getInstance().getPositionFile(fileName);
+        String positionFile = ResourceHelper.getPositionFile(fileName);
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);
@@ -125,7 +125,7 @@ public final class PositionMapper {
             } else if (position.startsWith("frac")) {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 if (fractureYbump == 400) {
-                    y -= (fractureYbump - 300) / 2; // always 50
+                    y -= (400 - 300) / 2; // always 50
                 } else {
                     y += 250;
                 }
@@ -239,11 +239,11 @@ public final class PositionMapper {
     }
 
     public static Point getUnitOffset() {
-        return new ShipPositionModel().getOffset();
+        return ShipPositionModel.getOffset();
     }
 
     public static Point getAllianceUnitOffset() {
-        return new ShipPositionModel().getAllianceOffset();
+        return ShipPositionModel.getAllianceOffset();
     }
 
     private static String getTileSpaceUnitLayout(String tileId) {

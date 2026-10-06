@@ -16,6 +16,9 @@ public class GameOptionService {
         sendFactionReactOptionButtons(channel);
         sendHexBorderOptionButtons(channel);
         sendShowOwnedPNsInPlayerAreaButton(game, channel);
+        if (!game.isFowMode()) {
+            sendRulesLinksButton(game, channel);
+        }
     }
 
     private static void sendFactionReactOptionButtons(MessageChannel channel) {
@@ -55,5 +58,18 @@ public class GameOptionService {
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel, "Show Owned Promissory Notes in Player Area?\n-# Click to toggle.", buttons);
+    }
+
+    public static final Button rulesLinks_ON = Buttons.green("injectRulesLinks_turnOFF", "ON");
+    public static final Button rulesLinks_OFF = Buttons.red("injectRulesLinks_turnON", "OFF");
+
+    private static void sendRulesLinksButton(Game game, MessageChannel channel) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(game.isInjectRulesLinks() ? rulesLinks_ON : rulesLinks_OFF);
+        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                channel,
+                "Link rules terms such as \"tactical action\" and \"production\" in bot messages to their entries on tirules2.com?\n-# Click to toggle.",
+                buttons);
     }
 }

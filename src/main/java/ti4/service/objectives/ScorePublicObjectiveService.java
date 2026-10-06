@@ -25,6 +25,7 @@ import ti4.helpers.StatusHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.fow.FowScoringStatusService;
 import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
@@ -63,6 +64,7 @@ public class ScorePublicObjectiveService {
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", poName);
+            FowScoringStatusService.refresh(game, player);
         }
         if (!scored) {
             MessageHelper.sendMessageToChannel(

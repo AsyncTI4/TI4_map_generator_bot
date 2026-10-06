@@ -18,16 +18,20 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.planet.MidgardLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -47,6 +51,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -178,14 +183,20 @@ public class DestroyUnitService {
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
         }
+        ScrapyardAbilitiesHandler.offerRepurposedParts(event, game, units, combat);
+        ScrapyardBreakthroughHandler.offerCompactorCapture(event, game, units);
         AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
         TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
+        MonumentsDSButtonHandler.resolveKortaliMonument(event, game, units);
+        MonumentsDSButtonHandler.offerKyroReliquaryRelocation(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
+        MidgardLegendaryButtonHandler.offerMusterManheim(event, game, units, combat);
+        TeHelperAbilities.offerStrandedStructureRemoval(event, game, units);
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);
@@ -201,22 +212,23 @@ public class DestroyUnitService {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
-        if (game.isMonumentsMode()
-                && unit.unitKey().unitType() == UnitType.Monument
-                && game.getActiveSystem() != null) {
-            for (Player secretHolder : game.getRealPlayers()) {
-                if (secretHolder == player || !secretHolder.getSecretsUnscored().containsKey("tam")) {
-                    continue;
+        if (game.isMonumentsMode()) {
+            if (unit.unitKey().unitType() == UnitType.Monument && game.getActiveSystem() != null) {
+                for (Player secretHolder : game.getRealPlayers()) {
+                    if (secretHolder == player
+                            || !secretHolder.getSecretsUnscored().containsKey("tam")) {
+                        continue;
+                    }
+                    Button scoreButton = Buttons.green(
+                            secretHolder.factionButtonChecker() + "scoreToppleAMonument",
+                            "Score Topple a Monument",
+                            CardEmojis.SecretObjective);
+                    MessageHelper.sendMessageToChannelWithButton(
+                            secretHolder.getCardsInfoThread(),
+                            secretHolder.getRepresentation() + ", a monument was destroyed during a tactical action. "
+                                    + "If you destroyed another player's monument, you can score _Topple a Monument_.",
+                            scoreButton);
                 }
-                Button scoreButton = Buttons.green(
-                        secretHolder.factionButtonChecker() + "scoreToppleAMonument",
-                        "Score Topple a Monument",
-                        CardEmojis.SecretObjective);
-                MessageHelper.sendMessageToChannelWithButton(
-                        secretHolder.getCardsInfoThread(),
-                        secretHolder.getRepresentation() + ", a monument was destroyed during a tactical action. "
-                                + "If you destroyed another player's monument, you can score _Topple a Monument_.",
-                        scoreButton);
             }
         }
         if (player != null && player.hasAbility("fragmentation")) {
@@ -249,6 +261,7 @@ public class DestroyUnitService {
         }
 
         List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
+        VanguardLeadersHandler.offerCommander(event, game, unit, killers, combat);
 
         switch (unit.unitKey().unitType()) {
             case Infantry -> {
@@ -304,11 +317,6 @@ public class DestroyUnitService {
                 }
                 if (player.hasUnit("veylor_mech")) {
                     VeylorUnitHandler.checkVeylorMech(game);
-                }
-                if (combat && player.hasUnit("ponthous_mech")) {
-                    for (int i = 0; i < totalAmount; i++) {
-                        PonthousUnitHandler.offerDragoonsButton(event, game, player, unit);
-                    }
                 }
                 if (player.hasUnit("tyris_mech")) {
                     TyrisAbilityHandler.offerCCForDestroyedReverb(player);

@@ -425,7 +425,7 @@ public class SliceDraftableSettings extends SettingsMenu {
         return "Unknown Event";
     }
 
-    private boolean isNucleusMode() {
+    public boolean isNucleusMode() {
         return mapGenerationMode.getValue() == MapGenerationMode.Nucleus;
     }
 }

@@ -11,6 +11,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
@@ -52,6 +54,10 @@ public class MiltyRandomSetupService {
 
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
+        game.setStoredValue(
+                Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(
+                        settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.sendTIGLSetupText(game);
         }
@@ -94,6 +100,7 @@ public class MiltyRandomSetupService {
         }
 
         draftManager.init(sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
         draftManager.setMapTemplate(specs.template.getAlias());
         game.setMapTemplateID(specs.template.getAlias());
         MiltyService.initDraftOrder(draftManager, specs.playerIDs, false);
@@ -148,8 +155,9 @@ public class MiltyRandomSetupService {
                                 ? "\n - True Random Galaxy is enabled, so tile slots will roll red/blue independently."
                                 : ""));
         game.clearTileMap();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             // Ignore
         }
@@ -158,26 +166,43 @@ public class MiltyRandomSetupService {
             p.getCardsInfoThread();
         }
 
+        String sliceError = createSlices(event, draftManager, specs, trueRandomGalaxy);
+        if (sliceError == null) {
+            assignRandomPicks(draftManager, specs);
+            presetRandomKeleresFlavorIfNeeded(draftManager, game);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
+            mapChanged |= FinishDraftService.finishDraft(event, draftManager, game);
+            applyRandomGalacticEvents(event, game, randomEventCount);
+            game.updateActivePlayer(null);
+        }
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
+        }
+        return sliceError;
+    }
+
+    private static String createSlices(
+            GenericInteractionCreateEvent event,
+            MiltyDraftManager draftManager,
+            MiltyDraftSpec specs,
+            boolean trueRandomGalaxy) {
         boolean slicesCreated = true;
         if (trueRandomGalaxy) {
             slicesCreated = generateTrueRandomGalaxySlices(draftManager, specs);
         } else if (specs.presetSlices != null) {
             specs.presetSlices.forEach(draftManager::addSlice);
         } else {
-            slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            GenerateSlicesService.Result result = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (result.impossibleReason() != null) {
+                return result.impossibleSettingsMessage(specs.numSlices);
+            }
+            slicesCreated = result.slicesCreated();
         }
         if (!slicesCreated) {
             return "Generating slices was too hard so I gave up.... Please try again.";
         }
-
-        assignRandomPicks(draftManager, specs);
-        presetRandomKeleresFlavorIfNeeded(draftManager, game);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
-        FinishDraftService.finishDraft(event, draftManager, game);
-        applyRandomGalacticEvents(event, game, randomEventCount);
-        game.updateActivePlayer(null);
         return null;
     }
 

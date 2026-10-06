@@ -20,12 +20,14 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -43,6 +45,7 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
@@ -249,6 +252,9 @@ public class StartPhaseService {
 
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";
+            ButtonHelperActionCards.checkForAssigningCrisis(game, player2);
+            ButtonHelperActionCards.checkForAssigningStasis(game, player2);
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, player2);
             if (player2.getPromissoryNotesInPlayArea().contains(id)) {
                 player2.removePromissoryNote(id);
                 Player nomad = game.getPNOwner(id);
@@ -657,6 +663,7 @@ public class StartPhaseService {
         }
 
         for (Player player2 : game.getRealPlayers()) {
+            KairnBreakthroughHandler.refreshRelics(game, player2);
             ArcanumPromissoryHandler.offerScrollOfAscension(game, player2);
             if (player2.getActionCards() != null
                     && player2.getPlayableActionCards().contains("summit")) {
@@ -1011,7 +1018,7 @@ public class StartPhaseService {
                     "This is the moment when you should resolve:\n- _Political Stability_\n- _Ancient Burial Sites_\n";
             boolean crownPresent = false, mawPresent = false, neuraloopPresent = false, oraclePresent = false;
             for (Player p : game.getRealPlayers()) {
-                crownPresent |= p.hasRelic("mawofworlds");
+                crownPresent |= p.hasRelic("emphidia");
                 mawPresent |= p.hasRelic("mawofworlds");
                 neuraloopPresent |= p.hasRelic("neuraloop");
                 oraclePresent |= p.hasLeader("naaluHero");
@@ -1032,7 +1039,7 @@ public class StartPhaseService {
                     Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
-        if (game.isFowMode()) {
+        if (game.isFowMode() && !FoWHelper.isFogQol01(game)) {
             Button draw1AC =
                     Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
             buttons.add(draw1AC);
@@ -1078,6 +1085,7 @@ public class StartPhaseService {
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
         }
+        StatusHelper.sendRemoveBreachButtons(game);
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
@@ -1241,12 +1249,13 @@ public class StartPhaseService {
         game.setStoredValue("willRevolution", "");
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        for (Player player : game.getRealPlayers()) {
+            MonumentsBRButtonHandler.offerArmageddonProject(game, player);
+        }
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "action"));
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);
-            ButtonHelperActionCards.checkForAssigningCrisis(game, p2);
-            ButtonHelperActionCards.checkForAssigningStasis(game, p2);
+
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
             if (game.getStoredValue("Play Naalu PN") != null
                     && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
@@ -1354,7 +1363,7 @@ public class StartPhaseService {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            if (!game.isFowMode()) {
+            if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
 
                 var userSettings = UserSettingsManager.get(p2.getUserID());
                 if (!userSettings.isPrefersPrePassOnSC()) {
@@ -1365,9 +1374,10 @@ public class StartPhaseService {
                         + " Feel free to not do this. **Trade** is never available for this feature due to **Trade** sometimes being mandatory.";
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), preDeclineMsg);
                 for (Integer sc : game.getSCList()) {
-                    if (p2.getSCs().contains(sc)
+                    if (sc <= 0
+                            || p2.getSCs().contains(sc)
                             || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade")
-                            || !scPickedList.contains(sc)) {
+                            || (!game.isFowMode() && !scPickedList.contains(sc))) {
                         continue;
                     }
                     List<Button> scButtons = new ArrayList<>();

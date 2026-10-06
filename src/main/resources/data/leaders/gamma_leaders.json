@@ -6,7 +6,7 @@
         "name": "Dirzuga Ospha",
         "title": "Knowledge Embraced",
         "abilityWindow": "After a player uses PRODUCTION”:",
-        "abilityText": "You may exhaust this card to allow  them to ready a planet they control in that system.",
+        "abilityText": "You may exhaust this card to allow them to ready a planet they control in that system.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -17,8 +17,8 @@
         "name": "Dirzuga Rophal",
         "title": "Flaah Ascendant",
         "abilityWindow": "After you resolve a tactical action during which you gained control of a readied planet:",
-        "abilityText": "You may place a structure on one of those planets.",
-        "unlockCondition": "Have 6 or more captured Infantry on planet cards you control",
+        "abilityText": "you may place a structure on one of those planets.",
+        "unlockCondition": "Have 6 or more captured Infantry on planet cards you control.",
         "source": "gamma"
     },
     {
@@ -28,8 +28,8 @@
         "name": "Letani Miasmiala",
         "title": "The Symphony",
         "abilityName": "Verdant Apotheosis",
-        "abilityWindow": "ACTION:for each of your planets that contain a mech, ready those planets.",
-        "abilityText": "Then, for each of those planets, you may use the production abilities of all units in that system.",
+        "abilityWindow": "ACTION: For each of your planets that contain a mech, ready that planet.",
+        "abilityText": "Then, for each of those planets, you may use the production abilities of all units in that system. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -40,7 +40,7 @@
         "name": "3X0M4",
         "title": "Repository Crawler",
         "abilityWindow": "During the announce retreat step of a combat containing neutral units",
-        "abilityText": "you may exhaust this card and choose a player: That player chooses an empty system or a system containing neutral units for them to retreat into.",
+        "abilityText": "you may exhaust this card and choose a player: that player chooses an empty system or a system containing neutral units for the neutral units to retreat into.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -50,8 +50,8 @@
         "type": "commander",
         "name": "T4X0N",
         "title": "Network Hardening",
-        "abilityWindow": "After a round of ground combat, when 1 of your infantry is destroyed, roll 1 die. ",
-        "abilityText": "If the result is 6 or greater, place the unit on this card. At the start of your next turn, place a fighter in the space area of a system of one of your space docks and no other player's units, removing an infantry from this card for each fighter placed.",
+        "abilityWindow": "When 1 of your infantry is destroyed, roll 1 die",
+        "abilityText": "If the result is 6 or greater, place a control token on this card. At the start of your next turn, place a fighter in the space area of a system of one of your space docks and no other player's ships for each control token on this card, removing them at the start of your turn",
         "unlockCondition": "A player loses a combat involving neutral units",
         "source": "gamma"
     },
@@ -62,8 +62,8 @@
         "name": "K3T4X",
         "title": "Hypernet Infiltrator",
         "abilityName": "Data Harvest Protocols",
-        "abilityWindow": "At the start of your turn, place this card on top of a non-fighter ship unit upgrade technology you own.",
-        "abilityText": "Matching units you control and neutral units gain +1 capacity. When you place this card over a unit upgrade technology, remove any number of neutral units from the board. At the end of that game round, purge this card.",
+        "abilityWindow": "At the start of your turn, choose a non-fighter ship unit upgrade technology you own and place this card on top of that card.",
+        "abilityText": "Matching units you control and matching neutral units gain +1 capacity.\nWhen you place this card over a unit upgrade technology, remove any number of neutral units from the board. At the end of that game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -73,8 +73,8 @@
         "type": "agent",
         "name": "Borbo Cerebro",
         "title": "Figment Merger",
-        "abilityWindow": "After any die is rolled:",
-        "abilityText": "You may exhaust this card and reroll that die.",
+        "abilityWindow": "After any dice is rolled:",
+        "abilityText": "you may exhaust this card and reroll that dice.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -84,9 +84,9 @@
         "type": "commander",
         "name": "Gogol Military",
         "title": "Clade Troop Recruiter",
-        "abilityWindow": "After another player moves ships into the active system:",
-        "abilityText": "You may remove 1 of your destoryers and produce 1 ship in this system as though there are no other player's ships.",
-        "unlockCondition": "Have 5 Hallucination tokens on the board",
+        "abilityWindow": "After another player moves ships into the active system",
+        "abilityText": "you may remove 1 of your destroyers and produce 1 ship in this system as though there are no other players' ships.",
+        "unlockCondition": "Have 5 Hallucination tokens on the board.",
         "source": "gamma"
     },
     {
@@ -97,7 +97,7 @@
         "title": "Until Death do us part",
         "abilityName": "Brainwashing Protocols",
         "abilityWindow": "At any time:",
-        "abilityText": "If this card is not attached, you may attach it to another non-strategy card in a player's play area. That card has no ability text while this card is attached; unit abilities are unaffected. At the begining of the strategy phase, if this card is attached, purge it.",
+        "abilityText": "If this card is not attached, you may attach it to another non-strategy card in a player's play area. That card has no ability text while this card is attached; unit abilities are unaffected.\nAt the beginning of the strategy phase, if this card is attached, purge it.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -108,7 +108,7 @@
         "name": "an Exception",
         "title": "Council Orthocrat",
         "abilityWindow": "After an agenda is revealed, predict an outcome:",
-        "abilityText": "after voting, you may exhaust this card to choose a player who voted for the same outcome as you to draw 1 action card and remove a command token from their faction sheet and return it to their owners reinforcements.",
+        "abilityText": "After voting, you may exhaust this card to choose a player who voted for the same outcome as you to draw 1 action card and remove a command token from their faction sheet and return it to their owners reinforcements.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -118,9 +118,9 @@
         "type": "commander",
         "name": "an Escalation",
         "title": "Righteous Defender",
-        "abilityWindow": "When an outlaw activates a system that contains a planet you control:",
-        "abilityText": "You may choose 1 of your units in that system to gain SPACE CANNON 6 until the end of this turn.",
-        "unlockCondition": "Retreat from a space combat",
+        "abilityWindow": "When an outlaw  activates a system that contains a planet you control",
+        "abilityText": "you may choose 1 of your units in that system to gain SPACE CANNON 6 until the end of this turn.",
+        "unlockCondition": "You have a total of 2 or more command tokens on other player's faction sheets.",
         "source": "gamma"
     },
     {
@@ -131,7 +131,7 @@
         "title": "Gunboat Diplomacy",
         "abilityName": "Commanding Ultimatum",
         "abilityWindow": "After an agenda is revealed, predict an outcome of the agenda",
-        "abilityText": "If the outcome you predicted is not resolved, immediately perform a tactical action without placing or spending a command token. Then, purge this card",
+        "abilityText": " If the outcome you predicted is not resolved, immediately perform a tactical action without placing a command token. When this agenda would be resolved or discarded, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -141,7 +141,7 @@
         "type": "agent",
         "name": "Sister Olon",
         "title": "Field Hospitaler",
-        "abilityWindow": "When a player gains control of a planet: ",
+        "abilityWindow": "When a player gains control of a planet;",
         "abilityText": "ready that planet, then exhaust this card.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
@@ -153,7 +153,7 @@
         "name": "Sister Myrion",
         "title": "Field Medic",
         "abilityWindow": "When you would spend resources to research technology:",
-        "abilityText": "reduce the cost by 1 for each tech speciality planet you control of a diffrent color.",
+        "abilityText": " reduce the cost by 1 for each technology specialty planet you control of a different type",
         "unlockCondition": "Have 3 mechs on the board",
         "source": "gamma"
     },
@@ -165,7 +165,7 @@
         "title": "Esteemed Biologer",
         "abilityName": "Biological Infiltration",
         "abilityWindow": "ACTION: ",
-        "abilityText": "Draw a number of abilities from the Twilight Fall ability deck equal to the number of players. Give 1 to each player, than purge this card ",
+        "abilityText": "Draw a number of abilities from the Twilight Fall ability deck equal to the number of players. Give 1 to each player, then purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -175,8 +175,8 @@
         "type": "agent",
         "name": "Mar Sikra",
         "title": "Strike Contact",
-        "abilityWindow": "At any time, you may exhaust this card",
-        "abilityText": "to allow a player to play the most recently discarded action card as if it were a card in their hand.",
+        "abilityWindow": "You may exhaust this card and choose a player.",
+        "abilityText": "allow the chosen player to play the most recently discarded action card as if it were a card in their hand.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -187,7 +187,7 @@
         "name": "S'Sy'",
         "title": "Coodrinated Raids",
         "abilityWindow": "",
-        "abilityText": "When you destroy another player's structure, draw one action card. You may exchange action cards as part of a transaction.",
+        "abilityText": "You may exchange action cards as part of a transaction. When you destroy another player's structure, draw 1 action card.",
         "unlockCondition": "1 of your mechs is destroyed during ground combat.",
         "source": "gamma"
     },
@@ -199,7 +199,7 @@
         "title": "Popular Instigator",
         "abilityName": "Stochastic Terrorism",
         "abilityWindow": "After you move ships into a system",
-        "abilityText": "destroy all structures belong to other players in this system, and cause each mech belonging to other players in this system to become sustained. Then, purge this card.",
+        "abilityText": "destroy all structures belonging to other players in this system, and cause each mech belonging to other players in this system to become damaged. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -210,7 +210,7 @@
         "name": "Envoy Shak Tai Trakt",
         "title": "Council Orthocrat",
         "abilityWindow": "When an agenda outcome that you voted for is resolved:",
-        "abilityText": "you may exhaust this card and choose a player who voted for an outcome you did not vote for; that player must give you 1 random action card from their hand, if able.",
+        "abilityText": "You may exhaust this card and choose a player who voted for an outcome you did not vote for; that player must give you 1 random action card from their hand, if able.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -220,9 +220,9 @@
         "type": "commander",
         "name": "Overseer Sestra",
         "title": "The Judicial",
-        "abilityWindow": "Whenever one of more of your units uses their PRODUCTION ability",
+        "abilityWindow": "Whenever one or more of your units uses the PRODUCTION:",
         "abilityText": "Apply +1 to the total PRODUCTION value of your units",
-        "unlockCondition": "produce 4 non-fighter ships in a single system using PRODUCTION",
+        "unlockCondition": "Produce 4 non-fighter ships in a single system using PRODUCTION",
         "source": "gamma"
     },
     {
@@ -233,7 +233,7 @@
         "title": "Rector Operative",
         "abilityName": "Convocation Crusade",
         "abilityWindow": "At the end of your tactical action during which you gained control of a planet from another player:",
-        "abilityText": "You may remove your command token from this system; if you do, use that token to perform a tactical action in another system that contains a planet controlled by that player.",
+        "abilityText": "You may remove your command token from this system; if you do, use that token to perform a tactical action in another system that contains a planet controlled by that player.\nThen, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -243,8 +243,8 @@
         "type": "agent",
         "name": "Rumplesilkskin",
         "title": "Golden Weaver",
-        "abilityWindow": "After a player replenishes their commodities",
-        "abilityText": "Exhaust this card to convert those commodities to trade goods, then place 1 of those trade goods on your faction sheet.",
+        "abilityWindow": "After a player activates a system",
+        "abilityText": "Exhaust this card and choose a different player; they may use the PRODUCTION ability of 1 of their units in that system.",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -254,9 +254,9 @@
         "type": "commander",
         "name": "Chessus Audax",
         "title": "Path Threader",
-        "abilityWindow": "At any time:",
-        "abilityText": "You may ignore the movement effects of nebulae.",
-        "unlockCondition": "There are 4 nebulae on the board.",
+        "abilityWindow": "At the beginning of a combat in an anomaly:",
+        "abilityText": "you may place 1 fighter from your reinforcements in the active system.",
+        "unlockCondition": "Win a combat in an anomaly.",
         "source": "gamma"
     },
     {
@@ -266,8 +266,8 @@
         "name": "Tactus Redux",
         "title": "Weavewender",
         "abilityName": "Hyperfold Stitch",
-        "abilityWindow": "At the begining of the invasion step in a system that contains you ships:",
-        "abilityText": "You may purge this card to move or place a weaveway token into that system. Choose an adjacent non-home system other than mecatol Rex that is adjacent to 2 nebula anomalies, if possible. Destroy all units in that system, purge each planet card that corresponds to that system tile and replace it with an available Hyperline tile.",
+        "abilityWindow": "ACTION: choose a non-home system other than Mecatol Rex that is adjacent to two or more systems that contain a nebula or your units.",
+        "abilityText": "Keeping those systems adjacent, replace that system tile with an available hyperlane tile and destroy all units in that system. Purge each planet card that corresponds to that system tile and this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "gamma"
     },
@@ -279,7 +279,7 @@
         "name": "Sindra of Brass Dunes",
         "title": "Embedded Operatives",
         "abilityWindow": "After a player commits 1 or more units to land on a planet:",
-        "abilityText": " You may Exhaust this card to let that player remove 1 of their ground forces from the board and place it on that planet.",
+        "abilityText": " You may exhaust this card to let that player remove 1 of their ground forces from the board and place it on that planet..",
         "unlockCondition": "Always Unlocked",
         "source": "gamma"
     },
@@ -289,8 +289,8 @@
         "type": "commander",
         "name": "Undersecretary Cheliyxx",
         "title": "Keleres Liason",
-        "abilityWindow": "During your first round of each combat:",
-        "abilityText": "apply -1 to your opponent's combat rolls'",
+        "abilityWindow": "During the first Round of combat:",
+        "abilityText": "Apply -1 to your opponent's combat rolls",
         "unlockCondition": "Have 1 face up secret objective in each other player's play area",
         "source": "gamma"
     },
@@ -302,8 +302,76 @@
         "title": "Veteran Soldier",
         "abilityName": "Winnaran Vault Heist",
         "abilityWindow": "ACTION:",
-        "abilityText": "Look at any number of unrevealed Stage II objectives. Gain 1 command token for each of those objctives you didn't look at. Rearrange the unrevealed Stage II objectives in any order you wish.",
+        "abilityText": "Look at any number of unrevealed Stage II objectives. Gain 1 command token for each of those objectives you didn't look at. Rearrange the unrevealed Stage II objectives in any order you wish.\nThen, Purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
       "source": "gamma"
+    },
+    {
+        "id": "companyagent",
+        "faction": "company",
+        "type": "agent",
+        "name": "_AWOL_83_",
+        "title": "Bounty Hunter",
+        "abilityWindow": "When 1 or more of a player's units make a roll for a unit ability",
+        "abilityText": "You may exhaust this card, and choose 1 of those units to roll 2 additional dice.",
+        "unlockCondition": "Always Unlocked",
+        "source": "gamma"
+    },
+    {
+        "id": "companycommander",
+        "faction": "company",
+        "type": "commander",
+        "name": "_ZEN_7_",
+        "title": "Bail Bondsman",
+        "abilityWindow": "After you score an objective",
+        "abilityText": "gain 1 trade good.",
+        "unlockCondition": "Score a secret objective on your faction sheet.",
+        "source": "gamma"
+    },
+    {
+        "id": "companyhero",
+        "faction": "company",
+        "type": "hero",
+        "name": "_ADMIRAL_0_",
+        "title": "Company Admiral",
+        "abilityName": "Open Call",
+        "abilityWindow": "At the start of a space combat that you are participating in",
+        "abilityText": "you may move any number of your ships into the active system from adjacent systems. Your units can move out of systems that contain your command tokens during this movement. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "gamma"
+    },
+    {
+        "id": "industriesagent",
+        "faction": "industries",
+        "type": "agent",
+        "name": "Arjan Gajakosh",
+        "title": "Geographic Developer",
+        "abilityWindow": "After a player gains control of a legendary planet or a planet that has a technology specialty;",
+        "abilityText": "exhaust this card to allow that player to place a PDS from their reinforcements on that planet. If it was another player, replenish your commodities.",
+        "unlockCondition": "Always Unlocked",
+        "source": "gamma"
+    },
+    {
+        "id": "industriescommander",
+        "faction": "industries",
+        "type": "commander",
+        "name": "Sylwia Nowakowska",
+        "title": "Company Treasurer",
+        "abilityWindow": "When an outcome of an agenda you voted for or predicted is resolved",
+        "abilityText": "you may ready a planet you control that contains 1 or more of your structures.",
+        "unlockCondition": "Have units on the gameboard with a combined PRODUCTION value of at least 12.",
+        "source": "gamma"
+    },
+    {
+        "id": "industrieshero",
+        "faction": "industries",
+        "type": "hero",
+        "name": "Elena Hagen",
+        "title": "Industry Director",
+        "abilityName": "Strategic Roadmap",
+        "abilityWindow": "ACTION: Players each ready up to 1 planet they control, and immediately vote on this card as if it were an agenda and you were the speaker.",
+        "abilityText": "For: The Jord player gains 2 technologies. Each other player researches 1 technology.\nAgainst: The Jord player places 1 infantry from their reinforcements on each planet they control that contains a structure. Then, each player readies each planet they control that contains a structure. \nWhen this agenda would be discarded, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "gamma"
     }
 ]

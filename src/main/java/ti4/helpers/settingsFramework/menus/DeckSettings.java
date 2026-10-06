@@ -35,7 +35,7 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
+    private static ChoiceSetting<DeckModel> deckChoice(String id, String defaultDeck, DeckModel.DeckType deckType) {
         List<DeckModel> decks = Mapper.getDecks().values().stream()
                 .filter(deck -> deck.getType() == deckType)
                 .toList();

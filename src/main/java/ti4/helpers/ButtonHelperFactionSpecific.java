@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,9 +35,10 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -103,6 +107,10 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("startIntrigueCard")
     public static void startIntrigueCard(Game game, Player player, ButtonInteractionEvent event) {
+        if (!player.hasAbility("intrigue")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "intrigueCardOn", null);
         if (player.getStrategicCC() < 1 && !player.hasRelicReady("emelpar")) {
             MessageHelper.sendMessageToChannel(
@@ -120,10 +128,18 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("intrigueCardOn")
     public static void intrigueCardOn(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (!player.hasAbility("intrigue")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
 
         String activePlayerFaction = buttonID.split("_")[1];
-        if (!activePlayerFaction.equalsIgnoreCase(player.getFaction())) {
-            Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
+        Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
+        if (p2 == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (p2 != player) {
             List<Button> buttons2 = new ArrayList<>();
             if (game.isFowMode()) {
                 // "Has units on it" is hidden state and cannot narrow the fog list; non-home is a public map
@@ -228,6 +244,10 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("intrigueCardResolve")
     public static void intrigueCardResolve(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (!player.hasAbility("intrigue")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         String activePlayerFaction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
         String card = buttonID.split("_")[2];
@@ -344,6 +364,7 @@ public final class ButtonHelperFactionSpecific {
                         buttons);
             }
         }
+        BlueReverieHelper.checkXinHarmony(game);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -587,6 +608,7 @@ public final class ButtonHelperFactionSpecific {
                         player.getRepresentation() + " has lost the _Thwart_ Dishonor card.");
             }
         }
+        MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
         if (player.getDishonorCounter() > 4) {
             if (!player.hasAbility("deceive")) {
                 player.addAbility("deceive");
@@ -627,6 +649,84 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
+        if (!hasUnlockedToldarBreakthrough(player)) {
+            return;
+        }
+
+        if (player.getDishonorCounter() > player.getHonorCounter()) {
+            if (player.hasBreakthrough("toldarbt")) {
+                flipToldarBreakthrough(player, "toldarbt", "toldarbtdishonor");
+            }
+            if (player.hasBreakthrough("toldarbthonor")) {
+                flipToldarBreakthrough(player, "toldarbthonor", "toldarbtdishonor");
+            }
+        }
+
+        if (player.getHonorCounter() > player.getDishonorCounter()) {
+            if (player.hasBreakthrough("toldarbt")) {
+                flipToldarBreakthrough(player, "toldarbt", "toldarbthonor");
+            }
+            if (player.hasBreakthrough("toldarbtdishonor")) {
+                flipToldarBreakthrough(player, "toldarbtdishonor", "toldarbthonor");
+            }
+        }
+    }
+
+    private static boolean hasUnlockedToldarBreakthrough(Player player) {
+        return player.isBreakthroughUnlocked("toldarbt")
+                || player.isBreakthroughUnlocked("toldarbthonor")
+                || player.isBreakthroughUnlocked("toldarbtdishonor");
+    }
+
+    private static void flipToldarBreakthrough(Player player, String currentBreakthrough, String nextBreakthrough) {
+        if (!player.changeBreakthrough(currentBreakthrough, nextBreakthrough)) {
+            return;
+        }
+        String side = "toldarbthonor".equals(nextBreakthrough) ? "Honor" : "Dishonor";
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " flipped _Shameix's Bane_ to its " + side + " side.",
+                Mapper.getBreakthrough(nextBreakthrough).getRepresentationEmbed());
+    }
+
+    public static void offerToldarBtSideChoice(Player player) {
+        if (!player.hasBreakthrough("toldarbt")
+                || !player.isBreakthroughUnlocked("toldarbt")
+                || player.getHonorCounter() != player.getDishonorCounter()) {
+            return;
+        }
+
+        List<Button> buttons = List.of(
+                Buttons.green(player.factionButtonChecker() + "chooseToldarBtSide_honor", "Use Honor Side"),
+                Buttons.red(player.factionButtonChecker() + "chooseToldarBtSide_dishonor", "Use Dishonor Side"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the starting side of _Shameix's Bane_.",
+                buttons);
+    }
+
+    @ButtonHandler("chooseToldarBtSide_")
+    public static void chooseToldarBtSide(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        if (!player.hasBreakthrough("toldarbt")
+                || !player.isBreakthroughUnlocked("toldarbt")
+                || player.getHonorCounter() != player.getDishonorCounter()) {
+            ButtonHelper.deleteMessage(event);
+            correctHonorAbilities(player, game);
+            return;
+        }
+
+        String side = buttonID.substring("chooseToldarBtSide_".length());
+        String selectedBreakthrough = "honor".equalsIgnoreCase(side) ? "toldarbthonor" : "toldarbtdishonor";
+
+        if (player.changeBreakthrough("toldarbt", selectedBreakthrough)) {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " chose the " + side + " side of _Shameix's Bane_.",
+                    Mapper.getBreakthrough(selectedBreakthrough).getRepresentationEmbed());
+        }
+
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("sardakkbtRes")
@@ -1102,7 +1202,11 @@ public final class ButtonHelperFactionSpecific {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Construction**");
             }
             String message = ButtonHelperSCs.deductCC(game, player, scNum);
-            ReactionService.addReaction(event, game, player, message);
+            if (game.isFowMode()) {
+                ButtonHelperSCs.reactToStrategyCardMessage(game, player, scNum, message);
+            } else {
+                ReactionService.addReaction(event, game, player, message);
+            }
         }
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
@@ -1611,7 +1715,7 @@ public final class ButtonHelperFactionSpecific {
         int hitRolls = DiceHelper.countSuccesses(resultRolls);
         totalHits += hitRolls;
         String unitRoll = CombatMessageHelper.displayUnitRoll(
-                player.getUnitByID("belkosea_flagship"),
+                Player.getUnitByID("belkosea_flagship"),
                 toHit,
                 modifierToHit,
                 1,
@@ -1918,7 +2022,7 @@ public final class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     player2.getCorrectChannel(),
                     player2.getFactionEmoji()
-                            + " gained 3 consolation trade goods from having their strategy card stolen via _Quantumn Datahub Node_ "
+                            + " gained 3 consolation trade goods from having their strategy card stolen via _Quantum Datahub Node_ "
                             + player2.gainTG(3, true) + ".");
         }
 
@@ -2052,7 +2156,7 @@ public final class ButtonHelperFactionSpecific {
         goAgainButtons.add(done);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message2);
-        if (game.isFowMode() || !game.isNewTransactionMethod()) {
+        if (!TransactionHelper.useNewTransactionModel(game)) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         hacan.getPrivateChannel(),
@@ -2628,11 +2732,20 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter) {
+        return gainOrConvertCommButtons(player, deleteAfter, null);
+    }
+
+    public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         String ffcc = player.factionButtonChecker();
         if (deleteAfter) {
-            buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
-            buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 Commodity", MiscEmojis.comm));
+            String extra = "";
+            if (tile != null) {
+                extra = "_" + tile.getPosition();
+            }
+            buttons.add(Buttons.green(
+                    ffcc + "convertComms_1" + extra, "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1" + extra, "Gain 1 Commodity", MiscEmojis.comm));
         } else {
             buttons.add(
                     Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
@@ -3101,9 +3214,9 @@ public final class ButtonHelperFactionSpecific {
 
     public static void resolveKolleccAbilities(Player player, Game game) {
         if (player.hasAbility("treasure_hunters") && game.isTwilightDS()) {
-            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "industrial");
-            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "hazardous");
-            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "cultural");
+            resolveExpLook(player, game, null, "industrial");
+            resolveExpLook(player, game, null, "hazardous");
+            resolveExpLook(player, game, null, "cultural");
         }
         if (player.hasAbility("treasure_hunters") && !game.isTwilightDS()) {
             // resolve treasure hunters

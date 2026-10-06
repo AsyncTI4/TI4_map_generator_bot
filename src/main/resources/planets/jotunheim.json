@@ -1,0 +1,30 @@
+{
+    "planetLayout":  {
+        "unitHolderName":  "jotunheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  {
+            "x":  171,
+            "y":  154
+        },
+        "planetRadius":  94
+    },
+    "id":  "jotunheim",
+    "tileId":  "ao7",
+    "name":  "Jotunheim",
+    "aliases":  [
+        "jotunheim"
+    ],
+    "resources":  2,
+    "influence":  1,
+    "planetTypes":  [
+        "HAZARDOUS"
+    ],
+    "techSpecialties":  [
+        "WARFARE"
+    ],
+    "legendaryAbilityName":  "Hrungnir's Husk",
+    "legendaryAbilityText":  "You may exhaust this card after you activate a system, During the \"Movement\" step of this tactical action, other players cannot use SPACE CANNON against your ships.",
+    "legendaryAbilityFlavourText":  "Rock and rubble gives them trouble.",
+    "flavourText":  "A rocky desert planet, once mined for a special ore. Now the debris ridden land is almost useless. Almost.",
+    "source":  "goose"
+}

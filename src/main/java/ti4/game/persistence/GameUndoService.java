@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -21,7 +22,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
-import ti4.spring.websocket.WebSocketNotifier;
+import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
 class GameUndoService {
@@ -105,13 +106,9 @@ class GameUndoService {
                 replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
                 return null;
             }
-            WebSocketNotifier.notifyGameStateChange(loadedGame);
+            GameWebStatePipeline.queue(loadedGame);
 
-            if (savedButtonsGame != null) {
-                generateSavedButtons(savedButtonsGame);
-            } else {
-                generateSavedButtons(gameToUndo);
-            }
+            generateSavedButtons(Objects.requireNonNullElse(savedButtonsGame, gameToUndo));
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
 
@@ -212,7 +209,7 @@ class GameUndoService {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
             Game loadedGame = GameLoadService.load(gameName);
             if (loadedGame != null) {
-                WebSocketNotifier.notifyGameStateChange(loadedGame);
+                GameWebStatePipeline.queue(loadedGame);
             }
             return loadedGame;
         } catch (IOException e) {

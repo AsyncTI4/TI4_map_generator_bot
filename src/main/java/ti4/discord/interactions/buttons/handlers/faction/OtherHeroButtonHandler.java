@@ -16,7 +16,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -24,6 +23,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.PurgeHeroService;
+import ti4.service.leader.UydaiHeroService;
+import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -47,12 +48,7 @@ class OtherHeroButtonHandler {
 
     @ButtonHandler("purgeAtokeraHero")
     public static void purgeAtokeraHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        PurgeHeroService.purgeHeroPreamble(event, player, game, "atokerahero", "Kapoko Vui, the Atokera hero");
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", unfortunately at this time the addition of ships to the ground is not automated."
-                        + " `/move units` can place them on the planet however, and they will roll dice as normal once there.");
+        AtokeraHeroButton.useHero(event, game, player);
     }
 
     @ButtonHandler("utilizePharadnHero_")
@@ -125,22 +121,14 @@ class OtherHeroButtonHandler {
     @ButtonHandler("purgeVaylerianHero")
     public static void purgeVaylerianHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         PurgeHeroService.purgeHeroPreamble(event, player, game, "vaylerianhero", "Dyln Harthuul, the Vaylerian hero");
-        if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-            player.setTacticalCC(player.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
-            game.setStoredValue("vaylerianHeroActive", "true");
+        game.setStoredValue("vaylerianHeroActive", "true");
+
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), "Use buttons to remove a command token from the game board.", buttons);
         }
-        List<Tile> gloryTiles = ButtonHelperAgents.getGloryTokenTiles(game);
-        for (int i = 0; i < gloryTiles.size(); i++) {
-            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
-            if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        "Use buttons to remove a command token from the game board.",
-                        buttons);
-            }
-        }
-        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+        buttons = ButtonHelper.getGainCCButtons(player);
         String message2 =
                 player.getRepresentationUnfogged() + ", you may gain 1 command token. Your current command tokens are "
                         + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
@@ -149,8 +137,8 @@ class OtherHeroButtonHandler {
     }
 
     @ButtonHandler("purgeUydaiHero")
-    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        PurgeHeroService.purgeHeroPreamble(event, player, game, "uydaihero", "Londor II, the Uydai hero");
+    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) {
+        UydaiHeroService.purgeHero(event, player, game);
     }
 
     @ButtonHandler("purgeKortaliHero_")

@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
@@ -54,10 +55,26 @@ public class FOWOptionService {
                 FOWOptionCategory.GAME,
                 "Allow comms in agenda",
                 "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
+        ANONYMOUS_COMMS(
+                FOWOptionCategory.GAME,
+                "Anonymous comms",
+                "Bot-relayed comms that hide who plays which color; replaces Managed comms"),
         STATUS_SUMMARY(
                 FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
+        NEW_TRANSACTIONS(
+                FOWOptionCategory.GAME,
+                "New transactions",
+                "Use the offer/accept transaction model instead of the legacy direct-send flow"),
+        FOG_QOL_01(
+                FOWOptionCategory.GAME,
+                "Fog QoL 01",
+                "Fog quality-of-life helpers: pre-decline strategy cards, auto status action cards, private reminders, GM waiting-on info"),
+        GM_TURN_MAP(
+                FOWOptionCategory.GAME,
+                "GM turn map",
+                "Post the unfogged map to the GM activity log at the end of every turn"),
 
         // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
@@ -70,6 +87,14 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",
                 "Action card discard pile shows only cards that were played"),
+        CLASSIC_MAP_LAYOUT(
+                FOWOptionCategory.VISIBILITY,
+                "Classic map layout",
+                "Show the full classic map instead of framing it to what each player knows; map sectors are ignored"),
+        FRACTURE_SEPARATE_MAP(
+                FOWOptionCategory.VISIBILITY,
+                "Separate Fracture map",
+                "Show the Fracture as its own map segment instead of below the galaxy"),
 
         // Precise Player Stats Options
         STATS_FROM_HS_ONLY(
@@ -204,6 +229,13 @@ public class FOWOptionService {
                                     "Enable " + option.getTitle()));
         }
 
+        if (selectedCategory == FOWOptionCategory.GAME) {
+            optionButtons.add(Buttons.blue("gmQolSettings~MDL", "Fog QoL 01 settings..."));
+            if (game.getFowOption(FOWOption.ANONYMOUS_COMMS)) {
+                optionButtons.add(Buttons.blue(AnonymousCommsService.SETTINGS_BUTTON, "Anonymous comms settings..."));
+            }
+        }
+
         // An ActionRow holds at most 5 buttons, and the message at most 5 rows - one of which is the category row.
         for (int i = 0; i < optionButtons.size(); i += BUTTONS_PER_ROW) {
             rows.add(ActionRow.of(optionButtons.subList(i, Math.min(i + BUTTONS_PER_ROW, optionButtons.size()))));
@@ -248,6 +280,15 @@ public class FOWOptionService {
         } else {
             game.setFowOption(option, value);
         }
+        if (value) disableConflictingCommsOption(game, option);
+    }
+
+    private static void disableConflictingCommsOption(Game game, FOWOption enabled) {
+        if (enabled == FOWOption.ANONYMOUS_COMMS) {
+            game.setFowOption(FOWOption.MANAGED_COMMS, false);
+            AnonymousCommsService.offerManagedThreadCleanup(game);
+        }
+        if (enabled == FOWOption.MANAGED_COMMS) game.setFowOption(FOWOption.ANONYMOUS_COMMS, false);
     }
 
     @ButtonHandler("fowOptionCategory_")

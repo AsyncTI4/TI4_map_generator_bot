@@ -20,7 +20,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
-public class DeconstructedMilitiaLLButtonHandler {
+class DeconstructedMilitiaLLButtonHandler {
     private static final String RESOLVE = "resolveDeconstructedMilitia";
     private static final String REMOVE = "removeDeconstructedMilitia_";
 

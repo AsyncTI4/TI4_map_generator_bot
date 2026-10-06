@@ -123,6 +123,8 @@ public class Mapper {
     private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
+    // ids + image paths of tokens flagged isFowVision; precomputed so per-tile fog checks avoid getTokenKey's scan
+    private static final Set<String> fowVisionTokenIds = new HashSet<>();
     private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
     @Getter
@@ -176,6 +178,7 @@ public class Mapper {
         importJsonObjectsFromFolder("galactic_events", galacticevents, GalacticEventModel.class);
 
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
+        indexFowVisionTokens();
         importJsonObjectsFromFolder("tokens", spaceTokens, SpaceTokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
@@ -191,7 +194,7 @@ public class Mapper {
 
     private static void readData(String propertyFileName, Properties properties) throws IOException {
         properties.clear();
-        String propFile = ResourceHelper.getInstance().getDataFile(propertyFileName);
+        String propFile = ResourceHelper.getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
@@ -204,7 +207,7 @@ public class Mapper {
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(
             String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
-        String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
+        String folderPath = ResourceHelper.getDataFolder(jsonFolderName);
         // Added to prevent duplicates when running Mapper.init() over and over with ModelTest classes
         objectMap.clear();
 
@@ -254,7 +257,7 @@ public class Mapper {
     private static <T extends ModelInterface> void importJsonObjects(
             String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         List<T> allObjects = new ArrayList<>();
-        String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
+        String filePath = ResourceHelper.getDataFile(jsonFileName);
         JavaType type = jsonMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
 
         if (filePath != null) {
@@ -1256,6 +1259,20 @@ public class Mapper {
         return tokens.get(getTokenKey(id));
     }
 
+    private static void indexFowVisionTokens() {
+        fowVisionTokenIds.clear();
+        for (TokenModel token : tokens.values()) {
+            if (!Boolean.TRUE.equals(token.getIsFowVision())) continue;
+            fowVisionTokenIds.add(token.getId());
+            if (token.getImagePath() != null) fowVisionTokenIds.add(token.getImagePath());
+        }
+    }
+
+    /** True if the id or image path belongs to a token flagged {@code isFowVision}. */
+    public static boolean isFowVisionToken(String tokenId) {
+        return tokenId != null && fowVisionTokenIds.contains(tokenId);
+    }
+
     public static boolean isValidToken(String id) {
         return getTokensFromProperties().contains(id);
     }
@@ -1525,8 +1542,7 @@ public class Mapper {
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
-        WormholeModel wormholeModel = new WormholeModel();
-        WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        WormholeModel.Wormhole wormhole = WormholeModel.getWormholeFromString(wormholeID);
         if (wormhole == null) {
             return new HashSet<>();
         }

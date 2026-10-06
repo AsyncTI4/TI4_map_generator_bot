@@ -1,6 +1,5 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +20,7 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.UserGameInfoService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingGameInfo;
 import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 @UtilityClass
@@ -29,7 +29,7 @@ class PlayerMatchmakingDataFactory {
     private static final List<String> ROLES_TO_TRACK =
             List.of(MatchmakingOptions.FLOATERS_ROLE_NAME, MatchmakingOptions.WARRIORS_ROLE_NAME);
     private static final Rating DEFAULT_NEW_PLAYER_RATING =
-            GameInfo.getDefaultGameInfo().getDefaultRating();
+            MatchmakingGameInfo.create().getDefaultRating();
 
     static Map<MatchmakingQueueMember, PlayerMatchmakingData> buildForParties(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()

@@ -29,7 +29,7 @@ class CombatReplaySideBetServiceTest {
         assertTrue(realAvailabilityService.isAfbSkippedAvailable(candidate, "yin"));
     }
 
-    private CombatCandidateEntity candidate(
+    private static CombatCandidateEntity candidate(
             int attackerDestroyers,
             int defenderDestroyers,
             boolean attackerHasAssaultCannon,

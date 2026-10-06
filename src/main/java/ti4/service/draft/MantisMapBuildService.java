@@ -327,10 +327,10 @@ public class MantisMapBuildService {
                 }
             }
             game.setShowMapSetup(false);
-            // Update the main game map
-            ButtonHelper.updateMap(mapBuildContext.game(), event, "Mantis Map Build Completed");
             // Do any post-build work
             mapBuildContext.buildCompleteCallback().accept(event);
+            // Update the main game map
+            ButtonHelper.updateMap(mapBuildContext.game(), event, "Mantis Map Build Completed");
             return;
         }
 

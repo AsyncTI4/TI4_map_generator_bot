@@ -7,8 +7,10 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -29,10 +31,25 @@ public final class CommandCounterHelper {
     }
 
     public static void addCC(GenericInteractionCreateEvent event, Player player, Tile tile) {
-        addCC(event, player, tile, true);
+        addCC(event, player, tile, true, false);
     }
 
     public static void addCC(GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping) {
+        addCC(event, player, tile, ping, false);
+    }
+
+    public static void addCC(
+            GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping, boolean useTactic) {
+        addCC(event, player, tile, ping, useTactic, false);
+    }
+
+    public static void addCC(
+            GenericInteractionCreateEvent event,
+            Player player,
+            Tile tile,
+            boolean ping,
+            boolean useTactic,
+            boolean skipKeleresMonumentPrompt) {
         if (player == null || !Mapper.isValidColor(player.getColor())) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -44,7 +61,22 @@ public final class CommandCounterHelper {
             return;
         }
         String ccID = Mapper.getCCID(player.getColor());
-        String ccPath = tile.getCCPath(ccID);
+        if (tile.hasCC(ccID)) {
+            return;
+        }
+        if (!skipKeleresMonumentPrompt
+                && MonumentsTEButtonHandler.offerKeleresMonumentTokenReplacement(
+                        event, player, tile, ping, useTactic)) {
+            return;
+        }
+        if (!skipKeleresMonumentPrompt
+                && RevenantLeadersHandler.offerRevVerydithAgentPrompt(event, player, tile, ping, useTactic)) {
+            return;
+        }
+        if (useTactic) {
+            player.setTacticalCC(player.getTacticalCC() - 1);
+        }
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null) {
             if (event != null) {
                 MessageHelper.sendMessageToChannel(
@@ -94,11 +126,12 @@ public final class CommandCounterHelper {
                 TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
             }
         }
+        RevenantLeadersHandler.offerRevArdentiaAgentButtons(player.getGame(), player, tile);
     }
 
     public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
-        String ccPath = tile.getCCPath(ccID);
+        String ccPath = Tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");

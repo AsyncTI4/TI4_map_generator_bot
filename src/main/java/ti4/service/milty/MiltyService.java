@@ -66,6 +66,10 @@ public class MiltyService {
         // Load the general game settings
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
+        game.setStoredValue(
+                Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
+                Boolean.toString(
+                        settings.getSourceSettings().getEchoesOfYggdrasil().isVal()));
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.sendTIGLSetupText(game);
         }
@@ -97,6 +101,7 @@ public class MiltyService {
         }
 
         draftManager.init(sources);
+        EchoesOfYggdrasilService.addTiles(game, draftManager);
         draftManager.setMapTemplate(specs.template.getAlias());
         game.setMapTemplateID(specs.template.getAlias());
         List<String> players = new ArrayList<>(specs.playerIDs);
@@ -175,8 +180,9 @@ public class MiltyService {
         }
 
         game.clearTileMap();
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             // Ignore
         }
@@ -192,8 +198,11 @@ public class MiltyService {
             MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), startMsg);
-            boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
-            if (!slicesCreated) {
+            GenerateSlicesService.Result result = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (result.impossibleReason() != null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), result.impossibleSettingsMessage(specs.numSlices));
+            } else if (!result.slicesCreated()) {
                 String msg = "Generating slices was too hard so I gave up.... Please try again.";
                 if (specs.numSlices == maxSlices) {
                     msg += "\n*...and maybe consider asking for fewer slices*";
@@ -222,6 +231,9 @@ public class MiltyService {
                     }
                 }
             }
+        }
+        if (mapChanged) {
+            ButtonHelper.updateMap(game, event);
         }
         return null;
     }

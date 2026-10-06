@@ -10,6 +10,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.BlueReverieHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -261,8 +262,11 @@ public class CommanderUnlockCheckService {
 
             // BR
             case "atokera", "belkosea", "pharadn", "qhet", "toldar", "uydai", "kaltrim" -> shouldBeUnlocked = true;
+            case "sarcosa" ->
+                shouldBeUnlocked = game.getPlanetsPlayerIsCoexistingOn(player).size() >= 2;
+            case "xin" -> shouldBeUnlocked = BlueReverieHelper.hasXinCommanderUnlock(player, game);
 
-            // Balacasi
+            // Whispers from the Void
             case "arvaxi", "kalora" -> shouldBeUnlocked = true;
             case "lunarium" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier", false) >= 4);
@@ -338,11 +342,16 @@ public class CommanderUnlockCheckService {
                     "xytheris",
                     "oblivion",
                     "revenant",
-                    "revenantmyrr",
-                    "revenantoblivion",
                     "revenantponthous",
+                    "revenantoblivion",
+                    "revenantxytheris",
+                    "revenantvanguard",
+                    "revenantveylor",
                     "thrones",
-                    "ponthous" ->
+                    "ponthous",
+                    "scrapyard",
+                    "morpha",
+                    "thurviali" ->
                 shouldBeUnlocked =
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
         }

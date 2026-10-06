@@ -21,7 +21,6 @@ public enum GameStatTypes {
     WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
     ENDING_ROUND_PHASE("End round and phase", "Shows how many games ended by round and phase"),
     PHASE_TIMES("Phase Times", "Shows how long each phase lasted, in days"),
-    SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred holding a Support for the Throne"),
     SECRET_OBJECTIVE_WIN_CHANCE("Secret objective win chance", "Shows win chance for secrets"),
     GAME_MODE_COUNT("Game count by mode", "Shows game counts and percentages for each game mode"),
     AVERAGE_MMR("Average MMR", "Show the average matchmaking rating of each game's players"),

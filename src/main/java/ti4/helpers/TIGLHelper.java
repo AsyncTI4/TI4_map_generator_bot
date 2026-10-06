@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -78,6 +79,8 @@ public final class TIGLHelper {
         HERO_XXCHA("TIGL - Xxekir Grom", -1), //
         HERO_YIN("TIGL - Dannel of the Tenth", -1), //
         HERO_YSSARIL("TIGL - Kyver, Blade and Key", -1);
+
+        private static final Pattern NON_ALPHANUMERIC_PATTERN = Pattern.compile("[^a-z0-9]");
 
         @Getter
         private final String name;
@@ -161,7 +164,7 @@ public final class TIGLHelper {
         }
 
         private static String normalizeRankId(String id) {
-            return id.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+            return NON_ALPHANUMERIC_PATTERN.matcher(id.toLowerCase(Locale.ROOT)).replaceAll("");
         }
     }
 

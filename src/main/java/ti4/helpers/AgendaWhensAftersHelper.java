@@ -13,6 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -71,8 +72,8 @@ public final class AgendaWhensAftersHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
-            List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
-            List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
+            List<String> whens = getPossibleWhenNames(player);
+            List<String> afters = getPossibleAfterNames(player);
             if (!game.getStoredValue("executiveOrder").isEmpty() && whens.isEmpty() && afters.isEmpty()) {
                 game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
             }
@@ -1233,7 +1234,12 @@ public final class AgendaWhensAftersHelper {
         ReactionService.addReaction(event, game, player, message);
     }
 
-    public static void playWhen(
+    @ButtonHandler("play_when")
+    public static void playWhen(ButtonContext context) {
+        playWhen(context.getEvent(), context.getGame(), context.getPlayer(), context.getMainGameChannel());
+    }
+
+    private static void playWhen(
             ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
         ReactionCheckService.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "is playing a \"when\".");

@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,10 +18,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.PillageButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -45,6 +51,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
@@ -73,7 +80,7 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("drawHeistObj_")
     public static void drawHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Integer type = Integer.parseInt(buttonID.split("_")[1]);
+        int type = Integer.parseInt(buttonID.split("_")[1]);
         game.drawSecretObjective(player.getUserID(), type);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -389,7 +396,7 @@ public final class ButtonHelperAbilities {
         return buttons;
     }
 
-    public static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
+    private static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             boolean empty = true;
@@ -880,6 +887,13 @@ public final class ButtonHelperAbilities {
         if ("no".equalsIgnoreCase(buttonID.split("_")[2])) {
             removeOmenDie(game, die);
         }
+        if (game.isMonumentsMode() && MonumentsService.isMonumentOnBoard(game, player, "mykomentori_monument")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " may produce 1 fighter in the _Gravelord's Keep_ system without spending resources.",
+                    MonumentsDSButtonHandler.getGravelordProduceFighterButton(game, player));
+        }
         String msg = player.getRepresentationUnfogged() + " used an **Omen** die with the number " + die + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -898,27 +912,27 @@ public final class ButtonHelperAbilities {
                 myko.getCorrectChannel(), msg.append(".").toString());
     }
 
-    @ButtonHandler("pillage_")
+    @ButtonHandler(PillageButtonIds.PREFIX)
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("pillage_", "");
-        String colorPlayer = buttonID.split("_")[0];
-        String checkedStatus = buttonID.split("_")[1];
-        Player pillaged = game.getPlayerFromColorOrFaction(colorPlayer);
+        PillageButtonIds.Parsed pillage = PillageButtonIds.parse(buttonID);
+        Player pillaged = game.getPlayerFromColorOrFaction(pillage.targetColor());
         if (pillaged == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Could not find player, please resolve manually.");
             return;
         }
-        if (checkedStatus.contains("unchecked")) {
+        if (pillage.stage() == PillageButtonIds.Stage.UNCHECKED) {
             List<Button> buttons = new ArrayList<>();
             String message2 =
                     "Please confirm this is a valid **Pillage** opportunity and that you wish to **Pillage**.";
             buttons.add(Buttons.red(
-                    player.factionButtonChecker() + "pillage_" + pillaged.getColor() + "_checked",
+                    player.factionButtonChecker()
+                            + PillageButtonIds.format(pillaged.getColor(), PillageButtonIds.Stage.TRADE_GOOD),
                     "Pillage 1 Trade Good"));
             if (pillaged.getCommodities() > 0) {
                 buttons.add(Buttons.red(
-                        player.factionButtonChecker() + "pillage_" + pillaged.getColor() + "_checkedcomm",
+                        player.factionButtonChecker()
+                                + PillageButtonIds.format(pillaged.getColor(), PillageButtonIds.Stage.COMMODITY),
                         "Pillage 1 Commodity"));
             }
             buttons.add(Buttons.green(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
@@ -958,7 +972,7 @@ public final class ButtonHelperAbilities {
 
             String pillagedMessage =
                     "Arrr, " + pillaged.getRepresentationUnfogged() + ", it do seem ye have been **Pillage**'d ";
-            if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
+            if (pillaged.getCommodities() > 0 && pillage.stage() == PillageButtonIds.Stage.COMMODITY) {
                 pillagedMessage += ", so your worthless commodities went from " + pillaged.getCommodities() + " to "
                         + (pillaged.getCommodities() - 1) + ".";
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
@@ -1097,8 +1111,9 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("addTombToken_")
     public static void addTombToken(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        var tombSpec =
-                PlanetTargetSpec.of("addTombToken").where(p -> !p.getTokenList().contains("token_tomb.png"));
+        var tombSpec = PlanetTargetSpec.of("addTombToken")
+                .where(p -> !p.getTokenList().contains("token_tomb.png"))
+                .withPageNavPrefix("addTombToken_");
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, tombSpec)) return;
         String planet = buttonID.split("_")[1];
         String message = player.getFactionEmoji() + " added a Tomb token to "
@@ -1154,7 +1169,8 @@ public final class ButtonHelperAbilities {
                     game,
                     player,
                     PlanetTargetSpec.of("addTombToken")
-                            .where(p -> !p.getTokenList().contains("token_tomb.png")),
+                            .where(p -> !p.getTokenList().contains("token_tomb.png"))
+                            .withPageNavPrefix("addTombToken_"),
                     buttons);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             return;
@@ -1337,10 +1353,45 @@ public final class ButtonHelperAbilities {
         return null;
     }
 
+    public static boolean canUseCaled(Game game, Player player) {
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        Tile caledSystem = getLocationOfSuperweapon(game, "caled");
+        return activeSystem != null
+                && activeSystem != caledSystem
+                && game.getRealPlayersNNeutral().stream()
+                        .anyMatch(other -> other != player
+                                && !player.getAllianceMembers().contains(other.getFaction())
+                                && FoWHelper.playerHasShipsInSystem(other, activeSystem));
+    }
+
+    public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
+        return game.getRealPlayersNNeutral().stream()
+                .anyMatch(other -> other != player
+                        && other.hasRelic("superweaponglatison")
+                        && tile == getLocationOfSuperweapon(game, "glatison"));
+    }
+
     @ButtonHandler("exhaustSuperweapon_")
     public static void exhaustSuperweapon(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String name = buttonID.split("_")[1];
         String superweapon = "superweapon" + buttonID.split("_")[1];
+        if (!player.hasRelicReady(superweapon)) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            return;
+        }
+        if ("caled".equals(name)) {
+            if (game.getActiveSystem().isBlank()) {
+                MessageHelper.sendEphemeralMessageToEventChannel(event, "Caled requires an active system.");
+                return;
+            }
+            if (buttonID.split("_").length < 3
+                    || !canUseCaled(game, player)
+                    || !game.getActiveSystem().equals(buttonID.split("_")[2])) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event, "Caled cannot target an opposing ship right now.");
+                return;
+            }
+        }
         player.addExhaustedRelic(superweapon);
         Tile tile = getLocationOfSuperweapon(game, name);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -1354,15 +1405,21 @@ public final class ButtonHelperAbilities {
         switch (name) {
             case "grom" -> {
                 for (String adj : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true)) {
-                    buttons.add(Buttons.gray(
-                            "gromPart2_" + adj, game.getTileByPosition(adj).getRepresentationForButtons()));
+                    Tile target = game.getTileByPosition(adj);
+                    if (target != null && FoWHelper.knowsTile(game, player, target.getPosition())) {
+                        buttons.add(Buttons.gray("gromPart2_" + adj, target.getRepresentationForButtons(game, player)));
+                    }
                 }
             }
             case "mors" -> {
                 Set<String> adjPos = FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, true);
                 for (Tile loc : game.getTileMap().values()) {
-                    if (!adjPos.contains(loc.getPosition()))
-                        buttons.add(Buttons.gray("morsPart2_" + loc.getPosition(), loc.getRepresentationForButtons()));
+                    if (!loc.getPosition().equals(tile.getPosition())
+                            && !adjPos.contains(loc.getPosition())
+                            && FoWHelper.knowsTile(game, player, loc.getPosition())) {
+                        buttons.add(Buttons.gray(
+                                "morsPart2_" + loc.getPosition(), loc.getRepresentationForButtons(game, player)));
+                    }
                 }
             }
             case "glatison" -> {
@@ -1398,6 +1455,10 @@ public final class ButtonHelperAbilities {
     public static void morsPart2(Player belk, Game game, String buttonID, ButtonInteractionEvent event) {
         String location = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(location);
+        if (tile == null || !FoWHelper.knowsTile(game, belk, tile.getPosition())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             for (Player player : game.getRealPlayers()) {
@@ -1429,6 +1490,10 @@ public final class ButtonHelperAbilities {
     public static void gromPart2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String location = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(location);
+        if (tile == null || !FoWHelper.knowsTile(game, player, tile.getPosition())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
 
         buttons.add(Buttons.red("getDamageButtons_" + location + "_spacecombat", "Assign Hits"));
@@ -1451,7 +1516,7 @@ public final class ButtonHelperAbilities {
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
                 totalHits += hitRolls;
                 String unitRoll = CombatMessageHelper.displayUnitRoll(
-                        player.getUnitByID("belkosea_flagship"),
+                        Player.getUnitByID("belkosea_flagship"),
                         toHit,
                         modifierToHit,
                         1,
@@ -2005,7 +2070,7 @@ public final class ButtonHelperAbilities {
                     continue;
                 }
                 Player pillager = neighbor;
-                String factionChecker = "FFCC_" + pillager.getFaction() + "_";
+                String factionChecker = ComponentIdEnvelope.ownedBy(pillager.getFaction());
                 List<Button> buttons = new ArrayList<>();
                 String playerIdent = player.getRepresentationNoPing();
                 player.getDisplayName();
@@ -2018,18 +2083,18 @@ public final class ButtonHelperAbilities {
                         + playerIdent
                         + ". Please check this is a valid **Pillage** opportunity, and use buttons to resolve.";
                 buttons.add(Buttons.red(
-                        factionChecker + "pillage_" + player.getColor() + "_unchecked",
+                        factionChecker + PillageButtonIds.format(player.getColor(), PillageButtonIds.Stage.UNCHECKED),
                         "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
                 buttons.add(Buttons.green(
-                        factionChecker + "declinePillage_" + player.getColor(), "Decline Pillage Window"));
+                        factionChecker + PillageButtonIds.formatDecline(player.getColor()), "Decline Pillage Window"));
                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
             }
         }
     }
 
-    @ButtonHandler("declinePillage_")
+    @ButtonHandler(PillageButtonIds.DECLINE_PREFIX)
     public static void declinePillage(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Player pillaged = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        Player pillaged = game.getPlayerFromColorOrFaction(PillageButtonIds.parseDeclinedColor(buttonID));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " officially declined to **Pillage** "
@@ -2170,6 +2235,7 @@ public final class ButtonHelperAbilities {
         if (player.getPlanets().contains(planet) && enemyPlayer.isPresent()) {
             AddPlanetService.addPlanet(enemyPlayer.get(), planet, game);
         }
+        ThurvialiBreakthroughHandler.offerNeurografting(event, game, player, unitHolder);
         oceanBoundCheck(game);
         if (player.hasAbility("raider_coves")) {
             player.gainTG(2, true);
@@ -2279,6 +2345,8 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
+        ThurvialiAbilityHandler.checkRadiantGrafting(game);
+        DiscordantStarsHelper.checkBRTaranisCrest(game);
     }
 
     @ButtonHandler("startCombatOn_")

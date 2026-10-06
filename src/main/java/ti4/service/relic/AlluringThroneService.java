@@ -43,7 +43,8 @@ public class AlluringThroneService {
                         .map(game::getTileByPosition))
                 .collect(Collectors.toSet());
 
-        Predicate<Tile> nonHome = tile -> !tile.isHomeSystem(game);
+        Predicate<Tile> nonHome = tile -> !tile.isHomeSystem(game)
+                && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane());
         Predicate<Tile> nonHomeAndAdj = nonHome.and(adjToPlanetTiles::contains);
         List<Button> illustrionLocations =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeIllustrion", nonHomeAndAdj, false);
@@ -58,6 +59,11 @@ public class AlluringThroneService {
         if (matcher.matches()) {
             String pos = matcher.group("pos");
             Tile tile = game.getTileByPosition(pos);
+            if (tile == null
+                    || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())) {
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+                return;
+            }
             AddTokenCommand.addToken(event, tile, ILLUSTRION, game);
             game.clearPlanetsCache();
 

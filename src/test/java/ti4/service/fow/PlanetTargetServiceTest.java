@@ -14,6 +14,7 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
 import ti4.helpers.FoWHelper;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
@@ -211,7 +212,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
 
             String uncontrolled = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
-                    .map(uh -> uh.getName())
+                    .map(UnitHolder::getName)
                     .filter(name -> game.getTileFromPlanet(name) != null)
                     .filter(name -> game.getPlayerThatControlsPlanet(name, true) == null)
                     .findFirst()
@@ -314,7 +315,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
             List<String> onMapPlanets = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .filter(uh -> uh instanceof ti4.game.Planet p && !p.isSpaceStation(game))
-                    .map(uh -> uh.getName())
+                    .map(UnitHolder::getName)
                     .distinct()
                     .limit(26)
                     .toList();
@@ -378,6 +379,57 @@ class PlanetTargetServiceTest extends BaseTi4Test {
                     .isEqualTo(1);
             assertThat(PlanetTargetService.pageNumberFor("someCardStep3_realplanetid", actor, spec))
                     .as("an ordinary target press must not be misread as a page press")
+                    .isNull();
+        }
+    }
+
+    /**
+     * A different, previously-live bug in the same family: several callers (Yin hero, shrineView,
+     * resolveSeethe, vyserixHeroAttach) register their resolve handler under {@code "someCard_"} (a
+     * trailing underscore) while their spec's {@code buttonPrefix} is just {@code "someCard"} - the
+     * underscore only ever appears because a REAL target press inserts it manually before the planet id
+     * ({@code buttonPrefix + "_" + planetId}). The nav id has no such manual insertion
+     * ({@code pageNavPrefix + "page" + N}), so without {@code withPageNavPrefix} it comes out as
+     * "someCardpage1", which does not start with "someCard_" - the routing framework never dispatches it to
+     * any handler at all, and the Next Page button silently does nothing on Discord.
+     */
+    @Test
+    void targetButtonsPage_navIdIsRoutableWhenTheHandlerRequiresATrailingUnderscoreTheBasePrefixLacks() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            Player actor = game.getRealPlayers().getFirst();
+
+            List<String> onMapPlanets = game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .filter(uh -> uh instanceof ti4.game.Planet p && !p.isSpaceStation(game))
+                    .map(UnitHolder::getName)
+                    .distinct()
+                    .limit(26)
+                    .toList();
+            assertThat(onMapPlanets).hasSizeGreaterThanOrEqualTo(26);
+
+            // "someCard" (no underscore) is the buttonPrefix; the handler is registered as "someCard_".
+            var spec = PlanetTargetSpec.of("someCard")
+                    .withAlwaysInclude(Set.copyOf(onMapPlanets))
+                    .withPageNavPrefix("someCard_");
+
+            List<Button> page0 = PlanetTargetService.targetButtonsPage(game, actor, spec, 0);
+            String navId = page0.stream()
+                    .map(Button::getCustomId)
+                    .filter(id -> id != null && id.contains("page"))
+                    .findFirst()
+                    .orElse(null);
+            assertThat(navId)
+                    .as("the built nav id must actually start with the registered handler's prefix")
+                    .isNotNull()
+                    .startsWith("someCard_");
+
+            assertThat(PlanetTargetService.pageNumberFor(navId, actor, spec))
+                    .as("and the parser must recognize exactly that id as a page press")
+                    .isEqualTo(1);
+            assertThat(PlanetTargetService.pageNumberFor("someCard_" + onMapPlanets.getFirst(), actor, spec))
+                    .as("while an ordinary target press sharing the same buttonPrefix stays a target press")
                     .isNull();
         }
     }

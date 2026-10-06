@@ -178,7 +178,7 @@ public class AnnotationHandler {
                 context.setShouldSave(save);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                GenericInteractionCreateEvent origin = null;
+                GenericInteractionCreateEvent origin = context.getEvent();
                 for (Object arg : args) {
                     if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
                         origin = buttonInteractionEvent;

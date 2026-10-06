@@ -273,7 +273,7 @@ public class CreateFoWGameService {
     }
 
     private static String getInfoTextFromFile(String file) {
-        String path = ResourceHelper.getInstance().getHelpFile(file);
+        String path = ResourceHelper.getHelpFile(file);
         try {
             return Files.readString(Paths.get(path));
         } catch (Exception e) {

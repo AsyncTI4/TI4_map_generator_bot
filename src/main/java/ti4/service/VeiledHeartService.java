@@ -201,8 +201,9 @@ public class VeiledHeartService {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
-                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
+        getVeiledCards(player)
+                .forEach(card -> VeiledCardType.fromCard(card)
+                        .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 
@@ -722,8 +723,7 @@ public class VeiledHeartService {
     public static void resolveTelepathicPreset(Game game, Player player) {
         String card = "tf-telepathic";
         if (hasVeiledCard(player, card) && PrePlayService.isAssigned(game, card)) {
-            VeiledHeartService.doAction(
-                    VeiledHeartService.VeiledCardAction.UNVEIL, VeiledCardType.ABILITY, player, card);
+            doAction(VeiledHeartService.VeiledCardAction.UNVEIL, VeiledCardType.ABILITY, player, card);
             PrePlayService.unassign(game, card);
         }
         if (player.hasTech(card)) {

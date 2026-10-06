@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -102,7 +103,7 @@ public class GameEventDraft {
         return displacement != null
                 && displacement.values().stream()
                         .flatMap(units -> units.values().stream())
-                        .filter(states -> states != null)
+                        .filter(Objects::nonNull)
                         .flatMap(List::stream)
                         .anyMatch(count -> count != null && count > 0);
     }

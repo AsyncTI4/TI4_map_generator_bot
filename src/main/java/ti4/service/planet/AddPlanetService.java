@@ -12,10 +12,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -28,6 +28,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
@@ -65,6 +66,7 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
+        DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
         if (setup && "ponthous".equalsIgnoreCase(planet)) {
             // Setup exhausts Ponthous without opening its optional ready-planet window.
@@ -95,9 +97,6 @@ public class AddPlanetService {
                     "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
         }
-        if ("ponthous".equalsIgnoreCase(planet)) {
-            PonthousAbilityHandler.resetFracturedSouls(game, player);
-        }
         if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
@@ -112,7 +111,6 @@ public class AddPlanetService {
             player.gainCommodities(1);
             ButtonHelperStats.afterGainCommsChecks(game, player, 1);
         }
-
         int shrineCount = 0;
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
         shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
@@ -137,6 +135,9 @@ public class AddPlanetService {
                         + player.getRepresentation() + " scored \"_" + kalt + "_\".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
+                if (game.isMonumentsMode()) {
+                    MonumentsBRButtonHandler.offerKaltrimMonumentDeploy(game, player);
+                }
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -202,7 +203,7 @@ public class AddPlanetService {
                             && !player_.getExhaustedPlanets().contains(planet)
                             && "action".equalsIgnoreCase(game.getPhaseOfGame())
                             && ButtonHelper.checkForTechSkips(game, planet)
-                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player_.getTg() + 1)) {
                         player_.exhaustPlanet(planet);
                         MessageHelper.sendMessageToChannel(
                                 player_.getCorrectChannel(),

@@ -1,0 +1,8 @@
+{
+  "name": "normal-6p",
+  "description": "Six seats with random factions on a standard map, each with a small hand; stops at setup.",
+  "you": {},
+  "seats": [{}, {}, {}, {}, {}],
+  "defaults": { "acs": 3, "sos": 1, "tg": 2 },
+  "start": "setup"
+}

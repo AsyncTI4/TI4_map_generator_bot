@@ -36,7 +36,7 @@ class ListCategoryChannelCounts extends Subcommand {
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 
-    private String getPercentage(double numerator, double denominator) {
+    private static String getPercentage(double numerator, double denominator) {
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
         // formatPercent.setMinimumFractionDigits(1);
         String formatted = formatPercent.format(denominator == 0 ? 0.0 : (numerator / denominator));

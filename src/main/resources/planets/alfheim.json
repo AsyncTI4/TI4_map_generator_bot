@@ -1,0 +1,31 @@
+{
+    "planetLayout":  
+    {
+        "unitHolderName":  "alfheim",
+        "resourcesLocation":  "BottomLeft",
+        "centerPosition":  
+        {
+            "x":  171,
+            "y":  162
+        },
+        "planetRadius":  55
+    },
+    "id":  "alfheim",
+    "tileId":  "ao3",
+    "name":  "Alfheim",
+    "aliases":  
+    [
+        "alfheim"
+    ],
+    "resources":  2,
+    "influence":  3,
+    "planetTypes":  
+    [
+        "CULTURAL"
+    ],
+    "legendaryAbilityName":  "Spritely Subterfuge",
+    "legendaryAbilityText":  "You may exhaust this card at the start of your turn to look at the top 3 cards in any one explore deck or the relic deck. Place the cards back in any order.",
+    "legendaryAbilityFlavourText":  "\"Calling it a computer misses the scale.\" - Admiral Jairdan MosVale",
+    "flavourText":  "Stable, sub-surface geothermal energy on this planet is harnessed for one of the largest computational data-hubs in the galaxy.",
+    "source":  "goose"
+}

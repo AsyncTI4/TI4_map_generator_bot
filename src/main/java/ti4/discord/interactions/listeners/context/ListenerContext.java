@@ -5,28 +5,28 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
-import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
+import ti4.service.testbed.TestBedService;
 import ti4.settings.users.UserSettingsManager;
 
 @Getter
@@ -35,12 +35,10 @@ public abstract class ListenerContext {
     private final long creationStartTime;
     private final long creationEndTime;
     protected boolean contextIsValid = true;
-    protected final String origComponentID;
-    protected String componentID;
-    protected boolean factionChecked;
+    protected final ComponentIdEnvelope envelope;
     protected final Game game;
     protected Player player;
-    protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
+    protected MessageChannel privateChannel, mainGameChannel;
     final GenericInteractionCreateEvent event;
 
     @Setter
@@ -54,7 +52,16 @@ public abstract class ListenerContext {
         return contextIsValid;
     }
 
+    public String getComponentID() {
+        return envelope.handlerId();
+    }
+
+    public String getOrigComponentID() {
+        return envelope.rawId();
+    }
+
     private boolean allowsNonPlayerInteraction() {
+        String componentID = getComponentID();
         return "showGameAgain".equalsIgnoreCase(componentID)
                 || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
                 || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX);
@@ -64,7 +71,7 @@ public abstract class ListenerContext {
         creationStartTime = System.currentTimeMillis();
 
         this.event = event;
-        componentID = origComponentID = compID;
+        envelope = ComponentIdEnvelope.decode(compID);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         game = GameManager.isValid(gameName)
@@ -76,7 +83,11 @@ public abstract class ListenerContext {
 
         if (game != null) {
             String userID = event.getUser().getId();
-            player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
+            Player clickerPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
+            player = TestBedService.resolveActingPlayerForComponent(game, event, clickerPlayer);
+            if (player != null && player != clickerPlayer && !TestBedService.isPanelComponent(compID)) {
+                TestBedService.logActingAs(game, event.getUser().getName(), player, getContextType() + " " + compID);
+            }
 
             if (player == null && !allowsNonPlayerInteraction()) {
                 String message = event.getUser().getAsMention() + " is not a player of the game";
@@ -120,10 +131,8 @@ public abstract class ListenerContext {
                 mainGameChannel = game.getMainGameChannel();
             }
 
-            if (componentID.contains("dummyPlayerSpoof")) {
-                String identity = StringUtils.substringBefore(componentID, "_").replace("dummyPlayerSpoof", "");
-                player = game.getPlayerFromColorOrFaction(identity);
-                componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
+            if (envelope.spoofedFaction() != null) {
+                player = game.getPlayerFromColorOrFaction(envelope.spoofedFaction());
             }
 
             if (player != null
@@ -133,42 +142,28 @@ public abstract class ListenerContext {
             }
         }
 
-        if (!checkFinsFactionChecker()) {
+        if (!isPressedByOwner()) {
+            handlePlayerHittingButtonTheyDoNotOwn(getEvent());
             contextIsValid = false;
             creationEndTime = System.currentTimeMillis();
             return;
         }
 
-        actionsChannel = null;
-        for (TextChannel textChannel_ : JdaService.jda.getTextChannels()) {
-            if (textChannel_.getName().equals(gameName + Constants.ACTIONS_CHANNEL_SUFFIX)) {
-                actionsChannel = textChannel_;
-                break;
-            }
-        }
         creationEndTime = System.currentTimeMillis();
     }
 
-    private boolean checkFinsFactionChecker() {
-        GenericInteractionCreateEvent event = getEvent();
-        if (factionChecked || componentID == null || !componentID.startsWith("FFCC_")) {
-            return true;
-        }
-        componentID = componentID.replace("FFCC_", "");
-        String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
+    private boolean isPressedByOwner() {
+        String owner = envelope.ownerFaction();
+        if (owner == null || player == null) return true;
+        String presser = player.getFaction();
+        return owner.equals(presser)
+                || ("firmament".equals(owner) && presser.contains("obsidian"))
+                || hasGrantedHolderAccess(owner);
+    }
 
-        if (player != null
-                && !componentID.startsWith(factionWhoPressedButton + "_")
-                && (!componentID.contains("firmament_") || !factionWhoPressedButton.contains("obsidian"))) {
-            handlePlayerHittingButtonTheyDoNotOwn(event);
-            return false;
-        }
-        if (componentID.contains("firmament_") && factionWhoPressedButton.contains("obsidian")) {
-            factionWhoPressedButton = "firmament";
-        }
-        componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
-        factionChecked = true;
-        return true;
+    private boolean hasGrantedHolderAccess(String holderFaction) {
+        if (!(getEvent() instanceof GenericComponentInteractionCreateEvent componentEvent)) return false;
+        return OnyxxaAbilityHandler.hasGrantedHolderAccess(game, componentEvent.getMessage(), player, holderFaction);
     }
 
     private void handlePlayerHittingButtonTheyDoNotOwn(Interaction event) {
@@ -203,6 +198,7 @@ public abstract class ListenerContext {
     }
 
     public void save() {
+        if (!shouldSave) return;
         if (game != null) {
             GameManager.save(game, EventAuditService.getReason(getEvent()));
         }

@@ -179,7 +179,7 @@ public class SearchGameHelper {
         if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
         if (player.getColor() != null && !"null".equals(player.getColor()))
             sb.append(ColorEmojis.getColorEmoji(player.getColor()));
-        sb.append("**").append(game.getName()).append("**");
+        sb.append(" `").append(game.getName()).append("` ");
         sb.append(gameChannelLink);
         if (showAverageTurnTime)
             sb.append("  [Average Turn Time: `")

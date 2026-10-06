@@ -93,24 +93,24 @@ public class BlindSelectionService {
             }
         }
 
-        appendBlindTargetButton(buttons, buttonPrefix, PLANET.equals(type));
+        buttons.add(blindTargetButton(buttonPrefix, type));
     }
 
-    /** Adds the red "Blind Target" button that opens the type-a-name modal. */
-    public static void appendBlindTargetButton(List<Button> buttons, String buttonPrefix, boolean planetType) {
-        appendBlindTargetButton(buttons, buttonPrefix, planetType ? PLANET : POSITION);
+    /** The red "Blind Target" button that opens the type-a-name modal. */
+    public static Button blindTargetButton(String buttonPrefix, boolean planetType) {
+        return blindTargetButton(buttonPrefix, planetType ? PLANET : POSITION);
     }
 
     /**
      * Blind target for a specific unit holder inside a system. Typing a system position selects the holder in
      * space; typing a planet name selects the holder on that planet.
      */
-    public static void appendBlindUnitHolderTargetButton(List<Button> buttons, String buttonPrefix) {
-        appendBlindTargetButton(buttons, buttonPrefix, UNIT_HOLDER);
+    public static Button blindUnitHolderTargetButton(String buttonPrefix) {
+        return blindTargetButton(buttonPrefix, UNIT_HOLDER);
     }
 
-    private static void appendBlindTargetButton(List<Button> buttons, String buttonPrefix, String type) {
-        buttons.add(Buttons.red("blindSelection~MDL_" + encodePrefix(buttonPrefix) + "_" + type, "Blind Target"));
+    private static Button blindTargetButton(String buttonPrefix, String type) {
+        return Buttons.red("blindSelection~MDL_" + encodePrefix(buttonPrefix) + "_" + type, "Blind Target");
     }
 
     /**
@@ -146,33 +146,40 @@ public class BlindSelectionService {
         String encodedButtonPrefix = splitButton[0];
         String type = splitButton[1];
 
-        // Say what the field wants. The old prompt was just "Target", so on a position-type selection sitting
-        // under a list of planet names the natural thing to type was a planet name, and it simply failed.
-        String fieldLabel;
-        String placeholder;
-        if (PLANET.equals(type)) {
-            fieldLabel = "Planet name";
-            placeholder = "e.g. Mellon";
-        } else if (UNIT_HOLDER.equals(type)) {
-            fieldLabel = "Planet name, or a system position for the one in space";
-            placeholder = "e.g. Mellon, or 305 for space";
-        } else {
-            fieldLabel = "System position, or a planet in it";
-            placeholder = "e.g. 305, or Mellon";
-        }
-
         TextInput target = TextInput.create(TARGET, TextInputStyle.SHORT)
                 .setRequired(true)
-                .setPlaceholder(placeholder)
+                .setPlaceholder(blindPromptPlaceholder(type))
                 .build();
 
         Modal blindSelectionModal = Modal.create(
                         "blindSelection_" + event.getMessageId() + "_" + encodedButtonPrefix + "_" + type,
                         "Blind Target")
-                .addComponents(Label.of(fieldLabel, target))
+                .addComponents(Label.of(blindPromptLabel(type), target))
                 .build();
 
         event.replyModal(blindSelectionModal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    // Say what the field wants. The old prompt was just "Target", so on a position-type selection sitting
+    // under a list of planet names the natural thing to type was a planet name, and it simply failed.
+    static String blindPromptLabel(String type) {
+        if (PLANET.equals(type)) {
+            return "Planet name";
+        }
+        if (UNIT_HOLDER.equals(type)) {
+            return "Planet name, or system position for space";
+        }
+        return "System position, or a planet in it";
+    }
+
+    static String blindPromptPlaceholder(String type) {
+        if (PLANET.equals(type)) {
+            return "e.g. Mellon";
+        }
+        if (UNIT_HOLDER.equals(type)) {
+            return "e.g. Mellon for the planet, or 305 for the one in space";
+        }
+        return "e.g. 305, or Mellon";
     }
 
     /**

@@ -17,10 +17,11 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -298,6 +299,11 @@ public class PlayerSetupService {
             }
         }
 
+        // In Twilight's Fall, every faction (including Franken) should always start with the base TF War Sun
+        if (game.isTwilightsFallMode()) {
+            player.addOwnedUnitByID("tf_warsun");
+        }
+
         // Don't do special stuff if Franken Faction
         if (faction.startsWith("franken")) {
             return;
@@ -523,6 +529,18 @@ public class PlayerSetupService {
         if (player.hasAbility("primordial_secrets")) {
             ArcanumAbilityHandler.offerPrimordialSecretsButtons(game, player);
         }
+        if (player.hasAbility("custom_rigs")) {
+            ScrapyardAbilitiesHandler.getScrapyardRigsButtons(game, player);
+        }
+        if ("scrapyard".equalsIgnoreCase(player.getFaction())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", use the buttons below to setup your starting fleet."
+                            + " You must place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, and 2 structures."
+                            + "\nYou do not have to pay for them.");
+            ButtonHelper.offerBuildOrRemove(player, game, player.getHomeSystemTile());
+        }
         if (player.hasAbility("call_of_the_haunted")) {
             RevenantAbilityHandler.offerCallOfTheHauntedButtons(game, player);
         }
@@ -547,6 +565,13 @@ public class PlayerSetupService {
                     player.getCorrectChannel(),
                     "Select the Throne planet you would like to place in your home system:");
             ThronesAbilityHandler.getUnplacedThronePlanetButtons(event, game, player);
+        }
+        if (player.hasAbility("matters_of_state")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", please choose which side you want your starting balance token to be on.",
+                    ButtonHelper.getBalanceButtons(player));
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
@@ -618,7 +643,7 @@ public class PlayerSetupService {
                 && game.getStoredValue("monumentsSetupAnnouncementSent").isEmpty()) {
             game.setStoredValue("monumentsSetupAnnouncementSent", "true");
             String helpFileName = "Monuments.txt";
-            String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
+            String path = ResourceHelper.getHelpFile(helpFileName);
             try {
                 String message = Files.readString(Paths.get(path));
                 MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), message);

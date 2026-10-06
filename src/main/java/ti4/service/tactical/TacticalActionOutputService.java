@@ -17,15 +17,16 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
@@ -37,7 +38,9 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
+import ti4.service.tactical.movement.RealityFieldImpactorService;
 
 @UtilityClass
 public class TacticalActionOutputService {
@@ -277,6 +280,7 @@ public class TacticalActionOutputService {
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
         boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                || AsgardLegendaryService.isBifrostBridgeActive(game, player)
                 || (unit.unitType() == UnitType.Flagship
                         && AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile));
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
@@ -292,6 +296,15 @@ public class TacticalActionOutputService {
             } else {
                 if (!game.isTwilightsFallMode()) {
                     output.append(", __does not have _Gravity Drive___)");
+                }
+            }
+            String cyclotronTilePosition = game.getStoredValue("dihmohnCyclotron_" + player.getFaction());
+            if (!cyclotronTilePosition.isEmpty()) {
+                Tile cyclotronTile = game.getTileByPosition(cyclotronTilePosition);
+                if (cyclotronTile != null) {
+                    output.append(" (ships moved from ")
+                            .append(cyclotronTile.getRepresentation())
+                            .append(" have +1 move from _Flotilla Cyclotron_)");
                 }
             }
             if (player.hasUnit("tk-voidcarver")) {
@@ -322,7 +335,9 @@ public class TacticalActionOutputService {
                     output.append(
                             ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
-                                    : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
+                                    : AsgardLegendaryService.isBifrostBridgeActive(game, player)
+                                            ? " (ignores gravity-rift effects due to _Bifrost Bridge_)"
+                                            : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
                 } else {
                     // Don't automatically count rifts, allowing the player to verify the chosen path.
                     output.append(" (gravity rifts along a path could add +")
@@ -341,18 +356,14 @@ public class TacticalActionOutputService {
             if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
                 output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
-            if (unit.unitType() == UnitType.Destroyer) {
-                if (player.ownsUnit("ponthous_destroyer2")) {
-                    output.append("**REMINDER**: Renegade II can only transport ground forces.");
-                } else if (player.ownsUnit("ponthous_destroyer")) {
-                    output.append("**REMINDER**: Renegade I can only transport infantry.");
-                }
-            }
             if (player.hasPlanet("gyraxis")
                     && player.getExhaustedPlanetsAbilities().contains("gyraxis")
                     && "yes".contains(game.getStoredValue("gyraxisActive"))) {
                 output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")) {
+            output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
@@ -386,6 +397,7 @@ public class TacticalActionOutputService {
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
         if (tile.isNebula(game)
+                && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                 && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
@@ -460,7 +472,6 @@ public class TacticalActionOutputService {
         if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
             bonusMoveValue += 1;
         }
-
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;
@@ -471,6 +482,10 @@ public class TacticalActionOutputService {
                     break;
                 }
             }
+        }
+        if (player.hasUnit("scrapyard_flagship")
+                && ButtonHelper.doesPlayerHaveFSHere("scrapyard_flagship", player, tile)) {
+            bonusMoveValue += 1;
         }
 
         return baseMoveValue + bonusMoveValue;

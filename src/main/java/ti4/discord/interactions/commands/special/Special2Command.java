@@ -16,6 +16,7 @@ public class Special2Command implements ParentCommand {
                     new SetExpedition(),
                     new Galvanize(),
                     new LoreCommand(),
+                    new Skulls(),
                     new ImportDeckConfig())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

@@ -17,6 +17,7 @@ import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
+import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
 
@@ -34,17 +35,18 @@ public final class SelectionMenuProcessor {
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String rawComponentID = event.getSelectMenu().getCustomId();
-        ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        HandlerRegistry.Route<SelectionMenuContext> route =
+                registry.resolve(event.getSelectMenu().getCustomId());
+        ExecutionLockType lockType = route.shouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> process(event),
+                () -> process(event, route),
                 lockType);
     }
 
-    private static void process(StringSelectInteractionEvent event) {
+    private static void process(StringSelectInteractionEvent event, HandlerRegistry.Route<SelectionMenuContext> route) {
         SelectionMenuContext context = new SelectionMenuContext(event);
         if (!context.isValid()) {
             BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
@@ -58,15 +60,15 @@ public final class SelectionMenuProcessor {
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
             if (combatReplayService != null) {
-                combatReplayService.setPreInteractionSnapshot(
+                CombatReplayService.setPreInteractionSnapshot(
                         combatReplayService.capturePreInteractionSnapshot(context.getGame()));
             }
             try {
-                resolveSelectionMenu(context);
+                resolveSelectionMenu(context, route);
                 context.save();
             } finally {
                 if (combatReplayService != null) {
-                    combatReplayService.clearPreInteractionSnapshot();
+                    CombatReplayService.clearPreInteractionSnapshot();
                 }
             }
         } catch (Exception e) {
@@ -78,8 +80,9 @@ public final class SelectionMenuProcessor {
         }
     }
 
-    private static void resolveSelectionMenu(SelectionMenuContext context) {
-        if (registry.handle(context.getMenuID(), context)) {
+    private static void resolveSelectionMenu(
+            SelectionMenuContext context, HandlerRegistry.Route<SelectionMenuContext> route) {
+        if (route.dispatch(context)) {
             return;
         }
 
@@ -97,6 +100,12 @@ public final class SelectionMenuProcessor {
                 return;
             }
         }
+
+        context.setShouldSave(false);
+        BotLogger.error(
+                new LogOrigin(event, context),
+                "Unrouted selection menu: `" + context.getMenuID() + "`. This could just be a stale selection menu.");
+        MessageHelper.sendMessageToEventChannel(event, "We couldn't resolve what to do with this selection.");
     }
 
     @SelectionHandler("jmfA_")

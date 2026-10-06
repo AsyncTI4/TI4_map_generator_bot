@@ -103,7 +103,7 @@ public class GameProperties {
     private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
-    private boolean injectRulesLinks = true;
+    private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
     private boolean queueSO = true;
@@ -182,9 +182,14 @@ public class GameProperties {
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
-    private @ExportableField boolean twilightKart;
     private @ExportableField boolean loreMode;
     private @ExportableField boolean twilightDS;
+    // Twilight Kart Modes
+    // TODO: remove twilightKart when no more games exist that have it set exist
+    private @ExportableField boolean twilightKart; // Deprecated.
+    private @ExportableField boolean tkDestroyerCup;
+    private @ExportableField boolean tkNovaCup;
+    private @ExportableField boolean tfBr;
 
     // Discord Snowflakes
     private @ExportableField String guildID;
@@ -224,6 +229,11 @@ public class GameProperties {
 
     public boolean hasFullPriorityTrackMode() {
         return priorityTrackMode == PriorityTrackMode.FULL;
+    }
+
+    public void reopen() {
+        hasEnded = false;
+        endedDate = 0;
     }
 
     // Misc Helpers

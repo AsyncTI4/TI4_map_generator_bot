@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -10,7 +11,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -110,7 +112,7 @@ public class ButtonHelperExplore {
         return player.getFragments().stream()
                 .filter(fragmentId -> fragmentId.startsWith("supermassive"))
                 .map(Mapper::getExplore)
-                .filter(fragment -> fragment != null)
+                .filter(Objects::nonNull)
                 .map(fragment -> switch (fragment.getType().toLowerCase()) {
                     case "cultural" ->
                         Buttons.blue(
@@ -181,7 +183,7 @@ public class ButtonHelperExplore {
         String trait = "supermassiveunknown".equals(supermassiveFragment) ? null : supermassiveModel.getType();
         return getPurgedFragments(game, trait, supermassiveFragment).stream()
                 .map(Mapper::getExplore)
-                .filter(fragment -> fragment != null)
+                .filter(Objects::nonNull)
                 .map(fragment -> switch (fragment.getType().toLowerCase()) {
                     case "cultural" ->
                         Buttons.blue(
@@ -273,17 +275,25 @@ public class ButtonHelperExplore {
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragId) {
                 case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "supermassivecultural" ->
-                    message.append(" a " + (fragId.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.CFrag + "cultural");
+                    message.append(" a ")
+                            .append(fragId.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.CFrag)
+                            .append("cultural");
                 case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
-                    message.append(" a " + (fragId.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.HFrag + "hazardous");
+                    message.append(" a ")
+                            .append(fragId.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.HFrag)
+                            .append("hazardous");
                 case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
-                    message.append(" an " + (fragId.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.IFrag + "industrial");
+                    message.append(" an ")
+                            .append(fragId.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.IFrag)
+                            .append("industrial");
                 case "urf1", "urf2", "urf3", "supermassiveunknown" ->
-                    message.append(" an " + (fragId.contains("supermassive") ? "supermassive " : "")
-                            + ExploreEmojis.UFrag + "unknown");
+                    message.append(" an ")
+                            .append(fragId.contains("supermassive") ? "supermassive " : "")
+                            .append(ExploreEmojis.UFrag)
+                            .append("unknown");
                 default -> message.append(' ').append(fragId);
             }
             message.append(" relic fragment.");
@@ -315,6 +325,7 @@ public class ButtonHelperExplore {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         OblivionUnitHandler.doOblivionMechCheck(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        ArcanumLeadersHandler.offerArcanumCommanderTechPurge(game, player, event, fragmentsToPurge.size());
         if (!game.isFowMode() && event.getMessageChannel() instanceof ThreadChannel) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         }

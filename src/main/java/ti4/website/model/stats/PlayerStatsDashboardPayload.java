@@ -66,6 +66,7 @@ public class PlayerStatsDashboardPayload {
     public List<String> getAlliances() {
         return player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
+                .filter(Objects::nonNull)
                 .filter(pn -> "Alliance".equalsIgnoreCase(pn.getName()))
                 .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
                 .map(pn -> game.getPNOwner(pn.getAlias()).getColor())
@@ -172,14 +173,16 @@ public class PlayerStatsDashboardPayload {
         // Secrets
         player.getSecretsScored().keySet().stream()
                 .map(Mapper::getSecretObjective)
+                .filter(Objects::nonNull)
                 .map(SecretObjectiveModel::getName)
                 .forEach(objectives::add);
 
         // Supports
         player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
+                .filter(Objects::nonNull)
                 .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                .map(pn -> "Support for the Throne (" + pn.getColor().get() + ")")
                 .forEach(objectives::add);
 
         return objectives;
@@ -304,7 +307,7 @@ public class PlayerStatsDashboardPayload {
     }
 
     @JsonIgnore // Dashboard doesn't use this yet
-    public List<Object> getUnitModifiers() {
+    public static List<Object> getUnitModifiers() {
         return Collections.emptyList();
     }
 

@@ -415,7 +415,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When you spend a command token to resolve the secondary ability of the \"Calamatis\" strategy card, you may resolve the primary ability of Warfare instead. (the token lift one)",
+        "text": "When you spend a command token to resolve the secondary ability of the \"Calamitas\" strategy card, you may instead remove 1 of your command tokens from the game board, then gain 1 command token and redistribute any number of command tokens on your command sheet.",
         "source": "twilight_ds",
         "faction": "kortali"
     },

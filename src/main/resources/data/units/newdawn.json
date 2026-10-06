@@ -1,16 +1,16 @@
 [
     {
-        "id": "firmament-warsun",
+        "id": "nd_firmament_warsun",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "The Dragon, Dormant",
-        "upgradesToUnitId": "firmament-warsun2",
+        "upgradesToUnitId": "nd_firmament_warsun2",
         "source": "newdawn",
         "faction": "firmament",
         "ability": "Flip this card if the Obsidian faction in in play and place it on their faction sheet.\n*You cannot produce this unit unless you own it's unit upgrade technology."
     },
     {
-        "id": "obsidian-warsun",
+        "id": "nd_obsidian_warsun",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "The Dragon, Imprisoned",
@@ -19,12 +19,12 @@
         "ability": "You cannot produce this unit or research its unit upgrade technology."
     },
     {
-        "id": "firmament-warsun2",
+        "id": "nd_firmament_warsun2",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "The Dragon, Chained",
-        "upgradesFromUnitId": "firmament-warsun",
-        "requiredTechId": "firmament-warsun2",
+        "upgradesFromUnitId": "nd_firmament_warsun",
+        "requiredTechId": "nd_firmament_warsun2",
         "source": "newdawn",
         "faction": "firmament",
         "capacityValue": 6,
@@ -38,11 +38,11 @@
         "ability": "When you gain this card, purge all but 1 of your war sun units. Flip this card if the Obsidian faction is in play and place it on their faction sheet."
     },
     {
-        "id": "obsidian-warsun2",
+        "id": "nd_obsidian_warsun2",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "The Dragon, Freed",
-        "upgradesFromUnitId": "obsidian-warsun",
+        "upgradesFromUnitId": "nd_obsidian_warsun",
         "source": "newdawn",
         "faction": "obsidian",
         "moveValue": 2,
@@ -60,23 +60,23 @@
         "ability": "This technology cannot be researched. When you gain this card, purge all but 1 of your warsun units. When this unit uses Bombardment, it uses it against each planet in its system and each adjacent system, even yours, ignoring PLANETARY SHIELD."
     },
     {
-        "id": "jolnar_warsun",
+        "id": "nd_jolnar_warsun",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "War Sun Project",
-        "upgradesToUnitId": "jolnar_warsun2",
+        "upgradesToUnitId": "nd_jolnar_warsun2",
         "source": "newdawn",
         "faction": "jolnar",
         "cost": 6,
         "ability": "This unit cannot be produced in your home system. At the start of space combat, this unit is destroyed."
     },
     {
-        "id": "jolnar_warsun2",
+        "id": "nd_jolnar_warsun2",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "University War Sun",
-        "upgradesFromUnitId": "jolnar_warsun",
-        "requiredTechId": "jolnar_warsun2",
+        "upgradesFromUnitId": "nd_jolnar_warsun",
+        "requiredTechId": "nd_jolnar_warsun2",
         "source": "newdawn",
         "faction": "jolnar",
         "moveValue": 3,
@@ -94,11 +94,11 @@
         "ability": "Other player's units in this system lose PLANETARY SHIELD."
     },
     {
-        "id": "hacan_spacedock",
+        "id": "nd_hacan_spacedock",
         "baseType": "spacedock",
         "asyncId": "sd",
         "name": "Production Biomes I",
-        "upgradesToUnitId": "hacan_spacedock2",
+        "upgradesToUnitId": "nd_hacan_spacedock2",
         "source": "newdawn",
         "faction": "hacan",
         "productionValue": "5",
@@ -107,12 +107,12 @@
         "ability": "Up to 3 fighters in this system do not count against your ship's capacity."
     },
     {
-        "id": "hacan_spacedock2",
+        "id": "nd_hacan_spacedock2",
         "baseType": "spacedock",
         "asyncId": "sd",
         "name": "Production Biomes II",
-        "upgradesFromUnitId": "hacan_spacedock",
-        "requiredTechId": "hacan_spacedock2",
+        "upgradesFromUnitId": "nd_hacan_spacedock",
+        "requiredTechId": "nd_hacan_spacedock2",
         "source": "newdawn",
         "faction": "hacan",
         "productionValue": "9",
@@ -121,11 +121,11 @@
         "ability": "Up to 3 fighters in this system do not count against your ship's capacity.\nWhen this unit uses PRODUCTION, you may spend 1 token from your strategy pool to gain 4 trade goods and choose another player to gain 2 trade goods."
     },
     {
-        "id": "empyrean_fighter",
+        "id": "nd_empyrean_fighter",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Truine I",
-        "upgradesToUnitId": "empyrean_fighter2",
+        "upgradesToUnitId": "nd_empyrean_fighter2",
         "source": "newdawn",
         "faction": "empyrean",
         "capacityUsed": 1,
@@ -135,12 +135,12 @@
         "isShip": true
     },
     {
-        "id": "empyrean_fighter2",
+        "id": "nd_empyrean_fighter2",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Tirune II",
-        "upgradesFromUnitId": "empyrean_fighter",
-        "requiredTechId": "empyrean_fighter2",
+        "upgradesFromUnitId": "nd_empyrean_fighter",
+        "requiredTechId": "nd_empyrean_fighter2",
         "source": "newdawn",
         "faction": "empyrean",
         "capacityUsed": 1,
@@ -152,11 +152,11 @@
         "ability": "This unit may move without being transported, counting against your fleetpool while doing so. During space combat in this system, you may remove 3 of your fighters to cancel an action card played by your opponent."
     },
     {
-        "id": "naaz_fighter",
+        "id": "nd_naaz_fighter",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Morphwing I",
-        "upgradesToUnitId": "naaz_fighter2",
+        "upgradesToUnitId": "nd_naaz_fighter2",
         "source": "newdawn",
         "faction": "naaz",
         "capacityUsed": 1,
@@ -167,12 +167,12 @@
         "ability": "This unit can be committed during an invasion, after ground combat replace it with 1 infantry."
     },
     {
-        "id": "naaz_fighter2",
+        "id": "nd_naaz_fighter2",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Morphwing II",
-        "upgradesFromUnitId": "naaz_fighter",
-        "requiredTechId": "naaz_fighter2",
+        "upgradesFromUnitId": "nd_naaz_fighter",
+        "requiredTechId": "nd_naaz_fighter2",
         "source": "newdawn",
         "faction": "naaz",
         "capacityUsed": 1,
@@ -183,11 +183,11 @@
         "ability": "This unit may move without being transported, counting against your fleet pool while doing so. This unit can be committed during an invasion, after ground combat either return it to the space area or replace it with 1 infantry."
     },
     {
-        "id": "letnev_dreadnought",
+        "id": "nd_letnev_dreadnought",
         "baseType": "dreadnought",
         "asyncId": "dn",
         "name": "Dawncrusher I",
-        "upgradesToUnitId": "letnev_dreadnought2",
+        "upgradesToUnitId": "nd_letnev_dreadnought2",
         "source": "newdawn",
         "faction": "letnev",
         "capacityUsed": 1,
@@ -203,12 +203,12 @@
         "capacityValue": 1
     },
     {
-        "id": "letnev_dreadnought2",
+        "id": "nd_letnev_dreadnought2",
         "baseType": "dreadnought",
         "asyncId": "dn",
         "name": "Dawncrusher II",
-        "upgradesFromUnitId": "letnev_dreadnought",
-        "requiredTechId": "letnev_dreadnought2",
+        "upgradesFromUnitId": "nd_letnev_dreadnought",
+        "requiredTechId": "nd_letnev_dreadnought2",
         "source": "newdawn",
         "faction": "letnev",
         "capacityUsed": 1,
@@ -225,11 +225,11 @@
         "ability": "This unit cannot be destroyed by 'Direct Hit' action cards."
     },
     {
-        "id": "yin_infantry",
+        "id": "nd_yin_infantry",
         "baseType": "infantry",
         "asyncId": "gf",
         "name": "Yin Clone I",
-        "upgradesToUnitId": "yin_infantry2",
+        "upgradesToUnitId": "nd_yin_infantry2",
         "source": "newdawn",
         "faction": "yin",
         "capacityUsed": 1,
@@ -240,12 +240,12 @@
         "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
     },
     {
-        "id": "yin_infantry2",
+        "id": "nd_yin_infantry2",
         "baseType": "infantry",
         "asyncId": "gf",
         "name": "Yin Clone II",
-        "upgradesFromUnitId": "yin_infantry",
-        "requiredTechId": "yin_infantry2",
+        "upgradesFromUnitId": "nd_yin_infantry",
+        "requiredTechId": "nd_yin_infantry2",
         "source": "newdawn",
         "faction": "yin",
         "capacityUsed": 1,
@@ -256,11 +256,11 @@
         "ability": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control."
     },
     {
-        "id": "yssaril_infantry",
+        "id": "nd_yssaril_infantry",
         "baseType": "infantry",
         "asyncId": "gf",
         "name": "Guild Agents I",
-        "upgradesToUnitId": "yssaril_infantry2",
+        "upgradesToUnitId": "nd_yssaril_infantry2",
         "source": "newdawn",
         "faction": "yssaril",
         "capacityUsed": 1,
@@ -271,12 +271,12 @@
         "ability": "After you commit this unit to another player's planet, you may look at that player's action cards."
     },
     {
-        "id": "yssaril_infantry2",
+        "id": "nd_yssaril_infantry2",
         "baseType": "infantry",
         "asyncId": "gf",
         "name": "Guild Agents II",
-        "upgradesFromUnitId": "yssaril_infantry",
-        "requiredTechId": "yssaril_infantry2",
+        "upgradesFromUnitId": "nd_yssaril_infantry",
+        "requiredTechId": "nd_yssaril_infantry2",
         "source": "newdawn",
         "faction": "yssaril",
         "capacityUsed": 1,
@@ -287,11 +287,11 @@
         "ability": "After this unit is destroyed, place the unit on this card. After you commit this unit to another player's planet, you may look at that player's action cards and may remove 6 infantry from this card to take 1 of them."
     },
     {
-        "id": "ghost_cruiser",
+        "id": "nd_ghost_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Ahk Syl Fier I",
-        "upgradesToUnitId": "ghost_cruiser2",
+        "upgradesToUnitId": "nd_ghost_cruiser2",
         "source": "newdawn",
         "faction": "ghost",
         "moveValue": 2,
@@ -303,12 +303,12 @@
         "isShip": true
     },
     {
-        "id": "ghost_cruiser2",
+        "id": "nd_ghost_cruiser2",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Ahk Syl Fier II",
-        "upgradesFromUnitId": "ghost_cruiser",
-        "requiredTechId": "ghost_cruiser2",
+        "upgradesFromUnitId": "nd_ghost_cruiser",
+        "requiredTechId": "nd_ghost_cruiser2",
         "source": "newdawn",
         "faction": "ghost",
         "moveValue": 3,
@@ -321,11 +321,11 @@
         "isShip": true
     },
     {
-        "id": "cabal_carrier",
+        "id": "nd_cabal_carrier",
         "baseType": "carrier",
         "asyncId": "cv",
         "name": "Vortexer I",
-        "upgradesToUnitId": "cabal_carrier2",
+        "upgradesToUnitId": "nd_cabal_carrier2",
         "source": "newdawn",
         "faction": "cabal",
         "moveValue": 1,
@@ -338,12 +338,12 @@
         "isShip": true
     },
     {
-        "id": "cabal_carrier2",
+        "id": "nd_cabal_carrier2",
         "baseType": "carrier",
         "asyncId": "cv",
         "name": "Vortexer II",
-        "upgradesFromUnitId": "cabal_carrier",
-        "requiredTechId": "cabal_carrier2",
+        "upgradesFromUnitId": "nd_cabal_carrier",
+        "requiredTechId": "nd_cabal_carrier2",
         "source": "newdawn",
         "faction": "cabal",
         "moveValue": 2,
@@ -356,11 +356,11 @@
         "isShip": true
     },
     {
-        "id": "keleresm_cruiser",
+        "id": "nd_keleresm_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Saggitaria I",
-        "upgradesToUnitId": "keleresm_cruiser2",
+        "upgradesToUnitId": "nd_keleresm_cruiser2",
         "source": "newdawn",
         "faction": "keleresm",
         "moveValue": 2,
@@ -372,12 +372,12 @@
         "isShip": true
     },
     {
-        "id": "keleresm_cruiser2",
+        "id": "nd_keleresm_cruiser2",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Saggitaria II",
-        "upgradesFromUnitId": "keleresm_cruiser",
-        "requiredTechId": "keleresm_cruiser2",
+        "upgradesFromUnitId": "nd_keleresm_cruiser",
+        "requiredTechId": "nd_keleresm_cruiser2",
         "source": "newdawn",
         "faction": "keleresm",
         "moveValue": 3,
@@ -392,11 +392,11 @@
         "isShip": true
     },
     {
-        "id": "keleresa_cruiser",
+        "id": "nd_keleresa_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Saggitaria I",
-        "upgradesToUnitId": "keleresa_cruiser2",
+        "upgradesToUnitId": "nd_keleresa_cruiser2",
         "source": "newdawn",
         "faction": "keleresa",
         "moveValue": 2,
@@ -408,12 +408,12 @@
         "isShip": true
     },
     {
-        "id": "keleresa_cruiser2",
+        "id": "nd_keleresa_cruiser2",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Saggitaria II",
-        "upgradesFromUnitId": "keleresa_cruiser",
-        "requiredTechId": "keleresa_cruiser2",
+        "upgradesFromUnitId": "nd_keleresa_cruiser",
+        "requiredTechId": "nd_keleresa_cruiser2",
         "source": "newdawn",
         "faction": "keleresa",
         "moveValue": 3,
@@ -428,11 +428,11 @@
         "isShip": true
     },
     {
-        "id": "keleresx_cruiser",
+        "id": "nd_keleresx_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Saggitaria I",
-        "upgradesToUnitId": "keleresx_cruiser2",
+        "upgradesToUnitId": "nd_keleresx_cruiser2",
         "source": "newdawn",
         "faction": "keleresx",
         "moveValue": 2,
@@ -444,12 +444,12 @@
         "isShip": true
     },
     {
-        "id": "keleresx_cruiser2",
+        "id": "nd_keleresx_cruiser2",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Saggitaria II",
-        "upgradesFromUnitId": "keleresx_cruiser",
-        "requiredTechId": "keleresx_cruiser2",
+        "upgradesFromUnitId": "nd_keleresx_cruiser",
+        "requiredTechId": "nd_keleresx_cruiser2",
         "source": "newdawn",
         "faction": "keleresx",
         "moveValue": 3,
@@ -464,11 +464,11 @@
         "isShip": true
     },
     {
-        "id": "winnu_pds",
+        "id": "nd_winnu_pds",
         "baseType": "pds",
         "asyncId": "pd",
         "name": "Justicer Rail I",
-        "upgradesToUnitId": "winnu_pds2",
+        "upgradesToUnitId": "nd_winnu_pds2",
         "source": "newdawn",
         "faction": "winnu",
         "spaceCannonHitsOn": 6,
@@ -478,12 +478,12 @@
         "ability": "Hits produced by this unit must be assigned to non-fighter ships if able."
     },
     {
-        "id": "winnu_pds2",
+        "id": "nd_winnu_pds2",
         "baseType": "pds",
         "asyncId": "pd",
         "name": "Justicer Rail II",
-        "upgradesFromUnitId": "winnu_pds",
-        "requiredTechId": "winnu_pds2",
+        "upgradesFromUnitId": "nd_winnu_pds",
+        "requiredTechId": "nd_winnu_pds2",
         "source": "newdawn",
         "faction": "winnu",
         "spaceCannonHitsOn": 5,
@@ -494,11 +494,11 @@
         "ability": "You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\nHits produced by this unit must be assigned to non-fighter ships if able."
     },
     {
-        "id": "xxcha_pds",
+        "id": "nd_xxcha_pds",
         "baseType": "pds",
         "asyncId": "pd",
         "name": "Keeper Matrix I",
-        "upgradesToUnitId": "xxcha_pds2",
+        "upgradesToUnitId": "nd_xxcha_pds2",
         "source": "newdawn",
         "faction": "xxcha",
         "spaceCannonHitsOn": 6,
@@ -507,12 +507,12 @@
         "isStructure": true
     },
     {
-        "id": "xxcha_pds2",
+        "id": "nd_xxcha_pds2",
         "baseType": "pds",
         "asyncId": "pd",
         "name": "Keeper Matrix II",
-        "upgradesFromUnitId": "xxcha_pds",
-        "requiredTechId": "xxcha_pds2",
+        "upgradesFromUnitId": "nd_xxcha_pds",
+        "requiredTechId": "nd_xxcha_pds2",
         "source": "newdawn",
         "faction": "xxcha",
         "spaceCannonHitsOn": 5,

@@ -202,7 +202,7 @@ public class AgendaRiderHelper {
 
     public static List<Button> getAgendaButtons(String riderName, Game game, String prefix) {
         if (game.getCurrentAgendaInfo() == null || !game.getCurrentAgendaInfo().contains("_")) {
-            return new ArrayList<Button>();
+            return new ArrayList<>();
         }
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
         String lower = agendaDetails.toLowerCase();
@@ -297,7 +297,7 @@ public class AgendaRiderHelper {
         String againstEmojiString = "👎";
         try {
             agendaInt = Integer.valueOf(agendaID);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
         }
         if (agendaInt != null) {
             String agendaAlias = "";

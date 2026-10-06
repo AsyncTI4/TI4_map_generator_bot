@@ -47,6 +47,14 @@
         "description": "New Stuff"
     },
     {
+        "source": "tf_br",
+        "name": "Twilight's Fall: Blue Reverie",
+        "canal": "community",
+        "subcanal": "lol homebrew",
+        "credits": "TacticBlue",
+        "description": "Twilight's Fall Mahact King"
+    },
+    {
         "source": "codex1",
         "name": "Twilight Codex\nVolume I: Ordinian",
         "canal": "official",
@@ -173,8 +181,8 @@
         ]
     },
     {
-        "source": "balacasi",
-        "name": "Balacasi",
+        "source": "wftv",
+        "name": "Whispers from the Void",
         "canal": "community",
         "subcanal": "lil homebrew",
         "credits": "balacasi",
@@ -201,7 +209,7 @@
         "name": "Gamma Galaxies",
         "canal": "community",
         "subcanal": "lil homebrew",
-        "credits": "Gamma Galaxies",
+        "credits": "addictunraveled, Cacotopos, Mr_Anvil, Philroi, Luminous, etc.",
         "description": "Reimagining of existing actions",
         "data": []
     },
@@ -341,7 +349,7 @@
         "name": "TI Addiction",
         "canal": "community",
         "subcanal": "personal projs",
-        "credits": "aubreynadler",
+        "credits": "addictunraveled",
         "description": "Splits Mecatol Rex into a 3-planet system (Mecatol City, Jun, The Polar Castelle) with new legendary abilities"
     },
     {
@@ -357,7 +365,15 @@
         "name": "New Dawn",
         "canal": "community",
         "subcanal": "personal projs",
-        "credits": "aubreynadler",
+        "credits": "ShaMedic",
         "description": "Optional alternate unit-upgrade technologies for 13 existing factions, swapped in during setup by purging a faction technology"
+    },
+    {
+        "source": "goose",
+        "name": "Goose",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Goose",
+        "description": "Homebrew from Goose"
     }
 ]

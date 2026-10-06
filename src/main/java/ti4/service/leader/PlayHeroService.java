@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
@@ -19,19 +20,22 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
@@ -107,8 +111,7 @@ public class PlayHeroService {
             OblivionUnitHandler.doOblivionMechCheck(game, player);
         }
         if (removed && reason == LeaderRemovalReason.PURGED) {
-            RevenantUnitsHandler.doRevenantMechCheck(game, player);
-            RevenantTechHandler.doLazarusPodsLeaderCheck(game);
+            RevenantTechHandler.doLazarusPodsLeaderCheck(game, player);
         }
         return removed;
     }
@@ -212,6 +215,9 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "scrapyardhero" ->
+                ScrapyardLeaderHandler.resolveScrapyardHero(
+                        event instanceof ButtonInteractionEvent buttonEvent ? buttonEvent : null, game, player);
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
@@ -274,6 +280,7 @@ public class PlayHeroService {
                 }
             }
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
+            case "xinhero" -> XinHeroHandler.startXinHero(game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
@@ -295,6 +302,7 @@ public class PlayHeroService {
             }
             case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
             case "revenantkairnhero" -> RevenantLeadersHandler.startRevKairnHero(event, game, player);
+            case "revenantthurvialihero" -> RevenantLeadersHandler.startRevThurvialiHero(event, game, player);
             case "throneshero" -> ThronesLeadersHandler.getUnplacedThronePlanetButtons(event, game, player);
             case "kairnhero" -> KairnLeadershandler.startKairnHero(event, game, player);
             case "ponthoushero" -> PonthousLeadersHandler.startPonthousHero(event, game, player);
@@ -303,6 +311,8 @@ public class PlayHeroService {
             case "myrrhero" -> MyrrLeadersHandler.startMyrrHero(event, game, player);
             case "oblivionhero" -> OblivionLeadersHandler.startOblivionHero(event, game, player);
             case "verydithhero" -> VerydithLeadersHandler.startVerydithHero(event, game, player);
+            case "vanguardhero" -> VanguardLeadersHandler.startHero(event, game, player);
+            case "thurvialihero" -> ThurvialiLeadersHandler.startThurvialiHero(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -476,22 +486,14 @@ public class PlayHeroService {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" -> {
-                if (!game.isNaaluAgent() && !game.isWarfareAction()) {
-                    player.setTacticalCC(player.getTacticalCC() - 1);
-                    CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
-                    game.setStoredValue("vaylerianHeroActive", "true");
-                }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
                 if (!removeCCs.isEmpty()) {
-                    for (int x = 0;
-                            x < ButtonHelperAgents.getGloryTokenTiles(game).size();
-                            x++) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCorrectChannel(),
-                                "Use buttons to remove 1 of your command tokens from the game board.",
-                                removeCCs);
-                    }
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            "Use buttons to remove 1 of your command tokens from the game board.",
+                            removeCCs);
                 }
+                game.setStoredValue("vaylerianHeroActive", "true");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), player.getFactionEmoji() + " may gain 1 command token.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);

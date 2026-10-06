@@ -43,6 +43,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.FogTokenRemovalService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.fow.PlanetTargetService.UnitHolderTargetSpec;
@@ -732,10 +733,9 @@ public final class ButtonHelperActionCards {
 
     public static List<Button> getCourageousOptions(Player player, Game game, boolean nekro, String type) {
         String factionChecker = player.factionButtonChecker();
-        nekro |= game.isTwilightKart() && game.isTwilightsFallMode();
         List<Button> buttons = new ArrayList<>();
 
-        List<String> allowedUnits = Stream.of(
+        List<String> allowedUnits = new ArrayList<>(Stream.of(
                         UnitType.Destroyer,
                         UnitType.Cruiser,
                         UnitType.Carrier,
@@ -744,22 +744,15 @@ public final class ButtonHelperActionCards {
                         UnitType.Warsun,
                         UnitType.Fighter)
                 .map(UnitType::getValue)
-                .toList();
-
-        if (nekro) {
-            allowedUnits = Stream.of(
-                            UnitType.Destroyer,
-                            UnitType.Cruiser,
-                            UnitType.Carrier,
-                            UnitType.Dreadnought,
-                            UnitType.Flagship,
-                            UnitType.Warsun,
-                            UnitType.Fighter,
-                            UnitType.Mech,
-                            UnitType.Infantry)
-                    .map(UnitType::getValue)
-                    .toList();
+                .toList());
+        // tkDestroyerCup's Avenge AC can target ground forces
+        // isTwilightKart is Deprecated. Once removed, just check for DestroyerCup here
+        boolean avengeAcUsed = game.isTwilightsFallMode() && (game.isTwilightKart() || game.isTkDestroyerCup());
+        if (nekro || avengeAcUsed) {
+            allowedUnits.add(UnitType.Mech.getValue());
+            allowedUnits.add(UnitType.Infantry.getValue());
         }
+
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
             if (ownedUnit != null) {
@@ -954,6 +947,11 @@ public final class ButtonHelperActionCards {
     public static void unexpectedSomeoneElseStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (game.isFowMode() && p2 != null) {
+            FogTokenRemovalService.startFlux(event, game, player, p2);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpectedOtherPerson", p2);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -1856,7 +1854,7 @@ public final class ButtonHelperActionCards {
      * the target names the holder rather than just the system. VISIBLE_NOW because a dock is a unit: a
      * remembered system tells you nothing about whether it is still there.
      */
-    public static UnitHolderTargetSpec meltdownSpec(Game game) {
+    private static UnitHolderTargetSpec meltdownSpec(Game game) {
         return UnitHolderTargetSpec.of("reactorMeltdownStep3_" + BlindSelectionService.TBD_FACTION, UnitType.Spacedock)
                 .excludingSelf()
                 .where((tile, uh) -> Constants.SPACE.equals(uh.getName())
@@ -2815,9 +2813,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReparationsStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, reparationsSpec())) return;
-        var target = PlanetTargetService.resolve(game, player, buttonID, reparationsSpec(), t -> t.owner()
-                .getReadiedPlanets()
-                .contains(t.planetId()));
+        var target = PlanetTargetService.resolve(
+                game,
+                player,
+                buttonID,
+                reparationsSpec(),
+                t -> t.owner().getReadiedPlanets().contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;
@@ -3299,7 +3300,7 @@ public final class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
-    public static List<Button> getExplorationRiderButtons(
+    private static List<Button> getExplorationRiderButtons(
             Player player, Game game, int remainingExplores, Set<String> selectedPlanets) {
         List<Button> buttons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -3363,7 +3364,7 @@ public final class ButtonHelperActionCards {
         return "industrial".equalsIgnoreCase(originalPlanetType) || "hazardous".equalsIgnoreCase(originalPlanetType);
     }
 
-    public static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
+    private static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
         if (selectedPlanets.isEmpty()) {
             return "";
         }

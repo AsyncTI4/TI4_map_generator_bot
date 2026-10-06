@@ -465,6 +465,22 @@
         ]
     },
     {
+        "alias": "arvaxi_hero_extra_die",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "arvaxihero",
+        "scope": "_upgraded_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Arvaxi ships with researched unit upgrades roll 1 additional die due to Hero"
+            }
+        ]
+    },
+    {
         "alias": "letnev_agent",
         "type": "extrarolls",
         "value": "+1",
@@ -490,8 +506,8 @@
         "forCombatAbility": "combatround",
         "related": [
             {
-                "type": "action_cards",
-                "alias": "classified_weapons1",
+                "type": "custom",
+                "alias": "custom",
                 "message": "_Classified Weapons_ gives +2 dice to the chosen unit"
             }
         ]
@@ -1813,5 +1829,21 @@
             }
         ],
         "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus2_zephyrion_flagship_bounty",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "zephyrion_flagship_bounty",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "zephyrion_flagship",
+                "message": "+2 due to a bounty on an opposing unit in this combat"
+            }
+        ],
+        "forCombatAbility": "combatround"
     }
 ]

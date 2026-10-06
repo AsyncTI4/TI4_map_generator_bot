@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,8 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+    private boolean fogMapOnTurnStart;
+    private RefreshMapStyle refreshMapStyle = RefreshMapStyle.COMBINED;
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
@@ -58,6 +61,10 @@ public class UserSettings {
 
     UserSettings(String userId) {
         this.userId = userId;
+    }
+
+    public RefreshMapStyle getRefreshMapStyle() {
+        return Objects.requireNonNullElse(refreshMapStyle, RefreshMapStyle.COMBINED);
     }
 
     public List<String> getPreferredColors() {
@@ -108,27 +115,26 @@ public class UserSettings {
         return getHotHours(activeHours);
     }
 
-    public void addActiveHour(int utcHour) {
+    public void addActiveHourCheckins(int[] checkinsByUtcHour) {
         if (!activityTracking) {
             return;
         }
         if (isBlank(activeHours)) {
             activeHours = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
         }
-        int x = 0;
-        StringBuilder newActiveHours = new StringBuilder();
-        for (String hourStr : activeHours.split(";")) {
-            int hour = Integer.parseInt(hourStr);
-            if (x == utcHour) {
-                hour++;
+        String[] storedCheckins = activeHours.split(";");
+        StringJoiner newActiveHours = new StringJoiner(";");
+        for (int hour = 0; hour < storedCheckins.length; hour++) {
+            int checkins = Integer.parseInt(storedCheckins[hour]);
+            if (hour < checkinsByUtcHour.length) {
+                checkins += checkinsByUtcHour[hour];
             }
-            newActiveHours.append(hour).append(";");
-            x++;
+            newActiveHours.add(String.valueOf(checkins));
         }
-        activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
+        activeHours = newActiveHours.toString();
     }
 
-    public String summarizeActiveHours(String activity) {
+    public static String summarizeActiveHours(String activity) {
         Set<Integer> hotHours = getHotHours(activity);
         if (hotHours.isEmpty()) {
             return null;
@@ -172,7 +178,7 @@ public class UserSettings {
         return result.isEmpty() ? null : result.toString();
     }
 
-    public String summarizeActiveHoursEmoji(String activity) {
+    public static String summarizeActiveHoursEmoji(String activity) {
         Set<Integer> hotHours = getHotHours(activity);
         if (hotHours.isEmpty()) {
             return "Not enough data.";

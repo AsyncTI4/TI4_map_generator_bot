@@ -134,7 +134,7 @@ public class BotLogger {
         logToChannel(null, message, null, LogSeverity.Error);
     }
 
-    public static void spammyerror(@Nonnull String message) {
+    public static void spammyError(@Nonnull String message) {
         logToChannel(null, message, null, LogSeverity.SpammyError);
     }
 
@@ -306,14 +306,16 @@ public class BotLogger {
                 if (channel == null) {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook
                 } else {
-                    channel.sendMessage(msgChunk).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
-                                t.getManager()
-                                        .setArchived(true)
-                                        .queueAfter(SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE, TimeUnit.SECONDS);
-                            }));
+                    channel.sendMessage(msgChunk)
+                            .queue(m -> m.createThreadChannel("Stack Trace")
+                                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                                    .queue(t -> {
+                                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
+                                        t.getManager()
+                                                .setArchived(true)
+                                                .queueAfter(
+                                                        SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE, TimeUnit.SECONDS);
+                                    }));
                 }
             }
         }

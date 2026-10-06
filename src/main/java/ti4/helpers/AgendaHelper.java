@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -33,12 +34,14 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Exploratio
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -79,6 +82,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.testbed.TestBedService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
@@ -86,7 +90,7 @@ import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
 public final class AgendaHelper {
-    public static final String AGENDA_START_VOTE_COUNTS = "agendaStartVoteCounts";
+    private static final String AGENDA_START_VOTE_COUNTS = "agendaStartVoteCounts";
 
     private static void pingAboutDebt(Game game) {
         if (game.isHiddenAgendaMode() || !game.getStoredValue("executiveOrder").isEmpty()) {
@@ -520,7 +524,9 @@ public final class AgendaHelper {
                                 nextInLine.getPrivateChannel(),
                                 AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n ");
                         MessageHelper.sendMessageToChannelWithButtons(
-                                nextInLine.getPrivateChannel(), "\n " + realIdentity + message, buttons);
+                                nextInLine.getPrivateChannel(),
+                                "\n " + realIdentity + message + ownVoteTotalLine(game, nextInLine),
+                                buttons);
                         player.getCorrectChannel()
                                 .sendMessage("Notified next in line")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -823,7 +829,8 @@ public final class AgendaHelper {
             List<Button> buttons = List.of(vote, abstain, forcedAbstain);
             if (game.isFowMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
-                    MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            nextInLine.getPrivateChannel(), message + ownVoteTotalLine(game, nextInLine), buttons);
                     game.getMainGameChannel()
                             .sendMessage("Voting started. Notified first in line")
                             .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1259,6 +1266,7 @@ public final class AgendaHelper {
             if (getWinningVoters(winner, game).contains(player) || predictedWinner) {
                 MonumentsButtonHandler.offerJolNarMonumentInfantry(game, player);
                 MonumentsButtonHandler.offerQanojShieldArray(game, player);
+                MonumentsBRButtonHandler.offerDeepmantle(game, player);
             }
         }
         return winningRs;
@@ -1300,6 +1308,7 @@ public final class AgendaHelper {
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null && !losers.contains(loser)) {
                         losers.add(loser);
+                        CommanderUnlockCheckService.checkPlayer(loser, "revenantveylor");
                     }
                 }
             }
@@ -1446,6 +1455,11 @@ public final class AgendaHelper {
             }
         }
         return losers;
+    }
+
+    private static String ownVoteTotalLine(Game game, Player player) {
+        if (!FoWHelper.isFogQol01(game)) return "";
+        return "\nYou have " + getVoteTotal(player, game)[0] + " votes available.";
     }
 
     static int[] getVoteTotal(Player player, Game game) {
@@ -2466,6 +2480,16 @@ public final class AgendaHelper {
         } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasTech("thveylory")) {
+                player.refreshTech("thveylory");
+
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " readied _Kleptocratic Politics_ due to the agenda being resolved with no effect.");
+            }
+        }
         List<Button> resActionRow = new ArrayList<>();
         boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
                 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
@@ -2959,6 +2983,15 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(
                     channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
         }
+        if (!action
+                && aCount <= 2
+                && game.getRealPlayers().stream()
+                        .anyMatch(player -> player.hasLeader("veylorhero") && player.hasLeaderUnlocked("veylorhero"))) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "## This is a reminder that someone has _Speaker Gilbrand_ unlocked and that there will be 3 agendas this agenda phase.");
+        }
+        RevenantLeadersHandler.offerRevVeylorCommanderPlanets(game);
         if (game.getLaws().size() > 2 && game.getStoredValue("executiveOrder").isEmpty()) {
             for (Player p : game.getRealPlayers()) {
                 if (p.getSecretsUnscored().containsKey("dp")) {
@@ -3010,7 +3043,7 @@ public final class AgendaHelper {
         return sb.toString();
     }
 
-    public static Map<String, Integer> getVoteCountByColor(Game game) {
+    private static Map<String, Integer> getVoteCountByColor(Game game) {
         Map<String, Integer> voteCounts = new LinkedHashMap<>();
         for (Player player : getVotingOrder(game)) {
             if (player.getColor() != null && !player.getColor().isBlank()) {
@@ -3071,9 +3104,18 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on top.");
-        ButtonHelper.sendMessageToRightStratThread(
-                game.getPlayer(game.getActivePlayerID()), game, "Agenda put on top.", "politics");
+        announceAgendaPlacement(game, "Agenda put on top.");
+    }
+
+    // The strat-thread fallback posts to the actions channel when no Politics thread exists (e.g. agenda-phase
+    // cards like Intrigue), which would duplicate the announcement, so only echo to the thread when it exists.
+    private static void announceAgendaPlacement(Game game, String message) {
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+        ThreadChannel politicsThread =
+                ButtonHelper.getRightStratThread(game, ButtonHelper.getStratName("politics", game));
+        if (politicsThread != null) {
+            MessageHelper.sendMessageToChannel(politicsThread, message);
+        }
     }
 
     public static void putBottom(int agendaID, Game game) {
@@ -3085,9 +3127,7 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom.");
-        ButtonHelper.sendMessageToRightStratThread(
-                game.getPlayer(game.getActivePlayerID()), game, "Agenda put on bottom.", "politics");
+        announceAgendaPlacement(game, "Agenda put on bottom.");
     }
 
     public static void putBottom(String agendaID, Game game) {
@@ -3101,7 +3141,10 @@ public final class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        if (!RiftSetModeService.deckInfoAvailable(game.getPlayer(event.getUser().getId()), game)) {
+        if (!RiftSetModeService.deckInfoAvailable(
+                TestBedService.resolveActingPlayer(
+                        game, event, game.getPlayer(event.getUser().getId())),
+                game)) {
             return;
         }
         StringBuilder sb2 = new StringBuilder();

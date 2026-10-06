@@ -92,7 +92,7 @@ public final class AliasHandler {
      */
     private static void readAliasFile(String fileName, Map<String, String> map) {
         Properties aliasProperties = new Properties();
-        String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
+        String aliasFile = ResourceHelper.getAliasFile(fileName);
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 aliasProperties.load(input);
@@ -113,7 +113,7 @@ public final class AliasHandler {
      */
     private static void readAliasFile(String fileName, List<String> list, boolean keys) {
         Properties aliasProperties = new Properties();
-        String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
+        String aliasFile = ResourceHelper.getAliasFile(fileName);
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 aliasProperties.load(input);
@@ -145,7 +145,7 @@ public final class AliasHandler {
      */
     private static void readAliasFile(String fileName, Map<String, String> aliasList, String errorMessage) {
         Properties aliasProperties = new Properties();
-        String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
+        String aliasFile = ResourceHelper.getAliasFile(fileName);
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 aliasProperties.load(input);
