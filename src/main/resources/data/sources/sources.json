@@ -353,6 +353,14 @@
         "description": "Splits Mecatol Rex into a 3-planet system (Mecatol City, Jun, The Polar Castelle) with new legendary abilities"
     },
     {
+        "source": "oplusplus",
+        "name": "O++",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "Dave Blair",
+        "description": "New objectives and associated galactic event for setup"
+    },
+    {
         "source": "combosloth",
         "name": "Combosloth",
         "canal": "community",
