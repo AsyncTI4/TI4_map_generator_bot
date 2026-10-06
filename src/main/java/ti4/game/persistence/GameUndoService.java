@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -69,25 +70,33 @@ class GameUndoService {
 
     @Nullable
     static Game undo(Game game) {
-        int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game.getName());
-        return lockAndUndo(game, latestUndoIndex - 1, latestUndoIndex);
+        return lockAndUndo(game, latestUndoIndex -> latestUndoIndex - 1);
     }
 
     @Nullable
     static Game undo(Game game, int undoIndex) {
         if (undoIndex <= 0) return null;
-        int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game.getName());
-        return lockAndUndo(game, undoIndex, latestUndoIndex);
+        return lockAndUndo(game, latestUndoIndex -> undoIndex);
     }
 
-    private static Game lockAndUndo(Game gameToUndo, int undoIndex, int latestUndoIndex) {
-        return GameFileLockManager.wrapWithWriteLock(
-                gameToUndo.getName(), () -> undo(gameToUndo, undoIndex, latestUndoIndex));
+    private static Game lockAndUndo(Game gameToUndo, IntUnaryOperator undoIndexFromLatest) {
+        return GameFileLockManager.wrapWithWriteLock(gameToUndo.getName(), () -> {
+            int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(gameToUndo.getName());
+            int undoIndex = undoIndexFromLatest.applyAsInt(latestUndoIndex);
+            return undo(gameToUndo, undoIndex, latestUndoIndex);
+        });
     }
 
     private static Game undo(Game gameToUndo, int undoIndex, int latestUndoIndex) {
         if (latestUndoIndex <= 1) return null;
         String gameName = gameToUndo.getName();
+        if (!requiredUndoFilesExist(gameName, undoIndex, latestUndoIndex)) {
+            BotLogger.warning(
+                    new LogOrigin(gameToUndo),
+                    "Undo save `" + undoIndex + "` (latest `" + latestUndoIndex + "`) is no longer available for "
+                            + gameName + ".");
+            return null;
+        }
         try {
             File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
             if (!currentGameFile.exists()) {
@@ -118,6 +127,16 @@ class GameUndoService {
             BotLogger.error(new LogOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
             return null;
         }
+    }
+
+    private static boolean requiredUndoFilesExist(String gameName, int undoIndex, int latestUndoIndex) {
+        if (undoIndex < 1 || undoIndex >= latestUndoIndex) return false;
+        if (!undoFileExists(gameName, undoIndex)) return false;
+        return undoIndex == latestUndoIndex - 1 || undoFileExists(gameName, undoIndex + 1);
+    }
+
+    private static boolean undoFileExists(String gameName, int undoIndex) {
+        return Files.exists(Storage.getGameUndo(gameName, getUndoFileName(gameName, undoIndex)));
     }
 
     private static void sendAnyChangedCardsInfo(Game game, Game loadedGame) {
