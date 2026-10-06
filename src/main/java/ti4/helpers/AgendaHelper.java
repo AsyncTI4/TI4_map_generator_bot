@@ -1934,7 +1934,26 @@ public final class AgendaHelper {
                 "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));
         planetButtons.add(
                 Buttons.red(player.factionButtonChecker() + "proceedToFinalizingVote", "Done exhausting planets."));
+        planetButtons.add(Buttons.gray(player.factionButtonChecker() + "resetMyVote", "Reset My Vote"));
         return planetButtons;
+    }
+
+    public static void undoThingsSpentOnThisVote(Game game, Player player) {
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        if (spentThings.stream().anyMatch(thing -> thing.startsWith("predictive_"))) {
+            game.setStoredValue(
+                    "riskedPredictive", game.getStoredValue("riskedPredictive").replace(player.getFaction(), ""));
+        }
+        boolean prevoting =
+                !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        if (prevoting) {
+            player.resetSpentThings();
+            return;
+        }
+        if (spentThings.stream().anyMatch(thing -> thing.startsWith("dsghotg_"))) {
+            player.refreshTech("dsghotg");
+        }
+        Helper.refreshPlanetsOnTheRevote(player, game);
     }
 
     @ButtonHandler("refreshAgenda")
