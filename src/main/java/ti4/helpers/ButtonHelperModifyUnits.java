@@ -369,8 +369,11 @@ public final class ButtonHelperModifyUnits {
                     "Unable to determine the planet the ground combat is occurring on. This may be a bug to report?");
             return 0;
         }
-        StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
-                + " in the following way:\n");
+        StringBuilder msg = new StringBuilder(
+                hits == 0
+                        ? player.getFactionEmoji() + " suffered no hits:\n"
+                        : player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
+                                + " in the following way:\n");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, false, false);
         Tile tile = game.getTileFromPlanet(planet);
@@ -658,6 +661,8 @@ public final class ButtonHelperModifyUnits {
                 + " in the following way:\n");
         if (justSummarizing) {
             msg = new StringBuilder("The hit" + (hits == 1 ? "" : "s") + " would be assigned in the following way:\n");
+        } else if (hits == 0) {
+            msg = new StringBuilder(player.getFactionEmoji() + " suffered no hits:\n");
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int oldGloryFighterSustains = PonthousUnitHandler.getTemporaryFighterSustainRemaining(game, player, tile);
