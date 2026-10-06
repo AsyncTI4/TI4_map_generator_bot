@@ -1,7 +1,10 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,12 +18,56 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class VyserixLeaderHandler {
+
+    public static void resolveCommanderOnResearch(Game game, Player player, TechnologyModel tech) {
+        if (tech.isUnitUpgrade() || !game.playerHasLeaderUnlockedOrAlliance(player, "vyserixcommander")) {
+            return;
+        }
+        int matchingPlanets = countPlanetsWithSpecialtyOf(game, player, tech);
+        if (matchingPlanets == 0) {
+            return;
+        }
+        String tgChange = player.gainTG(matchingPlanets, true);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " gained " + matchingPlanets + " trade good"
+                        + (matchingPlanets == 1 ? "" : "s") + " " + tgChange
+                        + " from Soluxar, the Vyserix commander, for controlling " + matchingPlanets
+                        + " planet" + (matchingPlanets == 1 ? "" : "s")
+                        + " with a technology specialty matching " + tech.getNameRepresentation() + ".");
+    }
+
+    private static int countPlanetsWithSpecialtyOf(Game game, Player player, TechnologyModel tech) {
+        Set<TechnologyType> matchingColors = getMatchingColors(player, tech);
+        int count = 0;
+        for (String planetID : player.getPlanets()) {
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+            if (planet != null && matchingColors.stream().anyMatch(planet::hasTechSpecialty)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static Set<TechnologyType> getMatchingColors(Player player, TechnologyModel tech) {
+        Set<TechnologyType> colors = EnumSet.noneOf(TechnologyType.class);
+        colors.addAll(tech.getTypes());
+        colors.retainAll(TechnologyType.mainFour);
+        Set<TechnologyType> synergies = player.getSynergies();
+        if (!Collections.disjoint(colors, synergies)) {
+            colors.addAll(synergies);
+            colors.retainAll(TechnologyType.mainFour);
+        }
+        return colors;
+    }
 
     public static void offerHeroAttachmentButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
