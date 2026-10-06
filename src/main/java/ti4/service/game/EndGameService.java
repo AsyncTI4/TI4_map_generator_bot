@@ -199,6 +199,16 @@ public class EndGameService {
         }
     }
 
+    public static boolean objectivesHaveRunOut(Game game) {
+        if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+            return false;
+        }
+        var endGameDeck =
+                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
+        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
+        return game.getRound() > endGameRound || endGameDeck.isEmpty();
+    }
+
     public static void recordMostPointsWinner(Game game, MessageChannel channel) {
         Optional<Player> winner = game.getMostPointsWinner();
         if (winner.isEmpty()) {
