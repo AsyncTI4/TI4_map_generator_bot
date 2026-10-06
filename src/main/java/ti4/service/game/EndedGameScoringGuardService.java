@@ -20,7 +20,7 @@ public class EndedGameScoringGuardService {
             return false;
         }
         if (game.getHighestScore() < game.getVp()) {
-            game.setHasEnded(false);
+            game.reopen();
             return false;
         }
         if (channel != null) {

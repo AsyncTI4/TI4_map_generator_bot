@@ -158,8 +158,7 @@ public class ImageHelper {
                 .build();
 
         try {
-            HttpResponse<byte[]> response =
-                    EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
+            HttpResponse<byte[]> response = sendRetryingOnceAfterNetworkError(request);
 
             if (response.statusCode() != 200) {
                 BotLogger.error("Failed to read image. URL: " + imageUrl + " Status: " + response.statusCode());
@@ -175,13 +174,28 @@ public class ImageHelper {
             }
             return image;
         } catch (HttpTimeoutException e) {
-            BotLogger.spammyerror("Timeout fetching image: " + imageUrl);
+            BotLogger.spammyError("Timeout fetching image: " + imageUrl);
         } catch (IOException e) {
-            BotLogger.error("Network error fetching image: " + imageUrl, e);
+            BotLogger.spammyError("Network error fetching image: " + imageUrl + " (" + e.getMessage() + ")");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         return null;
+    }
+
+    private static HttpResponse<byte[]> sendRetryingOnceAfterNetworkError(HttpRequest request)
+            throws IOException, InterruptedException {
+        try {
+            return send(request);
+        } catch (HttpTimeoutException e) {
+            throw e;
+        } catch (IOException e) {
+            return send(request);
+        }
+    }
+
+    private static HttpResponse<byte[]> send(HttpRequest request) throws IOException, InterruptedException {
+        return EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
     }
 
     private static String sanitizeUrl(String imageUrl) {

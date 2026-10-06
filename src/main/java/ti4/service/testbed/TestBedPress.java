@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -25,7 +27,9 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateRequest;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -38,16 +42,19 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.DiceHelper;
 
 @UtilityClass
 public class TestBedPress {
 
     static final int HISTORY_SIZE = 25;
+    public static final String FORCED_DICE_KEY = "testBedDice";
     private static final long SEARCH_RETRY_MILLIS = 2000;
 
     public static final class Recorder {
         private final List<String> replies = new ArrayList<>();
         private final List<String> unsupportedCalls = new ArrayList<>();
+        private final List<String> reposts = new ArrayList<>();
         private String modalId;
 
         synchronized void reply(String text) {
@@ -60,6 +67,14 @@ public class TestBedPress {
 
         synchronized void modal(String id) {
             modalId = id;
+        }
+
+        synchronized void reposted(String jumpUrl) {
+            reposts.add(jumpUrl);
+        }
+
+        public synchronized List<String> reposts() {
+            return List.copyOf(reposts);
         }
 
         public synchronized List<String> replies() {
@@ -77,6 +92,8 @@ public class TestBedPress {
     }
 
     public record PressResult(boolean pressed, String detail, Recorder recorder) {}
+
+    record Repost(MessageChannel channel, String seatName) {}
 
     private record Found(Message message, Button button) {}
 
@@ -182,19 +199,47 @@ public class TestBedPress {
         ExecutionLockManager.lock(game.getName(), ExecutionLockType.WRITE);
         try {
             String[] previous = {""};
+            Deque<Integer> dice = new ArrayDeque<>();
             runLocked(game, locked -> {
                 previous[0] = TestBedService.rawActingAs(locked, developerId);
                 TestBedService.setActingAs(locked, developerId, seat);
+                dice.addAll(forcedDice(locked));
             });
             try {
-                ButtonProcessor.processNow(standInEvent(message, button, developer, recorder));
+                ButtonInteractionEvent event =
+                        standInEvent(message, button, developer, recorder, repostFor(game, seat));
+                DiceHelper.withForcedResults(dice, () -> ButtonProcessor.processNow(event));
             } finally {
-                runLocked(game, locked -> TestBedService.restoreActingAs(locked, developerId, previous[0]));
+                runLocked(game, locked -> {
+                    TestBedService.restoreActingAs(locked, developerId, previous[0]);
+                    storeForcedDice(locked, dice);
+                });
             }
         } finally {
             ExecutionLockManager.unlock(game.getName(), ExecutionLockType.WRITE);
         }
         return new PressResult(true, "pressed `" + button.getLabel() + "` (`" + button.getCustomId() + "`)", recorder);
+    }
+
+    static List<Integer> forcedDice(Game game) {
+        List<Integer> dice = new ArrayList<>();
+        for (String token : game.getStoredValue(FORCED_DICE_KEY).trim().split("\\s+")) {
+            if (!token.matches("\\d{1,2}")) continue;
+            int value = Integer.parseInt(token);
+            if (value >= 1 && value <= 10) dice.add(value);
+        }
+        return dice;
+    }
+
+    private static void storeForcedDice(Game game, Collection<Integer> remaining) {
+        if (remaining.isEmpty()) {
+            game.removeStoredValue(FORCED_DICE_KEY);
+            return;
+        }
+        TestBedService.store(
+                game,
+                FORCED_DICE_KEY,
+                String.join(" ", remaining.stream().map(String::valueOf).toList()));
     }
 
     public static boolean runLocked(Game game, Consumer<Game> action) {
@@ -216,11 +261,27 @@ public class TestBedPress {
         }
     }
 
+    @Nullable
+    static MessageChannel ownChannel(Game game, Player seat) {
+        return game.isFowMode() ? seat.getPrivateChannel() : seat.getCardsInfoThread();
+    }
+
+    @Nullable
+    private static Repost repostFor(Game game, Player seat) {
+        MessageChannel channel = ownChannel(game, seat);
+        return channel == null ? null : new Repost(channel, seat.getFaction());
+    }
+
     static ButtonInteractionEvent standInEvent(Message message, Button button, Member developer, Recorder recorder) {
+        return standInEvent(message, button, developer, recorder, null);
+    }
+
+    static ButtonInteractionEvent standInEvent(
+            Message message, Button button, Member developer, Recorder recorder, @Nullable Repost repost) {
         JDA jda = message.getJDA();
         ButtonInteraction[] self = new ButtonInteraction[1];
-        InvocationHandler handler =
-                (proxy, method, args) -> answerInteraction(self[0], method, args, message, button, developer, recorder);
+        InvocationHandler handler = (proxy, method, args) ->
+                answerInteraction(self[0], method, args, message, button, developer, recorder, repost);
         self[0] = (ButtonInteraction) Proxy.newProxyInstance(
                 ButtonInteraction.class.getClassLoader(), new Class<?>[] {ButtonInteraction.class}, handler);
         return new ButtonInteractionEvent(jda, 0, self[0]);
@@ -233,7 +294,8 @@ public class TestBedPress {
             Message message,
             Button button,
             Member developer,
-            Recorder recorder)
+            Recorder recorder,
+            @Nullable Repost repost)
             throws Throwable {
         String name = method.getName();
         return switch (name) {
@@ -266,7 +328,7 @@ public class TestBedPress {
                 message.getInteractionMetadata() == null
                         ? null
                         : message.getInteractionMetadata().getIntegrationOwners();
-            case "getHook" -> hook(self, message, recorder);
+            case "getHook" -> hook(self, message, recorder, repost);
             case "replyModal" -> {
                 recorder.modal(((Modal) args[0]).getId());
                 yield noOpAction(method.getReturnType(), message.getJDA(), recorder);
@@ -281,12 +343,17 @@ public class TestBedPress {
                 if (!name.startsWith("reply") && !name.startsWith("defer") && !name.startsWith("edit")) {
                     recorder.unsupported(name);
                 }
+                if (createsMessage(method, repost)) {
+                    InteractionHook replyHook = hook(self, message, recorder, repost);
+                    yield capturingAction(method.getReturnType(), message.getJDA(), recorder, repost, replyHook);
+                }
                 yield defaultValue(method, message.getJDA(), recorder);
             }
         };
     }
 
-    private static InteractionHook hook(ButtonInteraction interaction, Message message, Recorder recorder) {
+    private static InteractionHook hook(
+            ButtonInteraction interaction, Message message, Recorder recorder, @Nullable Repost repost) {
         JDA jda = message.getJDA();
         InteractionHook[] self = new InteractionHook[1];
         self[0] = (InteractionHook) Proxy.newProxyInstance(
@@ -305,11 +372,97 @@ public class TestBedPress {
                     if ("retrieveOriginal".equals(name)) {
                         return message.getChannel().retrieveMessageById(message.getId());
                     }
+                    if (createsMessage(method, repost)) {
+                        Object action = capturingAction(method.getReturnType(), jda, recorder, repost, null);
+                        if (!seed(action, method, args)) recordText(recorder, args);
+                        return action;
+                    }
                     recordText(recorder, args);
                     if (returnsSelf(method, proxy)) return proxy;
                     return defaultValue(method, jda, recorder);
                 });
         return self[0];
+    }
+
+    private static boolean createsMessage(Method method, @Nullable Repost repost) {
+        Class<?> type = method.getReturnType();
+        return repost != null && type.isInterface() && MessageCreateRequest.class.isAssignableFrom(type);
+    }
+
+    private static boolean seed(Object action, Method method, @Nullable Object[] args) throws Throwable {
+        if (args == null || args.length != 1) return false;
+        String setter =
+                switch (method.getName()) {
+                    case "sendMessage" -> args[0] instanceof MessageCreateData ? "applyData" : "setContent";
+                    case "sendMessageEmbeds" -> "setEmbeds";
+                    case "sendMessageComponents" -> "setComponents";
+                    case "sendFiles" -> "setFiles";
+                    default -> null;
+                };
+        if (setter == null) return false;
+        Method target =
+                MethodUtils.getMatchingAccessibleMethod(MessageCreateRequest.class, setter, method.getParameterTypes());
+        if (target == null) return false;
+        invoke(target, action, args);
+        return true;
+    }
+
+    private static Object capturingAction(
+            Class<?> actionType, JDA jda, Recorder recorder, Repost repost, @Nullable Object callbackResult) {
+        MessageCreateBuilder builder = new MessageCreateBuilder();
+        Message[] sent = new Message[1];
+        boolean[] done = new boolean[1];
+        Supplier<Object> send = () -> {
+            if (!done[0]) {
+                done[0] = true;
+                sent[0] = repostIfItHasComponents(builder, repost, recorder);
+            }
+            if (sent[0] == null) return null;
+            return callbackResult != null ? callbackResult : sent[0];
+        };
+        return Proxy.newProxyInstance(
+                actionType.getClassLoader(), new Class<?>[] {actionType}, (proxy, method, args) -> {
+                    String name = method.getName();
+                    if ("queue".equals(name)) {
+                        acceptResult(send.get(), args);
+                        return null;
+                    }
+                    if ("complete".equals(name)) return send.get();
+                    if ("submit".equals(name)) return CompletableFuture.completedFuture(send.get());
+                    if ("getJDA".equals(name)) return jda;
+                    if ("toString".equals(name)) return "TestBedCapturingAction[" + actionType.getSimpleName() + "]";
+                    if ("hashCode".equals(name)) return System.identityHashCode(proxy);
+                    if ("equals".equals(name)) return args[0] == proxy;
+                    recordText(recorder, args);
+                    Method target = MethodUtils.getMatchingAccessibleMethod(
+                            MessageCreateBuilder.class, name, method.getParameterTypes());
+                    if (target != null) invoke(target, builder, args);
+                    if (returnsSelf(method, proxy)) return proxy;
+                    return defaultValue(method, jda, recorder);
+                });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void acceptResult(@Nullable Object result, @Nullable Object[] args) {
+        if (result == null || args == null || args.length == 0) return;
+        if (args[0] instanceof Consumer<?> success) ((Consumer<Object>) success).accept(result);
+    }
+
+    @Nullable
+    private static Message repostIfItHasComponents(MessageCreateBuilder builder, Repost repost, Recorder recorder) {
+        if (builder.getComponents().isEmpty()) return null;
+        String header = "-# 🧪 test bed: shown only to " + repost.seatName() + " in a real game";
+        String content = builder.getContent();
+        String withHeader = content.isEmpty() ? header : header + "\n" + content;
+        if (withHeader.length() <= Message.MAX_CONTENT_LENGTH) builder.setContent(withHeader);
+        try {
+            Message message = repost.channel().sendMessage(builder.build()).complete();
+            recorder.reposted(message.getJumpUrl());
+            return message;
+        } catch (RuntimeException e) {
+            recorder.unsupported("re-posting ephemeral buttons failed: " + e.getMessage());
+            return null;
+        }
     }
 
     private static boolean isMessageEdit(String name) {

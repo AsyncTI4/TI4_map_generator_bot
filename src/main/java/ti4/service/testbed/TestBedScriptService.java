@@ -31,7 +31,7 @@ public class TestBedScriptService {
     public static final String ALL_SEATS = "all";
     public static final String YOU = "you";
     public static final Set<String> SHARED_SCOPES = Set.of("main", "actions", "gm");
-    public static final Set<String> SEAT_SCOPES = Set.of("private", "cards-info");
+    public static final Set<String> SEAT_SCOPES = Set.of("private", "cards-info", "combat");
     public static final String VIRTUAL_SEAT_NAME = "seat";
     private static final int BUTTON_ID_LIMIT = 100;
 
@@ -333,8 +333,8 @@ public class TestBedScriptService {
         String seat = colon < 0 ? scope : scope.substring(0, colon);
         if (seat.isBlank() || ALL_SEATS.equals(seat)) errors.add(label + ": scope `" + scope + "` needs a seat.");
         if (colon >= 0 && !SEAT_SCOPES.contains(scope.substring(colon + 1))) {
-            errors.add(label + ": unknown scope `" + scope + "`; use main, actions, gm, <seat>, <seat>:private or"
-                    + " <seat>:cards-info.");
+            errors.add(label + ": unknown scope `" + scope + "`; use main, actions, gm, <seat>, <seat>:private,"
+                    + " <seat>:cards-info or <seat>:combat.");
         }
     }
 }

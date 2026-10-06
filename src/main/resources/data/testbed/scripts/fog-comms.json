@@ -1,0 +1,36 @@
+{
+  "name": "fog-comms",
+  "description": "Anonymous comms: option, inboxes and partners at turn start, Open/Reply buttons, settings modal, a hand-typed relay and the hide cron.",
+  "preset": "fog-comms-4p",
+  "settleSeconds": 3,
+  "steps": [
+    { "note": "you = red, seat1 = blue, seat2 = green, seat3 = yellow" },
+    { "label": "GM enables Anonymous comms", "as": "you", "in": "gm", "pressId": "fowOption_GAME_true_anonymous_comms" },
+    { "label": "Turn start runs the partner check", "do": "setActivePlayer", "as": "you" },
+    { "expect": { "state": "stored:anonCommsPartners_red", "equals": "blue" } },
+    { "expect": { "state": "stored:anonCommsPartners_blue", "equals": "green-red" } },
+    { "expect": { "state": "stored:anonCommsPartners_green", "equals": "blue" } },
+    { "expect": { "state": "stored:anonCommsPartners_yellow", "equals": "" } },
+    { "expect": { "in": "main", "noFactionLeak": true } },
+
+    { "label": "Red opens the Blue conversation", "as": "you", "pressId": "anonCommsOpen_blue" },
+    { "expect": { "ephemeral": "Conversation with" } },
+    { "note": "Check: Red's fow…-comms-blue-private thread is in your sidebar and its first message tags you." },
+    { "label": "Blue's Reply-to-Red button opens the modal", "as": "seat1", "pressId": "anonCommsReply_red~MDL" },
+    { "expect": { "modal": "anonCommsReplyResolve_red" } },
+    { "label": "GM opens the comms settings", "as": "you", "in": "gm", "pressId": "anonCommsSettings~MDL" },
+    { "expect": { "modal": "anonCommsSettingsResolve" } },
+
+    { "note": "YOUR TURN (60s): as yourself (no act-as), type `toblue test` in Red's fow…-comms-inbox-private thread." },
+    { "wait": 60 },
+    { "note": "Check: Red's inbox says 📤 Sent to Blue · #thread; Red's Blue thread shows `📤 You: test`." },
+    { "note": "Check: Blue's inbox has `📨 Blue-tag Red: test` with Reply/Open buttons; Blue's comms-red thread shows `:red: test` (emoji only, no name)." },
+    { "note": "Check: Green and Yellow got nothing; no Discord name or @mention of another seat anywhere." },
+
+    { "label": "Threads hide instantly", "do": "setStored", "key": "anonCommsHideHours", "value": "0" },
+    { "label": "Run the hide cron", "do": "runCron", "value": "AnonymousCommsArchiveCron" },
+    { "note": "Check: both Blue/Red conversation threads are archived (gone from the sidebar); the inboxes stay." },
+    { "label": "Back to the 3h default", "do": "removeStored", "key": "anonCommsHideHours" },
+    { "expect": { "in": "main", "noFactionLeak": true } }
+  ]
+}

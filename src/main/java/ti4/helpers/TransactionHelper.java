@@ -47,6 +47,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
@@ -428,12 +429,24 @@ public class TransactionHelper {
     }
 
     private static void announceFogRatification(Game game, Player p1, Player p2, String publicSummary) {
+        if (AnonymousCommsService.isActive(game)) {
+            announceInAnonymousConversation(game, p1, p2, publicSummary);
+            announceInAnonymousConversation(game, p2, p1, publicSummary);
+            notifyObserversOfRatifiedTransaction(game, p1, p2);
+            return;
+        }
         FowCommunicationThreadService.findOpenCommThread(game, p1, p2)
                 .ifPresentOrElse(thread -> MessageHelper.sendMessageToChannel(thread, publicSummary), () -> {
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), publicSummary);
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), publicSummary);
                 });
         notifyObserversOfRatifiedTransaction(game, p1, p2);
+    }
+
+    private static void announceInAnonymousConversation(Game game, Player owner, Player partner, String text) {
+        if (!AnonymousCommsService.postToConversation(game, owner, partner, text)) {
+            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), text);
+        }
     }
 
     private static void notifyObserversOfRatifiedTransaction(Game game, Player p1, Player p2) {
@@ -1649,6 +1662,10 @@ public class TransactionHelper {
         String pointer = p2.getRepresentation() + " you have received a transaction offer from "
                 + p1.getRepresentationNoPing() + ":\n" + offerText
                 + "\n**[Accept or reject the offer here](" + jumpUrl + ")**";
+        if (AnonymousCommsService.isActive(game)) {
+            AnonymousCommsService.postToConversationLater(game, p2, p1, pointer);
+            return;
+        }
         FowCommunicationThreadService.findOpenCommThread(game, p1, p2)
                 .ifPresentOrElse(
                         thread -> MessageHelper.sendMessageToChannel(thread, pointer),

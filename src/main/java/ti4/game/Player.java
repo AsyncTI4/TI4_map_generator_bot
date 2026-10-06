@@ -697,22 +697,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) return null;
 
-        TextChannel parentChannel = getCorrectChannel();
-        if (parentChannel == null) {
-            if (!game.isHasEnded()) {
-                BotLogger.warning(
-                        new LogOrigin(this),
-                        "`Player.getCardsInfoThread`: parent channel is null for game: " + game.getName());
-            }
-            return null;
-        }
+        TextChannel parentChannel = getCardsInfoThreadParentChannel();
+        if (parentChannel == null) return null;
 
-        String userName = getUserName().replace("/", "");
-        String threadName = DiscordThreadUtility.fitThreadName(
-                game.isFowMode()
-                        ? String.format("%s-cards-info-%s-private", game.getName(), userName)
-                        : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName));
-
+        String threadName = getCardsInfoThreadName();
         ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 
         if (foundThread != null) {
@@ -720,7 +708,40 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return foundThread;
         }
 
-        return createIfMissing ? createNewThread(parentChannel, threadName) : null;
+        return createIfMissing ? createAndGreetCardsInfoThread(parentChannel, threadName) : null;
+    }
+
+    @Nullable
+    public ThreadChannel createCardsInfoThread() {
+        if (isNpc() || isDummy()) return null;
+
+        TextChannel parentChannel = getCardsInfoThreadParentChannel();
+        if (parentChannel == null) return null;
+
+        return createCardsInfoThread(parentChannel, getCardsInfoThreadName());
+    }
+
+    public void sendCardsInfoThreadGreeting(ThreadChannel thread) {
+        MessageHelper.sendMessageToChannel(thread, "Hello " + getPing() + "! This is your private channel.");
+    }
+
+    @Nullable
+    private TextChannel getCardsInfoThreadParentChannel() {
+        TextChannel parentChannel = getCorrectChannel();
+        if (parentChannel == null && !game.isHasEnded()) {
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`Player.getCardsInfoThreadParentChannel`: parent channel is null for game: " + game.getName());
+        }
+        return parentChannel;
+    }
+
+    private String getCardsInfoThreadName() {
+        String userName = getUserName().replace("/", "");
+        return DiscordThreadUtility.fitThreadName(
+                game.isFowMode()
+                        ? String.format("%s-cards-info-%s-private", game.getName(), userName)
+                        : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName));
     }
 
     @Nullable
@@ -759,16 +780,21 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
     }
 
-    private ThreadChannel createNewThread(TextChannel actionsChannel, String threadName) {
+    private ThreadChannel createAndGreetCardsInfoThread(TextChannel parentChannel, String threadName) {
+        ThreadChannel thread = createCardsInfoThread(parentChannel, threadName);
+        sendCardsInfoThreadGreeting(thread);
+        return thread;
+    }
+
+    private ThreadChannel createCardsInfoThread(TextChannel parentChannel, String threadName) {
         boolean isPrivate = !game.isFowMode();
-        ThreadChannelAction action = actionsChannel
+        ThreadChannelAction action = parentChannel
                 .createThreadChannel(threadName, isPrivate)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
 
         if (isPrivate) action = action.setInvitable(false);
 
         ThreadChannel thread = action.complete();
-        MessageHelper.sendMessageToChannel(thread, "Hello " + getPing() + "! This is your private channel.");
         setCardsInfoThreadID(thread.getId());
         return thread;
     }
@@ -3670,6 +3696,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @JsonIgnore
     public void setStoredValue(String key, String val) {
+        if (StringUtils.isBlank(val)) {
+            removeStoredValue(key);
+            return;
+        }
         String safeKey = StringHelper.escape(key);
         getStoredValueMap().put(safeKey, StringHelper.escape(val));
     }
@@ -3697,19 +3727,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
         Collections.addAll(vs, vals);
-        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
-        getStoredValueMap().put(safeKey, ls);
+        putStoredList(safeKey, vs);
     }
 
     public void removeFromStoredList(String key, String... vals) {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
         for (String v : vals) vs.remove(v);
-        if (vs.isEmpty()) {
+        putStoredList(safeKey, vs);
+    }
+
+    private void putStoredList(String safeKey, List<String> values) {
+        String ls = String.join("|", values.stream().map(StringHelper::escape).toList());
+        if (ls.isEmpty()) {
             getStoredValueMap().remove(safeKey);
             return;
         }
-        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
         getStoredValueMap().put(safeKey, ls);
     }
 

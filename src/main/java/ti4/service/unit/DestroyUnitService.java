@@ -51,6 +51,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -195,6 +196,7 @@ public class DestroyUnitService {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
         }
         MidgardLegendaryButtonHandler.offerMusterManheim(event, game, units, combat);
+        TeHelperAbilities.offerStrandedStructureRemoval(event, game, units);
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);

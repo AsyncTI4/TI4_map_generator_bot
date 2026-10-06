@@ -1,0 +1,18 @@
+{
+  "name": "fog-comms-4p",
+  "description": "Fog game for comms: you neighbour seat1, seat1 neighbours seat2, seat3 is isolated. Starts in the action phase.",
+  "fog": true,
+  "you": { "faction": "letnev", "color": "red", "home": "301", "speaker": true, "sc": 1, "units": { "101": "ca" } },
+  "seats": [
+    { "faction": "nekro", "color": "blue", "home": "304", "sc": 3, "units": { "102": "dd" } },
+    { "faction": "hacan", "color": "green", "home": "307", "sc": 5, "units": { "103": "dd" } },
+    { "faction": "sol", "color": "yellow", "home": "310", "sc": 7 }
+  ],
+  "defaults": { "acs": 3, "sos": 1, "tg": 3, "commodities": 2, "ccs": "3/3/2" },
+  "start": "action",
+  "shortcuts": [
+    { "label": "Comms threads hide instantly", "steps": [ { "do": "setStored", "key": "anonCommsHideHours", "value": "0" } ] },
+    { "label": "Comms threads hide after 3h", "steps": [ { "do": "removeStored", "key": "anonCommsHideHours" } ] },
+    { "label": "Run comms hide cron", "steps": [ { "do": "runCron", "value": "AnonymousCommsArchiveCron" } ] }
+  ]
+}

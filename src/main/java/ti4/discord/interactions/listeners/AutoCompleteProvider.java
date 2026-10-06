@@ -606,7 +606,7 @@ class AutoCompleteProvider {
                                 BorderAnomalyModel.BorderAnomalyType::toSearchString,
                                 BorderAnomalyModel.BorderAnomalyType::getName));
                 List<Command.Choice> options = anomalies.entrySet().stream()
-                        .filter(anomaly -> anomaly.getValue().contains(enteredValue))
+                        .filter(anomaly -> anomaly.getValue().toLowerCase().contains(enteredValue))
                         .map(anomaly -> new Command.Choice(anomaly.getValue(), anomaly.getKey()))
                         .limit(25)
                         .collect(Collectors.toList());

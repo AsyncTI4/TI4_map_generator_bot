@@ -17,7 +17,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.buttons.Buttons;
@@ -209,8 +211,28 @@ class TestBedGameTest extends BaseTi4Test {
                 .mapToObj(i -> Buttons.green("FFCC_nekro_option" + i, "Option " + i))
                 .toList();
         TurnButtons turn = new TurnButtons(nekro, null, turnButtons);
-        assertWithinLimits(TestBedPanelService.turnComponents(turn));
+        assertWithinLimits(TestBedPanelService.turnComponents(game, turn));
         assertTrue(TestBedPanelService.turnContent(game, turn, null).contains("nekro"));
+
+        // In a combat thread the page also offers a "Roll as" button per side, so it keeps 15 buttons instead.
+        Player other = game.getRealPlayers().stream()
+                .filter(seat -> seat != nekro)
+                .findFirst()
+                .orElseThrow();
+        MessageChannelUnion thread = mock(MessageChannelUnion.class);
+        when(thread.getName()).thenReturn(game.getName() + "-round-1-system-101-turn-1-nekro-vs-" + other.getFaction());
+        when(thread.getAsMention()).thenReturn("<#1>");
+        Message combatMessage = mock(Message.class);
+        when(combatMessage.getChannel()).thenReturn(thread);
+        TurnButtons combat = new TurnButtons(nekro, combatMessage, turnButtons, other, true);
+        List<ActionRow> combatRows = TestBedPanelService.turnComponents(game, combat);
+        assertWithinLimits(combatRows);
+        assertEquals(15, combat.shown().size());
+        List<String> rollAs = combatRows.get(combatRows.size() - 2).getButtons().stream()
+                .map(Button::getLabel)
+                .toList();
+        assertEquals(2, rollAs.size());
+        assertTrue(rollAs.containsAll(List.of("Roll as nekro", "Roll as " + other.getFaction())), rollAs.toString());
 
         Shortcut shortcut = new Shortcut();
         shortcut.setLabel("A shortcut label that is rather long to see the truncation stay within limits ok");

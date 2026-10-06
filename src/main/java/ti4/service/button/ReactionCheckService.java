@@ -23,6 +23,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 
 @UtilityClass
@@ -157,12 +158,7 @@ public class ReactionCheckService {
                 }
             }
         }
-        var endGameDeck =
-                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
-        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-        if ((game.getRound() > endGameRound || endGameDeck.isEmpty())
-                && !game.isRedTapeMode()
-                && !game.isCivilizedSocietyMode()) {
+        if (EndGameService.objectivesHaveRunOut(game)) {
             if (game.isFowMode()) {
                 message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                 message2 += " Or end the game manually.";
@@ -172,7 +168,7 @@ public class ReactionCheckService {
                 message2 +=
                         " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
 
-                buttons.add(Buttons.red("gameEnd", "End Game"));
+                buttons.add(Buttons.red(EndGameService.MOST_POINTS_END_GAME_BUTTON_ID, "End Game"));
                 buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
             }
         }

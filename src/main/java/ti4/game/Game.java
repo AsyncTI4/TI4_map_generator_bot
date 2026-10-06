@@ -118,6 +118,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
     private static final JsonMapper mapper = JsonMapperManager.basic();
+    private static final String RECORDED_WINNER_KEY = "recordedWinner";
 
     // TODO (Jazz): Sort through these and add to GameProperties
     @Getter
@@ -697,6 +698,65 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Optional<Player> getWinner() {
+        return getWinner(isHasEnded());
+    }
+
+    public Optional<Player> getMostPointsWinner() {
+        List<Player> candidates = getRealPlayersNDummies();
+        int mostPoints = candidates.stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(0);
+        List<Player> leaders = candidates.stream()
+                .filter(player -> player.getTotalVictoryPoints() == mostPoints)
+                .toList();
+        if (leaders.size() == 1) {
+            return Optional.of(leaders.getFirst());
+        }
+        return getSoleEarliestInitiativePlayer(leaders);
+    }
+
+    public void recordWinner(Player winner) {
+        setStoredValue(RECORDED_WINNER_KEY, winner.getFaction());
+    }
+
+    @Override
+    public void reopen() {
+        super.reopen();
+        removeStoredValue(RECORDED_WINNER_KEY);
+    }
+
+    private Optional<Player> getWinner(boolean includeRecordedWinner) {
+        Optional<Player> winner = getVictoryRequirementWinner();
+        if (winner.isPresent() || !includeRecordedWinner) {
+            return winner;
+        }
+        return getRecordedWinner();
+    }
+
+    private static Optional<Player> getSoleEarliestInitiativePlayer(List<Player> tiedPlayers) {
+        if (tiedPlayers.isEmpty() || !tiedPlayers.stream().allMatch(player -> isNotEmpty(player.getSCs()))) {
+            return Optional.empty();
+        }
+        int earliestInitiative =
+                tiedPlayers.stream().mapToInt(Player::getInitiative).min().getAsInt();
+        List<Player> earliestPlayers = tiedPlayers.stream()
+                .filter(player -> player.getInitiative() == earliestInitiative)
+                .toList();
+        return earliestPlayers.size() == 1 ? Optional.of(earliestPlayers.getFirst()) : Optional.empty();
+    }
+
+    private Optional<Player> getRecordedWinner() {
+        String faction = getStoredValue(RECORDED_WINNER_KEY);
+        if (faction.isEmpty()) {
+            return Optional.empty();
+        }
+        return getRealPlayersNDummies().stream()
+                .filter(player -> faction.equals(player.getFaction()))
+                .findFirst();
+    }
+
+    private Optional<Player> getVictoryRequirementWinner() {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
             if (!meetsVictoryRequirement(player)) {
@@ -721,12 +781,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public List<Player> getWinners() {
-        Optional<Player> winnerOptional = getWinner();
-        if (winnerOptional.isEmpty()) {
-            return Collections.emptyList();
-        }
+        return getWinner().map(this::withAlliancePartners).orElse(Collections.emptyList());
+    }
 
-        Player winner = winnerOptional.get();
+    public List<Player> getWinnersOnceEnded() {
+        return getWinner(true).map(this::withAlliancePartners).orElse(Collections.emptyList());
+    }
+
+    private List<Player> withAlliancePartners(Player winner) {
         List<Player> winners = new ArrayList<>();
         winners.add(winner);
 

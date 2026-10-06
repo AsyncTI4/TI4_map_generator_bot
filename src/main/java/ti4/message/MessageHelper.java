@@ -59,7 +59,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
@@ -722,9 +721,8 @@ public class MessageHelper {
         buttons = sanitizeButtons(buttons, channel);
 
         String gameName = GameNameService.getGameNameFromChannel(channel);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame != null && !managedGame.isInjectRules()) {
-            messageText = injectRules(messageText);
+        if (shouldInjectRules(GameManager.getManagedGame(gameName))) {
+            messageText = RulesLinkInjector.inject(messageText);
         }
 
         String finalMessageText = messageText;
@@ -1432,30 +1430,7 @@ public class MessageHelper {
         return newButtons;
     }
 
-    private static String injectRules(String message) {
-        if (message == null) {
-            return null;
-        }
-        try {
-            StringBuilder edited = new StringBuilder(message);
-            StringBuilder copy = new StringBuilder(message.toLowerCase());
-            for (String keyWord : AliasHandler.getInjectedRules()) {
-                if ("bombardment".equals(keyWord) && message.contains("Tactical Bombardment")) continue;
-                if ("production".equals(keyWord) && message.contains("Monopolize Production")) continue;
-                if (copy.indexOf(keyWord) > -1) {
-                    String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
-                    int firstIndex = copy.indexOf(keyWord);
-                    int lastIndex = firstIndex + keyWord.length() + 1;
-                    copy.insert(firstIndex, "[");
-                    copy.insert(lastIndex, replace);
-                    edited.insert(firstIndex, "[");
-                    edited.insert(lastIndex, replace);
-                }
-            }
-            return edited.toString();
-        } catch (Exception e) {
-            BotLogger.error("Issue injecting Rules into message: " + message, e);
-            return message;
-        }
+    static boolean shouldInjectRules(ManagedGame managedGame) {
+        return managedGame != null && managedGame.isInjectRules() && !managedGame.isFowMode();
     }
 }

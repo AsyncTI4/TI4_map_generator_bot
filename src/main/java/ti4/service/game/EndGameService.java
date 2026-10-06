@@ -25,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.StatusHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -47,6 +48,8 @@ import ti4.spring.service.gameevent.GameEventType;
 @UtilityClass
 public class EndGameService {
 
+    public static final String MOST_POINTS_END_GAME_BUTTON_ID = "endGameMostPoints";
+
     public static void secondHalfOfGameEnd(
             GenericInteractionCreateEvent event, Game game, boolean publish, boolean archiveChannels, boolean rematch) {
         String gameName = game.getName();
@@ -67,7 +70,7 @@ public class EndGameService {
             // The game-winning objective may have just been staged into the status-scoring draft.
             StatusHelper.commitStatusScoringEvent(game);
             List<String> winners =
-                    game.getWinners().stream().map(Player::getFaction).toList();
+                    game.getWinnersOnceEnded().stream().map(Player::getFaction).toList();
             GameEventService.commit(
                     game, GameEventType.GAME_ENDED, null, winners.isEmpty() ? Map.of() : Map.of("winner", winners));
         }
@@ -194,6 +197,32 @@ public class EndGameService {
         if (rematch) {
             RematchService.secondHalfOfRematch(event, game);
         }
+    }
+
+    public static boolean objectivesHaveRunOut(Game game) {
+        if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+            return false;
+        }
+        var endGameDeck =
+                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
+        var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
+        return game.getRound() > endGameRound || endGameDeck.isEmpty();
+    }
+
+    public static void recordMostPointsWinner(Game game, MessageChannel channel) {
+        Optional<Player> winner = game.getMostPointsWinner();
+        if (winner.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "No winner has been recorded: the players tied for the most victory points could not be separated by initiative, so this game will end without a winner.");
+            return;
+        }
+        game.recordWinner(winner.get());
+        MessageHelper.sendMessageToChannel(
+                channel,
+                winner.get().getRepresentationNoPing() + " has been recorded as the winner with "
+                        + StringHelper.pluralize(winner.get().getTotalVictoryPoints(), "victory point")
+                        + ", the most of any player (ties go to the earliest initiative).");
     }
 
     static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {

@@ -40,3 +40,8 @@ scripts/**/__pycache__/
 # Developer test bed: personal presets, scripts and test buttons stay local (see DEVELOPER_TESTBED.md)
 src/main/resources/data/testbed/local/*
 !src/main/resources/data/testbed/local/README.md
+!src/main/resources/data/testbed/local/presets/
+!src/main/resources/data/testbed/local/scripts/
+!src/main/resources/data/testbed/local/shortcuts/
+src/main/resources/data/testbed/local/*/*
+!src/main/resources/data/testbed/local/*/.gitkeep

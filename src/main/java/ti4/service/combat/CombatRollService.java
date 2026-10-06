@@ -858,6 +858,7 @@ public class CombatRollService {
                                             event.getMessageChannel(), msg, buttons);
                                 }
                             }
+                            offerDuraniumRepairWithoutHits(event, opponent, tile, combatOnHolder);
                         }
                     } else if (opponent.hasTech("vpw") && h > 0) {
                         MessageHelper.sendMessageToChannel(
@@ -923,6 +924,7 @@ public class CombatRollService {
                         if (round2 > round) {
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                         }
+                        offerDuraniumRepairWithoutHits(event, opponent, tile, combatOnHolder);
                     }
                 }
             }
@@ -1220,6 +1222,30 @@ public class CombatRollService {
             msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+    }
+
+    private static void offerDuraniumRepairWithoutHits(
+            GenericInteractionCreateEvent event, Player opponent, Tile tile, UnitHolder combatOnHolder) {
+        if (!opponent.hasTech("da") || !hasDamagedUnit(opponent, combatOnHolder)) return;
+        String buttonPrefix =
+                opponent.isDummy() || opponent.isNpc() ? opponent.dummyPlayerSpoof() : opponent.factionButtonChecker();
+        String repairId = combatOnHolder instanceof Planet
+                ? AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), 0)
+                : "autoAssignSpaceHits_" + tile.getPosition() + "_0";
+        List<Button> buttons = List.of(
+                Buttons.green(buttonPrefix + repairId, "Repair With Duranium Armor"),
+                Buttons.gray("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                opponent.getRepresentationUnfogged()
+                        + ", you may repair 1 damaged unit with _Duranium Armor_ even though you suffered no hits.",
+                buttons);
+    }
+
+    private static boolean hasDamagedUnit(Player player, UnitHolder unitHolder) {
+        return unitHolder.getUnitKeys().stream()
+                .anyMatch(
+                        unitKey -> player.unitBelongsToPlayer(unitKey) && unitHolder.getDamagedUnitCount(unitKey) > 0);
     }
 
     // This roll was made from fow private channel and not from a combat thread

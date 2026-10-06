@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -135,10 +138,8 @@ public class CreateGameService {
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
 
         // ADD PLAYERS TO ROLE
-        for (Member member : members) {
-            if (missingMembers.contains(member)) continue; // skip members who aren't on the new server yet
-            guild.addRoleToMember(member, role).complete();
-        }
+        Map<Member, CompletableFuture<Void>> roleAssignments =
+                assignRoleToMembers(guild, role, members, missingMembers);
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
@@ -220,22 +221,21 @@ public class CreateGameService {
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
-        introductionToBotMapUpdatesThread(newGame);
-        introductionForNewPlayers(newGame);
 
         // Create Cards Info Threads
-        for (Player player : newGame.getPlayers().values()) {
-            if (player.isNpc() || player.isDummy()) {
-                continue;
-            }
-            player.getCardsInfoThread();
-        }
+        Map<Player, ThreadChannel> cardsInfoThreads = createCardsInfoThreads(newGame);
+
+        List<Member> membersWithoutRole = awaitRoleAssignments(roleAssignments, newGame);
+        introductionToBotMapUpdatesThread(newGame);
+        introductionForNewPlayers(newGame);
+        cardsInfoThreads.forEach(Player::sendCardsInfoThreadGreeting);
 
         // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " + role.getName()
                 + "\n> " + chatChannel.getAsMention()
                 + "\n> " + actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
+        reportMembersWithoutRole(event, membersWithoutRole, newGame);
 
         reportNewGameCreated(newGame);
 
@@ -265,6 +265,49 @@ public class CreateGameService {
         }
 
         return newGame;
+    }
+
+    private static Map<Member, CompletableFuture<Void>> assignRoleToMembers(
+            Guild guild, Role role, List<Member> members, List<Member> missingMembers) {
+        Map<Member, CompletableFuture<Void>> assignments = new LinkedHashMap<>();
+        for (Member member : members) {
+            if (missingMembers.contains(member)) continue;
+            assignments.put(member, guild.addRoleToMember(member, role).submit());
+        }
+        return assignments;
+    }
+
+    static List<Member> awaitRoleAssignments(Map<Member, CompletableFuture<Void>> assignments, Game game) {
+        List<Member> membersWithoutRole = new ArrayList<>();
+        assignments.forEach((member, assignment) -> {
+            Throwable failure = assignment.handle((ignored, error) -> error).join();
+            if (failure == null) return;
+            membersWithoutRole.add(member);
+            BotLogger.error(
+                    new LogOrigin(game),
+                    "Could not give " + member.getEffectiveName() + " the " + game.getName() + " role.",
+                    failure);
+        });
+        return membersWithoutRole;
+    }
+
+    private static void reportMembersWithoutRole(
+            GenericInteractionCreateEvent event, List<Member> membersWithoutRole, Game game) {
+        if (membersWithoutRole.isEmpty()) return;
+        String mentions = membersWithoutRole.stream().map(Member::getAsMention).collect(Collectors.joining(", "));
+        String message = mentions + ", the bot couldn't give you the **" + game.getName()
+                + "** role, so you can't see the game channels yet. Press **Locate My Game** to try again.";
+        Button locateGame = Buttons.green("pingGame_" + game.getName(), "Locate My Game");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, List.of(locateGame));
+    }
+
+    private static Map<Player, ThreadChannel> createCardsInfoThreads(Game game) {
+        Map<Player, ThreadChannel> threads = new LinkedHashMap<>();
+        for (Player player : game.getPlayers().values()) {
+            ThreadChannel thread = player.createCardsInfoThread();
+            if (thread != null) threads.put(player, thread);
+        }
+        return threads;
     }
 
     public static void presentSetupToPlayers(Game game) {
