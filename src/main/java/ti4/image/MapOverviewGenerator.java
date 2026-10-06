@@ -194,23 +194,10 @@ public class MapOverviewGenerator {
         }
 
         Polygon hexPolygon(Rectangle hex) {
-            int quarter = hex.width / 4;
-            int[] xs = {
-                hex.x + quarter,
-                hex.x + hex.width - quarter,
-                hex.x + hex.width,
-                hex.x + hex.width - quarter,
-                hex.x + quarter,
-                hex.x
-            };
-            int[] ys = {
-                hex.y, hex.y, hex.y + hex.height / 2, hex.y + hex.height, hex.y + hex.height, hex.y + hex.height / 2
-            };
-            Polygon polygon = new Polygon();
-            for (int i = 0; i < xs.length; i++) {
-                polygon.addPoint(toCanvasX(xs[i]), toCanvasY(ys[i]));
-            }
-            return polygon;
+            int left = toCanvasX(hex.x);
+            int top = toCanvasY(hex.y);
+            return MapFrame.hexPolygon(
+                    new Rectangle(left, top, toCanvasX(hex.x + hex.width) - left, toCanvasY(hex.y + hex.height) - top));
         }
     }
 }

@@ -817,6 +817,9 @@ class GameSaveService {
             writer.write(Constants.FOG_FILTER + " " + fogColor);
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.FOG_GHOST_HEXES + " " + player.isFogGhostHexes());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 

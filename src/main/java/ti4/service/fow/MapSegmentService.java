@@ -2,6 +2,8 @@ package ti4.service.fow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -49,8 +51,7 @@ public class MapSegmentService {
         List<String> names = new ArrayList<>(visibleTo(game, userId, foggedView).stream()
                 .map(MapSegment::name)
                 .toList());
-        boolean fractureIsTheOnlySector = MapSegment.all(game).stream().allMatch(MapSegment::isFracture);
-        if (fractureIsTheOnlySector && names.contains(MapSegment.FRACTURE)) {
+        if (!names.isEmpty() && MapSegment.mainMapVisibleTo(game, foggedViewer(game, userId, foggedView))) {
             names.addFirst(MapSegment.MAIN);
         }
         return names;
@@ -61,9 +62,19 @@ public class MapSegmentService {
         if (names.size() < 2) {
             return List.of();
         }
+        Map<String, String> labels = MapSegment.all(game).stream()
+                .collect(Collectors.toMap(MapSegment::name, MapSegment::displayName, (first, second) -> first));
         return names.stream()
-                .map(name -> Buttons.gray(SWITCH_PREFIX + name, "Map: " + name))
+                .map(name -> Buttons.gray(SWITCH_PREFIX + name, "Map: " + labels.getOrDefault(name, name)))
                 .toList();
+    }
+
+    @Nullable
+    private static Player foggedViewer(Game game, String userId, boolean foggedView) {
+        if (!foggedView && FoWHelper.isGameMaster(userId, game)) {
+            return null;
+        }
+        return game.getPlayer(userId);
     }
 
     private static List<MapSegment> visibleTo(Game game, String userId, boolean foggedView) {

@@ -85,6 +85,7 @@ import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.image.BoardPosition;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
@@ -1418,6 +1419,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         List<String> tilePositions = new ArrayList<>(tileMap.keySet());
         String highestPosition = tilePositions.stream()
+                .map(position ->
+                        BoardPosition.parse(position).map(BoardPosition::local).orElse(position))
                 .filter(Helper::isInteger)
                 .max(Comparator.comparingInt(Integer::parseInt))
                 .orElse(null);

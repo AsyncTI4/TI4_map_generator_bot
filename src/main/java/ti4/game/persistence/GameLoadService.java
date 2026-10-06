@@ -1136,6 +1136,7 @@ class GameLoadService {
                     String filter = tokenizer.nextToken();
                     player.setFogFilter(filter);
                 }
+                case Constants.FOG_GHOST_HEXES -> player.setFogGhostHexes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));

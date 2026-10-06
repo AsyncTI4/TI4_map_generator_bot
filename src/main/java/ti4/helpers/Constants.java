@@ -556,6 +556,7 @@ public final class Constants {
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
     public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
     public static final String TARGET_PLANET_PING = "target_planet";

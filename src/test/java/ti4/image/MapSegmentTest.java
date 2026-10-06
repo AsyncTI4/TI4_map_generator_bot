@@ -273,4 +273,79 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(Set.of("frac1", "frac2"), positionsOf(MapSegment.FRACTURE));
         assertEquals(1, names().stream().filter(MapSegment.FRACTURE::equals).count());
     }
+
+    @Test
+    void eachExtraBoardInUseIsItsOwnDetachedSector() {
+        game.setTile(new Tile("19", "a000"));
+        game.setTile(new Tile("19", "a101"));
+        game.setTile(new Tile("19", "c000"));
+
+        assertEquals(Set.of("a000", "a101"), positionsOf("board-a"));
+        assertEquals(Set.of("c000"), positionsOf("board-c"));
+        assertTrue(MapSegment.find(game, "board-a").orElseThrow().isDetached());
+        assertTrue(MapSegment.isDetachedPosition(game, "a101"));
+        assertFalse(MapSegment.isDetachedPosition(game, "101"));
+    }
+
+    @Test
+    void automaticSectorsSplitEachMapOnItsOwnAndNeverJoinMapsEvenWhenLinked() {
+        // Two islands on map A, one linked to the main map by a GM custom adjacency.
+        MapFrame.positionsWithin("a000", 1).forEach(position -> game.setTile(new Tile("19", position)));
+        game.setTile(new Tile("19", "a401"));
+        game.addCustomAdjacentTiles("000", List.of("a000"));
+        MapSegment.setAutoSectors(game, true);
+
+        List<MapSegment> onMapA = MapSegment.all(game).stream()
+                .filter(segment -> segment.positions().stream().allMatch(BoardPosition::isBoardPosition))
+                .toList();
+        assertEquals(2, onMapA.size(), "map A's two islands are two sectors");
+        assertTrue(onMapA.stream().noneMatch(MapSegment::isDetached));
+        assertTrue(onMapA.stream().allMatch(segment -> segment.displayName().startsWith("A / ")));
+        assertFalse(names().contains("board-a"), "every map A tile is already in a sector");
+        assertTrue(MapSegment.all(game).stream()
+                .noneMatch(segment -> segment.positions().contains("000")
+                        && segment.positions().contains("a000")));
+    }
+
+    @Test
+    void aNamedSectorOnAMapLeavesTheRestOfThatMapAsItsOwnView() {
+        game.setTile(new Tile("19", "b000"));
+        game.setTile(new Tile("19", "b401"));
+        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
+
+        assertEquals(
+                "B / outpost", MapSegment.find(game, "outpost").orElseThrow().displayName());
+        assertEquals(Set.of("b401"), positionsOf("board-b"));
+        assertEquals("B", MapSegment.find(game, "board-b").orElseThrow().displayName());
+    }
+
+    @Test
+    void theMainMapIsItsOwnViewWhileAnyOfItsSystemsIsOutsideEverySector() {
+        game.setTile(new Tile("19", "a000"));
+        assertTrue(MapSegment.mainMapVisibleTo(game, null), "main map has no sectors, map A is detached");
+        assertFalse(MapSegment.isOnUncoveredMainMap(game, "a000"));
+
+        MapSegment.put(game, new MapSegment("everything", "000", 3));
+        assertFalse(MapSegment.mainMapVisibleTo(game, null));
+    }
+
+    @Test
+    void aNamedSectorCanClaimABoard() {
+        game.setTile(new Tile("19", "b000"));
+        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
+
+        assertTrue(names().contains("outpost"));
+        assertFalse(names().contains("board-b"), "a board fully covered by a named sector needs no own sector");
+    }
+
+    @Test
+    void boardSectorNamesAreReservedAndOnlyExistInFog() {
+        assertTrue(MapSegment.isReservedName("board-a"));
+        assertTrue(MapSegment.isReservedName("board-g"));
+        assertFalse(MapSegment.isReservedName("board-h"));
+
+        game.setTile(new Tile("19", "a000"));
+        game.setFowMode(false);
+        assertFalse(names().contains("board-a"));
+    }
 }

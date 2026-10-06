@@ -92,6 +92,32 @@ class MapSegmentServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void anExtraMapOffersMainAndTheMapWithMapLetterLabels() {
+        game.setTile(new Tile("21", "a000"));
+        game.getTileByPosition("a000")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
+
+        assertEquals(
+                List.of(MapSegment.MAIN, "board-a"), MapSegmentService.viewableNames(game, player.getUserID(), true));
+        assertEquals(
+                List.of("Map: main", "Map: A"),
+                MapSegmentService.switchButtons(game, player.getUserID(), true).stream()
+                        .map(button -> button.getLabel())
+                        .toList());
+    }
+
+    @Test
+    void sectorsOnAnExtraMapStillLeaveTheUnsectoredMainMapReachable() {
+        game.setTile(new Tile("21", "a000"));
+        game.getTileByPosition("a000")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
+        MapSegment.put(game, new MapSegment("outpost", "a000", 1));
+
+        assertEquals(
+                List.of(MapSegment.MAIN, "outpost"), MapSegmentService.viewableNames(game, player.getUserID(), true));
+    }
+
+    @Test
     void segmentTravelsThroughAButtonIdAndBack() {
         assertEquals("showMap", MapSegmentService.withSegment("showMap", null));
         assertEquals("showMap_ursa-major", MapSegmentService.withSegment("showMap", "ursa-major"));
