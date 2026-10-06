@@ -773,7 +773,7 @@ class GameLoadService {
         while (mapdata.hasMoreTokens()) {
             StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
             String id = entry.nextToken();
-            String val = entry.nextToken();
+            String val = entry.hasMoreTokens() ? entry.nextToken() : "";
             data.put(id, val);
         }
         return data;
