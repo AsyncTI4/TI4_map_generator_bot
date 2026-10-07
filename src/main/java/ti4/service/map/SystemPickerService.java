@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +24,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.image.BoardPosition;
 import ti4.image.MapSegment;
 import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
@@ -38,12 +39,11 @@ public class SystemPickerService {
     private static final String CENTRE_RING = "0";
     private static final String OTHER_RING = "x";
     private static final int MAX_TILE_BUTTONS = 23;
-    private static final int MAX_RING_SEARCH = 40;
     private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     private static final Comparator<String> POSITION_ORDER =
             Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder());
 
-    record Area(String name, String label, String centre, Set<String> positions) {}
+    record Area(String name, String label, Set<String> positions) {}
 
     enum Part {
         W("West half"),
@@ -128,8 +128,7 @@ public class SystemPickerService {
             Set<String> positions = new HashSet<>(segment.positions());
             positions.retainAll(onMap);
             if (positions.isEmpty()) continue;
-            areas.add(new Area(
-                    segment.name(), segment.displayName(game), centreOf(segment.centre(), positions), positions));
+            areas.add(new Area(segment.name(), segment.displayName(game), positions));
         }
         Set<String> rest = onMap.stream()
                 .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
@@ -137,8 +136,7 @@ public class SystemPickerService {
                 .filter(position -> !covered.contains(position))
                 .collect(Collectors.toSet());
         if (!rest.isEmpty()) {
-            String centre = areas.isEmpty() ? "000" : centreOf("", rest);
-            areas.addFirst(new Area(MapSegment.MAIN, MapSegment.mainDisplayName(game), centre, rest));
+            areas.addFirst(new Area(MapSegment.MAIN, MapSegment.mainDisplayName(game), rest));
         }
         return areas;
     }
@@ -150,71 +148,31 @@ public class SystemPickerService {
         return MapSegment.visibleTo(game, player);
     }
 
-    private static String centreOf(String preferred, Set<String> positions) {
-        if (StringUtils.isNotBlank(preferred)) {
-            return preferred;
-        }
-        List<String> placed = positions.stream()
-                .filter(position -> PositionMapper.getTilePosition(position) != null)
-                .toList();
-        if (placed.isEmpty()) {
-            return positions.stream().min(POSITION_ORDER).orElse("000");
-        }
-        double centreX = placed.stream()
-                .mapToInt(position -> PositionMapper.getTilePosition(position).x)
-                .average()
-                .orElse(0);
-        double centreY = placed.stream()
-                .mapToInt(position -> PositionMapper.getTilePosition(position).y)
-                .average()
-                .orElse(0);
-        return placed.stream()
-                .min(Comparator.<String>comparingDouble(position -> {
-                            Point point = PositionMapper.getTilePosition(position);
-                            return Math.hypot(point.x - centreX, point.y - centreY);
-                        })
-                        .thenComparing(POSITION_ORDER))
-                .orElseThrow();
-    }
-
-    static Map<String, List<String>> byRing(Area area, List<String> positions) {
-        Map<String, Integer> distances = ringDistances(area);
+    static Map<String, List<String>> byRing(List<String> positions) {
         Map<String, List<String>> rings = new LinkedHashMap<>();
         positions.stream()
-                .sorted(Comparator.comparingInt(
-                                (String position) -> distances.getOrDefault(position, Integer.MAX_VALUE))
-                        .thenComparing(POSITION_ORDER))
-                .forEach(position -> {
-                    Integer distance = distances.get(position);
-                    String ring = distance == null ? OTHER_RING : String.valueOf(distance);
-                    rings.computeIfAbsent(ring, key -> new ArrayList<>()).add(position);
-                });
+                .sorted(Comparator.comparingInt(SystemPickerService::ringOrder).thenComparing(POSITION_ORDER))
+                .forEach(position -> rings.computeIfAbsent(mapRing(position), key -> new ArrayList<>())
+                        .add(position));
         return rings;
     }
 
-    private static Map<String, Integer> ringDistances(Area area) {
-        Map<String, Integer> distances = new HashMap<>();
-        Set<String> reached = new HashSet<>(Set.of(area.centre()));
-        List<String> frontier = List.of(area.centre());
-        for (int ring = 0;
-                ring <= MAX_RING_SEARCH
-                        && !frontier.isEmpty()
-                        && distances.size() < area.positions().size();
-                ring++) {
-            List<String> next = new ArrayList<>();
-            for (String position : frontier) {
-                if (area.positions().contains(position)) {
-                    distances.put(position, ring);
-                }
-                for (String adjacent : PositionMapper.getAdjacentTilePositions(position)) {
-                    if (reached.add(adjacent)) {
-                        next.add(adjacent);
-                    }
-                }
-            }
-            frontier = next;
-        }
-        return distances;
+    static String mapRing(String position) {
+        String local = BoardPosition.parse(position).map(BoardPosition::local).orElse(position);
+        return Helper.isInteger(local) ? String.valueOf(Integer.parseInt(local) / 100) : OTHER_RING;
+    }
+
+    private static int ringOrder(String position) {
+        String ring = mapRing(position);
+        return OTHER_RING.equals(ring) ? Integer.MAX_VALUE : Integer.parseInt(ring);
+    }
+
+    static String galaxyCentre(List<String> positions) {
+        return positions.stream()
+                .findFirst()
+                .flatMap(BoardPosition::parse)
+                .map(board -> board.withLocal("000"))
+                .orElse("000");
     }
 
     static Map<Part, List<String>> split(String centre, List<String> positions) {
@@ -266,7 +224,7 @@ public class SystemPickerService {
 
     private static List<Button> ringButtons(Player player, Game game, Area area, Predicate<Tile> selectable) {
         List<Button> buttons = new ArrayList<>();
-        byRing(area, selectablePositions(game, area.positions(), selectable)).forEach((ring, positions) -> {
+        byRing(selectablePositions(game, area.positions(), selectable)).forEach((ring, positions) -> {
             String id = player.factionButtonChecker() + STEP_PREFIX + area.name() + "_" + ring;
             buttons.add(Buttons.green(id, ringLabel(ring) + " (" + positions.size() + ")"));
         });
@@ -319,9 +277,9 @@ public class SystemPickerService {
                 message = "Please choose the ring of `" + area.get().label() + "` that the system is in.";
             }
         } else {
-            List<String> inRing = byRing(area.get(), positions).getOrDefault(step[1], List.of());
+            List<String> inRing = byRing(positions).getOrDefault(step[1], List.of());
             if (step.length == 2 && inRing.size() > MAX_TILE_BUTTONS) {
-                split(area.get().centre(), inRing)
+                split(galaxyCentre(inRing), inRing)
                         .forEach((part, partPositions) -> buttons.add(Buttons.green(
                                 player.factionButtonChecker() + STEP_PREFIX + step[0] + "_" + step[1] + "_" + part.id(),
                                 part.label + " (" + partPositions.size() + ")")));
@@ -329,7 +287,7 @@ public class SystemPickerService {
             } else {
                 List<String> shown = step.length == 2
                         ? inRing
-                        : split(area.get().centre(), inRing).getOrDefault(partOf(step[2]), List.of());
+                        : split(galaxyCentre(inRing), inRing).getOrDefault(partOf(step[2]), List.of());
                 buttons.addAll(tileButtons(player, game, shown));
             }
         }

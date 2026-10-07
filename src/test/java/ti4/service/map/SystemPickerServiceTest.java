@@ -181,22 +181,33 @@ class SystemPickerServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void automaticSectorsCountRingsFromTheirOwnMiddle() {
+    void sectorRingsUseTheMapsOwnRingNumbers() {
         MapSegment.setAutoSectors(game, true);
         game.getTileByPosition("1237")
                 .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
 
-        List<Area> areas = SystemPickerService.areas(game, player);
-        assertEquals(2, areas.size());
-        Area south = areas.stream()
+        Area south = SystemPickerService.areas(game, player).stream()
                 .filter(area -> area.positions().contains("1237"))
                 .findFirst()
                 .orElseThrow();
-        assertEquals("1237", south.centre());
+
+        // The south sector spans map rings 11-13; buttons name those rings, not rings counted from its middle.
         assertEquals(
-                Set.of("0", "1"),
-                SystemPickerService.byRing(south, List.copyOf(south.positions()))
-                        .keySet());
+                List.of("11", "12", "13"),
+                List.copyOf(SystemPickerService.byRing(List.copyOf(south.positions()))
+                        .keySet()));
+    }
+
+    @Test
+    void extraGalaxiesCountRingsWithinThatGalaxy() {
+        assertEquals("0", SystemPickerService.mapRing("000"));
+        assertEquals("5", SystemPickerService.mapRing("501"));
+        assertEquals("0", SystemPickerService.mapRing("a000"));
+        assertEquals("2", SystemPickerService.mapRing("a204"));
+        assertEquals("x", SystemPickerService.mapRing("tl"));
+        assertEquals("x", SystemPickerService.mapRing("frac3"));
+        assertEquals("a000", SystemPickerService.galaxyCentre(List.of("a501", "a502")));
+        assertEquals("000", SystemPickerService.galaxyCentre(List.of("501")));
     }
 
     @Test
