@@ -167,6 +167,11 @@ public final class FOWPlusService {
 
         String targetPosition = position;
         Tile tile = game.getTileByPosition(targetPosition);
+        if (!isActive(game) && !ButtonHelper.canActivateTile(game, player, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You cannot activate position " + position + ".");
+            return;
+        }
         if (tile == null) {
             tile = voidTile(targetPosition);
         }

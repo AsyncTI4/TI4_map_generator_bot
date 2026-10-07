@@ -55,7 +55,11 @@ class ShowGameButtonHandler {
         }
     }
 
-    private static boolean mayRenderHere(Game game, ButtonInteractionEvent event) {
+    private static boolean mayRenderHere(@Nullable Game game, ButtonInteractionEvent event) {
+        if (game == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a game for this channel.");
+            return false;
+        }
         if (MapSegmentService.isFoggedView(game, event) || FoWHelper.canSeeWholeMap(game, event)) {
             return true;
         }
