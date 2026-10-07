@@ -5646,9 +5646,10 @@ public class ButtonHelper {
             FOWPlusService.filterRingButtons(ringButtons, player, game, visibleFOWPositions);
         }
         if (smartPicker) {
+            SystemPickerService.dropUnknownSystems(ringButtons, player, game);
             SystemPickerService.addFirstStep(ringButtons, player, game);
         }
-        if (FOWPlusService.isActive(game)) {
+        if (FOWPlusService.isActive(game) || SystemPickerService.isSegmented(game)) {
             ringButtons.add(Buttons.red(factionChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
