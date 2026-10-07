@@ -70,6 +70,27 @@ public class SystemPickerService {
         return game.isFowMode();
     }
 
+    public static boolean isSegmented(Game game) {
+        return isEnabled(game) && !sectorsFor(game, null).isEmpty();
+    }
+
+    public static void dropUnknownSystems(List<Button> buttons, Player player, Game game) {
+        if (!isSegmented(game)) {
+            return;
+        }
+        Set<String> known = MapSegment.knownPositions(game, player);
+        buttons.removeIf(button -> {
+            String position = StringUtils.substringAfter(button.getCustomId(), "ringTile_");
+            return !position.isEmpty() && !known.contains(position);
+        });
+        boolean knowsACorner = known.stream()
+                .anyMatch(position ->
+                        CORNER_POSITIONS.contains(position.toLowerCase()) || MapSegment.isFracturePosition(position));
+        if (!knowsACorner) {
+            buttons.removeIf(button -> StringUtils.contains(button.getCustomId(), "ring_corners"));
+        }
+    }
+
     public static void addFirstStep(List<Button> ringButtons, Player player, Game game) {
         int cornersIndex = 0;
         while (cornersIndex < ringButtons.size()
@@ -102,11 +123,11 @@ public class SystemPickerService {
         Set<String> onMap = game.getTileMap().keySet();
         List<Area> areas = new ArrayList<>();
         Set<String> covered = new HashSet<>();
+        sectorsFor(game, null).forEach(segment -> covered.addAll(segment.positions()));
         for (MapSegment segment : sectorsFor(game, player)) {
             Set<String> positions = new HashSet<>(segment.positions());
             positions.retainAll(onMap);
             if (positions.isEmpty()) continue;
-            covered.addAll(positions);
             areas.add(new Area(segment.name(), centreOf(segment.centre(), positions), positions));
         }
         Set<String> rest = onMap.stream()
@@ -227,7 +248,12 @@ public class SystemPickerService {
 
     private static Predicate<Tile> selectableFor(Game game, Player player) {
         Set<String> visible = FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
-        return tile -> ButtonHelper.canActivateTile(game, player, tile, visible);
+        Predicate<Tile> activatable = tile -> ButtonHelper.canActivateTile(game, player, tile, visible);
+        if (!isSegmented(game)) {
+            return activatable;
+        }
+        Set<String> known = MapSegment.knownPositions(game, player);
+        return activatable.and(tile -> known.contains(tile.getPosition()));
     }
 
     private static List<String> selectablePositions(Game game, Set<String> positions, Predicate<Tile> selectable) {

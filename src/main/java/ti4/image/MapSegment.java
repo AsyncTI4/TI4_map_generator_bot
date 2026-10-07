@@ -408,7 +408,7 @@ public record MapSegment(
                 .toList();
     }
 
-    static Set<String> knownPositions(Game game, Player player) {
+    public static Set<String> knownPositions(Game game, Player player) {
         Set<String> known = new HashSet<>(FoWHelper.getTilePositionsToShow(game, player));
         new HashMap<>(player.getFogTiles()).forEach((position, tileId) -> {
             if (!"0b".equals(tileId)
