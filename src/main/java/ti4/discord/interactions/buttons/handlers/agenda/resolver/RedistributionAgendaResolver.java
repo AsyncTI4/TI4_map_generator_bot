@@ -34,6 +34,14 @@ public class RedistributionAgendaResolver implements AgendaResolver {
             if (player.getPlanets().contains(winner.toLowerCase())) {
                 Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
                 Tile tile = game.getTileFromPlanet(winner);
+                if (uH == null) {
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            planetName(game, winner)
+                                    + " is not on the game board, so there are no units to destroy and no infantry"
+                                    + " to place. Please resolve any change of control manually.");
+                    return;
+                }
                 if (tile != null) {
                     DestroyUnitService.destroyAllUnits(event, tile, game, uH, false);
                 }
