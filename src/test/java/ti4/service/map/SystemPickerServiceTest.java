@@ -84,6 +84,23 @@ class SystemPickerServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void sectorsOnAnExtraMapAreOfferedWithTheirMapLetter() {
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+        game.setTile(new Tile("19", "a000"));
+        game.setTile(new Tile("19", "a301"));
+        MapSegment.put(game, new MapSegment("outpost", "a000", 1));
+        game.getTileByPosition("a000")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
+        game.getTileByPosition("a301")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
+
+        // Labels name the map; the button ids keep the internal sector names.
+        List<Button> buttons = SystemPickerService.firstStepButtons(player, game);
+        assertTrue(labels(buttons).containsAll(List.of("Map: A / outpost (1)", "Map: A (1)")));
+        assertTrue(buttons.stream().anyMatch(button -> button.getCustomId().endsWith("systemPick_board-a")));
+    }
+
+    @Test
     void automaticSectorsCountRingsFromTheirOwnMiddle() {
         MapSegment.setAutoSectors(game, true);
         game.getTileByPosition("1237")

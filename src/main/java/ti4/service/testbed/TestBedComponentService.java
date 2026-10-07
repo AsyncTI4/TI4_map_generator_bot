@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -21,7 +22,12 @@ public class TestBedComponentService {
 
     static void applyGameState(Game game, TestBedPreset preset, List<String> warnings) {
         for (String option : preset.getFowOptions()) {
-            game.setFowOption(FOWOption.fromString(option), true);
+            FOWOption fowOption = FOWOption.fromString(option);
+            if (fowOption == FOWOption.FOW_PLUS) {
+                FOWPlusService.setActive(game, true);
+            } else {
+                game.setFowOption(fowOption, true);
+            }
         }
         preset.getStored().forEach(game::setStoredValue);
         for (String objective : preset.getRevealedObjectives()) {

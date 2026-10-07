@@ -12,6 +12,7 @@
     { "label": "Seat 1: show A", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "showMapSegment_board-a" } ] },
     { "label": "Seat 1: show main", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "showMapSegment_main" } ] },
     { "label": "Seat 1 moves into a000", "steps": [ { "do": "hand", "as": "seat1", "hand": { "units": { "a000": "dd" } } } ] },
+    { "label": "You move into a000", "steps": [ { "do": "hand", "as": "you", "hand": { "units": { "a000": "dd" } } } ] },
     { "label": "You move into a301", "steps": [ { "do": "hand", "as": "you", "hand": { "units": { "a301": "dd" } } } ] },
     { "label": "Auto sectors on", "steps": [ { "do": "setStored", "key": "fowMapAutoSectors", "value": "true" } ] },
     { "label": "Auto sectors off", "steps": [ { "do": "removeStored", "key": "fowMapAutoSectors" } ] },

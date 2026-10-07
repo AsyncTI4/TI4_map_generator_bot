@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
@@ -78,6 +79,7 @@ public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
+    private static final int TYPICAL_PLAYER_AREA_HEIGHT = 340;
     private static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300; // padding at left/right of map
     private static final int EXTRA_Y = 200; // padding at top/bottom of map
@@ -243,6 +245,7 @@ public class MapGenerator implements AutoCloseable {
         displayTypeBasic = basicTypeOf(this.displayType);
         tilesToDisplay = new HashMap<>(game.getTileMap());
         setupFow(tilesToDisplay);
+        heightOfPlayerAreasSection -= hiddenPlayerAreasHeight();
         Rectangle frameBounds = computeFrameBounds();
         if (frameBounds != null && segmentLabel(true) != null) {
             frameBounds.y -= SEGMENT_LABEL_SPACE;
@@ -307,26 +310,45 @@ public class MapGenerator implements AutoCloseable {
      * Returns the height for the sections Objectives (above 5) + Laws + Events + Players + idk what EXTRA_Y is for
      */
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
-        final int typicalPlayerAreaHeight = 340;
-        int playersY = playerCountForMap * typicalPlayerAreaHeight;
+        int playersY = playerCountForMap * TYPICAL_PLAYER_AREA_HEIGHT;
         int unrealPlayers = game.getNotRealPlayers().size();
         playersY += Math.round(unrealPlayers / 20.0f) * 15;
         for (Player player : game.getPlayers().values()) {
-            if ("neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy())) {
+            if (hasNoPlayerArea(player)) {
                 playersY -= 350;
             }
-            if (player.isEliminated()) {
-                playersY -= 190;
-            } else if (player.getSecretsScored().size() >= 4) {
-                playersY += (player.getSecretsScored().size() - 4) * 43 + 23;
-            }
-            playersY += (player.getTeamMateIDs().size() - 1) * 35;
+            playersY += playerAreaHeightAdjustment(player);
         }
         final int columnsOfLaws = 2;
         final int lawHeight = 115;
         int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
         lawsY += (game.getEventsInEffect().size() / columnsOfLaws + 1) * lawHeight;
         return playersY + lawsY + objectivesY + EXTRA_Y * 3;
+    }
+
+    private static boolean hasNoPlayerArea(Player player) {
+        return "neutral".equalsIgnoreCase(player.getFaction()) || (player.isNpc() && player.isDummy());
+    }
+
+    private static int playerAreaHeightAdjustment(Player player) {
+        int adjustment = (player.getTeamMateIDs().size() - 1) * 35;
+        if (player.isEliminated()) {
+            return adjustment - 190;
+        }
+        if (player.getSecretsScored().size() >= 4) {
+            return adjustment + (player.getSecretsScored().size() - 4) * 43 + 23;
+        }
+        return adjustment;
+    }
+
+    private int hiddenPlayerAreasHeight() {
+        if (!isFoWPrivate || fowPlayer == null) {
+            return 0;
+        }
+        return game.getRealAndEliminatedPlayers().stream()
+                .filter(player -> !hasNoPlayerArea(player) && shouldConvertToGeneric(player))
+                .mapToInt(player -> TYPICAL_PLAYER_AREA_HEIGHT + playerAreaHeightAdjustment(player))
+                .sum();
     }
 
     private static DisplayType basicTypeOf(DisplayType displayType) {
@@ -865,9 +887,18 @@ public class MapGenerator implements AutoCloseable {
         }
     }
 
+    private void drawMapTilesInsideFrame() {
+        Shape previousClip = graphics.getClip();
+        if (mapFrame != null) {
+            graphics.setClip(0, 0, width, mapFrame.height());
+        }
+        setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
+        graphics.setClip(previousClip);
+    }
+
     private void drawGame() {
         if (debug) debugTileTime = StopWatch.createStarted();
-        setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
+        drawMapTilesInsideFrame();
         drawConnectionStrip();
         if (debug) debugTileTime.stop();
 

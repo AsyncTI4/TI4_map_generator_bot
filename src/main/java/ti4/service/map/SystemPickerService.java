@@ -43,7 +43,7 @@ public class SystemPickerService {
     private static final Comparator<String> POSITION_ORDER =
             Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder());
 
-    record Area(String name, String centre, Set<String> positions) {}
+    record Area(String name, String label, String centre, Set<String> positions) {}
 
     enum Part {
         W("West half"),
@@ -91,7 +91,7 @@ public class SystemPickerService {
         return areas.stream()
                 .map(area -> Buttons.green(
                         player.factionButtonChecker() + STEP_PREFIX + area.name(),
-                        "Map: " + area.name() + " ("
+                        "Map: " + area.label() + " ("
                                 + selectablePositions(game, area.positions(), selectable)
                                         .size()
                                 + ")"))
@@ -107,7 +107,8 @@ public class SystemPickerService {
             positions.retainAll(onMap);
             if (positions.isEmpty()) continue;
             covered.addAll(positions);
-            areas.add(new Area(segment.name(), centreOf(segment.centre(), positions), positions));
+            areas.add(
+                    new Area(segment.name(), segment.displayName(), centreOf(segment.centre(), positions), positions));
         }
         Set<String> rest = onMap.stream()
                 .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
@@ -116,7 +117,7 @@ public class SystemPickerService {
                 .collect(Collectors.toSet());
         if (!rest.isEmpty()) {
             String centre = areas.isEmpty() ? "000" : centreOf("", rest);
-            areas.addFirst(new Area(MapSegment.MAIN, centre, rest));
+            areas.addFirst(new Area(MapSegment.MAIN, MapSegment.MAIN, centre, rest));
         }
         return areas;
     }
@@ -289,7 +290,7 @@ public class SystemPickerService {
                 buttons.addAll(tileButtons(player, game, positions));
             } else {
                 buttons.addAll(ringButtons(player, game, area.get(), selectable));
-                message = "Please choose the ring of `" + area.get().name() + "` that the system is in.";
+                message = "Please choose the ring of `" + area.get().label() + "` that the system is in.";
             }
         } else {
             List<String> inRing = byRing(area.get(), positions).getOrDefault(step[1], List.of());

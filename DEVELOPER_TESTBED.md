@@ -256,7 +256,7 @@ copy-paste templates.
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
 | `revealedObjectives`, `laws`, `tokens` | Game state; see [Set up any component](#set-up-any-component). |
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
-| `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). |
+| `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
