@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,7 @@ import ti4.logging.BotLogger;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
+import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
@@ -296,6 +298,26 @@ public class TestBedPresetService {
             }
             validateIds(entry.getValue(), TestBedPresetService::isKnownToken, "preset", "token", errors);
         }
+        preset.getTiles().forEach((position, tileId) -> {
+            if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
+                errors.add("preset: `tiles` position `" + position + "` is not a tile position.");
+            }
+            if (!TileHelper.isValidTile(tileId.toLowerCase())) {
+                errors.add("preset: unknown tile `" + tileId + "` at `" + position + "` in `tiles`.");
+            }
+        });
+        for (String option : preset.getFowOptions()) {
+            if (Arrays.stream(FOWOption.values())
+                    .noneMatch(known -> known.name().equalsIgnoreCase(option))) {
+                errors.add("preset: unknown fog option `" + option + "` in `fowOptions`.");
+            }
+        }
+        if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
+            errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");
+        }
+        preset.getStored().forEach((key, value) -> {
+            if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
+        });
         for (Seat seat : preset.allSeats()) {
             if (seat.getScoredObjectives() == null) continue;
             for (String objective : seat.getScoredObjectives()) {

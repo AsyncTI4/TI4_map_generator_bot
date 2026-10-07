@@ -123,6 +123,28 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 7: `pressId` is longer than Discord's 100-character limit");
     }
 
+    // Extra tiles (any valid position, including maps A-G), fog options and stored values are checked up front.
+    @Test
+    void mapAndFogFieldsAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "fog": false,
+                  "you": { "faction": "sol" },
+                  "tiles": { "a000": "39", "h101": "19", "b101": "notatile" },
+                  "fowOptions": ["map_connections", "make_it_dark"],
+                  "stored": { "fowMapSegments": "" }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`tiles` position `h101` is not a tile position",
+                "unknown tile `notatile` at `b101`",
+                "unknown fog option `make_it_dark`",
+                "`fowOptions` need a fog game",
+                "`stored` keys and values may not be blank");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("a000")), "map A positions are valid");
+    }
+
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and
     // anything stored in a game avoids the `,` and `:` the save format splits on.
     @Test

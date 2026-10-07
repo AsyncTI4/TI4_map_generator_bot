@@ -84,7 +84,7 @@ class ShowGameButtonHandler {
             List<Button> switchButtons = part == DisplayType.stats
                     ? List.of()
                     : MapSegmentService.switchButtons(
-                            game, event.getUser().getId(), MapSegmentService.isFoggedView(game, event));
+                            game, MapSegmentService.viewerId(game, event), MapSegmentService.isFoggedView(game, event));
             if (switchButtons.isEmpty()) {
                 MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
             } else {

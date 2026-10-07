@@ -123,6 +123,7 @@ public class TestBedApplyService {
         String mapString =
                 preset.getMapString() == null ? TestBedPresetService.DEFAULT_MAP_STRING : preset.getMapString();
         Map<String, String> tilesByPosition = MapStringMapper.getMappedTilesToPosition(mapString, game);
+        preset.getTiles().forEach((position, tileId) -> tilesByPosition.put(position.toLowerCase(), tileId));
         if (tilesByPosition.isEmpty()) {
             warnings.add("Could not map the map string to positions; the map was left empty.");
             return;

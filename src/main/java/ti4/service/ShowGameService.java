@@ -69,8 +69,8 @@ public class ShowGameService {
         MapRenderPipeline.queue(game, event, displayType, segment, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = Buttons.mapImageButtons(game, segment);
-                buttons.addAll(
-                        MapSegmentService.switchButtons(game, playerId, MapSegmentService.isFoggedView(game, event)));
+                buttons.addAll(MapSegmentService.switchButtons(
+                        game, MapSegmentService.viewerId(game, event), MapSegmentService.isFoggedView(game, event)));
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);

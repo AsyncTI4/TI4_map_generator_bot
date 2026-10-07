@@ -21,6 +21,7 @@ import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class MapSegmentService {
@@ -91,11 +92,16 @@ public class MapSegmentService {
         return MapSegment.visibleTo(game, player);
     }
 
+    public static String viewerId(Game game, GenericInteractionCreateEvent event) {
+        Player acting = TestBedService.resolveActingPlayer(game, event, null);
+        return acting != null ? acting.getUserID() : event.getUser().getId();
+    }
+
     @ButtonHandler(value = SWITCH_PREFIX, save = false)
     public static void showSegment(ButtonInteractionEvent event, String buttonID, Game game) {
         String name = buttonID.substring(SWITCH_PREFIX.length());
         boolean foggedView = isFoggedView(game, event);
-        if (!viewableNames(game, event.getUser().getId(), foggedView).contains(name)) {
+        if (!viewableNames(game, viewerId(game, event), foggedView).contains(name)) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That part of the map is not available to you.");
             return;
         }

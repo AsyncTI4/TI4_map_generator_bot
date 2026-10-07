@@ -1,0 +1,20 @@
+{
+  "group": "Fog maps",
+  "description": "Map views, sectors and extra maps A-G; seat names match the fog-maps-2p preset.",
+  "fog": true,
+  "shortcuts": [
+    { "label": "You: show core", "steps": [ { "as": "you", "in": "you", "pressId": "showMapSegment_core" } ] },
+    { "label": "You: show A / outpost", "steps": [ { "as": "you", "in": "you", "pressId": "showMapSegment_outpost" } ] },
+    { "label": "You: show A", "steps": [ { "as": "you", "in": "you", "pressId": "showMapSegment_board-a" } ] },
+    { "label": "You: show main", "steps": [ { "as": "you", "in": "you", "pressId": "showMapSegment_main" } ] },
+    { "label": "Seat 1: show core", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "showMapSegment_core" } ] },
+    { "label": "Seat 1: show A / outpost", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "showMapSegment_outpost" } ] },
+    { "label": "Seat 1: show A", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "showMapSegment_board-a" } ] },
+    { "label": "Seat 1: show main", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "showMapSegment_main" } ] },
+    { "label": "Seat 1 moves into a000", "steps": [ { "do": "hand", "as": "seat1", "hand": { "units": { "a000": "dd" } } } ] },
+    { "label": "You move into a301", "steps": [ { "do": "hand", "as": "you", "hand": { "units": { "a301": "dd" } } } ] },
+    { "label": "Auto sectors on", "steps": [ { "do": "setStored", "key": "fowMapAutoSectors", "value": "true" } ] },
+    { "label": "Auto sectors off", "steps": [ { "do": "removeStored", "key": "fowMapAutoSectors" } ] },
+    { "label": "Drop named sectors", "steps": [ { "do": "removeStored", "key": "fowMapSegments" } ] }
+  ]
+}
