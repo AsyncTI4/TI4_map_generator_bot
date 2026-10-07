@@ -26,6 +26,8 @@ public class DraftButtonService {
     // that a user made a mistake (e.g. clicked a button when it wasn't their turn).
     // The user will get a discrete ephemeral message with the rest of the string.
     public final String USER_MISTAKE_PREFIX = "@$!#pebcak:";
+    private final String DRAFT_DATA_CLEARED =
+            USER_MISTAKE_PREFIX + "This draft is over and its data has been cleared, so this button no longer works.";
 
     public boolean isError(String outcome) {
         return outcome != null
@@ -38,6 +40,10 @@ public class DraftButtonService {
     public void handleDraftButtonClick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String innerButtonID = buttonID.substring(DRAFT_BUTTON_SERVICE_PREFIX.length());
         DraftManager draftManager = game.getDraftManager();
+        if (draftManager.getDraftables().isEmpty() && draftManager.getOrchestrator() == null) {
+            handleButtonResult(event, DRAFT_DATA_CLEARED);
+            return;
+        }
         String outcome = draftManager.routeCommand(event, player, innerButtonID, DraftManager.CommandSource.BUTTON);
         handleButtonResult(event, outcome);
     }
