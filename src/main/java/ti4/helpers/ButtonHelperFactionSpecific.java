@@ -19,6 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -1824,7 +1825,10 @@ public final class ButtonHelperFactionSpecific {
             PlanetTargetService.fizzle(event, player);
             return;
         }
-        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
+        Stream.of("ragh", "sigma_raghs_call")
+                .filter(player::hasPlayablePromissoryInHand)
+                .findFirst()
+                .ifPresent(pnID -> PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event));
         if (game.isFowMode()) {
             // The note was traded consensually, but playing it is unilateral - listing every planet its
             // owner holds is not part of the bargain. Offer the planets this player already knows about.

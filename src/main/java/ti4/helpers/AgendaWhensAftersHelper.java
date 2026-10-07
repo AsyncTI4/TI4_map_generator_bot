@@ -23,6 +23,7 @@ import ti4.logging.BotLogger;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionCheckService;
 import ti4.service.button.ReactionService;
@@ -204,14 +205,22 @@ public final class AgendaWhensAftersHelper {
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
-                names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
-                        + Mapper.getPromissoryNote(pnId).getName());
+                names.add(whenPromissoryNoteLabel(pnId));
             }
         }
         return names;
     }
 
-    private static List<Button> getPossibleWhenButtons(Player player) {
+    private static String whenPromissoryNoteLabel(String pnId) {
+        PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnId);
+        String colorPrefix = promissoryNote
+                .getColor()
+                .map(color -> StringUtils.capitalize(color) + " ")
+                .orElse("");
+        return colorPrefix + promissoryNote.getName();
+    }
+
+    static List<Button> getPossibleWhenButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
@@ -226,10 +235,7 @@ public final class AgendaWhensAftersHelper {
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
                     && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
-                buttons.add(Buttons.red(
-                        "queueWhen_pn_" + pnId,
-                        StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
-                                + Mapper.getPromissoryNote(pnId).getName()));
+                buttons.add(Buttons.red("queueWhen_pn_" + pnId, whenPromissoryNoteLabel(pnId)));
             }
         }
         return buttons;
