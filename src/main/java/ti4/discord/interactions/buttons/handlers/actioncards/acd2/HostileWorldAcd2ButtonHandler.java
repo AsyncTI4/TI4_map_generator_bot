@@ -45,11 +45,11 @@ class HostileWorldAcd2ButtonHandler {
 
     private static String getHostileWorldLoreQuip(int hits) {
         return switch (hits) {
-            case 0 -> "\"Must've been the wind.\" - Guard, _Skyrim_.";
+            case 0 -> "\"Must've been the wind.\" — Guard, _Skyrim_";
             case 1 -> "\"Get off my lawn.\" — Walt Kowalski, _Gran Torino_";
-            case 2 -> "\"Watch out for that first step, it's a doozy!\" - Ned Ryerson, _Groundhog Day_";
+            case 2 -> "\"Watch out for that first step, it's a doozy!\" — Ned Ryerson, _Groundhog Day_";
             case 3 ->
-                "\"One does not simply walk into Mordor.\" - Boromir, _The Lord of the Rings: The Fellowship of the Ring_";
+                "\"One does not simply walk into Mordor.\" — Boromir, _The Lord of the Rings: The Fellowship of the Ring_";
             default -> null;
         };
     }
