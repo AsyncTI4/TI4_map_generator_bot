@@ -300,7 +300,8 @@ class MapSegmentTest extends BaseTi4Test {
                 .toList();
         assertEquals(2, onMapA.size(), "map A's two islands are two sectors");
         assertTrue(onMapA.stream().noneMatch(MapSegment::isDetached));
-        assertTrue(onMapA.stream().allMatch(segment -> segment.displayName().startsWith("A / ")));
+        String galaxyA = GalaxyNames.name(game, "a");
+        assertTrue(onMapA.stream().allMatch(segment -> segment.displayName(game).startsWith(galaxyA + " / ")));
         assertFalse(names().contains("board-a"), "every map A tile is already in a sector");
         assertTrue(MapSegment.all(game).stream()
                 .noneMatch(segment -> segment.positions().contains("000")
@@ -313,10 +314,26 @@ class MapSegmentTest extends BaseTi4Test {
         game.setTile(new Tile("19", "b401"));
         MapSegment.put(game, new MapSegment("outpost", "b000", 1));
 
+        String galaxyB = GalaxyNames.name(game, "b");
         assertEquals(
-                "B / outpost", MapSegment.find(game, "outpost").orElseThrow().displayName());
+                galaxyB + " / outpost",
+                MapSegment.find(game, "outpost").orElseThrow().displayName(game));
         assertEquals(Set.of("b401"), positionsOf("board-b"));
-        assertEquals("B", MapSegment.find(game, "board-b").orElseThrow().displayName());
+        assertEquals(galaxyB, MapSegment.find(game, "board-b").orElseThrow().displayName(game));
+    }
+
+    @Test
+    void mainMapSectorsKeepTheirPlainNamesUntilASecondGalaxyExists() {
+        MapSegment.put(game, new MapSegment("home", "000", 1));
+        assertEquals("home", MapSegment.find(game, "home").orElseThrow().displayName(game));
+        assertEquals(MapSegment.MAIN, MapSegment.mainDisplayName(game));
+
+        game.setTile(new Tile("19", "a000"));
+        String mainGalaxy = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+        assertEquals(
+                mainGalaxy + " / home",
+                MapSegment.find(game, "home").orElseThrow().displayName(game));
+        assertEquals(mainGalaxy, MapSegment.mainDisplayName(game));
     }
 
     @Test

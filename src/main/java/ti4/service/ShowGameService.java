@@ -18,6 +18,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.testbed.TestBedService;
@@ -71,6 +72,7 @@ public class ShowGameService {
                 List<Button> buttons = Buttons.mapImageButtons(game, segment);
                 buttons.addAll(MapSegmentService.switchButtons(
                         game, MapSegmentService.viewerId(game, event), MapSegmentService.isFoggedView(game, event)));
+                MapOverviewService.overviewButton(game, event).ifPresent(buttons::add);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);

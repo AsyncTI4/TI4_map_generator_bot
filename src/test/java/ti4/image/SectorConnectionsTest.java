@@ -77,11 +77,13 @@ class SectorConnectionsTest extends BaseTi4Test {
         List<Connection> fromBoard =
                 SectorConnections.find(game, player, board, Set.of("a000"), Set.of("a000", "000", "1201", "1237"));
 
+        // With a second galaxy in play, main-map sectors carry the main galaxy's name.
+        String main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
         assertEquals(
                 List.of(
-                        new Connection("000", "home"),
-                        new Connection("1201", "north"),
-                        new Connection("1237", "south")),
+                        new Connection("000", main + " / home"),
+                        new Connection("1201", main + " / north"),
+                        new Connection("1237", main + " / south")),
                 fromBoard);
     }
 
@@ -92,10 +94,10 @@ class SectorConnectionsTest extends BaseTi4Test {
         MapSegment board = MapSegment.find(game, "board-a").orElseThrow();
 
         List<Connection> fromBoard = SectorConnections.find(game, player, board, Set.of("a000"), Set.of("a000", "301"));
-        assertEquals(List.of(new Connection("301", MapSegment.MAIN)), fromBoard);
+        assertEquals(List.of(new Connection("301", MapSegment.mainDisplayName(game))), fromBoard);
 
         List<Connection> fromMain = SectorConnections.find(game, player, null, Set.of("301"), Set.of("301", "a000"));
-        assertTrue(fromMain.contains(new Connection("a000", "A")));
+        assertTrue(fromMain.contains(new Connection("a000", GalaxyNames.name(game, "a"))));
     }
 
     @Test

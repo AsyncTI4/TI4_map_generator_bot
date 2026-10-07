@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.image.GalaxyNames;
 import ti4.image.MapSegment;
 import ti4.image.Mapper;
 import ti4.model.FactionModel;
@@ -87,7 +88,7 @@ class SystemPickerServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void sectorsOnAnExtraMapAreOfferedWithTheirMapLetter() {
+    void sectorsOnAnExtraGalaxyAreOfferedWithTheGalaxyName() {
         MapSegment.put(game, new MapSegment("core", "000", 1));
         game.setTile(new Tile("19", "a000"));
         game.setTile(new Tile("19", "a301"));
@@ -99,7 +100,9 @@ class SystemPickerServiceTest extends BaseTi4Test {
 
         // Labels name the map; the button ids keep the internal sector names.
         List<Button> buttons = SystemPickerService.firstStepButtons(player, game);
-        assertTrue(labels(buttons).containsAll(List.of("Map: A / outpost (1)", "Map: A (1)")));
+        String galaxyA = GalaxyNames.name(game, "a");
+        assertTrue(
+                labels(buttons).containsAll(List.of("Map: " + galaxyA + " / outpost (1)", "Map: " + galaxyA + " (1)")));
         assertTrue(buttons.stream().anyMatch(button -> button.getCustomId().endsWith("systemPick_board-a")));
     }
 

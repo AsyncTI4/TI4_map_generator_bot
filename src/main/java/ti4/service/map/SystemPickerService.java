@@ -128,8 +128,8 @@ public class SystemPickerService {
             Set<String> positions = new HashSet<>(segment.positions());
             positions.retainAll(onMap);
             if (positions.isEmpty()) continue;
-            areas.add(
-                    new Area(segment.name(), segment.displayName(), centreOf(segment.centre(), positions), positions));
+            areas.add(new Area(
+                    segment.name(), segment.displayName(game), centreOf(segment.centre(), positions), positions));
         }
         Set<String> rest = onMap.stream()
                 .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
@@ -138,7 +138,7 @@ public class SystemPickerService {
                 .collect(Collectors.toSet());
         if (!rest.isEmpty()) {
             String centre = areas.isEmpty() ? "000" : centreOf("", rest);
-            areas.addFirst(new Area(MapSegment.MAIN, MapSegment.MAIN, centre, rest));
+            areas.addFirst(new Area(MapSegment.MAIN, MapSegment.mainDisplayName(game), centre, rest));
         }
         return areas;
     }

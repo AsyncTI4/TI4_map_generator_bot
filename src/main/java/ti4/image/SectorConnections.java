@@ -51,11 +51,12 @@ final class SectorConnections {
                 continue;
             }
             for (String position : segment.positions()) {
-                sectorByPosition.putIfAbsent(position, segment.displayName());
+                sectorByPosition.putIfAbsent(position, segment.displayName(game));
             }
         }
         if (shown != null) {
-            uncoveredMain.forEach(position -> sectorByPosition.putIfAbsent(position, MapSegment.MAIN));
+            String mainName = MapSegment.mainDisplayName(game);
+            uncoveredMain.forEach(position -> sectorByPosition.putIfAbsent(position, mainName));
         }
         return sectorByPosition;
     }

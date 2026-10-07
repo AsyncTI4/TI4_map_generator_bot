@@ -64,7 +64,9 @@ public class MapSegmentService {
             return List.of();
         }
         Map<String, String> labels = MapSegment.all(game).stream()
-                .collect(Collectors.toMap(MapSegment::name, MapSegment::displayName, (first, second) -> first));
+                .collect(Collectors.toMap(
+                        MapSegment::name, segment -> segment.displayName(game), (first, second) -> first));
+        labels.put(MapSegment.MAIN, MapSegment.mainDisplayName(game));
         return names.stream()
                 .map(name -> Buttons.gray(SWITCH_PREFIX + name, "Map: " + labels.getOrDefault(name, name)))
                 .toList();

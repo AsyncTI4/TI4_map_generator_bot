@@ -470,13 +470,21 @@ public record MapSegment(
         return kind == Kind.FRACTURE || kind == Kind.BOARD;
     }
 
-    public String displayName() {
+    public String displayName(Game game) {
         Set<Character> boards = positions().stream().map(BoardPosition::boardOf).collect(Collectors.toSet());
-        if (boards.size() != 1 || boards.contains(BoardPosition.MAIN_BOARD)) {
+        if (boards.size() != 1) {
             return name;
         }
-        String board = String.valueOf(Character.toUpperCase(boards.iterator().next()));
-        return kind == Kind.BOARD ? board : board + " / " + name;
+        char board = boards.iterator().next();
+        if (board == BoardPosition.MAIN_BOARD) {
+            return GalaxyNames.isMultiGalaxy(game) ? mainDisplayName(game) + " / " + name : name;
+        }
+        String galaxy = GalaxyNames.name(game, GalaxyNames.idOf(board));
+        return kind == Kind.BOARD ? galaxy : galaxy + " / " + name;
+    }
+
+    public static String mainDisplayName(Game game) {
+        return GalaxyNames.isMultiGalaxy(game) ? GalaxyNames.name(game, GalaxyNames.MAIN_ID) : MAIN;
     }
 
     public static boolean mainMapVisibleTo(Game game, @Nullable Player viewer) {

@@ -917,9 +917,11 @@ public class MapGenerator implements AutoCloseable {
     @Nullable
     private String segmentLabel(boolean framed) {
         if (shownSegment != null && (shownSegment.isDetached() || segmentsVisibleToViewer() > 1)) {
-            return shownSegment.displayName();
+            return shownSegment.displayName(game);
         }
-        return framed && MapSegment.all(game).stream().anyMatch(MapSegment::isDetached) ? MapSegment.MAIN : null;
+        return framed && MapSegment.all(game).stream().anyMatch(MapSegment::isDetached)
+                ? MapSegment.mainDisplayName(game)
+                : null;
     }
 
     static boolean isEasterEggRoll(int roll) {
@@ -943,7 +945,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private boolean isSectorTitle(String label) {
-        return shownSegment != null && !shownSegment.isFracture() && label.equals(shownSegment.displayName());
+        return shownSegment != null && !shownSegment.isFracture() && label.equals(shownSegment.displayName(game));
     }
 
     private void drawSegmentTitle(String text, Font font, Color color, Stroke stroke, Color outline) {
