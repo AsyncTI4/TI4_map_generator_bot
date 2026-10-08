@@ -123,6 +123,28 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 7: `pressId` is longer than Discord's 100-character limit");
     }
 
+    // Custom hyperlanes need a real position and a 6x6 matrix of 0/1; on maps A-G they also need a fog preset.
+    @Test
+    void customHyperlanesAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "customHyperlanes": {
+                    "204": "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,1,0,0,0,0;0,0,0,0,0,0",
+                    "nowhere": "0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0",
+                    "205": "1,2,3",
+                    "a206": "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0"
+                  }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`customHyperlanes` position `nowhere` is not a tile position",
+                "`customHyperlanes` at `205` needs a 6x6 matrix",
+                "maps A-G (`a000`-`g848`) need `\"fog\": true`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("`204`")), "a valid lane passes");
+    }
+
     // Extra tiles (any valid position, including maps A-G), fog options and stored values are checked up front.
     @Test
     void mapAndFogFieldsAreValidated() {

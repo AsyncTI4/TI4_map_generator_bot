@@ -28,6 +28,7 @@ import ti4.logging.BotLogger;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationFeature;
@@ -313,7 +314,17 @@ public class TestBedPresetService {
                 errors.add("preset: unknown fog option `" + option + "` in `fowOptions`.");
             }
         }
-        boolean placesExtraMaps = preset.getTiles().keySet().stream()
+        preset.getCustomHyperlanes().forEach((position, matrix) -> {
+            if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
+                errors.add("preset: `customHyperlanes` position `" + position + "` is not a tile position.");
+            }
+            if (!CustomHyperlaneService.isValidConnectionMatrix(matrix)) {
+                errors.add("preset: `customHyperlanes` at `" + position
+                        + "` needs a 6x6 matrix of 0/1, rows split by `;`, cells by `,`.");
+            }
+        });
+        boolean placesExtraMaps = Stream.concat(
+                        preset.getTiles().keySet().stream(), preset.getCustomHyperlanes().keySet().stream())
                 .anyMatch(position -> BoardPosition.isBoardPosition(position.toLowerCase()));
         if (placesExtraMaps && !Boolean.TRUE.equals(preset.getFog())) {
             errors.add("preset: `tiles` on maps A-G (`a000`-`g848`) need `\"fog\": true`; extra maps are fog-only.");

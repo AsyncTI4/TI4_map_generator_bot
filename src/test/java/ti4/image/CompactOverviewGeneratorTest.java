@@ -123,4 +123,17 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
     private static Rectangle box(Placed placed) {
         return new Rectangle(placed.x(), placed.y(), placed.width(), placed.height());
     }
+
+    @Test
+    void theCornersPanelLeavesRoomForOversizedCornerArt() {
+        Panel corners = CompactOverviewGenerator.gmPanels(game).stream()
+                .filter(panel -> "corners".equals(panel.title()))
+                .findFirst()
+                .orElseThrow();
+        Rectangle hex = corners.hexes().get("tl");
+
+        // Corner tiles can draw art over the whole 600px tile image, i.e. 100px beyond the hex on every side.
+        assertTrue(
+                corners.content().contains(new Rectangle(hex.x - 100, hex.y - 100, hex.width + 200, hex.height + 200)));
+    }
 }

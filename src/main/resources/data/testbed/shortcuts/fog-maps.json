@@ -14,6 +14,11 @@
     { "label": "Seat 1 moves into a000", "steps": [ { "do": "hand", "as": "seat1", "hand": { "units": { "a000": "dd" } } } ] },
     { "label": "You move into a000", "steps": [ { "do": "hand", "as": "you", "hand": { "units": { "a000": "dd" } } } ] },
     { "label": "You move into a301", "steps": [ { "do": "hand", "as": "you", "hand": { "units": { "a301": "dd" } } } ] },
+    { "label": "You: overview", "steps": [ { "as": "you", "in": "you", "pressId": "compactMapOverview" } ] },
+    { "label": "Seat 1: overview", "steps": [ { "as": "seat1", "in": "seat1", "pressId": "compactMapOverview" } ] },
+    { "label": "GM: overview", "steps": [ { "as": "you", "in": "gm", "pressId": "compactMapOverview" } ] },
+    { "label": "Name galaxy A frontier", "steps": [ { "do": "setStored", "key": "fowGalaxyRenames", "value": "a=frontier" } ] },
+    { "label": "Galaxy names automatic", "steps": [ { "do": "removeStored", "key": "fowGalaxyRenames" } ] },
     { "label": "Auto sectors on", "steps": [ { "do": "setStored", "key": "fowMapAutoSectors", "value": "true" } ] },
     { "label": "Auto sectors off", "steps": [ { "do": "removeStored", "key": "fowMapAutoSectors" } ] },
     { "label": "Drop named sectors", "steps": [ { "do": "removeStored", "key": "fowMapSegments" } ] }

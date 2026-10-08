@@ -16,7 +16,8 @@ public final class GalaxyNames {
 
     public static final String MAIN_ID = "main";
     public static final List<String> IDS = List.of(MAIN_ID, "a", "b", "c", "d", "e", "f", "g");
-    private static final String STORAGE_KEY = "fowGalaxyNames";
+    private static final String ASSIGNED_KEY = "fowGalaxyNames";
+    private static final String RENAMED_KEY = "fowGalaxyRenames";
 
     // spotless:off
     static final List<String> NAMES = List.of(
@@ -46,15 +47,17 @@ public final class GalaxyNames {
     }
 
     public static boolean isManual(Game game, String id) {
-        return manualNames(game).containsKey(id);
+        return read(game, RENAMED_KEY).containsKey(id);
     }
 
     public static Map<String, String> names(Game game) {
-        Map<String, String> manual = manualNames(game);
-        Set<String> taken = new HashSet<>(manual.values());
+        Map<String, String> assigned = read(game, ASSIGNED_KEY);
+        Map<String, String> renamed = read(game, RENAMED_KEY);
+        Set<String> taken = new HashSet<>(assigned.values());
+        taken.addAll(renamed.values());
         Map<String, String> names = new LinkedHashMap<>();
         for (String id : IDS) {
-            String name = manual.get(id);
+            String name = renamed.getOrDefault(id, assigned.get(id));
             if (name == null) {
                 name = autoName(game, id, taken);
                 taken.add(name);
@@ -62,6 +65,26 @@ public final class GalaxyNames {
             names.put(id, name);
         }
         return names;
+    }
+
+    public static void ensureAssigned(Game game) {
+        if (!isMultiGalaxy(game)) {
+            return;
+        }
+        Map<String, String> assigned = read(game, ASSIGNED_KEY);
+        List<String> missing =
+                inUse(game).stream().filter(id -> !assigned.containsKey(id)).toList();
+        if (missing.isEmpty()) {
+            return;
+        }
+        Set<String> taken = new HashSet<>(assigned.values());
+        taken.addAll(read(game, RENAMED_KEY).values());
+        for (String id : missing) {
+            String name = autoName(game, id, taken);
+            taken.add(name);
+            assigned.put(id, name);
+        }
+        save(game, ASSIGNED_KEY, assigned);
     }
 
     @Nullable
@@ -73,33 +96,33 @@ public final class GalaxyNames {
             return "Galaxy names use lowercase letters, digits and `-`, up to 20 characters, and cannot be `main`,"
                     + " `fracture` or `board-…`.";
         }
+        Map<String, String> assigned = read(game, ASSIGNED_KEY);
+        Map<String, String> renamed = read(game, RENAMED_KEY);
         Map<String, String> current = names(game);
-        Map<String, String> manualNow = manualNames(game);
         List<String> inUse = inUse(game);
         boolean usedElsewhere = IDS.stream()
                 .filter(other -> !other.equals(id))
-                .anyMatch(other -> name.equals(manualNow.get(other))
-                        || (inUse.contains(other) && name.equals(current.get(other))));
+                .filter(other -> inUse.contains(other) || assigned.containsKey(other) || renamed.containsKey(other))
+                .anyMatch(other -> name.equals(current.get(other)));
         if (usedElsewhere) {
             return "Another galaxy is already called `" + name + "`.";
         }
-        Map<String, String> manual = manualNames(game);
-        manual.put(id, name);
-        save(game, manual);
+        renamed.put(id, name);
+        save(game, RENAMED_KEY, renamed);
         return null;
     }
 
     public static void resetToAuto(Game game, String id) {
-        Map<String, String> manual = manualNames(game);
-        manual.remove(id);
-        save(game, manual);
+        Map<String, String> renamed = read(game, RENAMED_KEY);
+        renamed.remove(id);
+        save(game, RENAMED_KEY, renamed);
     }
 
     private static String autoName(Game game, String id, Set<String> taken) {
-        int start = Math.floorMod((game.getName() + ":" + id).hashCode(), NAMES.size());
         if (MAIN_ID.equals(id) && !taken.contains(NAMES.getFirst())) {
             return NAMES.getFirst();
         }
+        int start = Math.floorMod((game.getName() + ":" + id).hashCode(), NAMES.size());
         for (int offset = 0; offset < NAMES.size(); offset++) {
             String candidate = NAMES.get((start + offset) % NAMES.size());
             if (!taken.contains(candidate)) {
@@ -109,27 +132,27 @@ public final class GalaxyNames {
         return "galaxy-" + id;
     }
 
-    private static Map<String, String> manualNames(Game game) {
-        String stored = game.getStoredValue(STORAGE_KEY);
-        Map<String, String> manual = new LinkedHashMap<>();
+    private static Map<String, String> read(Game game, String key) {
+        String stored = game.getStoredValue(key);
+        Map<String, String> names = new LinkedHashMap<>();
         if (StringUtils.isBlank(stored)) {
-            return manual;
+            return names;
         }
         Arrays.stream(stored.split(";"))
                 .map(entry -> entry.split("=", 2))
                 .filter(parts -> parts.length == 2 && IDS.contains(parts[0]) && MapSegment.isValidName(parts[1]))
-                .forEach(parts -> manual.put(parts[0], parts[1]));
-        return manual;
+                .forEach(parts -> names.put(parts[0], parts[1]));
+        return names;
     }
 
-    private static void save(Game game, Map<String, String> manual) {
-        if (manual.isEmpty()) {
-            game.removeStoredValue(STORAGE_KEY);
+    private static void save(Game game, String key, Map<String, String> names) {
+        if (names.isEmpty()) {
+            game.removeStoredValue(key);
             return;
         }
         game.setStoredValue(
-                STORAGE_KEY,
-                manual.entrySet().stream()
+                key,
+                names.entrySet().stream()
                         .map(entry -> entry.getKey() + "=" + entry.getValue())
                         .collect(Collectors.joining(";")));
     }

@@ -58,14 +58,22 @@ public final class CompactOverviewGenerator {
             new Color(0, 210, 200),
             new Color(240, 70, 60));
 
-    record Panel(String title, Map<String, Rectangle> hexes) {
+    record Panel(String title, Map<String, Rectangle> hexes, int margin) {
+
+        Panel(String title, Map<String, Rectangle> hexes) {
+            this(title, hexes, 0);
+        }
 
         Rectangle content() {
             Rectangle content = null;
             for (Rectangle hex : hexes.values()) {
                 content = content == null ? new Rectangle(hex) : content.union(hex);
             }
-            return content == null ? new Rectangle() : content;
+            if (content == null) {
+                return new Rectangle();
+            }
+            content.grow(margin, margin);
+            return content;
         }
     }
 
@@ -176,7 +184,7 @@ public final class CompactOverviewGenerator {
             }
         }
         if (!corners.isEmpty()) {
-            panels.add(new Panel(CORNERS_TITLE, corners));
+            panels.add(new Panel(CORNERS_TITLE, corners, TILE_PADDING));
         }
         return panels;
     }

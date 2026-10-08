@@ -83,6 +83,32 @@ class GalaxyNamesTest extends BaseTi4Test {
     }
 
     @Test
+    void namesAreFixedOnceAGalaxyIsPlacedAndNeverShiftAfterwards() {
+        game.setTile(new Tile("19", "a000"));
+        String main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+        String a = GalaxyNames.name(game, "a");
+
+        game.setName("renamed-game");
+        game.setTile(new Tile("19", "c000"));
+        GalaxyNames.rename(game, "c", "outer-rim");
+
+        assertEquals(main, GalaxyNames.name(game, GalaxyNames.MAIN_ID), "main keeps its first name");
+        assertEquals(a, GalaxyNames.name(game, "a"), "a keeps its first name");
+        assertNotNull(GalaxyNames.rename(game, "c", a), "an assigned name cannot be taken");
+    }
+
+    @Test
+    void backToAutomaticRestoresTheFirstAssignedName() {
+        game.setTile(new Tile("19", "a000"));
+        String first = GalaxyNames.name(game, "a");
+
+        GalaxyNames.rename(game, "a", "frontier");
+        GalaxyNames.resetToAuto(game, "a");
+
+        assertEquals(first, GalaxyNames.name(game, "a"));
+    }
+
+    @Test
     void resetGoesBackToTheAutomaticName() {
         String automatic = GalaxyNames.name(game, "d");
         GalaxyNames.rename(game, "d", "deep-space");

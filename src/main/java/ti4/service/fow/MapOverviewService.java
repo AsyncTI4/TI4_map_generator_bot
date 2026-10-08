@@ -3,6 +3,7 @@ package ti4.service.fow;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -37,13 +38,29 @@ public class MapOverviewService {
         }
         Player viewer = viewer(game, event);
         MessageChannel channel = event.getMessageChannel();
+        boolean replyPrivately = view == View.PLAYER && isSharedChannel(game, channel);
         MapRenderPipeline.queueImage(
                 game,
                 "Map overview",
                 () -> view == View.GM
                         ? CompactOverviewGenerator.gmOverview(game)
                         : CompactOverviewGenerator.playerOverview(game, viewer, event),
-                fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
+                fileUpload -> {
+                    if (replyPrivately) {
+                        MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
+                    } else {
+                        MessageHelper.sendFileUploadToChannel(channel, fileUpload);
+                    }
+                });
+    }
+
+    private static boolean isSharedChannel(Game game, MessageChannel channel) {
+        MessageChannel shared = game.getMainGameChannel();
+        if (shared == null) {
+            return false;
+        }
+        MessageChannel checked = channel instanceof ThreadChannel thread ? thread.getParentMessageChannel() : channel;
+        return shared.getId().equals(checked.getId());
     }
 
     private enum View {
