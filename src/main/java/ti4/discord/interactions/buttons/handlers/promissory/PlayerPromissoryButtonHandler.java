@@ -44,7 +44,7 @@ class PlayerPromissoryButtonHandler {
             player.addTech(tech);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);

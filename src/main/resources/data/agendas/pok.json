@@ -48,6 +48,7 @@
         "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.). The other Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
         "text1": "",
         "text2": "",
+        "notes": "If keleres uses executive order to draw this from the bottom, the hidden agenda will also be from the bottom.",
         "source": "pok"
     },
     {

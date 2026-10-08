@@ -249,6 +249,7 @@ public class FactionDraftItem extends DraftItem {
             case HOMESYSTEM -> storedListContains(game, "bannedHSs", value);
             case STARTINGTECH -> storedListContains(game, "bannedStartingTechs", value);
             case STARTINGFLEET -> storedListContains(game, "bannedFleets", value);
+            case UNIT -> storedListContains(game, "bannedUnits", value);
             default -> false;
         };
     }

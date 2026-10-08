@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -4359,12 +4356,16 @@ public final class ButtonHelperFactionSpecific {
                 return true;
             }
         }
-        for (Player p2 : game.getRealPlayersNNeutral()) {
+        for (Player p2 : game.getRealPlayersNDummies()) {
             if (p2 == player) {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
                 return false;
+            }
+
+            if (!game.getRealAndEliminatedPlayers().contains(p2)) {
+                continue;
             }
             Tile hs = game.getTile(AliasHandler.resolveTile(p2.getFaction()));
             if (hs == null) {

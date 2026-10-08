@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -3131,6 +3131,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     continue;
                 }
                 if (so.getPoints() != type) {
+                    continue;
+                }
+                if (getRevealedPublicObjectives().containsKey(so.getAlias())) {
+                    continue;
+                }
+                if (getRevealedPublicObjectives().containsKey(so.getName())) {
                     continue;
                 }
                 id = so.getAlias();
