@@ -652,7 +652,9 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.rollForBelkoseaPN(player);
         }
         if ("gift".equalsIgnoreCase(id)) {
-            StartPhaseService.startActionPhase(event, game, false);
+            if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+                StartPhaseService.startActionPhase(event, game, false);
+            }
             // in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
         }

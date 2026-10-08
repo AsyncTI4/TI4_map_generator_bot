@@ -25,7 +25,7 @@ public class BothelperCommand implements ParentCommand {
                     new ImpersonateBot(),
                     new ReloadGame(),
                     new ServerGameStats(),
-                    new CorrectFaction(),
+                    // new CorrectFaction(),
                     new ListDeadGames(),
                     new RemoveTitle(),
                     new EditTrackRecord(),

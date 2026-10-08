@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6039,6 +6036,16 @@ public class ButtonHelper {
         }
         if (player.hasUnit("kalora_mech")) {
             KaloraUnitHandler.offerMechButtons(player, game, tile);
+        }
+        if (player.hasUnexhaustedLeader("sardakkagent")
+                && ButtonHelperAgents.getSardakkAgentButtons(game, player).size() > 0) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game, player));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", you can use these buttons to resolve sardakk agent.",
+                    buttons);
         }
         if (player.hasUnit("qhet_mech") && !isLawInPlay(game, "articles_war")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {

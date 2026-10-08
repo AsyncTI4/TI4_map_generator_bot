@@ -64,6 +64,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
@@ -925,6 +926,9 @@ public class PlayerTechService {
             message.append(" - This tech will be automatically removed at the end of the next status phase");
         }
         if (isResearch) {
+            if (techM.getFirstType() == TechnologyType.UNITUPGRADE) {
+                CommanderUnlockCheckService.checkPlayer(player, "dihmohn");
+            }
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         }
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
@@ -980,7 +984,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum", "netrunners");
+                player, "jolnar", "nekro", "mirveda", "kryxos", "arcanum", "netrunners");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1

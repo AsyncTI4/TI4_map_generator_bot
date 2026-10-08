@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -1824,7 +1822,10 @@ public final class ButtonHelperFactionSpecific {
             PlanetTargetService.fizzle(event, player);
             return;
         }
-        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
+        Stream.of("ragh", "sigma_raghs_call")
+                .filter(player::hasPlayablePromissoryInHand)
+                .findFirst()
+                .ifPresent(pnID -> PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event));
         if (game.isFowMode()) {
             // The note was traded consensually, but playing it is unilateral - listing every planet its
             // owner holds is not part of the bargain. Offer the planets this player already knows about.
@@ -4355,12 +4356,16 @@ public final class ButtonHelperFactionSpecific {
                 return true;
             }
         }
-        for (Player p2 : game.getRealPlayersNNeutral()) {
+        for (Player p2 : game.getRealPlayersNDummies()) {
             if (p2 == player) {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
                 return false;
+            }
+
+            if (!game.getRealAndEliminatedPlayers().contains(p2)) {
+                continue;
             }
             Tile hs = game.getTile(AliasHandler.resolveTile(p2.getFaction()));
             if (hs == null) {

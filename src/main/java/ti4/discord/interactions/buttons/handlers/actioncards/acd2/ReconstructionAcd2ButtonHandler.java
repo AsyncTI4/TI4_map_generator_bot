@@ -117,6 +117,7 @@ class ReconstructionAcd2ButtonHandler {
                 .append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
                 .append(':');
 
+        int attachmentsResolved = 0;
         for (int x = 0; x < 3; x++) {
             String cardId = game.drawExplore(trait);
             if (cardId == null) {
@@ -132,6 +133,7 @@ class ReconstructionAcd2ButtonHandler {
             sb.append("\n> Revealed ").append(explore.getNameRepresentation());
             if (Constants.ATTACH.equalsIgnoreCase(explore.getResolution())) {
                 sb.append(" and resolved the attachment.");
+                attachmentsResolved++;
                 String messageText = player.getRepresentation() + " resolved an attachment with _Reconstruction_ on "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ":";
                 ExploreService.resolveExplore(event, cardId, tile, planet, messageText, player, game);
@@ -140,7 +142,17 @@ class ReconstructionAcd2ButtonHandler {
             }
         }
 
+        sb.append("\n").append(getReconstructionLoreQuip(attachmentsResolved));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+    }
+
+    private static String getReconstructionLoreQuip(int attachmentsResolved) {
+        return switch (attachmentsResolved) {
+            case 0 -> "\"I got a rock.\" — Charlie Brown, _It's the Great Pumpkin, Charlie Brown_";
+            case 1 -> "\"If you build it, he will come.\" — The Voice, _Field of Dreams_";
+            case 2 -> "\"We can rebuild him. We have the technology.\" — Oscar Goldman, _The Six Million Dollar Man_";
+            default -> "\"In my experience, there's no such thing as luck.\" — Obi-Wan Kenobi, _Star Wars: A New Hope_";
+        };
     }
 
     private static List<Button> getReconstructionPlanetButtons(Game game, Player player, Tile activeSystem) {

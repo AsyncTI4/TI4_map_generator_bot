@@ -1445,6 +1445,7 @@ public final class ButtonHelperTacticalAction {
             Map<UnitKey, List<Integer>> unitsMovedFromUnitHolder = displacedUnits.get(uhKey);
             for (Entry<UnitKey, List<Integer>> entry : unitsMovedFromUnitHolder.entrySet()) {
                 List<Integer> states = entry.getValue();
+                if (states == null) continue;
                 for (UnitState state : UnitState.values()) {
                     int amt = states.get(state.ordinal());
                     for (int x = 1; x <= Math.min(2, amt); x++) {

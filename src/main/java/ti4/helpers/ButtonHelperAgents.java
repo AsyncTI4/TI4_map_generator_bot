@@ -2746,11 +2746,12 @@ public final class ButtonHelperAgents {
         return gloryTiles;
     }
 
-    public static List<Button> getSardakkAgentButtons(Game game) {
+    public static List<Button> getSardakkAgentButtons(Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetId = planet.getName();
+            if (!player.getPlanetsAllianceMode().contains(planetId)) continue;
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
 
             String buttonID = "exhaustAgent_sardakkagent_" + game.getActiveSystem() + "_" + planetId;
