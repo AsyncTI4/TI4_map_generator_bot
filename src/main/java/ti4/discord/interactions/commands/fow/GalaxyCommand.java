@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
+import ti4.helpers.FoWHelper;
 import ti4.image.GalaxyNames;
 import ti4.message.MessageHelper;
 
@@ -31,6 +32,10 @@ class GalaxyCommand extends GameStateSubcommand {
         Game game = getGame();
         if (!game.isFowMode() || !game.getPlayersWithGMRole().contains(getPlayer())) {
             MessageHelper.replyToMessage(event, "Only the GM of a Fog of War game can name galaxies.");
+            return;
+        }
+        if (!FoWHelper.canSeeWholeMap(game, event)) {
+            MessageHelper.replyToMessage(event, "This shows map layout. Use it in the GM room.");
             return;
         }
         String id = event.getOption(GALAXY, null, OptionMapping::getAsString);
