@@ -32,19 +32,17 @@ public class RedistributionAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         for (Player player : game.getRealPlayers()) {
             if (player.getPlanets().contains(winner.toLowerCase())) {
-                Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
                 Tile tile = game.getTileFromPlanet(winner);
-                if (uH == null) {
+                if (tile == null) {
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
                             planetName(game, winner)
-                                    + " is not on the game board, so there are no units to destroy and no infantry"
-                                    + " to place. Please resolve any change of control manually.");
+                                    + " is not on the game board and units cannot be placed on it, so _Colonial"
+                                    + " Redistribution_ has no effect on it.");
                     return;
                 }
-                if (tile != null) {
-                    DestroyUnitService.destroyAllUnits(event, tile, game, uH, false);
-                }
+                Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
+                DestroyUnitService.destroyAllUnits(event, tile, game, uH, false);
 
                 boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
                 if (containsDMZ) {
