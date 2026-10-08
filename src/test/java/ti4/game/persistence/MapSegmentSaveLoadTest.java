@@ -13,6 +13,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.GalaxyNames;
 import ti4.image.MapSegment;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 class MapSegmentSaveLoadTest extends BaseTi4Test {
@@ -60,6 +61,23 @@ class MapSegmentSaveLoadTest extends BaseTi4Test {
 
             assertThat(harness.load().getPlayer(player.getUserID()).isFogGhostHexes())
                     .isFalse();
+        }
+    }
+
+    // Only new fog games get map connections switched on (at creation). A game saved without the option, like
+    // every game from before it existed, must stay off after a reload; a GM switching it on must stick.
+    @Test
+    void mapConnectionsStayOffInOlderGamesUntilAGmTurnsThemOn() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            GameSaveService.save(game, "test");
+            assertThat(harness.load().getFowOption(FOWOption.MAP_CONNECTIONS)).isFalse();
+
+            game.setFowOption(FOWOption.MAP_CONNECTIONS, true);
+            GameSaveService.save(game, "test");
+
+            assertThat(harness.load().getFowOption(FOWOption.MAP_CONNECTIONS)).isTrue();
         }
     }
 }

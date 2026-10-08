@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -43,6 +44,7 @@ public class CreateFoWGameService {
 
     private static final int MAX_CHANNELS_MINUS_5 = 495;
     private static final int MAX_ROLE_COUNT = 250;
+    private static final Pattern FOW_GAME_NAME = Pattern.compile("fow[0-9]+");
 
     private static final long PERMISSIONS =
             Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
@@ -166,6 +168,7 @@ public class CreateFoWGameService {
         newGame.setFowMode(true);
         newGame.setFowOption(FOWOption.MANAGED_COMMS, true);
         newGame.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, true);
+        newGame.setFowOption(FOWOption.MAP_CONNECTIONS, true);
 
         // ADD PLAYERS
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
@@ -285,10 +288,12 @@ public class CreateFoWGameService {
         return "fow" + getLastFOWGameNumber();
     }
 
+    public static boolean isFowGameName(String gameName) {
+        return FOW_GAME_NAME.matcher(gameName).matches();
+    }
+
     public static String getNextFOWGameName() {
-        int nextFowNum = getLastFOWGameNumber() + 1;
-        while (ReserveGameNumberService.isGameNumReserved("fow" + nextFowNum)) nextFowNum++;
-        return "fow" + (getLastFOWGameNumber() + 1);
+        return "fow" + ReserveGameNumberService.firstUnreservedNumber("fow", getLastFOWGameNumber() + 1);
     }
 
     private static int getLastFOWGameNumber() {

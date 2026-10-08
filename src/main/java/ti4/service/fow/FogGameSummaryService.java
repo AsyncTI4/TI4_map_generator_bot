@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -20,7 +22,11 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
+import ti4.image.BoardPosition;
+import ti4.image.CompactOverviewGenerator;
+import ti4.image.GalaxyNames;
 import ti4.image.MapRenderPipeline;
+import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameModeService;
 import ti4.service.option.FOWOptionService;
@@ -76,6 +82,7 @@ public class FogGameSummaryService {
     public static List<MessageEmbed> buildEmbeds(Game game, boolean includeChannels) {
         List<MessageEmbed> embeds = new ArrayList<>();
         embeds.add(overviewEmbed(game));
+        embeds.add(galaxiesEmbed(game));
         embeds.add(contentEmbed(game));
         embeds.add(fogOptionsEmbed(game));
         embeds.add(peopleEmbed(game, includeChannels));
@@ -92,8 +99,21 @@ public class FogGameSummaryService {
         }
         MessageHelper.sendMessageToChannelWithEmbeds(
                 channel, "## Fog game ended: " + displayName(game), buildEmbeds(game, false));
+        MapRenderPipeline.queueImage(
+                game,
+                "Fog settings log overview",
+                () -> CompactOverviewGenerator.gmOverview(game),
+                upload -> MessageHelper.sendFileUploadToChannel(channel, upload));
         MapRenderPipeline.queueUnfoggedWithoutWebsiteUpload(
                 game, DisplayType.all, upload -> MessageHelper.sendFileUploadToChannel(channel, upload));
+    }
+
+    public static int galaxyCount(Game game) {
+        return GalaxyNames.inUse(game).size();
+    }
+
+    public static boolean usesSectors(Game game) {
+        return !MapSegment.stored(game).isEmpty() || MapSegment.isAutoSectors(game);
     }
 
     public static String displayName(Game game) {
@@ -154,6 +174,47 @@ public class FogGameSummaryService {
                     false);
         }
         return eb.build();
+    }
+
+    private static MessageEmbed galaxiesEmbed(Game game) {
+        EmbedBuilder eb = baseEmbed("Galaxies & sectors");
+        Map<Character, Long> tilesPerBoard = game.getTileMap().keySet().stream()
+                .collect(Collectors.groupingBy(BoardPosition::boardOf, Collectors.counting()));
+        List<String> galaxyLines = GalaxyNames.inUse(game).stream()
+                .map(id -> galaxyLine(game, id, tilesPerBoard))
+                .toList();
+        addChunkedField(eb, "Galaxies", galaxyLines);
+        List<String> sectorLines = MapSegment.all(game).stream()
+                .map(FogGameSummaryService::sectorLine)
+                .toList();
+        addChunkedField(eb, "Sectors", sectorLines);
+        inline(eb, "Auto sectors", yesNo(MapSegment.isAutoSectors(game)));
+        inline(eb, "Sector gap", String.valueOf(MapSegment.gap(game)));
+        inline(
+                eb,
+                "Default sector",
+                MapSegment.defaultSegment(game).map(MapSegment::name).orElse(NONE));
+        inline(eb, "Separate Fracture", yesNo(MapSegment.isFractureSeparate(game)));
+        return eb.build();
+    }
+
+    private static String galaxyLine(Game game, String id, Map<Character, Long> tilesPerBoard) {
+        char board = GalaxyNames.MAIN_ID.equals(id) ? BoardPosition.MAIN_BOARD : id.charAt(0);
+        String name = GalaxyNames.isMultiGalaxy(game) ? GalaxyNames.name(game, id) : MapSegment.MAIN;
+        String renamed = GalaxyNames.isManual(game, id) ? " (renamed)" : "";
+        return "`" + id + "` " + name + renamed + " · " + tilesPerBoard.getOrDefault(board, 0L) + " tiles";
+    }
+
+    private static String sectorLine(MapSegment segment) {
+        String kind = segment.kind().name().toLowerCase(Locale.ROOT);
+        if (segment.kind() == MapSegment.Kind.CIRCLE) {
+            return segment.name() + " · " + kind + " around `" + segment.centre() + "` r" + segment.radius();
+        }
+        return segment.name() + " · " + kind;
+    }
+
+    private static String yesNo(boolean value) {
+        return value ? "Yes" : "No";
     }
 
     private static MessageEmbed contentEmbed(Game game) {

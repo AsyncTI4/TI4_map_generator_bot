@@ -48,6 +48,8 @@ public class FogEndedGameStatisticsService {
 
         private int games;
         private final Map<Integer, Integer> playerCounts = new TreeMap<>();
+        private final Map<Integer, Integer> galaxyCounts = new TreeMap<>();
+        private int sectorGames;
         private final Map<String, Integer> variants = new HashMap<>();
         private final Map<String, Integer> factionGames = new HashMap<>();
         private final Map<String, Integer> factionWins = new HashMap<>();
@@ -63,6 +65,10 @@ public class FogEndedGameStatisticsService {
             playerCounts.merge(game.getRealAndEliminatedPlayers().size(), 1, Integer::sum);
             variants.merge(FogGameSummaryService.fogVariant(game), 1, Integer::sum);
             tiles.accept(game.getTileMap().size());
+            galaxyCounts.merge(FogGameSummaryService.galaxyCount(game), 1, Integer::sum);
+            if (FogGameSummaryService.usesSectors(game)) {
+                sectorGames++;
+            }
             game.getRealAndEliminatedPlayers().forEach(player -> countFaction(factionGames, player));
             game.getWinners().forEach(player -> countFaction(factionWins, player));
             ModeBreakdown modes = ModeBreakdown.of(game);
@@ -93,6 +99,14 @@ public class FogEndedGameStatisticsService {
             return factionWins;
         }
 
+        Map<Integer, Integer> galaxyCounts() {
+            return galaxyCounts;
+        }
+
+        int sectorGames() {
+            return sectorGames;
+        }
+
         IntSummaryStatistics tiles() {
             return tiles;
         }
@@ -114,6 +128,16 @@ public class FogEndedGameStatisticsService {
                     .append(String.format(Locale.ROOT, "%.1f", tiles.getAverage()))
                     .append(" · max ")
                     .append(tiles.getMax())
+                    .append('\n');
+            sb.append("**Galaxies per game:** ")
+                    .append(galaxyCounts.entrySet().stream()
+                            .map(entry -> entry.getKey() + ": " + entry.getValue())
+                            .collect(Collectors.joining(", ")))
+                    .append('\n');
+            sb.append("**Games with custom or auto sectors:** ")
+                    .append(sectorGames)
+                    .append('/')
+                    .append(games)
                     .append("\n\n");
             appendSection(sb, "Fog type", variants, Function.identity());
             appendSection(sb, "Expansions", expansions, Function.identity());

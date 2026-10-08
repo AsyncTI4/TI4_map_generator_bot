@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -57,13 +58,7 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
     void fogOptionsEmbedListsUnsetOptionsInEnumOrder() {
         game.setFowOption(FOWOption.BRIGHT_NOVAS, true);
 
-        MessageEmbed optionsEmbed =
-                FogGameSummaryService.buildEmbeds(game, false).get(2);
-        String visibility = optionsEmbed.getFields().stream()
-                .filter(field -> "Visibility".equals(field.getName()))
-                .findFirst()
-                .orElseThrow()
-                .getValue();
+        String visibility = fieldValue(embedTitled("Fog options"), "Visibility");
 
         // HIDE_MAP was never set, but the GM still needs to see it as off.
         assertThat(visibility).startsWith("✅ Bright Novas").contains("🚫 Hide Unexplored Map");
@@ -81,7 +76,7 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
 
         List<MessageEmbed> embeds = FogGameSummaryService.buildEmbeds(game, false);
 
-        assertThat(embeds).hasSize(4);
+        assertThat(embeds).hasSize(5);
         for (MessageEmbed embed : embeds) {
             assertThat(embed.getLength()).isLessThanOrEqualTo(MessageEmbed.EMBED_MAX_LENGTH_BOT);
             assertThat(embed.getFields()).hasSizeLessThanOrEqualTo(25);
@@ -90,10 +85,53 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
                 assertThat(field.getValue().length()).isLessThanOrEqualTo(MessageEmbed.VALUE_MAX_LENGTH);
             });
         }
-        String players = embeds.get(3).getFields().stream()
+        String players = embedTitled("People").getFields().stream()
                 .filter(field -> field.getName().startsWith("Players"))
                 .map(MessageEmbed.Field::getValue)
                 .reduce("", String::concat);
         FACTIONS.forEach(faction -> assertThat(players).contains(faction));
+    }
+
+    @Test
+    void galaxiesEmbedListsExtraGalaxiesWithTheirTileCounts() {
+        game.setTile(new Tile("19", "000"));
+        game.setTile(new Tile("20", "101"));
+        game.setTile(new Tile("21", "a000"));
+        game.setTile(new Tile("22", "a101"));
+        game.setTile(new Tile("23", "c000"));
+
+        String galaxies = fieldValue(embedTitled("Galaxies & sectors"), "Galaxies");
+
+        assertThat(FogGameSummaryService.galaxyCount(game)).isEqualTo(3);
+        assertThat(galaxies).contains("`main`").contains("`a`").contains("`c`").doesNotContain("`b`");
+        assertThat(galaxies.lines()).anyMatch(line -> line.startsWith("`a`") && line.endsWith("2 tiles"));
+        assertThat(galaxies.lines()).anyMatch(line -> line.startsWith("`main`") && line.endsWith("2 tiles"));
+    }
+
+    @Test
+    void singleGalaxyGameWithoutSectorsReportsNone() {
+        game.setTile(new Tile("19", "000"));
+
+        MessageEmbed galaxies = embedTitled("Galaxies & sectors");
+
+        assertThat(FogGameSummaryService.galaxyCount(game)).isEqualTo(1);
+        assertThat(FogGameSummaryService.usesSectors(game)).isFalse();
+        assertThat(fieldValue(galaxies, "Galaxies")).startsWith("`main` main");
+        assertThat(fieldValue(galaxies, "Sectors")).isEqualTo("None");
+    }
+
+    private MessageEmbed embedTitled(String title) {
+        return FogGameSummaryService.buildEmbeds(game, false).stream()
+                .filter(embed -> title.equals(embed.getTitle()))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private static String fieldValue(MessageEmbed embed, String name) {
+        return embed.getFields().stream()
+                .filter(field -> name.equals(field.getName()))
+                .findFirst()
+                .orElseThrow()
+                .getValue();
     }
 }
