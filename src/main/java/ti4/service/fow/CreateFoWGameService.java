@@ -37,7 +37,6 @@ import ti4.message.MessageHelper;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.fow.setup.FowSetupWizardService;
 import ti4.service.game.CreateGameService;
-import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 public class CreateFoWGameService {
@@ -166,9 +165,6 @@ public class CreateFoWGameService {
         Game newGame = CreateGameService.createNewGame(gameName, gameOwner);
         newGame.setCustomName(gameFunName);
         newGame.setFowMode(true);
-        newGame.setFowOption(FOWOption.MANAGED_COMMS, true);
-        newGame.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, true);
-        newGame.setFowOption(FOWOption.MAP_CONNECTIONS, true);
 
         // ADD PLAYERS
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
@@ -243,6 +239,9 @@ public class CreateFoWGameService {
                 + gmChannel.getAsMention() + "\n" + "> "
                 + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToChannel(eventChannel, message);
+
+        FogStandardService.apply(newGame);
+        FogStandardService.announce(newGame, gmChannel, actionsChannel);
 
         GameManager.save(newGame, "Create FOW Game Channels");
 

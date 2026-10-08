@@ -13,8 +13,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
@@ -243,7 +246,7 @@ public class FogGameSummaryService {
         return String.join("\n", lines);
     }
 
-    private static MessageEmbed fogOptionsEmbed(Game game) {
+    public static MessageEmbed fogOptionsEmbed(Game game) {
         EmbedBuilder eb = baseEmbed("Fog options");
         for (FOWOptionCategory category : FOWOptionCategory.values()) {
             String lines = Arrays.stream(FOWOption.values())
@@ -282,14 +285,46 @@ public class FogGameSummaryService {
                 .map(player -> playerLine(player, includeChannels))
                 .toList();
         addChunkedField(eb, "Players", playerLines);
+        List<String> observers = new ArrayList<>(game.getNotRealPlayers().stream()
+                .filter(player -> !gms.contains(player) && player.isSpectator())
+                .map(Player::getUserName)
+                .toList());
+        if (includeChannels) {
+            observers.addAll(channelObservers(game, gms));
+        }
+        if (!observers.isEmpty()) {
+            addChunkedField(eb, "Observers", observers);
+        }
         List<String> otherSeats = game.getNotRealPlayers().stream()
-                .filter(player -> !gms.contains(player))
+                .filter(player -> !gms.contains(player) && !player.isSpectator())
                 .map(Player::getUserName)
                 .toList();
         if (!otherSeats.isEmpty()) {
             eb.addField("Other seats", fieldValue(joined(otherSeats)), false);
         }
         return eb.build();
+    }
+
+    private static List<String> channelObservers(Game game, List<Player> gms) {
+        TextChannel mainChannel = game.getMainGameChannel();
+        if (mainChannel == null) {
+            return List.of();
+        }
+        Set<String> seated = game.getPlayers().keySet();
+        Set<String> gmIds = gms.stream().map(Player::getUserID).collect(Collectors.toSet());
+        String botId =
+                JdaService.jda == null ? "" : JdaService.jda.getSelfUser().getId();
+        return mainChannel.getMemberPermissionOverrides().stream()
+                .filter(override -> override.getAllowed().contains(Permission.VIEW_CHANNEL))
+                .map(PermissionOverride::getId)
+                .filter(id -> !seated.contains(id) && !gmIds.contains(id) && !id.equals(botId))
+                .map(id -> observerName(mainChannel.getGuild(), id))
+                .toList();
+    }
+
+    private static String observerName(Guild guild, String userId) {
+        Member member = guild.getMemberById(userId);
+        return member == null ? "<@" + userId + ">" : member.getEffectiveName();
     }
 
     private static String playerLine(Player player, boolean includeChannels) {

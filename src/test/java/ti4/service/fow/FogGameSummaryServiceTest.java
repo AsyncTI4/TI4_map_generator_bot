@@ -120,6 +120,19 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
         assertThat(fieldValue(galaxies, "Sectors")).isEqualTo("None");
     }
 
+    @Test
+    void spectatorSeatsAreListedAsObserversNotAsOtherSeats() {
+        Player player = game.addPlayer("player-id", "player-user");
+        player.setFaction("sol");
+        player.setColor("red");
+        game.addPlayer("spectator-id", "spectator-user");
+
+        MessageEmbed people = embedTitled("People");
+
+        assertThat(fieldValue(people, "Observers")).isEqualTo("spectator-user");
+        assertThat(people.getFields()).noneMatch(field -> "Other seats".equals(field.getName()));
+    }
+
     private MessageEmbed embedTitled(String title) {
         return FogGameSummaryService.buildEmbeds(game, false).stream()
                 .filter(embed -> title.equals(embed.getTitle()))
