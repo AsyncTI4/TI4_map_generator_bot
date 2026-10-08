@@ -1639,10 +1639,27 @@ public final class AgendaHelper {
     @ButtonHandler("presetCommitteeFormation")
     public static void presetCommitteeFormation(ButtonInteractionEvent event, Player player, Game game) {
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red("removeCommitteeFormation", "Remove Committee Formation"));
+        MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + " you successfully preset a play of _Committee Formation_.");
+                player.getRepresentation()
+                        + " you successfully preset a play of _Committee Formation_. You can use this button to undo it.",
+                buttons);
         game.setStoredValue("CommFormPreset", player.getFaction());
+    }
+
+    @ButtonHandler("removeCommitteeFormation")
+    public static void removeCommitteeFormation(ButtonInteractionEvent event, Player player, Game game) {
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + " you successfully removed a preset of _Committee Formation_. You can use this button to redo it.",
+                buttons);
+        game.removeStoredValue("CommFormPreset");
     }
 
     @ButtonHandler("exhaustForVotes_")

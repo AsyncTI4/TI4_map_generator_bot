@@ -237,6 +237,7 @@ public class StartPhaseService {
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
         StatusHelper.commitStatusScoringEvent(game);
+        StatusCleanupService.returnEndStatusPNs(game);
         // Phase-end lore must fire before the round number increments below, so "end of round N"
         // round gates see the round they close; the matching phase-START fires after setPhaseOfGame.
         LoreService.showPhaseEndLore(game, "strategy");

@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -103,7 +102,8 @@ public final class ButtonHelperAbilities {
         String so = buttonID.replace("changePoToSo_", "");
         game.addToSoToPoList(so);
         player.removeSecret(player.getSecrets().get(so));
-        Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(so), 1);
+        int vp = Mapper.getSecretObjective(so).getPoints();
+        Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(so), vp);
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " has revealed a Heist Objective.",

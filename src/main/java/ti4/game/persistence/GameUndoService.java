@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -125,6 +127,21 @@ class GameUndoService {
             Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
             if (p2 != null && (p1.getAcCount() != p2.getAcCount() || p1.getSo() != p2.getSo())) {
                 CardsInfoService.sendCardsInfo(loadedGame, p1);
+            }
+        }
+        if (loadedGame.getRealPlayers().size() < 1) {
+            for (Player player : loadedGame.getPlayers().values()) {
+                if (loadedGame
+                        .getStoredValue(player.getUserID() + "queuedMiltyPick")
+                        .isEmpty()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.gray("restartAllMiltyQueue", "Remove All Queues"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            loadedGame.getMainGameChannel(),
+                            "If a queue is causing issues, use this button to remove all queues.",
+                            buttons);
+                    break;
+                }
             }
         }
     }

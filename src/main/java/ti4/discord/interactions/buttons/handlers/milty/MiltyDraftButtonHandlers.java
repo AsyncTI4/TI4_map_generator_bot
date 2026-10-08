@@ -35,6 +35,16 @@ class MiltyDraftButtonHandlers {
         manager.doMiltyPick(event, game, buttonID, player);
     }
 
+    @ButtonHandler("restartAllMiltyQueue")
+    private void restartAllMiltyQueue(ButtonInteractionEvent event, Game game, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        for (Player player : game.getPlayers().values()) {
+            game.setStoredValue(player.getUserID() + "queuedMiltyPick", "");
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "All players' milty draft queues have been reset.");
+    }
+
     @ButtonHandler("restartMiltyQueue")
     private void restartMiltyQueue(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         ButtonHelper.deleteMessage(event);
