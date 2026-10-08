@@ -1,6 +1,7 @@
 package ti4.service.fow;
 
 import java.util.List;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.game.Game;
@@ -28,6 +29,15 @@ public class FogStandardService {
     public static void announce(Game game, MessageChannel gmChannel, MessageChannel announcementsChannel) {
         announceToGm(game, gmChannel);
         MessageHelper.sendMessageToChannel(announcementsChannel, ghostHexNote());
+    }
+
+    public static void reapply(Game game, MessageChannel gmChannel, @Nullable MessageChannel announcementsChannel) {
+        boolean ghostHexesWereOn = game.getFowOption(FOWOption.GHOST_HEXES);
+        apply(game);
+        announceToGm(game, gmChannel);
+        if (!ghostHexesWereOn && announcementsChannel != null) {
+            MessageHelper.sendMessageToChannel(announcementsChannel, ghostHexNote());
+        }
     }
 
     public static void announceToGm(Game game, MessageChannel gmChannel) {

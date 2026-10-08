@@ -45,6 +45,6 @@ class FowInfo extends GameStateSubcommand {
         if (CommandHelper.hasRole(event, JdaService.developerRoles)) {
             return true;
         }
-        return FoWHelper.isGameMaster(event.getUser().getId(), game) && FoWHelper.canSeeWholeMap(game, event);
+        return FoWHelper.isGameMasterInGmRoom(game, event);
     }
 }

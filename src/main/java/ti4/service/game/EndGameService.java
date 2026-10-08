@@ -232,7 +232,11 @@ public class EndGameService {
     }
 
     private static List<Player> fogGameMasters(Game game) {
-        return game.isFowMode() ? game.getPlayersWithGMRole() : List.of();
+        return isAnyFog(game) ? game.getPlayersWithGMRole() : List.of();
+    }
+
+    private static boolean isAnyFog(Game game) {
+        return game.isFowMode() || game.isLightFogMode();
     }
 
     private static void gameEndStuff(
@@ -257,7 +261,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
-        if (game.isFowMode() && publish && !game.getRealPlayers().isEmpty()) {
+        if (isAnyFog(game) && publish && !game.getRealPlayers().isEmpty()) {
             FogGameSummaryService.postSettingsLog(game, fogGameMasters);
         }
         WinningPathPersistenceService.addGame(game);

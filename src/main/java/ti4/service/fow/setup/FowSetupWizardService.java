@@ -625,8 +625,7 @@ public final class FowSetupWizardService {
         String type = buttonID.replace("fowSetupFogType_", "");
         switch (type) {
             case "standard" -> {
-                FogStandardService.apply(game);
-                FogStandardService.announceToGm(game, GMService.getGMChannel(game));
+                FogStandardService.reapply(game, GMService.getGMChannel(game), game.getMainGameChannel());
             }
             case "normal" -> {
                 FOWPlusService.setActive(game, false);
