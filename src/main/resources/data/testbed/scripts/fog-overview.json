@@ -1,0 +1,30 @@
+{
+  "name": "fog-overview",
+  "description": "Overview button for players and the GM; galaxy names on the switch buttons. Assumes the default (not split) map refresh style.",
+  "preset": "fog-galaxies-2p",
+  "settleSeconds": 3,
+  "timeoutSeconds": 40,
+  "steps": [
+    { "note": "you = sol (carrier at 305: alpha wormhole to a000, hyperlane 306, custom hyperlane 204); seat1 = hacan (destroyer at a301, hyperlane 207 next to its home)." },
+    { "expect": { "state": "stored:fowMapSegments", "contains": ["core=000:3", "outpost=a000:1"] } },
+
+    { "label": "Sol opens the core map", "as": "you", "in": "you", "pressId": "showMapSegment_core" },
+    { "label": "Sol's map offers the green Overview button", "as": "you", "in": "you", "press": "compactMapOverview" },
+
+    { "label": "In the shared channel the overview is a private reply", "as": "you", "in": "main", "pressId": "compactMapOverview" },
+    { "expect": { "ephemeral": "Here is your requested image" } },
+    { "label": "Name map A's galaxy", "do": "setStored", "key": "fowGalaxyRenames", "value": "a=frontier" },
+    { "label": "Sol refreshes the core map", "as": "you", "in": "you", "pressId": "showMapSegment_core" },
+    { "label": "The switch button carries the galaxy name", "as": "you", "in": "you", "press": "Map: frontier / outpost" },
+
+    { "label": "Hacan opens map A's rest", "as": "seat1", "in": "seat1", "pressId": "showMapSegment_board-a" },
+    { "label": "Hacan's map offers its own Overview", "as": "seat1", "in": "seat1", "press": "compactMapOverview" },
+
+    { "label": "GM refreshes the unfogged map", "as": "you", "in": "gm", "pressId": "showGameAgain" },
+    { "label": "The GM map offers the GM Overview", "as": "you", "in": "gm", "press": "compactMapOverview" },
+
+    { "label": "Galaxy names back to automatic", "do": "removeStored", "key": "fowGalaxyRenames" },
+    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "note": "By hand: Sol's overview shows only Sol's known systems (incl. hyperlane 306 and custom lane 204); the GM overview shows every panel with hyperlanes 306/207/a105 and custom lanes 204/a206; Hacan's overview shows nothing of Sol's area." }
+  ]
+}

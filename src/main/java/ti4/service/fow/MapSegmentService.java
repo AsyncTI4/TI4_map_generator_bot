@@ -2,6 +2,8 @@ package ti4.service.fow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -19,6 +21,7 @@ import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 public class MapSegmentService {
@@ -49,8 +52,7 @@ public class MapSegmentService {
         List<String> names = new ArrayList<>(visibleTo(game, userId, foggedView).stream()
                 .map(MapSegment::name)
                 .toList());
-        boolean fractureIsTheOnlySector = MapSegment.all(game).stream().allMatch(MapSegment::isFracture);
-        if (fractureIsTheOnlySector && names.contains(MapSegment.FRACTURE)) {
+        if (!names.isEmpty() && MapSegment.mainMapVisibleTo(game, foggedViewer(game, userId, foggedView))) {
             names.addFirst(MapSegment.MAIN);
         }
         return names;
@@ -61,9 +63,21 @@ public class MapSegmentService {
         if (names.size() < 2) {
             return List.of();
         }
+        Map<String, String> labels = MapSegment.all(game).stream()
+                .collect(Collectors.toMap(
+                        MapSegment::name, segment -> segment.displayName(game), (first, second) -> first));
+        labels.put(MapSegment.MAIN, MapSegment.mainDisplayName(game));
         return names.stream()
-                .map(name -> Buttons.gray(SWITCH_PREFIX + name, "Map: " + name))
+                .map(name -> Buttons.gray(SWITCH_PREFIX + name, "Map: " + labels.getOrDefault(name, name)))
                 .toList();
+    }
+
+    @Nullable
+    private static Player foggedViewer(Game game, String userId, boolean foggedView) {
+        if (!foggedView && FoWHelper.isGameMaster(userId, game)) {
+            return null;
+        }
+        return game.getPlayer(userId);
     }
 
     private static List<MapSegment> visibleTo(Game game, String userId, boolean foggedView) {
@@ -80,14 +94,19 @@ public class MapSegmentService {
         return MapSegment.visibleTo(game, player);
     }
 
+    public static String viewerId(Game game, GenericInteractionCreateEvent event) {
+        Player acting = TestBedService.resolveActingPlayer(game, event, null);
+        return acting != null ? acting.getUserID() : event.getUser().getId();
+    }
+
     @ButtonHandler(value = SWITCH_PREFIX, save = false)
     public static void showSegment(ButtonInteractionEvent event, String buttonID, Game game) {
         String name = buttonID.substring(SWITCH_PREFIX.length());
         boolean foggedView = isFoggedView(game, event);
-        if (!viewableNames(game, event.getUser().getId(), foggedView).contains(name)) {
+        if (!viewableNames(game, viewerId(game, event), foggedView).contains(name)) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That part of the map is not available to you.");
             return;
         }
-        ShowGameService.simpleShowGame(game, event, DisplayType.all, MapSegment.MAIN.equals(name) ? null : name);
+        ShowGameService.simpleShowGame(game, event, DisplayType.all, name);
     }
 }

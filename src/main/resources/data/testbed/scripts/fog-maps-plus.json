@@ -1,0 +1,30 @@
+{
+  "name": "fog-maps-plus",
+  "description": "FoW+: map views stay limited to what each seat knows, and Sol can activate a000 on map A through the sector picker (only visible systems, Blind Tile offered).",
+  "preset": "fog-maps-plus-2p",
+  "settleSeconds": 3,
+  "timeoutSeconds": 40,
+  "steps": [
+    { "note": "you = sol (carrier at 305, alpha wormhole to a000); seat1 = hacan (destroyer at a301). FoW+ forces Hide Unexplored Map." },
+    { "expect": { "state": "stored:fowMapSegments", "contains": ["core=000:3", "outpost=a000:1"] } },
+    { "expect": { "state": "you.ccs", "equals": "3/3/2" } },
+
+    { "label": "Sol opens the core map", "as": "you", "in": "you", "pressId": "showMapSegment_core" },
+    { "label": "Sol is offered A / outpost", "as": "you", "in": "you", "press": "showMapSegment_outpost" },
+    { "label": "Sol may not open map A's rest", "as": "you", "in": "you", "pressId": "showMapSegment_board-a" },
+    { "expect": { "ephemeral": "That part of the map is not available to you." } },
+    { "label": "Hacan may not open A / outpost", "as": "seat1", "in": "seat1", "pressId": "showMapSegment_outpost" },
+    { "expect": { "ephemeral": "That part of the map is not available to you." } },
+
+    { "label": "Sol's turn", "do": "setActivePlayer", "as": "you" },
+    { "label": "Sol starts a tactical action", "as": "you", "in": "you", "pressId": "tacticalAction" },
+    { "label": "FoW+ offers Blind Tile", "as": "you", "in": "you", "press": "blindTileSelection~MDL" },
+    { "expect": { "modal": "blindActivation_" } },
+    { "label": "The picker offers map A's sector (Sol sees a000)", "as": "you", "in": "you", "press": "systemPick_outpost" },
+    { "label": "Activate a000 on map A", "as": "you", "in": "you", "press": "ringTile_a000" },
+    { "label": "Activation spent a tactic token", "expect": { "state": "you.ccs", "equals": "2/3/2" } },
+
+    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "note": "By hand: move the carrier from 305 into a000; unexplored tiles stay hidden (Hide Unexplored Map), ghost rings still show numbered frontier hexes; Blind Tile with a void map A hex (e.g. a404) sends ships into The Void." }
+  ]
+}

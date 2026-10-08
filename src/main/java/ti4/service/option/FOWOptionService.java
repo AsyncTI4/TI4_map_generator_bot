@@ -26,6 +26,7 @@ public class FOWOptionService {
     public enum FOWOptionCategory {
         GAME("Game"),
         VISIBILITY("Visibility"),
+        MAP("Map"),
         OTHER("Other"),
         // Name must stay underscore-free: changeFOWOptions splits button IDs on "_" with the
         // category as the first token, so an underscore here would break that parse.
@@ -87,14 +88,24 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",
                 "Action card discard pile shows only cards that were played"),
+
+        // Map Options
         CLASSIC_MAP_LAYOUT(
-                FOWOptionCategory.VISIBILITY,
+                FOWOptionCategory.MAP,
                 "Classic map layout",
                 "Show the full classic map instead of framing it to what each player knows; map sectors are ignored"),
         FRACTURE_SEPARATE_MAP(
-                FOWOptionCategory.VISIBILITY,
+                FOWOptionCategory.MAP,
                 "Separate Fracture map",
                 "Show the Fracture as its own map segment instead of below the galaxy"),
+        MAP_CONNECTIONS(
+                FOWOptionCategory.MAP,
+                "Map connections",
+                "Under each sector map, show the known systems on other maps/sectors it connects to"),
+        GHOST_HEXES(
+                FOWOptionCategory.MAP,
+                "Ghost hexes",
+                "Faint numbered rings on unexplored hexes next to known space; players can hide them with /user fog_ghost_hexes"),
 
         // Precise Player Stats Options
         STATS_FROM_HS_ONLY(
@@ -236,11 +247,9 @@ public class FOWOptionService {
             }
         }
 
-        // An ActionRow holds at most 5 buttons, and the message at most 5 rows - one of which is the category row.
-        for (int i = 0; i < optionButtons.size(); i += BUTTONS_PER_ROW) {
-            rows.add(ActionRow.of(optionButtons.subList(i, Math.min(i + BUTTONS_PER_ROW, optionButtons.size()))));
-        }
-        rows.add(ActionRow.of(categoryButtons));
+        // An ActionRow holds at most 5 buttons, and the message at most 5 rows - two of which are category rows.
+        addRows(rows, optionButtons);
+        addRows(rows, categoryButtons);
 
         if (event == null) {
             GMService.getGMChannel(game)
@@ -252,6 +261,12 @@ public class FOWOptionService {
                     .editOriginal(sb.toString())
                     .setComponents(rows)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    private static void addRows(List<ActionRow> rows, List<Button> buttons) {
+        for (int i = 0; i < buttons.size(); i += BUTTONS_PER_ROW) {
+            rows.add(ActionRow.of(buttons.subList(i, Math.min(i + BUTTONS_PER_ROW, buttons.size()))));
         }
     }
 

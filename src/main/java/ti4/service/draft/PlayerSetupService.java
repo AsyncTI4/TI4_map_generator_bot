@@ -138,7 +138,7 @@ public class PlayerSetupService {
         }
 
         // HOME SYSTEM
-        if (!PositionMapper.isTilePositionValid(positionHS)) {
+        if (!PositionMapper.isTilePositionValid(game, positionHS)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;

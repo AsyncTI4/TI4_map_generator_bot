@@ -1,0 +1,28 @@
+{
+  "name": "fog-maps",
+  "description": "Extra map A: each seat is offered only the map views it knows, a wormhole into map A opens its sector, and forbidden views refuse without leaking.",
+  "preset": "fog-maps-2p",
+  "settleSeconds": 3,
+  "timeoutSeconds": 40,
+  "steps": [
+    { "note": "you = sol (carrier at 305, alpha wormhole to a000); seat1 = hacan (destroyer at a301, map A's unsectored rest)." },
+    { "expect": { "state": "stored:fowMapSegments", "contains": ["core=000:3", "outpost=a000:1"] } },
+
+    { "label": "Sol opens the core map", "as": "you", "in": "you", "pressId": "showMapSegment_core" },
+    { "label": "Sol is offered A / outpost (seen through the wormhole)", "as": "you", "in": "you", "press": "showMapSegment_outpost" },
+    { "label": "Sol may not open map A's rest", "as": "you", "in": "you", "pressId": "showMapSegment_board-a" },
+    { "expect": { "ephemeral": "That part of the map is not available to you." } },
+
+    { "label": "Hacan opens the core map (home is there)", "as": "seat1", "in": "seat1", "pressId": "showMapSegment_core" },
+    { "label": "Hacan is offered map A's rest", "as": "seat1", "in": "seat1", "press": "showMapSegment_board-a" },
+    { "label": "Hacan may not open A / outpost yet", "as": "seat1", "in": "seat1", "pressId": "showMapSegment_outpost" },
+    { "expect": { "ephemeral": "That part of the map is not available to you." } },
+
+    { "label": "Hacan moves into the outpost", "do": "hand", "as": "seat1", "hand": { "units": { "a000": "dd" } } },
+    { "label": "Hacan now opens A / outpost", "as": "seat1", "in": "seat1", "pressId": "showMapSegment_outpost" },
+    { "label": "and is offered it on the new map", "as": "seat1", "in": "seat1", "press": "showMapSegment_board-a" },
+
+    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "note": "By hand (images): Sol's core map has a 'Connections to other maps' strip with the a000 wormhole labelled 'A / outpost'; ghost rings with numbers sit on unexplored hexes next to known space; titles read 'Map: core', 'Map: A / outpost', 'Map: A'." }
+  ]
+}
