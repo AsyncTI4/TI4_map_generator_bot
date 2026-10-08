@@ -95,6 +95,11 @@ public class MapRenderPipeline {
         queue(game, event, displayType, segment, callback, true, true);
     }
 
+    public static void queueUnfoggedWithoutWebsiteUpload(
+            Game game, @Nullable DisplayType displayType, Consumer<FileUpload> callback) {
+        queue(game, null, displayType, null, callback, true, false);
+    }
+
     private static void queue(
             Game game,
             @Nullable GenericInteractionCreateEvent event,

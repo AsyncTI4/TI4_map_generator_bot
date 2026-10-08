@@ -153,7 +153,7 @@ public class FOWOptionService {
             this.visible = visible;
         }
 
-        FOWOptionCategory getCategory() {
+        public FOWOptionCategory getCategory() {
             return category;
         }
 
@@ -161,7 +161,7 @@ public class FOWOptionService {
             return description;
         }
 
-        boolean isVisible() {
+        public boolean isVisible() {
             return visible;
         }
 
@@ -208,7 +208,7 @@ public class FOWOptionService {
                 continue;
             }
 
-            boolean currentValue = readOption(game, option);
+            boolean currentValue = isEnabled(game, option);
             sb.append(valueRepresentation(currentValue))
                     .append(" **")
                     .append(option.getTitle())
@@ -269,7 +269,7 @@ public class FOWOptionService {
     }
 
     /** DISABLE_FRACTURE reads/writes noFractureMode, so this and {@code weird_game_setup no_fracture} cannot diverge. */
-    private static boolean readOption(Game game, FOWOption option) {
+    public static boolean isEnabled(Game game, FOWOption option) {
         if (option == FOWOption.DISABLE_FRACTURE) return game.isNoFractureMode();
         return game.getFowOption(option);
     }

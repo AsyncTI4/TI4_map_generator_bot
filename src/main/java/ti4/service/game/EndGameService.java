@@ -35,6 +35,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.fow.FogGameSummaryService;
 import ti4.service.fow.setup.FowSetupWizardService;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
@@ -246,6 +247,9 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
+        if (game.isFowMode() && publish && !game.getRealPlayers().isEmpty()) {
+            FogGameSummaryService.postSettingsLog(game);
+        }
         WinningPathPersistenceService.addGame(game);
     }
 
