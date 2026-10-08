@@ -27,6 +27,9 @@ final class SectorConnections {
             Collection<String> visibleSources,
             Set<String> known) {
         List<MapSegment> segments = MapSegment.all(game);
+        if (segments.isEmpty()) {
+            return List.of();
+        }
         Set<String> uncoveredMain = MapSegment.uncoveredMainPositions(game, segments);
         Set<String> shownPositions = shown == null ? mainViewPositions(game) : shown.positions();
         Map<String, String> sectorByPosition = sectorByPosition(game, segments, shown, uncoveredMain);

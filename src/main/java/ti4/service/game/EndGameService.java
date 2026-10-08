@@ -35,6 +35,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.fow.FogGameSummaryService;
 import ti4.service.fow.setup.FowSetupWizardService;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
@@ -53,6 +54,7 @@ public class EndGameService {
     public static void secondHalfOfGameEnd(
             GenericInteractionCreateEvent event, Game game, boolean publish, boolean archiveChannels, boolean rematch) {
         String gameName = game.getName();
+        List<Player> fogGameMasters = fogGameMasters(game);
         List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
         boolean deleteRole = true;
         if (gameRoles.size() > 1) {
@@ -168,7 +170,7 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
-        gameEndStuff(game, event, publish);
+        gameEndStuff(game, event, publish, fogGameMasters);
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = JdaService.guildPrimary.getTextChannelsByName("staff-lounge", true);
@@ -226,6 +228,19 @@ public class EndGameService {
     }
 
     static void gameEndStuff(Game game, GenericInteractionCreateEvent event, boolean publish) {
+        gameEndStuff(game, event, publish, fogGameMasters(game));
+    }
+
+    private static List<Player> fogGameMasters(Game game) {
+        return isAnyFog(game) ? game.getPlayersWithGMRole() : List.of();
+    }
+
+    private static boolean isAnyFog(Game game) {
+        return game.isFowMode() || game.isLightFogMode();
+    }
+
+    private static void gameEndStuff(
+            Game game, GenericInteractionCreateEvent event, boolean publish, List<Player> fogGameMasters) {
         String gameName = game.getName();
 
         game.setHasEnded(true);
@@ -246,6 +261,9 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
+        if (isAnyFog(game) && publish && !game.getRealPlayers().isEmpty()) {
+            FogGameSummaryService.postSettingsLog(game, fogGameMasters);
+        }
         WinningPathPersistenceService.addGame(game);
     }
 

@@ -30,7 +30,9 @@ public class FOWCommand implements ParentCommand {
                     new SetupWizard(),
                     new MapSegmentCommand(),
                     new MapOverviewCommand(),
-                    new GalaxyCommand())
+                    new GalaxyCommand(),
+                    new FowInfo(),
+                    new FowEndedStats())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
