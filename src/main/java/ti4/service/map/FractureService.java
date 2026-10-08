@@ -85,10 +85,8 @@ public class FractureService {
         if (game.isCosmicConvergenceMode()) {
             Die die1 = new Die(0);
             Die die2 = new Die(0);
-            result = die1.getResult();
             // For display, show both dice; success is if either is 1 or 10
             diceDisplay = DiceEmojis.getDieEmoji("green", die1.getResult()) + " " + DiceEmojis.getDieEmoji("green", die2.getResult());
-            // Override result logic: success if EITHER die is 1 or 10
             boolean isSuccess = (die1.getResult() == 1 || die1.getResult() == 10) || (die2.getResult() == 1 || die2.getResult() == 10);
             result = isSuccess ? 1 : 2; // use 1 for success, anything else for fail
         } else {
