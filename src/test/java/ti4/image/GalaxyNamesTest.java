@@ -54,5 +54,10 @@ class GalaxyNamesTest extends BaseTi4Test {
         assertNotNull(GalaxyNames.rename(game, "a", "Not Valid"));
         assertNotNull(GalaxyNames.rename(game, "a", "main"), "reserved");
         assertNotNull(GalaxyNames.rename(game, "h", "outer"), "no galaxy h");
+
+        // A renamed galaxy still owns its first name: nobody may take it, or resetting would create a duplicate.
+        String bFirst = GalaxyNames.name(game, "b");
+        assertNull(GalaxyNames.rename(game, "b", "far-reach"));
+        assertNotNull(GalaxyNames.rename(game, "a", bFirst), "b's hidden automatic name is still b's");
     }
 }

@@ -352,7 +352,8 @@ public record MapSegment(
             return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
         }
         if (isReservedName(from) || isReservedName(to)) {
-            return "`" + MAIN + "` and `" + FRACTURE + "` are built in and cannot be renamed or reused.";
+            return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are built in and cannot be renamed or"
+                    + " reused.";
         }
         List<MapSegment> live = all(game);
         if (from.equals(to) || live.stream().anyMatch(segment -> segment.name().equals(to))) {

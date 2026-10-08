@@ -144,7 +144,8 @@ class MapSegmentCommand extends GameStateSubcommand {
             return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
         }
         if (MapSegment.isReservedName(name)) {
-            return "`" + MapSegment.MAIN + "` and `" + MapSegment.FRACTURE + "` are reserved segment names.";
+            return "`" + MapSegment.MAIN + "`, `" + MapSegment.FRACTURE
+                    + "` and `board-a` to `board-g` are reserved segment names.";
         }
         if (radius == null && !cluster) {
             return "Give a `radius`, or set `cluster` to true.";

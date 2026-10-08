@@ -103,7 +103,7 @@ public final class GalaxyNames {
         boolean usedElsewhere = IDS.stream()
                 .filter(other -> !other.equals(id))
                 .filter(other -> inUse.contains(other) || assigned.containsKey(other) || renamed.containsKey(other))
-                .anyMatch(other -> name.equals(current.get(other)));
+                .anyMatch(other -> name.equals(current.get(other)) || name.equals(assigned.get(other)));
         if (usedElsewhere) {
             return "Another galaxy is already called `" + name + "`.";
         }
