@@ -40,6 +40,9 @@ public class FogStandardService {
                 + "This game starts with the fog standard: FoW+ and the options below.\n"
                 + "**FoW+ changes in play:**\n"
                 + FOWPlusService.FOWPLUS_PLAY_CHANGES
+                + "\n**Explore deck:** FoW+ has its own explore deck, `" + FOWPlusService.FOWPLUS_EXPLORE_DECK + "`."
+                + " Setup steps such as a game mode, homebrew or a draft's deck settings can replace it."
+                + " Check `/game info` before the game starts, and use `/game set_deck` to put it back if you want it."
                 + "\nChange single options with `/fow fow_options`, or pick another preset in the setup wizard's"
                 + " fog type step.";
     }

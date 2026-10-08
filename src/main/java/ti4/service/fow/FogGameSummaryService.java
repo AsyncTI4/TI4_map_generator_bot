@@ -83,25 +83,29 @@ public class FogGameSummaryService {
     }
 
     public static List<MessageEmbed> buildEmbeds(Game game, boolean includeChannels) {
+        return buildEmbeds(game, includeChannels, game.getPlayersWithGMRole());
+    }
+
+    public static List<MessageEmbed> buildEmbeds(Game game, boolean includeChannels, List<Player> gameMasters) {
         List<MessageEmbed> embeds = new ArrayList<>();
         embeds.add(overviewEmbed(game));
         embeds.add(galaxiesEmbed(game));
         embeds.add(contentEmbed(game));
         embeds.add(fogOptionsEmbed(game));
-        embeds.add(peopleEmbed(game, includeChannels));
+        embeds.add(peopleEmbed(game, includeChannels, gameMasters));
         if (includeChannels) {
             embeds.add(channelsEmbed(game));
         }
         return embeds;
     }
 
-    public static void postSettingsLog(Game game) {
+    public static void postSettingsLog(Game game, List<Player> gameMasters) {
         TextChannel channel = settingsLogChannel();
         if (channel == null) {
             return;
         }
         MessageHelper.sendMessageToChannelWithEmbeds(
-                channel, "## Fog game ended: " + displayName(game), buildEmbeds(game, false));
+                channel, "## Fog game ended: " + displayName(game), buildEmbeds(game, false, gameMasters));
         MapRenderPipeline.queueImage(
                 game,
                 "Fog settings log overview",
@@ -154,7 +158,12 @@ public class FogGameSummaryService {
         EmbedBuilder eb = baseEmbed(displayName(game));
         eb.setDescription("**" + fogVariant(game) + "** · " + (game.isHasEnded() ? "ended" : "in progress"));
         inline(eb, "Owner", game.getOwnerName());
-        inline(eb, "Created", game.getCreationDate());
+        inline(
+                eb,
+                "Created",
+                game.getCreationDateTime() > 0
+                        ? Helper.getDateRepresentation(game.getCreationDateTime())
+                        : game.getCreationDate());
         inline(eb, "Ended", game.isHasEnded() ? Helper.getDateRepresentation(game.getEndedDate()) : "No");
         inline(eb, "Round", String.valueOf(game.getRound()));
         inline(eb, "Phase", game.getPhaseOfGame());
@@ -271,9 +280,8 @@ public class FogGameSummaryService {
         return FOWOptionService.valueRepresentation(FOWOptionService.isEnabled(game, option)) + " " + option.getTitle();
     }
 
-    private static MessageEmbed peopleEmbed(Game game, boolean includeChannels) {
+    private static MessageEmbed peopleEmbed(Game game, boolean includeChannels, List<Player> gms) {
         EmbedBuilder eb = baseEmbed("People");
-        List<Player> gms = game.getPlayersWithGMRole();
         eb.addField(
                 "Game masters",
                 gms.isEmpty()

@@ -133,6 +133,21 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
         assertThat(people.getFields()).noneMatch(field -> "Other seats".equals(field.getName()));
     }
 
+    // At game end the GM role is deleted before the settings log is built, so the GMs are captured first and
+    // passed in; they must show as game masters and not fall through to the observer list.
+    @Test
+    void gameMastersPassedInAreShownEvenWithoutTheirRole() {
+        Player gm = game.addPlayer("gm-id", "gm-user");
+
+        MessageEmbed people = FogGameSummaryService.buildEmbeds(game, false, List.of(gm)).stream()
+                .filter(embed -> "People".equals(embed.getTitle()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(fieldValue(people, "Game masters")).isEqualTo("gm-user");
+        assertThat(people.getFields()).noneMatch(field -> "Observers".equals(field.getName()));
+    }
+
     private MessageEmbed embedTitled(String title) {
         return FogGameSummaryService.buildEmbeds(game, false).stream()
                 .filter(embed -> title.equals(embed.getTitle()))

@@ -75,6 +75,8 @@ class FogStandardServiceTest extends BaseTi4Test {
         MessageEmbed options = FogGameSummaryService.fogOptionsEmbed(game);
 
         assertThat(FogStandardService.gmOverviewText().length()).isLessThan(2000);
+        // Setup steps can swap the explore deck, so the GM is told the FoW+ deck exists and how to restore it.
+        assertThat(FogStandardService.gmOverviewText()).contains(FOWPLUS_DECK).contains("/game set_deck");
         assertThat(options.getLength()).isLessThanOrEqualTo(MessageEmbed.EMBED_MAX_LENGTH_BOT);
         assertThat(FogStandardService.ghostHexNote()).contains("/user fog_ghost_hexes show:False");
     }

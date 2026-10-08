@@ -63,7 +63,7 @@ public final class FOWPlusService {
     private static final String FOWPLUS_TAG = "FoW+";
     private static final String VOID_TILEID = "-1";
 
-    private static final String FOWPLUS_EXPLORE_DECK = "explores_fowplus";
+    public static final String FOWPLUS_EXPLORE_DECK = "explores_fowplus";
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
     private static final String FOWPLUS_EXPLORE_VORTEX = "fowplus_vortex";
     private static final String FOWPLUS_EXPLORE_CLARITY = "fowplus_clarity";
