@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.image.MapSegment;
 import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
@@ -52,6 +53,10 @@ class MapSegmentCommand extends GameStateSubcommand {
         Game game = getGame();
         if (!game.isFowMode() || !game.getPlayersWithGMRole().contains(getPlayer())) {
             MessageHelper.replyToMessage(event, "Only the GM of a Fog of War game can manage map segments.");
+            return;
+        }
+        if (!FoWHelper.canSeeWholeMap(game, event)) {
+            MessageHelper.replyToMessage(event, "This shows map layout. Use it in the GM room.");
             return;
         }
         List<String> replies = new ArrayList<>();
@@ -139,7 +144,8 @@ class MapSegmentCommand extends GameStateSubcommand {
             return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
         }
         if (MapSegment.isReservedName(name)) {
-            return "`" + MapSegment.MAIN + "` and `" + MapSegment.FRACTURE + "` are reserved segment names.";
+            return "`" + MapSegment.MAIN + "`, `" + MapSegment.FRACTURE
+                    + "` and `board-a` to `board-g` are reserved segment names.";
         }
         if (radius == null && !cluster) {
             return "Give a `radius`, or set `cluster` to true.";

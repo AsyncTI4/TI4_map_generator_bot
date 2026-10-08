@@ -28,7 +28,7 @@ class SetStatsAnchor extends GameStateSubcommand {
         String tileID = StringUtils.substringBefore(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
 
-        if (!PositionMapper.isTilePositionValid(tileID)) {
+        if (!PositionMapper.isTilePositionValid(getGame(), tileID)) {
             MessageHelper.sendMessageToEventChannel(event, "Tile ID `" + tileID + "` is not valid");
             return;
         }

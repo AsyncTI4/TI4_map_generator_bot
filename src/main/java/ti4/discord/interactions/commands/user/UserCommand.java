@@ -19,7 +19,8 @@ public class UserCommand implements ParentCommand {
                     new MessageMyGames(),
                     new SetPreferredSettings(),
                     new WipeTurnTime(),
-                    new SetFowFilter())
+                    new SetFowFilter(),
+                    new SetFogGhostHexes())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

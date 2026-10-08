@@ -1,6 +1,7 @@
 package ti4.image;
 
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -49,6 +50,21 @@ public record MapFrame(int offsetX, int offsetY, int width, int height) {
         if (raw == null) return null;
         Point scaled = PositionMapper.getScaledTilePosition(game, position, raw.x, raw.y, fractureYbump);
         return new Rectangle(scaled.x + padX, scaled.y + padY, TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT);
+    }
+
+    static Polygon hexPolygon(Rectangle hex) {
+        int quarter = hex.width / 4;
+        int[] xs = {
+            hex.x + quarter,
+            hex.x + hex.width - quarter,
+            hex.x + hex.width,
+            hex.x + hex.width - quarter,
+            hex.x + quarter,
+            hex.x
+        };
+        int[] ys = {hex.y, hex.y, hex.y + hex.height / 2, hex.y + hex.height, hex.y + hex.height, hex.y + hex.height / 2
+        };
+        return new Polygon(xs, ys, xs.length);
     }
 
     static boolean fitsCap(Rectangle bounds) {

@@ -78,6 +78,9 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Law in play | game `laws` (`id` or `id:elected`) | `"laws": ["arms_reduction"]` |
 | Token or attachment | game `tokens`: tile position or planet | `"tokens": { "101": ["frontier"], "mecatolrex": ["dmz"] }` |
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
+| Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
+| Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
+| Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
 | TG, commodities, command tokens | seat `tg`, `commodities`, `ccs` | `"ccs": "3/3/2"` |
 | State a feature keeps in stored values | script `do: setStored` | `{ "do": "setStored", "key": "x", "value": "y" }` |
@@ -254,6 +257,9 @@ copy-paste templates.
 | `start` | `setup` (default), `strategy` or `action` (seats without `sc` get the lowest free card). |
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
 | `revealedObjectives`, `laws`, `tokens` | Game state; see [Set up any component](#set-up-any-component). |
+| `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
+| `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
+| `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
 Seat fields (all optional): `faction`, `color`, `home`, `speaker`, `sc`; `acs`, `sos`, `relics` (a number draws

@@ -26,9 +26,11 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.image.MapSegment;
 import ti4.image.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript.Shortcut;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedPanelService.PageRef;
 import ti4.service.testbed.TestBedResetService.ResetResult;
 import ti4.service.testbed.TestBedShortcuts.ButtonGroup;
@@ -149,6 +151,24 @@ class TestBedGameTest extends BaseTi4Test {
         assertFalse(game.getRevealedPublicObjectives().containsKey("corner"));
         assertTrue(game.getAgendas().contains("arms_reduction"));
         assertFalse(TestBedService.isMarkedAsTestBed(game));
+    }
+
+    // Fog options and stored values from a preset are what the map code reads: options switch on, and segment
+    // definitions (which contain the `:` the script `setStored` guard refuses) arrive intact.
+    @Test
+    void presetFogOptionsAndStoredValuesReachTheMapCode() {
+        game.setFowMode(true);
+        TestBedPreset preset = TestBedPresetService.parse("""
+                { "fowOptions": ["map_connections", "GHOST_HEXES"],
+                  "stored": { "fowMapSegments": "core=000:3;outpost=a000:1" } }""");
+
+        TestBedComponentService.applyGameState(game, preset, new ArrayList<>());
+
+        assertTrue(game.getFowOption(FOWOption.MAP_CONNECTIONS));
+        assertTrue(game.getFowOption(FOWOption.GHOST_HEXES));
+        assertEquals(
+                List.of(new MapSegment("core", "000", 3), new MapSegment("outpost", "a000", 1)),
+                MapSegment.stored(game));
     }
 
     // Preset components land where the game keeps them; every state path scripts can read exists; placeholders

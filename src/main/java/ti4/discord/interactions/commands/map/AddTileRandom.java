@@ -49,7 +49,7 @@ class AddTileRandom extends GameStateSubcommand {
         StringTokenizer positionTokenizer = new StringTokenizer(positionString, ",");
         while (positionTokenizer.hasMoreTokens()) {
             String position = positionTokenizer.nextToken().trim();
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!PositionMapper.isTilePositionValid(getGame(), position)) {
                 MessageHelper.replyToMessage(event, "Invalid position: " + position);
                 return;
             }

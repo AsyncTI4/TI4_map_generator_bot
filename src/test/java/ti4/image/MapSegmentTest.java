@@ -273,4 +273,47 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(Set.of("frac1", "frac2"), positionsOf(MapSegment.FRACTURE));
         assertEquals(1, names().stream().filter(MapSegment.FRACTURE::equals).count());
     }
+
+    // A map's tiles outside every sector form its own detached view (fog only); a named sector can claim them.
+    @Test
+    void eachMapsLeftoverIsItsOwnDetachedViewInFogOnly() {
+        game.setTile(new Tile("19", "b000"));
+        game.setTile(new Tile("19", "b401"));
+        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
+
+        assertEquals(Set.of("b401"), positionsOf("board-b"));
+        assertTrue(MapSegment.find(game, "board-b").orElseThrow().isDetached());
+        assertTrue(MapSegment.isReservedName("board-b"));
+
+        game.removeTile("b401");
+        assertFalse(names().contains("board-b"), "fully covered by the named sector");
+        game.setTile(new Tile("19", "b401"));
+        game.setFowMode(false);
+        assertFalse(names().contains("board-b"), "no map views outside fog");
+    }
+
+    @Test
+    void automaticSectorsNeverJoinMapsEvenWhenLinked() {
+        MapFrame.positionsWithin("a000", 1).forEach(position -> game.setTile(new Tile("19", position)));
+        game.addCustomAdjacentTiles("000", List.of("a000"));
+        MapSegment.setAutoSectors(game, true);
+
+        assertTrue(MapSegment.all(game).stream()
+                .noneMatch(segment -> segment.positions().contains("000")
+                        && segment.positions().contains("a000")));
+    }
+
+    // Single-galaxy fog games must look exactly as before: no galaxy prefixes, main stays "main".
+    @Test
+    void mainMapSectorsKeepTheirPlainNamesUntilASecondGalaxyExists() {
+        MapSegment.put(game, new MapSegment("home", "000", 1));
+        assertEquals("home", MapSegment.find(game, "home").orElseThrow().displayName(game));
+        assertEquals(MapSegment.MAIN, MapSegment.mainDisplayName(game));
+
+        game.setTile(new Tile("19", "a000"));
+        String mainGalaxy = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+        assertEquals(
+                mainGalaxy + " / home",
+                MapSegment.find(game, "home").orElseThrow().displayName(game));
+    }
 }
