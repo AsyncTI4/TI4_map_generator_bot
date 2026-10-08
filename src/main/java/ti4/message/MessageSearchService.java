@@ -38,7 +38,8 @@ public class MessageSearchService {
 
     private static CompletableFuture<List<Message>> collectPages(
             MessageSearchAction search, int limit, List<Message> found, int indexingRetriesLeft) {
-        return search.offset(found.size()).submit().thenCompose(response -> {
+        if (!found.isEmpty()) search.offset(found.size());
+        return search.submit().thenCompose(response -> {
             if (response.isNotReady()) {
                 if (indexingRetriesLeft <= 0) return CompletableFuture.completedFuture(found);
                 return retryOnceIndexed(search, limit, found, indexingRetriesLeft, response.asNotReady());
