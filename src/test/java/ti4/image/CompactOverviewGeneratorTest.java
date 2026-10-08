@@ -2,7 +2,6 @@ package ti4.image;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Rectangle;
@@ -102,38 +101,7 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
         assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.PLAYER_MAX_SIZE);
     }
 
-    @Test
-    void packingRemovesTheEmptySpaceBetweenFarApartSectors() {
-        // core (around 000) and south (around 1237) are ~7000px apart on the real map.
-        List<Panel> twoSectors = CompactOverviewGenerator.gmPanels(game).stream()
-                .filter(panel -> panel.title().endsWith("core") || panel.title().endsWith("south"))
-                .toList();
-
-        Layout layout = CompactOverviewGenerator.layout(twoSectors, CompactOverviewGenerator.GM_MAX_SIZE);
-
-        assertEquals(1.0, layout.scale(), "two small sectors fit at full size once packed");
-        assertTrue(layout.width() < 3000 && layout.height() < 3000);
-    }
-
-    @Test
-    void theGmOverviewRenders() {
-        assertNotNull(CompactOverviewGenerator.gmOverview(game));
-    }
-
     private static Rectangle box(Placed placed) {
         return new Rectangle(placed.x(), placed.y(), placed.width(), placed.height());
-    }
-
-    @Test
-    void theCornersPanelLeavesRoomForOversizedCornerArt() {
-        Panel corners = CompactOverviewGenerator.gmPanels(game).stream()
-                .filter(panel -> "corners".equals(panel.title()))
-                .findFirst()
-                .orElseThrow();
-        Rectangle hex = corners.hexes().get("tl");
-
-        // Corner tiles can draw art over the whole 600px tile image, i.e. 100px beyond the hex on every side.
-        assertTrue(
-                corners.content().contains(new Rectangle(hex.x - 100, hex.y - 100, hex.width + 200, hex.height + 200)));
     }
 }

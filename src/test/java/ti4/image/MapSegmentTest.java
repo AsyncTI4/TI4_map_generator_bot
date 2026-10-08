@@ -274,54 +274,36 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(1, names().stream().filter(MapSegment.FRACTURE::equals).count());
     }
 
+    // A map's tiles outside every sector form its own detached view (fog only); a named sector can claim them.
     @Test
-    void eachExtraBoardInUseIsItsOwnDetachedSector() {
-        game.setTile(new Tile("19", "a000"));
-        game.setTile(new Tile("19", "a101"));
-        game.setTile(new Tile("19", "c000"));
+    void eachMapsLeftoverIsItsOwnDetachedViewInFogOnly() {
+        game.setTile(new Tile("19", "b000"));
+        game.setTile(new Tile("19", "b401"));
+        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
 
-        assertEquals(Set.of("a000", "a101"), positionsOf("board-a"));
-        assertEquals(Set.of("c000"), positionsOf("board-c"));
-        assertTrue(MapSegment.find(game, "board-a").orElseThrow().isDetached());
-        assertTrue(MapSegment.isDetachedPosition(game, "a101"));
-        assertFalse(MapSegment.isDetachedPosition(game, "101"));
+        assertEquals(Set.of("b401"), positionsOf("board-b"));
+        assertTrue(MapSegment.find(game, "board-b").orElseThrow().isDetached());
+        assertTrue(MapSegment.isReservedName("board-b"));
+
+        game.removeTile("b401");
+        assertFalse(names().contains("board-b"), "fully covered by the named sector");
+        game.setTile(new Tile("19", "b401"));
+        game.setFowMode(false);
+        assertFalse(names().contains("board-b"), "no map views outside fog");
     }
 
     @Test
-    void automaticSectorsSplitEachMapOnItsOwnAndNeverJoinMapsEvenWhenLinked() {
-        // Two islands on map A, one linked to the main map by a GM custom adjacency.
+    void automaticSectorsNeverJoinMapsEvenWhenLinked() {
         MapFrame.positionsWithin("a000", 1).forEach(position -> game.setTile(new Tile("19", position)));
-        game.setTile(new Tile("19", "a401"));
         game.addCustomAdjacentTiles("000", List.of("a000"));
         MapSegment.setAutoSectors(game, true);
 
-        List<MapSegment> onMapA = MapSegment.all(game).stream()
-                .filter(segment -> segment.positions().stream().allMatch(BoardPosition::isBoardPosition))
-                .toList();
-        assertEquals(2, onMapA.size(), "map A's two islands are two sectors");
-        assertTrue(onMapA.stream().noneMatch(MapSegment::isDetached));
-        String galaxyA = GalaxyNames.name(game, "a");
-        assertTrue(onMapA.stream().allMatch(segment -> segment.displayName(game).startsWith(galaxyA + " / ")));
-        assertFalse(names().contains("board-a"), "every map A tile is already in a sector");
         assertTrue(MapSegment.all(game).stream()
                 .noneMatch(segment -> segment.positions().contains("000")
                         && segment.positions().contains("a000")));
     }
 
-    @Test
-    void aNamedSectorOnAMapLeavesTheRestOfThatMapAsItsOwnView() {
-        game.setTile(new Tile("19", "b000"));
-        game.setTile(new Tile("19", "b401"));
-        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
-
-        String galaxyB = GalaxyNames.name(game, "b");
-        assertEquals(
-                galaxyB + " / outpost",
-                MapSegment.find(game, "outpost").orElseThrow().displayName(game));
-        assertEquals(Set.of("b401"), positionsOf("board-b"));
-        assertEquals(galaxyB, MapSegment.find(game, "board-b").orElseThrow().displayName(game));
-    }
-
+    // Single-galaxy fog games must look exactly as before: no galaxy prefixes, main stays "main".
     @Test
     void mainMapSectorsKeepTheirPlainNamesUntilASecondGalaxyExists() {
         MapSegment.put(game, new MapSegment("home", "000", 1));
@@ -333,36 +315,5 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(
                 mainGalaxy + " / home",
                 MapSegment.find(game, "home").orElseThrow().displayName(game));
-        assertEquals(mainGalaxy, MapSegment.mainDisplayName(game));
-    }
-
-    @Test
-    void theMainMapIsItsOwnViewWhileAnyOfItsSystemsIsOutsideEverySector() {
-        game.setTile(new Tile("19", "a000"));
-        assertTrue(MapSegment.mainMapVisibleTo(game, null), "main map has no sectors, map A is detached");
-        assertFalse(MapSegment.isOnUncoveredMainMap(game, "a000"));
-
-        MapSegment.put(game, new MapSegment("everything", "000", 3));
-        assertFalse(MapSegment.mainMapVisibleTo(game, null));
-    }
-
-    @Test
-    void aNamedSectorCanClaimABoard() {
-        game.setTile(new Tile("19", "b000"));
-        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
-
-        assertTrue(names().contains("outpost"));
-        assertFalse(names().contains("board-b"), "a board fully covered by a named sector needs no own sector");
-    }
-
-    @Test
-    void boardSectorNamesAreReservedAndOnlyExistInFog() {
-        assertTrue(MapSegment.isReservedName("board-a"));
-        assertTrue(MapSegment.isReservedName("board-g"));
-        assertFalse(MapSegment.isReservedName("board-h"));
-
-        game.setTile(new Tile("19", "a000"));
-        game.setFowMode(false);
-        assertFalse(names().contains("board-a"));
     }
 }

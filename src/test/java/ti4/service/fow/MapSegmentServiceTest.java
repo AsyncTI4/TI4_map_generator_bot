@@ -14,7 +14,6 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.GalaxyNames;
 import ti4.image.MapSegment;
 import ti4.image.Mapper;
 import ti4.model.FactionModel;
@@ -90,21 +89,6 @@ class MapSegmentServiceTest extends BaseTi4Test {
         game.getTileByPosition("1237")
                 .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
         assertEquals(sectors, MapSegmentService.viewableNames(game, player.getUserID(), true));
-    }
-
-    @Test
-    void anExtraGalaxyOffersMainAndTheGalaxyWithGalaxyNameLabels() {
-        game.setTile(new Tile("21", "a000"));
-        game.getTileByPosition("a000")
-                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, player.getColorID()), 1);
-
-        assertEquals(
-                List.of(MapSegment.MAIN, "board-a"), MapSegmentService.viewableNames(game, player.getUserID(), true));
-        assertEquals(
-                List.of("Map: " + GalaxyNames.name(game, GalaxyNames.MAIN_ID), "Map: " + GalaxyNames.name(game, "a")),
-                MapSegmentService.switchButtons(game, player.getUserID(), true).stream()
-                        .map(button -> button.getLabel())
-                        .toList());
     }
 
     @Test

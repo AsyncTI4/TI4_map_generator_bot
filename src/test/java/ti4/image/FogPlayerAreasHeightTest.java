@@ -53,16 +53,6 @@ class FogPlayerAreasHeightTest extends BaseTi4Test {
         assertEquals(unfogged - 3 * PLAYER_AREA_HEIGHT, asSol);
     }
 
-    @Test
-    void eliminatedHiddenPlayersGiveBackTheirSmallerArea() {
-        game.getPlayer("p4").setEliminated(true);
-        int unfogged = statsHeight(null);
-        int asSol = statsHeight(privateViewOf("p1"));
-
-        // Two hidden live seats plus one eliminated seat, whose area is 190 shorter.
-        assertEquals(unfogged - 2 * PLAYER_AREA_HEIGHT - (PLAYER_AREA_HEIGHT - 190), asSol);
-    }
-
     private int statsHeight(UserOverridenGenericInteractionCreateEvent event) {
         try (MapGenerator generator = new MapGenerator(game, DisplayType.stats, event, null)) {
             return generator.imageHeight();

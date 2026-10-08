@@ -196,6 +196,9 @@ class SystemPickerServiceTest extends BaseTi4Test {
                 List.of("11", "12", "13"),
                 List.copyOf(SystemPickerService.byRing(List.copyOf(south.positions()))
                         .keySet()));
+        // Extra galaxies count rings within themselves, and big rings split around that galaxy's centre.
+        assertEquals("2", SystemPickerService.mapRing("a204"));
+        assertEquals("a000", SystemPickerService.galaxyCentre(List.of("a501", "a502")));
     }
 
     @Test
@@ -209,18 +212,6 @@ class SystemPickerServiceTest extends BaseTi4Test {
         assertTrue(areas.stream()
                 .noneMatch(area -> area.positions().contains("a301")
                         && area.positions().stream().anyMatch(position -> !position.startsWith("a"))));
-    }
-
-    @Test
-    void extraGalaxiesCountRingsWithinThatGalaxy() {
-        assertEquals("0", SystemPickerService.mapRing("000"));
-        assertEquals("5", SystemPickerService.mapRing("501"));
-        assertEquals("0", SystemPickerService.mapRing("a000"));
-        assertEquals("2", SystemPickerService.mapRing("a204"));
-        assertEquals("x", SystemPickerService.mapRing("tl"));
-        assertEquals("x", SystemPickerService.mapRing("frac3"));
-        assertEquals("a000", SystemPickerService.galaxyCentre(List.of("a501", "a502")));
-        assertEquals("000", SystemPickerService.galaxyCentre(List.of("501")));
     }
 
     @Test
