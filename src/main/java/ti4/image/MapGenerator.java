@@ -928,9 +928,12 @@ public class MapGenerator implements AutoCloseable {
         if (shownSegment != null && (shownSegment.isDetached() || segmentsVisibleToViewer() > 1)) {
             return shownSegment.displayName(game);
         }
+        if (!framed) {
+            return null;
+        }
         boolean otherViews =
                 segmentsVisibleToViewer() > 0 || MapSegment.all(game).stream().anyMatch(MapSegment::isDetached);
-        return framed && otherViews ? MapSegment.mainDisplayName(game) : null;
+        return otherViews ? MapSegment.mainDisplayName(game) : null;
     }
 
     static boolean isEasterEggRoll(int roll) {
