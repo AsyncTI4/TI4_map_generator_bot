@@ -101,6 +101,17 @@ class SectorConnectionsTest extends BaseTi4Test {
     }
 
     @Test
+    void theMainViewDoesNotRepeatSectorSystemsItAlreadyDraws() {
+        // The main view draws every main-galaxy system, sectors included, so 101 next to 301 is not "elsewhere".
+        game.setTile(new Tile(EMPTY, "201"));
+
+        List<Connection> fromMain =
+                SectorConnections.find(game, player, null, Set.of("201"), Set.of("201", "101", "000"));
+
+        assertTrue(fromMain.isEmpty());
+    }
+
+    @Test
     void onlyCurrentlyVisibleSourcesInTheShownSectorCount() {
         // 1201 is known and visible, but it is not in the shown sector, so it cannot be a source.
         List<Connection> connections =

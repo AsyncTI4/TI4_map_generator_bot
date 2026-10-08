@@ -142,7 +142,8 @@ class TestBedDataTest extends BaseTi4Test {
                 "unknown fog option `make_it_dark`",
                 "`fowOptions` need a fog game",
                 "`stored` keys and values may not be blank");
-        assertTrue(errors.stream().noneMatch(error -> error.contains("a000")), "map A positions are valid");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("position `a000`")), "map A positions are valid");
+        assertContains(errors, "maps A-G (`a000`-`g848`) need `\"fog\": true`");
     }
 
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and

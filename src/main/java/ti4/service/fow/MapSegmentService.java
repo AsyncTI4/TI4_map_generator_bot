@@ -107,6 +107,6 @@ public class MapSegmentService {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That part of the map is not available to you.");
             return;
         }
-        ShowGameService.simpleShowGame(game, event, DisplayType.all, MapSegment.MAIN.equals(name) ? null : name);
+        ShowGameService.simpleShowGame(game, event, DisplayType.all, name);
     }
 }

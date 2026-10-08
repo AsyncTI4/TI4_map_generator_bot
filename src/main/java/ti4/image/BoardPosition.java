@@ -18,7 +18,11 @@ public record BoardPosition(char board, String local) {
     static final int RAW_STRIDE = (2 * MAX_RING + 2) * HORIZONTAL_TILE_SPACING;
 
     public static Optional<BoardPosition> parse(String position) {
-        if (position == null || !PATTERN.matcher(position).matches()) {
+        if (position == null
+                || position.length() != 4
+                || position.charAt(0) < BOARDS.getFirst()
+                || position.charAt(0) > BOARDS.getLast()
+                || !PATTERN.matcher(position).matches()) {
             return Optional.empty();
         }
         return Optional.of(new BoardPosition(position.charAt(0), position.substring(1)));

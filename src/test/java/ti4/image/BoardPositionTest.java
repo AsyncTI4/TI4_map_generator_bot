@@ -69,13 +69,26 @@ class BoardPositionTest extends BaseTi4Test {
     }
 
     @Test
-    void aBoardBiggerThanTheMainMapSetsTheRingCount() {
+    void aBoardBiggerThanTheMainMapOnlyWidensTheLayoutNotTheMainRingCount() {
         Game game = new Game();
         game.newGameSetup();
+        game.setFowMode(true);
         game.setTile(new Tile("19", "301"));
         game.setTile(new Tile("19", "b501"));
 
-        assertEquals(5, game.getRingCount());
+        assertEquals(3, game.getRingCount(), "ring buttons, map string and stats keep the main map's size");
+        assertEquals(5, PositionMapper.layoutRingCount(game), "layout makes room for the bigger board");
+    }
+
+    @Test
+    void extraBoardPositionsAreOnlyAllowedInFogGames() {
+        Game game = new Game();
+        game.newGameSetup();
+        assertFalse(PositionMapper.isTilePositionValid(game, "a101"));
+        assertTrue(PositionMapper.isTilePositionValid(game, "101"));
+
+        game.setFowMode(true);
+        assertTrue(PositionMapper.isTilePositionValid(game, "a101"));
     }
 
     @Test

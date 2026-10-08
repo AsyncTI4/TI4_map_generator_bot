@@ -83,6 +83,10 @@ public final class PositionMapper {
                 .orElse(backup);
     }
 
+    public static boolean isTilePositionValid(Game game, String position) {
+        return isTilePositionValid(position) && (game.isFowMode() || !BoardPosition.isBoardPosition(position));
+    }
+
     public static boolean isTilePositionValid(String position) {
         return tileImageCoordinates.getProperty(position) != null
                 || BoardPosition.parse(position)
@@ -104,8 +108,22 @@ public final class PositionMapper {
         return getScaledTilePosition(game, position, x, y, 0);
     }
 
+    public static int layoutRingCount(Game game) {
+        int mainRings = game.getRingCount();
+        if (!game.isFowMode()) {
+            return mainRings;
+        }
+        int boardRings = game.getTileMap().keySet().stream()
+                .map(BoardPosition::parse)
+                .flatMap(Optional::stream)
+                .mapToInt(board -> Integer.parseInt(board.local()) / 100)
+                .max()
+                .orElse(0);
+        return Math.max(mainRings, boardRings);
+    }
+
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
-        int ringCount = game.getRingCount();
+        int ringCount = layoutRingCount(game);
         ringCount = Math.clamp(ringCount, RING_MIN_COUNT, RING_MAX_COUNT);
         if (ringCount == RING_MIN_COUNT) {
             x += HORIZONTAL_TILE_SPACING;

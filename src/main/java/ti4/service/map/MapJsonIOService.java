@@ -239,7 +239,7 @@ public class MapJsonIOService {
     }
 
     private static boolean handleTile(TileIO tileIO, Game game, StringBuilder sb) {
-        if (!PositionMapper.isTilePositionValid(tileIO.getPosition())) {
+        if (!PositionMapper.isTilePositionValid(game, tileIO.getPosition())) {
             appendError(sb, tileIO, "Invalid tile position: " + tileIO.getPosition());
             return false;
         }

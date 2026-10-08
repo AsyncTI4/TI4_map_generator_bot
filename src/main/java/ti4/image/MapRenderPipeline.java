@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -51,6 +52,21 @@ public class MapRenderPipeline {
                     }
                 });
 
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+    }
+
+    public static void queueImage(Game game, String label, Supplier<FileUpload> image, Consumer<FileUpload> callback) {
+        if (CircuitBreaker.isOpen()) {
+            return;
+        }
+        var timedRunnable =
+                new TimedRunnable(label + " for " + game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                    try (FileUpload fileUpload = image.get()) {
+                        callback.accept(fileUpload);
+                    } catch (Exception e) {
+                        BotLogger.error(new LogOrigin(game), "Failed to render " + label + ".", e);
+                    }
+                });
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 

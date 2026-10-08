@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,9 +26,10 @@ final class SectorConnections {
             @Nullable MapSegment shown,
             Collection<String> visibleSources,
             Set<String> known) {
-        Set<String> uncoveredMain = MapSegment.uncoveredMainPositions(game);
-        Set<String> shownPositions = shown == null ? uncoveredMain : shown.positions();
-        Map<String, String> sectorByPosition = sectorByPosition(game, shown, uncoveredMain);
+        List<MapSegment> segments = MapSegment.all(game);
+        Set<String> uncoveredMain = MapSegment.uncoveredMainPositions(game, segments);
+        Set<String> shownPositions = shown == null ? mainViewPositions(game) : shown.positions();
+        Map<String, String> sectorByPosition = sectorByPosition(game, segments, shown, uncoveredMain);
         Map<String, Connection> connections = new TreeMap<>(MapFrame.POSITION_ORDER);
         for (String source : visibleSources) {
             if (!shownPositions.contains(source)) {
@@ -43,15 +45,22 @@ final class SectorConnections {
         return List.copyOf(connections.values());
     }
 
+    private static Set<String> mainViewPositions(Game game) {
+        return game.getTileMap().keySet().stream()
+                .filter(position -> !MapSegment.isDetachedPosition(game, position))
+                .collect(Collectors.toSet());
+    }
+
     private static Map<String, String> sectorByPosition(
-            Game game, @Nullable MapSegment shown, Set<String> uncoveredMain) {
+            Game game, List<MapSegment> segments, @Nullable MapSegment shown, Set<String> uncoveredMain) {
         Map<String, String> sectorByPosition = new HashMap<>();
-        for (MapSegment segment : MapSegment.all(game)) {
+        for (MapSegment segment : segments) {
             if (shown != null && segment.name().equals(shown.name())) {
                 continue;
             }
+            String label = segment.displayName(game);
             for (String position : segment.positions()) {
-                sectorByPosition.putIfAbsent(position, segment.displayName(game));
+                sectorByPosition.putIfAbsent(position, label);
             }
         }
         if (shown != null) {

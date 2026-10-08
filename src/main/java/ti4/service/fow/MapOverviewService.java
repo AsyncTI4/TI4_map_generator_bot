@@ -3,6 +3,7 @@ package ti4.service.fow;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -11,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.image.CompactOverviewGenerator;
+import ti4.image.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -26,18 +28,22 @@ public class MapOverviewService {
         return Optional.of(Buttons.green(OVERVIEW_BUTTON_ID, "Overview"));
     }
 
-    @ButtonHandler(OVERVIEW_BUTTON_ID)
+    @ButtonHandler(value = OVERVIEW_BUTTON_ID, save = false)
     public static void showOverview(ButtonInteractionEvent event, Game game) {
-        switch (viewOf(game, event)) {
-            case GM ->
-                MessageHelper.sendFileUploadToChannel(
-                        event.getMessageChannel(), CompactOverviewGenerator.gmOverview(game));
-            case PLAYER ->
-                MessageHelper.sendFileUploadToChannel(
-                        event.getMessageChannel(),
-                        CompactOverviewGenerator.playerOverview(game, viewer(game, event), event));
-            case NONE -> MessageHelper.sendEphemeralMessageToEventChannel(event, "The overview isn't available here.");
+        View view = viewOf(game, event);
+        if (view == View.NONE) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "The overview isn't available here.");
+            return;
         }
+        Player viewer = viewer(game, event);
+        MessageChannel channel = event.getMessageChannel();
+        MapRenderPipeline.queueImage(
+                game,
+                "Map overview",
+                () -> view == View.GM
+                        ? CompactOverviewGenerator.gmOverview(game)
+                        : CompactOverviewGenerator.playerOverview(game, viewer, event),
+                fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
     }
 
     private enum View {

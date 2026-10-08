@@ -199,6 +199,19 @@ class SystemPickerServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void classicLayoutKeepsEachGalaxyInItsOwnArea() {
+        game.setFowOption(FOWOption.CLASSIC_MAP_LAYOUT, true);
+        game.setTile(new Tile("19", "a301"));
+
+        List<Area> areas = SystemPickerService.areas(game, player);
+
+        assertEquals(2, areas.size(), "main and map A, never mixed");
+        assertTrue(areas.stream()
+                .noneMatch(area -> area.positions().contains("a301")
+                        && area.positions().stream().anyMatch(position -> !position.startsWith("a"))));
+    }
+
+    @Test
     void extraGalaxiesCountRingsWithinThatGalaxy() {
         assertEquals("0", SystemPickerService.mapRing("000"));
         assertEquals("5", SystemPickerService.mapRing("501"));

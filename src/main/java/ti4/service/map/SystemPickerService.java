@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -26,6 +26,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.image.BoardPosition;
+import ti4.image.GalaxyNames;
 import ti4.image.MapSegment;
 import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
@@ -130,14 +131,23 @@ public class SystemPickerService {
             if (positions.isEmpty()) continue;
             areas.add(new Area(segment.name(), segment.displayName(game), positions));
         }
-        Set<String> rest = onMap.stream()
+        Map<Character, Set<String>> restByGalaxy = new TreeMap<>();
+        onMap.stream()
                 .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
                 .filter(position -> !MapSegment.isFracturePosition(position))
                 .filter(position -> !covered.contains(position))
-                .collect(Collectors.toSet());
-        if (!rest.isEmpty()) {
-            areas.addFirst(new Area(MapSegment.MAIN, MapSegment.mainDisplayName(game), rest));
-        }
+                .forEach(position -> restByGalaxy
+                        .computeIfAbsent(BoardPosition.boardOf(position), key -> new HashSet<>())
+                        .add(position));
+        List<Area> rests = new ArrayList<>();
+        restByGalaxy.forEach((board, positions) -> rests.add(
+                board == BoardPosition.MAIN_BOARD
+                        ? new Area(MapSegment.MAIN, MapSegment.mainDisplayName(game), positions)
+                        : new Area(
+                                BoardPosition.defaultSegmentName(board),
+                                GalaxyNames.name(game, GalaxyNames.idOf(board)),
+                                positions)));
+        areas.addAll(0, rests);
         return areas;
     }
 

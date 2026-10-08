@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.image.BoardPosition;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
@@ -311,6 +312,11 @@ public class TestBedPresetService {
                     .noneMatch(known -> known.name().equalsIgnoreCase(option))) {
                 errors.add("preset: unknown fog option `" + option + "` in `fowOptions`.");
             }
+        }
+        boolean placesExtraMaps = preset.getTiles().keySet().stream()
+                .anyMatch(position -> BoardPosition.isBoardPosition(position.toLowerCase()));
+        if (placesExtraMaps && !Boolean.TRUE.equals(preset.getFog())) {
+            errors.add("preset: `tiles` on maps A-G (`a000`-`g848`) need `\"fog\": true`; extra maps are fog-only.");
         }
         if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
             errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");

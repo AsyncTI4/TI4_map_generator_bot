@@ -500,7 +500,10 @@ public record MapSegment(
     }
 
     static Set<String> uncoveredMainPositions(Game game) {
-        List<MapSegment> segments = all(game);
+        return uncoveredMainPositions(game, all(game));
+    }
+
+    static Set<String> uncoveredMainPositions(Game game, List<MapSegment> segments) {
         return game.getTileMap().keySet().stream()
                 .filter(position -> !isDetachedPosition(game, position))
                 .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))

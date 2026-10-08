@@ -17,6 +17,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
+import ti4.image.BoardPosition;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.FactionModel;
@@ -123,7 +124,14 @@ public class TestBedApplyService {
         String mapString =
                 preset.getMapString() == null ? TestBedPresetService.DEFAULT_MAP_STRING : preset.getMapString();
         Map<String, String> tilesByPosition = MapStringMapper.getMappedTilesToPosition(mapString, game);
-        preset.getTiles().forEach((position, tileId) -> tilesByPosition.put(position.toLowerCase(), tileId));
+        preset.getTiles().forEach((position, tileId) -> {
+            String lower = position.toLowerCase();
+            if (BoardPosition.isBoardPosition(lower) && !game.isFowMode()) {
+                warnings.add("Skipped `" + lower + "`: maps A-G are only available in fog games.");
+                return;
+            }
+            tilesByPosition.put(lower, tileId);
+        });
         if (tilesByPosition.isEmpty()) {
             warnings.add("Could not map the map string to positions; the map was left empty.");
             return;

@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.fow;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -9,6 +10,7 @@ import ti4.game.Game;
 import ti4.helpers.FoWHelper;
 import ti4.image.CompactOverviewGenerator;
 import ti4.image.MapOverviewGenerator;
+import ti4.image.MapRenderPipeline;
 import ti4.message.MessageHelper;
 
 class MapOverviewCommand extends GameStateSubcommand {
@@ -22,7 +24,9 @@ class MapOverviewCommand extends GameStateSubcommand {
                 new OptionData(
                         OptionType.BOOLEAN, COMPACT, "False: true map positions instead of packed sector panels"),
                 new OptionData(
-                        OptionType.BOOLEAN, SECTOR_NAMES, "Full layout only: overlay the map sectors and their names"));
+                        OptionType.BOOLEAN,
+                        SECTOR_NAMES,
+                        "True: full layout with the map sectors and their names overlaid"));
     }
 
     @Override
@@ -36,11 +40,17 @@ class MapOverviewCommand extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "The overview shows the whole unfogged map. Use it in the GM room.");
             return;
         }
-        if (event.getOption(COMPACT, true, OptionMapping::getAsBoolean)) {
-            MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), CompactOverviewGenerator.gmOverview(game));
+        boolean sectorNames = event.getOption(SECTOR_NAMES, false, OptionMapping::getAsBoolean);
+        if (event.getOption(COMPACT, !sectorNames, OptionMapping::getAsBoolean)) {
+            MessageChannel channel = event.getMessageChannel();
+            MessageHelper.replyToMessage(event, "Rendering the compact overview…");
+            MapRenderPipeline.queueImage(
+                    game,
+                    "Map overview",
+                    () -> CompactOverviewGenerator.gmOverview(game),
+                    fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
             return;
         }
-        boolean sectorNames = event.getOption(SECTOR_NAMES, false, OptionMapping::getAsBoolean);
         MessageHelper.sendFileUploadToChannel(
                 event.getMessageChannel(), MapOverviewGenerator.createFileUpload(game, sectorNames));
     }

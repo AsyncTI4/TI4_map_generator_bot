@@ -671,6 +671,9 @@ public class MapGenerator implements AutoCloseable {
 
     @Nullable
     private MapSegment shownSegment(Set<String> known) {
+        if (MapSegment.MAIN.equals(requestedSegment) && knowsGalaxySystems(known)) {
+            return null;
+        }
         List<MapSegment> visibleWithFracture =
                 isFoWPrivate ? MapSegment.visibleFrom(game, known) : MapSegment.all(game);
         if (requestedSegment != null) {
@@ -685,12 +688,7 @@ public class MapGenerator implements AutoCloseable {
                 .filter(segment -> !segment.isDetached())
                 .toList();
         if (visible.isEmpty()) {
-            return knowsGalaxySystems(known)
-                    ? null
-                    : visibleWithFracture.stream()
-                            .filter(MapSegment::isDetached)
-                            .findFirst()
-                            .orElse(null);
+            return knowsGalaxySystems(known) ? null : detachedViewFor(visibleWithFracture);
         }
         Optional<MapSegment> defaultSegment = MapSegment.defaultSegment(game).filter(visible::contains);
         if (!isFoWPrivate) {
@@ -712,6 +710,17 @@ public class MapGenerator implements AutoCloseable {
                                 .filter(known::contains)
                                 .count()))
                         .orElseThrow());
+    }
+
+    @Nullable
+    private MapSegment detachedViewFor(List<MapSegment> segments) {
+        String home = homeSystemPosition();
+        List<MapSegment> detached =
+                segments.stream().filter(MapSegment::isDetached).toList();
+        return detached.stream()
+                .filter(segment -> home != null && segment.positions().contains(home))
+                .findFirst()
+                .orElse(detached.isEmpty() ? null : detached.getFirst());
     }
 
     private static boolean knowsGalaxySystems(Set<String> known) {
@@ -919,9 +928,9 @@ public class MapGenerator implements AutoCloseable {
         if (shownSegment != null && (shownSegment.isDetached() || segmentsVisibleToViewer() > 1)) {
             return shownSegment.displayName(game);
         }
-        return framed && MapSegment.all(game).stream().anyMatch(MapSegment::isDetached)
-                ? MapSegment.mainDisplayName(game)
-                : null;
+        boolean otherViews =
+                segmentsVisibleToViewer() > 0 || MapSegment.all(game).stream().anyMatch(MapSegment::isDetached);
+        return framed && otherViews ? MapSegment.mainDisplayName(game) : null;
     }
 
     static boolean isEasterEggRoll(int roll) {
@@ -3203,7 +3212,7 @@ public class MapGenerator implements AutoCloseable {
      * @return between 3 and 8 (bounds based on constants)
      */
     private static int getRingCount(Game game) {
-        return Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
+        return Math.clamp(PositionMapper.layoutRingCount(game), RING_MIN_COUNT, RING_MAX_COUNT);
     }
 
     /**
