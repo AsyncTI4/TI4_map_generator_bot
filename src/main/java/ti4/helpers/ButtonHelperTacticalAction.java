@@ -24,10 +24,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.QhetAgentHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -125,6 +128,7 @@ public final class ButtonHelperTacticalAction {
         SarcosaCommanderHandler.clearAdjacency(game, player);
         UydaiHeroService.clear(game);
         XinCommanderHandler.clearCombat(game);
+        XinTechHandler.clearVeiledNetworkingStarProduction(game, player);
         QhetAgentHandler.returnTemporaryUnitUpgrades(game);
         RealityFieldImpactorService.clear(game);
         LostLegaciesRelicHandler.clearNaturesBoon(game, player);
@@ -847,6 +851,7 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         SarcosaCommanderHandler.offerAdjacencySelection(game, player);
         ThurvialiLeadersHandler.offerMendingLightButtons(game, tile);
@@ -955,6 +960,19 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         }
+        for (Player consulateOwner : game.getRealPlayers()) {
+            if (consulateOwner.ownsUnit("kaltrim_pds")
+                    && consulateOwner.isNeighboursWith(player)
+                    && KaltrimUnitHandler.canDeployConsulate(consulateOwner, game)) {
+                KaltrimUnitHandler.offerConsulateDeploy(consulateOwner, player, game);
+            }
+            if (consulateOwner.hasTech("dskaltpds")
+                    && player != consulateOwner
+                    && ButtonHelper.doesPlayerHaveUnitHere("kaltrim_pds2", consulateOwner, tile)) {
+                KaltrimUnitHandler.offerButtonsToCaptureConsulateInf(game, consulateOwner, player, tile);
+            }
+        }
+        KaltrimTechHandler.offerKaldurArrestField(player, game, tile);
         Player agentOwner = game.getPlayerFromLeader("scrapyardagent");
         if (agentOwner != null && agentOwner.hasUnexhaustedLeader("scrapyardagent")) {
             ScrapyardLeaderHandler.sendRikkaButtons(player, agentOwner);

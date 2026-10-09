@@ -54,6 +54,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.AtokeraAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
@@ -1409,6 +1413,17 @@ public final class Helper {
                     msg.append("Got 4 votes from voting the same way as another _Blood Pact_ member.\n");
             }
         }
+        int atokeraVotes = AtokeraAgentHandler.getVotes(player, game);
+        if (atokeraVotes > 0) {
+            votes += atokeraVotes;
+            if (!justVoteTotal) {
+                msg.append("> Used _Magruda, the Atokera Agent_ for ")
+                        .append(atokeraVotes)
+                        .append(" vote")
+                        .append(atokeraVotes == 1 ? "" : "s")
+                        .append(".\n");
+            }
+        }
         // Dreaming Throne Commander
         if (votes > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
             int count = DreamLeadersHandler.getDreamCommanderVoteCount(game, player);
@@ -1491,8 +1506,14 @@ public final class Helper {
     public static void refreshPlanetsOnTheRespend(Player player, Game game) {
         List<String> spentThings = new ArrayList<>(player.getSpentThingsThisWindow());
         int tg = player.getSpentTgsThisWindow();
+        int kaldurCapturedInfantry = KaltrimTechHandler.getCapturedInfantrySpent(player);
 
         player.setTg(player.getTg() + tg);
+        if (kaldurCapturedInfantry > 0) {
+            player.getNombox()
+                    .addUnit(Units.getUnitKey(UnitType.Infantry, player.getColorID()), kaldurCapturedInfantry);
+            player.getSpentThingsThisWindow().removeIf(thing -> thing.startsWith("kaldurCapturedInfantry_"));
+        }
         for (String thing : spentThings) {
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
@@ -1545,6 +1566,7 @@ public final class Helper {
         boolean countResourcesAsInfluence =
                 "inf".equalsIgnoreCase(resOrInfOrBoth) && WildlifePreservationLLButtonHandler.isActive(game, player);
         int tg = player.getSpentTgsThisWindow();
+        int kaldurCapturedInfantry = KaltrimTechHandler.getCapturedInfantrySpent(player);
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
         int bestRes = 0;
@@ -1599,6 +1621,9 @@ public final class Helper {
                 found = true;
             }
             if (thing.startsWith("blacktfCapturedInfantry_")) {
+                found = true;
+            }
+            if (thing.startsWith("kaldurCapturedInfantry_")) {
                 found = true;
             }
             if (!found
@@ -1833,8 +1858,8 @@ public final class Helper {
                     .append(priorityRequisitionDiscount)
                     .append(" resource discount.\n");
         }
-        res += tg + keleresAgent;
-        inf += tg + keleresAgent;
+        res += tg + keleresAgent + kaldurCapturedInfantry;
+        inf += tg + keleresAgent + kaldurCapturedInfantry;
         if (tg > 0) {
             msg.append("> Spent ")
                     .append(tg)
@@ -1848,9 +1873,17 @@ public final class Helper {
                     .append(player.getTg())
                     .append(") \n");
         }
-        if (player.hasTech("mc") && tg + keleresAgent > 0) {
-            res += tg + keleresAgent;
-            inf += tg + keleresAgent;
+        if (kaldurCapturedInfantry > 0) {
+            msg.append("> Spent ")
+                    .append(kaldurCapturedInfantry)
+                    .append(" captured infantry")
+                    .append(" as trade good")
+                    .append(kaldurCapturedInfantry == 1 ? "" : "s")
+                    .append(" with _Kaldur Arrest Field_\n");
+        }
+        if (player.hasTech("mc") && tg + keleresAgent + kaldurCapturedInfantry > 0) {
+            res += tg + keleresAgent + kaldurCapturedInfantry;
+            inf += tg + keleresAgent + kaldurCapturedInfantry;
             msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
         }
 
@@ -2009,8 +2042,8 @@ public final class Helper {
                             .append("!");
                 }
             } else if (activeSystem != null
-                    && tile == activeSystem
-                    && getProductionValue(player, game, tile, false) > 0) {
+                    && ((tile == activeSystem && getProductionValue(player, game, tile, false) > 0)
+                            || XinTechHandler.getVeiledNetworkingStarProductionValue(player, game, tile) > 0)) {
                 if (!player.hasUnit("arborec_mech")
                         && !player.hasUnit("arborec_infantry")
                         && !player.hasUnit("tf-lataniwarrior")
@@ -2018,7 +2051,9 @@ public final class Helper {
                         && !player.hasUnit("arborec_infantry2")) {
 
                     int productionLimit;
-                    productionLimit = getProductionValue(player, game, tile, false);
+                    productionLimit = Math.max(
+                            getProductionValue(player, game, tile, false),
+                            XinTechHandler.getVeiledNetworkingStarProductionValue(player, game, tile));
                     boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
                     if (warM) {
                         productionLimit += 4;
@@ -2240,11 +2275,21 @@ public final class Helper {
                 }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
-            } else if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)) {
+            } else {
+                boolean graveholdControlled =
+                        SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
+                if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit) && !graveholdControlled) {
+                    continue;
+                }
                 Player structureOwner = game.getPlayerByColorID(unit.colorID()).orElse(null);
-                UnitModel structure = structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
+                UnitModel structure = graveholdControlled
+                        ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit)
+                        : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
                 if (structure != null) {
                     int productionValue = structure.getProductionValue();
+                    if (graveholdControlled && "sd".equals(structure.getAsyncId())) {
+                        productionValue = 3;
+                    }
                     if ("mech".equalsIgnoreCase(structure.getBaseType())
                             && ButtonHelper.isLawInPlay(game, "articles_war")) {
                         productionValue = 0;
@@ -2551,13 +2596,14 @@ public final class Helper {
         if (tile.isScar(game)
                 && !player.hasUnlockedBreakthrough("nivynbt")
                 && !player.hasTech("tf-singularitypoint")
+                && !XinTechHandler.hasVeiledNetworkingStar(player)
                 && !ignoreScar) {
             return 0;
         }
         if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
             return 0;
         }
-        if (game.isTwilightsFallMode()) {
+        if (game.isTwilightsFallMode() && !XinTechHandler.hasVeiledNetworkingStar(player)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
                     for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
@@ -2633,12 +2679,23 @@ public final class Helper {
                         if (productionValue > highestProd) {
                             highestProd = productionValue;
                         }
-                    } else if (ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)) {
+                    } else {
+                        boolean graveholdControlled =
+                                SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
+                        if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)
+                                && !graveholdControlled) {
+                            continue;
+                        }
                         Player structureOwner =
                                 game.getPlayerByColorID(unit.colorID()).orElse(null);
-                        UnitModel structure = structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
+                        UnitModel structure = graveholdControlled
+                                ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit)
+                                : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
                         if (structure != null) {
                             int productionValue = structure.getProductionValue();
+                            if (graveholdControlled && "sd".equals(structure.getAsyncId())) {
+                                productionValue = 3;
+                            }
                             if ("mech".equalsIgnoreCase(structure.getBaseType())
                                     && ButtonHelper.isLawInPlay(game, "articles_war")) {
                                 productionValue = 0;
@@ -2873,6 +2930,11 @@ public final class Helper {
             Tile tile,
             String warfareNOtherstuff,
             String placePrefix) {
+        List<Button> veiledNetworkingButtons = XinTechHandler.getVeiledNetworkingStarProductionButtons(
+                game, player, tile, warfareNOtherstuff, placePrefix);
+        if (!veiledNetworkingButtons.isEmpty()) {
+            return veiledNetworkingButtons;
+        }
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
         boolean asn = warfareNOtherstuff.contains("asn");

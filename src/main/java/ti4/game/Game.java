@@ -2798,6 +2798,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             getActionCards().remove(id);
             player.setActionCard(id);
+            if (player.hasAbility("reflect")) {
+                ButtonHelperFactionSpecific.offerReflect(this, player);
+            }
 
             return player.getActionCards();
         }

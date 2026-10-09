@@ -2,6 +2,7 @@ package ti4.service.transaction;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -128,6 +129,7 @@ public class SendPromissoryService {
     public static void returnPromissoryFromPlayAreaToOwner(
             GenericInteractionCreateEvent event, Game game, Player sender, Player receiver, String pnAlias) {
         if (!promissoryShouldBeReturnedFromPlayArea(game, sender, receiver, pnAlias)) return;
+        if (XinPnHandler.offerStatecraftMentorForPlayAreaReturn(game, sender, receiver, pnAlias)) return;
 
         PromissoryNoteModel model = Mapper.getPromissoryNote(pnAlias);
         transferCardToReceiversHand(sender, receiver, pnAlias);

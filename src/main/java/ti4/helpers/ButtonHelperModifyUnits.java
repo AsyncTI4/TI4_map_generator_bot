@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
@@ -121,7 +122,8 @@ public final class ButtonHelperModifyUnits {
                 && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar(game)
                 && !player.hasUnlockedBreakthrough("nivynbt")
-                && !player.hasTech("tf-singularitypoint")) {
+                && !player.hasTech("tf-singularitypoint")
+                && !player.hasTech("dsxinystar")) {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
@@ -1530,12 +1532,15 @@ public final class ButtonHelperModifyUnits {
                                 || (player2.hasUnit("firmament_mech")
                                         && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
                                 || player.hasAbility("researchteam")
+                                || player.hasTech("dsxingstar")
                                 || player.hasAbility("raider_coves")
                                 || player.hasUnit("tf-ambassador")
                                 || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
                                 || TaBreakthroughHandler.canUseSafeHavensCoexistence(
                                         game, player2, unitHolder.getName())
                                 || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
+                                || XinUnitHandler.canUseStarSentinelCoexistence(player, unitHolder)
+                                || XinUnitHandler.canUseStarSentinelCoexistence(player2, unitHolder)
                                 || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
@@ -1548,10 +1553,12 @@ public final class ButtonHelperModifyUnits {
                     if (player.hasUnlockedBreakthrough("titansbt")
                             || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                             || player.hasAbility("researchteam")
+                            || player.hasTech("dsxingstar")
                             || player.hasAbility("raider_coves")
                             || player.hasUnit("tf-ambassador")
                             || TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player, unitHolder.getName())
-                            || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())) {
+                            || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
+                            || XinUnitHandler.canUseStarSentinelCoexistence(player, unitHolder)) {
                         buttons.add(Buttons.green(
                                 player.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
                                 "Enter Into Coexistence"));
@@ -1563,6 +1570,7 @@ public final class ButtonHelperModifyUnits {
                             && (player2.hasAbility("researchteam")
                                     || (player2.hasUnit("firmament_mech")
                                             && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
+                                    || XinUnitHandler.canUseStarSentinelCoexistence(player2, unitHolder)
                                     || TaBreakthroughHandler.canUseSafeHavensCoexistence(
                                             game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();

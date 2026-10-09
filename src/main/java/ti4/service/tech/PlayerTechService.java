@@ -39,6 +39,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.BlueReverieHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
@@ -94,6 +95,7 @@ public class PlayerTechService {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
+        BlueReverieHelper.checkXinHarmony(game, player);
         if (gainedTech) {
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
@@ -823,6 +825,7 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
+        BlueReverieHelper.checkXinHarmony(game, player);
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         if (isResearch) {
