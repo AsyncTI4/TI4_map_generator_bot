@@ -4,16 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 
 import java.util.Map;
 import net.dv8tion.jda.api.JDA;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.message.MessageHelper;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.testUtils.BaseTi4Test;
@@ -80,6 +86,70 @@ class MapJsonIOServiceTest extends BaseTi4Test {
         assertNotNull(stored);
         assertEquals("An old beacon flickers.", stored.loreText);
         assertEquals(LoreService.TRIGGER.CONTROLLED, stored.trigger);
+    }
+
+    // Lore is validated against the map, so it must be imported after every tile is placed: a target on a tile
+    // that comes later in the file used to be reported as "couldn't find target" although it was right there.
+    @Test
+    void loreTargetsOnTilesLaterInTheFileAreFound() {
+        String json = """
+                {
+                  "mapInfo": [
+                    {
+                      "position": "000",
+                      "tileID": "18",
+                      "systemLore": {
+                        "loreText": "A beacon points outward.",
+                        "footerText": "!token fowvision @101\\n!unit neutral 1 infantry wellon @wellon",
+                        "receiver": "CURRENT",
+                        "trigger": "MOVED",
+                        "ping": "NO",
+                        "persistance": "ONCE"
+                      }
+                    },
+                    { "position": "101", "tileID": "19" }
+                  ]
+                }
+                """;
+
+        try (MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class)) {
+            MapJsonIOService.importMapFromJson(game, json, null);
+
+            messages.verify(
+                    () -> MessageHelper.sendMessageToChannel(
+                            any(), argThat(msg -> msg.contains("couldn't find target"))),
+                    never());
+        }
+        assertNotNull(LoreService.getGameLore(game).get("000"));
+    }
+
+    @Test
+    void loreTargetThatIsNotOnTheMapIsStillReported() {
+        String json = """
+                {
+                  "mapInfo": [
+                    {
+                      "position": "000",
+                      "tileID": "18",
+                      "systemLore": {
+                        "loreText": "A beacon points nowhere.",
+                        "footerText": "!token fowvision @999",
+                        "receiver": "CURRENT",
+                        "trigger": "MOVED",
+                        "ping": "NO",
+                        "persistance": "ONCE"
+                      }
+                    }
+                  ]
+                }
+                """;
+
+        try (MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class)) {
+            MapJsonIOService.importMapFromJson(game, json, null);
+
+            messages.verify(() -> MessageHelper.sendMessageToChannel(
+                    any(), argThat(msg -> msg.contains("couldn't find target") && msg.contains("@999"))));
+        }
     }
 
     @Test

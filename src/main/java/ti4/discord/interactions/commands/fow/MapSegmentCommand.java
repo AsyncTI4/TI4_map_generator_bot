@@ -12,7 +12,6 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.image.MapSegment;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 
 class MapSegmentCommand extends GameStateSubcommand {
@@ -116,7 +115,7 @@ class MapSegmentCommand extends GameStateSubcommand {
     private static String saveSegment(SlashCommandInteractionEvent event, Game game, String name, String centre) {
         boolean cluster = event.getOption(CLUSTER, false, OptionMapping::getAsBoolean);
         Integer radius = event.getOption(RADIUS, null, OptionMapping::getAsInt);
-        String problem = validate(game, name, centre, radius, cluster);
+        String problem = MapSegment.validate(game, name, centre, radius, cluster);
         if (problem != null) {
             return problem;
         }
@@ -137,31 +136,6 @@ class MapSegmentCommand extends GameStateSubcommand {
         }
         MapSegment.setDefault(game, name);
         return "`" + name + "` is now the default segment.";
-    }
-
-    private static String validate(Game game, String name, String centre, Integer radius, boolean cluster) {
-        if (!MapSegment.isValidName(name)) {
-            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
-        }
-        if (MapSegment.isReservedName(name)) {
-            return "`" + MapSegment.MAIN + "`, `" + MapSegment.FRACTURE
-                    + "` and `board-a` to `board-g` are reserved segment names.";
-        }
-        if (radius == null && !cluster) {
-            return "Give a `radius`, or set `cluster` to true.";
-        }
-        if (!PositionMapper.isTilePositionValid(centre)) {
-            return "Tile position `" + centre + "` is invalid.";
-        }
-        if (cluster && game.getTileByPosition(centre) == null) {
-            return "There is no tile at `" + centre + "` to grow a cluster from.";
-        }
-        boolean isNew = MapSegment.stored(game).stream()
-                .noneMatch(segment -> segment.name().equals(name));
-        if (isNew && MapSegment.stored(game).size() >= MapSegment.MAX_SEGMENTS) {
-            return "This game already has the maximum of " + MapSegment.MAX_SEGMENTS + " segments.";
-        }
-        return null;
     }
 
     private static String listSegments(Game game) {

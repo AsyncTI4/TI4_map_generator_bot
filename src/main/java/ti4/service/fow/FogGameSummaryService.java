@@ -1,15 +1,23 @@
 package ti4.service.fow;
 
-import java.awt.Color;
+import static ti4.service.game.GameSummaryService.MISSING;
+import static ti4.service.game.GameSummaryService.NONE;
+import static ti4.service.game.GameSummaryService.addChunkedField;
+import static ti4.service.game.GameSummaryService.baseEmbed;
+import static ti4.service.game.GameSummaryService.fieldValue;
+import static ti4.service.game.GameSummaryService.inline;
+import static ti4.service.game.GameSummaryService.joined;
+import static ti4.service.game.GameSummaryService.mention;
+import static ti4.service.game.GameSummaryService.present;
+import static ti4.service.game.GameSummaryService.yesNo;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,14 +32,13 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Helper;
 import ti4.image.BoardPosition;
 import ti4.image.CompactOverviewGenerator;
 import ti4.image.GalaxyNames;
 import ti4.image.MapRenderPipeline;
 import ti4.image.MapSegment;
 import ti4.message.MessageHelper;
-import ti4.service.game.GameModeService;
+import ti4.service.game.GameSummaryService;
 import ti4.service.option.FOWOptionService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.FOWOptionService.FOWOptionCategory;
@@ -41,35 +48,8 @@ public class FogGameSummaryService {
 
     public static final String SETTINGS_LOG_CHANNEL = "fow-game-settings-log";
 
-    private static final Set<String> EXPANSION_MODES =
-            Set.of("Base Game", "Prophecy of Kings", "Thunder's Edge", "Thunder's Edge Demo", "Twilight's Fall");
-    private static final Set<String> HOMEBREW_MODES = Set.of(
-            "Absol",
-            "Discordant Stars",
-            "Twilight Discordant Stars",
-            "Blue Reverie",
-            "Uncharted Space",
-            "Milty Mod",
-            "Homebrew Strategy Cards");
-    private static final Set<String> SCENARIO_MODES = Set.of("Ordinian", "Liberation", "Erwan's Gambit", "Alliance");
-    private static final Set<String> MODES_SHOWN_AS_VARIANT =
-            Set.of("Fog of War", "Light Fog", "Franken", "Homebrew", "Normal");
-    private static final Color EMBED_COLOR = new Color(0x4B5D78);
-    private static final String NONE = "None";
-    private static final String MISSING = "⚠️ missing";
-
-    public record ModeBreakdown(
-            List<String> expansions, List<String> homebrew, List<String> scenarios, List<String> other) {
-
-        public static ModeBreakdown of(Game game) {
-            Set<String> modes = GameModeService.getModes(game);
-            return new ModeBreakdown(
-                    sortedMatching(modes, EXPANSION_MODES::contains),
-                    sortedMatching(modes, HOMEBREW_MODES::contains),
-                    sortedMatching(modes, SCENARIO_MODES::contains),
-                    sortedMatching(modes, FogGameSummaryService::isOtherMode));
-        }
-    }
+    private static final String GAME_MASTERS_LOST = "Unknown (GM role removed at game end)";
+    private static final String GAME_MASTER_IDS_KEY = "fogGameMasterIds";
 
     public static String fogVariant(Game game) {
         String variant = baseFogVariant(game);
@@ -83,14 +63,39 @@ public class FogGameSummaryService {
     }
 
     public static List<MessageEmbed> buildEmbeds(Game game, boolean includeChannels) {
-        return buildEmbeds(game, includeChannels, game.getPlayersWithGMRole());
+        return buildEmbeds(game, includeChannels, gameMasters(game));
+    }
+
+    public static void rememberGameMasters(Game game, List<Player> gameMasters) {
+        if (gameMasters.isEmpty()) {
+            return;
+        }
+        game.setStoredValue(
+                GAME_MASTER_IDS_KEY, gameMasters.stream().map(Player::getUserID).collect(Collectors.joining(",")));
+    }
+
+    public static List<Player> gameMasters(Game game) {
+        List<Player> withRole = game.getPlayersWithGMRole();
+        if (!withRole.isEmpty()) {
+            return withRole;
+        }
+        return Arrays.stream(StringUtils.split(game.getStoredValue(GAME_MASTER_IDS_KEY), ','))
+                .map(game::getPlayer)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private static boolean gameMastersLost(Game game) {
+        return game.isHasEnded() && StringUtils.isBlank(game.getStoredValue(GAME_MASTER_IDS_KEY));
     }
 
     public static List<MessageEmbed> buildEmbeds(Game game, boolean includeChannels, List<Player> gameMasters) {
         List<MessageEmbed> embeds = new ArrayList<>();
-        embeds.add(overviewEmbed(game));
+        embeds.add(GameSummaryService.overview(game, fogVariant(game)).build());
         embeds.add(galaxiesEmbed(game));
-        embeds.add(contentEmbed(game));
+        embeds.add(GameSummaryService.contentEmbed(game));
+        embeds.add(GameSummaryService.progress(game, false).build());
+        embeds.add(GameSummaryService.decksEmbed(game));
         embeds.add(fogOptionsEmbed(game));
         embeds.add(peopleEmbed(game, includeChannels, gameMasters));
         if (includeChannels) {
@@ -105,7 +110,9 @@ public class FogGameSummaryService {
             return;
         }
         MessageHelper.sendMessageToChannelWithEmbeds(
-                channel, "## Fog game ended: " + displayName(game), buildEmbeds(game, false, gameMasters));
+                channel,
+                "## Fog game ended: " + GameSummaryService.displayName(game),
+                buildEmbeds(game, false, gameMasters));
         MapRenderPipeline.queueImage(
                 game,
                 "Fog settings log overview",
@@ -123,11 +130,6 @@ public class FogGameSummaryService {
         return !MapSegment.stored(game).isEmpty() || MapSegment.isAutoSectors(game);
     }
 
-    public static String displayName(Game game) {
-        String customName = game.getCustomName();
-        return StringUtils.isBlank(customName) ? game.getName() : game.getName() + " (" + customName + ")";
-    }
-
     private static TextChannel settingsLogChannel() {
         if (JdaService.guildFogOfWar == null) {
             return null;
@@ -143,61 +145,19 @@ public class FogGameSummaryService {
         return FOWPlusService.isActive(game) ? "Fog+" : "Fog";
     }
 
-    private static boolean isOtherMode(String mode) {
-        return !EXPANSION_MODES.contains(mode)
-                && !HOMEBREW_MODES.contains(mode)
-                && !SCENARIO_MODES.contains(mode)
-                && !MODES_SHOWN_AS_VARIANT.contains(mode);
-    }
-
-    private static List<String> sortedMatching(Collection<String> modes, Predicate<String> filter) {
-        return modes.stream().filter(filter).sorted().toList();
-    }
-
-    private static MessageEmbed overviewEmbed(Game game) {
-        EmbedBuilder eb = baseEmbed(displayName(game));
-        eb.setDescription("**" + fogVariant(game) + "** · " + (game.isHasEnded() ? "ended" : "in progress"));
-        inline(eb, "Owner", game.getOwnerName());
-        inline(
-                eb,
-                "Created",
-                game.getCreationDateTime() > 0
-                        ? Helper.getDateRepresentation(game.getCreationDateTime())
-                        : game.getCreationDate());
-        inline(eb, "Ended", game.isHasEnded() ? Helper.getDateRepresentation(game.getEndedDate()) : "No");
-        inline(eb, "Round", String.valueOf(game.getRound()));
-        inline(eb, "Phase", game.getPhaseOfGame());
-        inline(eb, "VP goal", String.valueOf(game.getVp()));
-        inline(eb, "Secret objectives", String.valueOf(game.getMaxSOCountPerPlayer()));
-        inline(eb, "Players", String.valueOf(game.getRealAndEliminatedPlayers().size()));
-        inline(eb, "Map template", game.getMapTemplateID());
-        inline(eb, "Tiles", String.valueOf(game.getTileMap().size()));
-        inline(eb, "Strategy cards", game.getScSetID());
-        if (!game.isHasEnded()) {
-            Player active = game.getActivePlayer();
-            inline(eb, "Active player", active == null ? NONE : active.getRepresentationNoPing());
-        }
-        if (game.hasWinner()) {
-            eb.addField(
-                    "Winners",
-                    fieldValue(game.getWinners().stream()
-                            .map(Player::getRepresentationNoPing)
-                            .collect(Collectors.joining(", "))),
-                    false);
-        }
-        return eb.build();
-    }
-
     private static MessageEmbed galaxiesEmbed(Game game) {
         EmbedBuilder eb = baseEmbed("Galaxies & sectors");
-        Map<Character, Long> tilesPerBoard = game.getTileMap().keySet().stream()
-                .collect(Collectors.groupingBy(BoardPosition::boardOf, Collectors.counting()));
-        List<String> galaxyLines = GalaxyNames.inUse(game).stream()
-                .map(id -> galaxyLine(game, id, tilesPerBoard))
-                .toList();
-        addChunkedField(eb, "Galaxies", galaxyLines);
+        if (GalaxyNames.isMultiGalaxy(game)) {
+            Map<Character, Long> tilesPerBoard = game.getTileMap().keySet().stream()
+                    .collect(Collectors.groupingBy(BoardPosition::boardOf, Collectors.counting()));
+            List<String> galaxyLines = GalaxyNames.inUse(game).stream()
+                    .map(id -> galaxyLine(game, id, tilesPerBoard))
+                    .toList();
+            addChunkedField(eb, "Galaxies", galaxyLines);
+        }
+        Set<String> placed = game.getTileMap().keySet();
         List<String> sectorLines = MapSegment.all(game).stream()
-                .map(FogGameSummaryService::sectorLine)
+                .map(segment -> sectorLine(segment, placed))
                 .toList();
         addChunkedField(eb, "Sectors", sectorLines);
         inline(eb, "Auto sectors", yesNo(MapSegment.isAutoSectors(game)));
@@ -206,8 +166,16 @@ public class FogGameSummaryService {
                 eb,
                 "Default sector",
                 MapSegment.defaultSegment(game).map(MapSegment::name).orElse(NONE));
-        inline(eb, "Separate Fracture", yesNo(MapSegment.isFractureSeparate(game)));
+        inline(eb, "Fracture", fractureState(game));
         return eb.build();
+    }
+
+    static String fractureState(Game game) {
+        boolean inPlay = game.getTileMap().keySet().stream().anyMatch(MapSegment::isFracturePosition);
+        if (!inPlay) {
+            return "Not in play";
+        }
+        return MapSegment.isFractureSeparate(game) ? "Separate map" : "On the main map";
     }
 
     private static String galaxyLine(Game game, String id, Map<Character, Long> tilesPerBoard) {
@@ -217,41 +185,22 @@ public class FogGameSummaryService {
         return "`" + id + "` " + name + renamed + " · " + tilesPerBoard.getOrDefault(board, 0L) + " tiles";
     }
 
-    private static String sectorLine(MapSegment segment) {
+    private static String sectorLine(MapSegment segment, Set<String> placed) {
         String kind = segment.kind().name().toLowerCase(Locale.ROOT);
+        long systems = segment.positions().stream().filter(placed::contains).count();
+        String size = " · " + systems + (systems == 1 ? " system" : " systems");
         if (segment.kind() == MapSegment.Kind.CIRCLE) {
-            return segment.name() + " · " + kind + " around `" + segment.centre() + "` r" + segment.radius();
+            return segment.name() + " · " + kind + " around `" + segment.centre() + "` r" + segment.radius() + size;
         }
-        return segment.name() + " · " + kind;
+        return segment.name() + " · " + kind + size;
     }
 
-    private static String yesNo(boolean value) {
-        return value ? "Yes" : "No";
-    }
-
-    private static MessageEmbed contentEmbed(Game game) {
-        ModeBreakdown modes = ModeBreakdown.of(game);
-        EmbedBuilder eb = baseEmbed("Content");
-        eb.addField("Expansions", joined(modes.expansions()), true);
-        eb.addField("Homebrew", joined(modes.homebrew()), true);
-        eb.addField("Scenarios", joined(modes.scenarios()), true);
-        eb.addField("Other modes & events", joined(modes.other()), false);
-        eb.addField("Decks", fieldValue(deckLines(game)), false);
-        return eb.build();
-    }
-
-    private static String deckLines(Game game) {
+    private static String settingsLines(Game game) {
         List<String> lines = new ArrayList<>();
-        lines.add("Action cards: `" + game.getAcDeckID() + "`");
-        lines.add("Secret objectives: `" + game.getSoDeckID() + "`");
-        lines.add("Stage 1: `" + game.getStage1PublicDeckID() + "` · Stage 2: `" + game.getStage2PublicDeckID() + "`");
-        lines.add("Agendas: `" + game.getAgendaDeckID() + "`");
-        lines.add("Technologies: `" + game.getTechnologyDeckID() + "`");
-        lines.add("Relics: `" + game.getRelicDeckID() + "` · Explores: `" + game.getExplorationDeckID() + "`");
-        String eventDeck = game.getEventDeckID();
-        if (StringUtils.isNotBlank(eventDeck) && !"null".equals(eventDeck)) {
-            lines.add("Events: `" + eventDeck + "`");
-        }
+        lines.add("Auto-ping: " + GameSummaryService.autoPing(game));
+        lines.add("Beta features: " + yesNo(game.isTestBetaFeaturesMode()));
+        lines.add("Output verbosity: " + present(game.getOutputVerbosity()));
+        lines.add("Lore entries: " + LoreService.getGameLore(game).size());
         return String.join("\n", lines);
     }
 
@@ -273,6 +222,7 @@ public class FogGameSummaryService {
         if (!hiddenEnabled.isEmpty()) {
             eb.addField("Hidden", hiddenEnabled, true);
         }
+        eb.addField("Settings", fieldValue(settingsLines(game)), true);
         return eb.build();
     }
 
@@ -285,7 +235,7 @@ public class FogGameSummaryService {
         eb.addField(
                 "Game masters",
                 gms.isEmpty()
-                        ? NONE
+                        ? (gameMastersLost(game) ? GAME_MASTERS_LOST : NONE)
                         : fieldValue(
                                 joined(gms.stream().map(Player::getUserName).toList())),
                 false);
@@ -336,17 +286,7 @@ public class FogGameSummaryService {
     }
 
     private static String playerLine(Player player, boolean includeChannels) {
-        StringBuilder line = new StringBuilder();
-        line.append(player.getFactionEmoji())
-                .append(' ')
-                .append(player.getFaction())
-                .append(" · ")
-                .append(player.getColor())
-                .append(" · ")
-                .append(player.getUserName());
-        if (player.isEliminated()) {
-            line.append(" · eliminated");
-        }
+        StringBuilder line = GameSummaryService.playerLine(player);
         if (includeChannels) {
             TextChannel privateChannel = player.getPrivateChannel();
             line.append(" · ").append(privateChannel == null ? MISSING : privateChannel.getAsMention());
@@ -359,11 +299,20 @@ public class FogGameSummaryService {
         Guild guild = game.getGuild();
         inline(eb, "Server", guild == null ? MISSING : guild.getName());
         inline(eb, "GM room", guild == null ? MISSING : mention(GMService.gmRoomOrNull(game)));
-        inline(eb, "Main", mention(game.getMainGameChannel()));
-        inline(eb, "Actions", mention(game.getActionsChannel()));
-        inline(eb, "Table talk", mention(game.getTableTalkChannel()));
+        TextChannel main = game.getMainGameChannel();
+        inline(eb, "Main", mention(main));
+        TextChannel actions = game.getActionsChannel();
+        if (actions == null ? !game.isFowMode() : !actions.equals(main)) {
+            inline(eb, "Actions", mention(actions));
+        }
+        TextChannel tableTalk = game.getTableTalkChannel();
+        if (tableTalk != null || !game.isFowMode()) {
+            inline(eb, "Table talk", mention(tableTalk));
+        }
         String mapThreadId = game.getBotMapUpdatesThreadID();
-        inline(eb, "Map thread", StringUtils.isNumeric(mapThreadId) ? "<#" + mapThreadId + ">" : NONE);
+        if (StringUtils.isNumeric(mapThreadId)) {
+            inline(eb, "Map thread", "<#" + mapThreadId + ">");
+        }
         long withPrivateChannel = game.getRealAndEliminatedPlayers().stream()
                 .map(Player::getPrivateChannel)
                 .filter(Objects::nonNull)
@@ -373,48 +322,5 @@ public class FogGameSummaryService {
                 "Private channels",
                 withPrivateChannel + "/" + game.getRealAndEliminatedPlayers().size());
         return eb.build();
-    }
-
-    private static String mention(TextChannel channel) {
-        return channel == null ? MISSING : channel.getAsMention();
-    }
-
-    private static void addChunkedField(EmbedBuilder eb, String name, List<String> lines) {
-        if (lines.isEmpty()) {
-            eb.addField(name, NONE, false);
-            return;
-        }
-        StringBuilder chunk = new StringBuilder();
-        String fieldName = name;
-        for (String line : lines) {
-            if (!chunk.isEmpty() && chunk.length() + line.length() + 1 > MessageEmbed.VALUE_MAX_LENGTH) {
-                eb.addField(fieldName, chunk.toString(), false);
-                chunk.setLength(0);
-                fieldName = name + " (cont.)";
-            }
-            if (!chunk.isEmpty()) {
-                chunk.append('\n');
-            }
-            chunk.append(fieldValue(line));
-        }
-        eb.addField(fieldName, chunk.toString(), false);
-    }
-
-    private static EmbedBuilder baseEmbed(String title) {
-        return new EmbedBuilder()
-                .setColor(EMBED_COLOR)
-                .setTitle(StringUtils.abbreviate(title, MessageEmbed.TITLE_MAX_LENGTH));
-    }
-
-    private static void inline(EmbedBuilder eb, String name, String value) {
-        eb.addField(name, fieldValue(value), true);
-    }
-
-    private static String joined(List<String> values) {
-        return values.isEmpty() ? NONE : fieldValue(String.join(", ", values));
-    }
-
-    private static String fieldValue(String value) {
-        return StringUtils.isBlank(value) ? NONE : StringUtils.abbreviate(value, MessageEmbed.VALUE_MAX_LENGTH);
     }
 }
