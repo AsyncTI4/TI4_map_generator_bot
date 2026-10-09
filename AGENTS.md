@@ -119,3 +119,10 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
   (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
   new code and when touching existing call sites.
+- **The AI player is segregated in `ti4.ai`.** Everything for the bot-controlled seat
+  (see [AI_PLAYER.md](AI_PLAYER.md)) lives under `src/main/java/ti4/ai/**`, including its
+  `/ai` command and `@ButtonHandler`s. Code outside that package may reference it only at
+  the seams listed in `AiSegregationTest`, which fails the build otherwise. Prefer solving
+  AI needs from inside `ti4.ai` (polling `ManagedGame`, diffing game state, pressing the
+  real buttons) over adding hooks to engine code; if a seam is truly needed, keep it a
+  one-liner or a small generic improvement and add it to the test's list in the same change.
