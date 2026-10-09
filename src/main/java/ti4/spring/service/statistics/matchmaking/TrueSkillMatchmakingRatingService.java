@@ -130,7 +130,7 @@ class TrueSkillMatchmakingRatingService {
 
     private static Map<IPlayer, Rating> calculateNewRatings(
             GameInfo gameInfo, List<ITeam> teams, int[] ranks, Map<IPlayer, Rating> currentRatings) {
-        Map<IPlayer, Rating> newRatings = new HashMap<>(CALCULATOR.calculateNewRatings(gameInfo, teams, ranks));
+        Map<IPlayer, Rating> newRatings = new HashMap<>(CALCULATOR.calculateNewRatings(gameInfo, teams, ranks.clone()));
         Set<IPlayer> winners = winners(teams, ranks);
         newRatings.replaceAll((player, newRating) ->
                 clampCalibratedChange(currentRatings.get(player), newRating, winners.contains(player)));
