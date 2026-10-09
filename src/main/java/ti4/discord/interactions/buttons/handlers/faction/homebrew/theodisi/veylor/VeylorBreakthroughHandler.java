@@ -27,8 +27,10 @@ public class VeylorBreakthroughHandler {
                 FactionEmojis.veylor);
     }
 
-    public static Button offerDeclineFilibusterButton(Player player, String winner) {
-        return Buttons.red(player.factionButtonChecker() + DECLINE_FILIBUSTER + winner, "Resolve Agenda Normally");
+    public static Button offerDeclineFilibusterButton(Player player, String winner, boolean includeVeiledNetworking) {
+        return Buttons.red(
+                player.factionButtonChecker() + DECLINE_FILIBUSTER + winner + "|" + includeVeiledNetworking,
+                "Resolve Agenda Normally");
     }
 
     @ButtonHandler(USE_FILIBUSTER)
@@ -64,14 +66,15 @@ public class VeylorBreakthroughHandler {
             return;
         }
 
-        String winner = buttonID.substring(DECLINE_FILIBUSTER.length());
+        String[] parts = buttonID.substring(DECLINE_FILIBUSTER.length()).split("\\|", 2);
+        String winner = parts[0];
         if (winner.isBlank()) {
             return;
         }
 
-        List<Button> resolutions = List.of(
-                Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner"),
-                Buttons.red("autoresolve_manual", "Resolve it Manually"));
+        boolean includeVeiledNetworking = parts.length == 2 && Boolean.parseBoolean(parts[1]);
+        List<Button> resolutions =
+                AgendaHelper.getAgendaResolutionButtons(game, winner, false, includeVeiledNetworking);
         MessageHelper.editMessageWithButtons(
                 event,
                 event.getMessage().getContentRaw()
