@@ -74,7 +74,10 @@ class BombardmentButtonHandler {
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
+        if (tile.isScar(game)
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")
+                && !player.hasTech("dsxinystar")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()

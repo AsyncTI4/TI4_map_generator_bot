@@ -1529,6 +1529,22 @@ public class ExploreService {
             List<Button> buttons = List.of(placeSleeper, declineSleeper);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
         }
+        if (planetID != null
+                && player.hasUnlockedBreakthrough("pharadnbt")
+                && player.getNomboxTile().getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "hiddenVaultsProduce_" + planetID,
+                    "Produce 1 Infantry on " + Helper.getPlanetRepresentation(planetID, game),
+                    UnitEmojis.infantry));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", you may produce 1 infantry on "
+                            + Helper.getPlanetRepresentation(planetID, game) + " with _Hidden Vaults_.",
+                    buttons);
+        }
     }
 
     public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player) {
