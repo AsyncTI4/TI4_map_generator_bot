@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -26,8 +28,10 @@ class TrueSkillMatchmakingRatingService {
     private static final double SIGMA_CALIBRATION_THRESHOLD = 1.7;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
+    private static final int WINNING_RANK = 1;
 
-    static final double MAX_CALIBRATED_RATING_CHANGE_PER_GAME = 0.40;
+    static final double MAX_CALIBRATED_RATING_LOSS_PER_GAME = 0.40;
+    static final double MIN_CALIBRATED_RATING_GAIN_PER_WIN = 0.10;
     static final int RECENT_GAMES_WINDOW = 10;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
@@ -126,24 +130,40 @@ class TrueSkillMatchmakingRatingService {
 
     private static Map<IPlayer, Rating> calculateNewRatings(
             GameInfo gameInfo, List<ITeam> teams, int[] ranks, Map<IPlayer, Rating> currentRatings) {
-        Map<IPlayer, Rating> newRatings = new HashMap<>(CALCULATOR.calculateNewRatings(gameInfo, teams, ranks));
-        newRatings.replaceAll((player, newRating) -> capCalibratedChange(currentRatings.get(player), newRating));
+        Map<IPlayer, Rating> newRatings = new HashMap<>(CALCULATOR.calculateNewRatings(gameInfo, teams, ranks.clone()));
+        Set<IPlayer> winners = winners(teams, ranks);
+        newRatings.replaceAll((player, newRating) ->
+                clampCalibratedChange(currentRatings.get(player), newRating, winners.contains(player)));
         return newRatings;
     }
 
-    static Rating capCalibratedChange(Rating currentRating, Rating newRating) {
+    private static Set<IPlayer> winners(List<ITeam> teams, int[] ranks) {
+        Set<IPlayer> winners = new HashSet<>();
+        for (int i = 0; i < teams.size(); i++) {
+            if (ranks[i] == WINNING_RANK) {
+                winners.addAll(teams.get(i).keySet());
+            }
+        }
+        return winners;
+    }
+
+    static Rating clampCalibratedChange(Rating currentRating, Rating newRating, boolean won) {
         if (currentRating.getStandardDeviation() > SIGMA_CALIBRATION_THRESHOLD) {
             return newRating;
         }
         double change = newRating.getConservativeRating() - currentRating.getConservativeRating();
-        if (Math.abs(change) <= MAX_CALIBRATED_RATING_CHANGE_PER_GAME) {
+        double lowestAllowedChange = lowestAllowedChange(won);
+        if (change >= lowestAllowedChange) {
             return newRating;
         }
-        double excess = change - Math.copySign(MAX_CALIBRATED_RATING_CHANGE_PER_GAME, change);
         return new Rating(
-                newRating.getMean() - excess,
+                newRating.getMean() + lowestAllowedChange - change,
                 newRating.getStandardDeviation(),
                 newRating.getConservativeStandardDeviationMultiplier());
+    }
+
+    private static double lowestAllowedChange(boolean won) {
+        return won ? MIN_CALIBRATED_RATING_GAIN_PER_WIN : -MAX_CALIBRATED_RATING_LOSS_PER_GAME;
     }
 
     private static void recordRecentRatings(
