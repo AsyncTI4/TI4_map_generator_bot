@@ -157,6 +157,14 @@ public class SabotageService {
         return null;
     }
 
+    public static boolean isShameixBaneCancellationBlocked(Player canceller, Player actionCardPlayer) {
+        if (actionCardPlayer == null) return false;
+        return actionCardPlayer.hasUnlockedBreakthrough("toldarbthonor")
+                        && canceller.getTotalVictoryPoints() > actionCardPlayer.getTotalVictoryPoints()
+                || actionCardPlayer.hasUnlockedBreakthrough("toldarbtdishonor")
+                        && canceller.getTotalVictoryPoints() < actionCardPlayer.getTotalVictoryPoints();
+    }
+
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
         return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
                 .filter(ALL_SABOTAGE_CARD_ALIASES::contains)

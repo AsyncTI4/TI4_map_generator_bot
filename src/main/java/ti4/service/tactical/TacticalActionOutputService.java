@@ -365,6 +365,14 @@ public class TacticalActionOutputService {
         if (player.hasUnit("scrapyard_flagship")) {
             output.append(" (May apply +1 to the MOVE value of units in this system if _Jumpstarter_ does not move.)");
         }
+        UnitModel unitModel = player.getUnitFromUnitKey(unit);
+        if (unitModel != null && "qhet_cruiser2".equals(unitModel.getId())) {
+            int battlecruiserDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
+                    game, null, tile.getPosition(), game.getActiveSystem(), true);
+            output.append(" (May move through systems that contain different other players' ships, distance is ")
+                    .append(battlecruiserDistance)
+                    .append(")");
+        }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
         }

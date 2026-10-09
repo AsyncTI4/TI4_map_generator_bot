@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumLeaderHandler;
 import ti4.game.Game;
@@ -258,6 +259,14 @@ public class SecretObjectiveHelper {
     }
 
     public static void showAll(Player player, Player player2, Game game) {
+        if (XinTechHandler.hasAstromanticCloakSteel(player) && player != player2) {
+            MessageHelper.sendMessageToChannel(
+                    player2.getCorrectChannel(),
+                    player2.getRepresentation()
+                            + ", you cannot look at " + player.getRepresentationNoPing() + "'s"
+                            + " Secret Objectives because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');
