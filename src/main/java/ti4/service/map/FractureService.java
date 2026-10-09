@@ -86,8 +86,10 @@ public class FractureService {
             Die die1 = new Die(0);
             Die die2 = new Die(0);
             // For display, show both dice; success is if either is 1 or 10
-            diceDisplay = DiceEmojis.getDieEmoji("green", die1.getResult()) + " " + DiceEmojis.getDieEmoji("green", die2.getResult());
-            boolean isSuccess = (die1.getResult() == 1 || die1.getResult() == 10) || (die2.getResult() == 1 || die2.getResult() == 10);
+            diceDisplay = DiceEmojis.getDieEmoji("green", die1.getResult()) + " "
+                    + DiceEmojis.getDieEmoji("green", die2.getResult());
+            boolean isSuccess = (die1.getResult() == 1 || die1.getResult() == 10)
+                    || (die2.getResult() == 1 || die2.getResult() == 10);
             result = isSuccess ? 1 : 2; // use 1 for success, anything else for fail
         } else {
             Die singleDie = new Die(0);
@@ -199,9 +201,8 @@ public class FractureService {
                             buttons);
 
                 } else {
-                    String msg =
-                            player.getRepresentation(false, false) + " rolled a " + diceDisplay
-                                    + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                    String msg = player.getRepresentation(false, false) + " rolled a " + diceDisplay
+                            + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
                 }
@@ -211,8 +212,8 @@ public class FractureService {
                         "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
                                 + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
-                String msg = player.getRepresentation(true, false) + " rolled " + diceDisplay
-                        + ", better luck next time.";
+                String msg =
+                        player.getRepresentation(true, false) + " rolled " + diceDisplay + ", better luck next time.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
