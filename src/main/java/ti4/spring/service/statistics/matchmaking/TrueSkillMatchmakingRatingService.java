@@ -31,7 +31,7 @@ class TrueSkillMatchmakingRatingService {
     private static final int WINNING_RANK = 1;
 
     static final double MAX_CALIBRATED_RATING_LOSS_PER_GAME = 0.40;
-    static final double MIN_CALIBRATED_RATING_GAIN_PER_GAME = 0.10;
+    static final double MIN_CALIBRATED_RATING_GAIN_PER_WIN = 0.10;
     static final int RECENT_GAMES_WINDOW = 10;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
@@ -163,8 +163,8 @@ class TrueSkillMatchmakingRatingService {
     }
 
     private static double clampedChange(double change, boolean won) {
-        if (won || change >= 0) {
-            return Math.max(change, MIN_CALIBRATED_RATING_GAIN_PER_GAME);
+        if (won) {
+            return Math.max(change, MIN_CALIBRATED_RATING_GAIN_PER_WIN);
         }
         return Math.max(change, -MAX_CALIBRATED_RATING_LOSS_PER_GAME);
     }

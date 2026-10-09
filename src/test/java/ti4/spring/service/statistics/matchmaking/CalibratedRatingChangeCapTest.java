@@ -12,7 +12,7 @@ class CalibratedRatingChangeCapTest {
 
     private static final double TOLERANCE = 1.0e-9;
     private static final double CAP = TrueSkillMatchmakingRatingService.MAX_CALIBRATED_RATING_LOSS_PER_GAME;
-    private static final double FLOOR = TrueSkillMatchmakingRatingService.MIN_CALIBRATED_RATING_GAIN_PER_GAME;
+    private static final double FLOOR = TrueSkillMatchmakingRatingService.MIN_CALIBRATED_RATING_GAIN_PER_WIN;
     private static final double CALIBRATED_SIGMA = 1.3;
     private static final double UNCALIBRATED_SIGMA = 2.5;
     private static final long DAY_MILLIS = 86_400_000L;
@@ -70,14 +70,12 @@ class CalibratedRatingChangeCapTest {
     }
 
     @Test
-    void raisesATinyGainWithoutAWinToTheMinimum() {
+    void leavesATinyGainWithoutAWinAlone() {
         Rating current = new Rating(30.0, CALIBRATED_SIGMA);
         Rating unclamped = new Rating(30.02, CALIBRATED_SIGMA);
 
-        Rating clamped = TrueSkillMatchmakingRatingService.clampCalibratedChange(current, unclamped, false);
-
-        assertThat(clamped.getConservativeRating() - current.getConservativeRating())
-                .isEqualTo(FLOOR, within(TOLERANCE));
+        assertThat(TrueSkillMatchmakingRatingService.clampCalibratedChange(current, unclamped, false))
+                .isSameAs(unclamped);
     }
 
     @Test
