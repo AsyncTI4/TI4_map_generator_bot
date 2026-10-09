@@ -152,21 +152,18 @@ class TrueSkillMatchmakingRatingService {
             return newRating;
         }
         double change = newRating.getConservativeRating() - currentRating.getConservativeRating();
-        double clampedChange = clampedChange(change, won);
-        if (clampedChange == change) {
+        double lowestAllowedChange = lowestAllowedChange(won);
+        if (change >= lowestAllowedChange) {
             return newRating;
         }
         return new Rating(
-                newRating.getMean() + clampedChange - change,
+                newRating.getMean() + lowestAllowedChange - change,
                 newRating.getStandardDeviation(),
                 newRating.getConservativeStandardDeviationMultiplier());
     }
 
-    private static double clampedChange(double change, boolean won) {
-        if (won) {
-            return Math.max(change, MIN_CALIBRATED_RATING_GAIN_PER_WIN);
-        }
-        return Math.max(change, -MAX_CALIBRATED_RATING_LOSS_PER_GAME);
+    private static double lowestAllowedChange(boolean won) {
+        return won ? MIN_CALIBRATED_RATING_GAIN_PER_WIN : -MAX_CALIBRATED_RATING_LOSS_PER_GAME;
     }
 
     private static void recordRecentRatings(
