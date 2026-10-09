@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 class CalibratedRatingChangeCapTest {
 
     private static final double TOLERANCE = 1.0e-9;
-    private static final double CAP = TrueSkillMatchmakingRatingService.MAX_CALIBRATED_RATING_CHANGE_PER_GAME;
-    private static final double FLOOR = TrueSkillMatchmakingRatingService.MIN_CALIBRATED_RATING_CHANGE_PER_GAME;
+    private static final double CAP = TrueSkillMatchmakingRatingService.MAX_CALIBRATED_RATING_LOSS_PER_GAME;
+    private static final double FLOOR = TrueSkillMatchmakingRatingService.MIN_CALIBRATED_RATING_GAIN_PER_GAME;
     private static final double CALIBRATED_SIGMA = 1.3;
     private static final double UNCALIBRATED_SIGMA = 2.5;
     private static final long DAY_MILLIS = 86_400_000L;
@@ -20,15 +20,12 @@ class CalibratedRatingChangeCapTest {
     private static final int HEAVY_LOSS_RANK = 10;
 
     @Test
-    void capsALargeGainForACalibratedPlayer() {
+    void leavesALargeGainForACalibratedPlayerAlone() {
         Rating current = new Rating(30.0, CALIBRATED_SIGMA);
-        Rating uncapped = new Rating(31.5, CALIBRATED_SIGMA - 0.01);
+        Rating unclamped = new Rating(31.5, CALIBRATED_SIGMA - 0.01);
 
-        Rating capped = TrueSkillMatchmakingRatingService.clampCalibratedChange(current, uncapped, false);
-
-        assertThat(capped.getConservativeRating() - current.getConservativeRating())
-                .isEqualTo(CAP, within(TOLERANCE));
-        assertThat(capped.getStandardDeviation()).isEqualTo(uncapped.getStandardDeviation());
+        assertThat(TrueSkillMatchmakingRatingService.clampCalibratedChange(current, unclamped, true))
+                .isSameAs(unclamped);
     }
 
     @Test
@@ -64,14 +61,23 @@ class CalibratedRatingChangeCapTest {
     }
 
     @Test
-    void raisesATinyLossToTheMinimum() {
+    void leavesATinyLossAlone() {
         Rating current = new Rating(30.0, CALIBRATED_SIGMA);
         Rating unclamped = new Rating(29.98, CALIBRATED_SIGMA);
+
+        assertThat(TrueSkillMatchmakingRatingService.clampCalibratedChange(current, unclamped, false))
+                .isSameAs(unclamped);
+    }
+
+    @Test
+    void raisesATinyGainWithoutAWinToTheMinimum() {
+        Rating current = new Rating(30.0, CALIBRATED_SIGMA);
+        Rating unclamped = new Rating(30.02, CALIBRATED_SIGMA);
 
         Rating clamped = TrueSkillMatchmakingRatingService.clampCalibratedChange(current, unclamped, false);
 
         assertThat(clamped.getConservativeRating() - current.getConservativeRating())
-                .isEqualTo(-FLOOR, within(TOLERANCE));
+                .isEqualTo(FLOOR, within(TOLERANCE));
     }
 
     @Test
@@ -87,17 +93,6 @@ class CalibratedRatingChangeCapTest {
     }
 
     @Test
-    void capsALargeGainForAWinner() {
-        Rating current = new Rating(30.0, CALIBRATED_SIGMA);
-        Rating unclamped = new Rating(31.5, CALIBRATED_SIGMA);
-
-        Rating clamped = TrueSkillMatchmakingRatingService.clampCalibratedChange(current, unclamped, true);
-
-        assertThat(clamped.getConservativeRating() - current.getConservativeRating())
-                .isEqualTo(CAP, within(TOLERANCE));
-    }
-
-    @Test
     void leavesAPlayerWhoIsStillCalibratingAlone() {
         Rating current = new Rating(25.0, UNCALIBRATED_SIGMA);
         Rating uncapped = new Rating(28.0, UNCALIBRATED_SIGMA - 0.3);
@@ -110,12 +105,12 @@ class CalibratedRatingChangeCapTest {
     void treatsTheCalibrationThresholdItselfAsCalibrated() {
         // The ladder shows a rating once calibrationPercent reaches 100%, i.e. sigma <= 1.7.
         Rating current = new Rating(30.0, 1.7);
-        Rating uncapped = new Rating(32.0, 1.69);
+        Rating uncapped = new Rating(28.0, 1.69);
 
         Rating capped = TrueSkillMatchmakingRatingService.clampCalibratedChange(current, uncapped, false);
 
         assertThat(capped.getConservativeRating() - current.getConservativeRating())
-                .isEqualTo(CAP, within(TOLERANCE));
+                .isEqualTo(-CAP, within(TOLERANCE));
     }
 
     @Test
