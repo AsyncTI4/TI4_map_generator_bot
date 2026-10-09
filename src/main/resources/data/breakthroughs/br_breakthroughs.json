@@ -109,7 +109,7 @@
     },
     {
         "alias": "toldarbthonor",
-        "name": "Shameix's Bane",
+        "name": "Shameix's Bane (Honor)",
         "shortName": "Shameix's\nBane",
         "faction": "toldar",
         "synergy": [
@@ -121,7 +121,7 @@
     },
     {
         "alias": "toldarbtdishonor",
-        "name": "Shameix's Bane",
+        "name": "Shameix's Bane (Dishonor)",
         "shortName": "Shameix's\nBane",
         "faction": "toldar",
         "synergy": [

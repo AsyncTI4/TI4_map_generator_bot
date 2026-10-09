@@ -151,7 +151,7 @@
     },
     {
         "alias": "dsxingsteel",
-        "name": "Astromantic Cloak",
+        "name": "Astromantic Cloak (Steel)",
         "types": [
             "BIOTIC"
         ],
@@ -162,7 +162,7 @@
     },
     {
         "alias": "dsxingstar",
-        "name": "Astromantic Cloak",
+        "name": "Astromantic Cloak (Star)",
         "types": [
             "BIOTIC"
         ],
@@ -184,7 +184,7 @@
     },
     {
         "alias": "dsxinysteel",
-        "name": "Veiled Networking",
+        "name": "Veiled Networking (Steel)",
         "types": [
             "CYBERNETIC"
         ],
@@ -195,7 +195,7 @@
     },
     {
         "alias": "dsxinystar",
-        "name": "Veiled Networking",
+        "name": "Veiled Networking (Star)",
         "types": [
             "CYBERNETIC"
         ],
