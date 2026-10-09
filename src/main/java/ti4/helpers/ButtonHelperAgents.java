@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -2334,17 +2335,20 @@ public final class ButtonHelperAgents {
             return;
         }
         List<Button> buttons = new ArrayList<>();
+        Set<String> addedPositions = new HashSet<>();
 
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            Tile tile = game.getTileFromPlanet(p.getName());
-            if (tile != null
-                            && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                            && ButtonHelper.checkForTechSkips(game, planet)
-                    || tile.isHomeSystem(game)) {
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile == null || addedPositions.contains(tile.getPosition())) {
+                continue;
+            }
+            boolean techSkipSystemWithoutEnemyShips = !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                    && ButtonHelper.checkForTechSkips(game, planet);
+            if (techSkipSystemWithoutEnemyShips || tile.isHomeSystem(game)) {
+                addedPositions.add(tile.getPosition());
                 buttons.add(Buttons.green(
                         "produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                         tile.getRepresentationForButtons(game, player)));
