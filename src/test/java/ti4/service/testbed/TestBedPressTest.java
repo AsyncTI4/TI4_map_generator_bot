@@ -1,6 +1,7 @@
 package ti4.service.testbed;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,7 +14,9 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -21,6 +24,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -190,6 +194,51 @@ class TestBedPressTest extends BaseTi4Test {
         verify(seatChannel, never()).sendMessage(any(MessageCreateData.class));
         assertEquals(List.of("these buttons are for someone else"), recorder.replies());
         assertEquals(List.of(), recorder.reposts());
+    }
+
+    // A press only passes when the handler ran for that seat: a thrown handler or a "not yours" reply fails it.
+    @Test
+    void classifiesWhatAPressDid() {
+        assertEquals(TestBedPress.Outcome.PRESSED, TestBedPress.outcome(false, new Recorder()));
+        assertEquals(TestBedPress.Outcome.HANDLER_FAILED, TestBedPress.outcome(true, new Recorder()));
+
+        Recorder refused = new Recorder();
+        refused.reply("To <:sol:>: these buttons are for someone else");
+        assertEquals(TestBedPress.Outcome.REJECTED, TestBedPress.outcome(false, refused));
+
+        Recorder form = new Recorder();
+        form.modal("tradeModal_nekro");
+        assertEquals(TestBedPress.Outcome.FORM_OPENED, TestBedPress.outcome(false, form));
+        assertTrue(new TestBedPress.PressResult(TestBedPress.Outcome.FORM_OPENED, "", form).pressed());
+        assertFalse(new TestBedPress.PressResult(TestBedPress.Outcome.REJECTED, "", refused).pressed());
+    }
+
+    // Exact beats prefix, the acting seat's buttons beat another seat's, and among equals the newest message wins.
+    @Test
+    void picksTheButtonMeantForTheSeat() {
+        MessageChannel cardsInfo = mock(MessageChannel.class);
+        MessageChannel main = mock(MessageChannel.class);
+        Message olderOwn = buttonMessage(10, Button.danger("FFCC_nekro_turnEnd", "End Turn"));
+        Message newerForeign = buttonMessage(30, Button.danger("FFCC_sol_turnEnd", "End Turn"));
+        Message newestOwn = buttonMessage(20, Button.danger("FFCC_nekro_turnEnd", "End Turn"));
+        Map<MessageChannel, List<Message>> history = Map.of(
+                cardsInfo, List.of(olderOwn),
+                main, List.of(newerForeign, newestOwn));
+
+        List<String> seen = new ArrayList<>();
+        TestBedPress.Found found = TestBedPress.find(List.of(cardsInfo, main), history::get, "End Turn", "nekro", seen);
+
+        assertNotNull(found);
+        assertSame(newestOwn, found.message());
+        assertEquals(1, found.otherMatches());
+        assertTrue(seen.contains("End Turn (`turnEnd`, for sol)"), seen.toString());
+    }
+
+    private static Message buttonMessage(long id, Button button) {
+        Message message = mock(Message.class);
+        when(message.getIdLong()).thenReturn(id);
+        when(message.getComponentTree()).thenReturn(MessageComponentTree.of(ActionRow.of(button)));
+        return message;
     }
 
     // Guard for JDA upgrades: every no-argument method answers without being "unsupported", and JDA's own helper

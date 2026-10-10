@@ -9,6 +9,6 @@
     { "expect": { "state": "you.tg", "equals": "5" } },
     { "do": "startPhase", "value": "strategy" },
     { "expect": { "state": "game.phase", "equals": "strategy" } },
-    { "expect": { "in": "main", "noFactionLeak": true } }
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
   ]
 }

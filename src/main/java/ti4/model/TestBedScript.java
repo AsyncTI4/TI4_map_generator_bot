@@ -17,7 +17,7 @@ public class TestBedScript {
     private String name;
     private String description;
     private String preset;
-    private int settleSeconds = 2;
+    private double settleSeconds = 0.5;
     private int timeoutSeconds = 20;
     private boolean stopOnFail;
     private List<Step> steps = new ArrayList<>();
@@ -40,7 +40,7 @@ public class TestBedScript {
         private Seat hand;
         private Double wait;
         private Expect expect;
-        private Integer settleSeconds;
+        private Double settleSeconds;
         private Integer timeoutSeconds;
         private Boolean stopOnFail;
 
@@ -70,6 +70,9 @@ public class TestBedScript {
 
     @Data
     public static class Expect {
+        public static final String SINCE_START = "start";
+        public static final String SINCE_STEP = "step";
+
         private String in;
 
         @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -84,6 +87,19 @@ public class TestBedScript {
         private boolean noFactionLeak;
         private String state;
         private String equals;
+        private String since;
+        private String matches;
+        private String attachment;
+
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        private List<String> buttons = new ArrayList<>();
+
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        private List<String> noButtons = new ArrayList<>();
+
+        public boolean sinceStart() {
+            return SINCE_START.equals(since);
+        }
 
         public String describe() {
             if (state != null) {
@@ -97,7 +113,13 @@ public class TestBedScript {
             if (!contains.isEmpty()) sb.append(" contains ").append(contains);
             if (!notContains.isEmpty()) sb.append(" lacks ").append(notContains);
             if (count != null) sb.append(" ×").append(count);
+            if (matches != null) sb.append(" matches /").append(matches).append('/');
+            if (attachment != null)
+                sb.append(" attachment `").append(attachment).append('`');
+            if (!buttons.isEmpty()) sb.append(" buttons ").append(buttons);
+            if (!noButtons.isEmpty()) sb.append(" no buttons ").append(noButtons);
             if (noFactionLeak) sb.append(" no faction leak");
+            if (sinceStart()) sb.append(" since start");
             return sb.toString();
         }
     }
