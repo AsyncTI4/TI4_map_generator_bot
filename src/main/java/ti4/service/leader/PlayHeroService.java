@@ -760,7 +760,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "empyreanhero" -> {
-                AddFrontierTokensService.addFrontierTokens(event, game);
+                AddFrontierTokensService.addFrontierTokensIncludingFracture(event, game);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
