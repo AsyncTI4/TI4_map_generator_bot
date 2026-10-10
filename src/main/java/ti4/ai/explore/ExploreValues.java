@@ -21,6 +21,7 @@ public class ExploreValues {
     public static final double EXPANSION_SHARE = 0.5;
     public static final double LAST_FORCE_RISK_SHARE = 0.15;
     public static final double UNSPENT_READY_SHARE = 0.3;
+    public static final double READY_PLANET_SHARE = 0.9;
     public static final double MERCENARY_OUTFIT = 0.75;
     public static final double FREELANCERS = 1.5;
     public static final int FREELANCERS_TYPICAL_COST = 2;

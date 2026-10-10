@@ -549,21 +549,22 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.landings()).containsOnlyKeys("lodor").containsEntry("lodor", 4);
     }
 
-    // A second carrier still at home may need those infantry for its own expansion this round, so the first one takes
-    // only what it lands.
+    // Capacity is used, but with forethought: the first carrier takes infantry for Lodor and what lies beyond it, and
+    // leaves behind what the second carrier at home needs for the best system it can reach this round.
     @Test
     void leavesSpareInfantryHomeWhileAnotherCarrierIsThere() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 6);
         test.place("26", neighbour);
+        test.place("25", otherNeighbourOfHome());
 
         TacticalPlan plan = expansionTo(neighbour).orElseThrow();
 
         assertThat(plan.moves())
                 .containsExactlyInAnyOrder(
                         new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1),
-                        new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 1));
+                        new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 3));
     }
 
     // Mecatol Rex is worth an Imperial point every round it is held, so its last infantry stays: an empty Mecatol
@@ -669,7 +670,45 @@ class TacticalPlannerTest extends BaseTi4Test {
 
         TacticalPlan plan = expansionTo(neighbour).orElseThrow();
 
-        assertThat(plan.landings()).containsEntry("meharxull", 2);
+        assertThat(plan.landings().get("meharxull")).isGreaterThanOrEqualTo(2);
+    }
+
+    // Nekro's opening into Abyz and Fria, two hazardous planets: two dreadnoughts carry one infantry each, and both
+    // move so that every planet in the activated system is taken.
+    @Test
+    void bringsEnoughTransportsToTakeEveryPlanet() {
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.place("38", neighbour);
+
+        TacticalPlan plan = expansionTo(neighbour).orElseThrow();
+
+        assertThat(plan.landings()).containsOnlyKeys("abyz", "fria");
+        assertThat(plan.moves()).contains(new UnitMove(AiTestGame.HOME, "space", UnitType.Dreadnought, 2));
+    }
+
+    // Fighters ride along in the carrier's spare capacity: they move forward with it and guard it.
+    @Test
+    void fillsSpareCapacityWithFighters() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Fighter, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.place("26", neighbour);
+
+        TacticalPlan plan = expansionTo(neighbour).orElseThrow();
+
+        assertThat(plan.moves())
+                .contains(
+                        new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 2),
+                        new UnitMove(AiTestGame.HOME, "space", UnitType.Fighter, 2));
+    }
+
+    private String otherNeighbourOfHome() {
+        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(candidate -> !"x".equals(candidate) && !neighbour.equals(candidate))
+                .findFirst()
+                .orElseThrow();
     }
 
     private Optional<TacticalPlan> attackOn(String position) {

@@ -357,11 +357,15 @@ to build one by hand:
   - **Expand**: a carrier (or other transport) takes ground forces (infantry first, mechs last, except
     that mechs go to hazardous planets first) to free planets, keeping one ground force (a mech when there is one) on each home planet and on Mecatol Rex, and avoiding systems
     covered by enemy space cannon. In rounds 1-4 every planet taken is worth an extra 0.8, fading to nothing by round
-    8, so small planets are worth a token early. The last carrier to leave home takes a full load of spare infantry
-    for its next expansions. Every ground force it brings lands: a mech on each hazardous planet it can, then one
-    force on every other planet, then a second infantry on each hazardous planet (the cards that remove one become
-    nearly free), then the rest spread over the planets, ready to move on next round. A carrier with a sister at home
-    brings only what it lands plus a second infantry for each hazardous planet.
+    8, so small planets are worth a token early. It plans to take every free planet in the system: when one transport
+    cannot carry a ground force for each planet (and a second for each hazardous one), more transports from the same
+    system go along (0.3 per extra ship). Capacity is used: the transports fill up with every spare ground force,
+    except what the transports staying behind need for the best system they can reach this round, and then with
+    fighters that escort them (0.15 each; fighters stay home only when an enemy can reach it). Each ground force
+    beyond the planets taken is worth 0.5, up to the free planets within one move of the target, since it moves on
+    next round. Every ground force it brings lands: a mech on each hazardous planet it can, then one force on every
+    other planet, then a second infantry on each hazardous planet (the cards that remove one become nearly free),
+    then the rest spread over the planets.
   - **Attack**: only a single opponent, and only when the exact combat odds (`CombatOdds`, with standing combat
     modifiers such as Fragile or Unrelenting) give at least 80% in space and on each planet it lands on. It always
     clears enemy ships out of its own home system. It attacks another player's home system only while it holds
@@ -453,7 +457,7 @@ to build one by hand:
     | Card | Choice |
     | --- | --- |
     | Volatile Fuel Source, Core Mine | the command token (2), or the trade good (1), when the mech or infantry is worth it; otherwise it declines |
-    | Expedition | readies the planet when it is worth more than the infantry: its larger value while the AI still has something to build, 0.3 of it otherwise; never with Pre-Fab Arcologies or a planet that is ready |
+    | Expedition | readies the planet when 0.9 of its larger value is worth more than the infantry (nothing once the AI has passed); never with Pre-Fab Arcologies or a planet that is ready |
     | Local Fabricators | a mech (2, a little more for an empty planet) paid with a commodity or trade good, unless none is left in reinforcements or the planet has the Demilitarized Zone; otherwise a commodity |
     | Functioning Base | an action card for a commodity or trade good, unless the hand is full; otherwise a commodity |
     | Abandoned Warehouses, Merchant Station | convert commodities to trade goods or gain commodities, whichever is worth more |

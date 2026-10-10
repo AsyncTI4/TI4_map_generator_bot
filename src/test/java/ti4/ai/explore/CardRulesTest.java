@@ -180,23 +180,33 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo(DECLINE);
     }
 
-    // With nothing left to buy this round, readying Lazar (1 resource) is worth only 0.3, less than the 0.7 an
-    // infantry costs, so only a mech readies it.
+    // Zohbat (3/1) is readied by removing its only infantry: 3 resources to spend this round beat an infantry, even
+    // without a build lined up yet. Seen in a game where the AI declined it.
     @Test
-    void expeditionNeedsAMechWhenTheResourcesWouldGoUnspent() {
+    void expeditionReadiesAThreeResourcePlanetWithItsOnlyInfantry() {
+        Tile zohbat = test.place("30", otherNeighbourOfHome());
+        test.nekro.addPlanet("zohbat");
+        test.units(zohbat, "zohbat", test.nekro, UnitType.Infantry, 1);
+        test.nekro.exhaustPlanet("zohbat");
+
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_zohbat")).orElseThrow()))
+                .isEqualTo("resolveExpeditionInf_zohbat");
+    }
+
+    // Once the AI has passed, a ready planet is worth nothing until the status phase readies it anyway, so even a mech
+    // does not bother.
+    @Test
+    void expeditionIsWorthNothingAfterPassing() {
         Tile lazar = test.place("31", otherNeighbourOfHome());
         test.nekro.addPlanet("lazar");
         test.units(lazar, "lazar", test.nekro, UnitType.Infantry, 2);
+        test.units(lazar, "lazar", test.nekro, UnitType.Mech, 1);
         test.nekro.exhaustPlanet("lazar");
         test.nekro.setPassed(true);
 
-        assertThat(pressedId(next(expedition("resolveExpeditionInf_lazar")).orElseThrow()))
-                .isEqualTo(DECLINE);
-
-        test.units(lazar, "lazar", test.nekro, UnitType.Mech, 1);
         assertThat(pressedId(next(expedition("resolveExpeditionMech_lazar", "resolveExpeditionInf_lazar"))
                         .orElseThrow()))
-                .isEqualTo("resolveExpeditionMech_lazar");
+                .isEqualTo(DECLINE);
     }
 
     // Local Fabricators: a mech (2) for a commodity (a third) beats a commodity.

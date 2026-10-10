@@ -107,17 +107,17 @@ class ExploreOutlookTest extends BaseTi4Test {
         assertThat(needed.infantryCost()).isGreaterThan(ExploreValues.INFANTRY_UNIT + 1);
     }
 
-    // Readying a planet is worth its full value while the AI still has a dock with something to buy, and 0.3 of it
-    // once it has passed.
+    // Readying a planet is worth 0.9 of its value while the AI can still spend it this round, and nothing once it has
+    // passed.
     @Test
-    void aReadiedPlanetIsWorthLessOnceTheAiHasPassed() {
+    void aReadiedPlanetIsWorthNothingOnceTheAiHasPassed() {
         test.nekro.exhaustPlanet("tequran");
         ExploreSite tequran = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
-        assertThat(CardValue.readyValue(tequran)).isCloseTo(2.0, within(EXACT));
+        assertThat(CardValue.readyValue(tequran)).isCloseTo(1.8, within(EXACT));
 
         test.nekro.setPassed(true);
         ExploreSite afterPassing = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
-        assertThat(CardValue.readyValue(afterPassing)).isCloseTo(0.6, within(EXACT));
+        assertThat(CardValue.readyValue(afterPassing)).isZero();
     }
 
     // Freelancers is worth having when the seat could pay 2 resources of influence or resources for a unit.
