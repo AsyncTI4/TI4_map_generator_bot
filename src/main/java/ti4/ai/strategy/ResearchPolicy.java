@@ -67,6 +67,12 @@ public class ResearchPolicy {
     private static final String PRODUCE_EN_MASSE = "pem";
     private static final String SPACE_DOCK_UPGRADE = "sd2";
     private static final int DOCK_UPGRADE_PRODUCTION = 2;
+    private static final double STEPPING_STONE_SHARE = 0.3;
+    private static final Map<Character, TechnologyType> PREREQUISITE_COLOURS = Map.of(
+            'B', TechnologyType.PROPULSION,
+            'G', TechnologyType.BIOTIC,
+            'R', TechnologyType.WARFARE,
+            'Y', TechnologyType.CYBERNETIC);
 
     public static Optional<String> best(Game game, Player seat, Collection<String> candidates) {
         return candidates.stream()
@@ -89,10 +95,44 @@ public class ResearchPolicy {
     public static double value(Game game, Player seat, String alias) {
         TechnologyModel tech = Mapper.getTech(alias);
         if (tech == null || seat.hasTech(alias)) return 0;
-        double value = tech.getFaction().filter(faction -> !faction.isBlank()).isPresent()
-                ? FACTION_TECH_VALUE
-                : GENERIC_VALUE.getOrDefault(alias, DEFAULT_VALUE);
-        return value + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech);
+        return baseValue(tech)
+                + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
+                + steppingStoneValue(game, seat, tech);
+    }
+
+    static double baseValue(TechnologyModel tech) {
+        return isFactionTech(tech) ? FACTION_TECH_VALUE : GENERIC_VALUE.getOrDefault(tech.getAlias(), DEFAULT_VALUE);
+    }
+
+    private static double steppingStoneValue(Game game, Player seat, TechnologyModel tech) {
+        if (StrategyCardRules.cannotResearch(seat)) return 0;
+        double best = 0;
+        for (String alias : game.getTechnologyDeck()) {
+            TechnologyModel next = Mapper.getTech(alias);
+            if (next == null || next == tech || seat.hasTech(alias)) continue;
+            if (isFactionTech(next) && !seat.getNotResearchedFactionTechs().contains(alias)) continue;
+            if (missingPrerequisites(seat, next, null) != 1 || missingPrerequisites(seat, next, tech) != 0) continue;
+            if (ListTechService.isTechResearchable(next, seat)) continue;
+            best = Math.max(best, baseValue(next));
+        }
+        return STEPPING_STONE_SHARE * best;
+    }
+
+    private static int missingPrerequisites(Player seat, TechnologyModel next, TechnologyModel adding) {
+        String requirements = next.getRequirements().orElse("");
+        int missing = 0;
+        for (Map.Entry<Character, TechnologyType> colour : PREREQUISITE_COLOURS.entrySet()) {
+            long needed = requirements
+                    .chars()
+                    .filter(letter -> letter == colour.getKey())
+                    .count();
+            missing += (int) Math.max(0, needed - colourCount(seat, colour.getValue(), adding));
+        }
+        return missing;
+    }
+
+    private static boolean isFactionTech(TechnologyModel tech) {
+        return tech.getFaction().filter(faction -> !faction.isBlank()).isPresent();
     }
 
     private static double objectiveGain(Game game, Player seat, TechnologyModel tech) {

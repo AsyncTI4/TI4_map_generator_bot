@@ -43,13 +43,17 @@ public class MovementGraph {
         return tile == null
                 || tile.isNebula(game)
                 || tile.isGravityRift(game, player)
-                || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game);
+                || (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && !hasLightWaveDeflector(player));
     }
 
     public static boolean canEnter(Game game, Player player, @Nullable Tile tile) {
         if (tile == null || tile.getTileModel() == null) return false;
         if (tile.getTileModel().isHyperlane() || tile.isSupernova()) return false;
         return !tile.isAsteroidField() || hasAntimassDeflectors(player);
+    }
+
+    private static boolean hasLightWaveDeflector(Player player) {
+        return player.hasTech("lwd") || player.hasTech("absol_lwd");
     }
 
     private static boolean hasAntimassDeflectors(Player player) {
