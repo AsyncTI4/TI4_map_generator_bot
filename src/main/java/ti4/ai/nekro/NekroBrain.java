@@ -20,6 +20,7 @@ import ti4.ai.agenda.GalacticThreatRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
+import ti4.ai.brain.StrategyCard;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.PromissoryRules;
@@ -37,6 +38,8 @@ import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
 import ti4.ai.tactical.SingularityRules;
 import ti4.ai.tactical.SlingRelayRules;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
@@ -378,6 +381,10 @@ public class NekroBrain implements FactionBrain {
         }
         if (TacticalRules.pickingSystem(context)) return TacticalRules.start(context);
         if (TacticalRules.actionTaken(context)) return Optional.empty();
+        Optional<AiDecision> warfareFirst = warfareBeforeFollowUp(context, thisTurn);
+        if (warfareFirst.isPresent()) return warfareFirst;
+        Optional<AiDecision> sling = SlingRelayRules.insteadOfTacticalAction(context, thisTurn);
+        if (sling.isPresent()) return sling;
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {
@@ -410,11 +417,43 @@ public class NekroBrain implements FactionBrain {
             Optional<PromptButton> play = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
                     && button.handlerId().startsWith("strategicAction_")
                     && !context.alreadyPressed(prompt, button)
-                    && unplayed(context.game(), StrategyCardRanking.initiative(button)));
+                    && unplayed(context.game(), StrategyCardRanking.initiative(button))
+                    && worthPlayingNow(context, StrategyCardRanking.initiative(button)));
             if (play.isPresent()) {
                 TacticalRules.markSecondAction(context, false);
                 return Optional.of(StrategyCardRules.play(
                         context, prompt, play.get(), StrategyCardRanking.initiative(play.get())));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean worthPlayingNow(AiTurnContext context, int initiative) {
+        return StrategyCard.of(context.game(), initiative) == StrategyCard.IMPERIAL
+                && StrategyCardRanking.imperialScoresNow(context.game(), context.seat());
+    }
+
+    private static Optional<AiDecision> warfareBeforeFollowUp(AiTurnContext context, List<AiPrompt> thisTurn) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (!seat.hasTech(FLEET_LOGISTICS)) return Optional.empty();
+        boolean attack = TacticalPlanner.bestForWarfare(game, seat)
+                .filter(plan -> plan.kind() == TacticalPlan.Kind.ATTACK)
+                .isPresent();
+        if (!attack) return Optional.empty();
+        for (AiPrompt prompt : thisTurn) {
+            Optional<PromptButton> warfare = prompt.firstEnabled(button -> {
+                int initiative = StrategyCardRanking.initiative(button);
+                return button.isOwnedBy(context.faction())
+                        && button.handlerId().startsWith("strategicAction_")
+                        && !context.alreadyPressed(prompt, button)
+                        && unplayed(game, initiative)
+                        && StrategyCard.of(game, initiative) == StrategyCard.WARFARE
+                        && StrategyCardRules.isThundersEdgeWarfare(game, initiative);
+            });
+            if (warfare.isPresent()) {
+                return Optional.of(StrategyCardRules.play(
+                        context, prompt, warfare.get(), StrategyCardRanking.initiative(warfare.get())));
             }
         }
         return Optional.empty();

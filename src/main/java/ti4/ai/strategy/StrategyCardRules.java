@@ -153,10 +153,7 @@ public class StrategyCardRules {
     private static Optional<AiDecision> warfare(AiTurnContext context, Optional<AiPrompt> card, int initiative) {
         if (card.isEmpty() || CardMessages.done(context, WARFARE_FINISHED)) return Optional.empty();
         Game game = context.game();
-        boolean thundersEdge = game.getStrategyCardModelByInitiative(initiative)
-                .map(model -> model.usesAutomationForSCID("te6warfare"))
-                .orElse(false);
-        if (!thundersEdge) return removeTokenWithWarfare(context, card.get());
+        if (!isThundersEdgeWarfare(game, initiative)) return removeTokenWithWarfare(context, card.get());
         if (!CardMessages.done(context, "warfarePlan")) {
             CardMessages.markDone(context, "warfarePlan");
             Optional<TacticalPlan> plan = TacticalPlanner.bestForWarfare(game, context.seat());
@@ -184,6 +181,12 @@ public class StrategyCardRules {
         if (!TacticalRules.activatedThisTurn(context)) return waitForWarfare(context, "the system picker");
         CardMessages.markDone(context, WARFARE_FINISHED);
         return Optional.empty();
+    }
+
+    public static boolean isThundersEdgeWarfare(Game game, int initiative) {
+        return game.getStrategyCardModelByInitiative(initiative)
+                .map(model -> model.usesAutomationForSCID("te6warfare"))
+                .orElse(false);
     }
 
     private static Optional<AiDecision> waitForWarfare(AiTurnContext context, String what) {

@@ -3,6 +3,7 @@ package ti4.ai.tactical;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
@@ -37,23 +38,55 @@ public class SlingRelayRules {
     private static final String DONE = "done";
     private static final String FIELD = "~";
     private static final double STALL_VALUE = 0.5;
+    private static final double STALL_ACTION_VALUE = 1.5;
+    private static final double UNLOCKED_SHIP_VALUE = 1.0;
     private static final double TRADE_GOOD_VALUE = 0.6;
 
     record Choice(String position, BuildOrder ship) {}
 
     public static Optional<AiDecision> start(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!ready(context)) return Optional.empty();
+        return best(context.game(), context.seat())
+                .flatMap(choice -> open(context, thisTurn, choice, "instead of passing"));
+    }
+
+    public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!ready(context)) return Optional.empty();
+        Game game = context.game();
         Player seat = context.seat();
-        String key = SLING_KEY + context.turnKey();
-        if (!seat.hasTechReady(SLING_RELAY) || context.memory().has(key)) return Optional.empty();
-        Optional<Choice> choice = best(context.game(), seat);
+        double perResource = ProductionPlanner.fillerValuePerResource(game);
+        Optional<Choice> choice =
+                options(game, seat).max(Comparator.comparingDouble(option -> actionValue(option, perResource)));
         if (choice.isEmpty()) return Optional.empty();
+        double sling = actionValue(choice.get(), perResource);
+        Optional<TacticalPlan> plan = TacticalRules.rememberedPlan(context).or(() -> {
+            Optional<TacticalPlan> computed = TacticalPlanner.best(game, seat);
+            computed.ifPresent(found -> TacticalRules.remember(context, found));
+            return computed;
+        });
+        if (plan.isPresent() && plan.get().score() >= sling) return Optional.empty();
+        String reason = choice.get().ship().scoring() ? "for an objective, without locking it" : "and wait and see";
+        return open(context, thisTurn, choice.get(), reason);
+    }
+
+    private static boolean ready(AiTurnContext context) {
+        return context.seat().hasTechReady(SLING_RELAY) && !context.memory().has(SLING_KEY + context.turnKey());
+    }
+
+    private static double actionValue(Choice choice, double perResource) {
+        BuildOrder ship = choice.ship();
+        double value = ship.value() - perResource * ship.cost() + STALL_ACTION_VALUE;
+        return ship.scoring() ? value + UNLOCKED_SHIP_VALUE : value;
+    }
+
+    private static Optional<AiDecision> open(
+            AiTurnContext context, List<AiPrompt> thisTurn, Choice choice, String reason) {
         Optional<Match> component = Prompts.owned(thisTurn, context.faction(), COMPONENT_ACTION::equals);
-        BuildOrder ship = choice.get().ship();
+        BuildOrder ship = choice.ship();
         String cost = String.valueOf((int) Math.ceil(ship.cost()));
-        component.ifPresent(match ->
-                context.memory().put(key, String.join(FIELD, MENU, choice.get().position(), ship.unitId(), cost)));
-        return component.map(match ->
-                match.press("produce a " + choice.get().ship().unitId() + " with Sling Relay instead of passing"));
+        component.ifPresent(match -> context.memory()
+                .put(SLING_KEY + context.turnKey(), String.join(FIELD, MENU, choice.position(), ship.unitId(), cost)));
+        return component.map(match -> match.press("produce a " + ship.unitId() + " with Sling Relay " + reason));
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
@@ -104,16 +137,24 @@ public class SlingRelayRules {
     }
 
     static Optional<Choice> best(Game game, Player seat) {
+        int freeResources = freeResources(game, seat);
+        return options(game, seat)
+                .filter(choice -> netValue(choice, freeResources) > 0)
+                .max(Comparator.comparingDouble(choice -> netValue(choice, freeResources)));
+    }
+
+    private static Stream<Choice> options(Game game, Player seat) {
         int spendable = ProductionPlanner.spendableResources(game, seat);
-        int planetResources = Optional.ofNullable(Helper.getPlayerResourcesAvailable(seat, game))
-                .orElse(0);
-        int freeResources = Math.min(spendable, planetResources);
         return ButtonHelper.getTilesOfPlayersSpecificUnits(game, seat, UnitType.Spacedock).stream()
                 .distinct()
                 .flatMap(tile -> ProductionPlanner.oneShipOptions(game, seat, tile, spendable).stream()
-                        .map(order -> new Choice(tile.getPosition(), order)))
-                .filter(choice -> netValue(choice, freeResources) > 0)
-                .max(Comparator.comparingDouble(choice -> netValue(choice, freeResources)));
+                        .map(order -> new Choice(tile.getPosition(), order)));
+    }
+
+    private static int freeResources(Game game, Player seat) {
+        int planetResources = Optional.ofNullable(Helper.getPlayerResourcesAvailable(seat, game))
+                .orElse(0);
+        return Math.min(ProductionPlanner.spendableResources(game, seat), planetResources);
     }
 
     private static double netValue(Choice choice, int freeResources) {

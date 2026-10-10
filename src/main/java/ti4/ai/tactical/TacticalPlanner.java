@@ -50,7 +50,8 @@ public class TacticalPlanner {
     private static final double LAST_HOME_SHIP_COST = 1.5;
     private static final double TECH_STEAL_VALUE = 3.0;
     private static final double PLANET_TEMPO_VALUE = 0.8;
-    private static final double FRONTIER_EXPLORE_VALUE = 1.5;
+    private static final double FRONTIER_CARD_VALUE = 1.5;
+    private static final double FRONTIER_POSITION_VALUE = 1.0;
     private static final String DARK_ENERGY_TAP = "det";
     private static final int LAST_EARLY_ROUND = 4;
     private static final double EARLY_GAME_FADE_PER_ROUND = 0.25;
@@ -582,7 +583,7 @@ public class TacticalPlanner {
     private static double frontierExplore(Player seat, Tile tile) {
         if (!seat.hasTech(DARK_ENERGY_TAP) || BoardView.hasOwnShips(seat, tile)) return 0;
         boolean frontier = BoardView.space(tile).getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
-        return frontier ? FRONTIER_EXPLORE_VALUE : 0;
+        return frontier ? FRONTIER_CARD_VALUE + FRONTIER_POSITION_VALUE : 0;
     }
 
     private static Optional<TacticalPlan> groupPosition(Context context, Tile tile, Tile origin) {

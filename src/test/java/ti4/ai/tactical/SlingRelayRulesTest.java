@@ -12,6 +12,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.PaymentRules;
+import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
@@ -83,5 +84,33 @@ class SlingRelayRulesTest extends BaseTi4Test {
                 prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
 
         assertThat(SlingRelayRules.start(test.context(turn), List.of(turn))).isEmpty();
+    }
+
+    // Mid-round, Sling Relay is an action of its own. With no tactic token left there is no tactical action to take,
+    // so it adds a ship and waits to see what the others do.
+    @Test
+    void stallsWithSlingRelayWhenNoTacticalActionIsWorthIt() {
+        test.nekro.setTacticalCC(0);
+        AiPrompt turn =
+                prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_nekro_tacticalAction", "FFCC_nekro_componentAction");
+
+        assertThat(pressedId(SlingRelayRules.insteadOfTacticalAction(test.context(turn), List.of(turn))
+                        .orElseThrow()))
+                .isEqualTo("FFCC_nekro_componentAction");
+    }
+
+    // A free planet next door is worth more than a ship and a stall, so the tactical action goes first.
+    @Test
+    void takesAWorthwhileTacticalActionFirst() {
+        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        AiPrompt turn =
+                prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_nekro_tacticalAction", "FFCC_nekro_componentAction");
+
+        assertThat(SlingRelayRules.insteadOfTacticalAction(test.context(turn), List.of(turn)))
+                .isEmpty();
     }
 }

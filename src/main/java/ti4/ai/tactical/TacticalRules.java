@@ -17,12 +17,14 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.CeasefireRules;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.ProductionPlanner.BuildOrder;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
+import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.ai.tech.TechRules;
 import ti4.game.Game;
@@ -46,6 +48,7 @@ public class TacticalRules {
     static final String SECOND_ACTION_KEY = "secondAction|";
     private static final String SECOND_ACTION_SUFFIX = "#2";
     private static final String FLEET_LOGISTICS = "fl";
+    private static final double URGENT_SCORE = 0.75 * ObjectiveValue.VICTORY_POINT_VALUE;
     private static final String TACTICAL_ACTION = "tacticalAction";
     private static final String ANOTHER_ACTION = "doAnotherAction";
     private static final String FIELD = "|";
@@ -95,7 +98,7 @@ public class TacticalRules {
         if (secondActionStarted(context)) return pickingSecondSystem(context) ? start(context) : Optional.empty();
         if (!actionTaken(context) || inProgress(context.game(), context.seat())) return Optional.empty();
         Optional<TacticalPlan> plan = TacticalPlanner.best(context.game(), context.seat());
-        if (plan.isEmpty() || plan.get().score() < TacticalPlanner.MIN_SCORE) return Optional.empty();
+        if (plan.isEmpty() || !urgent(plan.get())) return Optional.empty();
         Optional<Match> again = Prompts.owned(thisTurn, context.faction(), TACTICAL_ACTION::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         if (again.isEmpty()) {
@@ -107,6 +110,10 @@ public class TacticalRules {
         context.memory().put(PLAN_KEY + actionKey(context), plan.get().encode());
         return Optional.of(
                 again.get().press("take a second tactical action with Fleet Logistics: " + describe(plan.get())));
+    }
+
+    private static boolean urgent(TacticalPlan plan) {
+        return plan.kind() == Kind.ATTACK || plan.score() >= URGENT_SCORE;
     }
 
     private static boolean pickingSecondSystem(AiTurnContext context) {

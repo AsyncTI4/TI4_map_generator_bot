@@ -123,11 +123,15 @@ to build one by hand:
     always, the rest only with nothing to save for scoring or Leadership); Predictive Intelligence's 3 votes on top
     of its planets (`AgendaVoting`); AI Development Algorithm as a production discount when it has 2 or more unit
     upgrades (or cannot research), and exhausted when a unit upgrade it researches needed its prerequisite skip
-    (`StrategyCardRules`); Sling Relay before passing (`SlingRelayRules`): the ship worth most at one of its docks
-    (a destroyer at least), weighing any trade goods it would spend against the ship and the extra action of
-    waiting; Fleet Logistics: after its first action it takes a second tactical action when one is worth a token,
-    otherwise plays its strategy card, keeping each action's plan separate; Dark Energy Tap: a spare ship is worth
-    sending to a system with a frontier token (worth 1.5) and it widens retreats; Production Biomes' 4 trade goods
+    (`StrategyCardRules`); Sling Relay (`SlingRelayRules`) as an action of its own whenever it beats the best
+    tactical plan: the ship's value less what its resources could buy elsewhere, plus 1.5 for waiting to see what
+    the others do and 1.0 more for an unlocked ship an objective wants (a destroyer at least); before passing it
+    also adds a ship, since unspent planets are wasted, weighing any trade goods against the ship and the stall;
+    Fleet Logistics plays slowly: a second tactical action only for an attack or a plan worth most of a point, a
+    second strategic action only for Imperial when it scores right away; with Thunder's Edge Warfare it attacks with
+    Warfare first (no command token), leaving the same ships free for the follow-up; each action keeps its own plan;
+    Dark Energy Tap: a spare ship is worth sending to a system with a frontier token (1.5 for the card, 1.0 for the
+    position, the stall and later edge-of-map objectives) and it widens retreats; Production Biomes' 4 trade goods
     instead of passing while it has a strategy token to
     spare (the other 2 to the player furthest behind); Nullification Field when the player activating a system
     with its ships could bring in a bigger fleet; Neural Parasite against the leader, on a planet rather than in space

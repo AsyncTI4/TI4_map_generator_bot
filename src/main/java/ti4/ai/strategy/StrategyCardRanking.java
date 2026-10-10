@@ -89,6 +89,11 @@ public class StrategyCardRanking {
         return hasRoomForSecret(seat) ? value + SECRET_DRAW_VALUE : value;
     }
 
+    public static boolean imperialScoresNow(Game game, Player seat) {
+        return seat.controlsMecatol(true)
+                || !ObjectivePolicy.scorablePublics(game, seat).isEmpty();
+    }
+
     private static double extraPublicScore(Game game, Player seat) {
         List<String> scorable = ObjectivePolicy.scorablePublics(game, seat);
         long free =

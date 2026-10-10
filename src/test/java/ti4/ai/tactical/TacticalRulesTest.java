@@ -501,12 +501,16 @@ class TacticalRulesTest extends BaseTi4Test {
         units.put(Units.getUnitKey(type, "black"), states);
     }
 
-    // With Fleet Logistics the bot offers a second action once the first is done. The AI plans again (Lodor is
-    // still free), starts the second tactical action, and then picks its system even though the first action's
-    // system is still the active one and the bot has reset its tactical-action flags.
+    // With Fleet Logistics the bot offers a second action once the first is done. Taking it is only worth it when
+    // something is urgent: Sol's lone infantry on Lodor is a target to hit now. The AI starts the second tactical
+    // action, then picks its system even though the first action's system is still the active one and the bot has
+    // reset its tactical-action flags.
     @Test
-    void takesASecondTacticalActionWithFleetLogistics() {
+    void takesASecondTacticalActionWithFleetLogisticsToAttack() {
         test.nekro.addTech("fl");
+        test.sol.addPlanet("lodor");
+        test.units(test.game.getTileByPosition(target), "lodor", test.sol, UnitType.Infantry, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         String firstTarget = "105";
         test.game.setActiveSystem(firstTarget);
         test.game.setStoredValue("currentActionSummarynekro", " Activated " + firstTarget + ".");
@@ -527,6 +531,23 @@ class TacticalRulesTest extends BaseTi4Test {
         assertThat(TacticalRules.inProgress(picking)).isFalse();
         assertThat(TacticalRules.pickingSystem(picking)).isTrue();
         assertThat(pressedId(TacticalRules.start(picking).orElseThrow())).isEqualTo("ringTile_" + target);
+    }
+
+    // A free planet next door is not urgent: it can wait for the next turn, so the seat plays slowly and ends its
+    // turn instead of spending Fleet Logistics' second action.
+    @Test
+    void playsSlowlyWithoutAnUrgentSecondAction() {
+        test.nekro.addTech("fl");
+        test.game.setActiveSystem("105");
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 105.");
+        test.game.setStoredValue("gameEventTacticalLogged", "yes");
+        AiPrompt first = prompt("first", PromptSource.PUBLIC, NOW, "FFCC_nekro_tacticalAction");
+        AiPrompt after = prompt(
+                "after", PromptSource.PUBLIC, NOW + 10, "FFCC_nekro_tacticalAction", "FFCC_nekro_endOfTurnAbilities");
+        AiTurnContext afterFirst = test.context(Set.of("first|FFCC_nekro_tacticalAction"), first, after);
+
+        assertThat(TacticalRules.secondAction(afterFirst, Prompts.thisTurn(afterFirst)))
+                .isEmpty();
     }
 
     // Without Fleet Logistics the turn ends after one action.

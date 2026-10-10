@@ -301,7 +301,7 @@ public class ProductionPlanner {
         return BoardView.model(seat, type).map(UnitModel::getIsUpgrade).orElse(false);
     }
 
-    private static double fillerValuePerResource(Game game) {
+    static double fillerValuePerResource(Game game) {
         return FILLER_VALUE_PER_RESOURCE - EARLY_FILLER_DISCOUNT * TacticalPlanner.earlyGameWeight(game);
     }
 
