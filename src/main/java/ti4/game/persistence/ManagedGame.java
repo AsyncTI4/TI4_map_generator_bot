@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -13,8 +14,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
 import ti4.game.Game;
-import ti4.helpers.FoWHelper;
 
 @Getter
 public class ManagedGame {
@@ -48,46 +49,58 @@ public class ManagedGame {
     private final Map<ManagedPlayer, Boolean> playerToIsReal;
 
     public ManagedGame(Game game) {
-        name = game.getName();
-        hasEnded = game.isHasEnded();
-        hasWinner = game.hasWinner();
-        vpGoalReached =
-                game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
-        fowMode = game.isFowMode();
-        factionReactMode = game.isBotFactionReacts();
-        twilightsFallMode = game.isTwilightsFallMode();
-        colorReactMode = game.isBotColorReacts();
-        stratReactMode = game.isBotStratReacts();
-        fastScFollowMode = game.isFastSCFollowMode();
-        fogQol01 = FoWHelper.isFogQol01(game);
-        injectRules = game.isInjectRulesLinks();
-        creationDateTime = game.getCreationDateTime();
-        lastModifiedDate = game.getLastModifiedDate();
-        activePlayerId = sanitizeToNull(game.getActivePlayerID());
-        lastActivePlayerChange = game.getLastActivePlayerChange() == null
-                ? 0
-                : game.getLastActivePlayerChange().getTime();
-        endedDate = game.getEndedDate();
-        round = game.getRound();
-        guild = game.getGuild();
-        mainGameChannel = game.getMainGameChannel();
-        tableTalkChannel = game.getTableTalkChannel();
-        launchPostThread = game.getLaunchPostThread();
-
-        players = game.getPlayers().values().stream()
-                .map(p -> GameManager.addOrMergePlayer(this, p))
-                .collect(toUnmodifiableSet());
-        playerToIsReal = game.getPlayers().values().stream()
-                .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()),
-                        p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
+        this(ManagedGameState.of(game));
     }
 
-    private static String sanitizeToNull(String str) {
-        if (StringUtils.isBlank(str) || "null".equalsIgnoreCase(str)) {
-            return null;
+    public ManagedGame(ManagedGameState state) {
+        name = state.name();
+        hasEnded = state.hasEnded();
+        hasWinner = state.hasWinner();
+        vpGoalReached = state.vpGoalReached();
+        fowMode = state.fowMode();
+        factionReactMode = state.factionReactMode();
+        twilightsFallMode = state.twilightsFallMode();
+        colorReactMode = state.colorReactMode();
+        stratReactMode = state.stratReactMode();
+        fastScFollowMode = state.fastScFollowMode();
+        fogQol01 = state.fogQol01();
+        injectRules = state.injectRules();
+        creationDateTime = state.creationDateTime();
+        lastModifiedDate = state.lastModifiedDate();
+        activePlayerId = state.activePlayerId();
+        lastActivePlayerChange = state.lastActivePlayerChange();
+        endedDate = state.endedDate();
+        round = state.round();
+        mainGameChannel = findById(state.mainGameChannelId(), id -> JdaService.jda.getTextChannelById(id));
+        tableTalkChannel = findById(state.tableTalkChannelId(), id -> JdaService.jda.getTextChannelById(id));
+        guild = findGuild(state.guildId(), mainGameChannel, tableTalkChannel);
+        launchPostThread = findById(state.launchPostThreadId(), ManagedGame::findPrimaryGuildThread);
+
+        players = state.participants().stream()
+                .map(participant -> GameManager.addOrMergePlayer(this, participant))
+                .collect(toUnmodifiableSet());
+        playerToIsReal = state.participants().stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        participant -> getPlayer(participant.userId()), ManagedGameState.Participant::realPlayer));
+    }
+
+    private static <T> T findById(String id, Function<String, T> lookup) {
+        if (JdaService.jda == null || !StringUtils.isNumeric(id)) return null;
+        return lookup.apply(id);
+    }
+
+    private static Guild findGuild(String guildId, TextChannel mainGameChannel, TextChannel tableTalkChannel) {
+        if (JdaService.jda != null && StringUtils.isNumeric(guildId)) {
+            return JdaService.jda.getGuildById(guildId);
         }
-        return str;
+        if (mainGameChannel != null) return mainGameChannel.getGuild();
+        if (tableTalkChannel != null) return tableTalkChannel.getGuild();
+        return null;
+    }
+
+    private static ThreadChannel findPrimaryGuildThread(String id) {
+        if (JdaService.guildPrimary == null) return null;
+        return JdaService.guildPrimary.getThreadChannelById(id);
     }
 
     @Nullable

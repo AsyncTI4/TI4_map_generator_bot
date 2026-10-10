@@ -6,8 +6,13 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import ti4.game.persistence.ManagedGameState;
 
-public record PersistedGameState(GameColumns game, List<PlayerRow> players, List<TitleRow> titles) {
+public record PersistedGameState(
+        GameColumns game,
+        List<PlayerRow> players,
+        List<ManagedGameState.Participant> participants,
+        List<TitleRow> titles) {
 
     public record GameColumns(
             String gameName,
@@ -28,7 +33,27 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
             boolean twilightImperiumGlobalLeague,
             boolean twilightImperiumGlobalLeagueFractured,
             String twilightImperiumGlobalLeagueRank,
-            int playerCount) {}
+            int playerCount,
+            boolean statisticsIgnored,
+            boolean ended,
+            boolean winner,
+            boolean victoryPointGoalReached,
+            boolean fogOfWarMode,
+            boolean fogQol01,
+            boolean factionReactMode,
+            boolean colorReactMode,
+            boolean strategyCardReactMode,
+            boolean fastStrategyCardFollowMode,
+            boolean injectRulesLinks,
+            long lastModifiedEpochMilliseconds,
+            long gameFileModifiedEpochMilliseconds,
+            long gameFileSizeBytes,
+            String activePlayerUserId,
+            long lastActivePlayerChangeEpochMilliseconds,
+            String guildId,
+            String mainGameChannelId,
+            String tableTalkChannelId,
+            String launchPostThreadId) {}
 
     public record PlayerRow(
             String userId,
@@ -45,19 +70,30 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     public record TitleRow(String userId, String title) {}
 
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
-        return of(snapshot.game(), snapshot.game().getPlayers(), snapshot.titles());
+        List<ManagedGameState.Participant> participants = snapshot.game().getParticipants().stream()
+                .map(participant -> new ManagedGameState.Participant(
+                        participant.getUserId(), participant.getUserName(), participant.isRealPlayer()))
+                .toList();
+        return of(snapshot.game(), snapshot.game().getPlayers(), participants, snapshot.titles());
     }
 
-    static PersistedGameState of(GameEntity game, Collection<PlayerEntity> players, Collection<TitleEntity> titles) {
+    static PersistedGameState of(
+            GameEntity game,
+            Collection<PlayerEntity> players,
+            Collection<ManagedGameState.Participant> participants,
+            Collection<TitleEntity> titles) {
         List<PlayerRow> playerRows = players.stream()
                 .map(PersistedGameState::toPlayerRow)
                 .sorted(Comparator.comparing(PlayerRow::toString))
+                .toList();
+        List<ManagedGameState.Participant> participantRows = participants.stream()
+                .sorted(Comparator.comparing(ManagedGameState.Participant::toString))
                 .toList();
         List<TitleRow> titleRows = titles.stream()
                 .map(title -> new TitleRow(title.getUser().getId(), title.getTitle()))
                 .sorted(Comparator.comparing(TitleRow::toString))
                 .toList();
-        return new PersistedGameState(toGameColumns(game), playerRows, titleRows);
+        return new PersistedGameState(toGameColumns(game), playerRows, participantRows, titleRows);
     }
 
     public List<String> describeDifferencesFrom(PersistedGameState actual) {
@@ -68,6 +104,9 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
         }
         if (!players.equals(actual.players)) {
             differences.add(describeRowDifference("player", players, actual.players));
+        }
+        if (!participants.equals(actual.participants)) {
+            differences.add(describeRowDifference("participant", participants, actual.participants));
         }
         if (!titles.equals(actual.titles)) {
             differences.add(describeRowDifference("title", titles, actual.titles));
@@ -121,7 +160,27 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
                 game.isTwilightImperiumGlobalLeague(),
                 game.isTwilightImperiumGlobalLeagueFractured(),
                 game.getTwilightImperiumGlobalLeagueRank(),
-                game.getPlayerCount());
+                game.getPlayerCount(),
+                game.isStatisticsIgnored(),
+                game.isEnded(),
+                game.isWinner(),
+                game.isVictoryPointGoalReached(),
+                game.isFogOfWarMode(),
+                game.isFogQol01(),
+                game.isFactionReactMode(),
+                game.isColorReactMode(),
+                game.isStrategyCardReactMode(),
+                game.isFastStrategyCardFollowMode(),
+                game.isInjectRulesLinks(),
+                game.getLastModifiedEpochMilliseconds(),
+                game.getGameFileModifiedEpochMilliseconds(),
+                game.getGameFileSizeBytes(),
+                game.getActivePlayerUserId(),
+                game.getLastActivePlayerChangeEpochMilliseconds(),
+                game.getGuildId(),
+                game.getMainGameChannelId(),
+                game.getTableTalkChannelId(),
+                game.getLaunchPostThreadId());
     }
 
     private static PlayerRow toPlayerRow(PlayerEntity player) {

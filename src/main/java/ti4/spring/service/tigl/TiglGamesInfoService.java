@@ -32,7 +32,8 @@ public class TiglGamesInfoService {
     @Transactional(readOnly = true)
     public String getOngoingGamesByRankMessage(boolean showGameIds) {
         List<GameEntity> ongoingTiglGames =
-                gameEntityRepository.findByTwilightImperiumGlobalLeagueTrueAndEndedEpochMillisecondsIsNull();
+                gameEntityRepository
+                        .findByTwilightImperiumGlobalLeagueTrueAndStatisticsIgnoredFalseAndEndedEpochMillisecondsIsNull();
 
         List<ParsedTiglGame> parsedGames = ongoingTiglGames.stream()
                 .map(game -> {

@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.GameFileStamp;
+import ti4.game.persistence.ManagedGameState;
 import ti4.helpers.TIGLHelper;
 import ti4.service.map.FractureService;
 
@@ -18,30 +20,72 @@ public class GameEntityMapper {
 
     static final String UNKNOWN_USER_PREFIX = "UNKNOWN USER ";
     private static final String TITLES_KEY_PREFIX = "TitlesFor";
-    private static final int MINIMUM_PERSISTED_PLAYER_COUNT = 3;
+    private static final int MINIMUM_STATISTICS_PLAYER_COUNT = 3;
 
-    public static boolean shouldPersist(Game game) {
-        return game.getRealAndEliminatedPlayers().size() >= MINIMUM_PERSISTED_PLAYER_COUNT;
+    public static GameEntitySnapshot toSnapshot(Game game, GameFileStamp gameFileStamp) {
+        return toSnapshot(game, ManagedGameState.of(game), gameFileStamp);
     }
 
-    public static GameEntitySnapshot toSnapshot(Game game) {
+    public static GameEntitySnapshot toSnapshot(
+            Game game, ManagedGameState managedGameState, GameFileStamp gameFileStamp) {
         Map<String, UserEntity> users = new LinkedHashMap<>();
-        GameEntity gameEntity = toGameEntity(game, users);
+        GameEntity gameEntity = toGameEntity(game, managedGameState, gameFileStamp);
+        if (gameEntity.isStatisticsIgnored()) {
+            return new GameEntitySnapshot(gameEntity, List.of(), List.of());
+        }
+        for (Player player : game.getRealAndEliminatedPlayers()) {
+            gameEntity.getPlayers().add(toPlayerEntity(player, gameEntity, users));
+        }
         List<TitleEntity> titles = toTitleEntities(game, gameEntity, users);
         return new GameEntitySnapshot(gameEntity, List.copyOf(users.values()), titles);
+    }
+
+    public static PersistedManagedGame toPersistedManagedGame(
+            GameEntity gameEntity, List<ManagedGameState.Participant> participants) {
+        var state = new ManagedGameState(
+                gameEntity.getGameName(),
+                gameEntity.isEnded(),
+                gameEntity.isWinner(),
+                gameEntity.isVictoryPointGoalReached(),
+                gameEntity.isFogOfWarMode(),
+                gameEntity.isFactionReactMode(),
+                gameEntity.isTwilightsFall(),
+                gameEntity.isColorReactMode(),
+                gameEntity.isStrategyCardReactMode(),
+                gameEntity.isFastStrategyCardFollowMode(),
+                gameEntity.isFogQol01(),
+                gameEntity.isInjectRulesLinks(),
+                gameEntity.getCreationEpochMilliseconds(),
+                gameEntity.getLastModifiedEpochMilliseconds(),
+                gameEntity.getActivePlayerUserId(),
+                gameEntity.getLastActivePlayerChangeEpochMilliseconds(),
+                Objects.requireNonNullElse(gameEntity.getEndedEpochMilliseconds(), 0L),
+                gameEntity.getRound(),
+                gameEntity.getGuildId(),
+                gameEntity.getMainGameChannelId(),
+                gameEntity.getTableTalkChannelId(),
+                gameEntity.getLaunchPostThreadId(),
+                participants);
+        var gameFileStamp =
+                new GameFileStamp(gameEntity.getGameFileModifiedEpochMilliseconds(), gameEntity.getGameFileSizeBytes());
+        return new PersistedManagedGame(state, gameFileStamp);
     }
 
     static boolean hasUnknownName(UserEntity user) {
         return user.getName().startsWith(UNKNOWN_USER_PREFIX);
     }
 
-    private static GameEntity toGameEntity(Game game, Map<String, UserEntity> users) {
+    private static boolean countsForStatistics(Game game) {
+        return game.getRealAndEliminatedPlayers().size() >= MINIMUM_STATISTICS_PLAYER_COUNT;
+    }
+
+    private static GameEntity toGameEntity(Game game, ManagedGameState managedGameState, GameFileStamp gameFileStamp) {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
-        gameEntity.setRound(game.getRound());
+        gameEntity.setRound(managedGameState.round());
         gameEntity.setVictoryPointGoal(game.getVp());
-        gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());
-        gameEntity.setEndedEpochMilliseconds(getEndedDate(game));
+        gameEntity.setCreationEpochMilliseconds(managedGameState.creationDateTime());
+        gameEntity.setEndedEpochMilliseconds(toNullableEpochMilliseconds(managedGameState.endedDate()));
         gameEntity.setCompleted(game.getWinner().isPresent() && game.isHasEnded());
         gameEntity.setFractureInPlay(FractureService.isFractureInPlay(game));
         gameEntity.setHomebrew(game.isHomebrew());
@@ -58,18 +102,50 @@ public class GameEntityMapper {
                         : game.getMinimumTIGLRankAtGameStart().toString());
         gameEntity.setProphecyOfKings(game.isProphecyOfKings());
         gameEntity.setThundersEdge(game.isThundersEdge());
-        gameEntity.setTwilightsFall(game.isTwilightsFallMode());
+        gameEntity.setTwilightsFall(managedGameState.twilightsFallMode());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
-
-        for (Player player : game.getRealAndEliminatedPlayers()) {
-            gameEntity.getPlayers().add(toPlayerEntity(player, gameEntity, users));
-        }
+        gameEntity.setStatisticsIgnored(!countsForStatistics(game));
+        gameEntity.setGameFileModifiedEpochMilliseconds(gameFileStamp.lastModifiedEpochMilliseconds());
+        gameEntity.setGameFileSizeBytes(gameFileStamp.sizeBytes());
+        setManagedGameColumns(gameEntity, managedGameState);
         return gameEntity;
     }
 
-    private static Long getEndedDate(Game game) {
-        long endedDate = game.getEndedDate();
-        return endedDate == 0 ? null : endedDate;
+    private static void setManagedGameColumns(GameEntity gameEntity, ManagedGameState managedGameState) {
+        gameEntity.setEnded(managedGameState.hasEnded());
+        gameEntity.setWinner(managedGameState.hasWinner());
+        gameEntity.setVictoryPointGoalReached(managedGameState.vpGoalReached());
+        gameEntity.setFogOfWarMode(managedGameState.fowMode());
+        gameEntity.setFogQol01(managedGameState.fogQol01());
+        gameEntity.setFactionReactMode(managedGameState.factionReactMode());
+        gameEntity.setColorReactMode(managedGameState.colorReactMode());
+        gameEntity.setStrategyCardReactMode(managedGameState.stratReactMode());
+        gameEntity.setFastStrategyCardFollowMode(managedGameState.fastScFollowMode());
+        gameEntity.setInjectRulesLinks(managedGameState.injectRules());
+        gameEntity.setLastModifiedEpochMilliseconds(managedGameState.lastModifiedDate());
+        gameEntity.setActivePlayerUserId(managedGameState.activePlayerId());
+        gameEntity.setLastActivePlayerChangeEpochMilliseconds(managedGameState.lastActivePlayerChange());
+        gameEntity.setGuildId(managedGameState.guildId());
+        gameEntity.setMainGameChannelId(managedGameState.mainGameChannelId());
+        gameEntity.setTableTalkChannelId(managedGameState.tableTalkChannelId());
+        gameEntity.setLaunchPostThreadId(managedGameState.launchPostThreadId());
+        for (ManagedGameState.Participant participant : managedGameState.participants()) {
+            gameEntity.getParticipants().add(toParticipantEntity(participant, gameEntity));
+        }
+    }
+
+    private static GameParticipantEntity toParticipantEntity(
+            ManagedGameState.Participant participant, GameEntity gameEntity) {
+        var participantEntity = new GameParticipantEntity();
+        participantEntity.setGame(gameEntity);
+        participantEntity.setUserId(participant.userId());
+        participantEntity.setUserName(participant.userName());
+        participantEntity.setRealPlayer(participant.realPlayer());
+        return participantEntity;
+    }
+
+    private static Long toNullableEpochMilliseconds(long epochMilliseconds) {
+        return epochMilliseconds == 0 ? null : epochMilliseconds;
     }
 
     private static PlayerEntity toPlayerEntity(Player player, GameEntity gameEntity, Map<String, UserEntity> users) {

@@ -93,6 +93,10 @@ class GameLoadService {
         }
     }
 
+    static GameFileStamp getGameFileStamp(String gameName) {
+        return GameFileStamp.of(Storage.getGameFile(gameName + GAME_FILE_EXTENSION));
+    }
+
     @Nullable
     public static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
