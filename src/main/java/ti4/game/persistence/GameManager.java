@@ -113,7 +113,7 @@ public class GameManager {
         GameDatabaseSyncPipeline.queueSync(game);
 
         gameNames.add(game.getName());
-        gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        replaceManagedGame(game);
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -150,8 +150,24 @@ public class GameManager {
         var managedGame = gameNameToManagedGame.get(game.getName());
         if (managedGame == null || !managedGame.matches(game)) {
             gameNames.add(game.getName());
-            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+            replaceManagedGame(game);
         }
+    }
+
+    private static void replaceManagedGame(Game game) {
+        gameNameToManagedGame.compute(game.getName(), (_, previousManagedGame) -> {
+            ManagedGame managedGame = new ManagedGame(game);
+            if (previousManagedGame != null) {
+                removeGameFromDepartedPlayers(previousManagedGame, managedGame);
+            }
+            return managedGame;
+        });
+    }
+
+    private static void removeGameFromDepartedPlayers(ManagedGame previousManagedGame, ManagedGame managedGame) {
+        previousManagedGame.getPlayers().stream()
+                .filter(player -> !managedGame.hasPlayer(player.getId()))
+                .forEach(player -> player.removeGame(managedGame.getName()));
     }
 
     @Nullable
