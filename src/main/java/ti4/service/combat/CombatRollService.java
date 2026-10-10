@@ -1103,7 +1103,12 @@ public class CombatRollService {
                         if (!bombardPlanet.isEmpty()
                                 && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                             if (p2.isRealPlayer()) {
-                                List<Button> targetButtons = new ArrayList<>(buttons);
+                                List<Button> targetButtons = new ArrayList<>();
+                                targetButtons.add(Buttons.green(
+                                        p2.factionButtonChecker()
+                                                + AutoAssignGroundHitsButtonIds.format(bombardPlanet, h),
+                                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                targetButtons.addAll(buttons);
                                 List<Button> stingOfTheHiveButtons =
                                         XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                                                 game, player, tile, CombatRollType.bombardment, p2, h);

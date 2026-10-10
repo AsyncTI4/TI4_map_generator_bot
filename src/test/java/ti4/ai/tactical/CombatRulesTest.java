@@ -113,6 +113,21 @@ class CombatRulesTest extends BaseTi4Test {
         assertThat(CombatRules.next(test.context(theirs))).isEmpty();
     }
 
+    // On its own tactical action its PDS on Lodor covers the system, so it fires at the defending cruiser before the
+    // space combat.
+    @Test
+    void firesItsOwnSpaceCannonWhenAttacking() {
+        Tile tile = test.game.getTileByPosition(position);
+        test.nekro.addPlanet("lodor");
+        test.units(tile, "lodor", test.nekro, UnitType.Pds, 1);
+        test.game.setActiveSystem(position);
+        AiPrompt cannon =
+                prompt("cannon", PromptSource.PUBLIC, NOW, "combatRoll_" + position + "_space_spacecannonoffence");
+
+        assertThat(pressedId(CombatRules.next(test.context(cannon)).orElseThrow()))
+                .isEqualTo("combatRoll_" + position + "_space_spacecannonoffence");
+    }
+
     @Test
     void firesAntiFighterBarrageOnceWithDestroyersAgainstFighters() {
         Tile tile = test.game.getTileByPosition(position);

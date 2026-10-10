@@ -298,6 +298,63 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.map(TacticalPlan::target)).contains(neighbour);
     }
 
+    // The same coin flip as above, but a PDS II at home covers Lodor (Deep Space Cannon): its expected hit removes
+    // the destroyer before the space combat, so the attack is safe without any fighters.
+    @Test
+    void countsItsOwnSpaceCannonWhenAttacking() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "space", test.sol, UnitType.Destroyer, 1);
+        assertThat(attackOn(neighbour)).isEmpty();
+
+        test.nekro.removeOwnedUnitByID("pds");
+        test.nekro.addOwnedUnitByID("pds2");
+        test.units(home, "mordaiii", test.nekro, UnitType.Pds, 1);
+
+        assertThat(attackOn(neighbour)).isPresent();
+    }
+
+    // Destroyer II's barrage (3 dice on 6 each) is expected to shoot down all three of Sol's fighters before the
+    // combat, leaving a lone carrier. Plain destroyers (2 dice on 9) only get one, and the fight stays even.
+    @Test
+    void countsAntiFighterBarrageBeforeTheSpaceCombat() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 3);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "space", test.sol, UnitType.Carrier, 1);
+        test.units(lodor, "space", test.sol, UnitType.Fighter, 3);
+        test.nekro.setFleetCC(5);
+        assertThat(attackOn(neighbour)).isEmpty();
+
+        test.nekro.removeOwnedUnitByID("destroyer");
+        test.nekro.addOwnedUnitByID("destroyer2");
+
+        assertThat(attackOn(neighbour)).isPresent();
+    }
+
+    // A damaged dreadnought can no longer sustain damage, but it still fights: two of the three dreadnoughts are
+    // damaged, one stays home as the guard, and the other two join the attack instead of waiting for repairs.
+    @Test
+    void bringsDamagedShipsIntoAnAttack() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
+        home.addUnitDamage("space", ti4.helpers.Units.getUnitKey(UnitType.Dreadnought, test.nekro.getColor()), 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.nekro.setFleetCC(5);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "space", test.sol, UnitType.Destroyer, 1);
+
+        TacticalPlan plan = attackOn(neighbour).orElseThrow();
+
+        assertThat(plan.moves()).contains(new UnitMove(AiTestGame.HOME, "space", UnitType.Dreadnought, 2));
+    }
+
     // Infantry are worth building while the dock is short of a carrier load; beyond that they are filler, so the same
     // four infantry score less once the home system already holds spares.
     @Test

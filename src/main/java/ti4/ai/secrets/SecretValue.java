@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.TechnologyModel;
+import ti4.service.combat.CombatRollType;
 import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
@@ -108,6 +109,7 @@ public class SecretValue {
             case "dtgs" -> enemyHeavyShipsExist(game, seat) ? 0.35 : 0.1;
             case "fwp" -> hasOnBoard(game, seat, "dd") ? 0.25 : 0.1;
             case "ttfd" -> hasOnBoard(game, seat, "pds") ? 0.25 : 0.05;
+            case "mew" -> hasBombardmentShips(game, seat) ? 0.3 : 0.15;
             case "bam" -> 0.1;
             default -> 0.05;
         };
@@ -115,6 +117,14 @@ public class SecretValue {
 
     private static boolean hasOnBoard(Game game, Player seat, String asyncId) {
         return ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, asyncId) > 0;
+    }
+
+    private static boolean hasBombardmentShips(Game game, Player seat) {
+        return BoardView.MOVING_SHIPS.stream()
+                .map(seat::getUnitByType)
+                .filter(model ->
+                        model != null && model.getCombatDieCountForAbility(CombatRollType.bombardment, seat) > 0)
+                .anyMatch(model -> hasOnBoard(game, seat, model.getAsyncId()));
     }
 
     private static boolean enemyHeavyShipsExist(Game game, Player seat) {

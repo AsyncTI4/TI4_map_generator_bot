@@ -37,6 +37,8 @@ public class ActionSecretRules {
     private static final String MARTYR = "bam";
     private static final String DUST = "ttfd";
     private static final String CANNON_KEY = "cannonWatch|";
+    private static final String MAKE_AN_EXAMPLE = "mew";
+    private static final String BOMBARD_KEY = "bombardWatch|";
     private static final String FIELD = "~";
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final List<String> COMBAT_SECRETS = List.of("dtgs", "uf", "dts", "btv", "sar", "baf", "fwp", "dyp");
@@ -129,8 +131,10 @@ public class ActionSecretRules {
 
     public static void watchSpaceCannon(AiTurnContext context, String position) {
         Game game = context.game();
-        Player target = game.getActivePlayer();
         Tile tile = game.getTileByPosition(position);
+        Player target = game.getActivePlayer() == context.seat() && tile != null
+                ? opponentIn(game, context.seat(), tile, BoardView.space(tile))
+                : game.getActivePlayer();
         if (target == null
                 || tile == null
                 || !context.seat().getSecretsUnscored().containsKey(DUST)) return;
@@ -141,6 +145,39 @@ public class ActionSecretRules {
             context.memory()
                     .put(CANNON_KEY + game.getRound(), context.turnKey() + "|" + position + "|" + target.getFaction());
         }
+    }
+
+    public static void watchBombardment(AiTurnContext context, String position, String planet, Player defender) {
+        if (!context.seat().getSecretsUnscored().containsKey(MAKE_AN_EXAMPLE)) return;
+        context.memory()
+                .put(
+                        BOMBARD_KEY + context.game().getRound(),
+                        String.join("|", context.turnKey(), position, planet, defender.getFaction()));
+    }
+
+    private static void watchBombardmentResult(AiTurnContext context, Set<String> held) {
+        if (!held.contains(MAKE_AN_EXAMPLE)) return;
+        Game game = context.game();
+        String bombardKey = BOMBARD_KEY + game.getRound();
+        Optional<String> watch = context.memory().get(bombardKey);
+        if (watch.isEmpty()) return;
+        String[] parts = watch.get().split("\\|");
+        Tile tile = parts.length < 4 ? null : game.getTileByPosition(parts[parts.length - 3]);
+        UnitHolder planet = tile == null ? null : tile.getUnitHolders().get(parts[parts.length - 2]);
+        Player defender = parts.length < 4 ? null : game.getPlayerFromColorOrFaction(parts[parts.length - 1]);
+        if (planet == null || defender == null || !watch.get().startsWith(context.turnKey())) {
+            context.memory().remove(bombardKey);
+            return;
+        }
+        Player seat = context.seat();
+        boolean landed = BoardView.groundForces(planet, seat) > 0;
+        if (BoardView.groundForces(planet, defender) > 0) {
+            if (landed) context.memory().remove(bombardKey);
+            return;
+        }
+        context.memory().remove(bombardKey);
+        if (landed && rounds(game, seat, tile.getPosition(), planet.getName()) > 0) return;
+        queue(context, List.of(MAKE_AN_EXAMPLE), "bombard|" + watch.get());
     }
 
     private static void watchCannonResult(AiTurnContext context, Set<String> held) {
@@ -174,6 +211,7 @@ public class ActionSecretRules {
         watchCombats(context, held);
         watchHomePlanets(context, held);
         watchCannonResult(context, held);
+        watchBombardmentResult(context, held);
         return Optional.empty();
     }
 

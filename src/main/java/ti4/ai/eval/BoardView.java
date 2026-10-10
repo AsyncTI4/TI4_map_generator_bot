@@ -60,6 +60,12 @@ public class BoardView {
         return holder == null ? 0 : holder.getUnitCountForState(type, player, UnitState.none);
     }
 
+    public static int damaged(@Nullable UnitHolder holder, Player player, UnitType type) {
+        if (holder == null) return 0;
+        return holder.getUnitCountForState(type, player, UnitState.dmg)
+                + holder.getUnitCountForState(type, player, UnitState.dmg_glv);
+    }
+
     public static int countInTile(Tile tile, Player player, UnitType type) {
         return tile.getUnitHolders().values().stream()
                 .mapToInt(holder -> count(holder, player, type))

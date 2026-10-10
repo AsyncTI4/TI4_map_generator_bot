@@ -95,7 +95,9 @@ to build one by hand:
 - **Decision.** The rules return `Press`, `Unsure`, `Wait` or `Idle`. They handle:
   - strategy card picks, valued by what the card is worth to the seat right now (below);
   - **tactical actions**: choosing a plan, activating the system, moving, landing, exploring, building, paying and ending the turn (below);
-  - **combat**: rolling, anti-fighter barrage, space cannon offense and defense, hit assignment, ground combat automation;
+  - **combat**: rolling, anti-fighter barrage, space cannon offense (also its own PDS and PDS II on its own tactical
+    action) and defense, bombardment before landing, hit assignment with the bot's auto-assign buttons (which use
+    Sustain Damage first), ground combat automation;
   - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat;
   - **strategy card primaries and secondaries** (below), ending its turn and passing;
   - declining whens/afters; **agenda votes**, Nekro's **Galactic Threat** and agenda ties as speaker (below);
@@ -135,7 +137,8 @@ to build one by hand:
       retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round), _Turn
       Their Fleets to Dust_ (its space cannon, and no other player's, destroys an invader's last ships), _Become a
       Martyr_ and _Prove Endurance_. Earned secrets wait in a queue, so two combats in one turn can score two.
-      For _Make an Example of Their World_ it builds ships with bombardment, but it does not bombard yet.
+      _Make an Example of Their World_ scores when its bombardment destroys the last ground forces on a planet
+      before it lands; it builds ships with bombardment for it and keeps the secret while it has some.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
     - It keeps the secrets it can achieve (weighted by how achievable they are for it) and uses Imperial to replace
@@ -311,7 +314,10 @@ to build one by hand:
     modifiers such as Fragile or Unrelenting) give at least 80% in space and on each planet it lands on. It always
     clears enemy ships out of its own home system. It attacks another player's home system only while it holds
     _Darken the Skies_ or _Conquer the Weak_ is unscored, taking the expected space cannon losses off its fleet
-    first; other systems covered by enemy space cannon are avoided. An attack can be worth it for objective
+    first; other systems covered by enemy space cannon are avoided. The odds also count its own space cannon (PDS in
+    the system, PDS II and other deep space cannon next to it) firing first, anti-fighter barrage on both sides, and
+    the expected bombardment hits on the planet the bot will bombard. Damaged ships join attacks but can no longer
+    sustain damage, and damaged defenders cannot either. An attack can be worth it for objective
     progress alone. It also weighs the attack with the fighters at the origin riding along in the fleet's capacity
     (the infantry and mechs to land share what is left) and takes whichever plan scores better; the ground odds use
     the infantry and mechs actually landed.
@@ -394,12 +400,14 @@ list. Today the seams are:
 | `SlashCommandManager` registers `AiCommand` | the `/ai` command |
 | `TestBedService.findNonDeveloper` skips AI seats | test-bed games with an AI can still be reset and scripted |
 
-Three small generic changes don't reference `ti4.ai`:
+Four small generic changes don't reference `ti4.ai`:
 - `GlobalSettings.ImplementedSettings.AI_PLAYERS_ENABLED`, the kill switch.
 - A public `TestBedPress.standInEvent` with a configurable repost header.
 - The Nekro hero's casualty and trade-good report goes to the player's game channel (`getCorrectChannel`) rather
   than the channel the button was pressed in. Nothing changes for humans, but an AI seat presses that button in its
   private thread, where the report's @mentions of the victims could add them to the thread.
+- The bombardment hit prompt offers every defender an "Auto-assign Hits" button (dummy players already had one), so
+  humans and AI seats alike can assign bombardment hits automatically.
 
 ## Testing
 
@@ -442,7 +450,7 @@ Three small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat, Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, economy action cards, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, Sabotage, Make an Example of Their World, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, economy action cards, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, Sabotage, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |

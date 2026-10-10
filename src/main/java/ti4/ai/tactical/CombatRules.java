@@ -109,7 +109,8 @@ public class CombatRules {
     private static Optional<AiDecision> spaceCannonOffence(AiTurnContext context, List<AiPrompt> prompts) {
         Game game = context.game();
         Player active = game.getActivePlayer();
-        if (active == null || active == context.seat()) return Optional.empty();
+        if (active == null) return Optional.empty();
+        boolean attacking = active == context.seat();
         long turnStart = Prompts.turnStart(context);
         for (AiPrompt prompt : prompts) {
             if (prompt.createdAtMillis() < turnStart) continue;
@@ -117,11 +118,13 @@ public class CombatRules {
                 String position = positionOf(roll);
                 String key = "spaceCannon|" + prompt.messageId() + "|" + position;
                 if (context.memory().has(key)) continue;
+                if (attacking && !position.equals(game.getActiveSystem())) continue;
                 if (!ButtonHelper.getPlayersWithPds2Cover(active, game, position)
                         .contains(context.seat())) continue;
                 context.memory().put(key, "pressed");
                 ActionSecretRules.watchSpaceCannon(context, position);
-                return Optional.of(AiDecision.press(prompt, roll, "fire space cannon"));
+                String reason = attacking ? "fire space cannon at the defenders" : "fire space cannon";
+                return Optional.of(AiDecision.press(prompt, roll, reason));
             }
         }
         return Optional.empty();
