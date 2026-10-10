@@ -24,10 +24,12 @@ import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.ProductionPlanner.BuildOrder;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
+import ti4.ai.tech.TechRules;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -52,6 +54,8 @@ public class TacticalRules {
     private static final String DONE_PRODUCING = "Done Producing Units";
     private static final String DONE_EXHAUSTING = "Done Exhausting Planets";
     private static final String SARWEEN = "sarween";
+    private static final String AIDA_EXHAUST = "exhaustTech_aida";
+    private static final String AIDA_DISCOUNT = "aida_";
     private static final int CUSTODIANS_COST = 6;
     private static final Set<String> STATE_SEGMENTS =
             Set.of(UnitState.dmg.name(), UnitState.glv.name(), UnitState.dmg_glv.name());
@@ -463,6 +467,9 @@ public class TacticalRules {
                 }
             }
         }
+        Optional<AiDecision> spinner =
+                TechRules.startYinSpinner(context, done.get().prompt());
+        if (spinner.isPresent()) return spinner;
         return Optional.of(done.get().press("done building"));
     }
 
@@ -492,6 +499,12 @@ public class TacticalRules {
             Optional<PromptButton> sarween = payment.enabledHandler("useTech_st");
             if (sarween.isPresent()) return Optional.of(AiDecision.press(payment, sarween.get(), "use Sarween Tools"));
         }
+        if (owed > 0 && ProductionPlanner.aidaDiscount(seat) > 0) {
+            Optional<PromptButton> aida = payment.enabledHandler(AIDA_EXHAUST);
+            if (aida.isPresent()) {
+                return Optional.of(AiDecision.press(payment, aida.get(), "exhaust AI Development Algorithm"));
+            }
+        }
         if (owed > 0) {
             Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed)
                     .or(() -> PaymentPlanner.choosePlanet(game, payment, owed));
@@ -511,6 +524,8 @@ public class TacticalRules {
         for (String thing : seat.getSpentThingsThisWindow()) {
             if (SARWEEN.equals(thing)) {
                 spent += 1;
+            } else if (AIDA_DISCOUNT.equals(thing)) {
+                spent += ButtonHelper.getNumberOfUnitUpgrades(seat);
             } else if (thing.startsWith("tg_")) {
                 spent += parseDouble(StringUtils.substringAfter(thing, "tg_"));
             } else if (seat.getPlanets().contains(thing)) {

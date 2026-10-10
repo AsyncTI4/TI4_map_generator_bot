@@ -16,6 +16,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.TokenPurchase;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -62,6 +63,8 @@ public class ProductionPlanner {
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String FIGHT_WITH_PRECISION = "fwp";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
+    private static final String AI_DEVELOPMENT = "aida";
+    private static final int AIDA_MIN_DISCOUNT = 2;
     private static final List<UnitType> HEAVY_SHIPS = List.of(UnitType.Flagship, UnitType.Warsun);
 
     public record BuildOrder(
@@ -153,13 +156,23 @@ public class ProductionPlanner {
                 tile,
                 new Budget(
                         Helper.getProductionValue(seat, game, tile, false),
-                        spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0),
+                        spendableResources(game, seat)
+                                + extraResources
+                                + (seat.hasTech("st") ? 1 : 0)
+                                + aidaDiscount(seat),
                         seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat)));
         planScoringUnits(builder);
         planCoreUnits(builder);
         planSurplusShips(builder);
         fillProduction(builder);
         return new BuildPlan(builder.orders);
+    }
+
+    static int aidaDiscount(Player seat) {
+        if (!seat.hasTechReady(AI_DEVELOPMENT)) return 0;
+        int upgrades = ButtonHelper.getNumberOfUnitUpgrades(seat);
+        boolean worthTheExhaust = upgrades >= AIDA_MIN_DISCOUNT || StrategyCardRules.cannotResearch(seat);
+        return worthTheExhaust ? upgrades : 0;
     }
 
     public static SpendCost reserve(Game game, Player seat) {

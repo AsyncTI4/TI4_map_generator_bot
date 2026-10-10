@@ -91,6 +91,7 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules::observe,
             TradeRules::observe,
             this::finishCommandTokenGain,
+            StrategyCardRules::exhaustAiDevelopmentForResearch,
             PaymentRules::pay,
             SecretCostRules::pay,
             NekroLeaderRules::payAgentCost,
@@ -99,6 +100,7 @@ public class NekroBrain implements FactionBrain {
             NekroRules::dacxiveAnimators,
             TechRules::reviveInfantry,
             TechRules::placeSpinnerInfantry,
+            TechRules::placeMagenInfantry,
             StrategyCardRules::chooseTechnology,
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,
@@ -355,6 +357,8 @@ public class NekroBrain implements FactionBrain {
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);
         if (primary.isPresent()) return primary;
         List<AiPrompt> thisTurn = promptsThisTurn(context);
+        Optional<AiDecision> endOfTurnTech = TechRules.endOfTurn(context, thisTurn);
+        if (endOfTurnTech.isPresent()) return endOfTurnTech;
         for (String handler : List.of("turnEnd", "endOfTurnAbilities")) {
             Optional<AiDecision> end = ownedHandler(context, thisTurn, handler, "end the turn");
             if (end.isPresent()) return end;
@@ -374,6 +378,8 @@ public class NekroBrain implements FactionBrain {
         }
         Optional<AiDecision> card = ActionCardRules.playBeforePassing(context);
         if (card.isPresent()) return card;
+        Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
+        if (beforePassing.isPresent()) return beforePassing;
         for (String handler : List.of("passForRound", "passingAbilities")) {
             Optional<AiDecision> pass = ownedHandler(context, thisTurn, handler, "pass for the round");
             if (pass.isPresent()) return pass;

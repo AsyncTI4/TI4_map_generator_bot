@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -208,12 +209,12 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 "gain",
                 PromptSource.AI_THREAD,
                 created,
-                java.util.List.of(
+                List.of(
                         "increase_tactic_cc",
                         "increase_fleet_cc",
                         "increase_strategy_cc",
                         "FFCC_nekro_deleteButtons_leadership"),
-                java.util.List.of(
+                List.of(
                         "Gain 1 Tactic Token",
                         "Gain 1 Fleet Token",
                         "Gain 1 Strategy Token",
@@ -225,8 +226,8 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 "pay",
                 PromptSource.AI_THREAD,
                 created,
-                java.util.List.of("deleteButtons_leadership"),
-                java.util.List.of("Done Exhausting Planets"));
+                List.of("deleteButtons_leadership"),
+                List.of("Done Exhausting Planets"));
     }
 
     // The primary's three tokens are free; the two bought with influence are only gained once that influence is paid.
@@ -270,9 +271,8 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 "pay",
                 PromptSource.AI_THREAD,
                 NOW,
-                java.util.List.of(
-                        "spend_qucenn_inf", "spend_rarron_inf", "spend_meharxull_inf", "deleteButtons_leadership"),
-                java.util.List.of("Qucenn", "Rarron", "Mehar Xull", "Done Exhausting Planets"));
+                List.of("spend_qucenn_inf", "spend_rarron_inf", "spend_meharxull_inf", "deleteButtons_leadership"),
+                List.of("Qucenn", "Rarron", "Mehar Xull", "Done Exhausting Planets"));
         for (int press = 0; press < 5; press++) {
             String id = PaymentRules.pay(test.context(card, payment))
                     .map(AiTestGame::pressedId)
@@ -292,7 +292,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
         StrategyCardRules.play(test.context(card), card, card.buttons().getFirst(), LEADERSHIP);
         assertThat(StrategyCardRules.resolvePrimary(test.context(card))).isPresent();
         test.game.setStoredValue("originalCCsFornekro", test.nekro.getCCRepresentation());
-        for (String planet : java.util.List.of("qucenn", "rarron", "meharxull")) test.nekro.exhaustPlanet(planet);
+        for (String planet : List.of("qucenn", "rarron", "meharxull")) test.nekro.exhaustPlanet(planet);
         assertThat(PaymentRules.pay(test.context(card, leadershipPaymentPrompt(NOW)))
                         .map(AiTestGame::pressedId))
                 .contains("deleteButtons_leadership");
@@ -648,8 +648,8 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 "produce",
                 PromptSource.AI_THREAD,
                 NOW,
-                java.util.List.of(place, done),
-                java.util.List.of("Produce", "Done Producing Units"));
+                List.of(place, done),
+                List.of("Produce", "Done Producing Units"));
         assertThat(StrategyCardRules.buildWithWarfare(test.context(production)).map(AiTestGame::pressedId))
                 .contains(place);
     }
@@ -882,5 +882,29 @@ class StrategyCardRulesTest extends BaseTi4Test {
 
         test.nekro.getActionCards().remove("sabo3");
         assertThat(StrategyCardRules.follow(test.context(constructionCard()))).isPresent();
+    }
+
+    // A unit upgrade researched through AI Development Algorithm's free prerequisite must exhaust it when paying,
+    // so the bot's record matches the rules. Without that pending skip the button is left alone.
+    @Test
+    void exhaustsAiDevelopmentWhenItsPrerequisiteSkipWasUsed() {
+        Player sol = test.sol;
+        sol.addTech("aida");
+        AiPrompt payment = prompt(
+                "payment",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of("spend_jord_res", "exhaustTech_aida", PaymentRules.TECHNOLOGY_DONE),
+                List.of("Jord", "Exhaust AI Development Algorithm", "Done Exhausting Planets"));
+        AiTurnContext context = test.contextFor(sol, Set.of(), NOW, payment);
+        assertThat(StrategyCardRules.exhaustAiDevelopmentForResearch(context)).isEmpty();
+
+        test.memoryOf(sol).put(StrategyCardRules.AIDA_RESEARCH_KEY + test.game.getRound(), "skip");
+
+        assertThat(StrategyCardRules.exhaustAiDevelopmentForResearch(context)
+                        .map(AiTestGame::pressedId)
+                        .orElseThrow())
+                .isEqualTo("exhaustTech_aida");
+        assertThat(StrategyCardRules.exhaustAiDevelopmentForResearch(context)).isEmpty();
     }
 }

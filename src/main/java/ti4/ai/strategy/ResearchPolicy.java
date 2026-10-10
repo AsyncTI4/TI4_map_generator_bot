@@ -179,7 +179,7 @@ public class ResearchPolicy {
         return STEPPING_STONE_SHARE * best;
     }
 
-    private static int missingPrerequisites(Player seat, TechnologyModel next, TechnologyModel adding) {
+    static int missingPrerequisites(Player seat, TechnologyModel next, TechnologyModel adding) {
         String requirements = next.getRequirements().orElse("");
         int missing = 0;
         for (Map.Entry<Character, TechnologyType> colour : PREREQUISITE_COLOURS.entrySet()) {

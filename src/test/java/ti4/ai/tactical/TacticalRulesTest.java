@@ -262,6 +262,31 @@ class TacticalRulesTest extends BaseTi4Test {
                 .isEqualTo("deleteButtons_tacticalAction");
     }
 
+    // With two unit upgrades AI Development Algorithm takes 2 off the bill, so it is exhausted before any planet.
+    @Test
+    void paysWithAiDevelopmentAlgorithmWithTwoUnitUpgrades() {
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        test.nekro.addTech("aida");
+        test.nekro.addTech("cv2");
+        test.nekro.addTech("dd2");
+        test.game.setStoredValue("producedUnitCostFornekro", "3");
+        AiPrompt payment = prompt(
+                "payment",
+                PromptSource.PUBLIC,
+                NOW + 10,
+                List.of("spend_mordaiii_res", "exhaustTech_aida", "deleteButtons_tacticalAction"),
+                List.of("Mordai II", "Exhaust AI Development Algorithm (2r)", "Done Exhausting Planets"));
+
+        assertThat(pressedId(TacticalRules.continueAction(test.context(payment)).orElseThrow()))
+                .isEqualTo("exhaustTech_aida");
+
+        test.nekro.exhaustTech("aida");
+        test.nekro.addSpentThing("aida_");
+        assertThat(pressedId(TacticalRules.continueAction(test.context(payment)).orElseThrow()))
+                .isEqualTo("spend_mordaiii_res");
+    }
+
     // The system picker groups tiles by ring; ring 5 and beyond are split in two halves before the full ring.
     @Test
     void picksTheRingButtonForAPosition() {
@@ -385,6 +410,27 @@ class TacticalRulesTest extends BaseTi4Test {
                 List.of("FFCC_nekro_place_infantry_mordaiii", "FFCC_nekro_deleteButtons_tacticalAction_301"),
                 List.of("Produce Infantry", "Done Producing Units"));
 
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_deleteButtons_tacticalAction_301");
+    }
+
+    // With Yin Spinner the production message also offers 2 free infantry; it takes them once before it is done.
+    @Test
+    void spinsTwoInfantryWithYinSpinnerBeforeFinishingTheBuild() {
+        test.nekro.addTech("yso");
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        AiPrompt production = prompt(
+                "production",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of("FFCC_nekro_deleteButtons_tacticalAction_301", "startYinSpinner"),
+                List.of("Done Producing Units", "Yin Spin 2 Duders"));
+
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("startYinSpinner");
         assertThat(pressedId(
                         TacticalRules.continueAction(test.context(production)).orElseThrow()))
                 .isEqualTo("FFCC_nekro_deleteButtons_tacticalAction_301");

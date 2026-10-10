@@ -5,6 +5,7 @@ import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.pressedId;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,6 +129,31 @@ class CombatRulesTest extends BaseTi4Test {
                 .isEqualTo("combatRoll_" + position + "_space_spacecannonoffence");
     }
 
+    // Sol's fighters would soak up the space cannon hits; Graviton Laser System makes them land on the cruiser, so it
+    // is exhausted before the roll.
+    @Test
+    void exhaustsGravitonBeforeFiringAtShipsScreenedByFighters() {
+        Tile tile = test.game.getTileByPosition(position);
+        test.nekro.addPlanet("lodor");
+        test.nekro.addTech("gls");
+        test.units(tile, "lodor", test.nekro, UnitType.Pds, 1);
+        test.units(tile, "space", test.sol, UnitType.Fighter, 2);
+        test.game.setActiveSystem(position);
+        AiPrompt cannon = prompt(
+                "cannon",
+                PromptSource.PUBLIC,
+                NOW,
+                "combatRoll_" + position + "_space_spacecannonoffence",
+                "exhaustTech_gls");
+
+        assertThat(pressedId(CombatRules.next(test.context(cannon)).orElseThrow()))
+                .isEqualTo("exhaustTech_gls");
+
+        test.nekro.exhaustTech("gls");
+        assertThat(pressedId(CombatRules.next(test.context(cannon)).orElseThrow()))
+                .isEqualTo("combatRoll_" + position + "_space_spacecannonoffence");
+    }
+
     @Test
     void firesAntiFighterBarrageOnceWithDestroyersAgainstFighters() {
         Tile tile = test.game.getTileByPosition(position);
@@ -181,6 +207,42 @@ class CombatRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_assignHits_" + position + "_1_dd_" + color);
         assertThat(pressedId(CombatRules.next(test.context(loss)).orElseThrow()))
                 .isEqualTo("deleteButtons");
+    }
+
+    // Magen Defense Grid gives a free hit at the start of a ground combat on a planet with its structures. It uses it,
+    // and an infantry is a better target than an undamaged mech, which would only sustain.
+    @Test
+    void hitsAnInfantryWithMagenDefenseGrid() {
+        String solColor = test.sol.getColor();
+        AiPrompt start = prompt("start", PromptSource.COMBAT_THREAD, NOW, "FFCC_nekro_magenHit_lodor");
+        AiPrompt targets = prompt(
+                "targets",
+                PromptSource.COMBAT_THREAD,
+                NOW + 1,
+                "FFCC_nekro_hitOpponentGround_lodor_mech_" + solColor + "_magen",
+                "FFCC_nekro_hitOpponentGround_lodor_infantry_" + solColor + "_magen");
+
+        assertThat(pressedId(CombatRules.next(test.context(start)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_magenHit_lodor");
+        assertThat(pressedId(CombatRules.next(test.context(targets)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_hitOpponentGround_lodor_infantry_" + solColor + "_magen");
+    }
+
+    // An opponent's single hit (Magen Defense Grid, Exotrireme and the like) is taken by sustaining damage when the
+    // unit can, instead of cancelling it or leaving the combat waiting.
+    @Test
+    void sustainsASingleHitWhenItCan() {
+        String color = test.nekro.getColor();
+        String unit = position + "_1_mf_lodor_" + color + "deleteThisMessage";
+        AiPrompt hit = prompt(
+                "hit",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                List.of("FFCC_nekro_assignHits_" + unit, "FFCC_nekro_assignDamage_" + unit, "deleteButtons"),
+                List.of("Destroy 1 Mech", "Sustain 1 Mech", "Cancel The Hit"));
+
+        assertThat(pressedId(CombatRules.next(test.context(hit)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_assignDamage_" + unit);
     }
 
     // Rolling while the opponent still assigns last round's hits would start the next round under them.

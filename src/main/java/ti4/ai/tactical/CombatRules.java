@@ -42,8 +42,14 @@ public class CombatRules {
     private static final String LATEST_ASSIGN_HITS = "latestAssignHits";
     private static final String ASSAULT_CANNON_HITS = "assaultcannoncombat";
     private static final String ASSIGN_HITS = "assignHits";
+    private static final String ASSIGN_DAMAGE = "assignDamage";
+    private static final String CANCEL_THE_HIT = "Cancel The Hit";
     private static final String DONE_REMOVING = "deleteButtons";
     private static final double DAMAGED_DISCOUNT = 0.1;
+    private static final String MAGEN_HIT_PREFIX = "magenHit_";
+    private static final String GRAVITON = "gls";
+    private static final String GRAVITON_EXHAUST = "exhaustTech_gls";
+    private static final String GROUND_HIT_PREFIX = "hitOpponentGround_";
     private static final List<String> ROUND_HIT_PREFIXES =
             List.of("autoAssignSpaceHits_", "autoAssignSpaceCannonOffenceHits_", AutoAssignGroundHitsButtonIds.PREFIX);
 
@@ -55,11 +61,17 @@ public class CombatRules {
         if (spaceCannonDefence.isPresent()) return spaceCannonDefence;
         Optional<AiDecision> assaultCannonLoss = destroyShipForAssaultCannon(context, prompts);
         if (assaultCannonLoss.isPresent()) return assaultCannonLoss;
+        Optional<AiDecision> singleHit = takeSingleHit(context, prompts);
+        if (singleHit.isPresent()) return singleHit;
         Optional<AiDecision> assignment = assignHits(context, prompts);
         if (assignment.isPresent()) return assignment;
         Optional<Match> structures =
                 Prompts.owned(prompts, context.faction(), id -> id.startsWith("removeAllStructures_"));
         if (structures.isPresent()) return Optional.of(structures.get().press("remove its lost structures"));
+        Optional<AiDecision> groundHit = hitOpposingGroundForce(context, prompts);
+        if (groundHit.isPresent()) return groundHit;
+        Optional<AiDecision> magen = magenDefenseGrid(context, prompts);
+        if (magen.isPresent()) return magen;
         Optional<Match> automate = Prompts.owned(
                 prompts, context.faction(), id -> id.startsWith("automateGroundCombat_") && id.endsWith("_confirmed"));
         if (automate.isPresent()) return Optional.of(automate.get().press("automate ground combat"));
@@ -137,6 +149,10 @@ public class CombatRules {
                 if (attacking && !position.equals(game.getActiveSystem())) continue;
                 if (!ButtonHelper.getPlayersWithPds2Cover(active, game, position)
                         .contains(context.seat())) continue;
+                Optional<PromptButton> graviton = graviton(context, prompt, game.getTileByPosition(position));
+                if (graviton.isPresent()) {
+                    return Optional.of(AiDecision.press(prompt, graviton.get(), "exhaust Graviton Laser System"));
+                }
                 context.memory().put(key, "pressed");
                 ActionSecretRules.watchSpaceCannon(context, position);
                 String reason = attacking ? "fire space cannon at the defenders" : "fire space cannon";
@@ -144,6 +160,18 @@ public class CombatRules {
             }
         }
         return Optional.empty();
+    }
+
+    private static Optional<PromptButton> graviton(AiTurnContext context, AiPrompt prompt, Tile tile) {
+        Player seat = context.seat();
+        if (tile == null || !seat.hasTechReady(GRAVITON)) return Optional.empty();
+        UnitHolder space = BoardView.space(tile);
+        boolean fightersScreenShips = context.game().getPlayers().values().stream()
+                .filter(other -> other != seat && other.getColor() != null)
+                .anyMatch(other -> BoardView.count(space, other, UnitType.Fighter) > 0
+                        && BoardView.nonFighterShips(space, other) > 0);
+        if (!fightersScreenShips) return Optional.empty();
+        return prompt.firstEnabled(button -> button.isUnowned() && GRAVITON_EXHAUST.equals(button.handlerId()));
     }
 
     private static Optional<AiDecision> antiFighterBarrage(AiTurnContext context, List<AiPrompt> prompts) {
@@ -213,9 +241,75 @@ public class CombatRules {
         return Optional.empty();
     }
 
-    private static boolean isSingleUnitLoss(PromptButton button) {
+    private static Optional<AiDecision> magenDefenseGrid(AiTurnContext context, List<AiPrompt> prompts) {
+        for (AiPrompt prompt : prompts) {
+            if (prompt.source() != PromptSource.COMBAT_THREAD) continue;
+            Optional<PromptButton> magen = prompt.firstEnabled(button ->
+                    button.isOwnedBy(context.faction()) && button.handlerId().startsWith(MAGEN_HIT_PREFIX));
+            if (magen.isEmpty()) continue;
+            String key = "magenHit|" + prompt.messageId() + "|" + magen.get().handlerId();
+            if (context.memory().has(key)) continue;
+            context.memory().put(key, "pressed");
+            return Optional.of(AiDecision.press(prompt, magen.get(), "hit with Magen Defense Grid"));
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<AiDecision> hitOpposingGroundForce(AiTurnContext context, List<AiPrompt> prompts) {
+        for (AiPrompt prompt : prompts) {
+            Optional<PromptButton> target = prompt.enabledButtons().stream()
+                    .filter(button -> button.isOwnedBy(context.faction())
+                            && button.handlerId().startsWith(GROUND_HIT_PREFIX))
+                    .max(Comparator.comparingInt(CombatRules::groundHitValue));
+            if (target.isPresent()) return Optional.of(AiDecision.press(prompt, target.get(), "hit a ground force"));
+        }
+        return Optional.empty();
+    }
+
+    private static int groundHitValue(PromptButton button) {
         String[] parts = button.handlerId().split("_");
-        return parts.length >= 5 && ASSIGN_HITS.equals(parts[0]) && StringUtils.isNumeric(parts[2]);
+        String unit = parts.length > 2 ? parts[2] : "";
+        boolean damaged = unit.contains("damaged");
+        String type = unit.replace("damaged", "").replace("galvanized", "");
+        if (UnitType.Mech.plainName().equals(type)) return damaged ? 3 : 1;
+        return UnitType.Infantry.plainName().equals(type) ? 2 : 0;
+    }
+
+    private static Optional<AiDecision> takeSingleHit(AiTurnContext context, List<AiPrompt> prompts) {
+        for (AiPrompt prompt : prompts) {
+            List<PromptButton> losses = prompt.enabledButtons().stream()
+                    .filter(button -> button.isOwnedBy(context.faction())
+                            && (isSingleUnitLoss(button) || isSingleUnitSustain(button)))
+                    .toList();
+            Optional<PromptButton> close =
+                    prompt.firstEnabled(button -> button.isUnowned() && DONE_REMOVING.equals(button.handlerId()));
+            if (losses.isEmpty() || close.isEmpty()) continue;
+            String key = "singleHit|" + prompt.messageId();
+            if (context.memory().has(key)) {
+                return Optional.of(AiDecision.press(prompt, close.get(), "finish taking the hit"));
+            }
+            if (!CANCEL_THE_HIT.equals(close.get().label())) continue;
+            PromptButton choice = losses.stream()
+                    .filter(CombatRules::isSingleUnitSustain)
+                    .findFirst()
+                    .orElse(losses.getFirst());
+            context.memory().put(key, "taken");
+            return Optional.of(AiDecision.press(prompt, choice, "take the hit"));
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isSingleUnitLoss(PromptButton button) {
+        return isSingleUnitPick(button, ASSIGN_HITS);
+    }
+
+    private static boolean isSingleUnitSustain(PromptButton button) {
+        return isSingleUnitPick(button, ASSIGN_DAMAGE);
+    }
+
+    private static boolean isSingleUnitPick(PromptButton button, String action) {
+        String[] parts = button.handlerId().split("_");
+        return parts.length >= 5 && action.equals(parts[0]) && StringUtils.isNumeric(parts[2]);
     }
 
     private static double lossCost(Player seat, PromptButton button) {

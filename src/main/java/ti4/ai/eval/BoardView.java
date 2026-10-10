@@ -150,4 +150,8 @@ public class BoardView {
     public static int planetResources(Game game, String planet) {
         return Helper.getPlanetResources(planet, game);
     }
+
+    public static int planetInfluence(Game game, String planet) {
+        return Helper.getPlanetInfluence(planet, game);
+    }
 }

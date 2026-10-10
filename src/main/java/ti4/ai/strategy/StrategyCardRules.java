@@ -38,6 +38,8 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
+import ti4.model.TechnologyModel;
 
 @UtilityClass
 public class StrategyCardRules {
@@ -55,6 +57,9 @@ public class StrategyCardRules {
     private static final int PDS_CODE = 0;
     private static final int SPACE_DOCK_CODE = 1;
     private static final String GET_TECH = "getTech_";
+    private static final String AI_DEVELOPMENT = "aida";
+    private static final String AIDA_EXHAUST = "exhaustTech_aida";
+    static final String AIDA_RESEARCH_KEY = "aidaResearch|";
     private static final String RESEARCH_BUTTON = "acquireATechWithSC_first";
     private static final String SPEAKER_PREFIX = "sc_3_assign_speaker_to_";
     static final int LEADERSHIP_TOKENS = 3;
@@ -490,6 +495,7 @@ public class StrategyCardRules {
         context.memory().remove(requestKey(context, RESEARCH_KEY));
         Optional<String> best = ResearchPolicy.best(game, seat, options.keySet());
         if (best.isEmpty()) return Optional.empty();
+        if (needsAiDevelopment(seat, best.get())) context.memory().put(AIDA_RESEARCH_KEY + game.getRound(), "skip");
         if (cost > 0) {
             Optional<Wallet.Payment> payment = ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(cost))
                     .or(() -> Wallet.of(game, seat).plan(SpendCost.resources(cost)));
@@ -499,6 +505,35 @@ public class StrategyCardRules {
             PaymentRules.expectNothing(context, "a technology", PaymentRules.TECHNOLOGY_DONE);
         }
         return Optional.of(options.get(best.get()).press("research " + best.get()));
+    }
+
+    public static Optional<AiDecision> exhaustAiDevelopmentForResearch(AiTurnContext context) {
+        String key = AIDA_RESEARCH_KEY + context.game().getRound();
+        if (!context.memory().has(key)) return Optional.empty();
+        if (!context.seat().hasTechReady(AI_DEVELOPMENT)) {
+            context.memory().remove(key);
+            return Optional.empty();
+        }
+        for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
+            boolean researchPayment = prompt.firstEnabled(
+                            button -> button.isUnowned() && PaymentRules.TECHNOLOGY_DONE.equals(button.handlerId()))
+                    .isPresent();
+            Optional<PromptButton> aida =
+                    prompt.firstEnabled(button -> button.isUnowned() && AIDA_EXHAUST.equals(button.handlerId()));
+            if (!researchPayment || aida.isEmpty()) continue;
+            context.memory().remove(key);
+            return Optional.of(
+                    AiDecision.press(prompt, aida.get(), "exhaust AI Development Algorithm as a prerequisite"));
+        }
+        return Optional.empty();
+    }
+
+    private static boolean needsAiDevelopment(Player seat, String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        return tech != null
+                && tech.isUnitUpgrade()
+                && seat.hasTechReady(AI_DEVELOPMENT)
+                && ResearchPolicy.missingPrerequisites(seat, tech, null) > 0;
     }
 
     public static Optional<AiDecision> placeStructure(AiTurnContext context) {
@@ -918,7 +953,7 @@ public class StrategyCardRules {
                 && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved >= reservedTokens;
     }
 
-    static boolean cannotResearch(Player seat) {
+    public static boolean cannotResearch(Player seat) {
         return seat.hasAbility("propagation");
     }
 

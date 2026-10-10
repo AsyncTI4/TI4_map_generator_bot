@@ -30,6 +30,8 @@ public class AgendaVoting {
     private static final String PLANET_OUTCOMES_PREFIX = "planetOutcomes_";
     private static final String PLANET_VOTE_PREFIX = "exhaustForVotes_planet_";
     private static final String CONFIRM_PREFIX = "resolveAgendaVote_";
+    private static final String PREDICTIVE_VOTES = "predictive_3";
+    private static final String PREDICTIVE_BUTTON = "exhaustForVotes_" + PREDICTIVE_VOTES;
     private static final String SPENT_PLANET_PREFIX = "planet_";
     private static final String VOTED_AT_KEY = "agendaVotedAt|";
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
@@ -160,6 +162,14 @@ public class AgendaVoting {
         Optional<Match> finish = Prompts.owned(turn, context.faction(), "proceedToFinalizingVote"::equals);
         if (finish.isEmpty()) return Optional.empty();
         AiPrompt prompt = finish.get().prompt();
+        if (ballot.votes() > 0 && !seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES)) {
+            Optional<PromptButton> predictive =
+                    prompt.firstEnabled(button -> button.isUnowned() && PREDICTIVE_BUTTON.equals(button.handlerId()));
+            if (predictive.isPresent()) {
+                return Optional.of(
+                        AiDecision.press(prompt, predictive.get(), "cast 3 votes with Predictive Intelligence"));
+            }
+        }
         int spent = seat.getSpentThingsThisWindow().stream()
                 .filter(thing -> thing.startsWith(SPENT_PLANET_PREFIX))
                 .map(thing -> StringUtils.removeStart(thing, SPENT_PLANET_PREFIX))

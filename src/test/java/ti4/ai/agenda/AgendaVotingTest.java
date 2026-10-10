@@ -60,6 +60,30 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(press(confirm)).isEqualTo("FFCC_sol_resolveAgendaVote_4");
     }
 
+    // Predictive Intelligence adds 3 votes that only cost anything if the outcome loses, so they go in first, on top
+    // of the planets.
+    @Test
+    void addsPredictiveIntelligenceVotesBeforeItsPlanets() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        sol.addTech("pi");
+        AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_sol_vote", "FFCC_sol_resolveAgendaVote_0");
+        assertThat(press(start)).isEqualTo("FFCC_sol_vote");
+        AiPrompt planets = prompt(
+                "planets",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of(
+                        "exhaustForVotes_planet_jord",
+                        "exhaustForVotes_predictive_3",
+                        "FFCC_sol_proceedToFinalizingVote"),
+                List.of("Jord (4)", "Use Predictive Intelligence Votes (3)", "Done exhausting planets."));
+
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_predictive_3");
+
+        sol.addSpentThing("predictive_3");
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_planet_jord");
+    }
+
     // Galactic Threat: Nekro cannot vote, so it never plans a ballot, even on an agenda it would like to win and
     // with planets that have influence.
     @Test

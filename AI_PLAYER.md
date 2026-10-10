@@ -98,8 +98,19 @@ to build one by hand:
   - **combat**: rolling, anti-fighter barrage, space cannon offense (also its own PDS and PDS II on its own tactical
     action) and defense, Assault Cannon (it fires it with 3 or more non-fighter ships before the first roll, and
     when an opponent fires it, destroys its own cheapest non-fighter ship and closes the prompt), bombardment before
-    landing, hit assignment with the bot's auto-assign buttons (which use Sustain Damage first), ground combat
+    landing, hit assignment with the bot's auto-assign buttons (which use Sustain Damage first), a single hit an
+    opponent's ability assigns to one of its units (it sustains if it can, otherwise takes the loss), Graviton
+    Laser System before its space cannon fires at ships screened by fighters, Magen Defense Grid's hit at the start
+    of a ground combat (a damaged mech first, then infantry, then a mech that would only sustain), ground combat
     automation;
+  - **technologies used outside combat** (`TechRules` unless noted): Infantry II revival at the start of its turn;
+    Yin Spinner's 2 infantry after producing (on its dock planet first); Magen Defense Grid's mandatory infantry;
+    Bio-Stims at the end of its turn to ready its best spent planet with a technology specialty; Psychoarchaeology
+    on the turn it passes, trading ready planets with a technology specialty for trade goods (those worth 1 or less
+    always, the rest only with nothing to save for scoring or Leadership); Predictive Intelligence's 3 votes on top
+    of its planets (`AgendaVoting`); AI Development Algorithm as a production discount when it has 2 or more unit
+    upgrades (or cannot research), and exhausted when a unit upgrade it researches needed its prerequisite skip
+    (`StrategyCardRules`);
   - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat;
   - **strategy card primaries and secondaries** (below), ending its turn and passing;
   - declining whens/afters; **agenda votes**, Nekro's **Galactic Threat** and agenda ties as speaker (below);
