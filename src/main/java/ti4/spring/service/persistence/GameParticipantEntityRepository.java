@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface GameEntityRepository extends JpaRepository<GameEntity, String> {
-    List<GameEntity> findByTwilightImperiumGlobalLeagueTrueAndStatisticsIgnoredFalseAndEndedEpochMillisecondsIsNull();
+public interface GameParticipantEntityRepository extends JpaRepository<GameParticipantEntity, Long> {
 
     @Modifying
-    @Query("DELETE FROM GameEntity g WHERE g.gameName = :gameName")
+    @Query("DELETE FROM GameParticipantEntity p WHERE p.game.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);
+
+    @Query("SELECT p FROM GameParticipantEntity p JOIN FETCH p.game g")
+    List<GameParticipantEntity> findAllWithGames();
 }

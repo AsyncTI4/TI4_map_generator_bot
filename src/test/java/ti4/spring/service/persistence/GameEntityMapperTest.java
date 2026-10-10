@@ -2,12 +2,16 @@ package ti4.spring.service.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.ManagedGameState;
 import ti4.testUtils.BaseTi4Test;
 
 class GameEntityMapperTest extends BaseTi4Test {
+
+    private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "black");
 
     @Test
     void replacedPlayerUsesStatsTrackedUserNameFromTheGameFile() {
@@ -18,16 +22,20 @@ class GameEntityMapperTest extends BaseTi4Test {
         replacement.setColor("red");
         replacement.setStatsTrackedUserID("original-id");
         replacement.setStatsTrackedUserName("Original");
+        addRealPlayer(game, "second-id", "hacan");
+        addRealPlayer(game, "third-id", "xxcha");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 0);
 
-        PlayerEntity playerEntity = snapshot.game().getPlayers().getFirst();
+        PlayerEntity playerEntity = playerFor(snapshot, "original-id");
         assertThat(playerEntity.isReplaced()).isTrue();
         assertThat(playerEntity.getUser().getId()).isEqualTo("original-id");
         assertThat(playerEntity.getUser().getName()).isEqualTo("Original");
         // Only users a player or title row points at are written, otherwise the nightly reconciler would
         // delete the replacement's unreferenced user row and report it every night.
-        assertThat(snapshot.users()).extracting(UserEntity::getId).containsExactly("original-id");
+        assertThat(snapshot.users())
+                .extracting(UserEntity::getId)
+                .containsExactlyInAnyOrder("original-id", "second-id", "third-id");
     }
 
     @Test
@@ -39,11 +47,123 @@ class GameEntityMapperTest extends BaseTi4Test {
         replacement.setColor("red");
         replacement.setStatsTrackedUserID("original-id");
         replacement.setStatsTrackedUserName(null);
+        addRealPlayer(game, "second-id", "hacan");
+        addRealPlayer(game, "third-id", "xxcha");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 0);
 
-        UserEntity user = snapshot.game().getPlayers().getFirst().getUser();
+        UserEntity user = playerFor(snapshot, "original-id").getUser();
         // The placeholder lets GameEntityPersistenceService keep any real name already stored for this user.
         assertThat(GameEntityMapper.hasUnknownName(user)).isTrue();
+    }
+
+    @Test
+    void gameWithFewerThanThreePlayersIsStatisticsIgnoredButKeepsItsParticipants() {
+        Game game = new Game();
+        game.setName("mapper-two-player-game");
+        addRealPlayer(game, "first-id", "sol");
+        addRealPlayer(game, "second-id", "hacan");
+        game.setStoredValue("TitlesForfirst-id", "Kingmaker");
+
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 1234);
+
+        assertThat(snapshot.game().isStatisticsIgnored()).isTrue();
+        // Statistics queries read player and title rows, so an ignored game must not write any.
+        assertThat(snapshot.game().getPlayers()).isEmpty();
+        assertThat(snapshot.titles()).isEmpty();
+        assertThat(snapshot.users()).isEmpty();
+        assertThat(snapshot.game().getParticipants())
+                .extracting(GameParticipantEntity::getUserId)
+                .containsExactly("first-id", "second-id");
+        assertThat(snapshot.game().getGameFileModifiedEpochMilliseconds()).isEqualTo(1234);
+    }
+
+    @Test
+    void seatsWithoutAFactionAreParticipantsButNotPlayers() {
+        Game game = new Game();
+        game.setName("mapper-unseated-participant");
+        addRealPlayer(game, "first-id", "sol");
+        addRealPlayer(game, "second-id", "hacan");
+        addRealPlayer(game, "third-id", "xxcha");
+        game.addPlayer("spectator-id", "Spectator");
+
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 0);
+
+        assertThat(snapshot.game().isStatisticsIgnored()).isFalse();
+        assertThat(snapshot.game().getPlayers())
+                .extracting(player -> player.getUser().getId())
+                .containsExactlyInAnyOrder("first-id", "second-id", "third-id");
+        assertThat(snapshot.game().getParticipants())
+                .filteredOn(participant -> "spectator-id".equals(participant.getUserId()))
+                .singleElement()
+                .satisfies(participant -> {
+                    assertThat(participant.getUserName()).isEqualTo("Spectator");
+                    assertThat(participant.isRealPlayer()).isFalse();
+                });
+    }
+
+    @Test
+    void managedGameStateSurvivesTheDatabaseRoundTrip() {
+        Game game = new Game();
+        game.setName("mapper-managed-round-trip");
+        addRealPlayer(game, "first-id", "sol");
+        addRealPlayer(game, "second-id", "hacan");
+        addRealPlayer(game, "third-id", "xxcha");
+        game.addPlayer("spectator-id", "Spectator");
+        game.setFowMode(true);
+        game.setBotFactionReacts(true);
+        game.setBotStratReacts(true);
+        game.setInjectRulesLinks(true);
+        game.setFastSCFollowMode(true);
+        game.setHasEnded(true);
+        game.setEndedDate(5678);
+        game.setRound(4);
+        game.setActivePlayerID("second-id");
+        game.setGuildID("111");
+        game.setMainChannelID("222");
+        game.setTableTalkChannelID("333");
+        game.setLaunchPostThreadID("444");
+        game.setLastModifiedDate(9999);
+
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 4321);
+        PersistedManagedGame persisted = GameEntityMapper.toPersistedManagedGame(
+                snapshot.game(), List.copyOf(snapshot.game().getParticipants()).reversed());
+
+        // Warmup rebuilds ManagedGames from this state, so it must match what the game file would produce.
+        assertThat(persisted.state()).isEqualTo(ManagedGameState.of(game));
+        assertThat(persisted.state().participants())
+                .extracting(ManagedGameState.Participant::userId)
+                .containsExactly("first-id", "second-id", "spectator-id", "third-id");
+        assertThat(persisted.state().guildId()).isEqualTo("111");
+        assertThat(persisted.state().endedDate()).isEqualTo(5678);
+        assertThat(persisted.gameFileModifiedEpochMilliseconds()).isEqualTo(4321);
+    }
+
+    @Test
+    void gameThatNeverEndedRoundTripsWithAnEndedDateOfZero() {
+        Game game = new Game();
+        game.setName("mapper-not-ended");
+        addRealPlayer(game, "first-id", "sol");
+
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 0);
+
+        assertThat(snapshot.game().getEndedEpochMilliseconds()).isNull();
+        assertThat(GameEntityMapper.toPersistedManagedGame(
+                                snapshot.game(), snapshot.game().getParticipants())
+                        .state())
+                .isEqualTo(ManagedGameState.of(game));
+    }
+
+    private static void addRealPlayer(Game game, String userId, String faction) {
+        Player player = game.addPlayer(userId, "User " + userId);
+        player.setFaction(faction);
+        player.setColor(COLORS.get(game.getPlayers().size() - 1));
+    }
+
+    private static PlayerEntity playerFor(GameEntitySnapshot snapshot, String userId) {
+        return snapshot.game().getPlayers().stream()
+                .filter(player -> player.getUser().getId().equals(userId))
+                .findFirst()
+                .orElseThrow();
     }
 }

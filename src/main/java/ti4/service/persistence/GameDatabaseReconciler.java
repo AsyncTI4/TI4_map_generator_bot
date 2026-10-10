@@ -11,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntityMapper;
@@ -40,8 +38,8 @@ public class GameDatabaseReconciler {
         try {
             long startedAt = System.currentTimeMillis();
             Map<String, PersistedGameState> persistedStates =
-                    SpringContext.getBean(PersistedGameStateService.class).loadAll();
-            GameEntityPersistenceService persistenceService = SpringContext.getBean(GameEntityPersistenceService.class);
+                    PersistedGameStateService.getBean().loadAll();
+            GameEntityPersistenceService persistenceService = GameEntityPersistenceService.getBean();
 
             List<String> discrepancies = new ArrayList<>();
             Set<String> existingGameNames = new HashSet<>();
@@ -63,7 +61,9 @@ public class GameDatabaseReconciler {
                 Game game = loadGame(managedGame);
                 if (game == null) continue;
                 existingGameNames.add(gameName);
-                reconcileGame(game, persistedStates.get(gameName), persistenceService)
+                long gameFileModified = GameManager.getGameFileLastModified(gameName);
+                if (gameFileModified > startedAt) continue;
+                reconcileGame(game, gameFileModified, persistedStates.get(gameName), persistenceService)
                         .ifPresent(discrepancies::add);
             }
             for (String persistedGameName : persistedStates.keySet()) {
@@ -83,17 +83,12 @@ public class GameDatabaseReconciler {
     }
 
     private static Optional<String> reconcileGame(
-            Game game, PersistedGameState persistedState, GameEntityPersistenceService persistenceService) {
+            Game game,
+            long gameFileModified,
+            PersistedGameState persistedState,
+            GameEntityPersistenceService persistenceService) {
         String gameName = game.getName();
-        if (!GameEntityMapper.shouldPersist(game)) {
-            if (persistedState == null) return Optional.empty();
-            return Optional.of(repair(
-                    gameName,
-                    "in the database but has fewer than 3 players",
-                    () -> persistenceService.delete(gameName)));
-        }
-
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, gameFileModified);
         if (persistedState == null) {
             return Optional.of(
                     repair(gameName, "missing from the database", () -> persistenceService.replace(snapshot)));
@@ -126,7 +121,7 @@ public class GameDatabaseReconciler {
     }
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {
-        return Storage.getGameFile(gameName + Constants.TXT).lastModified() > timestamp;
+        return GameManager.getGameFileLastModified(gameName) > timestamp;
     }
 
     private static Game loadGame(ManagedGame managedGame) {

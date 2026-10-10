@@ -93,6 +93,10 @@ class GameLoadService {
         }
     }
 
+    static long getGameFileLastModified(String gameName) {
+        return Storage.getGameFile(gameName + GAME_FILE_EXTENSION).lastModified();
+    }
+
     @Nullable
     public static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {

@@ -11,6 +11,7 @@ import ti4.executors.ExecutionHistoryManager;
 import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
 import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
@@ -29,11 +30,8 @@ public class GameDatabaseSyncPipeline {
     public static void queueSync(@Nullable Game game) {
         if (game == null || DatabasePersistenceGate.isDisabled()) return;
         try {
-            if (!GameEntityMapper.shouldPersist(game)) {
-                queueDelete(game.getName());
-                return;
-            }
-            GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+            GameEntitySnapshot snapshot =
+                    GameEntityMapper.toSnapshot(game, GameManager.getGameFileLastModified(game.getName()));
             queue(game.getName(), service -> service.replace(snapshot));
         } catch (Exception e) {
             BotLogger.error("Failed to prepare database sync for game " + game.getName() + ".", e);

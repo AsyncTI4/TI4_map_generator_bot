@@ -79,8 +79,71 @@ public class GameEntity {
     @Column(name = "player_count")
     private int playerCount;
 
+    @Column(name = "is_statistics_ignored", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean statisticsIgnored;
+
+    @Column(name = "is_ended", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean ended;
+
+    @Column(name = "has_winner", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean winner;
+
+    @Column(name = "is_victory_point_goal_reached", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean victoryPointGoalReached;
+
+    @Column(name = "is_fog_of_war_mode", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean fogOfWarMode;
+
+    @Column(name = "is_fog_qol_01", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean fogQol01;
+
+    @Column(name = "is_faction_react_mode", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean factionReactMode;
+
+    @Column(name = "is_color_react_mode", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean colorReactMode;
+
+    @Column(name = "is_strategy_card_react_mode", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean strategyCardReactMode;
+
+    @Column(name = "is_fast_strategy_card_follow_mode", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean fastStrategyCardFollowMode;
+
+    @Column(name = "is_inject_rules_links", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean injectRulesLinks;
+
+    @Column(name = "last_modified_epoch_milliseconds", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private long lastModifiedEpochMilliseconds;
+
+    @Column(name = "game_file_modified_epoch_milliseconds", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private long gameFileModifiedEpochMilliseconds;
+
+    @Column(name = "active_player_user_id")
+    private String activePlayerUserId;
+
+    @Column(
+            name = "last_active_player_change_epoch_milliseconds",
+            nullable = false,
+            columnDefinition = "BIGINT DEFAULT 0")
+    private long lastActivePlayerChangeEpochMilliseconds;
+
+    @Column(name = "guild_id")
+    private String guildId;
+
+    @Column(name = "main_game_channel_id")
+    private String mainGameChannelId;
+
+    @Column(name = "table_talk_channel_id")
+    private String tableTalkChannelId;
+
+    @Column(name = "launch_post_thread_id")
+    private String launchPostThreadId;
+
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<GameParticipantEntity> participants = new ArrayList<>();
 
     @Override
     public boolean equals(Object other) {
