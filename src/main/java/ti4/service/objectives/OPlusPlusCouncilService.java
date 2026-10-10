@@ -3,6 +3,7 @@ package ti4.service.objectives;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -13,9 +14,12 @@ import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.separator.Separator;
 import net.dv8tion.jda.api.components.separator.Separator.Spacing;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -24,6 +28,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 
@@ -60,6 +67,45 @@ public class OPlusPlusCouncilService {
                 "**Objective Council**: each player has been dealt "
                         + DEALT_STAGE1 + " Stage I, " + DEALT_STAGE2 + " Stage II, and " + DEALT_SECRETS
                         + " secret objectives in their `#cards-info` thread. Once everyone confirms their choices, the objective decks will be set.");
+        updateCouncilStatusMessage(game);
+    }
+
+    private static String councilStatusMessage(Game game) {
+        StringBuilder sb = new StringBuilder("### __Objective Council Status__:\n");
+        for (Player player : joinedPlayers(game)) {
+            sb.append("> ")
+                    .append(alreadyResponded(game, player) ? "✅" : "❌")
+                    .append(" ")
+                    .append(player.getRepresentationNoPing())
+                    .append('\n');
+        }
+        return sb.toString();
+    }
+
+    private static void updateCouncilStatusMessage(Game game) {
+        String msg = councilStatusMessage(game);
+        Optional<GameMessage> gm = GameMessageManager.getOne(game.getName(), GameMessageType.OPLUSPLUS_COUNCIL);
+        if (gm.isPresent()) {
+            MessageChannel channel = game.getActionsChannel();
+            channel.retrieveMessageById(gm.get().messageId())
+                    .flatMap(m -> m.editMessage(msg))
+                    .onErrorFlatMap(err -> {
+                        BotLogger.catchRestError(err);
+                        return sendCouncilStatusMessage(game, msg);
+                    })
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            sendCouncilStatusMessage(game, msg).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    private static RestAction<Message> sendCouncilStatusMessage(Game game, String msg) {
+        String name = game.getName();
+        long date = game.getLastModifiedDate();
+        return game.getActionsChannel()
+                .sendMessage(msg)
+                .onSuccess(m -> GameMessageManager.replace(
+                        name, new GameMessage(m.getId(), GameMessageType.OPLUSPLUS_COUNCIL, date)));
     }
 
     private static List<String> deal(List<String> deck, int count) {
@@ -222,10 +268,24 @@ public class OPlusPlusCouncilService {
                 .filter(p -> p.getUserID().equals(userID))
                 .findFirst()
                 .orElse(null);
-        if (player == null) return;
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Couldn't find you in this game anymore - nothing was confirmed.");
+            return;
+        }
 
         if (alreadyResponded(game, player)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "You've already confirmed your objective choices.");
+            return;
+        }
+
+        if (!hasPicked(game, pickKey("S1", player))
+                || !hasPicked(game, pickKey("S2", player))
+                || !hasPicked(game, pickKey("SO", player))) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentation()
+                            + " you need to make a selection in all three menus (Stage I, Stage II, and secrets) before confirming.");
             return;
         }
 
@@ -245,12 +305,18 @@ public class OPlusPlusCouncilService {
         game.setStoredValue(RESPONDED_KEY, game.getStoredValue(RESPONDED_KEY) + "|" + userID);
         event.getHook()
                 .editOriginal("Choices confirmed. Waiting on the rest of the table.")
+                .useComponentsV2(true)
                 .setComponents()
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+        updateCouncilStatusMessage(game);
 
         if (readyToFinish(game)) {
             finish(game);
         }
+    }
+
+    private static boolean hasPicked(Game game, String key) {
+        return game.getStoredValueMap().containsKey(key);
     }
 
     private static boolean alreadyResponded(Game game, Player player) {
@@ -279,6 +345,7 @@ public class OPlusPlusCouncilService {
             game.removeStoredValue(pickKey("SO", player));
         }
         game.removeStoredValue(RESPONDED_KEY);
+        GameMessageManager.remove(game.getName(), GameMessageType.OPLUSPLUS_COUNCIL);
 
         Collections.shuffle(finalStage1);
         Collections.shuffle(finalStage2);
