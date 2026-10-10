@@ -9,35 +9,43 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class FlagshipRating {
 
-    public static final double GOOD = 0.7;
+    private static final double S_TIER = 1.0;
+    private static final double A_TIER = 0.8;
+    private static final double B_TIER = 0.6;
+    private static final double C_TIER = 0.4;
+    private static final double D_TIER = 0.2;
+    public static final double GOOD = A_TIER;
     private static final double UNKNOWN = 0.5;
     private static final Map<String, Double> RATINGS = Map.ofEntries(
-            Map.entry("letnev_flagship", 1.0),
-            Map.entry("nomad_flagship2", 1.0),
-            Map.entry("mahact_flagship", 0.85),
-            Map.entry("l1z1x_flagship", 0.85),
-            Map.entry("mentak_flagship", 0.85),
-            Map.entry("nomad_flagship", 0.8),
-            Map.entry("arborec_flagship", 0.8),
-            Map.entry("sardakk_flagship", 0.8),
-            Map.entry("jolnar_flagship", 0.75),
-            Map.entry("cabal_flagship", 0.75),
-            Map.entry("xxcha_flagship", 0.7),
-            Map.entry("sol_flagship", 0.7),
-            Map.entry("yssaril_flagship", 0.65),
-            Map.entry("nekro_flagship", 0.6),
-            Map.entry("saar_flagship", 0.6),
-            Map.entry("empyrean_flagship", 0.6),
-            Map.entry("titans_flagship", 0.6),
-            Map.entry("naalu_flagship", 0.55),
-            Map.entry("winnu_flagship", 0.55),
-            Map.entry("ghost_flagship", 0.45),
-            Map.entry("argent_flagship", 0.45),
-            Map.entry("naaz_flagship", 0.45),
-            Map.entry("keleres_flagship", 0.45),
-            Map.entry("hacan_flagship", 0.4),
-            Map.entry("muaat_flagship", 0.35),
-            Map.entry("yin_flagship", 0.3));
+            Map.entry("nekro_flagship", S_TIER),
+            Map.entry("ghost_flagship", S_TIER),
+            Map.entry("nomad_flagship", S_TIER),
+            Map.entry("nomad_flagship2", S_TIER),
+            Map.entry("l1z1x_flagship", S_TIER),
+            Map.entry("deepwrought_flagship", S_TIER),
+            Map.entry("crimson_flagship", S_TIER),
+            Map.entry("xxcha_flagship", S_TIER),
+            Map.entry("yin_flagship", A_TIER),
+            Map.entry("sol_flagship", A_TIER),
+            Map.entry("naalu_flagship", A_TIER),
+            Map.entry("yssaril_flagship", A_TIER),
+            Map.entry("empyrean_flagship", A_TIER),
+            Map.entry("keleres_flagship", A_TIER),
+            Map.entry("naaz_flagship", A_TIER),
+            Map.entry("mahact_flagship", A_TIER),
+            Map.entry("jolnar_flagship", B_TIER),
+            Map.entry("winnu_flagship", B_TIER),
+            Map.entry("letnev_flagship", B_TIER),
+            Map.entry("mentak_flagship", B_TIER),
+            Map.entry("cabal_flagship", B_TIER),
+            Map.entry("muaat_flagship", C_TIER),
+            Map.entry("saar_flagship", C_TIER),
+            Map.entry("titans_flagship", C_TIER),
+            Map.entry("argent_flagship", D_TIER),
+            Map.entry("arborec_flagship", D_TIER),
+            Map.entry("ralnel_flagship", D_TIER),
+            Map.entry("sardakk_flagship", D_TIER),
+            Map.entry("hacan_flagship", D_TIER));
 
     public static double of(Player seat) {
         UnitModel flagship = seat.getUnitByType(UnitType.Flagship);

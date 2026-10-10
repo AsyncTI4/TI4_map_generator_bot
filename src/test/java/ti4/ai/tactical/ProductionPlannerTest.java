@@ -29,7 +29,7 @@ class ProductionPlannerTest extends BaseTi4Test {
     }
 
     // Mordai II (4 resources) gives the home dock production 6. With resources to spare, every point of it is used:
-    // two mechs and two dreadnoughts, then two fighters for the last two slots.
+    // two mechs and the S-tier Alastor, then three fighters for the last three slots.
     @Test
     void usesTheWholeProductionOfTheDock() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
@@ -40,8 +40,8 @@ class ProductionPlannerTest extends BaseTi4Test {
 
         assertThat(plan.units()).isEqualTo(Helper.getProductionValue(test.nekro, test.game, home, false));
         assertThat(plan.units(UnitType.Mech)).isEqualTo(2);
-        assertThat(plan.units(UnitType.Dreadnought)).isEqualTo(2);
-        assertThat(plan.units(UnitType.Fighter)).isEqualTo(2);
+        assertThat(plan.units(UnitType.Flagship)).isEqualTo(1);
+        assertThat(plan.units(UnitType.Fighter)).isEqualTo(3);
     }
 
     // Short of resources, cheap units fill the production instead of a dreadnought that would leave slots empty.
@@ -156,20 +156,20 @@ class ProductionPlannerTest extends BaseTi4Test {
                 .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
-    // The Alastor is an average flagship and is only built for objectives. The Arc Secundus is one of the best, so a
-    // seat flying it builds it with resources to spare.
+    // The Alastor is an S-tier flagship, so a seat flying it builds it with resources to spare. The Wrath of
+    // Kenara is D tier and is only ever built for objectives.
     @Test
-    void buildsAGoodFlagshipWithSpareResourcesButNotAnAverageOne() {
+    void buildsAGoodFlagshipWithSpareResourcesButNotAWeakOne() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.units(home, "mordaiii", test.nekro, UnitType.Mech, 2);
         test.nekro.setTg(16);
-        assertThat(plan().units(UnitType.Flagship)).isZero();
+        assertThat(plan().units(UnitType.Flagship)).isEqualTo(1);
 
         test.nekro.removeOwnedUnitByID("nekro_flagship");
-        test.nekro.addOwnedUnitByID("letnev_flagship");
+        test.nekro.addOwnedUnitByID("hacan_flagship");
 
-        assertThat(plan().units(UnitType.Flagship)).isEqualTo(1);
+        assertThat(plan().units(UnitType.Flagship)).isZero();
     }
 
     // A war sun is a luxury: with the technology it is only built once the resources would still fill the rest of
