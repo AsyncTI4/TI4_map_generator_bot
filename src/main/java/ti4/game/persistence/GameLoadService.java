@@ -1142,6 +1142,8 @@ class GameLoadService {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.OPLUSPLUS_COUNCIL_CONFIRMED ->
+                    player.setOplusplusCouncilConfirmed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.AUTO_PASS_WHENS_N_AFTERS ->
                     player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));

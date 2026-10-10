@@ -828,6 +828,9 @@ class GameSaveService {
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.OPLUSPLUS_COUNCIL_CONFIRMED + " " + player.isOplusplusCouncilConfirmed());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.isAutoPassOnWhensAfters());
             writer.write(System.lineSeparator());
 
