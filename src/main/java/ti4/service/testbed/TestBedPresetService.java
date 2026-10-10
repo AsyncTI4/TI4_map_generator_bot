@@ -300,6 +300,18 @@ public class TestBedPresetService {
             }
             validateIds(entry.getValue(), TestBedPresetService::isKnownToken, "preset", "token", errors);
         }
+        preset.getBorderAnomalies().forEach((position, borders) -> {
+            if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
+                errors.add("preset: `borderAnomalies` position `" + position + "` is not a tile position.");
+            }
+            for (String border : borders) {
+                if (TestBedComponentService.borderDirection(border) == null
+                        || Mapper.resolveBorderAnomaly(TestBedComponentService.borderType(border)) == null) {
+                    errors.add("preset: `borderAnomalies` entry `" + border + "` at `" + position
+                            + "` must be `<n|ne|se|s|sw|nw>:<border type>`.");
+                }
+            }
+        });
         preset.getTiles().forEach((position, tileId) -> {
             if (!PositionMapper.isTilePositionValid(position.toLowerCase())) {
                 errors.add("preset: `tiles` position `" + position + "` is not a tile position.");

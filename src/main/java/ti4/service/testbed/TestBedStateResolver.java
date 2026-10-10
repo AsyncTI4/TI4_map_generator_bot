@@ -28,7 +28,8 @@ public class TestBedStateResolver {
             "laws",
             "revealedPos",
             "purgedPns",
-            "exploreDiscard");
+            "exploreDiscard",
+            "borderAnomalies");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -93,6 +94,10 @@ public class TestBedStateResolver {
             case "revealedPos" -> joinSorted(game.getRevealedPublicObjectives().keySet());
             case "purgedPns" -> joinSorted(game.getPurgedPN());
             case "exploreDiscard" -> joinSorted(game.getAllExploreDiscard());
+            case "borderAnomalies" ->
+                joinSorted(game.getBorderAnomalies().stream()
+                        .map(border -> border.getTile() + ":" + border.getDirection() + ":" + border.getType())
+                        .toList());
             default -> "<unknown " + field + ">";
         };
     }

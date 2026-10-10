@@ -148,6 +148,28 @@ class TestBedDataTest extends BaseTi4Test {
                 "maps A-G (`a000`-`g848`) need `\"fog\": true`");
     }
 
+    // Border entries are `<direction>:<type>`; legacy type spellings are accepted, the retired `arrow` is not.
+    @Test
+    void borderAnomaliesAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "borderAnomalies": {
+                    "202": ["n:spatial_tear", "s:SPATIAL_TEAR", "ne:Gravity Wave"],
+                    "nowhere": ["n:nebula"],
+                    "205": ["up:nebula", "n:arrow", "nebula"]
+                  }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`borderAnomalies` position `nowhere` is not a tile position",
+                "`borderAnomalies` entry `up:nebula` at `205`",
+                "`borderAnomalies` entry `n:arrow` at `205`",
+                "`borderAnomalies` entry `nebula` at `205`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("at `202`")), String.join("\n", errors));
+    }
+
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and
     // anything stored in a game avoids the `,` and `:` the save format splits on.
     @Test
