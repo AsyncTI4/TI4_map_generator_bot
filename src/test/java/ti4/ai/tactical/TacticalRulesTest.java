@@ -16,6 +16,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
+import ti4.ai.explore.ExplorationRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -163,6 +164,33 @@ class TacticalRulesTest extends BaseTi4Test {
         assertThat(pressedId(
                         TacticalRules.continueAction(test.context(conclude)).orElseThrow()))
                 .isEqualTo("FFCC_nekro_doneWithTacticalAction");
+    }
+
+    // The bot gives Lodor to Nekro, and offers to explore it, the moment the infantry lands. Under the rules every unit
+    // is committed to its planet and every combat is over before any planet is explored, so it finishes landing first.
+    @Test
+    void finishesLandingBeforeExploring() {
+        activate();
+        Tile tile = test.game.getTileByPosition(target);
+        test.units(tile, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(tile, "lodor", test.nekro, UnitType.Infantry, 1);
+        test.nekro.addPlanet("lodor");
+        AiPrompt landing = prompt(
+                "landing",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_landUnits_" + target + "_1gf_lodor_black",
+                "FFCC_nekro_doneLanding_" + target);
+        AiPrompt explore =
+                prompt("explore", PromptSource.PUBLIC, NOW + 5, "FFCC_nekro_movedNExplored_filler_lodor_cultural");
+
+        assertThat(pressedId(TacticalRules.continueAction(test.context(landing, explore))
+                        .orElseThrow()))
+                .isEqualTo("FFCC_nekro_doneLanding_" + target);
+        assertThat(ExplorationRules.next(test.context(landing, explore))).isEmpty();
+
+        assertThat(pressedId(TacticalRules.continueAction(test.context(explore)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_movedNExplored_filler_lodor_cultural");
     }
 
     // Mechs are ground forces too: with only a mech aboard, the mech lands.

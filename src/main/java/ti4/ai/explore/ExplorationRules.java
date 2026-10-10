@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -18,6 +20,8 @@ public class ExplorationRules {
 
     private record Offer(PromptButton button, String planet, String trait, double value, boolean scanlink) {}
 
+    private record Choice(AiPrompt prompt, Offer offer) {}
+
     static final double SCANLINK_MIN_VALUE = 0;
     private static final String EXPLORE_PREFIX = "movedNExplored_";
     private static final String FILLER = "filler";
@@ -25,30 +29,49 @@ public class ExplorationRules {
     private static final String CROWN = "crownofemphidiaexplore";
     private static final String DECLINE = "deleteButtons";
     private static final List<String> TRAITS = List.of("cultural", "industrial", "hazardous");
+    private static final List<String> TRAIT_ORDER = List.of("hazardous", "industrial", "cultural");
 
     public static Optional<AiDecision> next(AiTurnContext context) {
         List<AiPrompt> prompts = ExploreWindow.prompts(context);
-        return explore(context, prompts)
-                .or(() -> crown(context, prompts))
+        Optional<AiDecision> explore =
+                TacticalRules.inProgress(context) ? scanlink(context, prompts) : explore(context, prompts);
+        return explore.or(() -> crown(context, prompts))
                 .or(() -> CardRules.next(context, prompts))
                 .or(() -> FreelancersRules.next(context, prompts))
                 .or(() -> TokenGainRules.next(context, prompts));
     }
 
     public static Optional<AiDecision> explore(AiTurnContext context, List<AiPrompt> prompts) {
+        return explore(context, prompts, offer -> true);
+    }
+
+    private static Optional<AiDecision> scanlink(AiTurnContext context, List<AiPrompt> prompts) {
+        return explore(context, prompts, Offer::scanlink);
+    }
+
+    private static Optional<AiDecision> explore(
+            AiTurnContext context, List<AiPrompt> prompts, Predicate<Offer> allowed) {
         ExploreOutlook outlook = new ExploreOutlook(context.game(), context.seat());
+        List<Choice> choices = new ArrayList<>();
         for (AiPrompt prompt : prompts) {
             if (!ExploreWindow.untouched(context, prompt)) continue;
-            List<Offer> offers = offersIn(context, prompt, outlook);
-            if (offers.isEmpty()) continue;
-            Offer best = offers.stream()
+            offersIn(context, prompt, outlook).stream()
+                    .filter(allowed)
                     .max(Comparator.comparingDouble(Offer::value))
-                    .orElseThrow();
-            if (best.scanlink() && best.value() <= SCANLINK_MIN_VALUE) continue;
-            return Optional.of(
-                    AiDecision.press(prompt, best.button(), "explore " + best.planet() + " as " + best.trait()));
+                    .filter(best -> !best.scanlink() || best.value() > SCANLINK_MIN_VALUE)
+                    .ifPresent(best -> choices.add(new Choice(prompt, best)));
         }
-        return Optional.empty();
+        return choices.stream()
+                .min(Comparator.comparingInt((Choice choice) ->
+                                TRAIT_ORDER.indexOf(choice.offer().trait()))
+                        .thenComparing(Comparator.comparingDouble(
+                                        (Choice choice) -> choice.offer().value())
+                                .reversed()))
+                .map(choice -> AiDecision.press(
+                        choice.prompt(),
+                        choice.offer().button(),
+                        "explore " + choice.offer().planet() + " as "
+                                + choice.offer().trait()));
     }
 
     private static List<Offer> offersIn(AiTurnContext context, AiPrompt prompt, ExploreOutlook outlook) {

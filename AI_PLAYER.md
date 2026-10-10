@@ -436,7 +436,10 @@ to build one by hand:
     to about 1 per exploration. `TacticalPlanner` adds that to every planet nobody holds that a plan expands to or
     invades (with the infantry and mechs the plan lands there); an invaded planet someone holds is never explored.
   - **Offers.** A newly taken planet is explored through the bot's offer, from the deck with the better average when it
-    has more than one trait. A Scanlink Drone Network offer (the planet it already holds) is answered only when the
+    has more than one trait. The bot gives the planet and offers the exploration as soon as a unit lands, but under the
+    rules every unit is committed to its planet and every combat is over before any planet is explored: during a
+    tactical action the AI finishes landing and waits out ground combat first, then explores hazardous planets first,
+    then industrial, then cultural, resolving each card before the next exploration. A Scanlink Drone Network offer (the planet it already holds) is answered only when the
     best deck is worth more than nothing, otherwise ignored; the Crown of Emphidia is exhausted at the end of a
     tactical action only for a planet whose deck is worth more than nothing, then used on the best one.
   - **Cards that ask.** Unowned buttons are only the AI's own on its turn, in a message for it (or one that names no

@@ -193,16 +193,16 @@ public class TacticalRules {
 
         Optional<AiDecision> movement = movement(context, turn, target, plan);
         if (movement.isPresent()) return movement;
-        Optional<AiDecision> explore = ExplorationRules.explore(context, turn);
-        if (explore.isPresent()) return explore;
-        Optional<Match> relic = Prompts.owned(turn, context.faction(), "drawRelic"::equals);
-        if (relic.isPresent()) return Optional.of(relic.get().press("draw a relic"));
         if (BoardView.hasOwnShips(seat, tile) && BoardView.hasEnemyShips(game, seat, tile)) {
             return waitForCombat(context, turn);
         }
         Optional<AiDecision> landing = landing(context, turn, tile, plan);
         if (landing.isPresent()) return landing;
         if (groundCombatOngoing(game, seat, tile)) return waitForCombat(context, turn);
+        Optional<AiDecision> explore = ExplorationRules.explore(context, turn);
+        if (explore.isPresent()) return explore;
+        Optional<Match> relic = Prompts.owned(turn, context.faction(), "drawRelic"::equals);
+        if (relic.isPresent()) return Optional.of(relic.get().press("draw a relic"));
         Optional<AiDecision> pay = payForUnits(context, turn, TACTICAL_SOURCE);
         if (pay.isPresent()) return pay;
         Optional<BuildPlan> buildPlan =

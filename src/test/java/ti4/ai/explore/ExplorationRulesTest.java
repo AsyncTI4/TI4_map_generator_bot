@@ -48,6 +48,17 @@ class ExplorationRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_movedNExplored_filler_tequran_hazardous");
     }
 
+    // With several planets to explore it goes hazardous first, then industrial, then cultural, as players usually do.
+    @Test
+    void exploresHazardousBeforeCultural() {
+        AiPrompt torkan = offer("filler", "torkan", "cultural");
+        AiPrompt tequran = offer("filler", "tequran", "hazardous");
+
+        assertThat(pressedId(
+                        ExplorationRules.next(test.context(torkan, tequran)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_movedNExplored_filler_tequran_hazardous");
+    }
+
     // One planet with two traits offers both decks. The AI looks at what is left in each: a Mining World (+2 resources)
     // beats a Demilitarized Zone, and the other way round when the decks are swapped.
     @Test
