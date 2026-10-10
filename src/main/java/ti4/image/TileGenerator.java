@@ -509,8 +509,7 @@ public class TileGenerator {
                     int direction = 0;
                     for (String secondaryTile : adj) {
                         if (secondaryTile != null) {
-                            addBorderDecoration(
-                                    direction, secondaryTile, tileGraphics, BorderAnomalyModel.BorderAnomalyType.ARROW);
+                            addBorderDecoration(direction, secondaryTile, tileGraphics, getAdjacencyArrowImagePath());
                         }
                         direction++;
                     }
@@ -519,7 +518,9 @@ public class TileGenerator {
                 if (!game.getBorderAnomalies().isEmpty()) {
                     List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
                     game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                        if (borderAnomalyHolder.getTile().equals(tile.getPosition())
+                        BorderAnomalyModel anomalyModel = borderAnomalyHolder.getModel();
+                        if (anomalyModel != null
+                                && borderAnomalyHolder.getTile().equals(tile.getPosition())
                                 && (!isFoWPrivate
                                         || !tile.hasFog(fowPlayer)
                                         || FoWHelper.getTilePositionsToShow(game, fowPlayer)
@@ -529,7 +530,7 @@ public class TileGenerator {
                                     borderAnomalyHolder.getDirection(),
                                     null,
                                     tileGraphics,
-                                    borderAnomalyHolder.getType());
+                                    anomalyModel.getImageFilePath());
                         }
                     });
                 }
@@ -1559,23 +1560,25 @@ public class TileGenerator {
         return "Distance" + distance + ".png";
     }
 
+    private static String getAdjacencyArrowImagePath() {
+        return ResourceHelper.getResourceFromFolder("borders/", "adjacency_arrow.png");
+    }
+
     private static void addBorderDecoration(
-            int direction,
-            String secondaryTile,
-            Graphics tileGraphics,
-            BorderAnomalyModel.BorderAnomalyType decorationType) {
+            int direction, String secondaryTile, Graphics tileGraphics, String decorationImagePath) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
-        if (decorationType == null) {
+        if (decorationImagePath == null) {
             return;
         }
+        boolean isAdjacencyArrow = secondaryTile != null;
         BufferedImage borderDecorationImage;
         try {
-            BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
+            BufferedImage cached = ImageHelper.read(decorationImagePath);
             borderDecorationImage = new BufferedImage(
                     cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
-            BotLogger.error("Could not find border decoration image! Decoration was " + decorationType, e);
+            BotLogger.error("Could not find border decoration image! Decoration was " + decorationImagePath, e);
             return;
         }
 
@@ -1589,7 +1592,7 @@ public class TileGenerator {
         int centerX = 173;
         int centerY = 150;
 
-        if (decorationType == BorderAnomalyModel.BorderAnomalyType.ARROW) {
+        if (isAdjacencyArrow) {
             int textOffsetX = 12;
             int textOffsetY = 40;
             Graphics2D arrow = borderDecorationImage.createGraphics();
@@ -1607,7 +1610,7 @@ public class TileGenerator {
         }
 
         tileGraphics2d.rotate(Math.toRadians((direction) * 60), centerX, centerY);
-        if (decorationType == BorderAnomalyModel.BorderAnomalyType.ARROW) centerX -= 20;
+        if (isAdjacencyArrow) centerX -= 20;
         tileGraphics2d.drawImage(borderDecorationImage, null, centerX - imageCenterX, -imageCenterY);
         tileGraphics2d.setTransform(originalTileTransform);
     }

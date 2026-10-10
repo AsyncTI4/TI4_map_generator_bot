@@ -94,7 +94,6 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -452,8 +451,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return borderAnomalyManager.has(tile, direction);
     }
 
-    public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        borderAnomalyManager.add(tile, direction, anomalyType);
+    public void addBorderAnomaly(String tile, Integer direction, String anomalyTypeId) {
+        borderAnomalyManager.add(tile, direction, anomalyTypeId);
     }
 
     public void removeBorderAnomaly(String tile, Integer direction) {
