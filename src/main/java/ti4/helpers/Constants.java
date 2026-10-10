@@ -104,6 +104,7 @@ public final class Constants {
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
+    public static final String OPLUSPLUS_COUNCIL_CONFIRMED = "oplusplus_council_confirmed";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
     public static final String AUTO_PASS_WHENS_N_AFTERS = "auto_pass_whens_n_afters";
