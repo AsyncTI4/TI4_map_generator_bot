@@ -58,11 +58,17 @@ public class BombardmentRules {
     public static int expectedHits(Player seat, Map<UnitType, Integer> ships) {
         double expected = 0;
         for (double chance : dieChances(seat, ships)) expected += chance;
-        return (int) Math.floor(expected);
+        return (int) Math.floor(expected) * hitMultiplier(seat);
+    }
+
+    private static int hitMultiplier(Player seat) {
+        return seat.hasTech(CombatForces.X89_DOUBLING) ? 2 : 1;
     }
 
     public static double chanceToDestroyAll(Player seat, Map<UnitType, Integer> ships, Planet planet, Player defender) {
-        int needed = BoardView.groundForces(planet, defender) + BoardView.undamaged(planet, defender, UnitType.Mech);
+        int needed = Math.ceilDiv(
+                BoardView.groundForces(planet, defender) + BoardView.undamaged(planet, defender, UnitType.Mech),
+                hitMultiplier(seat));
         double[] hits = {1.0};
         for (double chance : dieChances(seat, ships)) {
             double[] next = new double[hits.length + 1];

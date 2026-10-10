@@ -1,5 +1,6 @@
 package ti4.ai.strategy;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,7 +40,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.model.TechnologyModel;
 
 @UtilityClass
 public class StrategyCardRules {
@@ -495,15 +495,16 @@ public class StrategyCardRules {
         context.memory().remove(requestKey(context, RESEARCH_KEY));
         Optional<String> best = ResearchPolicy.best(game, seat, options.keySet());
         if (best.isEmpty()) return Optional.empty();
-        if (needsAiDevelopment(seat, best.get())) context.memory().put(AIDA_RESEARCH_KEY + game.getRound(), "skip");
-        if (cost > 0) {
-            Optional<Wallet.Payment> payment = ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(cost))
-                    .or(() -> Wallet.of(game, seat).plan(SpendCost.resources(cost)));
-            if (payment.isEmpty()) return Optional.empty();
-            PaymentRules.expect(context, "a technology", payment.get(), PaymentRules.TECHNOLOGY_DONE);
-        } else {
-            PaymentRules.expectNothing(context, "a technology", PaymentRules.TECHNOLOGY_DONE);
-        }
+        PrerequisiteSkips.Plan skips = PrerequisiteSkips.of(game, seat, Mapper.getTech(best.get()));
+        if (skips.aiDevelopment()) context.memory().put(AIDA_RESEARCH_KEY + game.getRound(), "skip");
+        Wallet wallet = withoutPlanets(Wallet.of(game, seat), skips.planets());
+        Optional<Wallet.Payment> payment = cost > 0
+                ? ScoringReserve.planAfterReserve(wallet, ScoringReserve.of(game, seat), SpendCost.resources(cost))
+                        .or(() -> wallet.plan(SpendCost.resources(cost)))
+                : Optional.of(new Wallet.Payment(List.of(), List.of(), 0, 0));
+        if (payment.isEmpty()) return Optional.empty();
+        PaymentRules.expect(
+                context, "a technology", withSkipPlanets(payment.get(), skips), PaymentRules.TECHNOLOGY_DONE);
         return Optional.of(options.get(best.get()).press("research " + best.get()));
     }
 
@@ -528,12 +529,21 @@ public class StrategyCardRules {
         return Optional.empty();
     }
 
-    private static boolean needsAiDevelopment(Player seat, String alias) {
-        TechnologyModel tech = Mapper.getTech(alias);
-        return tech != null
-                && tech.isUnitUpgrade()
-                && seat.hasTechReady(AI_DEVELOPMENT)
-                && ResearchPolicy.missingPrerequisites(seat, tech, null) > 0;
+    private static Wallet withoutPlanets(Wallet wallet, List<String> planets) {
+        return new Wallet(
+                wallet.planets().stream()
+                        .filter(planet -> !planets.contains(planet.name()))
+                        .toList(),
+                wallet.tradeGoods(),
+                wallet.tacticTokens(),
+                wallet.strategyTokens(),
+                wallet.tradeGoodValue());
+    }
+
+    private static Wallet.Payment withSkipPlanets(Wallet.Payment payment, PrerequisiteSkips.Plan skips) {
+        List<String> planets = new ArrayList<>(skips.planets());
+        planets.addAll(payment.forResources());
+        return new Wallet.Payment(planets, payment.forInfluence(), payment.tradeGoods(), payment.tokens());
     }
 
     public static Optional<AiDecision> placeStructure(AiTurnContext context) {
@@ -925,7 +935,7 @@ public class StrategyCardRules {
 
     static boolean worthResearching(Game game, Player seat, double worth) {
         return ResearchPolicy.bestResearchable(game, seat)
-                .map(alias -> ResearchPolicy.value(game, seat, alias) >= worth)
+                .map(alias -> ResearchPolicy.researchValue(game, seat, alias) >= worth)
                 .orElse(false);
     }
 

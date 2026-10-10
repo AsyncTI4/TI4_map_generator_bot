@@ -89,14 +89,19 @@ public class SingularityRules {
                             && button.handlerId().endsWith(NO_PAY_SUFFIX))
                     .filter(button -> copyable.contains(aliasOf(button)))
                     .filter(button -> CopiedTechPolicy.value(context.game(), context.seat(), aliasOf(button)) > 0)
-                    .max(Comparator.comparingDouble(
-                            button -> CopiedTechPolicy.value(context.game(), context.seat(), aliasOf(button))));
+                    .max(Comparator.comparingDouble(button -> copyValue(context, victim, aliasOf(button))));
             if (best.isPresent()) {
                 context.memory().remove(PRESSED_KEY);
                 return Optional.of(AiDecision.press(prompt, best.get(), "choose the technology to copy"));
             }
         }
         return Optional.empty();
+    }
+
+    private static double copyValue(AiTurnContext context, Player victim, String alias) {
+        Game game = context.game();
+        return CopiedTechPolicy.value(game, context.seat(), alias)
+                + CombatForces.copySwingValue(game, context.seat(), victim, alias);
     }
 
     private static String aliasOf(PromptButton button) {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.secrets.SecretValue;
@@ -97,6 +98,7 @@ public class ResearchPolicy {
             Map.entry("ps", 3.0),
             Map.entry("aida", 3.0),
             Map.entry("asc", 3.5),
+            Map.entry("x89c4", 3.5),
             Map.entry("dn2", 3.5),
             Map.entry("lwd", 3.0),
             Map.entry("ie", 3.0),
@@ -118,11 +120,16 @@ public class ResearchPolicy {
             Map.entry("td", 1.0),
             Map.entry("sr", 1.0),
             Map.entry("det", 1.0),
-            Map.entry("x89", 1.0),
-            Map.entry("x89c4", 1.0));
+            Map.entry("x89", 1.0));
     private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
     private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
     private static final String PRODUCE_EN_MASSE = "pem";
+    private static final String LAWS_OF_PHYSICS = "mlp";
+    private static final String ADAPT_NEW_STRATEGIES = "ans";
+    private static final int PAIR = 2;
+    private static final int DEFAULT_VICTORY_POINTS = 10;
+    private static final double LEADER_POINTS_PER_ROUND = 2.0;
+    private static final double RESEARCHES_PER_ROUND = 1.5;
     private static final String SPACE_DOCK_UPGRADE = "sd2";
     private static final int DOCK_UPGRADE_PRODUCTION = 2;
     private static final double STEPPING_STONE_SHARE = 0.3;
@@ -135,8 +142,14 @@ public class ResearchPolicy {
     public static Optional<String> best(Game game, Player seat, Collection<String> candidates) {
         return candidates.stream()
                 .filter(alias -> Mapper.getTech(alias) != null)
-                .max(Comparator.comparingDouble((String alias) -> value(game, seat, alias))
+                .max(Comparator.comparingDouble((String alias) -> researchValue(game, seat, alias))
                         .thenComparing(Comparator.naturalOrder()));
+    }
+
+    public static double researchValue(Game game, Player seat, String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        if (tech == null) return 0;
+        return value(game, seat, alias) - PrerequisiteSkips.of(game, seat, tech).valueLost();
     }
 
     public static Optional<String> bestResearchable(Game game, Player seat) {
@@ -198,6 +211,7 @@ public class ResearchPolicy {
 
     private static double objectiveGain(Game game, Player seat, TechnologyModel tech) {
         double gain = 0;
+        int laterResearches = researchesLeft(game) - 1;
         for (String objective : objectivesInPlay(game, seat)) {
             int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
             if (threshold <= 0) continue;
@@ -205,10 +219,52 @@ public class ResearchPolicy {
             if (before >= threshold) continue;
             int after = progress(game, objective, seat, tech);
             if (after <= before) continue;
+            if (after < threshold && techsStillNeeded(objective, seat, tech, threshold) > laterResearches) continue;
             double points = Math.max(1, ObjectivePolicy.victoryPoints(objective));
             gain += after >= threshold ? points : points * PARTIAL_PROGRESS_SHARE * after / threshold;
         }
         return gain;
+    }
+
+    static int researchesLeft(Game game) {
+        int goal = game.getVp() > 0 ? game.getVp() : DEFAULT_VICTORY_POINTS;
+        int leader = game.getRealPlayers().stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(0);
+        int roundsLeft = (int) Math.ceil(Math.max(0, goal - leader) / LEADER_POINTS_PER_ROUND);
+        return Math.max(1, (int) Math.floor(roundsLeft * RESEARCHES_PER_ROUND));
+    }
+
+    static boolean withinReach(Game game, Player seat, String objective) {
+        if (ObjectivePolicy.hasScored(game, seat, objective)) return false;
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
+        return threshold <= 0 || techsStillNeeded(objective, seat, null, threshold) <= researchesLeft(game);
+    }
+
+    private static int techsStillNeeded(
+            String objective, Player seat, @Nullable TechnologyModel adding, int threshold) {
+        if (UNIT_UPGRADE_OBJECTIVES.contains(objective)) {
+            boolean upgrade = adding != null && adding.isUnitUpgrade();
+            return threshold - ButtonHelper.getNumberOfUnitUpgrades(seat) - (upgrade ? 1 : 0);
+        }
+        List<Integer> colours = TechnologyType.mainFour.stream()
+                .map(type -> colourCount(seat, type, adding))
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        if (COLOUR_PAIR_OBJECTIVES.contains(objective)) {
+            return colours.stream()
+                    .limit(threshold)
+                    .mapToInt(count -> Math.max(0, PAIR - count))
+                    .sum();
+        }
+        if (LAWS_OF_PHYSICS.equals(objective)) return threshold - colours.getFirst();
+        if (ADAPT_NEW_STRATEGIES.equals(objective)) {
+            boolean ownFactionTech = adding != null
+                    && adding.getFaction().filter(seat.getFaction()::equals).isPresent();
+            return threshold - SecretValue.ownFactionTechnologies(seat) - (ownFactionTech ? 1 : 0);
+        }
+        return 0;
     }
 
     private static List<String> objectivesInPlay(Game game, Player seat) {
@@ -237,12 +293,12 @@ public class ResearchPolicy {
             }
             return pairs;
         }
-        if ("mlp".equals(objective)) {
+        if (LAWS_OF_PHYSICS.equals(objective)) {
             int best = 0;
             for (TechnologyType type : TechnologyType.mainFour) best = Math.max(best, colourCount(seat, type, adding));
             return best;
         }
-        if ("ans".equals(objective)) {
+        if (ADAPT_NEW_STRATEGIES.equals(objective)) {
             boolean addsOwnFactionTech = adding != null
                     && adding.getFaction().filter(seat.getFaction()::equals).isPresent();
             return SecretValue.ownFactionTechnologies(seat) + (addsOwnFactionTech ? 1 : 0);

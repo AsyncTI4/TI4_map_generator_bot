@@ -409,6 +409,33 @@ class StrategyCardRulesTest extends BaseTi4Test {
         assertThat(PaymentRules.isPending(withList)).isTrue();
     }
 
+    // Hyper Metabolism needs a second green technology, which Tarmann's specialty supplies. Using it means exhausting
+    // Tarmann, so the free research still plans that exhaust and presses it before closing the payment.
+    @Test
+    void exhaustsTheSpecialtyPlanetItResearchesWith() {
+        Player sol = test.sol;
+        test.place("22", "101");
+        sol.addPlanet("tarmann");
+        AiPrompt card = prompt("tech", PromptSource.PUBLIC, NOW, "sc_no_follow_7", "acquireATechWithSC_first");
+        test.game.setActivePlayerID(sol.getUserID());
+        test.memoryOf(sol).put("scPlayed|" + test.contextFor(sol, Set.of(), NOW).turnKey(), String.valueOf(TECHNOLOGY));
+        StrategyCardRules.resolvePrimary(test.contextFor(sol, Set.of(), NOW, card));
+        AiPrompt list = prompt("list", PromptSource.AI_THREAD, NOW, "FFCC_sol_getTech_hm");
+        assertThat(StrategyCardRules.chooseTechnology(test.contextFor(sol, Set.of(), NOW, card, list))
+                        .map(AiTestGame::pressedId))
+                .contains("FFCC_sol_getTech_hm");
+
+        AiPrompt payment = prompt(
+                "payment",
+                PromptSource.AI_THREAD,
+                NOW + 10,
+                List.of("spend_tarmann_restech", PaymentRules.TECHNOLOGY_DONE),
+                List.of("Tarmann", "Done Exhausting Planets"));
+        assertThat(PaymentRules.pay(test.contextFor(sol, Set.of(), NOW + 20, payment))
+                        .map(AiTestGame::pressedId))
+                .contains("spend_tarmann_restech");
+    }
+
     @Test
     void neverResearchesAsNekro() {
         AiPrompt card = prompt("tech", PromptSource.PUBLIC, NOW, "sc_no_follow_7", "acquireATechWithSC_first");

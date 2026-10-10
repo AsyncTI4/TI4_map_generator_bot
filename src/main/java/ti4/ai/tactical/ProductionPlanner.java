@@ -170,7 +170,7 @@ public class ProductionPlanner {
         return new BuildPlan(builder.orders);
     }
 
-    static int aidaDiscount(Player seat) {
+    public static int aidaDiscount(Player seat) {
         if (!seat.hasTechReady(AI_DEVELOPMENT)) return 0;
         int upgrades = ButtonHelper.getNumberOfUnitUpgrades(seat);
         boolean worthTheExhaust = upgrades >= AIDA_MIN_DISCOUNT || StrategyCardRules.cannotResearch(seat);

@@ -116,6 +116,32 @@ class SingularityRulesTest extends BaseTi4Test {
         assertThat(test.memory.has(SingularityRules.PRESSED_KEY)).isFalse();
     }
 
+    // Mid-combat, a technology that changes the rest of the fight is worth more. With a dreadnought and six fighters in
+    // a close fight against five cruisers, Fighter II beats the higher-rated Antimass Deflectors; once the fight is
+    // over, the rating decides.
+    @Test
+    void prefersATechnologyThatHelpsTheFightInProgress() {
+        test.units(battle, "space", test.nekro, UnitType.Fighter, 6);
+        test.units(battle, "space", test.sol, UnitType.Cruiser, 3);
+        test.sol.addTech("ff2");
+        test.sol.addTech("amd");
+        test.game.setActiveSystem(battle.getPosition());
+        AiPrompt choice = AiTestGame.withContent(
+                prompt("choice", PromptSource.PUBLIC, NOW + 1000, "getTech_amd__noPay", "getTech_ff2__noPay"),
+                test.nekro.getRepresentation() + ", please choose a technology to copy.");
+
+        test.memory.put(SingularityRules.PRESSED_KEY, NOW + "|" + AiTestGame.HUMAN_ID);
+        assertThat(pressedId(SingularityRules.next(test.contextAt(NOW + 2000, choice))
+                        .orElseThrow()))
+                .isEqualTo("getTech_ff2__noPay");
+
+        battle.removeUnit("space", Units.getUnitKey(UnitType.Cruiser, "blue"), 5);
+        test.memory.put(SingularityRules.PRESSED_KEY, NOW + "|" + AiTestGame.HUMAN_ID);
+        assertThat(pressedId(SingularityRules.next(test.contextAt(NOW + 2000, choice))
+                        .orElseThrow()))
+                .isEqualTo("getTech_amd__noPay");
+    }
+
     @Test
     void onlyChoosesFromAPromptAddressedToItself() {
         test.memory.put(SingularityRules.PRESSED_KEY, NOW + "|" + AiTestGame.HUMAN_ID);

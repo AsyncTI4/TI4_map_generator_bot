@@ -275,6 +275,52 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // Four infantry against three on Lodor fall short of the 80% bar. X-89 Bacterial Weapon ΩΩ doubles their ground
+    // combat hits, which makes the same invasion worth it.
+    @Test
+    void x89MakesAnInvasionWorthIt() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 3);
+
+        assertThat(attackOn(neighbour)).isEmpty();
+
+        test.nekro.addTech("x89c4");
+        assertThat(attackOn(neighbour).orElseThrow().landings()).containsEntry("lodor", 4);
+    }
+
+    // Nekro copies one of the defender's technologies after the first kill. Against Sol's four cruisers, copying
+    // Fighter II upgrades its six fighters for the rest of the fight, so the attack scores better when Sol owns
+    // Fighter II than when Sol only owns Antimass Deflectors, which would not change the fight.
+    @Test
+    void countsACombatTechnologyItWouldCopyMidFight() {
+        double withAntimass = attackScoreAgainstFourCruisers("amd");
+        double withFighterTwo = attackScoreAgainstFourCruisers("ff2");
+
+        assertThat(withFighterTwo).isGreaterThan(withAntimass);
+    }
+
+    private double attackScoreAgainstFourCruisers(String solTechnology) {
+        AiTestGame fresh = new AiTestGame();
+        Tile freshHome = fresh.nekroHome();
+        fresh.units(freshHome, "space", fresh.nekro, UnitType.Carrier, 2);
+        fresh.units(freshHome, "space", fresh.nekro, UnitType.Dreadnought, 1);
+        fresh.units(freshHome, "space", fresh.nekro, UnitType.Fighter, 6);
+        fresh.units(freshHome, "mordaiii", fresh.nekro, UnitType.Infantry, 4);
+        fresh.nekro.setFleetCC(8);
+        Tile lodor = fresh.place("26", neighbour);
+        fresh.sol.addPlanet("lodor");
+        fresh.units(lodor, "space", fresh.sol, UnitType.Cruiser, 4);
+        fresh.sol.addTech(solTechnology);
+        return TacticalPlanner.forTarget(fresh.game, fresh.nekro, neighbour)
+                .filter(found -> found.kind() == Kind.ATTACK)
+                .orElseThrow()
+                .score();
+    }
+
     // Copying a technology after a combat is Nekro's Technological Singularity. A seat without that ability must
     // not count it, so a marginal attack that only the copy made worthwhile is dropped.
     @Test

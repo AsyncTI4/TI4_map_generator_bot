@@ -77,7 +77,9 @@ public class StrategyCardRanking {
     private static double technologyValue(Game game, Player seat, int round) {
         if (seat.hasAbility("propagation")) return 1.0;
         double value = round <= 3 ? 5.0 : 3.5;
-        return value + (anyUnscored(game, seat, TECH_OBJECTIVES) ? 1.5 : 0);
+        boolean chasesTechObjective = game.getRevealedPublicObjectives().keySet().stream()
+                .anyMatch(id -> TECH_OBJECTIVES.contains(id) && ResearchPolicy.withinReach(game, seat, id));
+        return value + (chasesTechObjective ? 1.5 : 0);
     }
 
     private static double imperialValue(Game game, Player seat) {

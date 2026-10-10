@@ -38,4 +38,23 @@ class ResearchPolicyTest extends BaseTi4Test {
         assertThat(ResearchPolicy.baseValue(Mapper.getTech("dxa")))
                 .isLessThan(ResearchPolicy.baseValue(Mapper.getTech("x89")));
     }
+
+    // Master the Sciences wants two technologies in each of four colours. Sol owns one green one, so Bio-Stims
+    // still leaves six to go. Early on (about five rounds and seven researches left) that is worth chasing; once
+    // someone sits at 9 of 10 points there is about one research left, so the objective adds nothing.
+    @Test
+    void givesUpOnATechnologyObjectiveTooFarToFinish() {
+        test.game.getRevealedPublicObjectives().put("master_science", 1);
+        double early = ResearchPolicy.value(test.game, test.sol, "bs");
+
+        test.game.scorePublicObjective(test.nekro.getUserID(), test.game.addCustomPO("Test points", 9));
+        double late = ResearchPolicy.value(test.game, test.sol, "bs");
+
+        assertThat(early).isGreaterThan(late);
+        assertThat(late)
+                .isCloseTo(
+                        ResearchPolicy.baseValue(Mapper.getTech("bs"))
+                                + 0.3 * ResearchPolicy.baseValue(Mapper.getTech("hm")),
+                        Offset.offset(1e-9));
+    }
 }

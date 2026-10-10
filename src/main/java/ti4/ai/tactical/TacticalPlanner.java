@@ -10,14 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
-import ti4.ai.eval.CombatModifiers;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
+import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.promissory.PlayAreaNotes;
 import ti4.ai.scoring.Footprint;
@@ -38,7 +37,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
-import ti4.service.combat.CombatStatsService;
 
 @UtilityClass
 public class TacticalPlanner {
@@ -57,8 +55,6 @@ public class TacticalPlanner {
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String ASSAULT_CANNON = "asc";
-    private static final String NON_EUCLIDEAN_SHIELDING = "nes";
-    private static final int NEVER_HITS = 11;
     private static final int ASSAULT_CANNON_SHIPS = 3;
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double GROUP_MOVE_COST = 0.3;
@@ -268,8 +264,8 @@ public class TacticalPlanner {
                 : 0;
         double cannonLosses = 0;
         if (cannonHits > 0) {
-            List<Combatant> arriving =
-                    combatants(game, tile, space, attacking, new Side(opponent, Map.of()), attackersDamaged);
+            List<Combatant> arriving = CombatForces.combatants(
+                    game, tile, space, attacking, new Side(opponent, Map.of()), attackersDamaged);
             List<Combatant> survivors = afterCannonFire(arriving, cannonHits);
             if (survivors.isEmpty()) return Optional.empty();
             cannonLosses = arriving.stream().mapToDouble(Combatant::cost).sum()
@@ -278,18 +274,22 @@ public class TacticalPlanner {
         if (spaceCombat) {
             Side defending = new Side(opponent, BoardView.ships(space, opponent));
             Map<UnitType, Integer> defendersDamaged = damagedAmong(space, opponent, defending.units());
-            if (combatants(game, tile, space, defending, attacking, defendersDamaged)
+            if (CombatForces.combatants(game, tile, space, defending, attacking, defendersDamaged)
                     .isEmpty()) return Optional.empty();
             Side cannonedDefenders = afterAssaultCannon(defending, attacking);
             Side cannonedAttackers = afterAssaultCannon(attacking, defending);
             Side barragedDefenders = afterBarrage(cannonedDefenders, cannonedAttackers);
             Side barragedAttackers = afterBarrage(cannonedAttackers, cannonedDefenders);
             List<Combatant> defenders = afterCannonFire(
-                    combatants(game, tile, space, barragedDefenders, barragedAttackers, defendersDamaged),
+                    CombatForces.combatants(game, tile, space, barragedDefenders, barragedAttackers, defendersDamaged),
                     ownCannonHits(game, seat, tile, origin));
             List<Combatant> attackers = afterCannonFire(
-                    combatants(game, tile, space, barragedAttackers, barragedDefenders, attackersDamaged), cannonHits);
-            spaceWin = CombatOdds.resolve(attackers, defenders).attackerWins();
+                    CombatForces.combatants(game, tile, space, barragedAttackers, barragedDefenders, attackersDamaged),
+                    cannonHits);
+            Force defence = CombatForces.force(opponent, defenders, false);
+            Force attack = CombatForces.withExpectedCopy(
+                    game, seat, opponent, CombatForces.force(seat, attackers, false), defence, true, false);
+            spaceWin = CombatOdds.resolve(attack, defence).attackerWins();
             if (spaceWin < ATTACK_MIN_WIN) return Optional.empty();
         }
         Map<UnitType, Integer> bombarding = new EnumMap<>(UnitType.class);
@@ -461,7 +461,7 @@ public class TacticalPlanner {
                     remaining.stream().filter(Combatant::sustain).findFirst();
             if (sustaining.isPresent()) {
                 Combatant ship = sustaining.get();
-                remaining.set(remaining.indexOf(ship), new Combatant(ship.hitsOn(), ship.dice(), false, ship.cost()));
+                remaining.set(remaining.indexOf(ship), ship.withoutSustain());
             } else {
                 remaining.removeFirst();
             }
@@ -851,40 +851,22 @@ public class TacticalPlanner {
         Side attacking = new Side(seat, sent);
         Side defending = new Side(opponent, groundOn(planet, opponent));
         Map<UnitType, Integer> defendersDamaged = damagedAmong(planet, opponent, defending.units());
-        return CombatOdds.resolve(
-                        combatants(game, tile, planet, attacking, defending, Map.of()),
-                        afterCannonFire(
-                                combatants(game, tile, planet, defending, attacking, defendersDamaged),
-                                bombardmentHits))
-                .attackerWins();
-    }
-
-    private static List<Combatant> combatants(
-            Game game, Tile tile, UnitHolder holder, Side side, Side opponent, Map<UnitType, Integer> damaged) {
-        List<Combatant> combatants = new ArrayList<>();
-        Map<UnitType, Integer> modifiers = CombatModifiers.hitModifiers(game, tile, holder, side, opponent);
-        Player player = side.player();
-        side.units().forEach((type, count) -> {
-            UnitModel model = player.getUnitByType(type);
-            if (model == null || count <= 0) return;
-            CombatStatsService.CombatRoundProfile profile =
-                    CombatStatsService.getCombatRoundProfile(true, model, player, tile, opponent.player(), false);
-            int hitsOn = profile.hitsOn() - modifiers.getOrDefault(type, 0);
-            int hurt = damaged.getOrDefault(type, 0);
-            for (int i = 0; i < count; i++) {
-                boolean sustain = model.getSustainDamage() && i >= hurt;
-                combatants.add(new Combatant(hitsOn, profile.diceCount(), sustain, model.getCost()));
-            }
-        });
-        if (player.hasTech(NON_EUCLIDEAN_SHIELDING)) combatants.addAll(secondCancelledHits(combatants));
-        return combatants;
-    }
-
-    private static List<Combatant> secondCancelledHits(List<Combatant> combatants) {
-        long sustaining = combatants.stream().filter(Combatant::sustain).count();
-        return Stream.generate(() -> new Combatant(NEVER_HITS, 0, false, 0))
-                .limit(sustaining)
-                .toList();
+        Force defence = CombatForces.force(
+                opponent,
+                afterCannonFire(
+                        CombatForces.combatants(game, tile, planet, defending, attacking, defendersDamaged),
+                        bombardmentHits),
+                true);
+        Force attack = CombatForces.withExpectedCopy(
+                game,
+                seat,
+                opponent,
+                CombatForces.force(
+                        seat, CombatForces.combatants(game, tile, planet, attacking, defending, Map.of()), true),
+                defence,
+                true,
+                true);
+        return CombatOdds.resolve(attack, defence).attackerWins();
     }
 
     private static double fleetCost(Player seat, List<UnitMove> moves) {
