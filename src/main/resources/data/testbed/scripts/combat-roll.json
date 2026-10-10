@@ -7,7 +7,7 @@
     { "label": "Letnev rolls", "as": "you", "in": "you:combat", "press": "Roll Space Combat" },
     { "expect": { "in": "you:combat", "contains": "Total hits 0" } },
     { "label": "Nekro rolls", "as": "seat1", "in": "seat1:combat", "press": "Roll Space Combat" },
-    { "expect": { "in": "seat1:combat", "contains": "Total hits 0", "count": 2 } },
+    { "expect": { "in": "seat1:combat", "contains": "Total hits 0", "count": 1 } },
     { "label": "Clear fixed dice", "do": "removeStored", "key": "testBedDice" }
   ]
 }

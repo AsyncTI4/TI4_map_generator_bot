@@ -22,7 +22,7 @@
     { "label": "Hacan now opens A / outpost", "as": "seat1", "in": "seat1", "pressId": "showMapSegment_outpost" },
     { "label": "and is offered it on the new map", "as": "seat1", "in": "seat1", "press": "showMapSegment_board-a" },
 
-    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } },
     { "note": "By hand (images): Sol's core map has a 'Connections to other maps' strip with the a000 wormhole labelled 'A / outpost'; ghost rings with numbers sit on unexplored hexes next to known space; titles read 'Map: core', 'Map: A / outpost', 'Map: A'." }
   ]
 }

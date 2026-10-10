@@ -9,6 +9,7 @@ import static ti4.service.testbed.TestBedFixture.assertContains;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import ti4.game.Game;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
+import ti4.model.TestBedScript;
 import ti4.model.TestBedScript.Shortcut;
 import ti4.model.TestBedScript.Step;
 import ti4.testUtils.BaseTi4Test;
@@ -121,6 +123,56 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 5: `{ac:sabo2}` but nothing gives `sabo2` to sol",
                 "step 6: `setStored` key and value may not contain",
                 "step 7: `pressId` is longer than Discord's 100-character limit");
+
+        // Fields that a kind of check would silently ignore, typos in scopes, and checks with nothing to check.
+        List<String> expectErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "steps": [
+                    { "expect": { "ephemeral": "for someone else" } },
+                    { "as": "you", "press": "Pass" },
+                    { "expect": { "in": "main", "contains": "x", "equals": "y" } },
+                    { "expect": { "ephemeral": "x", "contains": "y" } },
+                    { "expect": { "state": "game.round", "equals": "2", "noFactionLeak": true } },
+                    { "expect": { "in": "mian", "contains": "x" } },
+                    { "expect": { "in": "main", "contains": "x", "since": "yesterday" } },
+                    { "expect": { "in": "main", "matches": "(" } },
+                    { "expect": { "state": "tile.101.mood", "equals": "x" } }
+                  ] }"""));
+        assertContains(
+                expectErrors,
+                "step 1: an `ephemeral` or `modal` check needs a `press` before it",
+                "step 3: `equals` only works with `state`",
+                "step 4: an `ephemeral` or `modal` check ignores [contains]",
+                "step 5: a `state` check ignores [noFactionLeak]",
+                "step 6: scope `mian` is neither main, actions, gm nor a seat",
+                "step 7: `since` must be",
+                "step 8: `matches` is not a valid regex",
+                "step 9: unknown tile. field `mood`");
+    }
+
+    // Script authors (often agents) learn the vocabulary from DEVELOPER_TESTBED.md; anything the code accepts but the
+    // reference does not mention is invisible to them.
+    @Test
+    void referenceDocumentsEveryVerbActionScopeAndStatePath() throws Exception {
+        String reference = Files.readString(Path.of("DEVELOPER_TESTBED.md"));
+        List<String> names = new ArrayList<>();
+        names.addAll(TestBedScript.VERBS);
+        names.addAll(TestBedScript.ACTIONS);
+        names.addAll(TestBedScriptService.SHARED_SCOPES);
+        names.addAll(TestBedStateResolver.SEAT_FIELDS);
+        names.addAll(TestBedStateResolver.GAME_FIELDS);
+        names.addAll(TestBedStateResolver.TILE_FIELDS);
+        names.addAll(TestBedStateResolver.PLANET_FIELDS);
+        List<String> missing = names.stream()
+                .filter(name -> !reference.contains("`" + name + "`")
+                        && !reference.contains("`" + name + " ")
+                        && !reference.contains("`" + name + "(")
+                        && !reference.contains(" " + name + "`"))
+                .toList();
+        List<String> missingScopes = TestBedScriptService.SEAT_SCOPES.stream()
+                .filter(scope -> !reference.contains("`<seat>:" + scope + "`"))
+                .toList();
+        assertEquals(List.of(), missing, "add these to DEVELOPER_TESTBED.md");
+        assertEquals(List.of(), missingScopes, "add these scopes to DEVELOPER_TESTBED.md");
     }
 
     // Map and fog preset fields fail validation up front: bad positions, tiles, lane matrices and fog options, and

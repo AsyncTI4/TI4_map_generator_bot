@@ -38,6 +38,8 @@ import ti4.logging.BotLogger;
 @UtilityClass
 public class AnnotationHandler {
 
+    public static final String BUTTON_FAILURE_PREFIX = "The button failed.";
+
     private static final List<Class<?>> classes = new ArrayList<>();
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
@@ -185,10 +187,10 @@ public class AnnotationHandler {
                         buttonInteractionEvent
                                 .getInteraction()
                                 .getMessage()
-                                .reply(
-                                        "The button failed. An exception has been logged for the developers. Please report this to "
-                                                + getBotBugsChannelLink()
-                                                + " if it doesn't resolve within an hour. Do not press this button again.")
+                                .reply(BUTTON_FAILURE_PREFIX
+                                        + " An exception has been logged for the developers. Please report this to "
+                                        + getBotBugsChannelLink()
+                                        + " if it doesn't resolve within an hour. Do not press this button again.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {

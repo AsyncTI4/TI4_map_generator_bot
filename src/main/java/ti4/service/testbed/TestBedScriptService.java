@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
@@ -192,12 +194,25 @@ public class TestBedScriptService {
 
     private static void validateSteps(
             List<Step> steps, String prefix, @Nullable Set<String> seatNames, List<String> errors) {
+        boolean pressed = false;
         for (int i = 0; i < steps.size(); i++) {
             String label = prefix + " " + (i + 1);
-            validateStep(steps.get(i), label, errors);
+            Step step = steps.get(i);
+            validateStep(step, label, errors);
+            Expect expect = step.getExpect();
+            if (!pressed && expect != null && (expect.getEphemeral() != null || expect.getModal() != null)) {
+                errors.add(label + ": an `ephemeral` or `modal` check needs a `press` before it.");
+            }
+            pressed |= step.getPress() != null || step.getPressId() != null;
             TestBedPlaceholders.validate(TestBedPresetService.toJson(steps.get(i)), label, errors);
             if (seatNames != null) validateSeatNames(steps.get(i), seatNames, label, errors);
         }
+    }
+
+    static boolean couldBeSeat(String name) {
+        if (YOU.equals(name) || name.contains("{")) return true;
+        if (name.matches(VIRTUAL_SEAT_NAME + "\\d+")) return true;
+        return Mapper.isValidFaction(name) || Mapper.isValidColor(name);
     }
 
     private static void validateSeatNames(Step step, Set<String> seatNames, String label, List<String> errors) {
@@ -219,6 +234,8 @@ public class TestBedScriptService {
         if (state != null
                 && !state.startsWith(TestBedStateResolver.GAME_PREFIX)
                 && !state.startsWith(TestBedStateResolver.STORED_PREFIX)
+                && !state.startsWith(TestBedStateResolver.TILE_PREFIX)
+                && !state.startsWith(TestBedStateResolver.PLANET_PREFIX)
                 && state.indexOf('.') > 0) {
             names.add(state.substring(0, state.indexOf('.')));
         }
@@ -309,22 +326,70 @@ public class TestBedScriptService {
                     && expect.getNotContains().isEmpty()) {
                 errors.add(label + ": a `state` check needs `equals`, `contains` or `notContains`.");
             }
+            rejectFields(label, "a `state` check", messageOnlyFields(expect), errors);
         }
-        if (expect.getEphemeral() != null) kinds++;
-        if (expect.getModal() != null) kinds++;
+        if (expect.getEphemeral() != null || expect.getModal() != null) {
+            kinds += (expect.getEphemeral() != null ? 1 : 0) + (expect.getModal() != null ? 1 : 0);
+            List<String> extra = new ArrayList<>(messageOnlyFields(expect));
+            if (!expect.getContains().isEmpty()) extra.add("contains");
+            if (!expect.getNotContains().isEmpty()) extra.add("notContains");
+            if (expect.getEquals() != null) extra.add("equals");
+            rejectFields(label, "an `ephemeral` or `modal` check", extra, errors);
+        }
         if (expect.getIn() != null) {
             kinds++;
             validateScope(expect.getIn(), label, errors);
-            boolean hasCheck = !expect.getContains().isEmpty()
-                    || !expect.getNotContains().isEmpty()
-                    || expect.getCount() != null
-                    || expect.isNoFactionLeak();
-            if (!hasCheck) errors.add(label + ": a message check needs contains, notContains, count or noFactionLeak.");
-            if (expect.getCount() != null && expect.getContains().size() != 1) {
-                errors.add(label + ": `count` needs exactly one `contains` text.");
-            }
+            validateMessageCheck(expect, label, errors);
         }
         if (kinds != 1) errors.add(label + ": `expect` needs exactly one of in, state, ephemeral or modal.");
+    }
+
+    private static void validateMessageCheck(Expect expect, String label, List<String> errors) {
+        boolean hasCheck = !expect.getContains().isEmpty()
+                || !expect.getNotContains().isEmpty()
+                || expect.getCount() != null
+                || expect.isNoFactionLeak()
+                || expect.getMatches() != null
+                || expect.getAttachment() != null
+                || !expect.getButtons().isEmpty()
+                || !expect.getNoButtons().isEmpty();
+        if (!hasCheck) {
+            errors.add(label + ": a message check needs contains, notContains, count, matches, attachment,"
+                    + " buttons, noButtons or noFactionLeak.");
+        }
+        if (expect.getCount() != null && expect.getContains().size() != 1) {
+            errors.add(label + ": `count` needs exactly one `contains` text.");
+        }
+        if (expect.getEquals() != null) errors.add(label + ": `equals` only works with `state`; use `contains`.");
+        if (expect.getSince() != null
+                && !Expect.SINCE_START.equals(expect.getSince())
+                && !Expect.SINCE_STEP.equals(expect.getSince())) {
+            errors.add(label + ": `since` must be `" + Expect.SINCE_STEP + "` or `" + Expect.SINCE_START + "`.");
+        }
+        if (expect.getMatches() != null) {
+            try {
+                Pattern.compile(expect.getMatches());
+            } catch (PatternSyntaxException e) {
+                errors.add(label + ": `matches` is not a valid regex: " + e.getDescription() + ".");
+            }
+        }
+    }
+
+    private static List<String> messageOnlyFields(Expect expect) {
+        List<String> fields = new ArrayList<>();
+        if (expect.getCount() != null) fields.add("count");
+        if (expect.isNoFactionLeak()) fields.add("noFactionLeak");
+        if (expect.getSince() != null) fields.add("since");
+        if (expect.getMatches() != null) fields.add("matches");
+        if (expect.getAttachment() != null) fields.add("attachment");
+        if (!expect.getButtons().isEmpty()) fields.add("buttons");
+        if (!expect.getNoButtons().isEmpty()) fields.add("noButtons");
+        return fields;
+    }
+
+    private static void rejectFields(String label, String kind, List<String> fields, List<String> errors) {
+        if (fields.isEmpty()) return;
+        errors.add(label + ": " + kind + " ignores " + fields + "; remove them or use an `in` message check.");
     }
 
     static void validateScope(String scope, String label, List<String> errors) {
@@ -332,6 +397,10 @@ public class TestBedScriptService {
         int colon = scope.indexOf(':');
         String seat = colon < 0 ? scope : scope.substring(0, colon);
         if (seat.isBlank() || ALL_SEATS.equals(seat)) errors.add(label + ": scope `" + scope + "` needs a seat.");
+        if (!seat.isBlank() && !ALL_SEATS.equals(seat) && !couldBeSeat(seat)) {
+            errors.add(label + ": scope `" + scope + "` is neither main, actions, gm nor a seat (`you`, `seat1`,"
+                    + " a faction or a color).");
+        }
         if (colon >= 0 && !SEAT_SCOPES.contains(scope.substring(colon + 1))) {
             errors.add(label + ": unknown scope `" + scope + "`; use main, actions, gm, <seat>, <seat>:private,"
                     + " <seat>:cards-info or <seat>:combat.");

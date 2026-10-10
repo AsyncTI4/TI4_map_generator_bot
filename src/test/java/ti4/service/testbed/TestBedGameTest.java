@@ -26,6 +26,8 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.image.MapSegment;
 import ti4.image.Mapper;
 import ti4.model.TestBedPreset;
@@ -171,6 +173,20 @@ class TestBedGameTest extends BaseTi4Test {
                 MapSegment.stored(game));
     }
 
+    // A timed-out step says what the game is still waiting on, per seat.
+    @Test
+    void waitReasonsNameWhatIsPending() {
+        game.setPhaseOfGame("statusScoring");
+        game.updateActivePlayer(nekro);
+        game.setStoredValue("solround" + game.getRound() + "PO", "done");
+
+        List<String> nekroWaits = TestBedWaitReasons.forSeat(game, nekro);
+        assertTrue(
+                nekroWaits.containsAll(List.of("its turn", "public scoring", "secret scoring")), nekroWaits.toString());
+        assertEquals(List.of("secret scoring"), TestBedWaitReasons.forSeat(game, developer));
+        assertTrue(TestBedWaitReasons.describe(game).startsWith("phase statusScoring"));
+    }
+
     // Preset components land where the game keeps them; every state path scripts can read exists; placeholders
     // turn card ids into hand numbers; a requested card is found wherever it is.
     @Test
@@ -197,6 +213,21 @@ class TestBedGameTest extends BaseTi4Test {
             assertFalse(resolve("game." + field).startsWith("<"), field);
         }
         assertEquals("corner", resolve("nekro.posScored"));
+
+        // Tile and planet paths read the board itself.
+        Tile wellon = game.getTileByPosition("101");
+        wellon.getSpaceUnitHolder().addUnit(Units.getUnitKey(UnitType.Destroyer, "blue"), 2);
+        wellon.getSpaceUnitHolder().addCC("blue");
+        nekro.addPlanet("wellon");
+        assertEquals("space:blue_dd=2", resolve("tile.101.units"));
+        assertTrue(resolve("tile.101.ccs").contains("blue"), resolve("tile.101.ccs"));
+        assertEquals("wellon", resolve("tile.101.planets"));
+        assertEquals("nekro", resolve("planet.wellon.owner"));
+        assertEquals("<no tile at 999>", resolve("tile.999.units"));
+        assertEquals(null, TestBedStateResolver.validatePath("tile.101.units"));
+        assertEquals(null, TestBedStateResolver.validatePath("planet.wellon.owner"));
+        assertTrue(TestBedStateResolver.validatePath("tile.101.mood").contains("unknown tile."));
+        assertTrue(TestBedStateResolver.validatePath("tile.units").contains("must be"));
 
         game.drawSpecificActionCard("sabo1", nekro.getUserID());
         String resolved = TestBedPlaceholders.resolve(

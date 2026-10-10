@@ -11,7 +11,7 @@
     { "expect": { "state": "stored:anonCommsPartners_blue", "equals": "green-red" } },
     { "expect": { "state": "stored:anonCommsPartners_green", "equals": "blue" } },
     { "expect": { "state": "stored:anonCommsPartners_yellow", "equals": "" } },
-    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } },
 
     { "label": "Red opens the Blue conversation", "as": "you", "pressId": "anonCommsOpen_blue" },
     { "expect": { "ephemeral": "Conversation with" } },
@@ -31,6 +31,6 @@
     { "label": "Run the hide cron", "do": "runCron", "value": "AnonymousCommsArchiveCron" },
     { "note": "Check: both Blue/Red conversation threads are archived (gone from the sidebar); the inboxes stay." },
     { "label": "Back to the 3h default", "do": "removeStored", "key": "anonCommsHideHours" },
-    { "expect": { "in": "main", "noFactionLeak": true } }
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
   ]
 }

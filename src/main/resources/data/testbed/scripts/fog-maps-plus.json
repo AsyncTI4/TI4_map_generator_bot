@@ -24,7 +24,7 @@
     { "label": "Activate a000 on map A", "as": "you", "in": "you", "press": "ringTile_a000" },
     { "label": "Activation spent a tactic token", "expect": { "state": "you.ccs", "equals": "2/3/2" } },
 
-    { "expect": { "in": "main", "noFactionLeak": true } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } },
     { "note": "By hand: move the carrier from 305 into a000; unexplored tiles stay hidden (Hide Unexplored Map), ghost rings still show numbered frontier hexes; Blind Tile with a void map A hex (e.g. a404) sends ships into The Void." }
   ]
 }
