@@ -28,9 +28,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrap
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.planet.MidgardLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
