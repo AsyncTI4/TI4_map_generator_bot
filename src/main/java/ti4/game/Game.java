@@ -939,17 +939,26 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         super.setRound(Math.max(1, round));
     }
 
-    @Override
-    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
-        boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
-        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
-        boolean hasStandardOnlyIncompatibleMode = isAbsolMode()
+    public boolean hasTiglIncompatibleMode() {
+        return isAllianceMode() || isCommunityMode();
+    }
+
+    public boolean hasStandardLadderIncompatibleMode() {
+        return isAbsolMode()
                 || isMiltyModMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
                 || isHomebrewSCMode()
                 || isFowMode();
-        if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
+    }
+
+    public boolean canBeCompetitiveTIGLGame(boolean isFractured) {
+        return !hasTiglIncompatibleMode() && (isFractured || !hasStandardLadderIncompatibleMode());
+    }
+
+    @Override
+    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
+        if (!canBeCompetitiveTIGLGame(TIGLHelper.isFracturedTIGLGame(this))) {
             competitiveTIGLGame = false;
         }
         super.setCompetitiveTIGLGame(competitiveTIGLGame);
@@ -1205,6 +1214,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public TextChannel getActionsChannel() {
         return getMainGameChannel();
+    }
+
+    public TextChannel getTableTalkOrActionsChannel() {
+        TextChannel tableTalk = getTableTalkChannel();
+        return tableTalk == null ? getActionsChannel() : tableTalk;
     }
 
     public ThreadChannel getBotMapUpdatesThread() {
@@ -3528,9 +3542,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(settings.getSecrets().getVal());
         }
-        if (settings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(this, settings.getTiglFractured().isVal());
-        }
         setAllianceMode(settings.getAlliance().isVal());
 
         if ("1pIsland".equals(settings.getMapTemplate().getValue().getAlias())) {
@@ -3556,10 +3567,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(gameSetupSettings.getSecrets().getVal());
-        }
-        if (gameSetupSettings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(
-                    this, gameSetupSettings.getTiglFractured().isVal());
         }
         setAllianceMode(gameSetupSettings.getAlliance().isVal());
 

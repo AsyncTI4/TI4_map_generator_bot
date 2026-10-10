@@ -24,6 +24,8 @@ public final class Constants {
     public static final String solaxId = "380689512621277185";
     public static final String andcatId = "238933125072158720";
     public static final String privateStaticVoidId = "148195684644814848";
+    public static final String lazikId = "206450549371961346";
+    public static final String niuId = "339399043740467200";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
@@ -48,6 +50,14 @@ public final class Constants {
             entry("1220415693837832212", "Emoji Farm 17"),
             entry("1243245147551170582", "Emoji Farm 18"),
             entry("1303437221361352715", "Emoji Farm 19"));
+
+    public static String lazikPing() {
+        return "<@" + lazikId + ">";
+    }
+
+    public static String niuPing() {
+        return "<@" + niuId + ">";
+    }
 
     public static String jazzPing() {
         return "<@" + jazzId + ">";
@@ -1679,6 +1689,11 @@ public final class Constants {
     public static final String TIGL = "tigl";
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
     public static final String TIGL_REPORT_MANUALLY = "report_manually";
+    public static final String TIGL_USER_RANKS = "user_ranks";
+    public static final String TIGL_ENABLE = "enable";
+    public static final String TIGL_MODE = "mode";
+    public static final String TIGL_INIT_RANKS = "init_ranks";
+    public static final String TIGL_INCLUDE_HISTORY = "include_history";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
     public static final String LAZAX = "lazax";
@@ -1686,7 +1701,6 @@ public final class Constants {
     public static final String LAZAX_TOP_100 = "top_100";
     public static final String LAZAX_DELEGATION_LEADERBOARD = "delegation_leaderboard";
     public static final String PUBLIC = "public";
-    public static final String IS_FRACTURED = "is_fractured";
     public static final String SHOW_GAME_IDS = "show_game_ids";
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";

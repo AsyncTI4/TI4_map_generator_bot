@@ -14,7 +14,6 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -26,6 +25,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
+import ti4.service.tigl.TiglSetupService;
 
 public class WeirdGameSetup extends GameStateSubcommand {
 
@@ -241,8 +241,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
     }
 
     private static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
-        if (event.getOption(Constants.TIGL_GAME) == null
-                && event.getOption(Constants.ABSOL_MODE) == null
+        if (event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
                 && event.getOption(Constants.BLUE_REVERIE_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
@@ -250,8 +249,6 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 && event.getOption(Constants.VOTC_MODE) == null) {
             return true; // no changes were made
         }
-        boolean isTIGLGame =
-                event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
         boolean absolMode = event.getOption(Constants.ABSOL_MODE, game.isAbsolMode(), OptionMapping::getAsBoolean);
         boolean miltyModMode =
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
@@ -262,16 +259,12 @@ public class WeirdGameSetup extends GameStateSubcommand {
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
-        return setGameMode(
-                event,
-                game,
-                baseGameMode,
-                absolMode,
-                miltyModMode,
-                discordantStarsMode,
-                blueReverieMode,
-                isTIGLGame,
-                votcMode);
+        boolean success = setGameMode(
+                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, blueReverieMode, votcMode);
+        if (success) {
+            TiglSetupService.recheckLadder(game);
+        }
+        return success;
     }
 
     // TODO: find a better way to handle this - this is annoying
@@ -284,31 +277,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             boolean miltyModMode,
             boolean discordantStarsMode,
             boolean blueReverieMode,
-            boolean isTIGLGame,
             boolean votcMode) {
-        if (isTIGLGame && (game.isAllianceMode() || game.isCommunityMode())) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games cannot be mixed with Alliance or Community mode.");
-            return false;
-        }
-        if (isTIGLGame
-                && !TIGLHelper.isFracturedTIGLGame(game)
-                && (baseGameMode
-                        || absolMode
-                        || discordantStarsMode
-                        || blueReverieMode
-                        || game.isHomebrewSCMode()
-                        || game.isFowMode()
-                        || votcMode)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games in standard ladder cannot be mixed with other game modes.");
-            return false;
-        } else if (isTIGLGame) {
-            TIGLHelper.initializeTIGLGame(game);
-            return true;
-        }
-
-        game.setCompetitiveTIGLGame(false);
         if (game.isThundersEdge() || game.isTwilightsFallMode()) {
             return true;
             // These modes are incompatible atm with the rest of the game mode settings, so skip them
@@ -510,7 +479,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         game.setThundersEdge(false);
         game.setTwilightsFallMode(false);
         game.removeStoredValue("useOldPok");
-        boolean success = setGameMode(event, game, true, false, false, false, false, false, false);
+        boolean success = setGameMode(event, game, true, false, false, false, false, false);
         if (success) {
             game.setStrategyCardSet("pok");
         }
