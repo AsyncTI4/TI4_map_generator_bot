@@ -96,8 +96,10 @@ to build one by hand:
   - strategy card picks, valued by what the card is worth to the seat right now (below);
   - **tactical actions**: choosing a plan, activating the system, moving, landing, exploring, building, paying and ending the turn (below);
   - **combat**: rolling, anti-fighter barrage, space cannon offense (also its own PDS and PDS II on its own tactical
-    action) and defense, bombardment before landing, hit assignment with the bot's auto-assign buttons (which use
-    Sustain Damage first), ground combat automation;
+    action) and defense, Assault Cannon (it fires it with 3 or more non-fighter ships before the first roll, and
+    when an opponent fires it, destroys its own cheapest non-fighter ship and closes the prompt), bombardment before
+    landing, hit assignment with the bot's auto-assign buttons (which use Sustain Damage first), ground combat
+    automation;
   - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat;
   - **strategy card primaries and secondaries** (below), ending its turn and passing;
   - declining whens/afters; **agenda votes**, Nekro's **Galactic Threat** and agenda ties as speaker (below);
@@ -315,8 +317,9 @@ to build one by hand:
     clears enemy ships out of its own home system. It attacks another player's home system only while it holds
     _Darken the Skies_ or _Conquer the Weak_ is unscored, taking the expected space cannon losses off its fleet
     first; other systems covered by enemy space cannon are avoided. The odds also count its own space cannon (PDS in
-    the system, PDS II and other deep space cannon next to it) firing first, anti-fighter barrage on both sides, and
-    the expected bombardment hits on the planet the bot will bombard. Damaged ships join attacks but can no longer
+    the system, PDS II and other deep space cannon next to it) firing first, Assault Cannon on both sides (the
+    cheapest non-fighter ship lost), anti-fighter barrage on both sides, and the expected bombardment hits on the
+    planet the bot will bombard. Damaged ships join attacks but can no longer
     sustain damage, and damaged defenders cannot either. An attack can be worth it for objective
     progress alone. It also weighs the attack with the fighters at the origin riding along in the fleet's capacity
     (the infantry and mechs to land share what is left) and takes whichever plan scores better; the ground odds use
@@ -363,7 +366,10 @@ to build one by hand:
   - It moves out of its home system before producing there, and keeps enough tokens for a token objective.
 
   Plans respect move values (nebulae, rifts, asteroid fields, supernovas, enemy ships), capacity,
-  fleet supply and stranded cargo. `TacticalRules` then walks the bot's own buttons step by step,
+  fleet supply and stranded cargo. With Gravity Drive one ship per action may move one system farther: the
+  transport of an expansion, the ship of a single-ship move, or one extra ship in an attack (the strongest against
+  enemy ships, otherwise the one with the most capacity) or a group move. A ship leaving home stays as the guard only
+  when the move would otherwise empty the home system. `TacticalRules` then walks the bot's own buttons step by step,
   in distance or ring mode, looking for the planned system in every part of a system picker that was split over
   several messages; if it still cannot find it, it activates the best system the picker does offer. Once it has
   taken an action, it only ends its turn. When its units

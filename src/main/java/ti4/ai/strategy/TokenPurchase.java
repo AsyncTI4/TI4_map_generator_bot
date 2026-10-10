@@ -78,7 +78,7 @@ public class TokenPurchase {
                 .filter(tile -> BoardView.planets(tile).stream().anyMatch(BoardView::hasCustodians))
                 .findFirst();
         if (mecatol.isEmpty()) return false;
-        int move = BoardView.moveValue(seat, UnitType.Carrier);
+        int move = BoardView.moveValueWithGravityDrive(seat, UnitType.Carrier);
         for (Tile tile : game.getTileMap().values()) {
             if (!BoardView.hasOwnShips(seat, tile)) continue;
             if (MovementGraph.reach(game, seat, tile.getPosition(), move)

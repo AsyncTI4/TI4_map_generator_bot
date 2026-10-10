@@ -34,6 +34,7 @@ public class BoardView {
             UnitType.Warsun);
     public static final Set<UnitType> GROUND_FORCES = EnumSet.of(UnitType.Infantry, UnitType.Mech);
     public static final int DOCK_FIGHTER_ALLOWANCE = 3;
+    private static final String GRAVITY_DRIVE = "gd";
 
     public static int count(@Nullable UnitHolder holder, Player player, UnitType type) {
         return holder == null ? 0 : holder.getUnitCount(type, player.getColor());
@@ -82,6 +83,10 @@ public class BoardView {
 
     public static int moveValue(Player player, UnitType type) {
         return model(player, type).map(UnitModel::getMoveValue).orElse(0);
+    }
+
+    public static int moveValueWithGravityDrive(Player player, UnitType type) {
+        return moveValue(player, type) + (player.hasTech(GRAVITY_DRIVE) ? 1 : 0);
     }
 
     public static int capacity(Player player, UnitType type) {

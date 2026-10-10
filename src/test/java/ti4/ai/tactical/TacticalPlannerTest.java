@@ -2,6 +2,7 @@ package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.image.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TacticalPlannerTest extends BaseTi4Test {
@@ -58,6 +60,42 @@ class TacticalPlannerTest extends BaseTi4Test {
         Optional<TacticalPlan> plan = TacticalPlanner.forTarget(test.game, test.nekro, neighbour);
 
         assertThat(plan.filter(found -> found.kind() == Kind.EXPAND)).isEmpty();
+    }
+
+    // Quann is two systems away and a carrier moves one. Gravity Drive gives one ship a move of +1 on each tactical
+    // action, which is enough for the carrier and its infantry.
+    @Test
+    void gravityDriveTakesACarrierOneSystemFarther() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("26", neighbour);
+        String farther = twoSystemsFromHome();
+        test.place("25", farther);
+        assertThat(expansionTo(farther)).isEmpty();
+
+        test.nekro.addTech("gd");
+
+        assertThat(expansionTo(farther)).isPresent();
+    }
+
+    // Only one ship gets the extra move: of the two carriers at home, one goes to take Sol's undefended New Albion
+    // and Starpoint. The dreadnought that cannot reach them stays home as the guard, so the carrier need not.
+    @Test
+    void gravityDriveSpeedsUpOnlyOneShipOfAnAttack() {
+        String farther = twoSystemsFromHome();
+        test.place("26", neighbour);
+        test.place("27", farther);
+        test.sol.addPlanet("newalbion");
+        test.sol.addPlanet("starpoint");
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.nekro.addTech("gd");
+
+        TacticalPlan plan = attackOn(farther).orElseThrow();
+
+        assertThat(plan.moves()).contains(new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1));
+        assertThat(plan.moves()).noneMatch(move -> move.type() == UnitType.Dreadnought);
     }
 
     // A mech is the better garrison: with one at home, the last infantry is free to take Lodor.
@@ -337,6 +375,24 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
+    // A cruiser stays home as the guard, so a carrier and two cruisers attack Sol's two cruisers: too even a fight.
+    // With Assault Cannon those three ships make Sol destroy a cruiser before the combat, and the attack is on.
+    @Test
+    void countsAssaultCannonBeforeTheSpaceCombat() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Cruiser, 3);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "space", test.sol, UnitType.Cruiser, 2);
+        test.nekro.setFleetCC(5);
+        assertThat(attackOn(neighbour)).isEmpty();
+
+        test.nekro.addTech("asc");
+
+        assertThat(attackOn(neighbour)).isPresent();
+    }
+
     // A damaged dreadnought can no longer sustain damage, but it still fights: two of the three dreadnoughts are
     // damaged, one stays home as the guard, and the other two join the attack instead of waiting for repairs.
     @Test
@@ -438,6 +494,15 @@ class TacticalPlannerTest extends BaseTi4Test {
         // A second infantry on Mecatol is free to leave and take Lodor.
         test.units(rex, "mr", test.nekro, UnitType.Infantry, 1);
         assertThat(expansionTo("101")).isPresent();
+    }
+
+    private String twoSystemsFromHome() {
+        List<String> nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return PositionMapper.getAdjacentTilePositions(neighbour).stream()
+                .filter(position ->
+                        !"x".equals(position) && !AiTestGame.HOME.equals(position) && !nearHome.contains(position))
+                .findFirst()
+                .orElseThrow();
     }
 
     private Optional<TacticalPlan> attackOn(String position) {

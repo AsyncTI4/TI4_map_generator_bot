@@ -284,7 +284,7 @@ public class ProductionPlanner {
     }
 
     private static boolean reachesSupremacy(Game game, Player seat, Tile dock, UnitType type) {
-        int move = BoardView.moveValue(seat, type);
+        int move = BoardView.moveValueWithGravityDrive(seat, type);
         for (String position :
                 MovementGraph.reach(game, seat, dock.getPosition(), move).keySet()) {
             Tile tile = game.getTileByPosition(position);

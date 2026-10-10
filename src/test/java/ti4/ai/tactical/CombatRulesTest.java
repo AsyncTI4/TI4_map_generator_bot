@@ -141,6 +141,48 @@ class CombatRulesTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // With Assault Cannon and three non-fighter ships it makes the opponent lose a ship before the first roll. With
+    // fewer ships the button is not its to press.
+    @Test
+    void firesAssaultCannonWithThreeShipsBeforeTheFirstRoll() {
+        test.nekro.addTech("asc");
+        AiPrompt start = prompt(
+                "start",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "assCannonNDihmohn_asc_" + position,
+                "combatRoll_" + position + "_space");
+        assertThat(CombatRules.next(test.context(start)).filter(AiDecision.Press.class::isInstance))
+                .isEmpty();
+
+        test.units(test.game.getTileByPosition(position), "space", test.nekro, UnitType.Destroyer, 2);
+        assertThat(pressedId(CombatRules.next(test.context(start)).orElseThrow()))
+                .isEqualTo("assCannonNDihmohn_asc_" + position);
+        assertThat(CombatRules.next(test.context(start)).filter(AiDecision.Press.class::isInstance))
+                .isEmpty();
+    }
+
+    // When the opponent fires Assault Cannon, the seat destroys its cheapest non-fighter ship and closes the prompt,
+    // instead of leaving the combat waiting on it.
+    @Test
+    void destroysItsCheapestShipForTheOpponentsAssaultCannon() {
+        test.game.setStoredValue("nekrolatestAssignHits", "assaultcannoncombat");
+        String color = test.nekro.getColor();
+        AiPrompt loss = prompt(
+                "loss",
+                PromptSource.COMBAT_THREAD,
+                NOW,
+                "FFCC_nekro_assignHits_" + position + "_1_dn_" + color,
+                "FFCC_nekro_assignHits_" + position + "_1_dd_" + color,
+                "FFCC_nekro_assignHits_" + position + "_AllShips",
+                "deleteButtons");
+
+        assertThat(pressedId(CombatRules.next(test.context(loss)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_assignHits_" + position + "_1_dd_" + color);
+        assertThat(pressedId(CombatRules.next(test.context(loss)).orElseThrow()))
+                .isEqualTo("deleteButtons");
+    }
+
     // Rolling while the opponent still assigns last round's hits would start the next round under them.
     @Test
     void waitsWhileTheOpponentIsAssigningHits() {

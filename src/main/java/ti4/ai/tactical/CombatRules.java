@@ -1,5 +1,6 @@
 package ti4.ai.tactical;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
@@ -20,7 +21,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 
 @UtilityClass
 public class CombatRules {
@@ -32,6 +35,15 @@ public class CombatRules {
     private static final String AFB_SUFFIX = "_afb";
     private static final String SPACE_CANNON_OFFENCE_SUFFIX = "_spacecannonoffence";
     private static final String SPACE_CANNON_DEFENCE_SUFFIX = "_spacecannondefence";
+    private static final String ASSAULT_CANNON = "asc";
+    private static final String ASSAULT_CANNON_PREFIX = "assCannonNDihmohn_asc_";
+    private static final int ASSAULT_CANNON_SHIPS = 3;
+    private static final String NEKRO_FLAGSHIP = "nekro_flagship";
+    private static final String LATEST_ASSIGN_HITS = "latestAssignHits";
+    private static final String ASSAULT_CANNON_HITS = "assaultcannoncombat";
+    private static final String ASSIGN_HITS = "assignHits";
+    private static final String DONE_REMOVING = "deleteButtons";
+    private static final double DAMAGED_DISCOUNT = 0.1;
     private static final List<String> ROUND_HIT_PREFIXES =
             List.of("autoAssignSpaceHits_", "autoAssignSpaceCannonOffenceHits_", AutoAssignGroundHitsButtonIds.PREFIX);
 
@@ -41,6 +53,8 @@ public class CombatRules {
                 .toList();
         Optional<AiDecision> spaceCannonDefence = spaceCannonDefence(context, prompts);
         if (spaceCannonDefence.isPresent()) return spaceCannonDefence;
+        Optional<AiDecision> assaultCannonLoss = destroyShipForAssaultCannon(context, prompts);
+        if (assaultCannonLoss.isPresent()) return assaultCannonLoss;
         Optional<AiDecision> assignment = assignHits(context, prompts);
         if (assignment.isPresent()) return assignment;
         Optional<Match> structures =
@@ -51,6 +65,8 @@ public class CombatRules {
         if (automate.isPresent()) return Optional.of(automate.get().press("automate ground combat"));
         Optional<AiDecision> spaceCannon = spaceCannonOffence(context, prompts);
         if (spaceCannon.isPresent()) return spaceCannon;
+        Optional<AiDecision> assaultCannon = assaultCannon(context, prompts);
+        if (assaultCannon.isPresent()) return assaultCannon;
         Optional<AiDecision> afb = antiFighterBarrage(context, prompts);
         if (afb.isPresent()) return afb;
         return combatRound(context, prompts);
@@ -148,6 +164,78 @@ public class CombatRules {
             }
         }
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> assaultCannon(AiTurnContext context, List<AiPrompt> prompts) {
+        Player seat = context.seat();
+        if (!seat.hasTech(ASSAULT_CANNON)) return Optional.empty();
+        for (AiPrompt prompt : prompts) {
+            if (prompt.source() != PromptSource.COMBAT_THREAD) continue;
+            Optional<PromptButton> fire = prompt.firstEnabled(
+                    button -> button.isUnowned() && button.handlerId().startsWith(ASSAULT_CANNON_PREFIX));
+            if (fire.isEmpty()) continue;
+            String position = StringUtils.removeStart(fire.get().handlerId(), ASSAULT_CANNON_PREFIX);
+            Tile tile = context.game().getTileByPosition(position);
+            String key = "assaultCannon|" + prompt.messageId() + "|" + position;
+            if (tile == null
+                    || context.memory().has(key)
+                    || tracker(context, context.faction(), position, BoardView.SPACE) > 0) {
+                continue;
+            }
+            if (!firesAssaultCannon(seat, tile) || !enemyNonFighterShips(context.game(), seat, tile)) continue;
+            context.memory().put(key, "pressed");
+            return Optional.of(AiDecision.press(prompt, fire.get(), "fire Assault Cannon"));
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<AiDecision> destroyShipForAssaultCannon(AiTurnContext context, List<AiPrompt> prompts) {
+        String type = context.game().getStoredValue(context.faction() + LATEST_ASSIGN_HITS);
+        if (!ASSAULT_CANNON_HITS.equals(type)) return Optional.empty();
+        for (AiPrompt prompt : prompts) {
+            List<PromptButton> losses = prompt.enabledButtons().stream()
+                    .filter(button -> button.isOwnedBy(context.faction()) && isSingleUnitLoss(button))
+                    .toList();
+            if (losses.isEmpty()) continue;
+            String key = "assaultCannonLoss|" + prompt.messageId();
+            if (context.memory().has(key)) {
+                Optional<PromptButton> done =
+                        prompt.firstEnabled(button -> button.isUnowned() && DONE_REMOVING.equals(button.handlerId()));
+                if (done.isEmpty()) continue;
+                return Optional.of(AiDecision.press(prompt, done.get(), "finish the Assault Cannon loss"));
+            }
+            PromptButton cheapest = losses.stream()
+                    .min(Comparator.comparingDouble(button -> lossCost(context.seat(), button)))
+                    .orElseThrow();
+            context.memory().put(key, "destroyed");
+            return Optional.of(AiDecision.press(prompt, cheapest, "destroy its cheapest ship for Assault Cannon"));
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isSingleUnitLoss(PromptButton button) {
+        String[] parts = button.handlerId().split("_");
+        return parts.length >= 5 && ASSIGN_HITS.equals(parts[0]) && StringUtils.isNumeric(parts[2]);
+    }
+
+    private static double lossCost(Player seat, PromptButton button) {
+        String[] parts = button.handlerId().split("_");
+        UnitModel model = seat.getUnitFromAsyncID(parts[3]);
+        double cost = model == null ? Double.MAX_VALUE : model.getCost();
+        boolean damaged = parts.length > 5 && UnitState.dmg.name().equals(parts[4]);
+        return damaged ? cost - DAMAGED_DISCOUNT : cost;
+    }
+
+    private static boolean firesAssaultCannon(Player seat, Tile tile) {
+        return ButtonHelper.checkNumberNonFighterShips(seat, tile) >= ASSAULT_CANNON_SHIPS
+                || ButtonHelper.doesPlayerHaveFSHere(NEKRO_FLAGSHIP, seat, tile);
+    }
+
+    private static boolean enemyNonFighterShips(Game game, Player seat, Tile tile) {
+        UnitHolder space = BoardView.space(tile);
+        return game.getPlayers().values().stream()
+                .filter(other -> other != seat && other.getColor() != null)
+                .anyMatch(other -> BoardView.nonFighterShips(space, other) > 0);
     }
 
     private static Optional<AiDecision> combatRound(AiTurnContext context, List<AiPrompt> prompts) {

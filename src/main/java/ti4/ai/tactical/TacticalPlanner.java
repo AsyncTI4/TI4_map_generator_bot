@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
@@ -54,6 +55,8 @@ public class TacticalPlanner {
     private static final String DARKEN_THE_SKIES = "dts";
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MAKE_AN_EXAMPLE = "mew";
+    private static final String ASSAULT_CANNON = "asc";
+    private static final int ASSAULT_CANNON_SHIPS = 3;
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double GROUP_MOVE_COST = 0.3;
     private static final double SHIP_COST_WEIGHT = 0.05;
@@ -156,7 +159,7 @@ public class TacticalPlanner {
         Optional<UnitType> transport = TRANSPORT_PREFERENCE.stream()
                 .filter(type -> BoardView.undamaged(BoardView.space(origin), seat, type) > 0)
                 .filter(type -> BoardView.capacity(seat, type) > 0)
-                .filter(type -> context.reaches(origin, tile, type))
+                .filter(type -> context.reachesWithGravityDrive(origin, tile, type))
                 .findFirst();
         if (transport.isEmpty()) return Optional.empty();
         List<UnitMove> groundForces = availableGroundForces(context.game, seat, origin);
@@ -235,8 +238,20 @@ public class TacticalPlanner {
             if (available == 0 || !context.reaches(origin, tile, type)) continue;
             ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, available));
         }
+        Comparator<UnitType> preference = BoardView.hasEnemyShips(game, seat, tile)
+                ? Comparator.comparingDouble(type -> cost(seat, type))
+                : Comparator.comparingInt((UnitType type) -> BoardView.capacity(seat, type))
+                        .thenComparingDouble(type -> -cost(seat, type));
+        gravityDriveShip(
+                        context,
+                        origin,
+                        tile,
+                        BoardView.MOVING_SHIPS,
+                        type -> BoardView.count(originSpace, seat, type),
+                        preference)
+                .ifPresent(ships::add);
         if (ships.isEmpty()) return Optional.empty();
-        if (origin.isHomeSystem(game)) keepOneShipHome(seat, ships);
+        if (origin.isHomeSystem(game)) keepOneShipHome(seat, origin, ships);
         if (ships.isEmpty()) return Optional.empty();
         int escort = Math.min(fightersAvailable, capacityOf(seat, ships));
         if (escort > 0) ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, escort));
@@ -262,8 +277,10 @@ public class TacticalPlanner {
             Map<UnitType, Integer> defendersDamaged = damagedAmong(space, opponent, defending.units());
             if (combatants(game, tile, space, defending, attacking, defendersDamaged)
                     .isEmpty()) return Optional.empty();
-            Side barragedDefenders = afterBarrage(defending, attacking);
-            Side barragedAttackers = afterBarrage(attacking, defending);
+            Side cannonedDefenders = afterAssaultCannon(defending, attacking);
+            Side cannonedAttackers = afterAssaultCannon(attacking, defending);
+            Side barragedDefenders = afterBarrage(cannonedDefenders, cannonedAttackers);
+            Side barragedAttackers = afterBarrage(cannonedAttackers, cannonedDefenders);
             List<Combatant> defenders = afterCannonFire(
                     combatants(game, tile, space, barragedDefenders, barragedAttackers, defendersDamaged),
                     ownCannonHits(game, seat, tile, origin));
@@ -314,6 +331,25 @@ public class TacticalPlanner {
         double score = spaceWin * value - (1 - spaceWin) * fleetCost(seat, legal.get()) - cannonLosses;
         if (score < ATTACK_MIN_SCORE) return Optional.empty();
         return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), legal.get(), landings, score));
+    }
+
+    private static Optional<UnitMove> gravityDriveShip(
+            Context context,
+            Tile origin,
+            Tile tile,
+            Collection<UnitType> types,
+            ToIntFunction<UnitType> available,
+            Comparator<UnitType> preference) {
+        return types.stream()
+                .filter(type -> available.applyAsInt(type) > 0)
+                .filter(type ->
+                        !context.reaches(origin, tile, type) && context.reachesWithGravityDrive(origin, tile, type))
+                .max(preference)
+                .map(type -> new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
+    }
+
+    private static double cost(Player seat, UnitType type) {
+        return BoardView.model(seat, type).map(UnitModel::getCost).orElse(0f);
     }
 
     private static double makeAnExampleBonus(
@@ -376,6 +412,29 @@ public class TacticalPlanner {
         units.putAll(target.units());
         units.put(UnitType.Fighter, fighters - destroyed);
         return new Side(target.player(), units);
+    }
+
+    private static Side afterAssaultCannon(Side target, Side shooter) {
+        if (!firesAssaultCannon(shooter)) return target;
+        Player player = target.player();
+        Optional<UnitType> cheapest = target.units().entrySet().stream()
+                .filter(entry -> entry.getKey() != UnitType.Fighter && entry.getValue() > 0)
+                .map(Map.Entry::getKey)
+                .min(Comparator.comparingDouble(type ->
+                        BoardView.model(player, type).map(UnitModel::getCost).orElse(0f)));
+        if (cheapest.isEmpty()) return target;
+        Map<UnitType, Integer> units = new EnumMap<>(UnitType.class);
+        units.putAll(target.units());
+        units.merge(cheapest.get(), -1, Integer::sum);
+        return new Side(player, units);
+    }
+
+    private static boolean firesAssaultCannon(Side side) {
+        int nonFighterShips = side.units().entrySet().stream()
+                .filter(entry -> entry.getKey() != UnitType.Fighter)
+                .mapToInt(Map.Entry::getValue)
+                .sum();
+        return side.player().hasTech(ASSAULT_CANNON) && nonFighterShips >= ASSAULT_CANNON_SHIPS;
     }
 
     private static double hitChance(int hitsOn) {
@@ -490,7 +549,7 @@ public class TacticalPlanner {
             if (origin == tile) continue;
             for (UnitType type : POSITION_SHIPS) {
                 if (BoardView.undamaged(BoardView.space(origin), seat, type) == 0
-                        || !context.reaches(origin, tile, type)) {
+                        || !context.reachesWithGravityDrive(origin, tile, type)) {
                     continue;
                 }
                 List<UnitMove> moves = List.of(new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
@@ -515,13 +574,22 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> groupPosition(Context context, Tile tile, Tile origin) {
         Player seat = context.seat;
         List<UnitMove> ships = new ArrayList<>();
+        UnitHolder originSpace = BoardView.space(origin);
         for (UnitType type : POSITION_SHIPS) {
-            int available = BoardView.undamaged(BoardView.space(origin), seat, type);
+            int available = BoardView.undamaged(originSpace, seat, type);
             if (available > 0 && context.reaches(origin, tile, type)) {
                 ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, available));
             }
         }
-        if (origin.isHomeSystem(context.game) && !ships.isEmpty()) keepOneShipHome(seat, ships);
+        gravityDriveShip(
+                        context,
+                        origin,
+                        tile,
+                        POSITION_SHIPS,
+                        type -> BoardView.undamaged(originSpace, seat, type),
+                        Comparator.comparingDouble((UnitType type) -> -cost(seat, type)))
+                .ifPresent(ships::add);
+        if (origin.isHomeSystem(context.game) && !ships.isEmpty()) keepOneShipHome(seat, origin, ships);
         if (movedNonFighterShips(ships) < 2) return Optional.empty();
         Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, ships);
         if (legal.isEmpty()) return Optional.empty();
@@ -730,7 +798,8 @@ public class TacticalPlanner {
         return rest;
     }
 
-    private static void keepOneShipHome(Player seat, List<UnitMove> ships) {
+    private static void keepOneShipHome(Player seat, Tile home, List<UnitMove> ships) {
+        if (BoardView.nonFighterShips(BoardView.space(home), seat) > movedNonFighterShips(ships)) return;
         UnitMove guard = ships.stream()
                 .min(Comparator.comparingInt((UnitMove move) -> BoardView.capacity(seat, move.type()))
                         .thenComparingDouble(move -> BoardView.model(seat, move.type())
@@ -874,8 +943,12 @@ public class TacticalPlanner {
             return distance(origin, target, type) <= BoardView.moveValue(seat, type);
         }
 
+        boolean reachesWithGravityDrive(Tile origin, Tile target, UnitType type) {
+            return distance(origin, target, type) <= BoardView.moveValueWithGravityDrive(seat, type);
+        }
+
         int distance(Tile origin, Tile target, UnitType type) {
-            int move = BoardView.moveValue(seat, type);
+            int move = BoardView.moveValueWithGravityDrive(seat, type);
             Map<String, Integer> reach = reachCache.computeIfAbsent(
                     origin.getPosition() + "#" + move,
                     key -> MovementGraph.reach(game, seat, origin.getPosition(), move));

@@ -148,7 +148,7 @@ public class CeasefireRules {
     private static int fastestShip(Player mover, Tile origin) {
         return BoardView.ships(BoardView.space(origin), mover).keySet().stream()
                 .filter(type -> type != UnitType.Fighter)
-                .mapToInt(type -> BoardView.moveValue(mover, type))
+                .mapToInt(type -> BoardView.moveValueWithGravityDrive(mover, type))
                 .max()
                 .orElse(0);
     }
