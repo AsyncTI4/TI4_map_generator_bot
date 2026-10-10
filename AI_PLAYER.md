@@ -332,11 +332,14 @@ to build one by hand:
        Precision_. A few destroyers to move around for presence objectives.
     2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
        _Mechanize the Military_).
-    3. **Surplus.** Its flagship if it is S or A tier in `FlagshipRating` (S: Nekro, Ghosts, Nomad, L1Z1X,
-       Deepwrought, Crimson Rebellion, Xxcha; A: Yin, Sol, Naalu, Yssaril, Empyrean, Keleres, Naaz-Rokha, Mahact;
-       B to D tiers are only built for objectives), a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
+    3. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
        and destroyers up to four, then plain cruisers up to two. Each only while the resources left could still fill
-       the rest of the production with cheap units. Plain destroyers are only built for objectives.
+       the rest of the production with cheap units. Every flagship is worth building with money to spare, ahead of
+       dreadnoughts, and its tier in `FlagshipRating` sets how much more it needs on top: nothing for S (Nekro,
+       Ghosts, Nomad, L1Z1X, Deepwrought, Crimson Rebellion, Xxcha), 1.5 resources for A (Yin, Sol, Naalu, Yssaril,
+       Empyrean, Keleres, Naaz-Rokha, Mahact), 3 for B (Jol-Nar, Winnu, Letnev, Mentak, Cabal), 4.5 for C (Muaat,
+       Saar, Titans), 6 for D (Argent, Arborec, Ral Nel, Sardakk, Hacan), and 3.75 for a flagship not on the list.
+       Plain destroyers are only built for objectives.
     4. **Fill.** The rest of the dock's production: fighters into the dock's 3 free fighter slots and the spare
        capacity of its ships (each carrier keeps room for two infantry, so fighters never block an expansion), then
        infantry.

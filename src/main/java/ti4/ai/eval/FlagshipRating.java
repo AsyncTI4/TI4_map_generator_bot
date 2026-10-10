@@ -14,8 +14,9 @@ public class FlagshipRating {
     private static final double B_TIER = 0.6;
     private static final double C_TIER = 0.4;
     private static final double D_TIER = 0.2;
-    public static final double GOOD = A_TIER;
     private static final double UNKNOWN = 0.5;
+    private static final double TIER_STEP = 0.2;
+    private static final double SPARE_RESOURCES_PER_TIER = 1.5;
     private static final Map<String, Double> RATINGS = Map.ofEntries(
             Map.entry("nekro_flagship", S_TIER),
             Map.entry("ghost_flagship", S_TIER),
@@ -52,7 +53,8 @@ public class FlagshipRating {
         return flagship == null ? 0 : RATINGS.getOrDefault(flagship.getId(), UNKNOWN);
     }
 
-    public static boolean isGood(Player seat) {
-        return of(seat) >= GOOD;
+    public static double spareResourcesNeeded(Player seat) {
+        double tiersBelowTop = Math.max(0, S_TIER - of(seat)) / TIER_STEP;
+        return tiersBelowTop * SPARE_RESOURCES_PER_TIER;
     }
 }

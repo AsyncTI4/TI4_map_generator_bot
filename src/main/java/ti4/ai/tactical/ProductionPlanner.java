@@ -220,7 +220,7 @@ public class ProductionPlanner {
 
     private static void planSurplusShips(Builder builder) {
         Player seat = builder.seat;
-        if (FlagshipRating.isGood(seat)) builder.surplusShipsUpTo(UnitType.Flagship, 1, 1);
+        builder.surplusShipsUpTo(UnitType.Flagship, 1, 1, FlagshipRating.spareResourcesNeeded(seat));
         builder.surplusShipsUpTo(UnitType.Warsun, 1, 1);
         builder.surplusShipsUpTo(UnitType.Dreadnought, WANTED_DREADNOUGHTS, 1);
         for (UnitType light : List.of(UnitType.Cruiser, UnitType.Destroyer)) {
@@ -349,8 +349,12 @@ public class ProductionPlanner {
         }
 
         void surplusShipsUpTo(UnitType type, int target, double share) {
+            surplusShipsUpTo(type, target, share, 0);
+        }
+
+        void surplusShipsUpTo(UnitType type, int target, double share, double spareNeeded) {
             double value = share * fillerValue(type);
-            while (count(type) < target && leavesRoomToFill(cost(type))) {
+            while (count(type) < target && leavesRoomToFill(cost(type) + spareNeeded)) {
                 if (!ship(type, value, false)) return;
             }
         }

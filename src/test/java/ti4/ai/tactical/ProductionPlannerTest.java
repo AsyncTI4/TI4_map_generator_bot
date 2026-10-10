@@ -156,20 +156,23 @@ class ProductionPlannerTest extends BaseTi4Test {
                 .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
-    // The Alastor is an S-tier flagship, so a seat flying it builds it with resources to spare. The Wrath of
-    // Kenara is D tier and is only ever built for objectives.
+    // Any flagship is worth building with resources to spare; its tier sets how many. The S-tier Alastor is built as
+    // soon as the rest of the production can still be filled. The D-tier Wrath of Kenara waits for 6 more resources
+    // (1.5 per tier below S), and then it is built too.
     @Test
-    void buildsAGoodFlagshipWithSpareResourcesButNotAWeakOne() {
+    void needsMoreSpareResourcesForAWeakerFlagship() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.units(home, "mordaiii", test.nekro, UnitType.Mech, 2);
-        test.nekro.setTg(16);
+        test.nekro.setTg(8);
         assertThat(plan().units(UnitType.Flagship)).isEqualTo(1);
 
         test.nekro.removeOwnedUnitByID("nekro_flagship");
         test.nekro.addOwnedUnitByID("hacan_flagship");
-
         assertThat(plan().units(UnitType.Flagship)).isZero();
+
+        test.nekro.setTg(16);
+        assertThat(plan().units(UnitType.Flagship)).isEqualTo(1);
     }
 
     // A war sun is a luxury: with the technology it is only built once the resources would still fill the rest of
