@@ -1,40 +1,33 @@
 package ti4.discord.interactions.buttons.handlers.unit;
 
-import java.util.regex.Matcher;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.RegexHelper;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
 import ti4.service.unit.ParsedUnit;
 
 @UtilityClass
 class UnitPickerHandlerHelper {
 
-    public String singleUnitRegex(Game game, String action) {
-        String regexSingleUnit = action;
-        regexSingleUnit += "_" + RegexHelper.posRegex(game);
-        regexSingleUnit += "_" + RegexHelper.intRegex("amt");
-        regexSingleUnit += "_" + RegexHelper.unitTypeRegex();
-        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.unitStateRegex());
-        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.planetNameRegex(game, "planet"));
-        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.colorRegex(game));
-        return regexSingleUnit;
+    public ParsedUnit ownParsedUnit(Player player, UnitPickButtonIds.Parsed picked) {
+        UnitKey key = Units.getUnitKey(picked.unitType(), player.getColorID());
+        String location = picked.onPlanet() ? picked.planetName() : Constants.SPACE;
+        return new ParsedUnit(key, picked.amount(), location);
     }
 
-    // TODO: Jazz make this useful
-    public ParsedUnit parsedUnitFromMatcher(Player player, Matcher matcher) {
-        int amt = Integer.parseInt(matcher.group("amt"));
-        UnitType type = Units.findUnitType(matcher.group("unittype"));
-        // TODO: Jazz add this functionality by default to parsed unit
-        // boolean prefersState = matcher.group("state") != null && StringUtils.isNotBlank(matcher.group("state"));
-        // UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
-        String location = matcher.group("planet");
-        if (location == null || location.isBlank()) location = "space";
+    public UnitHolder pickedUnitHolder(Tile tile, UnitPickButtonIds.Parsed picked) {
+        return picked.onPlanet() ? tile.getUnitHolderFromPlanet(picked.planetName()) : tile.getSpaceUnitHolder();
+    }
 
-        UnitKey key = Units.getUnitKey(type, player.getColorID());
-        return new ParsedUnit(key, amt, location);
+    public String pickedLocation(
+            Game game, Player player, Tile tile, UnitHolder holder, UnitPickButtonIds.Parsed picked) {
+        return picked.onPlanet() && holder != null
+                ? " on " + holder.getRepresentation(game)
+                : " in tile " + tile.getRepresentationForButtons(game, player);
     }
 }

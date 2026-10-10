@@ -72,6 +72,8 @@ import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButto
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds.BulkCommand;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1435,10 +1437,12 @@ public final class ButtonHelperTacticalAction {
 
         if ("Remove".equalsIgnoreCase(moveOrRemove)) {
             buttons.add(Buttons.gray(
-                    factionChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAllShips",
+                    factionChecker
+                            + tacticalBulkId(UnitPickButtonIds.TACTICAL_REMOVE, tile, BulkCommand.REMOVE_ALL_SHIPS),
                     "Remove All Ships"));
             buttons.add(Buttons.gray(
-                    factionChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAll", "Remove All Units"));
+                    factionChecker + tacticalBulkId(UnitPickButtonIds.TACTICAL_REMOVE, tile, BulkCommand.REMOVE_ALL),
+                    "Remove All Units"));
             buttons.add(Buttons.blue(factionChecker + "doneRemoving", "Done removing units"));
             return buttons;
         } else {
@@ -1450,7 +1454,8 @@ public final class ButtonHelperTacticalAction {
                         FactionEmojis.tnelis));
 
             buttons.add(Buttons.gray(
-                    factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+                    factionChecker + tacticalBulkId(UnitPickButtonIds.TACTICAL_MOVE, tile, BulkCommand.MOVE_ALL),
+                    "Move All Units"));
             buttons.add(Buttons.blue(
                     factionChecker + "doneWithOneSystem_" + tile.getPosition(), "Done Moving Units From This System"));
         }
@@ -1476,9 +1481,14 @@ public final class ButtonHelperTacticalAction {
         }
         if (!displacedUnits.isEmpty()) {
             Button validTile2 = Buttons.green(
-                    factionChecker + "unitTacticalMove_" + tile.getPosition() + "_reverseAll", "Undo All");
+                    factionChecker + tacticalBulkId(UnitPickButtonIds.TACTICAL_MOVE, tile, BulkCommand.REVERSE_ALL),
+                    "Undo All");
             buttons.add(validTile2);
         }
         return buttons;
+    }
+
+    private static String tacticalBulkId(String action, Tile tile, BulkCommand command) {
+        return UnitPickButtonIds.formatBulk(action, tile.getPosition(), command);
     }
 }

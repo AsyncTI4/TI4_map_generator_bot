@@ -1,6 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.unit;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -8,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds;
+import ti4.discord.interactions.buttons.ids.UnitPickButtonIds.ParsedBulk;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,7 +21,6 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
-import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -37,72 +39,85 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 @UtilityClass
 class TacticalActionButtonHandlers {
 
+    private static final String TACTICAL_ACTION_PREFIX = "unitTactical";
+
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")
     public static void newTacticalMoveUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regexSingleUnit = "unitTactical(?<type>Move|Remove)";
-        regexSingleUnit += "_" + RegexHelper.posRegex(game);
-        regexSingleUnit += "_" + RegexHelper.intRegex("amt");
-        regexSingleUnit += "_" + RegexHelper.unitTypeRegex();
-        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.unitStateRegex());
-        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.planetNameRegex(game, "planet"));
-        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.colorRegex(game));
-        regexSingleUnit += RegexHelper.optional("_" + "(?<reverse>reverse)");
-        if (RegexService.runMatcher(
-                regexSingleUnit,
-                buttonID,
-                matcher -> {
-                    String moveOrRemove = matcher.group("type");
-                    Tile tile = game.getTileByPosition(matcher.group("pos"));
-                    int amt = Integer.parseInt(matcher.group("amt"));
-                    UnitType typeToMove = Units.findUnitType(matcher.group("unittype"));
-                    boolean prefersState =
-                            matcher.group("state") != null && StringUtils.isNotBlank(matcher.group("state"));
-                    UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
-                    String planetName = matcher.group("planet");
-                    boolean reverse = StringUtils.isNotBlank(matcher.group("reverse"));
-                    String color = matcher.group("color");
+        String action = StringUtils.substringBefore(buttonID, "_");
+        String moveOrRemove = StringUtils.removeStart(action, TACTICAL_ACTION_PREFIX);
 
-                    if (!reverse)
-                        TacticalActionService.moveSingleUnit(
-                                event, game, player, tile, planetName, typeToMove, amt, state, moveOrRemove, color);
-                    if (reverse)
-                        TacticalActionService.reverseSingleUnit(
-                                event, game, player, tile, planetName, typeToMove, amt, state, moveOrRemove, color);
-                },
-                x -> {})) {
+        Optional<UnitPickButtonIds.Parsed> picked =
+                UnitPickButtonIds.tryParse(action, buttonID).filter(p -> isTacticalPosition(game, p.position()));
+        if (picked.isPresent()) {
+            moveOrReversePickedUnit(event, game, player, picked.get(), moveOrRemove);
             return;
         }
 
-        String regexAllCmd = "unitTactical(?<type>Move|Remove)";
-        regexAllCmd += "_" + RegexHelper.posRegex(game);
-        regexAllCmd += "_" + "(?<cmd>(moveAll|reverseAll|removeAllShips|removeAll))";
-        if (RegexService.runMatcher(
-                regexAllCmd,
-                buttonID,
-                matcher -> {
-                    String moveOrRemove = matcher.group("type");
-                    Tile tile = game.getTileByPosition(matcher.group("pos"));
-                    switch (matcher.group("cmd")) {
-                        case "moveAll", "removeAll" ->
-                            TacticalActionService.moveAllFromTile(event, game, player, tile, moveOrRemove);
-                        case "reverseAll" ->
-                            TacticalActionService.reverseTileUnitMovement(event, game, player, tile, moveOrRemove);
-                        case "removeAllShips" ->
-                            TacticalActionService.moveAllShipsFromTile(event, game, player, tile, moveOrRemove);
-                    }
-                },
-                x -> {})) {
+        Optional<ParsedBulk> bulk = UnitPickButtonIds.tryParseBulk(action, buttonID)
+                .filter(command -> isTacticalPosition(game, command.position()));
+        if (bulk.isPresent()) {
+            moveAllUnits(event, game, player, bulk.get(), moveOrRemove);
             return;
         }
 
         // Refresh buttons if there was an error
         String pos = buttonID.split("_")[1];
         Tile t = game.getTileByPosition(pos);
-        String moveRemove = buttonID.split("_")[0].replace("unitTactical", "");
-        TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, t, moveRemove);
+        TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, t, moveOrRemove);
         BotLogger.error(new LogOrigin(event, game), "Error matching regex for tactical action: " + buttonID);
         MessageHelper.sendEphemeralMessageToEventChannel(event, "Encountered error, refreshed buttons.");
+    }
+
+    private static void moveOrReversePickedUnit(
+            ButtonInteractionEvent event,
+            Game game,
+            Player player,
+            UnitPickButtonIds.Parsed picked,
+            String moveOrRemove) {
+        Tile tile = game.getTileByPosition(picked.position());
+        if (picked.reverse()) {
+            TacticalActionService.reverseSingleUnit(
+                    event,
+                    game,
+                    player,
+                    tile,
+                    picked.planetName(),
+                    picked.unitType(),
+                    picked.amount(),
+                    picked.state(),
+                    moveOrRemove,
+                    picked.color());
+        } else {
+            TacticalActionService.moveSingleUnit(
+                    event,
+                    game,
+                    player,
+                    tile,
+                    picked.planetName(),
+                    picked.unitType(),
+                    picked.amount(),
+                    picked.state(),
+                    moveOrRemove,
+                    picked.color());
+        }
+    }
+
+    private static void moveAllUnits(
+            ButtonInteractionEvent event, Game game, Player player, ParsedBulk bulk, String moveOrRemove) {
+        Tile tile = game.getTileByPosition(bulk.position());
+        switch (bulk.command()) {
+            case MOVE_ALL, REMOVE_ALL -> TacticalActionService.moveAllFromTile(event, game, player, tile, moveOrRemove);
+            case REVERSE_ALL -> TacticalActionService.reverseTileUnitMovement(event, game, player, tile, moveOrRemove);
+            case REMOVE_ALL_SHIPS ->
+                TacticalActionService.moveAllShipsFromTile(event, game, player, tile, moveOrRemove);
+            default -> {}
+        }
+    }
+
+    private static boolean isTacticalPosition(Game game, String position) {
+        if (game.getTileByPosition(position) != null) return true;
+        return position.equals(game.getActiveSystem()) && FOWPlusService.isVoid(game, position);
     }
 
     @ButtonHandler("doneWithOneSystem_")
