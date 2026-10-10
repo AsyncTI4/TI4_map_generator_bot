@@ -21,6 +21,8 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.explore.ExplorationRules;
+import ti4.ai.explore.RelicActionRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.PromissoryRules;
@@ -84,7 +86,21 @@ public class NekroBrain implements FactionBrain {
             "nekroAgentRes_",
             PromissoryRules.GREYFIRE_TARGET,
             TIED_PLANETS,
-            "sendTGTo_");
+            "sendTGTo_",
+            "integratedBuild_",
+            "resolveVolatile",
+            "resolveExpedition",
+            "resolveCoreMine",
+            "resolveLocalFab_",
+            "freelancersBuild_",
+            "decline_explore",
+            "comm_for_AC",
+            "gain_1_comms",
+            "gain_2_comms",
+            "convert_2_comms",
+            "addIonStorm_",
+            "crownofemphidiaexplore",
+            "acquireATech");
     private static final String NO_SABOTAGE = "no_sabotage";
     private static final long MIN_SELF_PLAY_PASS_DELAY_SECONDS = 5;
     private static final int SELF_PLAY_PASS_DELAY_SPREAD_SECONDS = 10;
@@ -114,6 +130,8 @@ public class NekroBrain implements FactionBrain {
             TechRules::neuralParasite,
             TechRules::salvageOperations,
             IntegratedEconomyRules::next,
+            ExplorationRules::next,
+            RelicActionRules::next,
             StrategyCardRules::chooseTechnology,
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,
@@ -385,6 +403,8 @@ public class NekroBrain implements FactionBrain {
         if (warfareFirst.isPresent()) return warfareFirst;
         Optional<AiDecision> sling = SlingRelayRules.insteadOfTacticalAction(context, thisTurn);
         if (sling.isPresent()) return sling;
+        Optional<AiDecision> relicAction = RelicActionRules.insteadOfTacticalAction(context, thisTurn);
+        if (relicAction.isPresent()) return relicAction;
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {
@@ -398,6 +418,8 @@ public class NekroBrain implements FactionBrain {
         }
         Optional<AiDecision> card = ActionCardRules.playBeforePassing(context);
         if (card.isPresent()) return card;
+        Optional<AiDecision> relicBeforePassing = RelicActionRules.beforePassing(context, thisTurn);
+        if (relicBeforePassing.isPresent()) return relicBeforePassing;
         Optional<AiDecision> beforePassing = TechRules.beforePassing(context, thisTurn);
         if (beforePassing.isPresent()) return beforePassing;
         for (String handler : List.of("passForRound", "passingAbilities")) {

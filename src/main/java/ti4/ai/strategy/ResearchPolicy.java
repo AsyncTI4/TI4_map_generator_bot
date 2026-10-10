@@ -23,7 +23,7 @@ import ti4.service.tech.ListTechService;
 @UtilityClass
 public class ResearchPolicy {
 
-    static final double WORTH_PAYING_FOR = 4.0;
+    public static final double WORTH_PAYING_FOR = 4.0;
     static final double WORTH_FOLLOWING_FOR = 3.0;
     private static final double FACTION_TECH_VALUE = 2.0;
     private static final double DEFAULT_VALUE = 1.5;

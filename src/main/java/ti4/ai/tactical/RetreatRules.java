@@ -10,6 +10,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.PlanetStake;
 import ti4.ai.eval.Threats;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
@@ -31,7 +32,6 @@ class RetreatRules {
     static final double SPARE_SYSTEM_RETREAT = 0.35;
     static final double CRITICAL_SYSTEM_RETREAT = 0.20;
     private static final double CRITICAL_STAKE = ObjectiveValue.VICTORY_POINT_VALUE;
-    private static final List<UnitType> STRUCTURES = List.of(UnitType.Spacedock, UnitType.Pds);
     private static final String ANNOUNCE = "announceARetreat";
     private static final String RETREAT_PREFIX = "retreat_";
     private static final String DESTINATION_PREFIX = "retreatUnitsFrom_";
@@ -113,17 +113,7 @@ class RetreatRules {
                         * BoardView.model(seat, unit).map(UnitModel::getCost).orElse(0f))
                 .sum();
         double hold = CombatForces.garrisonHoldChance(game, from, planet, seat, invader);
-        return hold < garrison / (garrison + planetStake(game, seat, planet));
-    }
-
-    static double planetStake(Game game, Player seat, Planet planet) {
-        String name = planet.getName();
-        double stake = BoardView.planetValue(planet);
-        if (!seat.getExhaustedPlanets().contains(name)) {
-            stake += Math.max(BoardView.planetResources(game, name), BoardView.planetInfluence(game, name));
-        }
-        ObjectiveValue objectives = new ObjectiveValue(game, seat);
-        return stake + Math.max(0, -objectives.gain(objectives.before().withoutPlanet(name)));
+        return hold < garrison / (garrison + PlanetStake.of(game, seat, planet));
     }
 
     private static int spareCapacity(Player seat, Tile to) {
@@ -194,13 +184,7 @@ class RetreatRules {
         double stake = 0;
         for (Planet planet : BoardView.planets(tile)) {
             if (!seat.getPlanets().contains(planet.getName())) continue;
-            stake += planetStake(game, seat, planet);
-            for (UnitType structure : STRUCTURES) {
-                stake += BoardView.count(planet, seat, structure)
-                        * BoardView.model(seat, structure)
-                                .map(UnitModel::getCost)
-                                .orElse(0f);
-            }
+            stake += PlanetStake.of(game, seat, planet) + PlanetStake.structures(planet, seat);
         }
         ObjectiveValue objectives = new ObjectiveValue(game, seat);
         stake += Math.max(0, -objectives.gain(objectives.before().withoutShipsIn(tile.getPosition())));

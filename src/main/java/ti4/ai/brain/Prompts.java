@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.game.Player;
 
 @UtilityClass
 public class Prompts {
@@ -50,6 +51,17 @@ public class Prompts {
             if (button.isPresent()) return Optional.of(new Match(prompt, button.get()));
         }
         return Optional.empty();
+    }
+
+    public static boolean mentions(AiPrompt prompt, Player seat) {
+        String content = prompt.content();
+        return content.contains(seat.getRepresentation())
+                || content.contains(seat.getRepresentationUnfogged())
+                || content.contains(seat.getRepresentationNoPing());
+    }
+
+    public static boolean createdThisTurn(AiTurnContext context, AiPrompt prompt) {
+        return prompt.createdAtMillis() >= turnStart(context);
     }
 
     public static Optional<PromptButton> in(AiPrompt prompt, Predicate<PromptButton> predicate) {

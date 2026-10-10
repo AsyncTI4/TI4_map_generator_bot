@@ -2,6 +2,7 @@ package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -361,9 +362,11 @@ class TacticalPlannerTest extends BaseTi4Test {
 
     // Xanhact (0/1) is the only free planet left once Cealdri is held. Early in the game any free planet is worth a
     // tactical action, so the expansion clears the bar (0.6 + 0.8 tempo - 0.2 distance); by round 8 the tempo has
-    // faded and the same planet (0.4) is no longer worth a token on its own.
+    // faded and the same planet (0.4) is no longer worth a token on its own. The explore decks are empty, so that
+    // exploring the planet adds nothing to the numbers.
     @Test
     void takesALoneSmallPlanetEarlyButNotLate() {
+        test.game.setExploreDeck(new ArrayList<>());
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
@@ -587,6 +590,57 @@ class TacticalPlannerTest extends BaseTi4Test {
                         !"x".equals(position) && !AiTestGame.HOME.equals(position) && !nearHome.contains(position))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    // Taking a planet nobody holds explores it, so the planet is worth the average of what is left in its deck on
+    // top of its own value. A Dyson Sphere alone (2 resources and 1 influence, 2.6) raises the plan by exactly that.
+    @Test
+    void valuesExploringAPlanetNobodyHolds() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("26", neighbour);
+
+        test.game.setExploreDeck(new ArrayList<>());
+        double unexplored = expansionTo(neighbour).orElseThrow().score();
+        test.game.setExploreDeck(new ArrayList<>(List.of("ds")));
+        double explored = expansionTo(neighbour).orElseThrow().score();
+
+        assertThat(explored - unexplored).isCloseTo(2.6, org.assertj.core.data.Offset.offset(1e-9));
+    }
+
+    // A planet that someone holds is not explored when it is invaded, so the same deck changes nothing.
+    @Test
+    void doesNotValueExploringAPlanetAnotherPlayerHolds() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 1);
+
+        test.game.setExploreDeck(new ArrayList<>());
+        double without = attackOn(neighbour).orElseThrow().score();
+        test.game.setExploreDeck(new ArrayList<>(List.of("ds")));
+        double with = attackOn(neighbour).orElseThrow().score();
+
+        assertThat(with).isEqualTo(without);
+    }
+
+    // The same attack on a planet nobody holds (but that has defenders) does explore it once it is taken.
+    @Test
+    void valuesExploringAPlanetTakenFromGroundForcesThatDoNotHoldIt() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        Tile lodor = test.place("26", neighbour);
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 1);
+
+        test.game.setExploreDeck(new ArrayList<>());
+        double without = attackOn(neighbour).orElseThrow().score();
+        test.game.setExploreDeck(new ArrayList<>(List.of("ds")));
+        double with = attackOn(neighbour).orElseThrow().score();
+
+        assertThat(with).isGreaterThan(without);
     }
 
     private Optional<TacticalPlan> attackOn(String position) {

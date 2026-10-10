@@ -479,6 +479,10 @@ public class StrategyCardRules {
                 .anyMatch(since -> context.now() - since <= FOLLOW_WAIT_MILLIS);
     }
 
+    public static void expectResearch(AiTurnContext context, int cost) {
+        context.memory().put(requestKey(context, RESEARCH_KEY), context.now() + "|" + cost);
+    }
+
     public static Optional<AiDecision> chooseTechnology(AiTurnContext context) {
         Optional<long[]> request = request(context, RESEARCH_KEY);
         if (request.isEmpty()) return Optional.empty();
@@ -750,7 +754,7 @@ public class StrategyCardRules {
         return reinforcements(context.game(), context.seat());
     }
 
-    static int reinforcements(Game game, Player seat) {
+    public static int reinforcements(Game game, Player seat) {
         return Math.max(0, seat.getCommandTokenLimit() - Helper.getCCCount(game, seat.getColor()));
     }
 
@@ -930,7 +934,7 @@ public class StrategyCardRules {
         return worthPayingForResearch(game, seat, cost, worth, Wallet.of(game, seat));
     }
 
-    static boolean worthPayingForResearch(Game game, Player seat, int cost, double worth, Wallet wallet) {
+    public static boolean worthPayingForResearch(Game game, Player seat, int cost, double worth, Wallet wallet) {
         if (ScoringReserve.planAfterReserve(wallet, ScoringReserve.of(game, seat), SpendCost.resources(cost))
                 .isEmpty()) return false;
         return worthResearching(game, seat, worth);

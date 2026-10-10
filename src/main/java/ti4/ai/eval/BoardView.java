@@ -35,6 +35,9 @@ public class BoardView {
             UnitType.Warsun);
     public static final Set<UnitType> GROUND_FORCES = EnumSet.of(UnitType.Infantry, UnitType.Mech);
     public static final int DOCK_FIGHTER_ALLOWANCE = 3;
+    public static final double INFLUENCE_WEIGHT = 0.6;
+    public static final double LEGENDARY_VALUE = 2;
+    public static final double TECH_SPECIALTY_VALUE = 0.3;
     private static final String GRAVITY_DRIVE = "gd";
 
     public static int count(@Nullable UnitHolder holder, Player player, UnitType type) {
@@ -137,9 +140,9 @@ public class BoardView {
     }
 
     public static double planetValue(Planet planet) {
-        double value = planet.getResources() + 0.6 * planet.getInfluence();
-        if (planet.isLegendary()) value += 2;
-        if (!planet.getTechSpecialities().isEmpty()) value += 0.3;
+        double value = planet.getResources() + INFLUENCE_WEIGHT * planet.getInfluence();
+        if (planet.isLegendary()) value += LEGENDARY_VALUE;
+        if (!planet.getTechSpecialities().isEmpty()) value += TECH_SPECIALTY_VALUE;
         return value;
     }
 

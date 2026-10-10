@@ -13,6 +13,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.explore.ExplorationRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
@@ -191,8 +192,8 @@ public class TacticalRules {
 
         Optional<AiDecision> movement = movement(context, turn, target, plan);
         if (movement.isPresent()) return movement;
-        Optional<Match> explore = Prompts.owned(turn, context.faction(), id -> id.startsWith("movedNExplored_"));
-        if (explore.isPresent()) return Optional.of(explore.get().press("explore a newly gained planet"));
+        Optional<AiDecision> explore = ExplorationRules.explore(context, turn);
+        if (explore.isPresent()) return explore;
         Optional<Match> relic = Prompts.owned(turn, context.faction(), "drawRelic"::equals);
         if (relic.isPresent()) return Optional.of(relic.get().press("draw a relic"));
         if (BoardView.hasOwnShips(seat, tile) && BoardView.hasEnemyShips(game, seat, tile)) {

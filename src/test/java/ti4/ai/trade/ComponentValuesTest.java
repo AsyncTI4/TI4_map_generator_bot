@@ -158,6 +158,27 @@ class ComponentValuesTest extends BaseTi4Test {
                 .isCloseTo(4, within(EXACT));
     }
 
+    // A fragment found by exploring is valued like one received: 1, and 2 when it makes three of a kind.
+    @Test
+    void aFragmentFoundByExploringIsValuedLikeAReceivedOne() {
+        nekro.setCrf(1);
+        nekro.setUrf(1);
+
+        assertThat(ComponentValues.gainedFragment(nekro, "CRF")).isCloseTo(2, within(EXACT));
+        assertThat(ComponentValues.gainedFragment(nekro, "IRF")).isCloseTo(1, within(EXACT));
+
+        nekro.setSecret("dhw");
+        nekro.setCrf(0);
+        nekro.setUrf(0);
+        assertThat(ComponentValues.gainedFragment(nekro, "HRF")).isCloseTo(3, within(EXACT));
+    }
+
+    // Without a partner to leave out, an own commodity is worth 0.3 until someone else could wash it.
+    @Test
+    void anOwnCommodityHasAValueWithoutAPartner() {
+        assertThat(ComponentValues.ownCommodity(table.game, nekro)).isCloseTo(0.3, within(EXACT));
+    }
+
     // Destroy Heretical Works scores for purging 2 fragments: while the AI holds it with fewer than 2, each is worth 3.
     @Test
     void destroyHereticalWorksMakesTheFirstTwoFragmentsValuable() {

@@ -101,6 +101,19 @@ class RetreatRulesTest extends BaseTi4Test {
         assertThat(ready).isLessThan(spent).isGreaterThanOrEqualTo(RetreatRules.CRITICAL_SYSTEM_RETREAT);
     }
 
+    // Structures count too: a space dock on Lodor makes the system worth holding even longer.
+    @Test
+    void sticksOutLongerToProtectAStructure() {
+        test.nekro.addPlanet("lodor");
+        test.nekro.exhaustPlanet("lodor");
+        double bare = RetreatRules.retreatBelow(test.game, test.nekro, battle);
+        test.units(battle, "lodor", test.nekro, UnitType.Spacedock, 1);
+
+        assertThat(RetreatRules.retreatBelow(test.game, test.nekro, battle))
+                .isLessThan(bare)
+                .isGreaterThanOrEqualTo(RetreatRules.CRITICAL_SYSTEM_RETREAT);
+    }
+
     // After the fleet retreats home, Sol's four infantry in orbit will invade Lodor. A lone infantry cannot hold it,
     // so the carrier that retreated takes it along; three infantry against one invader stay to hold the planet.
     @Test

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.Test;
+import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
 
@@ -35,6 +36,20 @@ class AiPerceptionTest extends BaseTi4Test {
                 .isFalse();
         assertThat(AiPerception.isRelevant(PromptSource.PUBLIC, buttons("showGameAgain"), "nekro", WINDOWS))
                 .isFalse();
+    }
+
+    // Integrated Economy and the exploration cards answer with unowned buttons in the main channel; the AI's public
+    // windows must let it see them.
+    @Test
+    void seesItsIntegratedEconomyOfferAndExplorationCards() {
+        Set<String> windows = new NekroBrain().publicWindowHandlerPrefixes();
+
+        assertThat(AiPerception.isRelevant(
+                        PromptSource.PUBLIC, buttons("integratedBuild_lodor", "deleteButtons"), "nekro", windows))
+                .isTrue();
+        assertThat(AiPerception.isRelevant(
+                        PromptSource.PUBLIC, buttons("resolveVolatileInf_lodor", "decline_explore"), "nekro", windows))
+                .isTrue();
     }
 
     // The AI must never react to its own "choose for the AI" messages.

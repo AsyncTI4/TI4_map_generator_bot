@@ -18,6 +18,9 @@ import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.explore.ExploreDeck;
+import ti4.ai.explore.ExploreOutlook;
+import ti4.ai.explore.ExploreSite;
 import ti4.ai.promissory.PlayAreaNotes;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -179,7 +182,7 @@ public class TacticalPlanner {
         double value = 0;
         for (Planet planet : free.subList(0, landed)) {
             landings.put(planet.getName(), 1);
-            value += BoardView.planetValue(planet) + planetTempo(context.game);
+            value += BoardView.planetValue(planet) + planetTempo(context.game) + context.exploreValue(tile, planet);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
         }
         value += context.objectiveGain(tile, legal.get(), landings.keySet());
@@ -322,7 +325,7 @@ public class TacticalPlanner {
             if (groundWin < ATTACK_MIN_WIN) continue;
             landings.put(planet.getName(), sent);
             assigned += sent;
-            value += BoardView.planetValue(planet) * groundWin;
+            value += (BoardView.planetValue(planet) + unexploredValue(context, tile, planet)) * groundWin;
             groundCombat |= defenders > 0;
         }
         if ((spaceCombat || groundCombat) && canStealTech(game, seat, opponent)) value += TECH_STEAL_VALUE;
@@ -339,6 +342,10 @@ public class TacticalPlanner {
         double score = spaceWin * value - (1 - spaceWin) * fleetCost(seat, legal.get()) - cannonLosses;
         if (score < ATTACK_MIN_SCORE) return Optional.empty();
         return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), legal.get(), landings, score));
+    }
+
+    private static double unexploredValue(Context context, Tile tile, Planet planet) {
+        return BoardView.controller(context.game, planet.getName()) == null ? context.exploreValue(tile, planet) : 0;
     }
 
     private static Optional<UnitMove> gravityDriveShip(
@@ -898,10 +905,20 @@ public class TacticalPlanner {
         private List<Tile> origins;
         private ObjectiveValue objectives;
         private Boolean canPayCustodians;
+        private ExploreOutlook exploreOutlook;
+        private final Map<String, Double> exploreValues = new HashMap<>();
 
         Context(Game game, Player seat) {
             this.game = game;
             this.seat = seat;
+        }
+
+        double exploreValue(Tile tile, Planet planet) {
+            if (exploreOutlook == null) exploreOutlook = new ExploreOutlook(game, seat);
+            return exploreValues.computeIfAbsent(
+                    planet.getName(),
+                    name -> ExploreDeck.expectedValueOfPlanet(
+                            ExploreSite.landing(game, seat, tile, planet, 1, 0, exploreOutlook)));
         }
 
         ObjectiveValue objectives() {

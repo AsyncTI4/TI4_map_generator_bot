@@ -8,7 +8,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 
 @UtilityClass
-class ComponentValues {
+public class ComponentValues {
 
     private static final double TRADE_GOOD = 1.0;
     private static final double COMMODITY_RECEIVED = 1.0;
@@ -73,6 +73,10 @@ class ComponentValues {
         };
     }
 
+    public static double ownCommodity(Game game, Player seat) {
+        return ownCommodity(game, seat, null);
+    }
+
     static double ownCommodity(Game game, Player seat, Player excluding) {
         return hasOutlet(game, seat, excluding) ? OWN_COMMODITY_WITH_OUTLET : OWN_COMMODITY_WITHOUT_OUTLET;
     }
@@ -125,6 +129,15 @@ class ComponentValues {
             case UNKNOWN -> player.getUrf();
             default -> 0;
         };
+    }
+
+    public static double gainedFragment(Player seat, String kind) {
+        int held = FRAGMENT_KINDS.stream()
+                .mapToInt(known -> fragmentsOfKind(seat, known))
+                .sum();
+        boolean hereticalWorks =
+                seat.getSecretsUnscored().containsKey(HERETICAL_WORKS) && held < HERETICAL_WORKS_FRAGMENTS;
+        return fragmentValue(hereticalWorks, fragmentsToward(seat, kind));
     }
 
     private static double fragments(Player seat, DealItem item, boolean seatPrivate) {

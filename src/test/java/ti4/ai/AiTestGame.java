@@ -48,6 +48,7 @@ public final class AiTestGame {
         game = new Game();
         game.setName("ai-test-game");
         game.setRound(2);
+        game.setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
         game.setActiveSystem("");
         nekro = addSeat(AI_ID, "nekro", "black");
         sol = addSeat(solUserId, "sol", "blue");

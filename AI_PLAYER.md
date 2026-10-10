@@ -422,6 +422,50 @@ to build one by hand:
   several messages; if it still cannot find it, it activates the best system the picker does offer. Once it has
   taken an action, it only ends its turn. When its units
   share a system with another player's but no combat starts, it hands the choice over.
+- **Exploration** (`ti4.ai.explore`). Everything an exploration gives is valued in resources: a trade good 1, a
+  command token 2 (nothing once none is left in reinforcements), an action card 1 (nothing at the hand limit), its own
+  commodity a third (0.6 with someone to wash it with), a relic fragment 1 (2 for the one that completes a set, 3 while
+  Destroy Heretical Works needs two).
+  - **Decks.** The decks are public, so a deck is worth the average of the cards still in its draw pile: an attachment
+    by the resources and influence it adds (a research facility 0.3, or 1.6 on a planet with a technology specialty),
+    the Demilitarized Zone by -1.5 less the space docks (4) and PDS (3) it returns, Mercenary Outfit 0.75, Freelancers
+    1.5 when it could pay for a unit, Lost Crew two action cards, Derelict Vessel a secret objective. A full deck comes
+    to about 1 per exploration. `TacticalPlanner` adds that to every planet nobody holds that a plan expands to or
+    invades (it assumes one infantry lands there); an invaded planet someone holds is never explored.
+  - **Offers.** A newly taken planet is explored through the bot's offer, from the deck with the better average when it
+    has more than one trait. A Scanlink Drone Network offer (the planet it already holds) is answered only when the
+    best deck is worth more than nothing, otherwise ignored; the Crown of Emphidia is exhausted at the end of a
+    tactical action only for a planet whose deck is worth more than nothing, then used on the best one.
+  - **Cards that ask.** Unowned buttons are only the AI's own on its turn, in a message for it (or one that names no
+    one else). Removing an infantry costs 0.5, half a resource more while its ships can still reach a planet to claim,
+    and the planet's whole stake (`PlanetStake`, also used for retreats) when it is the last ground force and an enemy
+    fleet can reach the system; a mech is free. A card with no decline button is always answered, even when neither
+    option gains anything, and one left with only Decline is declined.
+    | Card | Choice |
+    | --- | --- |
+    | Volatile Fuel Source, Core Mine | the command token (2), or the trade good (1), when the mech or infantry is worth it; otherwise it declines |
+    | Expedition | readies the planet when it is worth more than the infantry: its larger value while the AI still has something to build, 0.3 of it otherwise; never with Pre-Fab Arcologies or a planet that is ready |
+    | Local Fabricators | a mech (2, a little more for an empty planet) paid with a commodity or trade good, unless none is left in reinforcements or the planet has the Demilitarized Zone; otherwise a commodity |
+    | Functioning Base | an action card for a commodity or trade good, unless the hand is full; otherwise a commodity |
+    | Abandoned Warehouses, Merchant Station | convert commodities to trade goods or gain commodities, whichever is worth more |
+    | Ion Storm | the side whose other wormholes lead to free planets and its own ships, away from enemy fleets near its planets (alpha on a tie) |
+    | Freelancers | below |
+  - **Freelancers.** It picks the best single unit for the system: the ship `ProductionPlanner` would build there (plus 1
+    in a system without its dock, where a ship saves the trip), a fighter that fits, an infantry or a mech on a planet
+    of its own. Each planet pays the higher of its resources and influence, so the payment takes the planets with the
+    lowest cost this round (a resource at the filler value of a unit, an influence a quarter, a trade good 1, a third
+    of the resources when the AI will not spend more this round), within the scoring reserve. It builds when the unit
+    is worth at least 0.25 more than the payment and declines otherwise.
+  - **Command tokens** from Volatile Fuel Source (or any exploration that asks for them) go to the pool the command
+    token policy grows first.
+  - **Relic fragments.** With three of one kind (unknown fragments fill in last), it purges exactly three as a
+    component action and draws the relic: instead of a tactical action when no plan scores 2.5 (1 for having the relic
+    sooner, 1.5 for waiting to see what the others do), and before passing. It keeps two fragments back while it holds
+    an unscored _Destroy Heretical Works_, one relic a turn.
+  - **Enigmatic Device.** When the best technology it can research is worth at least 4 (the bar for paying for a
+    second technology) and it can pay 6 resources after the scoring reserve, it purges the device as a component
+    action, picks the type of the best technology and pays the 6 resources through the research payment (the bot posts
+    the research without charging them). Nekro leaves the device alone: it cannot research.
 - **Actuation.** The AI presses the bot's **real** buttons through the test bed's stand-in
   event (`TestBedPress.standInEvent`), so every rule and side effect runs exactly as for a
   human. The stand-in user carries the seat's id, so the normal owner checks apply. Handler

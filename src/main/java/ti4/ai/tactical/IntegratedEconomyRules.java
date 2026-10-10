@@ -42,7 +42,7 @@ public class IntegratedEconomyRules {
         for (AiPrompt prompt : visible) {
             Optional<PromptButton> offer = prompt.firstEnabled(
                     button -> button.isUnowned() && button.handlerId().startsWith(OFFER_PREFIX));
-            if (offer.isEmpty() || !mentions(prompt, seat)) continue;
+            if (offer.isEmpty() || !Prompts.mentions(prompt, seat)) continue;
             String planet = StringUtils.removeStart(offer.get().handlerId(), OFFER_PREFIX);
             String key = OFFER_KEY + prompt.messageId();
             Tile tile = game.getTileFromPlanet(planet);
@@ -73,12 +73,5 @@ public class IntegratedEconomyRules {
         String source = SOURCE_PREFIX + planet;
         return TacticalRules.placeUnits(context, visible, source, tile.getPosition(), plan)
                 .or(() -> TacticalRules.payForUnits(context, visible, source));
-    }
-
-    private static boolean mentions(AiPrompt prompt, Player seat) {
-        String content = prompt.content();
-        return content.contains(seat.getRepresentation())
-                || content.contains(seat.getRepresentationUnfogged())
-                || content.contains(seat.getRepresentationNoPing());
     }
 }
