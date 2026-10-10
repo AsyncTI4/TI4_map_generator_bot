@@ -15,7 +15,6 @@ public class CopiedTechPolicy {
 
     private static final Set<String> ASSIMILATORS = Set.of("vax", "vay");
     private static final int ASSIMILATOR_TOKENS = 2;
-    private static final double PREREQUISITE_VALUE = 0.3;
 
     public static Optional<String> best(Game game, Player seat, Collection<String> aliases) {
         return aliases.stream()
@@ -25,10 +24,7 @@ public class CopiedTechPolicy {
     }
 
     public static double value(Game game, Player seat, String alias) {
-        TechnologyModel tech = Mapper.getTech(alias);
-        if (tech == null || !allowed(seat, alias)) return 0;
-        double prerequisites = tech.getRequirements().map(String::length).orElse(0);
-        return ResearchPolicy.value(game, seat, alias) + PREREQUISITE_VALUE * prerequisites;
+        return allowed(seat, alias) ? ResearchPolicy.value(game, seat, alias) : 0;
     }
 
     private static boolean allowed(Player seat, String alias) {

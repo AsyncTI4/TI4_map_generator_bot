@@ -24,8 +24,65 @@ public class ResearchPolicy {
 
     static final double WORTH_PAYING_FOR = 4.0;
     static final double WORTH_FOLLOWING_FOR = 3.0;
-    private static final double FACTION_TECH_VALUE = 3.5;
+    private static final double FACTION_TECH_VALUE = 2.0;
     private static final double DEFAULT_VALUE = 1.5;
+    private static final Map<String, Double> FACTION_VALUE = Map.ofEntries(
+            Map.entry("ac2", 4.5),
+            Map.entry("sdn2", 4.0),
+            Map.entry("nes", 4.0),
+            Map.entry("exo2", 3.5),
+            Map.entry("hcf2", 3.5),
+            Map.entry("l4", 3.0),
+            Map.entry("ers", 3.0),
+            Map.entry("vpw", 3.0),
+            Map.entry("ng", 3.0),
+            Map.entry("mc", 3.0),
+            Map.entry("pws2", 3.0),
+            Map.entry("se2", 3.0),
+            Map.entry("swa2", 3.0),
+            Map.entry("helios2", 3.0),
+            Map.entry("m2", 3.0),
+            Map.entry("yso", 3.0),
+            Map.entry("so2", 2.5),
+            Map.entry("pfa", 2.5),
+            Map.entry("lw2", 2.5),
+            Map.entry("cl2", 2.5),
+            Map.entry("ht2", 2.5),
+            Map.entry("dt2", 2.5),
+            Map.entry("exile2", 2.5),
+            Map.entry("linkship2", 2.5),
+            Map.entry("ic", 2.5),
+            Map.entry("tp", 2.0),
+            Map.entry("vw", 2.0),
+            Map.entry("ah", 2.0),
+            Map.entry("hydrothermal", 2.0),
+            Map.entry("ffac2", 2.0),
+            Map.entry("pm", 2.0),
+            Map.entry("nf", 1.5),
+            Map.entry("scc", 1.5),
+            Map.entry("is", 1.5),
+            Map.entry("it", 1.5),
+            Map.entry("qdn", 1.0),
+            Map.entry("vtx", 1.0),
+            Map.entry("lgf", 1.0),
+            Map.entry("tcs", 1.0),
+            Map.entry("gr", 1.0),
+            Map.entry("htp", 1.0),
+            Map.entry("radical", 1.0),
+            Map.entry("planesplitter-obs", 1.0),
+            Map.entry("mr", 1.0),
+            Map.entry("mi", 1.0),
+            Map.entry("cm", 1.0),
+            Map.entry("as", 1.0),
+            Map.entry("wg", 1.0),
+            Map.entry("nanomachines", 1.0),
+            Map.entry("executiveorder", 1.0),
+            Map.entry("asn", 1.0),
+            Map.entry("ds", 1.0),
+            Map.entry("so", 1.0),
+            Map.entry("parasite-obs", 1.0),
+            Map.entry("subatomic", 1.0),
+            Map.entry("sc", 1.0));
     private static final double OBJECTIVE_WEIGHT = 4.0;
     private static final double PARTIAL_PROGRESS_SHARE = 0.4;
     private static final Map<String, Double> GENERIC_VALUE = Map.ofEntries(
@@ -61,7 +118,8 @@ public class ResearchPolicy {
             Map.entry("gls", 1.5),
             Map.entry("td", 1.5),
             Map.entry("det", 1.0),
-            Map.entry("x89", 1.0));
+            Map.entry("x89", 1.0),
+            Map.entry("x89c4", 1.0));
     private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
     private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
     private static final String PRODUCE_EN_MASSE = "pem";
@@ -101,7 +159,10 @@ public class ResearchPolicy {
     }
 
     static double baseValue(TechnologyModel tech) {
-        return isFactionTech(tech) ? FACTION_TECH_VALUE : GENERIC_VALUE.getOrDefault(tech.getAlias(), DEFAULT_VALUE);
+        String alias = tech.getAlias();
+        return isFactionTech(tech)
+                ? FACTION_VALUE.getOrDefault(alias, FACTION_TECH_VALUE)
+                : GENERIC_VALUE.getOrDefault(alias, DEFAULT_VALUE);
     }
 
     private static double steppingStoneValue(Game game, Player seat, TechnologyModel tech) {

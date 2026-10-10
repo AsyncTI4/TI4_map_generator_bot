@@ -36,6 +36,7 @@ import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.SingularityRules;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -96,6 +97,8 @@ public class NekroBrain implements FactionBrain {
             NekroRules::propagationTokens,
             NekroRules::commanderDraw,
             NekroRules::dacxiveAnimators,
+            TechRules::reviveInfantry,
+            TechRules::placeSpinnerInfantry,
             StrategyCardRules::chooseTechnology,
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,
