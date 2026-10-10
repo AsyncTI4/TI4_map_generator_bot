@@ -366,8 +366,10 @@ public class OPlusPlusCouncilService {
         }
         List<ContainerChildComponent> components = new ArrayList<>();
         components.add(TextDisplay.of(sb.toString()));
-        components.add(ActionRow.of(
-                buildMenu(menuCustomID, "Choose " + keepCount + " " + label, ids, keepCount, modelLookup)));
+        if (keepCount > 0) {
+            components.add(ActionRow.of(
+                    buildMenu(menuCustomID, "Choose " + keepCount + " " + label, ids, keepCount, modelLookup)));
+        }
         return Container.of(components).withAccentColor(accentColor);
     }
 

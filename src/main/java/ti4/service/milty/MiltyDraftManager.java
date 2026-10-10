@@ -588,7 +588,7 @@ public class MiltyDraftManager {
             String current = getCurrentDraftPlayer();
             if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("**__");
-            sb.append(player.getUserName());
+            sb.append(player == null ? "Unknown player" : player.getUserName());
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
             if (next != null && p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("__**");

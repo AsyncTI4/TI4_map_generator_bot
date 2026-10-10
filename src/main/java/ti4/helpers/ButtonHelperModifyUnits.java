@@ -2148,38 +2148,11 @@ public final class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 PDS on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else if ("monument".equalsIgnoreCase(unitLong)) {
-            if (player.ownsUnit("empyrean_monument")) {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
-                successMessage = "Placed 1 monument in the space area of the "
-                        + Helper.getPlanetRepresentation(planetName, game) + " system.";
-            } else {
-                String coexistFlag = game.getStoredValue("coexistFlag");
-                if (placingSarcosaMonumentInCoexistence) {
-                    game.setStoredValue("coexistFlag", "yes");
-                }
-                try {
-                    AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
-                } finally {
-                    if (placingSarcosaMonumentInCoexistence) {
-                        if (coexistFlag.isEmpty()) {
-                            game.removeStoredValue("coexistFlag");
-                        } else {
-                            game.setStoredValue("coexistFlag", coexistFlag);
-                        }
-                    }
-                }
-                MonumentsAgendaService.resolveCathedralOfIxthPlacement(game, player, planetName);
-                successMessage = "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
-                if (player.hasUnit("saar_monument")) {
-                    MonumentsButtonHandler.sendSaarMonumentSpaceDockButtons(game, player, event, true);
-                }
-                if (buttonID.startsWith("place_monument_")) {
-                    UnitModel monument = player.getUnitByBaseType("monument");
-                    if (monument != null) {
-                        MessageHelper.sendMessageToChannelWithEmbed(
-                                player.getCorrectChannel(), successMessage, monument.getRepresentationEmbed());
-                    }
-                }
+            successMessage = placeMonument(event, game, player, tile, planetName, placingSarcosaMonumentInCoexistence);
+            UnitModel monument = player.getUnitByBaseType("monument");
+            if (!player.ownsUnit("empyrean_monument") && buttonID.startsWith("place_monument_") && monument != null) {
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        player.getCorrectChannel(), successMessage, monument.getRepresentationEmbed());
             }
         } else {
             String producedOrPlaced = "Produced";
@@ -2545,6 +2518,40 @@ public final class ButtonHelperModifyUnits {
         }
     }
 
+    private static String placeMonument(
+            ButtonInteractionEvent event,
+            Game game,
+            Player player,
+            Tile tile,
+            String planetName,
+            boolean placingSarcosaMonumentInCoexistence) {
+        if (player.ownsUnit("empyrean_monument")) {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "monument");
+            return "Placed 1 monument in the space area of the " + Helper.getPlanetRepresentation(planetName, game)
+                    + " system.";
+        }
+        String coexistFlag = game.getStoredValue("coexistFlag");
+        if (placingSarcosaMonumentInCoexistence) {
+            game.setStoredValue("coexistFlag", "yes");
+        }
+        try {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "monument " + planetName);
+        } finally {
+            if (placingSarcosaMonumentInCoexistence) {
+                if (coexistFlag.isEmpty()) {
+                    game.removeStoredValue("coexistFlag");
+                } else {
+                    game.setStoredValue("coexistFlag", coexistFlag);
+                }
+            }
+        }
+        MonumentsAgendaService.resolveCathedralOfIxthPlacement(game, player, planetName);
+        if (player.hasUnit("saar_monument")) {
+            MonumentsButtonHandler.sendSaarMonumentSpaceDockButtons(game, player, event, true);
+        }
+        return "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
+    }
+
     @ButtonHandler("placeOneNDone_")
     public static void placeUnitAndDeleteButton(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -2572,7 +2579,12 @@ public final class ButtonHelperModifyUnits {
         } else if (unitLong.contains("2gf") || unitLong.contains("mech")) {
             planetName += "space";
         }
-        if ("sd".equalsIgnoreCase(unitID)) {
+        if ("monument".equalsIgnoreCase(unitLong)) {
+            tile = game.getTileFromPlanet(planetName);
+            boolean placingSarcosaMonumentInCoexistence = player.ownsUnit("sarcosa_monument")
+                    && !player.getPlanetsAllianceMode().contains(planetName);
+            successMessage = placeMonument(event, game, player, tile, planetName, placingSarcosaMonumentInCoexistence);
+        } else if ("sd".equalsIgnoreCase(unitID)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
@@ -2592,6 +2604,16 @@ public final class ButtonHelperModifyUnits {
                 successMessage =
                         "Placed 1 " + UnitEmojis.pds + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
+        } else if ("monument".equalsIgnoreCase(unitID)) {
+            tile = game.getTileFromPlanet(planetName);
+            if (tile == null) {
+                MessageHelper.sendMessageToEventChannel(event, "That planet is no longer on the map.");
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
+            AddUnitService.addUnits(event, tile, game, player.getColor(), unitID + " " + planetName);
+            successMessage =
+                    "Placed 1 " + unitKey.unitEmoji() + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
         } else {
             if ("gf".equalsIgnoreCase(unitID)
                     || "mf".equalsIgnoreCase(unitID)

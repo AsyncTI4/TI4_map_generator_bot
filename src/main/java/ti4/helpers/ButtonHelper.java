@@ -4144,8 +4144,9 @@ public class ButtonHelper {
         game.setSavedMessage(exhaustedMessage);
         List<Button> buttons = new ArrayList<>();
         for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
-            for (ActionRowChildComponentUnion but : row.getComponents()) {
-                if (but instanceof Button button) {
+            List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
+            for (ActionRowChildComponent component : buttonRow) {
+                if (component instanceof Button button) {
                     buttons.add(button);
                 }
             }
