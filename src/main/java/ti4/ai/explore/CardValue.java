@@ -67,7 +67,7 @@ public class CardValue {
         if (seat.hasTech(PRE_FAB_ARCOLOGIES) || alreadyReady) return 0;
         double worth = Math.max(
                 BoardView.planetResources(site.game(), planet), BoardView.planetInfluence(site.game(), planet));
-        return site.seat().isPassed() ? 0 : ExploreValues.READY_PLANET_SHARE * worth;
+        return site.outlook().canSpendReadied(planet) ? ExploreValues.READY_PLANET_SHARE * worth : 0;
     }
 
     public static boolean canPlaceMech(ExploreSite site) {

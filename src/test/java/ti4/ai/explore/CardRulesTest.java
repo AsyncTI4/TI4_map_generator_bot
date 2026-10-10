@@ -180,17 +180,50 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo(DECLINE);
     }
 
-    // Zohbat (3/1) is readied by removing its only infantry: 3 resources to spend this round beat an infantry, even
-    // without a build lined up yet. Seen in a game where the AI declined it.
+    // Zohbat (3/1) with its only infantry. With Technology still to be played and a strategy token to follow it,
+    // 3 resources readied now will be spent, which beats the infantry.
     @Test
-    void expeditionReadiesAThreeResourcePlanetWithItsOnlyInfantry() {
+    void expeditionReadiesAPlanetItCanSpendOnAStrategyCard() {
+        exhaustedZohbatWithOneInfantry();
+        test.sol.addSC(7);
+        test.nekro.setStrategicCC(1);
+
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_zohbat")).orElseThrow()))
+                .isEqualTo("resolveExpeditionInf_zohbat");
+    }
+
+    // The same Zohbat with nothing left to spend it on this round (no tactic token to produce with, no card to follow,
+    // no spend objective): the readied resources would sit unused, so the infantry stays.
+    @Test
+    void expeditionKeepsTheInfantryWhenTheResourcesWouldGoUnused() {
+        exhaustedZohbatWithOneInfantry();
+        test.nekro.setTacticalCC(0);
+
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_zohbat")).orElseThrow()))
+                .isEqualTo(DECLINE);
+    }
+
+    // Even after passing, a readied Zohbat counts when it completes a spend objective in the status phase: Erect a
+    // Monument needs 8 resources, and Mordai II (4) and a trade good fall 3 short.
+    @Test
+    void expeditionReadiesAPlanetThatCompletesASpendObjective() {
+        exhaustedZohbatWithOneInfantry();
+        test.nekro.getPlanets().forEach(test.nekro::exhaustPlanet);
+        test.nekro.refreshPlanet("mordaiii");
+        test.nekro.setTg(1);
+        test.nekro.setTacticalCC(0);
+        test.nekro.setPassed(true);
+        test.game.getRevealedPublicObjectives().put("monument", 1);
+
+        assertThat(pressedId(next(expedition("resolveExpeditionInf_zohbat")).orElseThrow()))
+                .isEqualTo("resolveExpeditionInf_zohbat");
+    }
+
+    private void exhaustedZohbatWithOneInfantry() {
         Tile zohbat = test.place("30", otherNeighbourOfHome());
         test.nekro.addPlanet("zohbat");
         test.units(zohbat, "zohbat", test.nekro, UnitType.Infantry, 1);
         test.nekro.exhaustPlanet("zohbat");
-
-        assertThat(pressedId(next(expedition("resolveExpeditionInf_zohbat")).orElseThrow()))
-                .isEqualTo("resolveExpeditionInf_zohbat");
     }
 
     // Once the AI has passed, a ready planet is worth nothing until the status phase readies it anyway, so even a mech

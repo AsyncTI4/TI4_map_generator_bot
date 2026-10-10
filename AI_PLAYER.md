@@ -457,7 +457,7 @@ to build one by hand:
     | Card | Choice |
     | --- | --- |
     | Volatile Fuel Source, Core Mine | the command token (2), or the trade good (1), when the mech or infantry is worth it; otherwise it declines |
-    | Expedition | readies the planet when 0.9 of its larger value is worth more than the infantry (nothing once the AI has passed); never with Pre-Fab Arcologies or a planet that is ready |
+    | Expedition | readies the planet when 0.9 of its larger value is worth more than the infantry, and only if it can spend it this round: a dock it can still activate that would build more with one more resource, an unexhausted Sling Relay, a Leadership, Warfare or Technology card still to be played (its own, or another's with a strategy token to follow), or a revealed spend objective the planet completes (that one counts even after passing); never with Pre-Fab Arcologies or a planet that is ready |
     | Local Fabricators | a mech (2, a little more for an empty planet) paid with a commodity or trade good, unless none is left in reinforcements or the planet has the Demilitarized Zone; otherwise a commodity |
     | Functioning Base | an action card for a commodity or trade good, unless the hand is full; otherwise a commodity |
     | Abandoned Warehouses, Merchant Station | convert commodities to trade goods or gain commodities, whichever is worth more |
