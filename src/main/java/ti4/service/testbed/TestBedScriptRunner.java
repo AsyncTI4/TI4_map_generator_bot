@@ -74,6 +74,8 @@ public final class TestBedScriptRunner {
     private long startMark;
     private long stepMark;
     private long stepStartedAt = System.currentTimeMillis();
+    private long runStartedAt = System.currentTimeMillis();
+    private long runMillis;
     private String trace = "";
     private String failureSnapshot = "";
     private Recorder lastPress = new Recorder();
@@ -131,6 +133,8 @@ public final class TestBedScriptRunner {
 
     private void runSafely() {
         String guildId = origin.getGuild() == null ? null : origin.getGuild().getId();
+        runStartedAt = System.currentTimeMillis();
+        stepStartedAt = runStartedAt;
         try (TestBedMessageLog opened = TestBedMessageLog.open(origin.getJDA(), guildId)) {
             log = opened;
             run();
@@ -138,6 +142,11 @@ public final class TestBedScriptRunner {
             BotLogger.error("Test bed script " + title + " stopped", e);
             add(-1, "runner", Status.FAIL, "no exception", e.getClass().getSimpleName() + ": " + e.getMessage());
         }
+        runMillis = System.currentTimeMillis() - runStartedAt;
+    }
+
+    private String totalTime() {
+        return String.format("%.1fs", runMillis / 1000.0);
     }
 
     private static void runSuite(Game game, List<TestBedScript> scripts, GenericInteractionCreateEvent origin) {
@@ -168,7 +177,8 @@ public final class TestBedScriptRunner {
                     .append(runner.countOf(Status.PASS))
                     .append(" passed, ")
                     .append(runner.countOf(Status.FAIL))
-                    .append(" failed")
+                    .append(" failed in ")
+                    .append(runner.totalTime())
                     .append(runner.firstFailure())
                     .append('\n');
             markdown.append('\n').append(runner.markdownSection());
@@ -253,6 +263,7 @@ public final class TestBedScriptRunner {
         if (!resetFirst) return true;
         Game game = current();
         if (!TestBedService.isTestBed(game) || game.getRealPlayers().isEmpty()) return true;
+        stepStartedAt = System.currentTimeMillis();
         List<TestBedResetService.ResetResult> results = new ArrayList<>();
         boolean done = TestBedPress.runLocked(game, false, locked -> {
             TestBedResetService.ResetResult result = TestBedResetService.reset(locked);
@@ -263,8 +274,8 @@ public final class TestBedScriptRunner {
             add(0, "reset", Status.FAIL, "reset", "game not loaded");
             return false;
         }
-        add(0, "reset", Status.INFO, "", results.getFirst().toString());
         settle(null);
+        add(0, "reset", Status.INFO, "", results.getFirst().toString());
         return true;
     }
 
@@ -295,6 +306,7 @@ public final class TestBedScriptRunner {
         }
         List<String> warnings = new ArrayList<>();
         long before = log.mark();
+        stepStartedAt = System.currentTimeMillis();
         boolean done = TestBedPress.runLocked(
                 game, locked -> warnings.addAll(TestBedApplyService.apply(locked, preset, origin)));
         if (!done) {
@@ -313,15 +325,30 @@ public final class TestBedScriptRunner {
     }
 
     private void waitForCardsInfo(long before) {
-        long deadline = System.currentTimeMillis() + script.getTimeoutSeconds() * 1000L;
+        stepStartedAt = System.currentTimeMillis();
+        long deadline = stepStartedAt + script.getTimeoutSeconds() * 1000L;
         List<String> late = new ArrayList<>();
+        List<String> seen = new ArrayList<>();
         for (Player player : current().getRealPlayers()) {
             MessageChannel thread = scopeChannel(current(), player.getFaction() + ":cards-info");
-            if (thread == null) continue;
+            if (thread == null) {
+                seen.add(player.getFaction() + " no thread");
+                continue;
+            }
             if (!waitUntil(() -> cardsInfoArrived(thread, before), deadline)) late.add(player.getFaction());
+            seen.add(player.getFaction() + " "
+                    + log.arrivedAfter(thread, before).size() + " in `" + thread.getName() + "`");
         }
-        if (!late.isEmpty()) {
-            add(0, "cards info", Status.INFO, "", "still arriving for " + late + "; hand buttons may be missing");
+        String counts = "messages since the preset: " + String.join(", ", seen);
+        if (late.isEmpty()) {
+            add(0, "cards info", Status.INFO, "", "arrived; " + counts);
+        } else {
+            add(
+                    0,
+                    "cards info",
+                    Status.INFO,
+                    "",
+                    "still arriving for " + late + "; hand buttons may be missing; " + counts);
         }
     }
 
@@ -769,7 +796,7 @@ public final class TestBedScriptRunner {
     }
 
     private Status add(int index, String step, Status status, String expected, String actual) {
-        long millis = index > 0 ? System.currentTimeMillis() - stepStartedAt : 0;
+        long millis = System.currentTimeMillis() - stepStartedAt;
         results.add(new Result(index, step, status, flatten(expected), flatten(actual), millis, trace));
         if (status == Status.FAIL && failureSnapshot.isEmpty()) failureSnapshot = snapshotSafely();
         return status;
@@ -864,7 +891,9 @@ public final class TestBedScriptRunner {
                 .append(countOf(Status.FAIL))
                 .append(" ❌ ")
                 .append(countOf(Status.SKIP))
-                .append(" ⏭️\n");
+                .append(" ⏭️ in ")
+                .append(totalTime())
+                .append('\n');
         for (Result result : results) {
             discord.append(icon(result.status())).append(' ');
             if (result.index() > 0) discord.append(result.index()).append(". ");
@@ -887,7 +916,11 @@ public final class TestBedScriptRunner {
     }
 
     private String markdownSection() {
-        StringBuilder markdown = new StringBuilder("## `").append(title).append("`\n\n");
+        StringBuilder markdown = new StringBuilder("## `")
+                .append(title)
+                .append("` (")
+                .append(totalTime())
+                .append(")\n\n");
         if (script.getDescription() != null)
             markdown.append(script.getDescription()).append("\n\n");
         markdown.append("| # | Step | Result | Time | Expected | Actual |\n|---|---|---|---|---|---|\n");

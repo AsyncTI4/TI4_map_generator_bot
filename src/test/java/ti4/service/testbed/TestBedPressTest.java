@@ -213,7 +213,8 @@ class TestBedPressTest extends BaseTi4Test {
         assertFalse(new TestBedPress.PressResult(TestBedPress.Outcome.REJECTED, "", refused).pressed());
     }
 
-    // Exact beats prefix, the acting seat's buttons beat another seat's, and among equals the newest message wins.
+    // Exact beats prefix, the acting seat's buttons beat another seat's, buttons posted during this run beat leftovers
+    // from earlier runs, and among equals the newest message wins. Only equally ranked matches count as ambiguous.
     @Test
     void picksTheButtonMeantForTheSeat() {
         MessageChannel cardsInfo = mock(MessageChannel.class);
@@ -226,11 +227,19 @@ class TestBedPressTest extends BaseTi4Test {
                 main, List.of(newerForeign, newestOwn));
 
         List<String> seen = new ArrayList<>();
-        TestBedPress.Found found = TestBedPress.find(List.of(cardsInfo, main), history::get, "End Turn", "nekro", seen);
+        TestBedPress.Found found =
+                TestBedPress.find(List.of(cardsInfo, main), history::get, message -> true, "End Turn", "nekro", seen);
 
         assertNotNull(found);
         assertSame(newestOwn, found.message());
         assertEquals(1, found.otherMatches());
+
+        // The newest own button is a leftover from an earlier run: the one posted during this run wins, alone.
+        TestBedPress.Found fresh = TestBedPress.find(
+                List.of(cardsInfo, main), history::get, message -> message == olderOwn, "End Turn", "nekro", seen);
+        assertNotNull(fresh);
+        assertSame(olderOwn, fresh.message());
+        assertEquals(0, fresh.otherMatches());
         assertTrue(seen.contains("End Turn (`turnEnd`, for sol)"), seen.toString());
     }
 

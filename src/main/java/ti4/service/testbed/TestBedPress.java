@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -115,7 +116,11 @@ public class TestBedPress {
 
     record Found(Message message, Button button, int otherMatches) {}
 
-    private record Candidate(Message message, Button button, Match match, boolean foreign) {}
+    private record Candidate(Message message, Button button, Match match, boolean foreign, boolean stale) {
+        boolean sameRank(Candidate other) {
+            return match == other.match && foreign == other.foreign && stale == other.stale;
+        }
+    }
 
     static PressResult pressVisible(
             Game game,
@@ -128,13 +133,13 @@ public class TestBedPress {
         long deadline = System.currentTimeMillis() + timeoutMillis;
         List<String> seen = new ArrayList<>();
         long mark = log.mark();
-        Found found = find(channels.get(), log::newestFirst, labelOrId, seat.getFaction(), seen);
+        Found found = find(channels.get(), log::newestFirst, log::arrivedDuringRun, labelOrId, seat.getFaction(), seen);
         while (found == null && System.currentTimeMillis() < deadline) {
             long left = deadline - System.currentTimeMillis();
             log.awaitChange(mark, Math.min(left, SEARCH_RETRY_MILLIS));
             mark = log.mark();
             seen.clear();
-            found = find(channels.get(), log::newestFirst, labelOrId, seat.getFaction(), seen);
+            found = find(channels.get(), log::newestFirst, log::arrivedDuringRun, labelOrId, seat.getFaction(), seen);
         }
         if (found == null) {
             String visible = seen.isEmpty()
@@ -159,6 +164,7 @@ public class TestBedPress {
     static Found find(
             List<MessageChannel> channels,
             Function<MessageChannel, List<Message>> reader,
+            Predicate<Message> fresh,
             String labelOrId,
             String seatFaction,
             List<String> seen) {
@@ -172,19 +178,18 @@ public class TestBedPress {
                     if (button.isDisabled()) continue;
                     Match match = match(button, labelOrId);
                     if (match == Match.NONE) continue;
-                    candidates.add(new Candidate(message, button, match, isForeign(button, seatFaction)));
+                    candidates.add(new Candidate(
+                            message, button, match, isForeign(button, seatFaction), !fresh.test(message)));
                 }
             }
         }
         if (candidates.isEmpty()) return null;
         candidates.sort(Comparator.comparing(Candidate::match)
                 .thenComparing(Candidate::foreign)
+                .thenComparing(Candidate::stale)
                 .thenComparing(candidate -> candidate.message().getIdLong(), Comparator.reverseOrder()));
         Candidate best = candidates.getFirst();
-        int others = (int) candidates.stream()
-                .skip(1)
-                .filter(candidate -> candidate.match() == best.match() && candidate.foreign() == best.foreign())
-                .count();
+        int others = (int) candidates.stream().skip(1).filter(best::sameRank).count();
         return new Found(best.message(), best.button(), others);
     }
 

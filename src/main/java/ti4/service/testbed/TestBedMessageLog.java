@@ -107,6 +107,12 @@ final class TestBedMessageLog extends ListenerAdapter implements AutoCloseable {
         return arrivals;
     }
 
+    synchronized boolean arrivedDuringRun(Message message) {
+        Map<Long, Entry> channel = byChannel.get(message.getChannel().getId());
+        Entry entry = channel == null ? null : channel.get(message.getIdLong());
+        return entry != null && entry.arrival() > BEFORE_RUN;
+    }
+
     List<Message> newestFirst(MessageChannel channel) {
         seedOnce(channel);
         return entries(channel.getId()).stream().map(Entry::message).toList();
