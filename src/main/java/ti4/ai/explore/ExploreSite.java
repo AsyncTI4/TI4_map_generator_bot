@@ -46,9 +46,10 @@ public record ExploreSite(
     }
 
     public double infantryCost() {
-        double cost = ExploreValues.INFANTRY_UNIT;
-        if (outlook.claimablePlanetsLeft()) cost += ExploreValues.CLAIMABLE_PLANET_PREMIUM;
-        if (lastGroundForce() && outlook.enemyCanReach(tile)) cost += outlook.planetStake(holder());
+        double cost = ExploreValues.INFANTRY_UNIT + outlook.expansionNeed(holder());
+        if (lastGroundForce() && outlook.enemyCanReach(tile)) {
+            cost += ExploreValues.LAST_FORCE_RISK_SHARE * outlook.planetStake(holder());
+        }
         return cost;
     }
 

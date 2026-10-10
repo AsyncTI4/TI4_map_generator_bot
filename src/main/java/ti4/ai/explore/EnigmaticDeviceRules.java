@@ -9,6 +9,9 @@ import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.PaymentRules;
+import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
@@ -27,7 +30,10 @@ class EnigmaticDeviceRules {
     private static final String MENU = "menu";
     private static final String RESEARCH = "research";
     private static final String TYPE = "type";
+    private static final String TOKENS = "tokens";
     private static final String DONE = "done";
+    private static final String PAY = "nekroTechExhaust";
+    private static final int PROPAGATION_TOKENS = 3;
     private static final String PURGE_DEVICE = "componentActionRes_relic_" + Constants.ENIGMATIC_DEVICE;
     private static final String GET_TECHNOLOGY = "acquireATech";
     private static final String TYPE_PREFIX = "getAllTechOfType_";
@@ -60,6 +66,7 @@ class EnigmaticDeviceRules {
         if (state.isEmpty()) return Optional.empty();
         return switch (state.get().get(1)) {
             case MENU -> purgeDevice(context);
+            case TOKENS -> openPayment(context);
             case RESEARCH -> getTechnology(context);
             case TYPE -> chooseType(context);
             default -> Optional.empty();
@@ -70,10 +77,26 @@ class EnigmaticDeviceRules {
         Optional<Match> purge = Prompts.owned(visible(context), context.faction(), PURGE_DEVICE::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
         purge.ifPresent(match -> {
-            StrategyCardRules.expectResearch(context, RESEARCH_COST);
-            ComponentFlow.put(context, FLOW, RESEARCH);
+            boolean tokens = StrategyCardRules.cannotResearch(context.seat());
+            if (!tokens) StrategyCardRules.expectResearch(context, RESEARCH_COST);
+            ComponentFlow.put(context, FLOW, tokens ? TOKENS : RESEARCH);
         });
         return purge.map(match -> match.press("purge the Enigmatic Device to research a technology"));
+    }
+
+    private static Optional<AiDecision> openPayment(AiTurnContext context) {
+        Optional<Match> pay = Prompts.owned(visible(context), context.faction(), PAY::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+        Optional<Wallet.Payment> payment = payment(context.game(), context.seat());
+        if (pay.isEmpty() || payment.isEmpty()) return Optional.empty();
+        PaymentRules.expect(context, "the Enigmatic Device", payment.get(), PaymentRules.TECHNOLOGY_DONE);
+        ComponentFlow.put(context, FLOW, DONE);
+        return pay.map(match -> match.press("pay the 6 resources for the Enigmatic Device"));
+    }
+
+    private static Optional<Wallet.Payment> payment(Game game, Player seat) {
+        return ScoringReserve.planAfterReserve(
+                Wallet.of(game, seat), ScoringReserve.of(game, seat), SpendCost.resources(RESEARCH_COST));
     }
 
     private static Optional<AiDecision> getTechnology(AiTurnContext context) {
@@ -106,13 +129,24 @@ class EnigmaticDeviceRules {
     }
 
     static boolean worthUsing(Game game, Player seat) {
-        return seat.getRelics().contains(Constants.ENIGMATIC_DEVICE)
-                && !StrategyCardRules.cannotResearch(seat)
-                && StrategyCardRules.worthPayingForResearch(
-                        game, seat, RESEARCH_COST, ResearchPolicy.WORTH_PAYING_FOR, Wallet.of(game, seat));
+        if (!seat.getRelics().contains(Constants.ENIGMATIC_DEVICE)) return false;
+        if (StrategyCardRules.cannotResearch(seat)) return worthTokens(game, seat);
+        return StrategyCardRules.worthPayingForResearch(
+                game, seat, RESEARCH_COST, ResearchPolicy.WORTH_PAYING_FOR, Wallet.of(game, seat));
+    }
+
+    private static boolean worthTokens(Game game, Player seat) {
+        return StrategyCardRules.reinforcements(game, seat) >= PROPAGATION_TOKENS
+                && tokensValue(game, seat) > RESEARCH_COST * ProductionPlanner.fillerValuePerResource(game)
+                && payment(game, seat).isPresent();
+    }
+
+    private static double tokensValue(Game game, Player seat) {
+        return PROPAGATION_TOKENS * ExploreValues.tokenValue(game, seat);
     }
 
     private static double researchValue(Game game, Player seat) {
+        if (StrategyCardRules.cannotResearch(seat)) return tokensValue(game, seat);
         return ResearchPolicy.bestResearchable(game, seat)
                 .map(alias -> ResearchPolicy.researchValue(game, seat, alias))
                 .orElse(0.0);

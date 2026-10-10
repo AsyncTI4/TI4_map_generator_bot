@@ -17,8 +17,9 @@ public class ExploreValues {
     public static final double ACTION_CARD = 1.0;
     public static final double MECH = 2.0;
     public static final double MECH_GARRISON = 0.5;
-    public static final double INFANTRY_UNIT = 0.5;
-    public static final double CLAIMABLE_PLANET_PREMIUM = 0.5;
+    public static final double INFANTRY_UNIT = 0.7;
+    public static final double EXPANSION_SHARE = 0.5;
+    public static final double LAST_FORCE_RISK_SHARE = 0.15;
     public static final double UNSPENT_READY_SHARE = 0.3;
     public static final double MERCENARY_OUTFIT = 0.75;
     public static final double FREELANCERS = 1.5;

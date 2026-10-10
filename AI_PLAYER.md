@@ -354,11 +354,14 @@ to build one by hand:
   useful to them. The trade goods on a card, which the picker keeps, make that card a little more attractive.
 - **Tactical actions.** At the start of its turn, `TacticalPlanner` scores every system it can
   activate and remembers the best plan for the turn:
-  - **Expand**: a carrier (or other transport) takes ground forces (infantry first, mechs last) to free planets,
-    keeping one ground force (a mech when there is one) on each home planet and on Mecatol Rex, and avoiding systems
+  - **Expand**: a carrier (or other transport) takes ground forces (infantry first, mechs last, except
+    that mechs go to hazardous planets first) to free planets, keeping one ground force (a mech when there is one) on each home planet and on Mecatol Rex, and avoiding systems
     covered by enemy space cannon. In rounds 1-4 every planet taken is worth an extra 0.8, fading to nothing by round
     8, so small planets are worth a token early. The last carrier to leave home takes a full load of spare infantry
-    for its next expansions.
+    for its next expansions. Every ground force it brings lands: a mech on each hazardous planet it can, then one
+    force on every other planet, then a second infantry on each hazardous planet (the cards that remove one become
+    nearly free), then the rest spread over the planets, ready to move on next round. A carrier with a sister at home
+    brings only what it lands plus a second infantry for each hazardous planet.
   - **Attack**: only a single opponent, and only when the exact combat odds (`CombatOdds`, with standing combat
     modifiers such as Fragile or Unrelenting) give at least 80% in space and on each planet it lands on. It always
     clears enemy ships out of its own home system. It attacks another player's home system only while it holds
@@ -431,15 +434,18 @@ to build one by hand:
     the Demilitarized Zone by -1.5 less the space docks (4) and PDS (3) it returns, Mercenary Outfit 0.75, Freelancers
     1.5 when it could pay for a unit, Lost Crew two action cards, Derelict Vessel a secret objective. A full deck comes
     to about 1 per exploration. `TacticalPlanner` adds that to every planet nobody holds that a plan expands to or
-    invades (it assumes one infantry lands there); an invaded planet someone holds is never explored.
+    invades (with the infantry and mechs the plan lands there); an invaded planet someone holds is never explored.
   - **Offers.** A newly taken planet is explored through the bot's offer, from the deck with the better average when it
     has more than one trait. A Scanlink Drone Network offer (the planet it already holds) is answered only when the
     best deck is worth more than nothing, otherwise ignored; the Crown of Emphidia is exhausted at the end of a
     tactical action only for a planet whose deck is worth more than nothing, then used on the best one.
   - **Cards that ask.** Unowned buttons are only the AI's own on its turn, in a message for it (or one that names no
-    one else). Removing an infantry costs 0.5, half a resource more while its ships can still reach a planet to claim,
-    and the planet's whole stake (`PlanetStake`, also used for retreats) when it is the last ground force and an enemy
-    fleet can reach the system; a mech is free. A card with no decline button is always answered, even when neither
+    one else). Removing an infantry costs 0.7 (production limits included). It costs half the value of
+    the best planet left to claim when it is needed for that: more planets within reach of its ships than the seat has
+    other ground forces. When it is the last ground force and an enemy fleet can reach the system it also costs 0.15 of
+    the planet's stake (`PlanetStake`, also used for retreats), because the enemy pays a token and risks retaliation
+    to take it anyway. A mech is free. So a Volatile Fuel Source (2) or Core Mine (1) is usually taken, and kept only
+    when the infantry is needed to claim more. A card with no decline button is always answered, even when neither
     option gains anything, and one left with only Decline is declined.
     | Card | Choice |
     | --- | --- |
@@ -465,7 +471,11 @@ to build one by hand:
   - **Enigmatic Device.** When the best technology it can research is worth at least 4 (the bar for paying for a
     second technology) and it can pay 6 resources after the scoring reserve, it purges the device as a component
     action, picks the type of the best technology and pays the 6 resources through the research payment (the bot posts
-    the research without charging them). Nekro leaves the device alone: it cannot research.
+    the research without charging them). Nekro cannot research: Propagation turns the research into 3 command tokens, so it uses the
+    device only when 3 tokens (6) are worth more than 6 resources at the filler value, it has room for 3 tokens in
+    reinforcements and the scoring reserve leaves 6 resources. The bot gives it the tokens without charging anything, so
+    it first presses the message's "Exhaust Planets" button (before the tokens, which close the message) and pays
+    exactly 6 through the research payment, then takes the tokens as for any Propagation.
 - **Actuation.** The AI presses the bot's **real** buttons through the test bed's stand-in
   event (`TestBedPress.standInEvent`), so every rule and side effect runs exactly as for a
   human. The stand-in user carries the seat's id, so the normal owner checks apply. Handler

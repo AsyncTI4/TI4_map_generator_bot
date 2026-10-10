@@ -42,8 +42,8 @@ class CardRulesTest extends BaseTi4Test {
         test.aiIsActive("action");
     }
 
-    // Nothing can reach Tequran and nothing is left to claim, so the infantry costs half a resource and a command
-    // token is worth 2: it is removed.
+    // Nothing can reach Tequran and nothing is left to claim, so the infantry costs 0.7 and a command token is
+    // worth 2: it is removed.
     @Test
     void volatileFuelSourceTakesTheTokenOnASafePlanet() {
         test.units(site, "tequran", test.nekro, UnitType.Infantry, 1);
@@ -52,18 +52,31 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo("resolveVolatileInf_tequran");
     }
 
-    // A Sol destroyer next door can reach the planet, and the infantry is its only ground force: it would lose a planet
-    // worth far more than a token.
+    // A Sol destroyer next door could take the planet anyway, and would pay a token and risk retaliation for it: the
+    // infantry is its only ground force, yet 0.7 plus a small share of the planet's stake is far below a token.
     @Test
-    void volatileFuelSourceKeepsTheLastInfantryOnAThreatenedPlanet() {
+    void volatileFuelSourceTakesTheTokenEvenWithAnEnemyNextDoor() {
         test.units(site, "tequran", test.nekro, UnitType.Infantry, 1);
         solDestroyerNextDoor();
+
+        assertThat(pressedId(next(volatile_("resolveVolatileInf_tequran")).orElseThrow()))
+                .isEqualTo("resolveVolatileInf_tequran");
+    }
+
+    // The infantry is kept when it is needed to claim a planet worth more: Lodor, a carrier away, and no other
+    // ground force to take it.
+    @Test
+    void volatileFuelSourceKeepsTheInfantryNeededForExpansion() {
+        test.units(site, "tequran", test.nekro, UnitType.Infantry, 1);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Carrier, 1);
+        test.place("26", otherNeighbourOfHome());
+        test.nekro.addPlanet("torkan");
 
         assertThat(pressedId(next(volatile_("resolveVolatileInf_tequran")).orElseThrow()))
                 .isEqualTo(DECLINE);
     }
 
-    // Another infantry stays to hold the planet, so removing one is cheap again even with an enemy next door.
+    // Another infantry stays to hold the planet, so removing one is fine even with an enemy next door.
     @Test
     void volatileFuelSourceRemovesAnInfantryThatIsNotTheLastForce() {
         test.units(site, "tequran", test.nekro, UnitType.Infantry, 2);
@@ -97,8 +110,8 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo(DECLINE);
     }
 
-    // A planet left to claim makes the infantry worth keeping: a trade good (1) does not beat half a resource plus
-    // half for the planet it could still take.
+    // A planet left to claim makes the infantry worth keeping: a trade good (1) does not beat 0.7 plus half the
+    // value of the planet (Lodor) it could still take.
     @Test
     void coreMineDeclinesWhileTheInfantryCanStillClaimAPlanet() {
         test.units(site, "tequran", test.nekro, UnitType.Infantry, 2);
@@ -167,7 +180,7 @@ class CardRulesTest extends BaseTi4Test {
                 .isEqualTo(DECLINE);
     }
 
-    // With nothing left to buy this round, readying Lazar (1 resource) is worth only 0.3, less than the 0.5 an
+    // With nothing left to buy this round, readying Lazar (1 resource) is worth only 0.3, less than the 0.7 an
     // infantry costs, so only a mech readies it.
     @Test
     void expeditionNeedsAMechWhenTheResourcesWouldGoUnspent() {

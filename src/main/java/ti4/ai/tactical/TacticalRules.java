@@ -50,6 +50,7 @@ public class TacticalRules {
     private static final String SECOND_ACTION_SUFFIX = "#2";
     private static final String FLEET_LOGISTICS = "fl";
     private static final double URGENT_SCORE = 0.75 * ObjectiveValue.VICTORY_POINT_VALUE;
+    private static final String HAZARDOUS = "hazardous";
     private static final String TACTICAL_ACTION = "tacticalAction";
     private static final String ANOTHER_ACTION = "doAnotherAction";
     private static final String FIELD = "|";
@@ -410,8 +411,8 @@ public class TacticalRules {
             Optional<Landing> landing = nextLanding(context, tile, plan)
                     .filter(found -> !needsCustodiansPayment(tile, found.planet())
                             || custodiansPayment(context).isPresent());
-            Optional<PromptButton> button =
-                    landing.flatMap(found -> landButton(done.get().prompt(), tile, found, seat));
+            Optional<PromptButton> button = landing.flatMap(
+                    found -> landButton(context.game(), done.get().prompt(), tile, found, seat));
             if (button.isPresent()) {
                 expectCustodiansPayment(context, tile, landing.get().planet());
                 return Optional.of(AiDecision.press(
@@ -423,8 +424,9 @@ public class TacticalRules {
         return Optional.of(done.get().press("done landing"));
     }
 
-    private static Optional<PromptButton> landButton(AiPrompt prompt, Tile tile, Landing landing, Player seat) {
-        for (UnitType type : List.of(UnitType.Infantry, UnitType.Mech)) {
+    private static Optional<PromptButton> landButton(
+            Game game, AiPrompt prompt, Tile tile, Landing landing, Player seat) {
+        for (UnitType type : landingOrder(game, tile, landing.planet())) {
             int inSpace = BoardView.count(BoardView.space(tile), seat, type);
             if (inSpace == 0) continue;
             int amount = Math.min(2, Math.min(inSpace, landing.wanted()));
@@ -433,6 +435,15 @@ public class TacticalRules {
             if (button.isPresent()) return button;
         }
         return Optional.empty();
+    }
+
+    private static List<UnitType> landingOrder(Game game, Tile tile, String planetName) {
+        boolean claimingHazardous = BoardView.controller(game, planetName) == null
+                && tile.getUnitHolders().get(planetName) instanceof Planet planet
+                && planet.getPlanetTypes().contains(HAZARDOUS);
+        return claimingHazardous
+                ? List.of(UnitType.Mech, UnitType.Infantry)
+                : List.of(UnitType.Infantry, UnitType.Mech);
     }
 
     private record Landing(String planet, int wanted) {}

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.PaymentRules;
@@ -81,18 +82,71 @@ class EnigmaticDeviceRulesTest extends BaseTi4Test {
         assertThat(RelicActionRules.beforePassing(context(turn), List.of(turn))).isEmpty();
     }
 
-    // Nekro never researches (Propagation turns it into command tokens), and the bot would post no payment for them.
+    // Nekro cannot research: Propagation turns the research into 3 command tokens (6, above the 3 that 6 resources are
+    // worth). The bot posts the tokens with an "Exhaust Planets" button but charges nothing, so the AI presses it
+    // before taking the tokens (the brain would otherwise close the message), and pays 6 resources.
     @Test
-    void nekroLeavesTheDeviceAlone() {
-        test.nekroHome();
-        test.nekro.addPlanet("mordaiii");
-        test.nekro.addRelic("enigmaticdevice");
-        test.aiIsActive("action");
+    void nekroTakesTheTokensAndPaysSixResources() {
+        nekroWithSixResources();
         AiPrompt nekroTurn =
                 prompt("nekroTurn", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
+        assertThat(pressedId(RelicActionRules.beforePassing(test.context(nekroTurn), List.of(nekroTurn))
+                        .orElseThrow()))
+                .isEqualTo("FFCC_nekro_componentAction");
 
+        AiPrompt menu =
+                prompt("menu", PromptSource.PUBLIC, NOW + 1, "FFCC_nekro_componentActionRes_relic_enigmaticdevice");
+        assertThat(pressedId(RelicActionRules.next(test.context(menu)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_componentActionRes_relic_enigmaticdevice");
+
+        AiPrompt tokens = AiTestGame.withContent(
+                prompt(
+                        "tokens",
+                        PromptSource.PUBLIC,
+                        NOW + 2,
+                        List.of(
+                                "FFCC_nekro_increase_tactic_cc",
+                                "FFCC_nekro_deleteButtons",
+                                "FFCC_nekro_nekroTechExhaust"),
+                        List.of("Gain 1 Tactic Token", "Done Gaining Command Tokens", "Exhaust Planets")),
+                "because of **Propagation**, you instead gain 3 command tokens");
+        test.game.setStoredValue("originalCCsFornekro", test.nekro.getCCRepresentation());
+        assertThat(pressedId(new NekroBrain().decide(test.context(tokens)))).isEqualTo("FFCC_nekro_nekroTechExhaust");
+        assertThat(PaymentRules.isPending(test.context())).isTrue();
+
+        AiPrompt payment = prompt(
+                "payment",
+                PromptSource.AI_THREAD,
+                NOW + 3,
+                List.of("spend_mordaiii_restech", "spend_lodor_restech", PaymentRules.TECHNOLOGY_DONE),
+                List.of("Mordai II", "Lodor", "Done Exhausting Planets"));
+        assertThat(PaymentRules.pay(test.context(payment))).isPresent();
+    }
+
+    // Without room for 3 tokens in reinforcements, or without 6 resources after the reserve, the device stays.
+    @Test
+    void nekroLeavesTheDeviceAloneWithoutRoomOrResources() {
+        nekroWithSixResources();
+        AiPrompt nekroTurn =
+                prompt("nekroTurn", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
+        test.nekro.setTacticalCC(9);
+        test.nekro.setFleetCC(4);
+        test.nekro.setStrategicCC(2);
         assertThat(RelicActionRules.beforePassing(test.context(nekroTurn), List.of(nekroTurn)))
                 .isEmpty();
+
+        test.nekro.setTacticalCC(3);
+        test.nekro.exhaustPlanet("lodor");
+        assertThat(RelicActionRules.beforePassing(test.context(nekroTurn), List.of(nekroTurn)))
+                .isEmpty();
+    }
+
+    private void nekroWithSixResources() {
+        test.nekroHome();
+        test.place("26", "302");
+        test.nekro.addPlanet("lodor");
+        test.nekro.addRelic("enigmaticdevice");
+        test.aiIsActive("action");
     }
 
     private AiTurnContext context(AiPrompt... prompts) {

@@ -531,8 +531,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(productionScoreAtHome()).isGreaterThanOrEqualTo(TacticalPlanner.MIN_SCORE);
     }
 
-    // The last carrier to leave home fills up with spare infantry beyond the one it lands. The rest stay aboard, so
-    // next round it can take more planets from wherever it ends up. The home garrison stays.
+    // The last carrier to leave home fills up with spare infantry beyond the one it lands. The rest land on the planet
+    // too, ready to move on next round. The home garrison stays.
     @Test
     void fillsTheLastCarrierLeavingHomeWithSpareInfantry() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -546,7 +546,7 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .containsExactlyInAnyOrder(
                         new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1),
                         new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 4));
-        assertThat(plan.landings()).containsOnlyKeys("lodor").containsEntry("lodor", 1);
+        assertThat(plan.landings()).containsOnlyKeys("lodor").containsEntry("lodor", 4);
     }
 
     // A second carrier still at home may need those infantry for its own expansion this round, so the first one takes
@@ -641,6 +641,35 @@ class TacticalPlannerTest extends BaseTi4Test {
         double with = attackOn(neighbour).orElseThrow().score();
 
         assertThat(with).isGreaterThan(without);
+    }
+
+    // A mech on a hazardous planet makes Volatile Fuel Source, Core Mine and Expedition free, so the carrier takes the
+    // mech along and lands it there, with the infantry that come with it.
+    @Test
+    void landsAMechOnAHazardousPlanet() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Mech, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.place("24", neighbour);
+
+        TacticalPlan plan = expansionTo(neighbour).orElseThrow();
+
+        assertThat(plan.moves()).contains(new UnitMove(AiTestGame.HOME, "space", UnitType.Mech, 1));
+        assertThat(plan.landings()).containsEntry("meharxull", 3);
+        assertThat(plan.landings()).hasSize(1);
+    }
+
+    // With a second carrier at home to need the rest, the first still brings a second infantry for a hazardous planet:
+    // the cards that remove an infantry then cost almost nothing, and one stays to move on from there.
+    @Test
+    void landsTwoInfantryOnAHazardousPlanet() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 6);
+        test.place("24", neighbour);
+
+        TacticalPlan plan = expansionTo(neighbour).orElseThrow();
+
+        assertThat(plan.landings()).containsEntry("meharxull", 2);
     }
 
     private Optional<TacticalPlan> attackOn(String position) {

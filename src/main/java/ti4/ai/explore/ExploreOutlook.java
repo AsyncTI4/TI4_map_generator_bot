@@ -2,6 +2,7 @@ package ti4.ai.explore;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
@@ -23,7 +24,7 @@ public final class ExploreOutlook {
     private final Game game;
     private final Player seat;
     private final Map<String, Boolean> enemyReach = new HashMap<>();
-    private Boolean claimablePlanets;
+    private List<Planet> claimablePlanets;
     private Boolean spendsMore;
     private Boolean fundsFreelancers;
 
@@ -48,9 +49,28 @@ public final class ExploreOutlook {
         return fundsFreelancers;
     }
 
-    public boolean claimablePlanetsLeft() {
+    public double expansionNeed(Planet holding) {
+        List<Planet> claimable = claimablePlanets();
+        if (claimable.size() <= groundForcesElsewhere(holding)) return 0;
+        double best =
+                claimable.stream().mapToDouble(BoardView::planetValue).max().orElse(0);
+        return ExploreValues.EXPANSION_SHARE * best;
+    }
+
+    private List<Planet> claimablePlanets() {
         if (claimablePlanets == null) claimablePlanets = computeClaimablePlanets();
         return claimablePlanets;
+    }
+
+    private int groundForcesElsewhere(Planet holding) {
+        int forces = 0;
+        for (Tile tile : game.getTileMap().values()) {
+            forces += BoardView.groundForces(BoardView.space(tile), seat);
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (!planet.getName().equals(holding.getName())) forces += BoardView.groundForces(planet, seat);
+            }
+        }
+        return forces;
     }
 
     public boolean enemyCanReach(Tile tile) {
@@ -66,7 +86,7 @@ public final class ExploreOutlook {
         return PlanetStake.of(game, seat, planet);
     }
 
-    private boolean computeClaimablePlanets() {
+    private List<Planet> computeClaimablePlanets() {
         Set<String> reachable = new HashSet<>();
         for (Tile origin : game.getTileMap().values()) {
             int move = fastestShipMove(origin);
@@ -77,7 +97,8 @@ public final class ExploreOutlook {
         return game.getTileMap().values().stream()
                 .filter(tile -> reachable.contains(tile.getPosition()))
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-                .anyMatch(this::isClaimable);
+                .filter(this::isClaimable)
+                .toList();
     }
 
     private int fastestShipMove(Tile origin) {

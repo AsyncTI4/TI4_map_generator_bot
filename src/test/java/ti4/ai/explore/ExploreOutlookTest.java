@@ -46,14 +46,29 @@ class ExploreOutlookTest extends BaseTi4Test {
                 .orElseThrow();
     }
 
-    // A planet counts as left to claim only if a ship of the seat can reach its system: without ships nothing can.
+    private double need() {
+        return outlook().expansionNeed(site.getUnitHolderFromPlanet("tequran"));
+    }
+
+    // Half the value of the best planet left to claim (Lodor, 3.6) is the price of an infantry that is needed to take
+    // it, but only if a ship of the seat can reach it: without ships nothing can.
     @Test
-    void aFreePlanetCountsOnlyWhenAShipCanReachIt() {
+    void anInfantryIsNeededOnlyForAPlanetAShipCanReach() {
         test.place("26", otherNeighbourOfHome());
-        assertThat(outlook().claimablePlanetsLeft()).isFalse();
+        assertThat(need()).isZero();
 
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        assertThat(outlook().claimablePlanetsLeft()).isTrue();
+        assertThat(need()).isCloseTo(0.5 * 3.6, within(EXACT));
+    }
+
+    // Other ground forces of the seat can take the planet instead, so the infantry is not needed.
+    @Test
+    void anInfantryIsNotNeededWhenOthersCanTakeThePlanet() {
+        test.place("26", otherNeighbourOfHome());
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 1);
+
+        assertThat(need()).isZero();
     }
 
     // A planet somebody holds, or that is guarded by another player's ground forces, is not up for claiming.
@@ -62,25 +77,19 @@ class ExploreOutlookTest extends BaseTi4Test {
         Tile lodor = test.place("26", otherNeighbourOfHome());
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.sol.addPlanet("lodor");
-        assertThat(outlook().claimablePlanetsLeft()).isFalse();
+        assertThat(need()).isZero();
 
         test.sol.removePlanet("lodor");
         test.units(lodor, "lodor", test.sol, UnitType.Infantry, 1);
-        assertThat(outlook().claimablePlanetsLeft()).isFalse();
+        assertThat(need()).isZero();
     }
 
-    // An infantry that could still take a planet is worth half a resource more; when a Sol ship can reach the planet
-    // and the infantry is its only garrison, the planet's value is at stake as well.
+    // An infantry costs 0.7. It costs the claim it is needed for as well, and a small share of the planet's stake when
+    // it is the last garrison and a Sol ship can reach the planet.
     @Test
-    void anInfantryCostsMoreWhileAPlanetIsLeftToClaimAndWhenItIsTheLastGarrison() {
+    void anInfantryCostsMoreWhenNeededAndWhenItIsTheLastGarrisonUnderThreat() {
         ExploreSite quiet = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
         assertThat(quiet.infantryCost()).isCloseTo(ExploreValues.INFANTRY_UNIT, within(EXACT));
-
-        test.place("26", otherNeighbourOfHome());
-        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        ExploreSite claimable = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
-        assertThat(claimable.infantryCost())
-                .isCloseTo(ExploreValues.INFANTRY_UNIT + ExploreValues.CLAIMABLE_PLANET_PREMIUM, within(EXACT));
 
         String solSpot = PositionMapper.getAdjacentTilePositions(site.getPosition()).stream()
                 .filter(candidate -> !"x".equals(candidate) && test.game.getTileByPosition(candidate) == null)
@@ -88,7 +97,14 @@ class ExploreOutlookTest extends BaseTi4Test {
                 .orElseThrow();
         test.units(test.place("25", solSpot), "space", test.sol, UnitType.Destroyer, 1);
         ExploreSite threatened = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
-        assertThat(threatened.infantryCost()).isGreaterThan(claimable.infantryCost() + 2);
+        double stake = outlook().planetStake(site.getUnitHolderFromPlanet("tequran"));
+        assertThat(threatened.infantryCost())
+                .isCloseTo(ExploreValues.INFANTRY_UNIT + ExploreValues.LAST_FORCE_RISK_SHARE * stake, within(EXACT));
+
+        test.place("26", otherNeighbourOfHome());
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        ExploreSite needed = ExploreSite.onBoard(test.game, test.nekro, "tequran", outlook());
+        assertThat(needed.infantryCost()).isGreaterThan(ExploreValues.INFANTRY_UNIT + 1);
     }
 
     // Readying a planet is worth its full value while the AI still has a dock with something to buy, and 0.3 of it

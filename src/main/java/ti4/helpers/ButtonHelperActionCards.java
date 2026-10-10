@@ -2846,6 +2846,7 @@ public final class ButtonHelperActionCards {
                     List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            buttons.add(Buttons.red(player.factionButtonChecker() + "nekroTechExhaust", "Exhaust Planets"));
             String message2 = player.getRepresentation()
                     + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation()

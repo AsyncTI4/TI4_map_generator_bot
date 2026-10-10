@@ -56,6 +56,9 @@ public class TacticalPlanner {
     private static final double FRONTIER_CARD_VALUE = 1.5;
     private static final double FRONTIER_POSITION_VALUE = 1.0;
     private static final String DARK_ENERGY_TAP = "det";
+    private static final String HAZARDOUS = "hazardous";
+    private static final int INFANTRY = 0;
+    private static final int MECH = 1;
     private static final int LAST_EARLY_ROUND = 4;
     private static final double EARLY_GAME_FADE_PER_ROUND = 0.25;
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
@@ -173,16 +176,33 @@ public class TacticalPlanner {
         int loadable = Math.min(BoardView.capacity(seat, transport.get()), unitCount(groundForces));
         int landed = Math.min(loadable, free.size());
         if (landed == 0) return Optional.empty();
-        int carried = isLastCarrierLeavingHome(context, origin, transport.get()) ? loadable : landed;
-        Optional<List<UnitMove>> legal = loadedMoves(
-                        context, origin, tile, transport.get(), take(groundForces, carried))
-                .or(() -> loadedMoves(context, origin, tile, transport.get(), take(groundForces, landed)));
+        List<Planet> targets = free.subList(0, landed);
+        List<UnitMove> ordered = mechsFirstForHazardousPlanets(groundForces, targets);
+        int carried = isLastCarrierLeavingHome(context, origin, transport.get())
+                ? loadable
+                : Math.min(
+                        loadable,
+                        landed
+                                + (int) targets.stream()
+                                        .filter(TacticalPlanner::isHazardous)
+                                        .count());
+        List<UnitMove> cargo = take(ordered, carried);
+        Optional<List<UnitMove>> legal = loadedMoves(context, origin, tile, transport.get(), cargo);
+        if (legal.isEmpty()) {
+            cargo = take(ordered, landed);
+            legal = loadedMoves(context, origin, tile, transport.get(), cargo);
+        }
         if (legal.isEmpty()) return Optional.empty();
+        Map<Planet, int[]> forces =
+                distribute(targets, countOf(cargo, UnitType.Infantry), countOf(cargo, UnitType.Mech));
         Map<String, Integer> landings = new LinkedHashMap<>();
         double value = 0;
-        for (Planet planet : free.subList(0, landed)) {
-            landings.put(planet.getName(), 1);
-            value += BoardView.planetValue(planet) + planetTempo(context.game) + context.exploreValue(tile, planet);
+        for (Planet planet : targets) {
+            int[] landing = forces.get(planet);
+            landings.put(planet.getName(), landing[INFANTRY] + landing[MECH]);
+            value += BoardView.planetValue(planet)
+                    + planetTempo(context.game)
+                    + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
         }
         value += context.objectiveGain(tile, legal.get(), landings.keySet());
@@ -190,6 +210,65 @@ public class TacticalPlanner {
                 - DISTANCE_COST * context.distance(origin, tile, transport.get())
                 - (leavesHomeWithoutShips(context, origin, legal.get()) ? LAST_HOME_SHIP_COST : 0);
         return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score));
+    }
+
+    private static List<UnitMove> mechsFirstForHazardousPlanets(List<UnitMove> forces, List<Planet> targets) {
+        long hazardous = targets.stream().filter(TacticalPlanner::isHazardous).count();
+        List<UnitMove> mechs = ofType(forces, UnitType.Mech);
+        int forHazardous = (int) Math.min(hazardous, unitCount(mechs));
+        List<UnitMove> ordered = new ArrayList<>(take(mechs, forHazardous));
+        ordered.addAll(ofType(forces, UnitType.Infantry));
+        ordered.addAll(skip(mechs, forHazardous));
+        return ordered;
+    }
+
+    private static List<UnitMove> ofType(List<UnitMove> moves, UnitType type) {
+        return moves.stream().filter(move -> move.type() == type).toList();
+    }
+
+    private static int countOf(List<UnitMove> moves, UnitType type) {
+        return unitCount(ofType(moves, type));
+    }
+
+    private static boolean isHazardous(Planet planet) {
+        return planet.getPlanetTypes().contains(HAZARDOUS);
+    }
+
+    private static Map<Planet, int[]> distribute(List<Planet> targets, int infantry, int mechs) {
+        Map<Planet, int[]> forces = new LinkedHashMap<>();
+        targets.forEach(planet -> forces.put(planet, new int[2]));
+        int[] left = {infantry, mechs};
+        for (Planet planet : targets) {
+            if (isHazardous(planet)) give(forces.get(planet), left, MECH);
+        }
+        for (Planet planet : targets) {
+            if (total(forces.get(planet)) == 0) giveEither(forces.get(planet), left);
+        }
+        for (Planet planet : targets) {
+            if (isHazardous(planet) && forces.get(planet)[MECH] == 0) give(forces.get(planet), left, INFANTRY);
+        }
+        while (left[INFANTRY] + left[MECH] > 0) {
+            for (Planet planet : targets) giveEither(forces.get(planet), left);
+        }
+        return forces;
+    }
+
+    private static void giveEither(int[] landing, int[] left) {
+        if (left[INFANTRY] > 0) {
+            give(landing, left, INFANTRY);
+        } else {
+            give(landing, left, MECH);
+        }
+    }
+
+    private static void give(int[] landing, int[] left, int type) {
+        if (left[type] <= 0) return;
+        left[type]--;
+        landing[type]++;
+    }
+
+    private static int total(int[] landing) {
+        return landing[INFANTRY] + landing[MECH];
     }
 
     private static Optional<List<UnitMove>> loadedMoves(
@@ -325,7 +404,7 @@ public class TacticalPlanner {
             if (groundWin < ATTACK_MIN_WIN) continue;
             landings.put(planet.getName(), sent);
             assigned += sent;
-            value += (BoardView.planetValue(planet) + unexploredValue(context, tile, planet)) * groundWin;
+            value += (BoardView.planetValue(planet) + unexploredValue(context, tile, planet, sent)) * groundWin;
             groundCombat |= defenders > 0;
         }
         if ((spaceCombat || groundCombat) && canStealTech(game, seat, opponent)) value += TECH_STEAL_VALUE;
@@ -344,8 +423,10 @@ public class TacticalPlanner {
         return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), legal.get(), landings, score));
     }
 
-    private static double unexploredValue(Context context, Tile tile, Planet planet) {
-        return BoardView.controller(context.game, planet.getName()) == null ? context.exploreValue(tile, planet) : 0;
+    private static double unexploredValue(Context context, Tile tile, Planet planet, int infantry) {
+        return BoardView.controller(context.game, planet.getName()) == null
+                ? context.exploreValue(tile, planet, infantry, 0)
+                : 0;
     }
 
     private static Optional<UnitMove> gravityDriveShip(
@@ -913,12 +994,12 @@ public class TacticalPlanner {
             this.seat = seat;
         }
 
-        double exploreValue(Tile tile, Planet planet) {
+        double exploreValue(Tile tile, Planet planet, int infantry, int mechs) {
             if (exploreOutlook == null) exploreOutlook = new ExploreOutlook(game, seat);
             return exploreValues.computeIfAbsent(
-                    planet.getName(),
-                    name -> ExploreDeck.expectedValueOfPlanet(
-                            ExploreSite.landing(game, seat, tile, planet, 1, 0, exploreOutlook)));
+                    planet.getName() + "#" + infantry + "#" + mechs,
+                    key -> ExploreDeck.expectedValueOfPlanet(
+                            ExploreSite.landing(game, seat, tile, planet, infantry, mechs, exploreOutlook)));
         }
 
         ObjectiveValue objectives() {
