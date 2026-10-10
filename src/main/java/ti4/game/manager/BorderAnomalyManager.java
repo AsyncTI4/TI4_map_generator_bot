@@ -21,11 +21,7 @@ public class BorderAnomalyManager {
         List<BorderAnomalyHolder> incoming = newAnomalies == null ? List.of() : new ArrayList<>(newAnomalies);
         anomalies.clear();
         for (BorderAnomalyHolder holder : incoming) {
-            if (holder == null) continue;
-            if (RETIRED_ARROW_TYPE.equalsIgnoreCase(holder.getType())) {
-                BotLogger.warning("Dropped retired border anomaly type `arrow` on tile " + holder.getTile());
-                continue;
-            }
+            if (holder == null || isRetiredArrow(holder.getTile(), holder.getType())) continue;
             holder.setType(normalizeType(holder.getType()));
             anomalies.add(holder);
         }
@@ -37,7 +33,14 @@ public class BorderAnomalyManager {
     }
 
     public void add(String tile, Integer direction, String typeId) {
+        if (isRetiredArrow(tile, typeId)) return;
         anomalies.add(new BorderAnomalyHolder(tile, direction, normalizeType(typeId)));
+    }
+
+    private static boolean isRetiredArrow(String tile, String typeId) {
+        if (!RETIRED_ARROW_TYPE.equalsIgnoreCase(typeId)) return false;
+        BotLogger.warning("Dropped retired border anomaly type `arrow` on tile " + tile);
+        return true;
     }
 
     public void remove(String tile, Integer direction) {

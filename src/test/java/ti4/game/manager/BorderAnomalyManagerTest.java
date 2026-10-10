@@ -25,6 +25,15 @@ class BorderAnomalyManagerTest extends BaseTi4Test {
     }
 
     @Test
+    void addDropsRetiredArrowLikeSetDoes() {
+        BorderAnomalyManager manager = new BorderAnomalyManager();
+        manager.add("101", 0, "ARROW");
+
+        assertThat(manager.get()).isEmpty();
+        assertThat(manager.has("101", 0)).isFalse();
+    }
+
+    @Test
     void unknownTypeBlocksNothing() {
         BorderAnomalyManager manager = new BorderAnomalyManager();
         manager.add("101", 0, "FOO");
