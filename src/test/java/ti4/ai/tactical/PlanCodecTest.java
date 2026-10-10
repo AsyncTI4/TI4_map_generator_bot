@@ -43,8 +43,8 @@ class PlanCodecTest {
     @Test
     void buildPlanRoundTrips() {
         BuildPlan plan = new BuildPlan(List.of(
-                new BuildOrder("carrier", "301", UnitType.Carrier, 1, 3.0),
-                new BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0)));
+                new BuildOrder("carrier", "301", UnitType.Carrier, 1, 3.0, 2.5, false),
+                new BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 0.4, true)));
 
         assertThat(BuildPlan.decode(plan.encode())).contains(plan);
     }

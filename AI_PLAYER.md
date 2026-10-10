@@ -115,7 +115,9 @@ to build one by hand:
     exhausts exactly that. It prefers the objective worth more points, then one that costs nothing.
   - **Reserve.** During the action phase it keeps back what the cheapest affordable spend objective needs at the
     status phase (unexhausted planets, trade goods, tokens), unless it already qualifies for enough free
-    objectives. Production, research and following respect the reserve.
+    objectives. Production, research and following respect the reserve. Production also leaves the custodians' 6
+    influence while its ships can reach Mecatol Rex, and the influence-leaning planets a Leadership secondary (or its
+    own primary) would spend on command tokens while that card is still to come this round.
   - **Mecatol Rex.** It lands on Mecatol Rex when it can pay the custodians' 6 influence (on top of the reserve),
     pays it honestly, and scores the Imperial point whenever it plays Imperial while holding Mecatol Rex.
   - **Secret objectives** (`ti4.ai.secrets`), within the scoring limits:
@@ -133,7 +135,7 @@ to build one by hand:
       retreated), _Fight with Precision_ (anti-fighter barrage clears the fighters before the first round), _Turn
       Their Fleets to Dust_ (its space cannon, and no other player's, destroys an invader's last ships), _Become a
       Martyr_ and _Prove Endurance_. Earned secrets wait in a queue, so two combats in one turn can score two.
-      _Make an Example of Their World_ needs bombardment, which it does not use yet.
+      For _Make an Example of Their World_ it builds ships with bombardment, but it does not bombard yet.
     - **Agenda phase:** no limit: _Dictate Policy_ (3 laws in play) and _Drive the Debate_ (it or its planet is
       elected by the agenda just resolved, never one from an earlier round), for which it also votes for itself.
     - It keeps the secrets it can achieve (weighted by how achievable they are for it) and uses Imperial to replace
@@ -165,10 +167,10 @@ to build one by hand:
   | Card | Primary | Follows when |
   | --- | --- | --- |
   | Imperial | scores the best public objective it qualifies for, then the Imperial point (Mecatol Rex) or a secret | it has a spare strategy token and room in hand for a secret (it never swaps one secret for another) |
-  | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value plus progress on tech objectives, and Space Dock II for _Produce en Masse_); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
+  | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value, informed by the technologies Nekro players most often end games with, plus progress on tech objectives, and Space Dock II for _Produce en Masse_); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
   | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token) |
   | Politics | makes itself speaker (or the player furthest behind), draws 2 action cards | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with 2 or more spare strategy tokens and room for 2 cards; never with no strategy token, a full hand or _Hold No Action Cards_ |
-  | Construction | two structures: a space dock on its best non-home planet by resources (any planet for _Fuel the War Machine_'s third), otherwise PDS on planets without structures | a revealed or held structure objective is 1 or 2 structures short |
+  | Construction | two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); any planet for _Fuel the War Machine_ | a revealed or held structure objective is 1 or 2 structures short |
   | Diplomacy | readies the 2 exhausted planets it can use best (the same test as a follow), otherwise its 2 most valuable | its best 2 exhausted planets make a spend objective payable at the status phase (even after passing), or, while it still has actions, pay at least 3 towards production it would actually build or the custodians (both need a tactic token), research (a Technology follow it still has a strategy token for, or the 6-resource second technology of its own primary; never Nekro's free Propagation) or Leadership tokens (within its reinforcements). It readies those planets. |
   | Warfare | a tactical action without a command token, which may reactivate a system that already holds its token (for example a second production at home) | producing at home is worth as much as a tactical action's production would need to be (carriers, infantry for free planets, ships for objectives, or enough filler) |
   | Trade | the bot resolves the primary; an AI holder then announces X−k terms per player (k = 2 for 4 or more commodities or a player ahead of it, otherwise 1; none for a player close to winning, the leader, a bad payer or one the commodities would let score) and sends each follower the deal: their commodities for that many minus k trade goods (k debt when they are not neighbours, k trade goods after Replenish and Wash), an even wash for Hacan and for players who spent a strategy token | for free when an AI holder's terms are worth it (it holds its own _Trade Agreement_, gains commodities, and the deal or the debt is worth more than what it gives up), always as Hacan, and with a strategy token for a human holder only for 4 or more new commodities and somewhere to wash them |
@@ -300,24 +302,44 @@ to build one by hand:
   useful to them. The trade goods on a card, which the picker keeps, make that card a little more attractive.
 - **Tactical actions.** At the start of its turn, `TacticalPlanner` scores every system it can
   activate and remembers the best plan for the turn:
-  - **Expand**: a carrier (or other transport) takes infantry to free planets, keeping one
-    infantry on each home planet and on Mecatol Rex, and avoiding systems covered by enemy space cannon. In rounds
-    1-4 every planet taken is worth an extra 0.8, fading to nothing by round 8, so small planets are worth a token
-    early. The last carrier to leave home takes a full load of spare infantry for its next expansions.
+  - **Expand**: a carrier (or other transport) takes ground forces (infantry first, mechs last) to free planets,
+    keeping one ground force (a mech when there is one) on each home planet and on Mecatol Rex, and avoiding systems
+    covered by enemy space cannon. In rounds 1-4 every planet taken is worth an extra 0.8, fading to nothing by round
+    8, so small planets are worth a token early. The last carrier to leave home takes a full load of spare infantry
+    for its next expansions.
   - **Attack**: only a single opponent, and only when the exact combat odds (`CombatOdds`, with standing combat
     modifiers such as Fragile or Unrelenting) give at least 80% in space and on each planet it lands on. It always
     clears enemy ships out of its own home system. It attacks another player's home system only while it holds
     _Darken the Skies_ or _Conquer the Weak_ is unscored, taking the expected space cannon losses off its fleet
     first; other systems covered by enemy space cannon are avoided. An attack can be worth it for objective
-    progress alone.
-  - **Produce**: build at a space dock (carriers, infantry, dreadnoughts; a flagship while _Engineer a Marvel_ is
-    unscored, or for _Achieve Supremacy_ when the flagship could reach Mecatol Rex or another home from that dock;
-    destroyers to stack five (or eight) ships for _Raise a Fleet_ (_Command an Armada_) unless a big enough stack
-    already exists, growing its fleet pool to match what it can field and never past 4 under _Fleet Regulations_;
-    and a few destroyers to move around for presence objectives) within production, resources kept out of the scoring
-    reserve, fleet supply and reinforcements, using Sarween Tools when it has them. A build is scored by what it is
-    for: carriers and the infantry the dock is short of keep their value, while in rounds 1-4 extra dreadnoughts and
-    surplus infantry count for less, so a free planet wins the last token over filler.
+    progress alone. It also weighs the attack with the fighters at the origin riding along in the fleet's capacity
+    (the infantry and mechs to land share what is left) and takes whichever plan scores better; the ground odds use
+    the infantry and mechs actually landed.
+  - **Produce** (`ProductionPlanner`): build at a space dock, scoring first. Activating a system to build is only
+    worth it for at least 4 units, unless the build scores or advances an objective. In order:
+    1. **Scoring.** A flagship or war sun (the cheaper) while _Engineer a Marvel_ is unscored, one that could reach
+       Mecatol Rex or another home from that dock for _Achieve Supremacy_, and the flagship itself for _Unveil
+       Flagship_. Destroyers to stack five (or eight) ships for _Raise a Fleet_ (_Command an Armada_) unless a big
+       enough stack already exists; the fleet pool grows to match what it can field, never past 4 under _Fleet
+       Regulations_. Dreadnoughts up to five for _Gather a Mighty Fleet_. Two ships with bombardment (dreadnoughts
+       first) for _Make an Example of Their World_ and two with anti-fighter barrage (destroyers) for _Fight with
+       Precision_. A few destroyers to move around for presence objectives.
+    2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
+       _Mechanize the Military_).
+    3. **Surplus.** Its flagship if it is a good one (`FlagshipRating`, from community opinion: Arc Secundus,
+       [0.0.1], C'Morran N'orr, J.N.S. Hylarim, Loncara Ssodu and Genesis are; The Alastor, Matriarch, Wrath of
+       Kenara and Van Hauge are not), a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
+       and destroyers up to four, then plain cruisers up to two. Each only while the resources left could still fill
+       the rest of the production with cheap units. Plain destroyers are only built for objectives.
+    4. **Fill.** The rest of the dock's production: fighters into the dock's 3 free fighter slots and the spare
+       capacity of its ships (each carrier keeps room for two infantry, so fighters never block an expansion), then
+       infantry.
+
+    It stays within production, fleet supply, reinforcements and the reserve, using Sarween Tools when it has them,
+    and pays keeping the same reserve. A build is scored by what it is for: carriers and the infantry the dock is
+    short of keep their value, ships for objectives are worth 0.5 per resource (plus 0.3 of a point split over the
+    units _Unveil Flagship_, _Make an Example_ or _Fight with Precision_ need), and everything else is filler, worth
+    less in rounds 1-4, so a free planet wins the last token over filler.
   - **Position**: move the cheapest ship that helps (or a group, to stack a fleet) into a system that advances a
     presence objective (_Intimidate Council_, _Explore Deep Space_, _Populate the Outer Rim_, _Make History_,
     _Raise a Fleet_, _Achieve Supremacy_ with its flagship or a war sun, and secrets such as _Control the Region_,

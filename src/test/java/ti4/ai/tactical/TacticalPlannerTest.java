@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
@@ -59,6 +60,41 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.filter(found -> found.kind() == Kind.EXPAND)).isEmpty();
     }
 
+    // A mech is the better garrison: with one at home, the last infantry is free to take Lodor.
+    @Test
+    void aMechGarrisonFreesTheLastInfantry() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Mech, 1);
+        test.place("26", neighbour);
+
+        TacticalPlan plan = expansionTo(neighbour).orElseThrow();
+
+        assertThat(plan.moves())
+                .containsExactlyInAnyOrder(
+                        new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1),
+                        new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 1));
+    }
+
+    // A lone carrier is a coin flip against Sol's destroyer, but the fighters at home can ride along and make the
+    // attack safe. Two of the carrier's four slots still carry infantry to land on Lodor.
+    @Test
+    void bringsFightersToWinASpaceCombat() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "space", test.sol, UnitType.Destroyer, 1);
+        assertThat(attackOn(neighbour)).isEmpty();
+
+        test.units(home, "space", test.nekro, UnitType.Fighter, 2);
+
+        TacticalPlan plan = attackOn(neighbour).orElseThrow();
+        assertThat(plan.moves()).contains(new UnitMove(AiTestGame.HOME, "space", UnitType.Fighter, 2));
+        assertThat(plan.landings()).containsKey("lodor");
+    }
+
     @Test
     void doesNotExpandIntoAnotherPlayersUnits() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -75,6 +111,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     @Test
     void producesAtHomeWhenThereIsNothingToTake() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.nekro.setTg(2);
 
         Optional<TacticalPlan> plan = TacticalPlanner.best(test.game, test.nekro);
 
@@ -83,6 +120,28 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.get().target()).isEqualTo(AiTestGame.HOME);
         assertThat(ProductionPlanner.plan(test.game, test.nekro, home).units(UnitType.Carrier))
                 .isEqualTo(1);
+    }
+
+    // Mordai II's 4 resources buy a carrier and two infantry: three units are not worth activating the system, so
+    // the seat keeps its token and its resources for a bigger build.
+    @Test
+    void doesNotActivateADockToBuildFewerThanFourUnits() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+
+        assertThat(ProductionPlanner.plan(test.game, test.nekro, home).units()).isEqualTo(3);
+        assertThat(TacticalPlanner.best(test.game, test.nekro)).isEmpty();
+    }
+
+    // A flagship for Engineer a Marvel scores a point on its own, so that one unit is worth the token.
+    @Test
+    void buildsALoneFlagshipThatScoresAnObjective() {
+        test.game.getRevealedPublicObjectives().put("engineer_marvel", 1);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
+        test.nekro.setTg(4);
+
+        assertThat(ProductionPlanner.plan(test.game, test.nekro, home).units()).isEqualTo(1);
+        assertThat(productionScoreAtHome()).isGreaterThan(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
     @Test
@@ -217,8 +276,9 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // With both carriers on the board and a carrier load of infantry already waiting at home, this build is only
-    // dreadnought filler (10 resources at 0.2). Early in the game that is still worth a spare tactic token when
-    // nothing else is, but the last token goes to Wellon next door (2.5 + 0.8 tempo - 0.2 distance) instead.
+    // filler: two mechs, two dreadnoughts and two fighters (13 resources at 0.2). Early in the game that is still
+    // worth a spare tactic token when nothing else is, but the last token goes to Wellon next door (2.5 + 0.8 tempo
+    // - 0.2 distance) instead.
     @Test
     void prefersAFreePlanetToDreadnoughtFillerWithItsLastToken() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
@@ -254,9 +314,9 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // Destroyers built as pawns for a revealed presence objective are not filler: building them at home moves no
-    // objective yet, so builtGain does not value them. Four surplus infantry (2 resources at 0.2) plus two pawns
-    // (2 resources at 0.5) score 1.4, so the build is still worth a spare token early; discounting the pawns as
-    // filler too would score 0.8.
+    // objective yet, so builtGain does not value them. Four fighters (2 resources at 0.2) plus two pawns (2
+    // resources at 0.5) score 1.4, so the build is still worth a spare token early; discounting the pawns as filler
+    // too would score 0.8.
     @Test
     void keepsTheValueOfDestroyerPawnsForAPresenceObjectiveEarly() {
         test.game.setPhaseOfGame("action");

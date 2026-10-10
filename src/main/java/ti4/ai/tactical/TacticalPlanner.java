@@ -47,15 +47,9 @@ public class TacticalPlanner {
     private static final double DISTANCE_COST = 0.2;
     private static final double LAST_HOME_SHIP_COST = 1.5;
     private static final double TECH_STEAL_VALUE = 3.0;
-    private static final double PRODUCTION_VALUE_PER_RESOURCE = 0.5;
-    private static final double MIN_PRODUCTION_SPEND = 2.0;
     private static final double PLANET_TEMPO_VALUE = 0.8;
     private static final int LAST_EARLY_ROUND = 4;
     private static final double EARLY_GAME_FADE_PER_ROUND = 0.25;
-    private static final double EARLY_FILLER_DISCOUNT = 0.3;
-    private static final double CARRIER_BUILD_VALUE = 2.5;
-    private static final double NEEDED_INFANTRY_VALUE = 0.5;
-    private static final int WANTED_SPARE_INFANTRY = 4;
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
     private static final String DARKEN_THE_SKIES = "dts";
     private static final String CONQUER_THE_WEAK = "conquer";
@@ -68,6 +62,7 @@ public class TacticalPlanner {
     private static final int MECATOL_GARRISON = 1;
     private static final List<UnitType> TRANSPORT_PREFERENCE =
             List.of(UnitType.Carrier, UnitType.Flagship, UnitType.Dreadnought, UnitType.Warsun);
+    private static final List<UnitType> GROUND_FORCE_ORDER = List.of(UnitType.Infantry, UnitType.Mech);
     private static final List<UnitType> POSITION_SHIPS = List.of(
             UnitType.Destroyer,
             UnitType.Cruiser,
@@ -163,13 +158,14 @@ public class TacticalPlanner {
                 .filter(type -> context.reaches(origin, tile, type))
                 .findFirst();
         if (transport.isEmpty()) return Optional.empty();
-        List<UnitMove> infantry = availableInfantry(context, origin);
-        int loadable = Math.min(BoardView.capacity(seat, transport.get()), infantryCount(infantry));
+        List<UnitMove> groundForces = availableGroundForces(context.game, seat, origin);
+        int loadable = Math.min(BoardView.capacity(seat, transport.get()), unitCount(groundForces));
         int landed = Math.min(loadable, free.size());
         if (landed == 0) return Optional.empty();
         int carried = isLastCarrierLeavingHome(context, origin, transport.get()) ? loadable : landed;
-        Optional<List<UnitMove>> legal = loadedMoves(context, origin, tile, transport.get(), take(infantry, carried))
-                .or(() -> loadedMoves(context, origin, tile, transport.get(), take(infantry, landed)));
+        Optional<List<UnitMove>> legal = loadedMoves(
+                        context, origin, tile, transport.get(), take(groundForces, carried))
+                .or(() -> loadedMoves(context, origin, tile, transport.get(), take(groundForces, landed)));
         if (legal.isEmpty()) return Optional.empty();
         Map<String, Integer> landings = new LinkedHashMap<>();
         double value = 0;
@@ -218,6 +214,17 @@ public class TacticalPlanner {
     }
 
     private static Optional<TacticalPlan> attackFrom(Context context, Tile tile, Tile origin, Player opponent) {
+        Optional<TacticalPlan> unescorted = attackFrom(context, tile, origin, opponent, 0);
+        int fighters = BoardView.count(BoardView.space(origin), context.seat, UnitType.Fighter);
+        if (fighters == 0 || !BoardView.hasEnemyShips(context.game, context.seat, tile)) return unescorted;
+        Optional<TacticalPlan> escorted = attackFrom(context, tile, origin, opponent, fighters);
+        if (escorted.isEmpty()) return unescorted;
+        if (unescorted.isEmpty()) return escorted;
+        return escorted.get().score() > unescorted.get().score() ? escorted : unescorted;
+    }
+
+    private static Optional<TacticalPlan> attackFrom(
+            Context context, Tile tile, Tile origin, Player opponent, int fightersAvailable) {
         Game game = context.game;
         Player seat = context.seat;
         List<UnitMove> ships = new ArrayList<>();
@@ -229,6 +236,8 @@ public class TacticalPlanner {
         if (ships.isEmpty()) return Optional.empty();
         if (origin.isHomeSystem(game)) keepOneShipHome(seat, ships);
         if (ships.isEmpty()) return Optional.empty();
+        int escort = Math.min(fightersAvailable, capacityOf(seat, ships));
+        if (escort > 0) ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, escort));
         double spaceWin = 1.0;
         boolean spaceCombat = BoardView.hasEnemyShips(game, seat, tile);
         UnitHolder space = BoardView.space(tile);
@@ -253,20 +262,23 @@ public class TacticalPlanner {
             spaceWin = CombatOdds.resolve(attackers, defenders).attackerWins();
             if (spaceWin < ATTACK_MIN_WIN) return Optional.empty();
         }
-        List<UnitMove> infantry = take(availableInfantry(context, origin), capacityOf(seat, ships));
-        int ground = infantryCount(infantry);
+        List<UnitMove> cargo = take(availableGroundForces(game, seat, origin), capacityOf(seat, ships) - escort);
+        int assigned = 0;
         Map<String, Integer> landings = new LinkedHashMap<>();
         double value = 0;
         boolean groundCombat = false;
         boolean conquering = tile.isHomeSystem(game) && wantsToConquer(game, seat);
         for (Planet planet : enemyPlanets(game, seat, tile)) {
+            int ground = unitCount(cargo) - assigned;
             if (ground == 0 || (BoardView.enemyStructuresOn(game, seat, planet) && !conquering)) continue;
             int defenders = BoardView.groundForces(planet, opponent);
             int sent = defenders == 0 ? 1 : ground;
-            double groundWin = defenders == 0 ? 1.0 : groundOdds(game, tile, planet, seat, opponent, sent);
+            double groundWin = defenders == 0
+                    ? 1.0
+                    : groundOdds(game, tile, planet, seat, opponent, unitsOf(skip(cargo, assigned)));
             if (groundWin < ATTACK_MIN_WIN) continue;
             landings.put(planet.getName(), sent);
-            ground -= sent;
+            assigned += sent;
             value += BoardView.planetValue(planet) * groundWin;
             groundCombat |= defenders > 0;
         }
@@ -275,7 +287,7 @@ public class TacticalPlanner {
         if (spaceCombat && tile == seat.getHomeSystemTile()) value += HOME_DEFENCE_VALUE;
         int landed = landings.values().stream().mapToInt(Integer::intValue).sum();
         List<UnitMove> moves = new ArrayList<>(ships);
-        moves.addAll(take(infantry, landed));
+        moves.addAll(take(cargo, landed));
         Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, moves);
         if (legal.isEmpty()) return Optional.empty();
         value += spaceWin * context.objectiveGain(tile, legal.get(), landings.keySet());
@@ -374,49 +386,21 @@ public class TacticalPlanner {
 
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {
         Player seat = context.seat;
-        boolean hasDock = tile.getPlanetUnitHolders().stream()
-                .anyMatch(planet -> seat.getPlanets().contains(planet.getName())
-                        && BoardView.count(planet, seat, UnitType.Spacedock) > 0);
-        if (!hasDock) return Optional.empty();
+        if (!hasDock(seat, tile)) return Optional.empty();
         ProductionPlanner.BuildPlan build = ProductionPlanner.plan(context.game, seat, tile);
-        if (build.totalCost() < MIN_PRODUCTION_SPEND) return Optional.empty();
+        if (build.isEmpty()) return Optional.empty();
         double objectiveGain = context.builtGain(tile, build);
-        return Optional.of(new TacticalPlan(
-                Kind.PRODUCE,
-                tile.getPosition(),
-                List.of(),
-                Map.of(),
-                buildValue(context, tile, build) + objectiveGain));
-    }
-
-    private static double buildValue(Context context, Tile tile, ProductionPlanner.BuildPlan build) {
-        int neededInfantry = Math.min(build.units(UnitType.Infantry), infantryShortfall(context, tile));
-        double neededInfantrySpend = neededInfantry * unitCost(context.seat, UnitType.Infantry);
-        double fillerSpend = build.cost(UnitType.Dreadnought) + build.cost(UnitType.Infantry) - neededInfantrySpend;
-        double objectiveShipSpend = build.cost(UnitType.Destroyer) + build.cost(UnitType.Flagship);
-        return CARRIER_BUILD_VALUE * build.units(UnitType.Carrier)
-                + NEEDED_INFANTRY_VALUE * neededInfantry
-                + PRODUCTION_VALUE_PER_RESOURCE * objectiveShipSpend
-                + fillerValuePerResource(context.game) * fillerSpend;
-    }
-
-    private static int infantryShortfall(Context context, Tile dock) {
-        return Math.max(0, WANTED_SPARE_INFANTRY - infantryCount(availableInfantry(context, dock)));
-    }
-
-    private static double unitCost(Player seat, UnitType type) {
-        return BoardView.model(seat, type).map(UnitModel::getCost).orElse(0f);
-    }
-
-    private static double fillerValuePerResource(Game game) {
-        return PRODUCTION_VALUE_PER_RESOURCE - EARLY_FILLER_DISCOUNT * earlyGameWeight(game);
+        boolean forScoring = build.scoring() || objectiveGain > 0;
+        if (build.units() < ProductionPlanner.MIN_UNITS && !forScoring) return Optional.empty();
+        return Optional.of(
+                new TacticalPlan(Kind.PRODUCE, tile.getPosition(), List.of(), Map.of(), build.value() + objectiveGain));
     }
 
     private static double planetTempo(Game game) {
         return PLANET_TEMPO_VALUE * earlyGameWeight(game);
     }
 
-    private static double earlyGameWeight(Game game) {
+    static double earlyGameWeight(Game game) {
         int roundsPastEarlyGame = Math.max(0, game.getRound() - LAST_EARLY_ROUND);
         return Math.max(0, 1 - EARLY_GAME_FADE_PER_ROUND * roundsPastEarlyGame);
     }
@@ -487,11 +471,10 @@ public class TacticalPlanner {
         List<UnitMove> legal = new ArrayList<>(moves);
         UnitHolder space = BoardView.space(origin);
         int spare = capacityOf(seat, shipsIn(legal)) - cargoIn(legal);
-        int groundLeftInSpace = BoardView.groundForces(space, seat) - groundForcesFromSpace(legal);
-        if (groundLeftInSpace > 0 && spare > 0) {
-            int carried = Math.min(spare, Math.min(groundLeftInSpace, spaceInfantry(seat, space, legal)));
+        for (UnitType type : GROUND_FORCE_ORDER) {
+            int carried = Math.min(spare, leftInSpace(seat, space, legal, type));
             if (carried > 0) {
-                legal.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Infantry, carried));
+                legal.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, carried));
                 spare -= carried;
             }
         }
@@ -504,12 +487,12 @@ public class TacticalPlanner {
         return stranded(context, origin, legal) > 0 ? Optional.empty() : Optional.of(merge(legal));
     }
 
-    private static int spaceInfantry(Player seat, UnitHolder space, List<UnitMove> moves) {
+    private static int leftInSpace(Player seat, UnitHolder space, List<UnitMove> moves, UnitType type) {
         int moved = moves.stream()
-                .filter(move -> BoardView.SPACE.equals(move.holder()) && move.type() == UnitType.Infantry)
+                .filter(move -> BoardView.SPACE.equals(move.holder()) && move.type() == type)
                 .mapToInt(UnitMove::count)
                 .sum();
-        return BoardView.count(space, seat, UnitType.Infantry) - moved;
+        return BoardView.count(space, seat, type) - moved;
     }
 
     private static int stranded(Context context, Tile origin, List<UnitMove> moves) {
@@ -608,19 +591,38 @@ public class TacticalPlanner {
                         .isEmpty();
     }
 
-    private static List<UnitMove> availableInfantry(Context context, Tile origin) {
-        Player seat = context.seat;
-        List<UnitMove> available = new ArrayList<>();
-        int inSpace = BoardView.count(BoardView.space(origin), seat, UnitType.Infantry);
-        if (inSpace > 0) available.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Infantry, inSpace));
+    static int movableGroundForces(Game game, Player seat, Tile origin) {
+        return unitCount(availableGroundForces(game, seat, origin));
+    }
+
+    private static List<UnitMove> availableGroundForces(Game game, Player seat, Tile origin) {
+        List<UnitMove> infantry = new ArrayList<>();
+        List<UnitMove> mechs = new ArrayList<>();
+        String position = origin.getPosition();
+        UnitHolder space = BoardView.space(origin);
+        addMove(
+                infantry,
+                position,
+                BoardView.SPACE,
+                UnitType.Infantry,
+                BoardView.count(space, seat, UnitType.Infantry));
+        addMove(mechs, position, BoardView.SPACE, UnitType.Mech, BoardView.count(space, seat, UnitType.Mech));
         for (Planet planet : origin.getPlanetUnitHolders()) {
-            int onPlanet = BoardView.count(planet, seat, UnitType.Infantry);
-            if (onPlanet == 0 || !seat.getPlanets().contains(planet.getName())) continue;
-            int movable = onPlanet - garrison(context.game, origin, planet);
-            if (movable > 0)
-                available.add(new UnitMove(origin.getPosition(), planet.getName(), UnitType.Infantry, movable));
+            if (!seat.getPlanets().contains(planet.getName())) continue;
+            int planetMechs = BoardView.count(planet, seat, UnitType.Mech);
+            int garrison = garrison(game, origin, planet);
+            int mechsStaying = Math.min(planetMechs, garrison);
+            int infantryStaying = garrison - mechsStaying;
+            int planetInfantry = BoardView.count(planet, seat, UnitType.Infantry);
+            addMove(infantry, position, planet.getName(), UnitType.Infantry, planetInfantry - infantryStaying);
+            addMove(mechs, position, planet.getName(), UnitType.Mech, planetMechs - mechsStaying);
         }
-        return available;
+        infantry.addAll(mechs);
+        return infantry;
+    }
+
+    private static void addMove(List<UnitMove> moves, String origin, String holder, UnitType type, int count) {
+        if (count > 0) moves.add(new UnitMove(origin, holder, type, count));
     }
 
     private static int garrison(Game game, Tile origin, Planet planet) {
@@ -628,7 +630,7 @@ public class TacticalPlanner {
         return game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
     }
 
-    private static int infantryCount(List<UnitMove> moves) {
+    private static int unitCount(List<UnitMove> moves) {
         return moves.stream().mapToInt(UnitMove::count).sum();
     }
 
@@ -642,6 +644,17 @@ public class TacticalPlanner {
             remaining -= count;
         }
         return taken;
+    }
+
+    private static List<UnitMove> skip(List<UnitMove> available, int skipped) {
+        List<UnitMove> rest = new ArrayList<>();
+        int toSkip = skipped;
+        for (UnitMove move : available) {
+            int skippedHere = Math.min(toSkip, move.count());
+            toSkip -= skippedHere;
+            addMove(rest, move.origin(), move.holder(), move.type(), move.count() - skippedHere);
+        }
+        return rest;
     }
 
     private static void keepOneShipHome(Player seat, List<UnitMove> ships) {
@@ -665,9 +678,15 @@ public class TacticalPlanner {
     }
 
     private static Map<UnitType, Integer> shipsOf(List<UnitMove> moves) {
-        Map<UnitType, Integer> ships = new HashMap<>();
-        for (UnitMove move : shipsIn(moves)) ships.merge(move.type(), move.count(), Integer::sum);
-        return ships;
+        return unitsOf(moves.stream()
+                .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()) || move.type() == UnitType.Fighter)
+                .toList());
+    }
+
+    private static Map<UnitType, Integer> unitsOf(List<UnitMove> moves) {
+        Map<UnitType, Integer> units = new EnumMap<>(UnitType.class);
+        for (UnitMove move : moves) units.merge(move.type(), move.count(), Integer::sum);
+        return units;
     }
 
     private static Map<UnitType, Integer> groundOn(UnitHolder planet, Player player) {
@@ -676,8 +695,9 @@ public class TacticalPlanner {
         return ground;
     }
 
-    private static double groundOdds(Game game, Tile tile, Planet planet, Player seat, Player opponent, int sent) {
-        Side attacking = new Side(seat, Map.of(UnitType.Infantry, sent));
+    private static double groundOdds(
+            Game game, Tile tile, Planet planet, Player seat, Player opponent, Map<UnitType, Integer> sent) {
+        Side attacking = new Side(seat, sent);
         Side defending = new Side(opponent, groundOn(planet, opponent));
         return CombatOdds.resolve(
                         combatants(game, tile, planet, attacking, defending),

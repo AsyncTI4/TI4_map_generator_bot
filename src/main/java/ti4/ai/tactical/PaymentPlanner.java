@@ -36,7 +36,8 @@ class PaymentPlanner {
 
     static Optional<PromptButton> keepingReserve(Game game, Player seat, AiPrompt payment, double owed) {
         int wanted = (int) Math.ceil(owed);
-        Optional<Wallet.Payment> plan = ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(wanted));
+        Optional<Wallet.Payment> plan = ScoringReserve.planAfterReserve(
+                Wallet.of(game, seat), ProductionPlanner.reserve(game, seat), SpendCost.resources(wanted));
         if (plan.isEmpty()) return Optional.empty();
         Optional<PromptButton> planet = plan.get().forResources().stream()
                 .map(name -> payment.enabledHandler(SPEND_PREFIX + name + RESOURCE_SUFFIX))

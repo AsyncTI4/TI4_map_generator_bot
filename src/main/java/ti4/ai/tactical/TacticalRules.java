@@ -330,27 +330,33 @@ public class TacticalRules {
         Optional<Match> done = Prompts.owned(turn, context.faction(), ("doneLanding_" + target)::equals);
         if (done.isEmpty()) return Optional.empty();
         Player seat = context.seat();
-        int inSpace = BoardView.count(BoardView.space(tile), seat, UnitType.Infantry);
-        if (inSpace > 0) {
+        if (BoardView.groundForces(BoardView.space(tile), seat) > 0) {
             Optional<Landing> landing = nextLanding(context, tile, plan)
                     .filter(found -> !needsCustodiansPayment(tile, found.planet())
                             || custodiansPayment(context).isPresent());
-            if (landing.isPresent()) {
-                int amount = Math.min(2, Math.min(inSpace, landing.get().wanted()));
-                Optional<PromptButton> button = landButton(
-                                done.get().prompt(), target, landing.get().planet(), amount, seat)
-                        .or(() -> landButton(
-                                done.get().prompt(), target, landing.get().planet(), 1, seat));
-                if (button.isPresent()) {
-                    expectCustodiansPayment(context, tile, landing.get().planet());
-                    return Optional.of(AiDecision.press(
-                            done.get().prompt(),
-                            button.get(),
-                            "land on " + landing.get().planet()));
-                }
+            Optional<PromptButton> button =
+                    landing.flatMap(found -> landButton(done.get().prompt(), tile, found, seat));
+            if (button.isPresent()) {
+                expectCustodiansPayment(context, tile, landing.get().planet());
+                return Optional.of(AiDecision.press(
+                        done.get().prompt(),
+                        button.get(),
+                        "land on " + landing.get().planet()));
             }
         }
         return Optional.of(done.get().press("done landing"));
+    }
+
+    private static Optional<PromptButton> landButton(AiPrompt prompt, Tile tile, Landing landing, Player seat) {
+        for (UnitType type : List.of(UnitType.Infantry, UnitType.Mech)) {
+            int inSpace = BoardView.count(BoardView.space(tile), seat, type);
+            if (inSpace == 0) continue;
+            int amount = Math.min(2, Math.min(inSpace, landing.wanted()));
+            Optional<PromptButton> button = landButton(prompt, tile.getPosition(), landing.planet(), amount, type, seat)
+                    .or(() -> landButton(prompt, tile.getPosition(), landing.planet(), 1, type, seat));
+            if (button.isPresent()) return button;
+        }
+        return Optional.empty();
     }
 
     private record Landing(String planet, int wanted) {}
@@ -392,8 +398,8 @@ public class TacticalRules {
     }
 
     private static Optional<PromptButton> landButton(
-            AiPrompt prompt, String target, String planet, int amount, Player seat) {
-        String id = "landUnits_" + target + "_" + amount + "gf_" + planet + "_" + seat.getColor();
+            AiPrompt prompt, String target, String planet, int amount, UnitType type, Player seat) {
+        String id = "landUnits_" + target + "_" + amount + type.getValue() + "_" + planet + "_" + seat.getColor();
         return prompt.enabledHandler(id);
     }
 
@@ -448,9 +454,8 @@ public class TacticalRules {
                 if (produced(context.seat(), order.type()) >= plan.get().units(order.type())) continue;
                 AiPrompt prompt = done.get().prompt();
                 Optional<PromptButton> button = prompt.enabledHandler(order.handlerId())
-                        .or(() -> order.type() == UnitType.Infantry
-                                ? prompt.enabledHandler("place_infantry_" + order.location())
-                                : Optional.empty());
+                        .or(() ->
+                                order.units() > 1 ? prompt.enabledHandler(order.singleHandlerId()) : Optional.empty());
                 if (button.isPresent()) {
                     return Optional.of(AiDecision.press(prompt, button.get(), "build " + order.unitId()));
                 }

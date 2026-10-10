@@ -153,6 +153,7 @@ public final class ObjectiveValue {
                         + Math.min(1, overlap(footprint.shipSystems(), "beta"));
             case "ose" -> occupiesMecatol(footprint);
             case "engineer_marvel" -> footprint.heavyShipCount();
+            case "gamf" -> footprint.dreadnoughtCount();
             case "conquer" -> countPlanets(footprint, this::inAnotherHomeSystem);
             case "supremacy" -> overlap(footprint.heavyShipSystems(), "supremacy");
             default -> NOT_MODELLED;

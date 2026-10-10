@@ -162,6 +162,24 @@ class TacticalRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_doneWithTacticalAction");
     }
 
+    // Mechs are ground forces too: with only a mech aboard, the mech lands.
+    @Test
+    void landsAMechWhenNoInfantryIsAboard() {
+        activate();
+        Tile tile = test.game.getTileByPosition(target);
+        test.units(tile, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(tile, "space", test.nekro, UnitType.Mech, 1);
+        AiPrompt landing = prompt(
+                "landing",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_landUnits_" + target + "_1mf_lodor_black",
+                "FFCC_nekro_doneLanding_" + target);
+
+        assertThat(pressedId(TacticalRules.continueAction(test.context(landing)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_landUnits_" + target + "_1mf_lodor_black");
+    }
+
     // A carrier that brought spare infantry lands only the planned one and keeps the rest aboard for its next
     // expansion.
     @Test
@@ -208,8 +226,8 @@ class TacticalRulesTest extends BaseTi4Test {
         test.game.setActiveSystem(AiTestGame.HOME);
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
-                new ProductionPlanner.BuildPlan(List.of(
-                                new ProductionPlanner.BuildOrder("carrier", AiTestGame.HOME, UnitType.Carrier, 1, 3.0)))
+                new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
+                                "carrier", AiTestGame.HOME, UnitType.Carrier, 1, 3.0, 2.5, false)))
                         .encode());
         AiPrompt production = prompt(
                 "production",
@@ -303,8 +321,8 @@ class TacticalRulesTest extends BaseTi4Test {
         test.game.setActiveSystem(AiTestGame.HOME);
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
-                new ProductionPlanner.BuildPlan(
-                                List.of(new ProductionPlanner.BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0)))
+                new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
+                                "2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 1.0, false)))
                         .encode());
         AiPrompt production = prompt(
                 "production",
@@ -321,15 +339,44 @@ class TacticalRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_place_infantry_mordaiii");
     }
 
-    // Only infantry has a single-unit fallback; a missing ship button means the AI is done building.
+    // Systems with three or more planets offer no "2 fighters" button, so fighters are built one at a time.
+    @Test
+    void buildsSingleFightersWhenThePairButtonIsMissing() {
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        test.memory.put(
+                TacticalRules.BUILD_KEY + test.context().turnKey(),
+                new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
+                                "2ff", AiTestGame.HOME, UnitType.Fighter, 2, 1.0, 0.2, false)))
+                        .encode());
+        AiPrompt production = prompt(
+                "production",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of("FFCC_nekro_place_fighter_301", "FFCC_nekro_deleteButtons_tacticalAction_301"),
+                List.of("Produce 1 Fighter", "Done Producing Units"));
+
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_place_fighter_301");
+
+        test.nekro.produceUnit("ff_301_space");
+        test.nekro.produceUnit("ff_301_space");
+        assertThat(pressedId(
+                        TacticalRules.continueAction(test.context(production)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_deleteButtons_tacticalAction_301");
+    }
+
+    // Only pairs of infantry or fighters have a single-unit fallback; a missing ship button means the AI is done
+    // building.
     @Test
     void finishesBuildingWhenAPlannedShipButtonIsMissing() {
         test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
         test.game.setActiveSystem(AiTestGame.HOME);
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
-                new ProductionPlanner.BuildPlan(List.of(
-                                new ProductionPlanner.BuildOrder("dreadnought", "301", UnitType.Dreadnought, 1, 4.0)))
+                new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
+                                "dreadnought", "301", UnitType.Dreadnought, 1, 4.0, 2.0, true)))
                         .encode());
         AiPrompt production = prompt(
                 "production",

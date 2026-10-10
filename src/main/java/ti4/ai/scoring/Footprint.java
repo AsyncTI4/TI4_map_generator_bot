@@ -22,18 +22,21 @@ public final class Footprint {
     private final Map<String, Integer> nonFighterShips;
     private final Map<String, Integer> heavyShips;
     private final Set<String> planets;
+    private final int dreadnoughts;
 
     private Footprint(
             Map<String, Integer> units,
             Map<String, Integer> ships,
             Map<String, Integer> nonFighterShips,
             Map<String, Integer> heavyShips,
-            Set<String> planets) {
+            Set<String> planets,
+            int dreadnoughts) {
         this.units = units;
         this.ships = ships;
         this.nonFighterShips = nonFighterShips;
         this.heavyShips = heavyShips;
         this.planets = planets;
+        this.dreadnoughts = dreadnoughts;
     }
 
     private static boolean isHeavy(UnitType type) {
@@ -45,6 +48,7 @@ public final class Footprint {
         Map<String, Integer> ships = new HashMap<>();
         Map<String, Integer> nonFighterShips = new HashMap<>();
         Map<String, Integer> heavyShips = new HashMap<>();
+        int dreadnoughts = 0;
         for (Tile tile : game.getTileMap().values()) {
             int count = 0;
             for (UnitHolder holder : tile.getUnitHolders().values()) {
@@ -61,8 +65,9 @@ public final class Footprint {
             if (capital > 0) nonFighterShips.put(position, capital);
             int heavy = shipsHere.getOrDefault(UnitType.Flagship, 0) + shipsHere.getOrDefault(UnitType.Warsun, 0);
             if (heavy > 0) heavyShips.put(position, heavy);
+            dreadnoughts += shipsHere.getOrDefault(UnitType.Dreadnought, 0);
         }
-        return new Footprint(units, ships, nonFighterShips, heavyShips, new HashSet<>(seat.getPlanets()));
+        return new Footprint(units, ships, nonFighterShips, heavyShips, new HashSet<>(seat.getPlanets()), dreadnoughts);
     }
 
     public Footprint after(String target, Collection<Move> moves, Collection<String> gainedPlanets) {
@@ -81,7 +86,7 @@ public final class Footprint {
         }
         Set<String> newPlanets = new HashSet<>(planets);
         newPlanets.addAll(gainedPlanets);
-        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, newPlanets);
+        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, newPlanets, dreadnoughts);
     }
 
     public Footprint withBuilt(String position, Map<UnitType, Integer> built) {
@@ -97,11 +102,16 @@ public final class Footprint {
             if (BoardView.MOVING_SHIPS.contains(type)) newNonFighter.merge(position, count, Integer::sum);
             if (isHeavy(type)) newHeavy.merge(position, count, Integer::sum);
         });
-        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets);
+        int newDreadnoughts = dreadnoughts + built.getOrDefault(UnitType.Dreadnought, 0);
+        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, newDreadnoughts);
     }
 
     public Set<String> heavyShipSystems() {
         return heavyShips.keySet();
+    }
+
+    public int dreadnoughtCount() {
+        return dreadnoughts;
     }
 
     public int heavyShipCount() {
