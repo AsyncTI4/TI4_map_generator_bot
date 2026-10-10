@@ -21,6 +21,7 @@ public class AddFrontierTokensService {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {
             if ("silver_flame".equalsIgnoreCase(tile.getTileID())) continue;
+            if (tile.isFracture()) continue;
             if (tile.getPlanetUnitHolders().isEmpty()
                     && Mapper.getFrontierTileIds().contains(tile.getTileID())
                     && !game.isBaseGameMode()) {

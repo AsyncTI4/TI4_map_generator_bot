@@ -11,13 +11,14 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FogGameSummaryService;
+import ti4.service.game.GameSummaryService;
 
 class FowInfo extends GameStateSubcommand {
 
     public FowInfo() {
         super(
-                Constants.INFO,
-                "Fog game settings, options, players and channels (GM room or admin/developer)",
+                Constants.GAME_INFO,
+                "Fog game settings, options, players and channels (GM room, developer, or anyone once ended)",
                 false,
                 false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
@@ -32,17 +33,18 @@ class FowInfo extends GameStateSubcommand {
         }
         if (!canViewFogInfo(game, event)) {
             MessageHelper.replyToMessage(
-                    event, "Only a GM of this game in the GM room, an admin or a developer can use this command.");
+                    event,
+                    "Until the game ends, only a GM of this game in the GM room or a developer can use this command.");
             return;
         }
         MessageHelper.sendMessageToChannelWithEmbeds(
                 event.getChannel(),
-                "## Fog Info: " + FogGameSummaryService.displayName(game),
+                "## Fog Info: " + GameSummaryService.displayName(game),
                 FogGameSummaryService.buildEmbeds(game, true));
     }
 
     private static boolean canViewFogInfo(Game game, SlashCommandInteractionEvent event) {
-        if (CommandHelper.hasRole(event, JdaService.developerRoles)) {
+        if (game.isHasEnded() || CommandHelper.hasRole(event, JdaService.developerRoles)) {
             return true;
         }
         return FoWHelper.isGameMasterInGmRoom(game, event);

@@ -21,7 +21,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.service.fow.FogGameSummaryService;
-import ti4.service.fow.FogGameSummaryService.ModeBreakdown;
+import ti4.service.game.GameSummaryService.ModeBreakdown;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass

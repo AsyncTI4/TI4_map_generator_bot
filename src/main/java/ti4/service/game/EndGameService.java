@@ -247,6 +247,7 @@ public class EndGameService {
         game.setEndedDate(System.currentTimeMillis());
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+        FogGameSummaryService.rememberGameMasters(game, fogGameMasters);
 
         GameMessageManager.remove(List.of(game.getName()));
 
@@ -427,7 +428,7 @@ public class EndGameService {
         sb.append('\n');
         if (game.isFowMode()) {
             sb.append("**GM:** ");
-            for (Player gm : game.getPlayersWithGMRole()) {
+            for (Player gm : FogGameSummaryService.gameMasters(game)) {
                 appendUserName(sb, gm);
                 sb.append(' ');
             }
