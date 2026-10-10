@@ -17,7 +17,7 @@ public enum LeaderRemovalReason {
 
     public static LeaderRemovalReason fromHeroId(String leaderId) {
         return switch (leaderId) {
-            case "titanshero", "kyrohero", "toldarhero", "freesystemshero" -> ATTACHED;
+            case "titanshero", "kyrohero", "toldarhero", "freesystemshero", "vyserixhero" -> ATTACHED;
 
             case "letnevhero",
                     "nomadhero",

@@ -40,7 +40,7 @@ public class OPlusPlusCouncilService {
 
         int originalMaxSOCount = game.getMaxSOCountPerPlayer();
         game.setMaxSOCountPerPlayer(DEALT_SECRETS);
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : joinedPlayers(game)) {
             List<String> stage1 = deal(game.getPublicObjectives1(), DEALT_STAGE1);
             List<String> stage2 = deal(game.getPublicObjectives2(), DEALT_STAGE2);
             game.setStoredValue(stage1Key(player), String.join(",", stage1));
@@ -70,20 +70,26 @@ public class OPlusPlusCouncilService {
         return dealt;
     }
 
+    private static List<Player> joinedPlayers(Game game) {
+        return game.getPlayers().values().stream()
+                .filter(p -> !p.isDummy() && !p.isNpc())
+                .toList();
+    }
+
     private static String stage1Key(Player player) {
-        return "oplusplusCouncilS1_" + player.getFaction();
+        return "oplusplusCouncilS1_" + player.getUserID();
     }
 
     private static String stage2Key(Player player) {
-        return "oplusplusCouncilS2_" + player.getFaction();
+        return "oplusplusCouncilS2_" + player.getUserID();
     }
 
     private static String pickKey(String category, Player player) {
-        return "oplusplusCouncilPick" + category + "_" + player.getFaction();
+        return "oplusplusCouncilPick" + category + "_" + player.getUserID();
     }
 
     private static int maxPurgePerType(Game game) {
-        return game.getRealPlayers().size() == 3 ? 2 : 3;
+        return joinedPlayers(game).size() == 3 ? 2 : 3;
     }
 
     private static List<String> idsFromStored(Game game, String key) {
@@ -109,24 +115,24 @@ public class OPlusPlusCouncilService {
                 "Stage I",
                 max,
                 stage1,
-                PICK_S1_PREFIX + player.getFaction(),
+                PICK_S1_PREFIX + player.getUserID(),
                 Mapper::getPublicObjective,
                 CATEGORY_ACCENTS.get(0)));
         builder.append(purgeCategoryContainer(
                 "Stage II",
                 max,
                 stage2,
-                PICK_S2_PREFIX + player.getFaction(),
+                PICK_S2_PREFIX + player.getUserID(),
                 Mapper::getPublicObjective,
                 CATEGORY_ACCENTS.get(1)));
         builder.append(purgeCategoryContainer(
                 "Secrets",
                 max,
                 secrets,
-                PICK_SO_PREFIX + player.getFaction(),
+                PICK_SO_PREFIX + player.getUserID(),
                 Mapper::getSecretObjective,
                 CATEGORY_ACCENTS.get(2)));
-        builder.append(Buttons.green(CONFIRM_PREFIX + player.getFaction(), "Confirm Choices"));
+        builder.append(Buttons.green(CONFIRM_PREFIX + player.getUserID(), "Confirm Choices"));
         builder.send();
     }
 
@@ -202,18 +208,18 @@ public class OPlusPlusCouncilService {
     }
 
     private static Player playerFromComponentID(Game game, String componentID, String prefix) {
-        String faction = componentID.substring(prefix.length());
-        return game.getRealPlayers().stream()
-                .filter(p -> p.getFaction().equals(faction))
+        String userID = componentID.substring(prefix.length());
+        return joinedPlayers(game).stream()
+                .filter(p -> p.getUserID().equals(userID))
                 .findFirst()
                 .orElse(null);
     }
 
     @ButtonHandler(CONFIRM_PREFIX)
     public static void confirmPurge(Game game, ButtonInteractionEvent event, String buttonID) {
-        String faction = buttonID.substring(CONFIRM_PREFIX.length());
-        Player player = game.getRealPlayers().stream()
-                .filter(p -> p.getFaction().equals(faction))
+        String userID = buttonID.substring(CONFIRM_PREFIX.length());
+        Player player = joinedPlayers(game).stream()
+                .filter(p -> p.getUserID().equals(userID))
                 .findFirst()
                 .orElse(null);
         if (player == null) return;
@@ -236,7 +242,7 @@ public class OPlusPlusCouncilService {
             player.getSecrets().remove(soID);
         }
 
-        game.setStoredValue(RESPONDED_KEY, game.getStoredValue(RESPONDED_KEY) + "|" + faction);
+        game.setStoredValue(RESPONDED_KEY, game.getStoredValue(RESPONDED_KEY) + "|" + userID);
         event.getHook()
                 .editOriginal("Choices confirmed. Waiting on the rest of the table.")
                 .setComponents()
@@ -249,11 +255,11 @@ public class OPlusPlusCouncilService {
 
     private static boolean alreadyResponded(Game game, Player player) {
         String val = game.getStoredValue(RESPONDED_KEY);
-        return val != null && val.contains("|" + player.getFaction());
+        return val != null && val.contains("|" + player.getUserID());
     }
 
     private static boolean readyToFinish(Game game) {
-        return game.getRealPlayers().stream().allMatch(p -> alreadyResponded(game, p));
+        return joinedPlayers(game).stream().allMatch(p -> alreadyResponded(game, p));
     }
 
     private static void finish(Game game) {
@@ -261,7 +267,7 @@ public class OPlusPlusCouncilService {
         List<String> finalStage2 = new ArrayList<>();
         List<String> finalSecrets = new ArrayList<>();
 
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : joinedPlayers(game)) {
             finalStage1.addAll(idsFromStored(game, stage1Key(player)));
             finalStage2.addAll(idsFromStored(game, stage2Key(player)));
             finalSecrets.addAll(player.getSecrets().keySet());
