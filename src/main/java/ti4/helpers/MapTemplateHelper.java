@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
@@ -180,12 +179,11 @@ public final class MapTemplateHelper {
     public static boolean buildPartialMapFromMiltyData(Game game, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
-        List<Player> players =
-                manager.getPlayers().stream().map(game::getPlayer).toList();
         boolean somethingHappened = false;
         // fill in draft tiles for all players
-        for (Player p : players) {
-            PlayerDraft draft = manager.getPlayerDraft(p);
+        for (String playerId : manager.getPlayers()) {
+            PlayerDraft draft = manager.getPlayerDraft(playerId);
+            if (draft == null) continue;
             Integer playerNum = draft.getPosition();
             String faction = draft.getFaction();
             MiltyDraftSlice slice = draft.getSlice();

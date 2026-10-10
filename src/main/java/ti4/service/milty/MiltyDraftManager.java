@@ -177,6 +177,7 @@ public class MiltyDraftManager {
     }
 
     public PlayerDraft getPlayerDraft(Player player) {
+        if (player == null) return null;
         return draft.get(player.getUserID());
     }
 
@@ -588,7 +589,7 @@ public class MiltyDraftManager {
             String current = getCurrentDraftPlayer();
             if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("**__");
-            sb.append(player.getUserName());
+            sb.append(player == null ? p : player.getUserName());
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
             if (next != null && p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("__**");
