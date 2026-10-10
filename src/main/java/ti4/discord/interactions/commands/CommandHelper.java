@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
@@ -210,11 +209,9 @@ public class CommandHelper {
         if (hasRole(event, acceptedRoles)) {
             return true;
         }
-        var acceptRolesStr =
-                acceptedRoles.stream().map(Role::getName).distinct().collect(Collectors.joining(", "));
         event.getHook()
-                .editOriginal("You are not authorized to use this command. You must have one of the following roles: "
-                        + acceptRolesStr)
+                .editOriginal(
+                        "You are not authorized to use this command. Ping bothelper if you think this is a mistake.")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         return false;
     }

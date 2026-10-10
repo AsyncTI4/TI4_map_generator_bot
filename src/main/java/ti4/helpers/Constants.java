@@ -556,6 +556,7 @@ public final class Constants {
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
     public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
     public static final String TARGET_PLANET_PING = "target_planet";
@@ -1479,6 +1480,7 @@ public final class Constants {
     public static final String FACTION_RECORD_OF_TECH = "faction_record_of_tech";
     public static final String FACTION_RECORD_OF_SCPICK = "faction_record_of_scpick";
     public static final String FACTION_TOP_COLORS = "faction_top_colors";
+    public static final String FOW_ENDED_STATS = "ended_stats";
     public static final String ACTION_CARD_STATS = "action_card_stats";
     public static final String SPENDS = "spends";
     public static final String TOP_LIMIT = "top_limit";

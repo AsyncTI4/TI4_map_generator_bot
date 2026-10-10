@@ -15,9 +15,9 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -46,6 +46,9 @@ import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
+
+    private static final Set<String> CODE_CARD_ABILITIES =
+            Set.of("bestow", "reflect", "ascend", "thwart", "deceive", "scourge");
 
     private static Boolean IsModInScopeForUnits(
             List<UnitModel> units, CombatModifierModel modifier, CombatRollType rollType, Game game, Player player) {
@@ -623,6 +626,7 @@ public class CombatModHelper {
                     meetsCondition = ownUnits < opponentUnits;
                 }
             }
+            case "toldar_mech_owner" -> meetsCondition = player.ownsUnit("toldar_mech");
             case "lizho_commander_particular" -> {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lizhocommander")) {
                     int nonFighter = 0;
@@ -801,25 +805,10 @@ public class CombatModHelper {
                         scalingCount += 1;
                     }
                 }
-                case "code" -> {
-                    if (player.getHonorCounter() > 1) {
-                        scalingCount += 1;
-                        if (player.getHonorCounter() > 4) {
-                            scalingCount += 1;
-                            if (player.getHonorCounter() > 7) {
-                                scalingCount += 1;
-                            }
-                        }
-                    }
-
-                    if (player.getDishonorCounter() > 1) {
-                        scalingCount += 1;
-                        if (player.getDishonorCounter() < 4) {
-                            scalingCount += 1;
-                            scalingCount += 1;
-                        }
-                    }
-                }
+                case "code" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(CODE_CARD_ABILITIES::contains)
+                            .count();
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {

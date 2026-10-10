@@ -1,4 +1,4 @@
-# Developer test bed
+# Developer testbed
 
 Set up a game with virtual players from a small JSON preset, then act as any seat, so every button counts as that
 seat. Works in normal and fog games, for developers only. With the switch off, the bot behaves exactly as before.
@@ -7,11 +7,13 @@ seat. Works in normal and fog games, for developers only. With the switch off, t
 [Add a test button](#add-a-test-button) · [Write a script](#write-a-script) · [Your own files](#your-own-files) ·
 [Reference](#reference) · [Safety](#safety) · [How it works](#how-it-works)
 
-Writing scripts with an AI agent: point it at [TESTBED_AGENT_GUIDE.md](TESTBED_AGENT_GUIDE.md).
+Writing scripts with an AI agent: point it at [TESTBED_AGENT_GUIDE.md](TESTBED_AGENT_GUIDE.md). Agents only
+write or edit testbed files when you ask (see [AGENTS.md](AGENTS.md)), and may extend the framework with new
+paths, fields and actions but not change existing behaviour.
 
 ## Start
 
-1. Turn the test bed on, once per bot (a dev bot, not production):
+1. Turn the testbed on, once per bot (a dev bot, not production):
    ```
    /developer setting setting_name:testbed_enabled setting_value:true setting_type:bool
    ```
@@ -26,9 +28,9 @@ Writing scripts with an AI agent: point it at [TESTBED_AGENT_GUIDE.md](TESTBED_A
 | `/testbed panel` | Your private panel: switch seats, Follow Turn, test buttons. |
 | `/testbed act_as [faction_or_color]` | Act as a seat, `turn` to follow the active player, empty for yourself. |
 | `/testbed run [script] [file]` | Runs a test script (`all` runs every script) and posts a ✅/❌ report. |
-| `/testbed reset confirm:true` | Deletes the test bed's channels and restores the game as it was before `apply`. |
+| `/testbed reset confirm:true` | Deletes the testbed's channels and restores the game as it was before `apply`. |
 | `/testbed reload` | Re-reads presets, scripts and test button files after you edit them, and lists any invalid file. |
-| `/testbed enable [allow_real_players]` / `disable` | Marks or unmarks an existing game as a test bed. |
+| `/testbed enable [allow_real_players]` / `disable` | Marks or unmarks an existing game as a testbed. |
 
 ## Play solo
 
@@ -76,6 +78,9 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Law in play | game `laws` (`id` or `id:elected`) | `"laws": ["arms_reduction"]` |
 | Token or attachment | game `tokens`: tile position or planet | `"tokens": { "101": ["frontier"], "mecatolrex": ["dmz"] }` |
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
+| Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
+| Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
+| Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
 | TG, commodities, command tokens | seat `tg`, `commodities`, `ccs` | `"ccs": "3/3/2"` |
 | State a feature keeps in stored values | script `do: setStored` | `{ "do": "setStored", "key": "x", "value": "y" }` |
@@ -93,7 +98,7 @@ A preset's `combat` positions open the real combat thread on apply (see `2p-comb
   seat, without switching act-as.
 - **Scripts:** the scope `<seat>:combat` is that seat's newest combat thread, for `press` and `expect`.
 - **Fixed dice:** set the stored value `testBedDice` to space-separated results, e.g. `10 10 1`. Presses made by
-  the test bed (panel, scripts, test buttons) use them in order; leftovers wait for the next press, and an empty
+  the testbed (panel, scripts, test buttons) use them in order; leftovers wait for the next press, and an empty
   list goes back to random. Buttons you click yourself in Discord still roll random dice. `2p-combat` has
   **Next dice all hit / all miss** test buttons; `combat-roll` is the example script.
 
@@ -165,7 +170,7 @@ suite in JSON. Shared scripts live in `src/main/resources/data/testbed/scripts/`
 }
 ```
 
-A script with a `preset` always starts clean: the test bed is reset, the preset applied, and step 1 waits until
+A script with a `preset` always starts clean: the testbed is reset, the preset applied, and step 1 waits until
 every seat's new hand has arrived in its cards-info thread.
 `selftest-core` and `selftest-components` are worked examples that exercise most of the features.
 
@@ -203,7 +208,7 @@ fixed text (card names often render as emoji, so `Politics` is not in the play m
 `count` to catch duplicates; `noFactionLeak` on `main` in fog games only. Messages posted before the script
 started (everything the preset did) are invisible, so check those through state.
 
-**Run, read, fix.** `/testbed run file:<script>.json` in a test-bed game or a new game of the right kind. Read the
+**Run, read, fix.** `/testbed run file:<script>.json` in a testbed game or a new game of the right kind. Read the
 ❌ lines; the attached `.md` log has the full detail. `unsupported interaction calls` means the handler used
 something the stand-in click only fakes: check that step by hand once. When it passes twice, keep it in
 `data/testbed/local/scripts/` or share it in `data/testbed/scripts/`; `/testbed run script:all` runs it with the
@@ -252,6 +257,9 @@ copy-paste templates.
 | `start` | `setup` (default), `strategy` or `action` (seats without `sc` get the lowest free card). |
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
 | `revealedObjectives`, `laws`, `tokens` | Game state; see [Set up any component](#set-up-any-component). |
+| `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
+| `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
+| `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
 Seat fields (all optional): `faction`, `color`, `home`, `speaker`, `sc`; `acs`, `sos`, `relics` (a number draws
@@ -292,8 +300,10 @@ Every step may also have a `label` for the report.
 
 - **Seats:** a faction or color, `you`, `seat1`, `seat2`, … (virtual seats in preset order), and `all` (only for
   `do: hand`).
-- **Scopes (`in`):** `main`, `actions`, `gm`, `<seat>` (its private channel in fog, the main channel otherwise),
-  `<seat>:private`, `<seat>:cards-info`.
+- **Scopes (`in`):** `main`, `actions` (normal games only; fog games have no actions channel), `gm` (fog games
+  only), `<seat>` (the seat's own channel from `getCorrectChannel()`: its private channel when it has one, in fog
+  or not, otherwise the main channel), `<seat>:private`, `<seat>:cards-info`, `<seat>:combat` (its newest combat
+  thread).
 - **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `scs`, `passed`, `followed`, `acs` (count), `acIds`,
   `sos` (count), `soIds`, `pns`, `pnsInPlay`, `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`,
   `techs`, `exhaustedTechs`, `purgedTechs`, `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`;
@@ -331,7 +341,7 @@ Every step may also have a `label` for the report.
   their cards-info thread or fog private channel.
 - Normal games: you are added to each virtual seat's cards-info thread. Fog games: each seat gets a private
   channel `<game>-testseatN-private` and you get the `<game> GM` role.
-- Channels the test bed creates are recorded in `testBedChannels`; `reset` deletes only those.
+- Channels the testbed creates are recorded in `testBedChannels`; `reset` deletes only those.
 - `apply` copies the game file to `storage/testbed/<game>.txt` first; `reset` restores and reloads it. Games
   applied before snapshots existed fall back to rebuilding seats, map, played strategy cards and the main decks.
 - Script presses build a stand-in click on a real message and run it through `ButtonProcessor.processNow`, the
@@ -340,10 +350,10 @@ Every step may also have a `label` for the report.
 
 ### Regression guards
 
-`src/test/java/ti4/service/testbed/` fails the build when a change would break the test bed: every preset,
+`src/test/java/ti4/service/testbed/` fails the build when a change would break the testbed: every preset,
 script and test button file is its own test case; the panel and test button pages are checked against Discord's
 limits; every state path and built-in group must exist; the stand-in click must answer every method JDA
-requires; everything the test bed stores must be safe for the game save format.
+requires; everything the testbed stores must be safe for the game save format.
 
 ### Known gaps
 

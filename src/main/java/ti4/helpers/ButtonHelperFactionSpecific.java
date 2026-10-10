@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -35,9 +33,10 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
@@ -84,6 +83,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
@@ -92,6 +92,21 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public final class ButtonHelperFactionSpecific {
+    private static final String DEATH_BINDING = "dspnphar";
+    private static final String DEATH_BINDING_INFANTRY = "deathBindingInfantry_";
+    private static final String KALTRIM_AMBASSADORS_AGENDA = "kaltrimAmbassadorsAgenda_";
+    private static final String KALTRIM_AMBASSADORS_PLANET = "kaltrimAmbassadorsPlanet_";
+    private static final String THWART_SESSION = "thwartSession_";
+    private static final String THWART_REMAINING = "thwartRemaining_";
+    private static final String THWART_TARGETS = "thwartTargets_";
+    private static final String DECEIVE_TARGET = "deceiveTarget_";
+    private static final String DECEIVE_DECLINE = "deceiveDecline";
+    private static final String DECEIVE_PENDING = "deceivePending_";
+    private static final String REFLECT_TARGET = "reflectTarget_";
+    private static final String REFLECT_GIVE = "reflectGive_";
+    private static final String REFLECT_DECLINE = "reflectDecline";
+    private static final String REFLECT_PENDING = "reflectPending_";
+    private static final String REFLECT_DRAWING = "reflectDrawing_";
 
     public static List<Button> getc4RedTechButtons(Player player) {
         // ACTION: Exhaust this card to place 1 PDS on a planet you control.
@@ -522,6 +537,9 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static void resolveDeceive(Player player, Game game) {
+        if (!game.getStoredValue(DECEIVE_PENDING + player.getFaction()).isBlank()) {
+            return;
+        }
         String msg = player.getRepresentation()
                 + ", please choose which neighbor who you wish to steal a random action card from."
                 + " Please ensure that everyone's action card counts are accurate before resolving this (async often floats action card draws).";
@@ -531,9 +549,144 @@ public final class ButtonHelperFactionSpecific {
             if (game.isFowMode()) {
                 rep = neighbor.getColor();
             }
-            buttons.add(Buttons.green("spyStep2_" + neighbor.getFaction(), rep));
+            buttons.add(Buttons.green(player.factionButtonChecker() + DECEIVE_TARGET + neighbor.getFaction(), rep));
         }
+        if (buttons.isEmpty()) {
+            return;
+        }
+        game.setStoredValue(DECEIVE_PENDING + player.getFaction(), "true");
+        buttons.add(Buttons.red(player.factionButtonChecker() + DECEIVE_DECLINE, "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    @ButtonHandler(DECEIVE_TARGET)
+    public static void resolveDeceiveTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String faction = buttonID.substring(DECEIVE_TARGET.length());
+        Player neighbor = game.getPlayerFromColorOrFaction(faction);
+        if (!player.hasAbility("deceive")
+                || game.getStoredValue(DECEIVE_PENDING + player.getFaction()).isBlank()
+                || neighbor == null
+                || !player.getNeighbouringPlayers(true).contains(neighbor)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        game.removeStoredValue(DECEIVE_PENDING + player.getFaction());
+        ButtonHelperActionCards.resolveSpyStep2(player, game, event, "spyStep2_" + faction);
+    }
+
+    @ButtonHandler(DECEIVE_DECLINE)
+    public static void declineDeceive(ButtonInteractionEvent event, Game game, Player player) {
+        game.removeStoredValue(DECEIVE_PENDING + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void offerReflect(Game game, Player player) {
+        if (!player.hasAbility("reflect")
+                || !game.getStoredValue(REFLECT_PENDING + player.getFaction()).isBlank()
+                || !game.getStoredValue(REFLECT_DRAWING + player.getFaction()).isBlank()) {
+            return;
+        }
+        Set<Player> neighbors = player.getNeighbouringPlayers(true);
+        if (neighbors.isEmpty()) {
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (Player neighbor : neighbors) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + REFLECT_TARGET + neighbor.getFaction(),
+                    "Choose " + neighbor.getColor(),
+                    neighbor.getFactionEmoji()));
+        }
+        game.setStoredValue(REFLECT_PENDING + player.getFaction(), "true");
+        buttons.add(Buttons.red(player.factionButtonChecker() + REFLECT_DECLINE, "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing()
+                        + ", you drew action cards and may resolve _Reflect_. Choose a neighbor.",
+                buttons);
+    }
+
+    @ButtonHandler(REFLECT_TARGET)
+    public static void resolveReflectTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String neighborFaction = buttonID.substring(REFLECT_TARGET.length());
+        Player neighbor = game.getPlayerFromColorOrFaction(neighborFaction);
+        if (!player.hasAbility("reflect")
+                || game.getStoredValue(REFLECT_PENDING + player.getFaction()).isBlank()
+                || neighbor == null
+                || !player.getNeighbouringPlayers(true).contains(neighbor)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int actionCardsBefore = player.getActionCards().size();
+        game.setStoredValue(REFLECT_DRAWING + player.getFaction(), "true");
+        try {
+            game.drawActionCard(player.getUserID());
+        } finally {
+            game.removeStoredValue(REFLECT_DRAWING + player.getFaction());
+        }
+        if (player.getActionCards().size() == actionCardsBefore) {
+            game.removeStoredValue(REFLECT_PENDING + player.getFaction());
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ActionCardHelper.sendActionCardInfo(game, player);
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Integer> actionCard : player.getActionCards().entrySet()) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + REFLECT_GIVE + neighborFaction + "|" + actionCard.getValue(),
+                    Mapper.getActionCard(actionCard.getKey()).getName(),
+                    CardEmojis.getACEmoji(game)));
+        }
+        MessageHelper.editMessageWithButtons(
+                event,
+                player.getRepresentationNoPing()
+                        + " drew 1 action card with _Reflect_. Choose 1 action card to give away.",
+                buttons);
+    }
+
+    @ButtonHandler(REFLECT_GIVE)
+    public static void resolveReflectGive(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload = buttonID.substring(REFLECT_GIVE.length()).split("\\|", 2);
+        if (payload.length != 2) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        Player neighbor = game.getPlayerFromColorOrFaction(payload[0]);
+        int actionCardIndex;
+        try {
+            actionCardIndex = Integer.parseInt(payload[1]);
+        } catch (NumberFormatException e) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String actionCard = player.getActionCards().entrySet().stream()
+                .filter(entry -> entry.getValue() == actionCardIndex)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+        if (!player.hasAbility("reflect")
+                || neighbor == null
+                || !player.getNeighbouringPlayers(true).contains(neighbor)
+                || actionCard == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        player.removeActionCard(actionCardIndex);
+        neighbor.setActionCard(actionCard);
+        game.removeStoredValue(REFLECT_PENDING + player.getFaction());
+        ButtonHelper.checkACLimit(game, neighbor);
+        ActionCardHelper.sendActionCardInfo(game, player);
+        ActionCardHelper.sendActionCardInfo(game, neighbor);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " gave an action card to a neighbor using _Reflect_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(REFLECT_DECLINE)
+    public static void declineReflect(ButtonInteractionEvent event, Game game, Player player) {
+        game.removeStoredValue(REFLECT_PENDING + player.getFaction());
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void correctHonorAbilities(Player player, Game game) {
@@ -670,6 +823,312 @@ public final class ButtonHelperFactionSpecific {
                 flipToldarBreakthrough(player, "toldarbtdishonor", "toldarbthonor");
             }
         }
+    }
+
+    public static void offerThwart(Game game, Player player) {
+        if (!player.hasAbility("thwart")) {
+            return;
+        }
+        String session = Long.toString(System.nanoTime(), Character.MAX_RADIX);
+        game.setStoredValue(THWART_SESSION + player.getFaction(), session);
+        game.setStoredValue(THWART_REMAINING + player.getFaction(), "2");
+        game.removeStoredValue(THWART_TARGETS + player.getFaction());
+        sendThwartButtons(game, player, session);
+    }
+
+    public static void offerDeathBinding(Game game, Player owner) {
+        if (game.getPNOwner(DEATH_BINDING) != owner) {
+            return;
+        }
+        for (Player holder : game.getRealPlayers()) {
+            if (holder != owner && holder.hasPlayablePromissoryInHand(DEATH_BINDING)) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        holder.getCardsInfoThread(),
+                        holder.getRepresentation()
+                                + ", the Pharad'n player has passed; you may resolve _Death Binding_.",
+                        List.of(
+                                Buttons.green("resolvePNPlay_" + DEATH_BINDING, "Resolve Death Binding"),
+                                Buttons.red(holder.factionButtonChecker() + "deleteButtons", "Decline")));
+            }
+        }
+    }
+
+    public static void resolveDeathBinding(Game game, Player player, GenericInteractionCreateEvent event) {
+        Player owner = game.getPNOwner(DEATH_BINDING);
+        if (!player.hasPlayablePromissoryInHand(DEATH_BINDING) || owner == null || !owner.isPassed()) {
+            return;
+        }
+        game.setStoredValue(DEATH_BINDING_INFANTRY + player.getFaction(), "4");
+        sendDeathBindingButtons(game, player);
+    }
+
+    private static void sendDeathBindingButtons(Game game, Player player) {
+        int remaining = Integer.parseInt(game.getStoredValue(DEATH_BINDING_INFANTRY + player.getFaction()));
+        String message = deathBindingMessage(player, remaining);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                message,
+                NewStuffHelper.buttonPagination(
+                        getDeathBindingInfantryButtons(game, player),
+                        player.factionButtonChecker() + "deathBindingRemove_",
+                        0));
+    }
+
+    private static String deathBindingMessage(Player player, int remaining) {
+        return player.getRepresentation() + ", please remove " + remaining + " infantry for _Death Binding_.";
+    }
+
+    private static List<Button> getDeathBindingInfantryButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder holder : tile.getUnitHolders().values()) {
+                if (holder.getUnitCount(UnitType.Infantry, player) > 0) {
+                    buttons.add(Buttons.red(
+                            player.factionButtonChecker() + "deathBindingRemove_" + tile.getPosition() + "_"
+                                    + holder.getName(),
+                            "Remove 1 Infantry from " + ButtonHelper.getUnitHolderRep(holder, tile, game)));
+                }
+            }
+        }
+        return buttons;
+    }
+
+    @ButtonHandler("deathBindingRemove_")
+    public static void deathBindingRemove(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player owner = game.getPNOwner(DEATH_BINDING);
+        String remainingValue = game.getStoredValue(DEATH_BINDING_INFANTRY + player.getFaction());
+        if (remainingValue.isBlank()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int remaining;
+        try {
+            remaining = Integer.parseInt(remainingValue);
+        } catch (NumberFormatException e) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String message = deathBindingMessage(player, remaining);
+        String prefix = player.factionButtonChecker() + "deathBindingRemove_";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                getDeathBindingInfantryButtons(game, player),
+                message,
+                prefix,
+                buttonID)) {
+            return;
+        }
+        String[] parts = buttonID.split("_");
+        Tile tile = game.getTileByPosition(parts[1]);
+        UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(parts[2]);
+        if (!player.hasPlayablePromissoryInHand(DEATH_BINDING)
+                || owner == null
+                || !owner.isPassed()
+                || holder == null
+                || holder.getUnitCount(UnitType.Infantry, player) < 1
+                || remaining < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + holder.getName());
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
+        ButtonHelper.deleteMessage(event);
+        if (--remaining > 0) {
+            game.setStoredValue(DEATH_BINDING_INFANTRY + player.getFaction(), Integer.toString(remaining));
+            sendDeathBindingButtons(game, player);
+            return;
+        }
+        game.removeStoredValue(DEATH_BINDING_INFANTRY + player.getFaction());
+        player.removePromissoryNote(DEATH_BINDING);
+        owner.setPromissoryNote(DEATH_BINDING);
+        AddUnitService.addUnits(event, owner.getNomboxTile(), game, owner.getColor(), "1 infantry");
+        List<TechnologyModel> techs = new ArrayList<>(Mapper.getTechs().values().stream()
+                .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
+                .filter(tech -> !player.hasTech(tech.getAlias()))
+                .filter(tech -> tech.getRequirements().orElse("").isEmpty())
+                .filter(tech -> ListTechService.isTechResearchable(tech, player))
+                .filter(tech -> tech.getFaction().isEmpty()
+                        || tech.getFaction().get().isBlank()
+                        || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+                .toList());
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", please choose a technology to gain with _Death Binding_.",
+                ListTechService.getTechButtons(techs, player, "free"));
+    }
+
+    public static void offerKaltrimAmbassadors(Game game) {
+        Player owner = game.getPNOwner("dspnkalt");
+        for (Player holder : game.getRealPlayers()) {
+            if (holder == owner || !holder.hasPlayablePromissoryInHand("dspnkalt")) continue;
+            MessageHelper.sendMessageToChannelWithButtons(
+                    holder.getCardsInfoThread(),
+                    holder.getRepresentationNoPing()
+                            + ", you may resolve _Kaltrim Ambassadors_ during this agenda phase.",
+                    List.of(
+                            Buttons.green("resolvePNPlay_dspnkalt", "Resolve Kaltrim Ambassadors"),
+                            Buttons.gray(holder.factionButtonChecker() + "deleteButtons", "Decline")));
+        }
+    }
+
+    public static void startKaltrimAmbassadors(Game game, Player player) {
+        Player owner = game.getPNOwner("dspnkalt");
+        if (owner == null
+                || !player.hasPlayablePromissoryInHand("dspnkalt")
+                || game.getAgendas().isEmpty()) return;
+        String agenda = game.getAgendas().getFirst();
+        AgendaModel agendaModel = Mapper.getAgenda(agenda);
+        if (agendaModel == null) return;
+        game.setStoredValue(KALTRIM_AMBASSADORS_AGENDA + player.getFaction(), agenda);
+        List<Button> buttons = player.getPlanets().stream()
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + "kaltrimAmbassadors_" + planet,
+                        "Place Infantry on " + Helper.getPlanetRepresentation(planet, game)))
+                .toList();
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", choose a planet to resolve _Kaltrim Ambassadors_.",
+                List.of(agendaModel.getRepresentationEmbed()),
+                buttons);
+    }
+
+    @ButtonHandler("kaltrimAmbassadors_")
+    public static void resolveKaltrimAmbassadors(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player owner = game.getPNOwner("dspnkalt");
+        String planet = buttonID.substring("kaltrimAmbassadors_".length());
+        Tile tile = game.getTileFromPlanet(planet);
+        String agenda = game.getStoredValue(KALTRIM_AMBASSADORS_AGENDA + player.getFaction());
+        if (owner == null
+                || !player.hasPlayablePromissoryInHand("dspnkalt")
+                || !player.getPlanets().contains(planet)
+                || tile == null
+                || game.getAgendas().isEmpty()
+                || !agenda.equals(game.getAgendas().getFirst())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        AddUnitService.addUnits(event, tile, game, owner.getColor(), "1 infantry " + planet);
+        player.removePromissoryNote("dspnkalt");
+        owner.setPromissoryNote("dspnkalt");
+        game.removeStoredValue(KALTRIM_AMBASSADORS_AGENDA + player.getFaction());
+        game.setStoredValue(KALTRIM_AMBASSADORS_PLANET + player.getFaction(), planet);
+        ButtonHelper.deleteMessage(event);
+        AgendaModel agendaModel = Mapper.getAgenda(agenda);
+        if (agendaModel == null) return;
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", you may discard this agenda.",
+                List.of(agendaModel.getRepresentationEmbed()),
+                List.of(
+                        Buttons.red(player.factionButtonChecker() + "discardKaltrimAgenda_" + agenda, "Discard Agenda"),
+                        Buttons.gray(player.factionButtonChecker() + "declineKaltrimAgenda", "Decline")));
+    }
+
+    @ButtonHandler("discardKaltrimAgenda_")
+    public static void discardKaltrimAgenda(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String agenda = buttonID.substring("discardKaltrimAgenda_".length());
+        if (!game.getAgendas().isEmpty() && agenda.equals(game.getAgendas().getFirst())) {
+            game.discardSpecificAgenda(agenda);
+            announceKaltrimAmbassadorsDecision(game, player, "discarded the agenda using _Kaltrim Ambassadors_");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("declineKaltrimAgenda")
+    public static void declineKaltrimAgenda(Game game, Player player, ButtonInteractionEvent event) {
+        announceKaltrimAmbassadorsDecision(game, player, "declined to discard the agenda using _Kaltrim Ambassadors_");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void announceKaltrimAmbassadorsDecision(Game game, Player player, String decision) {
+        String planet = game.getStoredValue(KALTRIM_AMBASSADORS_PLANET + player.getFaction());
+        if (planet.isBlank()) return;
+        game.removeStoredValue(KALTRIM_AMBASSADORS_PLANET + player.getFaction());
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed 1 Kaltrim infantry on "
+                        + Helper.getPlanetRepresentation(planet, game) + " and " + decision + ".");
+    }
+
+    private static void sendThwartButtons(Game game, Player player, String session) {
+        int remaining = Integer.parseInt(game.getStoredValue(THWART_REMAINING + player.getFaction()));
+        Set<String> targetedFactions = getThwartTargets(game, player);
+        List<Button> buttons = new ArrayList<>();
+        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+            if (!targetedFactions.contains(neighbor.getFaction())
+                    && (neighbor.getCommodities() > 0 || neighbor.getTg() > 0)) {
+                buttons.add(Buttons.red(
+                        player.factionButtonChecker() + "thwartTake_" + session + "_" + neighbor.getFaction(),
+                        "Take 1 Commodity From " + neighbor.getFactionModel().getFactionName(),
+                        neighbor.getFactionEmojiOrColor()));
+            }
+        }
+        buttons.add(Buttons.red(player.factionButtonChecker() + "thwartDone_" + session, "Done Taking Commodities"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", please choose up to " + remaining
+                        + " commodities to take using _Thwart_.",
+                buttons);
+    }
+
+    @ButtonHandler("thwartTake_")
+    public static void thwartTake(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.split("_");
+        String session = parts[1];
+        Player neighbor = game.getPlayerFromColorOrFaction(parts[2]);
+        if (!player.hasAbility("thwart")
+                || !session.equals(game.getStoredValue(THWART_SESSION + player.getFaction()))
+                || neighbor == null
+                || getThwartTargets(game, player).contains(neighbor.getFaction())
+                || !player.getNeighbouringPlayers(true).contains(neighbor)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int remaining = Integer.parseInt(game.getStoredValue(THWART_REMAINING + player.getFaction()));
+        if (remaining < 1 || (neighbor.getCommodities() < 1 && neighbor.getTg() < 1)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        boolean takingCommodity = neighbor.getCommodities() > 0;
+        if (takingCommodity) {
+            neighbor.setCommodities(neighbor.getCommodities() - 1);
+        } else {
+            neighbor.setTg(neighbor.getTg() - 1);
+        }
+        player.setCommodities(player.getCommodities() + 1);
+        ButtonHelperAgents.toldarAgentInitiation(game, player, 1);
+        Set<String> targetedFactions = getThwartTargets(game, player);
+        targetedFactions.add(neighbor.getFaction());
+        game.setStoredValue(THWART_TARGETS + player.getFaction(), String.join("|", targetedFactions));
+        game.setStoredValue(THWART_REMAINING + player.getFaction(), Integer.toString(remaining - 1));
+        MessageHelper.sendMessageToChannel(
+                neighbor.getCorrectChannel(),
+                neighbor.getRepresentation() + " lost 1 commodity to " + player.getRepresentationNoPing()
+                        + "'s _Thwart_.");
+        ButtonHelper.deleteTheOneButton(event);
+        if (remaining == 1) {
+            game.removeStoredValue(THWART_SESSION + player.getFaction());
+            game.removeStoredValue(THWART_REMAINING + player.getFaction());
+            game.removeStoredValue(THWART_TARGETS + player.getFaction());
+        }
+    }
+
+    @ButtonHandler("thwartDone_")
+    public static void thwartDone(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String session = buttonID.substring("thwartDone_".length());
+        if (session.equals(game.getStoredValue(THWART_SESSION + player.getFaction()))) {
+            game.removeStoredValue(THWART_SESSION + player.getFaction());
+            game.removeStoredValue(THWART_REMAINING + player.getFaction());
+            game.removeStoredValue(THWART_TARGETS + player.getFaction());
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static Set<String> getThwartTargets(Game game, Player player) {
+        String targets = game.getStoredValue(THWART_TARGETS + player.getFaction());
+        return targets.isBlank() ? new HashSet<>() : new HashSet<>(List.of(targets.split("\\|")));
     }
 
     private static boolean hasUnlockedToldarBreakthrough(Player player) {
@@ -1824,7 +2283,10 @@ public final class ButtonHelperFactionSpecific {
             PlanetTargetService.fizzle(event, player);
             return;
         }
-        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
+        Stream.of("ragh", "sigma_raghs_call")
+                .filter(player::hasPlayablePromissoryInHand)
+                .findFirst()
+                .ifPresent(pnID -> PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event));
         if (game.isFowMode()) {
             // The note was traded consensually, but playing it is unilateral - listing every planet its
             // owner holds is not part of the bargain. Offer the planets this player already knows about.
@@ -2659,6 +3121,15 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("qhetInfRevival_")
     public static void qhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
+        UnitHolder planetHolder = game.getUnitHolderFromPlanet(planet);
+        if (!player.hasTech("dsqhetinf")
+                || planetHolder == null
+                || planetHolder.getUnitCount(UnitType.Spacedock, player) == 0) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Commando II can only be revived on a planet containing your space dock.");
+            return;
+        }
         if (player.getStasisInfantry() < 1) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getFactionEmoji() + " is out of infantry to revive.");
@@ -2989,9 +3460,20 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("passMalevolencyTo")
     public static void passMalevolencyTo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Integer malevolencyIndex = player.getPromissoryNotes().get("malevolency");
+        if (malevolencyIndex == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you do not have _Malevolency_ in your hand to pass.");
+            return;
+        }
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String id = "naaluHeroSend_" + p2.getFaction() + "_"
-                + player.getPromissoryNotes().get("malevolency");
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve the neighbor, please pass _Malevolency_ manually.");
+            return;
+        }
+        String id = "naaluHeroSend_" + p2.getFaction() + "_" + malevolencyIndex;
         ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, event);
     }
 
@@ -3809,6 +4291,14 @@ public final class ButtonHelperFactionSpecific {
                     event.getMessageChannel(), "Could not find that action, so no action card was added/lost.");
             return;
         }
+        if (XinTechHandler.hasAstromanticCloakSteel(player2)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you cannot forcibly take " + player2.getRepresentationNoPing() + "'s"
+                            + " Action Cards because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         String ident2 = player2.getRepresentation();
         String message2 = player.getRepresentationUnfogged() + " took action card #" + acNum + " from " + ident2 + ".";
         String acID = null;
@@ -4344,12 +4834,16 @@ public final class ButtonHelperFactionSpecific {
                 return true;
             }
         }
-        for (Player p2 : game.getRealPlayersNNeutral()) {
+        for (Player p2 : game.getRealPlayersNDummies()) {
             if (p2 == player) {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
                 return false;
+            }
+
+            if (!game.getRealAndEliminatedPlayers().contains(p2)) {
+                continue;
             }
             Tile hs = game.getTile(AliasHandler.resolveTile(p2.getFaction()));
             if (hs == null) {

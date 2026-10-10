@@ -126,8 +126,10 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
         eb.setDescription(sb.toString());
 
         // Image
-        eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
-                + imagePath + "?raw=true");
+        eb.setThumbnail(
+                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + imagePath
+                        + "?raw=true",
+                id);
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliasList());
         return eb.build();

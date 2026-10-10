@@ -29,8 +29,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -38,6 +39,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.BlueReverieHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
@@ -63,6 +65,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
@@ -92,6 +95,7 @@ public class PlayerTechService {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
+        BlueReverieHelper.checkXinHarmony(game, player);
         if (gainedTech) {
             WhiteTfUnitHandler.offerMechRemoval(event, game, player, techID);
         }
@@ -821,10 +825,12 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
+        BlueReverieHelper.checkXinHarmony(game, player);
         NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
+            VyserixLeaderHandler.resolveCommanderOnResearch(game, player, techM);
         }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
@@ -923,6 +929,9 @@ public class PlayerTechService {
             message.append(" - This tech will be automatically removed at the end of the next status phase");
         }
         if (isResearch) {
+            if (techM.getFirstType() == TechnologyType.UNITUPGRADE) {
+                CommanderUnlockCheckService.checkPlayer(player, "dihmohn");
+            }
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         }
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
@@ -978,7 +987,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum", "netrunners");
+                player, "jolnar", "nekro", "mirveda", "kryxos", "arcanum", "netrunners");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1

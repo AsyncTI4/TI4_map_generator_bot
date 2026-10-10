@@ -126,3 +126,16 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   AI needs from inside `ti4.ai` (polling `ManagedGame`, diffing game state, pressing the
   real buttons) over adding hooks to engine code; if a seam is truly needed, keep it a
   one-liner or a small generic improvement and add it to the test's list in the same change.
+
+### Testing of new functionality and/or bug fixes
+The repo includes a testbed: a developer-only feature for testing on a live Discord dev bot
+run by the developer. It sets up games with virtual seats and drives them through JSON
+scripts, presets and shortcuts under `src/main/resources/data/testbed/`. See
+[DEVELOPER_TESTBED.md](DEVELOPER_TESTBED.md) and [TESTBED_AGENT_GUIDE.md](TESTBED_AGENT_GUIDE.md).
+
+- Do not create or edit testbed scripts, presets or shortcuts unless the developer explicitly
+  asks for it, or a private instruction set from the developer allows it.
+- You may suggest that a change would benefit from a testbed check.
+- This rule covers only the testbed. Writing JUnit tests in `src/test/java` and running the
+  normal Maven build (including `TestBedDataTest`) are always allowed and encouraged.
+

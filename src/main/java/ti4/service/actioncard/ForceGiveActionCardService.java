@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
@@ -15,6 +16,14 @@ import ti4.service.emoji.CardEmojis;
 public class ForceGiveActionCardService {
 
     public static void sendGiveACButtons(Player receiver, Player giver, Game game, String prompt) {
+        if (XinTechHandler.hasAstromanticCloakSteel(giver)) {
+            MessageHelper.sendMessageToChannel(
+                    receiver.getCorrectChannel(),
+                    receiver.getRepresentation()
+                            + ", you cannot forcibly take " + giver.getRepresentationNoPing() + "'s"
+                            + " Action Cards because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         for (var entry : giver.getActionCards().entrySet()) {
             String acName = Mapper.getActionCard(entry.getKey()).getName();

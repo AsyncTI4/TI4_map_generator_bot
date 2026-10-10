@@ -83,8 +83,15 @@ public final class PositionMapper {
                 .orElse(backup);
     }
 
+    public static boolean isTilePositionValid(Game game, String position) {
+        return isTilePositionValid(position) && (game.isFowMode() || !BoardPosition.isBoardPosition(position));
+    }
+
     public static boolean isTilePositionValid(String position) {
-        return tileImageCoordinates.getProperty(position) != null;
+        return tileImageCoordinates.getProperty(position) != null
+                || BoardPosition.parse(position)
+                        .map(board -> tileImageCoordinates.getProperty(board.local()) != null)
+                        .orElse(false);
     }
 
     public static Set<String> getTilePositions() {
@@ -101,8 +108,22 @@ public final class PositionMapper {
         return getScaledTilePosition(game, position, x, y, 0);
     }
 
+    public static int layoutRingCount(Game game) {
+        int mainRings = game.getRingCount();
+        if (!game.isFowMode()) {
+            return mainRings;
+        }
+        int boardRings = game.getTileMap().keySet().stream()
+                .map(BoardPosition::parse)
+                .flatMap(Optional::stream)
+                .mapToInt(board -> Integer.parseInt(board.local()) / 100)
+                .max()
+                .orElse(0);
+        return Math.max(mainRings, boardRings);
+    }
+
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
-        int ringCount = game.getRingCount();
+        int ringCount = layoutRingCount(game);
         ringCount = Math.clamp(ringCount, RING_MIN_COUNT, RING_MAX_COUNT);
         if (ringCount == RING_MIN_COUNT) {
             x += HORIZONTAL_TILE_SPACING;
@@ -133,6 +154,10 @@ public final class PositionMapper {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 y -= lower * SPACE_FOR_TILE_HEIGHT;
                 y += fractureYbump;
+                Optional<BoardPosition> board = BoardPosition.parse(position);
+                if (board.isPresent()) {
+                    x -= BoardPosition.ringCompression(board.get().index(), ringCount);
+                }
             }
             return new Point(x, y);
         }
@@ -141,7 +166,15 @@ public final class PositionMapper {
 
     @Nullable
     public static Point getTilePosition(String position) {
-        return getPosition(position, tileImageCoordinates);
+        Optional<BoardPosition> board = BoardPosition.parse(position);
+        if (board.isEmpty()) {
+            return getPosition(position, tileImageCoordinates);
+        }
+        Point local = getPosition(board.get().local(), tileImageCoordinates);
+        if (local != null) {
+            local.translate(BoardPosition.rawOffsetX(board.get().index()), 0);
+        }
+        return local;
     }
 
     private static Point getPosition(String position, Properties positionTileMap) {
@@ -302,6 +335,13 @@ public final class PositionMapper {
      * @return List of tiles adjacent to position in clockwise compass order: [N, NE, SE, S, SW, NW]
      */
     public static List<String> getAdjacentTilePositions(String position) {
+        Optional<BoardPosition> board = BoardPosition.parse(position);
+        if (board.isPresent()) {
+            return getAdjacentTilePositions(board.get().local()).stream()
+                    .map(board.get()::withLocal)
+                    .map(neighbour -> isTilePositionValid(neighbour) ? neighbour : "x")
+                    .toList();
+        }
         String property = tileAdjacencies.getProperty(position);
         if (property == null) {
             return Collections.emptyList();

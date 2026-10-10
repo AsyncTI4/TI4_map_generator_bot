@@ -32,7 +32,7 @@ public class GameStatisticsFilterer {
     public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
-    static final String FOG_FILTER = "is_fog";
+    public static final String FOG_FILTER = "is_fog";
     static final String HOMEBREW_FILTER = "has_homebrew";
     public static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";

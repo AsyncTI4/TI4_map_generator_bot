@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,8 +28,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionLeaderHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -2334,17 +2335,20 @@ public final class ButtonHelperAgents {
             return;
         }
         List<Button> buttons = new ArrayList<>();
+        Set<String> addedPositions = new HashSet<>();
 
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            Tile tile = game.getTileFromPlanet(p.getName());
-            if (tile != null
-                            && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                            && ButtonHelper.checkForTechSkips(game, planet)
-                    || tile.isHomeSystem(game)) {
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile == null || addedPositions.contains(tile.getPosition())) {
+                continue;
+            }
+            boolean techSkipSystemWithoutEnemyShips = !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                    && ButtonHelper.checkForTechSkips(game, planet);
+            if (techSkipSystemWithoutEnemyShips || tile.isHomeSystem(game)) {
+                addedPositions.add(tile.getPosition());
                 buttons.add(Buttons.green(
                         "produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                         tile.getRepresentationForButtons(game, player)));
@@ -2746,11 +2750,12 @@ public final class ButtonHelperAgents {
         return gloryTiles;
     }
 
-    public static List<Button> getSardakkAgentButtons(Game game) {
+    public static List<Button> getSardakkAgentButtons(Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetId = planet.getName();
+            if (!player.getPlanetsAllianceMode().contains(planetId)) continue;
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
 
             String buttonID = "exhaustAgent_sardakkagent_" + game.getActiveSystem() + "_" + planetId;

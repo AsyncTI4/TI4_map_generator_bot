@@ -97,7 +97,7 @@ public final class GMService {
         return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
     }
 
-    private static TextChannel gmRoomOrNull(Game game) {
+    public static TextChannel gmRoomOrNull(Game game) {
         List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? null : channels.getFirst();
     }

@@ -58,7 +58,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
@@ -3696,6 +3696,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @JsonIgnore
     public void setStoredValue(String key, String val) {
+        if (StringUtils.isBlank(val)) {
+            removeStoredValue(key);
+            return;
+        }
         String safeKey = StringHelper.escape(key);
         getStoredValueMap().put(safeKey, StringHelper.escape(val));
     }
@@ -3723,19 +3727,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
         Collections.addAll(vs, vals);
-        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
-        getStoredValueMap().put(safeKey, ls);
+        putStoredList(safeKey, vs);
     }
 
     public void removeFromStoredList(String key, String... vals) {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
         for (String v : vals) vs.remove(v);
-        if (vs.isEmpty()) {
+        putStoredList(safeKey, vs);
+    }
+
+    private void putStoredList(String safeKey, List<String> values) {
+        String ls = String.join("|", values.stream().map(StringHelper::escape).toList());
+        if (ls.isEmpty()) {
             getStoredValueMap().remove(safeKey);
             return;
         }
-        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
         getStoredValueMap().put(safeKey, ls);
     }
 

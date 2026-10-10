@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +33,8 @@ public record MapSegment(
         CIRCLE,
         CLUSTER,
         AUTO,
-        FRACTURE
+        FRACTURE,
+        BOARD
     }
 
     public static final int MAX_RADIUS = 9;
@@ -43,8 +46,10 @@ public record MapSegment(
     private static final String DEFAULT_KEY = "fowMapSegmentDefault";
     private static final String AUTO_KEY = "fowMapAutoSectors";
     private static final String GAP_KEY = "fowMapSegmentGap";
+    private static final String PIN_KEY = "fowMapSectorNames";
     private static final String CLUSTER_TOKEN = "c";
     private static final Pattern NAME_PATTERN = Pattern.compile("[a-z0-9-]{1,20}");
+    private static final Pattern BOARD_NAME_PATTERN = Pattern.compile("board-[a-g]");
     private static final Set<String> CORNER_POSITIONS = Set.of("tl", "tr", "bl", "br");
     private static final List<String> FRACTURE_POSITIONS =
             IntStream.rangeClosed(1, 25).mapToObj(i -> "frac" + i).toList();
@@ -57,12 +62,53 @@ public record MapSegment(
         return new MapSegment(name, centre, radiusCap, Kind.CLUSTER, null);
     }
 
+    public record Dormant(String name, @Nullable String mergedInto) {}
+
+    private record Pin(String name, Set<String> positions) {}
+
+    private static List<Pin> pins(Game game) {
+        String stored = game.getStoredValue(PIN_KEY);
+        if (StringUtils.isBlank(stored)) {
+            return List.of();
+        }
+        return Arrays.stream(stored.split(";"))
+                .map(MapSegment::parsePin)
+                .flatMap(Optional::stream)
+                .toList();
+    }
+
+    private static Optional<Pin> parsePin(String entry) {
+        String name = StringUtils.substringBefore(entry, "=");
+        Set<String> positions = Arrays.stream(
+                        StringUtils.substringAfter(entry, "=").split(","))
+                .map(String::trim)
+                .filter(position -> PositionMapper.getTilePosition(position) != null)
+                .collect(Collectors.toSet());
+        if (!isValidName(name) || isReservedName(name) || positions.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Pin(name, positions));
+    }
+
+    private static void savePins(Game game, List<Pin> pins) {
+        game.setStoredValue(
+                PIN_KEY,
+                pins.stream()
+                        .map(pin -> pin.name() + "="
+                                + pin.positions().stream()
+                                        .sorted(MapFrame.POSITION_ORDER)
+                                        .collect(Collectors.joining(",")))
+                        .collect(Collectors.joining(";")));
+    }
+
     public static boolean isValidName(@Nullable String name) {
         return name != null && NAME_PATTERN.matcher(name).matches();
     }
 
     public static boolean isReservedName(String name) {
-        return MAIN.equals(name) || FRACTURE.equals(name);
+        return MAIN.equals(name)
+                || FRACTURE.equals(name)
+                || BOARD_NAME_PATTERN.matcher(name).matches();
     }
 
     // TODO: clusters are recomputed on every call (several per render); cache per game keyed on occupied positions
@@ -74,6 +120,7 @@ public record MapSegment(
         if (isAutoSectors(game)) {
             segments.addAll(autoSectors(game, segments));
         }
+        segments.addAll(boardSegments(game, segments));
         fractureSegment(game).ifPresent(segments::add);
         return segments;
     }
@@ -117,6 +164,37 @@ public record MapSegment(
         return position.startsWith("frac");
     }
 
+    public static boolean isDetachedPosition(Game game, String position) {
+        if (isFracturePosition(position)) {
+            return isFractureSeparate(game);
+        }
+        return game.isFowMode() && BoardPosition.isBoardPosition(position);
+    }
+
+    private static List<MapSegment> boardSegments(Game game, List<MapSegment> named) {
+        if (!game.isFowMode()) {
+            return List.of();
+        }
+        Map<Character, Set<String>> positionsByBoard = new TreeMap<>();
+        for (String position : game.getTileMap().keySet()) {
+            boolean covered =
+                    named.stream().anyMatch(segment -> segment.positions().contains(position));
+            BoardPosition.parse(position)
+                    .filter(board -> !covered)
+                    .ifPresent(board -> positionsByBoard
+                            .computeIfAbsent(board.board(), key -> new HashSet<>())
+                            .add(position));
+        }
+        return positionsByBoard.entrySet().stream()
+                .map(entry -> new MapSegment(
+                        BoardPosition.defaultSegmentName(entry.getKey()),
+                        entry.getKey() + "000",
+                        0,
+                        Kind.BOARD,
+                        entry.getValue()))
+                .toList();
+    }
+
     private static Optional<MapSegment> fractureSegment(Game game) {
         if (!game.isFowMode() || !game.getFowOption(FOWOption.FRACTURE_SEPARATE_MAP) && !isAutoSectors(game)) {
             return Optional.empty();
@@ -130,20 +208,59 @@ public record MapSegment(
     }
 
     private static List<MapSegment> autoSectors(Game game, List<MapSegment> named) {
-        List<MapSegment> sectors = new ArrayList<>();
         Set<String> takenNames = new HashSet<>(Set.of(MAIN, FRACTURE));
         named.forEach(segment -> takenNames.add(segment.name()));
-        Set<String> placed = placedGridPositions(game);
-        for (Set<String> cluster : MapFrame.clusters(placed, gap(game) + 1, adjacencyLinks(game, placed))) {
-            boolean coveredByNamedSegment =
-                    named.stream().anyMatch(segment -> !Collections.disjoint(segment.positions(), cluster));
-            if (!coveredByNamedSegment) {
-                String name = autoSectorName(game, cluster, takenNames);
-                takenNames.add(name);
-                sectors.add(new MapSegment(name, "", 0, Kind.AUTO, cluster));
-            }
+        List<Pin> pins = pins(game);
+        pins.forEach(pin -> takenNames.add(pin.name()));
+        List<Pin> usablePins = pins.stream()
+                .filter(pin ->
+                        named.stream().noneMatch(segment -> segment.name().equals(pin.name())))
+                .toList();
+        List<Set<String>> clusters = uncoveredClusters(game, named);
+        Map<Integer, Pin> pinByCluster = assignPins(clusters, usablePins);
+        List<MapSegment> sectors = new ArrayList<>();
+        for (int index = 0; index < clusters.size(); index++) {
+            Set<String> cluster = clusters.get(index);
+            Pin pin = pinByCluster.get(index);
+            String name = pin != null ? pin.name() : autoSectorName(game, cluster, takenNames);
+            takenNames.add(name);
+            sectors.add(new MapSegment(name, "", 0, Kind.AUTO, cluster));
         }
         return sectors;
+    }
+
+    private static List<Set<String>> uncoveredClusters(Game game, List<MapSegment> named) {
+        Set<String> placed = placedGridPositions(game);
+        return MapFrame.clusters(placed, gap(game) + 1, adjacencyLinks(game, placed)).stream()
+                .filter(cluster ->
+                        named.stream().allMatch(segment -> Collections.disjoint(segment.positions(), cluster)))
+                .toList();
+    }
+
+    private static Map<Integer, Pin> assignPins(List<Set<String>> clusters, List<Pin> pins) {
+        record Match(int pin, int cluster, long overlap) {}
+        List<Match> matches = new ArrayList<>();
+        for (int pin = 0; pin < pins.size(); pin++) {
+            for (int cluster = 0; cluster < clusters.size(); cluster++) {
+                long overlap = overlap(pins.get(pin).positions(), clusters.get(cluster));
+                if (overlap > 0) {
+                    matches.add(new Match(pin, cluster, overlap));
+                }
+            }
+        }
+        matches.sort(Comparator.comparingLong(Match::overlap).reversed().thenComparingInt(Match::pin));
+        Map<Integer, Pin> pinByCluster = new HashMap<>();
+        Set<Integer> usedPins = new HashSet<>();
+        for (Match match : matches) {
+            if (!pinByCluster.containsKey(match.cluster()) && usedPins.add(match.pin())) {
+                pinByCluster.put(match.cluster(), pins.get(match.pin()));
+            }
+        }
+        return pinByCluster;
+    }
+
+    private static long overlap(Set<String> a, Set<String> b) {
+        return a.stream().filter(b::contains).count();
     }
 
     private static String autoSectorName(Game game, Set<String> cluster, Set<String> takenNames) {
@@ -180,7 +297,9 @@ public record MapSegment(
     }
 
     private static void link(Map<String, Set<String>> links, Set<String> placed, String from, String to) {
-        if (!placed.contains(from) || !placed.contains(to)) {
+        if (!placed.contains(from)
+                || !placed.contains(to)
+                || BoardPosition.boardOf(from) != BoardPosition.boardOf(to)) {
             return;
         }
         links.computeIfAbsent(from, key -> new HashSet<>()).add(to);
@@ -218,10 +337,90 @@ public record MapSegment(
         List<MapSegment> segments = new ArrayList<>(stored(game));
         boolean removed = segments.removeIf(existing -> existing.name().equals(name));
         save(game, segments);
+        List<Pin> pins = new ArrayList<>(pins(game));
+        removed |= pins.removeIf(pin -> pin.name().equals(name));
+        savePins(game, pins);
         if (name.equals(game.getStoredValue(DEFAULT_KEY))) {
             game.removeStoredValue(DEFAULT_KEY);
         }
         return removed;
+    }
+
+    @Nullable
+    public static String rename(Game game, String from, String to) {
+        if (!isValidName(to)) {
+            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
+        }
+        if (isReservedName(from) || isReservedName(to)) {
+            return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are built in and cannot be renamed or"
+                    + " reused.";
+        }
+        List<MapSegment> live = all(game);
+        if (from.equals(to) || live.stream().anyMatch(segment -> segment.name().equals(to))) {
+            return "There is already a segment called `" + to + "`.";
+        }
+        Optional<MapSegment> current =
+                live.stream().filter(segment -> segment.name().equals(from)).findFirst();
+        List<Pin> pins = new ArrayList<>(pins(game));
+        boolean pinned = pins.stream().anyMatch(pin -> pin.name().equals(from));
+        if (current.isEmpty() && !pinned) {
+            return "No segment called `" + from + "`.";
+        }
+        boolean storedSegment = current.isPresent() && current.get().kind() != Kind.AUTO;
+        if (!storedSegment && !pinned && pins.size() >= MAX_SEGMENTS) {
+            return "This game already has the maximum of " + MAX_SEGMENTS + " renamed sectors.";
+        }
+        pins.removeIf(pin -> pin.name().equals(to));
+        if (storedSegment) {
+            renameStored(game, from, to);
+        } else {
+            Set<String> positions = current.isPresent()
+                    ? current.get().positions()
+                    : pins.stream()
+                            .filter(pin -> pin.name().equals(from))
+                            .findFirst()
+                            .orElseThrow()
+                            .positions();
+            pins.replaceAll(pin -> pin.name().equals(from) ? new Pin(to, positions) : pin);
+            if (!pinned) {
+                pins.add(new Pin(to, positions));
+            }
+        }
+        savePins(game, pins);
+        if (from.equals(game.getStoredValue(DEFAULT_KEY))) {
+            setDefault(game, to);
+        }
+        return null;
+    }
+
+    public static List<Dormant> dormantNames(Game game) {
+        if (!isAutoSectors(game)) {
+            return List.of();
+        }
+        List<MapSegment> live = all(game);
+        return pins(game).stream()
+                .filter(pin -> live.stream().noneMatch(segment -> segment.name().equals(pin.name())))
+                .map(pin -> new Dormant(pin.name(), largestOverlap(live, pin.positions())))
+                .toList();
+    }
+
+    @Nullable
+    private static String largestOverlap(List<MapSegment> segments, Set<String> positions) {
+        return segments.stream()
+                .filter(segment -> overlap(segment.positions(), positions) > 0)
+                .max(Comparator.comparingLong(segment -> overlap(segment.positions(), positions)))
+                .map(MapSegment::name)
+                .orElse(null);
+    }
+
+    private static void renameStored(Game game, String from, String to) {
+        save(
+                game,
+                stored(game).stream()
+                        .map(segment -> segment.name().equals(from)
+                                ? new MapSegment(to, segment.centre(), segment.radius(), segment.kind(), null)
+                                : segment)
+                        .toList());
     }
 
     public static Optional<MapSegment> defaultSegment(Game game) {
@@ -249,7 +448,7 @@ public record MapSegment(
                 .toList();
     }
 
-    static Set<String> knownPositions(Game game, Player player) {
+    public static Set<String> knownPositions(Game game, Player player) {
         Set<String> known = new HashSet<>(FoWHelper.getTilePositionsToShow(game, player));
         new HashMap<>(player.getFogTiles()).forEach((position, tileId) -> {
             if (!"0b".equals(tileId)
@@ -268,6 +467,52 @@ public record MapSegment(
         return kind == Kind.FRACTURE;
     }
 
+    public boolean isDetached() {
+        return kind == Kind.FRACTURE || kind == Kind.BOARD;
+    }
+
+    public String displayName(Game game) {
+        Set<Character> boards = positions().stream().map(BoardPosition::boardOf).collect(Collectors.toSet());
+        if (boards.size() != 1) {
+            return name;
+        }
+        char board = boards.iterator().next();
+        if (board == BoardPosition.MAIN_BOARD) {
+            return GalaxyNames.isMultiGalaxy(game) ? mainDisplayName(game) + " / " + name : name;
+        }
+        String galaxy = GalaxyNames.name(game, GalaxyNames.idOf(board));
+        return kind == Kind.BOARD ? galaxy : galaxy + " / " + name;
+    }
+
+    public static String mainDisplayName(Game game) {
+        return GalaxyNames.isMultiGalaxy(game) ? GalaxyNames.name(game, GalaxyNames.MAIN_ID) : MAIN;
+    }
+
+    public static boolean mainMapVisibleTo(Game game, @Nullable Player viewer) {
+        Set<String> uncovered = uncoveredMainPositions(game);
+        if (viewer == null) {
+            return !uncovered.isEmpty();
+        }
+        return !Collections.disjoint(uncovered, knownPositions(game, viewer));
+    }
+
+    public static boolean isOnUncoveredMainMap(Game game, String position) {
+        return uncoveredMainPositions(game).contains(position);
+    }
+
+    static Set<String> uncoveredMainPositions(Game game) {
+        return uncoveredMainPositions(game, all(game));
+    }
+
+    static Set<String> uncoveredMainPositions(Game game, List<MapSegment> segments) {
+        return game.getTileMap().keySet().stream()
+                .filter(position -> !isDetachedPosition(game, position))
+                .filter(position -> !CORNER_POSITIONS.contains(position.toLowerCase()))
+                .filter(position -> segments.stream()
+                        .noneMatch(segment -> segment.positions().contains(position)))
+                .collect(Collectors.toSet());
+    }
+
     public boolean isDerivedFromMap() {
         return kind == Kind.CLUSTER || kind == Kind.AUTO;
     }
@@ -279,6 +524,9 @@ public record MapSegment(
     public String describe() {
         return switch (kind) {
             case FRACTURE -> "`" + name + "`: the Fracture (built in, from the FoW option)";
+            case BOARD ->
+                "`" + name + "`: extra board " + Character.toUpperCase(centre.charAt(0)) + " ("
+                        + positions().size() + " systems)";
             case AUTO -> "`" + name + "`: automatic sector (" + positions().size() + " systems)";
             case CLUSTER ->
                 "`" + name + "`: cluster around " + centre + (radius > 0 ? ", at most radius " + radius : "")

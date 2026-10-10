@@ -151,7 +151,7 @@
     },
     {
         "alias": "dsxingsteel",
-        "name": "Astromantic Cloak",
+        "name": "Astromantic Cloak (Steel)",
         "types": [
             "BIOTIC"
         ],
@@ -162,7 +162,7 @@
     },
     {
         "alias": "dsxingstar",
-        "name": "Astromantic Cloak",
+        "name": "Astromantic Cloak (Star)",
         "types": [
             "BIOTIC"
         ],
@@ -184,7 +184,7 @@
     },
     {
         "alias": "dsxinysteel",
-        "name": "Veiled Networking",
+        "name": "Veiled Networking (Steel)",
         "types": [
             "CYBERNETIC"
         ],
@@ -195,7 +195,7 @@
     },
     {
         "alias": "dsxinystar",
-        "name": "Veiled Networking",
+        "name": "Veiled Networking (Star)",
         "types": [
             "CYBERNETIC"
         ],
@@ -249,5 +249,213 @@
         "faction": "toldar",
         "source": "blue_reverie",
         "text": "During each round of combat, you may cancel 1 hit your units produced to cancel up to 1 hit your opponent's units produced. At any time, you may exhaust this card to cancel 1 hit produced against your units."
+    },
+    {
+        "alias": "aws",
+        "name": "\u00c2tman-Weave Supressors",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "source": "blue_reverie",
+        "text": "At the end of a round of ground combat, if your units participating in that combat did not stop coexisting during this action, you may exhaust this card to have each of those units enter coexistence. That combat ends in a draw."
+    },
+    {
+        "alias": "rgs",
+        "name": "RAM-Gate System",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "source": "blue_reverie",
+        "text": "Up to 1 ship in each system that contains 1 of your command tokens does not count against your fleet pool.\n\nYour command tokens in systems that contain your ships have a capacity value of 2 as if they were your units."
+    },
+    {
+        "alias": "ee",
+        "name": "Ecological Engineering",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "source": "blue_reverie",
+        "text": "The minimum resource and influence values of each planet you control are 1 instead of 0.\n\nPlanets you control that have technology specialties have PLANETARY SHIELD as if they were units."
+    },
+    {
+        "alias": "nfc",
+        "name": "Near-Field Cloaking",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "source": "blue_reverie",
+        "text": "When you win a combat you may either exhaust this card to take one of your opponent's action cards, at random, or ready this card."
+    },
+    {
+        "alias": "ve",
+        "name": "Viral Entanglement",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "source": "blue_reverie",
+        "text": "Before you resolve the secondary ability of a strategy card, you may exhaust this card and spend 1 token from your strategy pool and destroy 2 of oyur infantry on the game board to resolve the secondary ability of another strategy card instead.\n\nYou cannot resolve the primary ability of a strategy card during this ability."
+    },
+    {
+        "alias": "fsd",
+        "name": "Fractal Spike Drives",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "source": "blue_reverie",
+        "text": "Units your ships transport can be moved out of systems that contain your command tokens. You may treat wormholes as ingress tokens or gravity rifts."
+    },
+    {
+        "alias": "nc",
+        "name": "Networked Constructors",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "source": "blue_reverie",
+        "text": "Your command tokens in systems have PRODUCTION 1 as if they were your units. After a player activates a system, you may exhaust this card to place 1 structure from your reinforcements on a planet you control in that system."
+    },
+    {
+        "alias": "sfg",
+        "name": "Stasis Field Generators",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "source": "blue_reverie",
+        "text": "Hits you produce with unit abilities cannot be canceled. Capture units destroyed by your unit abilities.\n\nAfter you roll a combat or ability die you may return 1 of your captured units to apply +1 to the result."
+    },
+    {
+        "alias": "dxa_br",
+        "name": "Daxcive Animators",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "dxa",
+        "text": "At the start of a ground combat you are participating in, you may exhaust this card to place 1 infantry on that planet.\nAfter you gain a technology or win a ground combat, ready this card."
+    },
+    {
+        "alias": "gd_br",
+        "name": "Gravity Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "gd",
+        "text": "After you activate a system, you may exhaust this card to apply +1 to the move value of 1 of your ships during this tactical action."
+    },
+    {
+        "alias": "gls_br",
+        "name": "Graviton Laser System",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "homebrewReplacesID": "gls",
+        "source": "blue_reverie",
+        "text": "After 1 or more of your units make a SPACE CANNON roll, you may exhaust this card; if you do, hits produced by that roll must be assigned to non-fighter, non-infantry units, if able."
+    },
+    {
+        "alias": "sar_br",
+        "name": "Self Assembly Routines",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "homebrewReplacesID": "sar",
+        "source": "blue_reverie",
+        "text": "After you produce 1 or more units in a system, you may place 1 mech from your reinforcements in that system.\nAfter 1 of your mechs is destroyed during ground combat, you may gain 1 trade good or exhaust this card to produce 1 hit against your opponent’s units."
+    },
+    {
+        "alias": "bio_br",
+        "name": "Bioplasmosis",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "arborec",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "bio",
+        "text": "At the end of your turn, you may move up to 2 infantry from any planet you control to a planet you control in the same or an adjacent system."
+    },
+    {
+        "alias": "pm_br",
+        "name": "Production Biomes",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "hacan",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "pm",
+        "text": "Apply +2 to the PRODUCTION value of each of your units with PRODUCTION.\nWhen 1 or more of your units use PRODUCTION, you may spend 1 command token from your command sheet to gain 4 trade goods and choose another player to gain 2 trade goods."
+    },
+    {
+        "alias": "scc_br",
+        "name": "Spatial Conduit Cyclinder",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "faction": "jolnar",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "scc",
+        "text": "During tactical actions in systems that contain your units and no other player's units, you may treat the active system as adjacent to all other systems that contain 1 or more of your units."
+    },
+    {
+        "alias": "executiveorder_br",
+        "name": "Executive Order",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "keleres",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "executiveorder",
+        "text": "ACTION: Exhaust this card to draw and reveal the top or bottom card of the agenda deck. Then, players vote on that agenda as if you were the speaker; you vote first on that agenda."
+    },
+    {
+        "alias": "is_br",
+        "name": "Inheritance Systems",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "l1z1x",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "is",
+        "text": "You may exhaust this card when you research a technology to ignore all of that technology's prerequisites, or gain 1 command token."
+    },
+    {
+        "alias": "l4_br",
+        "name": "L4 Disruptors",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "letnev",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "l4",
+        "text": "During invasion, other players cannot use SPACE CANNON against your units.\nDuring the action phase, you may exhaust this card to repair each of your units on the game board."
+    },
+    {
+        "alias": "lgf_br",
+        "name": "Lazax Gate Folding",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "faction": "winnu",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "lgf",
+        "text": "During your tactical actions, treat systems that contain legendary planets you do not control as if they contain both an alpha and beta wormhole.\nWhen you pass, place 2 infantry from your reinforcements into coexistence on Mecatol Rex, if able."
     }
 ]

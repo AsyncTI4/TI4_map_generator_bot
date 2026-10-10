@@ -151,6 +151,8 @@ public class GameProperties {
     private @ExportableField boolean feastOrFamineMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
+    private @ExportableField boolean oplusplusRegularMode;
+    private @ExportableField boolean oplusplusCouncilMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean veiledHeartMode;
     private @ExportableField boolean limitedWhispersMode;

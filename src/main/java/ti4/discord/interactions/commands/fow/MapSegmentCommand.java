@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.image.MapSegment;
 import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
@@ -23,6 +24,7 @@ class MapSegmentCommand extends GameStateSubcommand {
     private static final String MAKE_DEFAULT = "make_default";
     private static final String AUTO_SECTORS = "auto_sectors";
     private static final String GAP = "gap";
+    private static final String RENAME = "rename";
 
     MapSegmentCommand() {
         super(
@@ -43,6 +45,7 @@ class MapSegmentCommand extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.INTEGER, GAP, "Empty hexes a cluster may jump (0-" + MapSegment.MAX_GAP + ")")
                         .setRequiredRange(0, MapSegment.MAX_GAP));
+        addOptions(new OptionData(OptionType.STRING, RENAME, "New name for the segment given in name"));
     }
 
     @Override
@@ -50,6 +53,10 @@ class MapSegmentCommand extends GameStateSubcommand {
         Game game = getGame();
         if (!game.isFowMode() || !game.getPlayersWithGMRole().contains(getPlayer())) {
             MessageHelper.replyToMessage(event, "Only the GM of a Fog of War game can manage map segments.");
+            return;
+        }
+        if (!FoWHelper.canSeeWholeMap(game, event)) {
+            MessageHelper.replyToMessage(event, "This shows map layout. Use it in the GM room.");
             return;
         }
         List<String> replies = new ArrayList<>();
@@ -81,6 +88,13 @@ class MapSegmentCommand extends GameStateSubcommand {
         if (event.getOption(REMOVE, false, OptionMapping::getAsBoolean)) {
             boolean removed = MapSegment.remove(game, name);
             replies.add(removed ? "Removed segment `" + name + "`." : "No segment called `" + name + "`.");
+            return replies;
+        }
+        String rename = event.getOption(RENAME, null, OptionMapping::getAsString);
+        if (rename != null) {
+            String newName = rename.trim();
+            String problem = MapSegment.rename(game, name, newName);
+            replies.add(problem != null ? problem : "Renamed `" + name + "` to `" + newName + "`.");
             return replies;
         }
         String centre = event.getOption(Constants.POSITION, null, OptionMapping::getAsString);
@@ -130,7 +144,8 @@ class MapSegmentCommand extends GameStateSubcommand {
             return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
         }
         if (MapSegment.isReservedName(name)) {
-            return "`" + MapSegment.MAIN + "` and `" + MapSegment.FRACTURE + "` are reserved segment names.";
+            return "`" + MapSegment.MAIN + "`, `" + MapSegment.FRACTURE
+                    + "` and `board-a` to `board-g` are reserved segment names.";
         }
         if (radius == null && !cluster) {
             return "Give a `radius`, or set `cluster` to true.";
@@ -163,6 +178,24 @@ class MapSegmentCommand extends GameStateSubcommand {
                         .map(segment ->
                                 "- " + segment.describe() + (segment.name().equals(defaultName) ? " (default)" : ""))
                         .collect(Collectors.joining("\n"))
+                + hiddenNames(game)
                 + "\n" + settings;
+    }
+
+    private static String hiddenNames(Game game) {
+        return MapSegment.dormantNames(game).stream()
+                .map(MapSegmentCommand::describeDormant)
+                .map(line -> "\n" + line)
+                .collect(Collectors.joining());
+    }
+
+    private static String describeDormant(MapSegment.Dormant dormant) {
+        String name = "`" + dormant.name() + "`";
+        if (dormant.mergedInto() == null) {
+            return "Hidden name " + name + ": its systems are not on the map. Remove " + name + " to drop it.";
+        }
+        String mergedInto = "`" + dormant.mergedInto() + "`";
+        return "Hidden name " + name + " (merged into " + mergedInto + "): rename " + mergedInto + " to " + name
+                + " to use it, or remove " + name + ".";
     }
 }

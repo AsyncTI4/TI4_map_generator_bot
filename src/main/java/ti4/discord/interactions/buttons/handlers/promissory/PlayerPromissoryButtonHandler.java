@@ -23,17 +23,28 @@ class PlayerPromissoryButtonHandler {
     @ButtonHandler("resolvePNPlay_")
     public static void resolvePNPlay(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pnID = buttonID.replace("resolvePNPlay_", "");
-
+        String tech = null;
         if (pnID.contains("ra_")) {
-            String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
-            TechnologyModel techModel = Mapper.getTech(tech);
+            tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
             pnID = pnID.replace("_" + tech, "");
+        }
+
+        if (!canPlayFromHand(player, pnID)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event,
+                    "You can't play this promissory note: it has already been played, is no longer in your hand,"
+                            + " or is your own.");
+            return;
+        }
+
+        if (tech != null) {
+            TechnologyModel techModel = Mapper.getTech(tech);
             String message = player.getRepresentationNoPing() + " acquired the technology "
                     + techModel.getRepresentation(false) + " via _Research Agreement_.";
             player.addTech(tech);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);
@@ -49,5 +60,11 @@ class PlayerPromissoryButtonHandler {
                     player.getCardsInfoThread(),
                     "Combat modifier will be applied next time you push the \"Combat Roll\" button.");
         }
+    }
+
+    private static boolean canPlayFromHand(Player player, String pnID) {
+        String cardID = "bmfNotHand".equalsIgnoreCase(pnID) ? "bmf" : pnID;
+        return player.hasPlayablePromissoryInHand(cardID)
+                && !player.getPromissoryNotesInPlayArea().contains(cardID);
     }
 }

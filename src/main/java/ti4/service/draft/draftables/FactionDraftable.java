@@ -494,15 +494,12 @@ public class FactionDraftable extends SinglePickDraftable {
                 }
             }
 
-            boolean first = true;
             List<MessageEmbed> embeds =
                     factions.stream().map(FactionModel::fancyEmbed).toList();
-            for (MessageEmbed e : embeds) {
-                String message = "";
-                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions.";
-                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                first = false;
-            }
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", here is an overview of the factions.",
+                    embeds);
             Game game = player.getGame();
             if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
                 List<MessageEmbed> teEmbeds = new ArrayList<>();
@@ -515,14 +512,11 @@ public class FactionDraftable extends SinglePickDraftable {
                         teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
                     }
                 }
-                first = true;
-                for (MessageEmbed e : teEmbeds) {
-                    String message = "";
-                    if (first)
-                        message = player.getRepresentationUnfogged()
-                                + ", here is an overview of the faction breakthroughs.";
-                    MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                    first = false;
+                if (!teEmbeds.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithEmbeds(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.",
+                            teEmbeds);
                 }
             }
         }

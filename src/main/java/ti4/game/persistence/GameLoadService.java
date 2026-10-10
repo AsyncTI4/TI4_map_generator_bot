@@ -59,6 +59,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.tactical.TacticalActionDisplacementService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
@@ -510,6 +511,7 @@ class GameLoadService {
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
                             mapper.readValue(info, new TypeReference<>() {});
+                    TacticalActionDisplacementService.removeEmptyDisplacement(displacedUnits);
                     game.setTacticalActionDisplacement(displacedUnits);
                 }
                 case Constants.FOW_OPTIONS -> {
@@ -773,7 +775,7 @@ class GameLoadService {
         while (mapdata.hasMoreTokens()) {
             StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
             String id = entry.nextToken();
-            String val = entry.nextToken();
+            String val = entry.hasMoreTokens() ? entry.nextToken() : "";
             data.put(id, val);
         }
         return data;
@@ -1136,6 +1138,7 @@ class GameLoadService {
                     String filter = tokenizer.nextToken();
                     player.setFogFilter(filter);
                 }
+                case Constants.FOG_GHOST_HEXES -> player.setFogGhostHexes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));

@@ -3,6 +3,8 @@ package ti4.image;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -150,6 +152,87 @@ class MapSegmentTest extends BaseTi4Test {
         assertNotEquals(takenName, segments.get(1).name(), "the automatic sector moved to another name");
     }
 
+    private String sectorAt(String position) {
+        return MapSegment.all(game).stream()
+                .filter(segment -> segment.positions().contains(position))
+                .findFirst()
+                .orElseThrow()
+                .name();
+    }
+
+    @Test
+    void renamingAStoredSegmentKeepsItsShapeAndMovesTheDefault() {
+        MapSegment.put(game, MapSegment.cluster("core", "000", 2));
+        MapSegment.setDefault(game, "core");
+
+        assertNull(MapSegment.rename(game, "core", "home"));
+        assertEquals(List.of(MapSegment.cluster("home", "000", 2)), MapSegment.stored(game));
+        assertEquals("home", MapSegment.defaultSegment(game).orElseThrow().name());
+    }
+
+    @Test
+    void renamedAutomaticSectorKeepsItsNameAsItGrows() {
+        MapSegment.setAutoSectors(game, true);
+        assertNull(MapSegment.rename(game, sectorAt("000"), "home"));
+        assertEquals("home", sectorAt("000"));
+
+        // 201 joins the core to 301; the bigger renamed core keeps its name over the unnamed 301 sector.
+        game.setTile(new Tile("21", "201"));
+        assertEquals(List.of("home"), names());
+        assertTrue(MapSegment.dormantNames(game).isEmpty());
+    }
+
+    @Test
+    void mergedSectorsShowTheBiggerNameAndTheOtherReturnsOnASplit() {
+        MapSegment.setAutoSectors(game, true);
+        MapSegment.rename(game, sectorAt("000"), "home");
+        MapSegment.rename(game, sectorAt("301"), "outpost");
+
+        game.setTile(new Tile("21", "201"));
+        assertEquals(List.of("home"), names());
+        assertEquals(List.of(new MapSegment.Dormant("outpost", "home")), MapSegment.dormantNames(game));
+
+        game.removeTile("201");
+        assertEquals("home", sectorAt("000"));
+        assertEquals("outpost", sectorAt("301"));
+        assertTrue(MapSegment.dormantNames(game).isEmpty());
+    }
+
+    @Test
+    void renamingAMergedSectorToAHiddenNameAbsorbsIt() {
+        MapSegment.setAutoSectors(game, true);
+        MapSegment.rename(game, sectorAt("000"), "home");
+        MapSegment.rename(game, sectorAt("301"), "outpost");
+        game.setTile(new Tile("21", "201"));
+
+        assertNull(MapSegment.rename(game, "home", "outpost"));
+        assertEquals(List.of("outpost"), names());
+        assertTrue(MapSegment.dormantNames(game).isEmpty());
+        assertEquals(1, game.getStoredValue("fowMapSectorNames").split(";").length);
+    }
+
+    @Test
+    void removingARenamedSectorGivesItAnAutomaticNameAgain() {
+        MapSegment.setAutoSectors(game, true);
+        MapSegment.rename(game, sectorAt("000"), "home");
+
+        assertTrue(MapSegment.remove(game, "home"));
+        assertTrue(SectorNames.NAMES.contains(sectorAt("000")));
+    }
+
+    @Test
+    void renameRejectsInvalidReservedAndTakenNames() {
+        MapSegment.setAutoSectors(game, true);
+        String core = sectorAt("000");
+        String outpost = sectorAt("301");
+
+        assertNotNull(MapSegment.rename(game, core, "Bad Name"));
+        assertNotNull(MapSegment.rename(game, core, MapSegment.MAIN));
+        assertNotNull(MapSegment.rename(game, core, outpost));
+        assertNotNull(MapSegment.rename(game, "nothing-here", "home"));
+        assertEquals(core, sectorAt("000"));
+    }
+
     @Test
     void fractureIsABuiltInSegmentOnlyWhenTheOptionIsOn() {
         game.setTile(new Tile("25", "frac1"));
@@ -189,5 +272,48 @@ class MapSegmentTest extends BaseTi4Test {
         game.setFowOption(FOWOption.FRACTURE_SEPARATE_MAP, true);
         assertEquals(Set.of("frac1", "frac2"), positionsOf(MapSegment.FRACTURE));
         assertEquals(1, names().stream().filter(MapSegment.FRACTURE::equals).count());
+    }
+
+    // A map's tiles outside every sector form its own detached view (fog only); a named sector can claim them.
+    @Test
+    void eachMapsLeftoverIsItsOwnDetachedViewInFogOnly() {
+        game.setTile(new Tile("19", "b000"));
+        game.setTile(new Tile("19", "b401"));
+        MapSegment.put(game, new MapSegment("outpost", "b000", 1));
+
+        assertEquals(Set.of("b401"), positionsOf("board-b"));
+        assertTrue(MapSegment.find(game, "board-b").orElseThrow().isDetached());
+        assertTrue(MapSegment.isReservedName("board-b"));
+
+        game.removeTile("b401");
+        assertFalse(names().contains("board-b"), "fully covered by the named sector");
+        game.setTile(new Tile("19", "b401"));
+        game.setFowMode(false);
+        assertFalse(names().contains("board-b"), "no map views outside fog");
+    }
+
+    @Test
+    void automaticSectorsNeverJoinMapsEvenWhenLinked() {
+        MapFrame.positionsWithin("a000", 1).forEach(position -> game.setTile(new Tile("19", position)));
+        game.addCustomAdjacentTiles("000", List.of("a000"));
+        MapSegment.setAutoSectors(game, true);
+
+        assertTrue(MapSegment.all(game).stream()
+                .noneMatch(segment -> segment.positions().contains("000")
+                        && segment.positions().contains("a000")));
+    }
+
+    // Single-galaxy fog games must look exactly as before: no galaxy prefixes, main stays "main".
+    @Test
+    void mainMapSectorsKeepTheirPlainNamesUntilASecondGalaxyExists() {
+        MapSegment.put(game, new MapSegment("home", "000", 1));
+        assertEquals("home", MapSegment.find(game, "home").orElseThrow().displayName(game));
+        assertEquals(MapSegment.MAIN, MapSegment.mainDisplayName(game));
+
+        game.setTile(new Tile("19", "a000"));
+        String mainGalaxy = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+        assertEquals(
+                mainGalaxy + " / home",
+                MapSegment.find(game, "home").orElseThrow().displayName(game));
     }
 }

@@ -20,7 +20,7 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "If you have the Infantry II technology, flip this card and place it on top of Infantry II.",
+        "text": "If you have the Infantry II technology, flip this card and place it on top of Infantry II.\n\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place that unit on this card, otherwise destroy up to 1 infantry unit on this planet. At the end of your turn, place each unit that is on this card on a legendary planet you control.\nCost 1(x2), Combat 7",
         "source": "blue_reverie"
     },
     {
@@ -29,8 +29,8 @@
         "shortName": "Hidden\nVaults",
         "faction": "pharadn",
         "synergy": [
-            "CYBERNETIC",
-            "BIOTIC"
+            "BIOTIC",
+            "CYBERNETIC"
         ],
         "text": "When you explore a planet, you may produce 1 infantry on that planet. At any time, you may exhaust this card to destroy any number of your units on the game board.",
         "source": "blue_reverie"
@@ -41,8 +41,8 @@
         "shortName": "Duranium\nOutfitting",
         "faction": "qhet",
         "synergy": [
-            "WARFARE",
-            "BIOTIC"
+            "BIOTIC",
+            "WARFARE"
         ],
         "text": "At the start of ground combat, choose 1 of your plastic-piece infantry participating in that combat; that plastic-piece unit gains SUSTAIN DAMAGE until the end of that combat.",
         "source": "blue_reverie"
@@ -65,10 +65,10 @@
         "shortName": "Echo\nOperatives",
         "faction": "kaltrim",
         "synergy": [
-            "CYBERNETIC",
-            "PROPULSION"
+            "PROPULSION",
+            "CYBERNETIC"
         ],
-        "text": "When you would return a promissory note to another player, you may exhaust this card to spend 1 token from your strategy pool instead of returning that promissory note. At any time, one of your neighbors may spend 3 influence to repair 1 of your units.",
+        "text": "When you would return a promissory note to another player, you may exhaust this card to spend 1 token from your strategy pool instead of returning that promissory note. At any time, you may return 1 promissory note to another player to repair one of your ships in a system adjacent to that player's units.",
         "source": "blue_reverie"
     },
     {
@@ -77,8 +77,8 @@
         "shortName": "Harmonious\nDiplomacy",
         "faction": "xin",
         "synergy": [
-            "CYBERNETIC",
-            "BIOTIC"
+            "BIOTIC",
+            "CYBERNETIC"
         ],
         "text": "When you are negotiating a transaction, secret objectives can be exchanged as part of that transaction.",
         "source": "blue_reverie"
@@ -89,8 +89,8 @@
         "shortName": "Gravehold",
         "faction": "sarcosa",
         "synergy": [
-            "PROPULSION",
-            "BIOTIC"
+            "BIOTIC",
+            "PROPULSION"
         ],
         "text": "At any time, you may exhaust this card to place a neutral structure into coexistence on a planet that contains your units. The active player controls coexisting neutral structures as their own. Neutral space docks have PRODUCTION 3.",
         "source": "blue_reverie"
@@ -109,7 +109,7 @@
     },
     {
         "alias": "toldarbthonor",
-        "name": "Shameix's Bane",
+        "name": "Shameix's Bane (Honor)",
         "shortName": "Shameix's\nBane",
         "faction": "toldar",
         "synergy": [
@@ -121,7 +121,7 @@
     },
     {
         "alias": "toldarbtdishonor",
-        "name": "Shameix's Bane",
+        "name": "Shameix's Bane (Dishonor)",
         "shortName": "Shameix's\nBane",
         "faction": "toldar",
         "synergy": [

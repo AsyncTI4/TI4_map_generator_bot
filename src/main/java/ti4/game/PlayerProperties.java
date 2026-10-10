@@ -28,6 +28,7 @@ public class PlayerProperties {
     private String decalSet;
     private String notes = "";
     private String fogFilter;
+    private boolean fogGhostHexes = true;
 
     // Channels & IDs
     private @Nullable String roleIDForCommunity;

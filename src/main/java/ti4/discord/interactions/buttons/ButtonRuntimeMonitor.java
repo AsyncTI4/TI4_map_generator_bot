@@ -215,10 +215,10 @@ class ButtonRuntimeMonitor {
                 .max()
                 .orElse(0);
         nameWidth = Math.max(nameWidth, "handler".length());
-        String rowFormat = "%-" + nameWidth + "s %6s %7s %8s %7s%n";
+        String rowFormat = "%-" + nameWidth + "s %6s %7s %8s %7s %8s%n";
 
         StringBuilder table = new StringBuilder();
-        table.append(String.format(rowFormat, "handler", "count", "total", "mean", "p95"));
+        table.append(String.format(rowFormat, "handler", "count", "total", "mean", "p95", "max"));
         for (Map.Entry<String, LatencyHistogram> entry : slowestHandlers) {
             LatencyHistogram histogram = entry.getValue();
             table.append(String.format(
@@ -227,7 +227,8 @@ class ButtonRuntimeMonitor {
                     histogram.count(),
                     formatTotalMillis(histogram.totalMillis()),
                     String.format("%.1fms", histogram.meanMillis()),
-                    histogram.percentileMillis(0.95) + "ms"));
+                    histogram.percentileMillis(0.95) + "ms",
+                    histogram.maxMillis() + "ms"));
         }
         return "\nMost total resolve time:\n```\n" + table + "```";
     }

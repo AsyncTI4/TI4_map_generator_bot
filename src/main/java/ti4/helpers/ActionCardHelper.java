@@ -24,8 +24,9 @@ import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -597,6 +598,9 @@ public class ActionCardHelper {
 
     public static List<Button> getToBeStolenActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
+        if (XinTechHandler.hasAstromanticCloakSteel(player)) {
+            return acButtons;
+        }
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
@@ -2594,6 +2598,14 @@ public class ActionCardHelper {
     }
 
     public static void showAll(Player player, Player player2, Game game) {
+        if (XinTechHandler.hasAstromanticCloakSteel(player) && player != player2) {
+            MessageHelper.sendMessageToChannel(
+                    player2.getCorrectChannel(),
+                    player2.getRepresentation()
+                            + ", you cannot look at " + player.getRepresentationNoPing() + "'s"
+                            + " Action Cards because they have _Astromantic Cloak (Steel)!");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         StringBuilder sa = new StringBuilder();
         sa.append("Your action cards were shown to: ")

@@ -79,7 +79,24 @@ public class FractureService {
             return;
         }
 
-        int result = new Die(0).getResult();
+        // Roll dice: one d10 normally, or two d10s if Cosmic Convergence is active
+        int result;
+        String diceDisplay;
+        if (game.isCosmicConvergenceMode()) {
+            Die die1 = new Die(0);
+            Die die2 = new Die(0);
+            // For display, show both dice; success is if either is 1 or 10
+            diceDisplay = DiceEmojis.getDieEmoji("green", die1.getResult()) + " "
+                    + DiceEmojis.getDieEmoji("green", die2.getResult());
+            boolean isSuccess = (die1.getResult() == 1 || die1.getResult() == 10)
+                    || (die2.getResult() == 1 || die2.getResult() == 10);
+            result = isSuccess ? 1 : 2; // use 1 for success, anything else for fail
+        } else {
+            Die singleDie = new Die(0);
+            result = singleDie.getResult();
+            diceDisplay = DiceEmojis.getDieEmoji("green", result);
+        }
+
         if ("onyxxabt".equals(bt)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -97,6 +114,11 @@ public class FractureService {
         } else {
             if (result == 1 || result == 10) { // success
                 if (game.isCosmicConvergenceMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation(false, false) + " rolled " + diceDisplay
+                                    + "! The Fracture is entering play. A new fracture tile will be drawn.");
+
                     int countPer = 1;
                     boolean goneThrough = false;
                     List<TechnologyType> techTypesToAddIngress = new ArrayList<>(TechnologyType.mainFour);
@@ -179,9 +201,8 @@ public class FractureService {
                             buttons);
 
                 } else {
-                    String msg =
-                            player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
-                                    + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                    String msg = player.getRepresentation(false, false) + " rolled a " + diceDisplay
+                            + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
                 }
@@ -191,8 +212,8 @@ public class FractureService {
                         "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
                                 + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
-                String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
-                        + ", better luck next time.";
+                String msg =
+                        player.getRepresentation(true, false) + " rolled " + diceDisplay + ", better luck next time.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

@@ -97,6 +97,9 @@ public class FrankenButtonHandler {
                             && !MonumentDraftItem.isAvailable(player.getGame(), addl.getItemId())) {
                         continue;
                     }
+                    if (player.getDraftHand().containsAlias(addl.getAlias())) {
+                        continue;
+                    }
                     player.getDraftHand().Contents.add(addl);
                     msg.append("\n> ").append(addl.getTitle(player.getGame()));
                 }

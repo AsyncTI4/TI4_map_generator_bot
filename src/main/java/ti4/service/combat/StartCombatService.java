@@ -37,7 +37,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiFlagshipHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -58,12 +64,12 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -273,6 +279,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             UnitHolder unitHolder,
             Tile tile) {
+        XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
         XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
         String threadName = combatThreadName(game, player, player2, tile, null);
@@ -823,6 +830,20 @@ public class StartCombatService {
                     player1.getRepresentation()
                             + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
+        if (player1.hasUnlockedBreakthrough("qhetbt") && isGroundCombat) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel,
+                    player1.getRepresentation()
+                            + ", a reminder that you have _Duranium Outfitting_, and as such, one of your plastic-piece infantry may use sustain damage during this combat."
+                            + "\n-# This is not automated, just cancel 1 hit and keep track of if it has been used or not.");
+        }
+        if (player2.hasUnlockedBreakthrough("qhetbt") && isGroundCombat) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel,
+                    player2.getRepresentation()
+                            + ", a reminder that you have _Duranium Outfitting_, and as such, one of your plastic-piece infantry may use sustain damage during this combat."
+                            + "\n-# This is not automated, just cancel 1 hit and keep track of if it has been used or not.");
+        }
 
         if (tile.isHomeSystem(game)
                 && isGroundCombat
@@ -1104,7 +1125,13 @@ public class StartCombatService {
             if (!"mentak".equalsIgnoreCase(player.getFaction())) {
                 mentakOpponent = player;
             }
-
+            if (player.getPromissoryNotesInPlayArea().contains("dspnsarc")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder that if you win this combat, you may give _Plunderers_ to your opponent to take up to 2 trade goods or commodities from them.",
+                        SarcosaPnHandler.offerPlunderersButton(player, otherPlayer));
+            }
             if ((player.hasAbility("primacy")
                             || player.hasAbility("edict")
                             || player.hasAbility("edict_y")
@@ -1363,6 +1390,33 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you lose this combat, you ready Mobius Spike, Belkosea Hero.",
+                        buttons);
+            }
+            if ("space".equalsIgnoreCase(type)
+                    && player.ownsUnit("sarcosa_destroyer")
+                    && ButtonHelper.doesPlayerHaveUnitHere("sarcosa_destroyer", player, tile)
+                    && (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dd", true) < player.getUnitCap("dd"))) {
+                buttons = new ArrayList<>();
+                buttons.add(SarcosaUnitHandler.offerRavagerDeploy(player, tile));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that if you win this combat, you may deploy one of your _Ravagers_ in the active system.",
+                        buttons);
+            }
+            if ("space".equalsIgnoreCase(type)
+                    && player.hasTech("dssarcdd")
+                    && ButtonHelper.doesPlayerHaveUnitHere("sarcosa_destroyer2", player, tile)
+                    && otherPlayer.getTg() > 0) {
+                int ravagerIIs = SarcosaUnitHandler.getRavagerIICount(player, tile);
+                buttons = new ArrayList<>();
+                buttons.add(SarcosaUnitHandler.sendRavagerTGSteal(player, otherPlayer, tile));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that if you win this combat, take up to 1 trade good from them for each of your "
+                                + ravagerIIs
+                                + " _Ravager II_ units in this system.",
                         buttons);
             }
             if (player.getLeaderIDs().contains("kortalicommander") && !player.hasLeaderUnlocked("kortalicommander")) {
@@ -1659,10 +1713,18 @@ public class StartCombatService {
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
+        CurrentCombat currentCombat = getCurrentCombat(game);
+        UnitHolder combatHolder = isSpaceCombat
+                ? space
+                : currentCombat != null
+                                && pos.equals(currentCombat.tilePosition())
+                                && currentCombat.unitHolderName() != null
+                        ? tile.getUnitHolders().get(currentCombat.unitHolderName())
+                        : null;
+        UydaiFlagshipHandler.addCombatButton(buttons, game, tile, combatHolder, p1, p2, 0);
         boolean isGroundCombat = "ground".equalsIgnoreCase(groundOrSpace);
 
         String commanderUnitHolder = isSpaceCombat ? Constants.SPACE : null;
-        CurrentCombat currentCombat = getCurrentCombat(game);
         if (commanderUnitHolder == null && currentCombat != null && pos.equals(currentCombat.tilePosition())) {
             commanderUnitHolder = currentCombat.unitHolderName();
         }
@@ -1681,6 +1743,8 @@ public class StartCombatService {
         if (isGroundCombat) {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
+            XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
+            XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
         }
         if (isGroundCombat) {
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
@@ -2208,14 +2272,10 @@ public class StartCombatService {
                     Buttons.gray(factionChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
         }
 
-        if (p2.hasTech("dstoldr") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(factionChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
+        if (!game.isFowMode()) {
+            ToldarTechHandler.addVirTrainingButton(buttons, p2);
         }
-        if (p1.hasTech("dstoldr")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(factionChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
-        }
+        ToldarTechHandler.addVirTrainingButton(buttons, p1);
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
             String factionChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(

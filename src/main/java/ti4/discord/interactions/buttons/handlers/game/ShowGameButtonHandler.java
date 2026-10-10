@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.game;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -16,6 +17,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettingsManager;
@@ -55,7 +57,11 @@ class ShowGameButtonHandler {
         }
     }
 
-    private static boolean mayRenderHere(Game game, ButtonInteractionEvent event) {
+    private static boolean mayRenderHere(@Nullable Game game, ButtonInteractionEvent event) {
+        if (game == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a game for this channel.");
+            return false;
+        }
         if (MapSegmentService.isFoggedView(game, event) || FoWHelper.canSeeWholeMap(game, event)) {
             return true;
         }
@@ -81,15 +87,17 @@ class ShowGameButtonHandler {
                 MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
                 return;
             }
-            List<Button> switchButtons = part == DisplayType.stats
-                    ? List.of()
-                    : MapSegmentService.switchButtons(
-                            game, event.getUser().getId(), MapSegmentService.isFoggedView(game, event));
-            if (switchButtons.isEmpty()) {
+            List<Button> mapButtons = new ArrayList<>();
+            if (part != DisplayType.stats) {
+                mapButtons.addAll(MapSegmentService.switchButtons(
+                        game, MapSegmentService.viewerId(game, event), MapSegmentService.isFoggedView(game, event)));
+                MapOverviewService.overviewButton(game, event).ifPresent(mapButtons::add);
+            }
+            if (mapButtons.isEmpty()) {
                 MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
             } else {
                 ButtonHelper.sendFileWithCorrectButtons(
-                        event.getMessageChannel(), fileUpload, null, switchButtons, game, null);
+                        event.getMessageChannel(), fileUpload, null, mapButtons, game, null);
             }
         });
     }

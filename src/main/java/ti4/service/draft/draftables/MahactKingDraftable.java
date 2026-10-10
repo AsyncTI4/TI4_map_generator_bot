@@ -308,15 +308,12 @@ public class MahactKingDraftable extends SinglePickDraftable {
                 }
             }
 
-            boolean first = true;
             List<MessageEmbed> embeds =
                     factions.stream().map(FactionModel::fancyEmbed).toList();
-            for (MessageEmbed e : embeds) {
-                String message = "";
-                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions:";
-                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                first = false;
-            }
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", here is an overview of the factions:",
+                    embeds);
         }
     }
 }

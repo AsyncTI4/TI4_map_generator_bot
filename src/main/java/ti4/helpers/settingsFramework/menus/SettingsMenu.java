@@ -334,7 +334,7 @@ public abstract class SettingsMenu {
     }
 
     private void refreshMessageAndButtons(GenericInteractionCreateEvent event, String settingTouched, int page) {
-        String newSummary = menuSummaryString(settingTouched);
+        String newSummary = fitToMessageLimit(menuSummaryString(settingTouched));
         List<MessageTopLevelComponent> actionRows = new ArrayList<>();
         for (List<Button> row : ListUtils.partition(getPaginatedButtons(page), 5)) {
             actionRows.add(ActionRow.of(row));
@@ -378,6 +378,12 @@ public abstract class SettingsMenu {
                     .setComponents(actionRows)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    static String fitToMessageLimit(String content) {
+        if (content.length() <= Message.MAX_CONTENT_LENGTH) return content;
+        String ellipsis = "...";
+        return content.substring(0, Message.MAX_CONTENT_LENGTH - ellipsis.length()) + ellipsis;
     }
 
     @JsonIgnore

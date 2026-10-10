@@ -26,7 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -237,6 +237,7 @@ public class StartPhaseService {
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
         StatusHelper.commitStatusScoringEvent(game);
+        StatusCleanupService.returnEndStatusPNs(game);
         // Phase-end lore must fire before the round number increments below, so "end of round N"
         // round gates see the round they close; the matching phase-START fires after setPhaseOfGame.
         LoreService.showPhaseEndLore(game, "strategy");
@@ -1247,6 +1248,7 @@ public class StartPhaseService {
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
         boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
+        playPreassignedGiftOfPrescience(event, game);
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
         for (Player player : game.getRealPlayers()) {
@@ -1257,13 +1259,6 @@ public class StartPhaseService {
         for (Player p2 : game.getRealPlayers()) {
 
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
-            if (game.getStoredValue("Play Naalu PN") != null
-                    && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
-                if (!p2.getPromissoryNotesInPlayArea().contains("gift")
-                        && p2.getPromissoryNotes().containsKey("gift")) {
-                    PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
-                }
-            }
             if (game.isVeiledHeartMode()) {
                 VeiledHeartService.resolveTelepathicPreset(game, p2);
             }
@@ -1402,6 +1397,17 @@ public class StartPhaseService {
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of action phase for round #" + game.getRound() + ".");
+        }
+    }
+
+    private static void playPreassignedGiftOfPrescience(GenericInteractionCreateEvent event, Game game) {
+        String preassignedFactions = game.getStoredValue("Play Naalu PN");
+        for (Player player : game.getRealPlayers()) {
+            if (preassignedFactions.contains(player.getFaction())
+                    && !player.getPromissoryNotesInPlayArea().contains("gift")
+                    && player.getPromissoryNotes().containsKey("gift")) {
+                PromissoryNoteHelper.resolvePNPlay("gift", player, game, event);
+            }
         }
     }
 }

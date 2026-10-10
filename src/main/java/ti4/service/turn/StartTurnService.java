@@ -36,7 +36,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -341,7 +341,10 @@ public class StartTurnService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             } else {
                 String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
-                msg += " the bot couldn't find any planets you control in your home system to place them on";
+                String placement = player.hasTech("dsqhetinf")
+                        ? " a planet containing your space dock"
+                        : " any planets you control in your home system";
+                msg += " the bot couldn't find" + placement + " to place them on";
                 msg += ", so per the rules they now disappear into the ether.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 player.setStasisInfantry(0);
@@ -1003,6 +1006,10 @@ public class StartTurnService {
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(Buttons.gray(
                     factionChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+        }
+        if (player.hasReadyBreakthrough("pharadnbt")) {
+            startButtons.add(Buttons.gray(
+                    player.factionButtonChecker() + "hiddenVaultsDestroy", "Destroy Units", FactionEmojis.pharadn));
         }
         if (player.hasRelicReady("e6-g0_network")) {
             startButtons.add(Buttons.green(
