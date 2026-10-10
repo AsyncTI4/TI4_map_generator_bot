@@ -93,7 +93,11 @@ public class TestBedPress {
 
     public record PressResult(boolean pressed, String detail, Recorder recorder) {}
 
-    record Repost(MessageChannel channel, String seatName) {}
+    public record Repost(MessageChannel channel, String seatName, String header) {
+        public Repost(MessageChannel channel, String seatName) {
+            this(channel, seatName, "-# 🧪 test bed: shown only to " + seatName + " in a real game");
+        }
+    }
 
     private record Found(Message message, Button button) {}
 
@@ -276,7 +280,7 @@ public class TestBedPress {
         return standInEvent(message, button, developer, recorder, null);
     }
 
-    static ButtonInteractionEvent standInEvent(
+    public static ButtonInteractionEvent standInEvent(
             Message message, Button button, Member developer, Recorder recorder, @Nullable Repost repost) {
         JDA jda = message.getJDA();
         ButtonInteraction[] self = new ButtonInteraction[1];
@@ -451,7 +455,7 @@ public class TestBedPress {
     @Nullable
     private static Message repostIfItHasComponents(MessageCreateBuilder builder, Repost repost, Recorder recorder) {
         if (builder.getComponents().isEmpty()) return null;
-        String header = "-# 🧪 test bed: shown only to " + repost.seatName() + " in a real game";
+        String header = repost.header();
         String content = builder.getContent();
         String withHeader = content.isEmpty() ? header : header + "\n" + content;
         if (withHeader.length() <= Message.MAX_CONTENT_LENGTH) builder.setContent(withHeader);
