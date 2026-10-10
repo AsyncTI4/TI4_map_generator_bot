@@ -12,7 +12,9 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -319,6 +321,24 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .filter(found -> found.kind() == Kind.ATTACK)
                 .orElseThrow()
                 .score();
+    }
+
+    // Dark Energy Tap explores a frontier token when a ship ends a tactical action in its system, so a spare destroyer
+    // is worth sending to an empty neighbour holding one. Without the technology there is nothing to gain there.
+    @Test
+    void sendsAShipToExploreAFrontierWithDarkEnergyTap() {
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        Tile empty = test.place("46", neighbour);
+        empty.getSpaceUnitHolder().addToken(Mapper.getTokenID(Constants.FRONTIER));
+
+        assertThat(TacticalPlanner.forTarget(test.game, test.nekro, neighbour)).isEmpty();
+
+        test.nekro.addTech("det");
+        TacticalPlan plan =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+        assertThat(plan.kind()).isEqualTo(Kind.POSITION);
+        assertThat(plan.moves()).containsExactly(new UnitMove(AiTestGame.HOME, "space", UnitType.Destroyer, 1));
     }
 
     // Copying a technology after a combat is Nekro's Technological Singularity. A seat without that ability must

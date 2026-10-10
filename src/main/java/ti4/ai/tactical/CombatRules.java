@@ -83,6 +83,8 @@ public class CombatRules {
         if (combatTech.isPresent()) return combatTech;
         Optional<AiDecision> afb = antiFighterBarrage(context, prompts);
         if (afb.isPresent()) return afb;
+        Optional<AiDecision> retreat = RetreatRules.next(context, prompts);
+        if (retreat.isPresent()) return retreat;
         return combatRound(context, prompts);
     }
 

@@ -89,6 +89,25 @@ public final class Footprint {
         return new Footprint(newUnits, newShips, newNonFighter, newHeavy, newPlanets, dreadnoughts);
     }
 
+    public Footprint withoutShipsIn(String position) {
+        Map<String, Integer> newUnits = new HashMap<>(units);
+        int leaving = ships.getOrDefault(position, 0);
+        newUnits.computeIfPresent(position, (ignored, count) -> count > leaving ? count - leaving : null);
+        Map<String, Integer> newShips = new HashMap<>(ships);
+        Map<String, Integer> newNonFighter = new HashMap<>(nonFighterShips);
+        Map<String, Integer> newHeavy = new HashMap<>(heavyShips);
+        newShips.remove(position);
+        newNonFighter.remove(position);
+        newHeavy.remove(position);
+        return new Footprint(newUnits, newShips, newNonFighter, newHeavy, planets, dreadnoughts);
+    }
+
+    public Footprint withoutPlanet(String planet) {
+        Set<String> newPlanets = new HashSet<>(planets);
+        newPlanets.remove(planet);
+        return new Footprint(units, ships, nonFighterShips, heavyShips, newPlanets, dreadnoughts);
+    }
+
     public Footprint withBuilt(String position, Map<UnitType, Integer> built) {
         Map<String, Integer> newUnits = new HashMap<>(units);
         Map<String, Integer> newShips = new HashMap<>(ships);

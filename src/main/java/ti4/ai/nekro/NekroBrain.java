@@ -36,6 +36,7 @@ import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
 import ti4.ai.tactical.SingularityRules;
+import ti4.ai.tactical.SlingRelayRules;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
@@ -50,6 +51,7 @@ import ti4.message.GameMessageType;
 public class NekroBrain implements FactionBrain {
 
     private static final String TIED_PLANETS = "tiedPlanets_";
+    private static final String FLEET_LOGISTICS = "fl";
     private static final String CHECKS_AND_BALANCES = ChecksAndBalances.GIVE_PREFIX;
     private static final String GIVE_AWAY_KEY = "checksAndBalancesRecipient|";
     private static final String AC_DISCARD = "ac_discard_from_hand_";
@@ -104,6 +106,7 @@ public class NekroBrain implements FactionBrain {
             TechRules::placeSelfAssemblyMech,
             TechRules::placeMagenInfantry,
             TechRules::continueProductionBiomes,
+            SlingRelayRules::next,
             TechRules::nullificationField,
             TechRules::neuralParasite,
             TechRules::salvageOperations,
@@ -360,10 +363,13 @@ public class NekroBrain implements FactionBrain {
                 || !"action".equalsIgnoreCase(context.game().getPhaseOfGame())) {
             return Optional.empty();
         }
-        if (TacticalRules.inProgress(context.game(), context.seat())) return TacticalRules.continueAction(context);
+        if (TacticalRules.inProgress(context)) return TacticalRules.continueAction(context);
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);
         if (primary.isPresent()) return primary;
         List<AiPrompt> thisTurn = promptsThisTurn(context);
+        Optional<AiDecision> secondAction =
+                TacticalRules.secondAction(context, thisTurn).or(() -> secondStrategicAction(context, thisTurn));
+        if (secondAction.isPresent()) return secondAction;
         Optional<AiDecision> endOfTurnTech = TechRules.endOfTurn(context, thisTurn);
         if (endOfTurnTech.isPresent()) return endOfTurnTech;
         for (String handler : List.of("turnEnd", "endOfTurnAbilities")) {
@@ -390,6 +396,26 @@ public class NekroBrain implements FactionBrain {
         for (String handler : List.of("passForRound", "passingAbilities")) {
             Optional<AiDecision> pass = ownedHandler(context, thisTurn, handler, "pass for the round");
             if (pass.isPresent()) return pass;
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<AiDecision> secondStrategicAction(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!context.seat().hasTech(FLEET_LOGISTICS)
+                || !TacticalRules.actionTaken(context)
+                || TacticalRules.secondActionStarted(context)) {
+            return Optional.empty();
+        }
+        for (AiPrompt prompt : thisTurn) {
+            Optional<PromptButton> play = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
+                    && button.handlerId().startsWith("strategicAction_")
+                    && !context.alreadyPressed(prompt, button)
+                    && unplayed(context.game(), StrategyCardRanking.initiative(button)));
+            if (play.isPresent()) {
+                TacticalRules.markSecondAction(context, false);
+                return Optional.of(StrategyCardRules.play(
+                        context, prompt, play.get(), StrategyCardRanking.initiative(play.get())));
+            }
         }
         return Optional.empty();
     }

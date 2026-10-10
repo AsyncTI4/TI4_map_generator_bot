@@ -33,9 +33,11 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.model.UnitModel;
 
 @UtilityClass
@@ -48,6 +50,8 @@ public class TacticalPlanner {
     private static final double LAST_HOME_SHIP_COST = 1.5;
     private static final double TECH_STEAL_VALUE = 3.0;
     private static final double PLANET_TEMPO_VALUE = 0.8;
+    private static final double FRONTIER_EXPLORE_VALUE = 1.5;
+    private static final String DARK_ENERGY_TAP = "det";
     private static final int LAST_EARLY_ROUND = 4;
     private static final double EARLY_GAME_FADE_PER_ROUND = 0.25;
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
@@ -543,7 +547,8 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> position(Context context, Tile tile) {
         Game game = context.game;
         Player seat = context.seat;
-        if (!context.objectives().caresAboutPresence()) return Optional.empty();
+        double frontier = frontierExplore(seat, tile);
+        if (!context.objectives().caresAboutPresence() && frontier == 0) return Optional.empty();
         if (BoardView.hasEnemyShips(game, seat, tile) || context.coveredByEnemySpaceCannon(tile)) {
             return Optional.empty();
         }
@@ -558,7 +563,7 @@ public class TacticalPlanner {
                 List<UnitMove> moves = List.of(new UnitMove(origin.getPosition(), BoardView.SPACE, type, 1));
                 Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, moves);
                 if (legal.isEmpty()) continue;
-                double gain = context.objectiveGain(tile, legal.get(), List.of());
+                double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontier;
                 if (gain <= 0) continue;
                 double score = gain
                         - DISTANCE_COST * context.distance(origin, tile, type)
@@ -572,6 +577,12 @@ public class TacticalPlanner {
             if (group.isPresent() && (best == null || group.get().score() > best.score())) best = group.get();
         }
         return Optional.ofNullable(best);
+    }
+
+    private static double frontierExplore(Player seat, Tile tile) {
+        if (!seat.hasTech(DARK_ENERGY_TAP) || BoardView.hasOwnShips(seat, tile)) return 0;
+        boolean frontier = BoardView.space(tile).getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
+        return frontier ? FRONTIER_EXPLORE_VALUE : 0;
     }
 
     private static Optional<TacticalPlan> groupPosition(Context context, Tile tile, Tile origin) {
@@ -596,7 +607,7 @@ public class TacticalPlanner {
         if (movedNonFighterShips(ships) < 2) return Optional.empty();
         Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, ships);
         if (legal.isEmpty()) return Optional.empty();
-        double gain = context.objectiveGain(tile, legal.get(), List.of());
+        double gain = context.objectiveGain(tile, legal.get(), List.of()) + frontierExplore(seat, tile);
         if (gain <= 0) return Optional.empty();
         int farthest = legal.get().stream()
                 .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))

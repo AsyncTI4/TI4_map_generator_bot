@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
+import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.Prompts;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -496,5 +499,47 @@ class TacticalRulesTest extends BaseTi4Test {
                 test.game.getTacticalActionDisplacement().computeIfAbsent(key, ignored -> new HashMap<>());
         List<Integer> states = new ArrayList<>(List.of(count, 0, 0, 0));
         units.put(Units.getUnitKey(type, "black"), states);
+    }
+
+    // With Fleet Logistics the bot offers a second action once the first is done. The AI plans again (Lodor is
+    // still free), starts the second tactical action, and then picks its system even though the first action's
+    // system is still the active one and the bot has reset its tactical-action flags.
+    @Test
+    void takesASecondTacticalActionWithFleetLogistics() {
+        test.nekro.addTech("fl");
+        String firstTarget = "105";
+        test.game.setActiveSystem(firstTarget);
+        test.game.setStoredValue("currentActionSummarynekro", " Activated " + firstTarget + ".");
+        test.game.setStoredValue("gameEventTacticalLogged", "yes");
+        AiPrompt first = prompt("first", PromptSource.PUBLIC, NOW, "FFCC_nekro_tacticalAction");
+        AiPrompt after = prompt(
+                "after", PromptSource.PUBLIC, NOW + 10, "FFCC_nekro_tacticalAction", "FFCC_nekro_endOfTurnAbilities");
+        Set<String> pressed = Set.of("first|FFCC_nekro_tacticalAction");
+        AiTurnContext afterFirst = test.context(pressed, first, after);
+
+        assertThat(pressedId(TacticalRules.secondAction(afterFirst, Prompts.thisTurn(afterFirst))
+                        .orElseThrow()))
+                .isEqualTo("FFCC_nekro_tacticalAction");
+
+        test.game.setStoredValue("gameEventTacticalLogged", "");
+        AiPrompt picker = prompt("picker", PromptSource.PUBLIC, NOW + 20, "ringTile_" + target, "ringTile_105");
+        AiTurnContext picking = test.contextAt(NOW + 30, first, after, picker);
+        assertThat(TacticalRules.inProgress(picking)).isFalse();
+        assertThat(TacticalRules.pickingSystem(picking)).isTrue();
+        assertThat(pressedId(TacticalRules.start(picking).orElseThrow())).isEqualTo("ringTile_" + target);
+    }
+
+    // Without Fleet Logistics the turn ends after one action.
+    @Test
+    void takesNoSecondActionWithoutFleetLogistics() {
+        test.game.setActiveSystem("105");
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 105.");
+        test.game.setStoredValue("gameEventTacticalLogged", "yes");
+        AiPrompt first = prompt("first", PromptSource.PUBLIC, NOW, "FFCC_nekro_tacticalAction");
+        AiPrompt after = prompt("after", PromptSource.PUBLIC, NOW + 10, "FFCC_nekro_endOfTurnAbilities");
+        AiTurnContext afterFirst = test.context(Set.of("first|FFCC_nekro_tacticalAction"), first, after);
+
+        assertThat(TacticalRules.secondAction(afterFirst, Prompts.thisTurn(afterFirst)))
+                .isEmpty();
     }
 }

@@ -2,7 +2,6 @@ package ti4.ai.tech;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -15,18 +14,19 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
-import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.Threats;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.tactical.ProductionPlanner;
+import ti4.ai.tactical.SlingRelayRules;
+import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.model.UnitModel;
 
 @UtilityClass
 public class TechRules {
@@ -90,31 +90,31 @@ public class TechRules {
 
     public static Optional<AiDecision> startYinSpinner(AiTurnContext context, AiPrompt production) {
         if (!context.seat().hasTech(YIN_SPINNER)) return Optional.empty();
-        String key = SPINNER_KEY + context.turnKey() + "|" + production.messageId();
+        String key = SPINNER_KEY + TacticalRules.actionKey(context) + "|" + production.messageId();
         if (context.memory().has(key)) return Optional.empty();
         Optional<PromptButton> spinner =
                 production.firstEnabled(button -> button.isUnowned() && SPINNER_START.equals(button.handlerId()));
         if (spinner.isEmpty()) return Optional.empty();
         context.memory().put(key, "started");
-        context.memory().put(SPINNER_KEY + context.turnKey(), "placing");
+        context.memory().put(SPINNER_KEY + TacticalRules.actionKey(context), "placing");
         return Optional.of(AiDecision.press(production, spinner.get(), "place 2 infantry with Yin Spinner"));
     }
 
     public static Optional<AiDecision> startSelfAssembly(AiTurnContext context, AiPrompt production) {
         Player seat = context.seat();
         if (!seat.hasTechReady(SELF_ASSEMBLY) || !mechInReinforcements(context.game(), seat)) return Optional.empty();
-        String key = ASSEMBLY_KEY + context.turnKey() + "|" + production.messageId();
+        String key = ASSEMBLY_KEY + TacticalRules.actionKey(context) + "|" + production.messageId();
         if (context.memory().has(key)) return Optional.empty();
         Optional<PromptButton> start = production.firstEnabled(
                 button -> button.isUnowned() && button.handlerId().startsWith(ASSEMBLY_START));
         if (start.isEmpty()) return Optional.empty();
         context.memory().put(key, "started");
-        context.memory().put(ASSEMBLY_KEY + context.turnKey(), "placing");
+        context.memory().put(ASSEMBLY_KEY + TacticalRules.actionKey(context), "placing");
         return Optional.of(AiDecision.press(production, start.get(), "place a mech with Self-Assembly Routines"));
     }
 
     public static Optional<AiDecision> placeSelfAssemblyMech(AiTurnContext context) {
-        String key = ASSEMBLY_KEY + context.turnKey();
+        String key = ASSEMBLY_KEY + TacticalRules.actionKey(context);
         if (context.memory().get(key).filter("placing"::equals).isEmpty()) return Optional.empty();
         Game game = context.game();
         Player seat = context.seat();
@@ -137,7 +137,7 @@ public class TechRules {
     }
 
     public static Optional<AiDecision> placeSpinnerInfantry(AiTurnContext context) {
-        String key = SPINNER_KEY + context.turnKey();
+        String key = SPINNER_KEY + TacticalRules.actionKey(context);
         if (!context.memory().get(key).filter("placing"::equals).isPresent()) return Optional.empty();
         Optional<Choice> best = bestOwned(
                 context, SPINNER_PLACE_PREFIX, button -> spinnerScore(context.game(), context.seat(), button));
@@ -186,7 +186,9 @@ public class TechRules {
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
-        return startProductionBiomes(context, thisTurn).or(() -> psychoarchaeology(context, thisTurn));
+        return startProductionBiomes(context, thisTurn)
+                .or(() -> SlingRelayRules.start(context, thisTurn))
+                .or(() -> psychoarchaeology(context, thisTurn));
     }
 
     private static Optional<AiDecision> startProductionBiomes(AiTurnContext context, List<AiPrompt> thisTurn) {
@@ -251,7 +253,7 @@ public class TechRules {
     }
 
     private static boolean threatened(Game game, Player seat, Player active, Tile tile) {
-        double incoming = reachingFleetCost(game, active, tile);
+        double incoming = Threats.incomingFleetCost(game, active, tile);
         if (incoming <= 0) return false;
         if (tile == seat.getHomeSystemTile()) return true;
         double defending = BoardView.ships(BoardView.space(tile), seat).entrySet().stream()
@@ -261,25 +263,6 @@ public class TechRules {
                         * entry.getValue())
                 .sum();
         return incoming >= defending;
-    }
-
-    private static double reachingFleetCost(Game game, Player mover, Tile target) {
-        double total = 0;
-        for (Tile origin : game.getTileMap().values()) {
-            if (origin == target || origin.hasPlayerCC(mover)) continue;
-            for (Map.Entry<UnitType, Integer> ship :
-                    BoardView.ships(BoardView.space(origin), mover).entrySet()) {
-                if (ship.getKey() == UnitType.Fighter) continue;
-                int move = BoardView.moveValueWithGravityDrive(mover, ship.getKey());
-                if (!MovementGraph.reach(game, mover, origin.getPosition(), move)
-                        .containsKey(target.getPosition())) continue;
-                total += BoardView.model(mover, ship.getKey())
-                                .map(UnitModel::getCost)
-                                .orElse(0f)
-                        * ship.getValue();
-            }
-        }
-        return total;
     }
 
     public static Optional<AiDecision> neuralParasite(AiTurnContext context) {

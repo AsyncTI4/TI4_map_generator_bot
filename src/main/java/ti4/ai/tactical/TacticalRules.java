@@ -43,6 +43,12 @@ public class TacticalRules {
     static final String PICKER_PRESSES_KEY = "pickerPresses|";
     static final String EXHAUSTED_ORIGIN_KEY = "exhaustedOrigin|";
     static final String COMBAT_EXPECTED_KEY = "combatExpectedSince|";
+    static final String SECOND_ACTION_KEY = "secondAction|";
+    private static final String SECOND_ACTION_SUFFIX = "#2";
+    private static final String FLEET_LOGISTICS = "fl";
+    private static final String TACTICAL_ACTION = "tacticalAction";
+    private static final String ANOTHER_ACTION = "doAnotherAction";
+    private static final String FIELD = "|";
     private static final int MAX_PICKER_PRESSES = 4;
     private static final String RING_TILE_PREFIX = "ringTile_";
     private static final int LARGE_RING = 5;
@@ -67,6 +73,54 @@ public class TacticalRules {
                 && !"yes".equals(game.getStoredValue("gameEventTacticalLogged"));
     }
 
+    public static boolean inProgress(AiTurnContext context) {
+        return inProgress(context.game(), context.seat()) && !pickingSecondSystem(context);
+    }
+
+    public static String actionKey(AiTurnContext context) {
+        return secondActionStarted(context) ? context.turnKey() + SECOND_ACTION_SUFFIX : context.turnKey();
+    }
+
+    public static boolean secondActionStarted(AiTurnContext context) {
+        return context.memory().has(SECOND_ACTION_KEY + context.turnKey());
+    }
+
+    public static void markSecondAction(AiTurnContext context, boolean tactical) {
+        String firstTarget = tactical ? context.game().getCurrentActiveSystem() : "";
+        context.memory().put(SECOND_ACTION_KEY + context.turnKey(), firstTarget + FIELD + context.now());
+    }
+
+    public static Optional<AiDecision> secondAction(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!context.seat().hasTech(FLEET_LOGISTICS)) return Optional.empty();
+        if (secondActionStarted(context)) return pickingSecondSystem(context) ? start(context) : Optional.empty();
+        if (!actionTaken(context) || inProgress(context.game(), context.seat())) return Optional.empty();
+        Optional<TacticalPlan> plan = TacticalPlanner.best(context.game(), context.seat());
+        if (plan.isEmpty() || plan.get().score() < TacticalPlanner.MIN_SCORE) return Optional.empty();
+        Optional<Match> again = Prompts.owned(thisTurn, context.faction(), TACTICAL_ACTION::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+        if (again.isEmpty()) {
+            return Prompts.owned(thisTurn, context.faction(), ANOTHER_ACTION::equals)
+                    .filter(match -> !context.alreadyPressed(match.prompt(), match.button()))
+                    .map(match -> match.press("take another action with Fleet Logistics"));
+        }
+        markSecondAction(context, true);
+        context.memory().put(PLAN_KEY + actionKey(context), plan.get().encode());
+        return Optional.of(
+                again.get().press("take a second tactical action with Fleet Logistics: " + describe(plan.get())));
+    }
+
+    private static boolean pickingSecondSystem(AiTurnContext context) {
+        String firstTarget = StringUtils.substringBefore(
+                context.memory().get(SECOND_ACTION_KEY + context.turnKey()).orElse(""), FIELD);
+        return !firstTarget.isEmpty() && firstTarget.equals(context.game().getCurrentActiveSystem());
+    }
+
+    private static long secondActionSince(AiTurnContext context) {
+        String since = StringUtils.substringAfter(
+                context.memory().get(SECOND_ACTION_KEY + context.turnKey()).orElse(""), FIELD);
+        return StringUtils.isNumeric(since) ? Long.parseLong(since) : 0;
+    }
+
     public static boolean actionTaken(AiTurnContext context) {
         String faction = context.faction();
         return Prompts.thisTurn(context).stream()
@@ -79,30 +133,38 @@ public class TacticalRules {
 
     public static boolean pickingSystem(AiTurnContext context) {
         String summary = context.game().getStoredValue("currentActionSummary" + context.faction());
-        return !summary.contains(" Activated ")
-                && Prompts.thisTurn(context).stream().anyMatch(TacticalRules::isPicker);
+        boolean picking = !summary.contains(" Activated ") || pickingSecondSystem(context);
+        return picking && !pickers(context, Prompts.thisTurn(context)).isEmpty();
+    }
+
+    private static List<AiPrompt> pickers(AiTurnContext context, List<AiPrompt> turn) {
+        long since = secondActionSince(context);
+        return turn.stream()
+                .filter(TacticalRules::isPicker)
+                .filter(prompt -> prompt.createdAtMillis() >= since)
+                .toList();
     }
 
     public static Optional<AiDecision> start(AiTurnContext context) {
         List<AiPrompt> turn = Prompts.thisTurn(context);
-        List<AiPrompt> pickers = turn.stream().filter(TacticalRules::isPicker).toList();
+        List<AiPrompt> pickers = pickers(context, turn);
         Optional<AiPrompt> picker = pickers.stream().findFirst();
         Optional<TacticalPlan> plan = rememberedPlan(context).or(() -> {
             Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat());
-            computed.ifPresent(found -> context.memory().put(PLAN_KEY + context.turnKey(), found.encode()));
+            computed.ifPresent(found -> context.memory().put(PLAN_KEY + actionKey(context), found.encode()));
             return computed;
         });
         if (plan.isEmpty()) {
             return picker.map(found -> new AiDecision.Unsure(found, "it found no system worth activating"));
         }
         if (picker.isPresent()) return Optional.of(pickSystem(context, pickers, plan.get()));
-        return Prompts.owned(turn, context.faction(), "tacticalAction"::equals)
+        return Prompts.owned(turn, context.faction(), TACTICAL_ACTION::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()))
                 .map(match -> match.press("start a tactical action: " + describe(plan.get())));
     }
 
     public static void remember(AiTurnContext context, TacticalPlan plan) {
-        context.memory().put(PLAN_KEY + context.turnKey(), plan.encode());
+        context.memory().put(PLAN_KEY + actionKey(context), plan.encode());
     }
 
     public static boolean activatedThisTurn(AiTurnContext context) {
@@ -135,14 +197,14 @@ public class TacticalRules {
         Optional<AiDecision> pay = payForUnits(context, turn, TACTICAL_SOURCE);
         if (pay.isPresent()) return pay;
         Optional<BuildPlan> buildPlan =
-                context.memory().get(BUILD_KEY + context.turnKey()).flatMap(BuildPlan::decode);
+                context.memory().get(BUILD_KEY + actionKey(context)).flatMap(BuildPlan::decode);
         Optional<AiDecision> place = placeUnits(context, turn, TACTICAL_SOURCE, target, buildPlan);
         if (place.isPresent()) return place;
         return build(context, turn, tile);
     }
 
     public static Optional<TacticalPlan> rememberedPlan(AiTurnContext context) {
-        return context.memory().get(PLAN_KEY + context.turnKey()).flatMap(TacticalPlan::decode);
+        return context.memory().get(PLAN_KEY + actionKey(context)).flatMap(TacticalPlan::decode);
     }
 
     private static Optional<TacticalPlan> plan(AiTurnContext context, String target) {
@@ -158,7 +220,7 @@ public class TacticalRules {
                 Prompts.first(pickers, button -> button.handlerId().equals(RING_TILE_PREFIX + plan.target()));
         if (target.isPresent()) return target.get().press("activate " + plan.target());
         AiPrompt picker = pickers.getFirst();
-        String pressesKey = PICKER_PRESSES_KEY + context.turnKey();
+        String pressesKey = PICKER_PRESSES_KEY + actionKey(context);
         int presses = Integer.parseInt(context.memory().get(pressesKey).orElse("0"));
         Optional<PromptButton> navigate =
                 presses >= MAX_PICKER_PRESSES ? Optional.empty() : navigationButton(context, picker, plan.target());
@@ -287,13 +349,13 @@ public class TacticalRules {
                 }
             }
         }
-        context.memory().put(EXHAUSTED_ORIGIN_KEY + context.turnKey() + "|" + origin.get(), "yes");
+        context.memory().put(EXHAUSTED_ORIGIN_KEY + actionKey(context) + "|" + origin.get(), "yes");
         return prompt.enabledHandler("doneWithOneSystem_" + origin.get())
                 .map(button -> AiDecision.press(prompt, button, "done picking units in " + origin.get()));
     }
 
     private static boolean originExhausted(AiTurnContext context, String origin) {
-        return context.memory().has(EXHAUSTED_ORIGIN_KEY + context.turnKey() + "|" + origin);
+        return context.memory().has(EXHAUSTED_ORIGIN_KEY + actionKey(context) + "|" + origin);
     }
 
     private static Optional<PromptButton> moveButton(
@@ -421,7 +483,7 @@ public class TacticalRules {
         if (combatThread) {
             return Optional.of(new AiDecision.Wait(context.now() + COMBAT_WAIT_MILLIS, "combat in the active system"));
         }
-        String key = COMBAT_EXPECTED_KEY + context.turnKey();
+        String key = COMBAT_EXPECTED_KEY + actionKey(context);
         long since = context.memory().get(key).map(Long::parseLong).orElse(context.now());
         if (!context.memory().has(key)) context.memory().put(key, String.valueOf(since));
         if (context.now() - since < COMBAT_THREAD_GRACE_MILLIS) {
@@ -440,7 +502,7 @@ public class TacticalRules {
         if (build.isPresent()) {
             BuildPlan plan = ProductionPlanner.plan(context.game(), context.seat(), tile);
             if (!plan.isEmpty()) {
-                context.memory().put(BUILD_KEY + context.turnKey(), plan.encode());
+                context.memory().put(BUILD_KEY + actionKey(context), plan.encode());
                 return Optional.of(build.get().press("build units"));
             }
         }

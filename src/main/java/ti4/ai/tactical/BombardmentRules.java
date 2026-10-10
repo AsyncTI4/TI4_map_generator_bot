@@ -84,7 +84,7 @@ public class BombardmentRules {
     }
 
     public static Optional<AiDecision> beforeLanding(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
-        String key = BOMBARD_KEY + context.turnKey() + "|" + tile.getPosition();
+        String key = BOMBARD_KEY + TacticalRules.actionKey(context) + "|" + tile.getPosition();
         Optional<String> state = context.memory().get(key);
         if (state.isPresent()) return afterPress(context, tile, key, state.get());
         Player seat = context.seat();

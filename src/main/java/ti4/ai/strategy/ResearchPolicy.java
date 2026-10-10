@@ -91,8 +91,8 @@ public class ResearchPolicy {
             Map.entry("cv2", 4.5),
             Map.entry("st", 4.0),
             Map.entry("hm", 5.5),
-            Map.entry("fl", 1.0),
             Map.entry("amd", 3.0),
+            Map.entry("fl", 3.0),
             Map.entry("nm", 3.0),
             Map.entry("dxa", 0.5),
             Map.entry("ps", 3.0),
@@ -110,16 +110,16 @@ public class ResearchPolicy {
             Map.entry("bs", 2.5),
             Map.entry("md", 2.5),
             Map.entry("ws", 2.5),
+            Map.entry("sr", 2.5),
             Map.entry("inf2", 2.0),
             Map.entry("pa", 2.0),
             Map.entry("pi", 2.0),
+            Map.entry("det", 2.0),
             Map.entry("pds2", 2.0),
             Map.entry("cr2", 2.0),
             Map.entry("sdn", 2.0),
             Map.entry("gls", 1.5),
             Map.entry("td", 1.0),
-            Map.entry("sr", 1.0),
-            Map.entry("det", 1.0),
             Map.entry("x89", 1.0));
     private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
     private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");

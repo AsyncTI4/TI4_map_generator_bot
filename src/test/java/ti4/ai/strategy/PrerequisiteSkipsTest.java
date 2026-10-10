@@ -50,16 +50,17 @@ class PrerequisiteSkipsTest extends BaseTi4Test {
         assertThat(plan.valueLost()).isZero();
     }
 
-    // Magen Defense Grid needs a red technology. Meer could stand in, but exhausting it gives up 4 influence, which
-    // costs more than the technology is worth, so a technology needing no specialty is researched instead.
+    // Magen Defense Grid needs a red technology. Meer could stand in, but exhausting it gives up 4 influence, more than
+    // the technology is worth to Sol, so even Dacxive Animators (a stepping stone towards Hyper Metabolism) is
+    // researched instead. With Psychoarchaeology the specialty is free and Magen Defense Grid wins.
     @Test
     void passesOnASkipThatCostsTooMuch() {
         sol.addPlanet("meer");
 
-        assertThat(ResearchPolicy.best(test.game, sol, List.of("md", "det"))).contains("det");
+        assertThat(ResearchPolicy.best(test.game, sol, List.of("md", "dxa"))).contains("dxa");
 
         sol.addTech("pa");
-        assertThat(ResearchPolicy.best(test.game, sol, List.of("md", "det"))).contains("md");
+        assertThat(ResearchPolicy.best(test.game, sol, List.of("md", "dxa"))).contains("md");
     }
 
     // Destroyer II needs two red technologies. AI Development Algorithm is one; Mehar Xull (1/3) could cover the

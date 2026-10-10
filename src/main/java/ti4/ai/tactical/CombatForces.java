@@ -109,17 +109,39 @@ class CombatForces {
             String alias,
             boolean seatAttacks,
             boolean ground) {
-        Side own =
-                new Side(seat, ground ? unitsOf(holder, seat, BoardView.GROUND_FORCES) : BoardView.ships(holder, seat));
-        Side enemy = new Side(
+        Force own = current(game, tile, holder, seat, opponent, ground);
+        Force enemy = current(game, tile, holder, opponent, seat, ground);
+        Optional<Force> improved = improved(seat, own, alias, ground);
+        if (improved.isEmpty()) return 0;
+        double swing = win(improved.get(), enemy, seatAttacks) - win(own, enemy, seatAttacks);
+        return swing * stake(own, enemy) * SWING_VALUE_PER_RESOURCE;
+    }
+
+    static double spaceWinChance(Game game, Tile tile, Player seat, Player opponent) {
+        UnitHolder space = BoardView.space(tile);
+        Force own = current(game, tile, space, seat, opponent, false);
+        Force enemy = current(game, tile, space, opponent, seat, false);
+        return win(own, enemy, game.getActivePlayer() == seat);
+    }
+
+    static double garrisonHoldChance(Game game, Tile tile, UnitHolder planet, Player seat, Player invader) {
+        Map<UnitType, Integer> invaders = unitsOf(BoardView.space(tile), invader, BoardView.GROUND_FORCES);
+        if (invaders.isEmpty()) return 1.0;
+        Side garrison = new Side(seat, unitsOf(planet, seat, BoardView.GROUND_FORCES));
+        Side landing = new Side(invader, invaders);
+        Force defence = force(seat, combatants(game, tile, planet, garrison, landing, damaged(planet, garrison)), true);
+        Force attack = force(invader, combatants(game, tile, planet, landing, garrison, Map.of()), true);
+        return CombatOdds.resolve(attack, defence).defenderWins();
+    }
+
+    private static Force current(
+            Game game, Tile tile, UnitHolder holder, Player player, Player opponent, boolean ground) {
+        Side side = new Side(
+                player, ground ? unitsOf(holder, player, BoardView.GROUND_FORCES) : BoardView.ships(holder, player));
+        Side other = new Side(
                 opponent,
                 ground ? unitsOf(holder, opponent, BoardView.GROUND_FORCES) : BoardView.ships(holder, opponent));
-        Force ownForce = force(seat, combatants(game, tile, holder, own, enemy, damaged(holder, own)), ground);
-        Force enemyForce = force(opponent, combatants(game, tile, holder, enemy, own, damaged(holder, enemy)), ground);
-        Optional<Force> improved = improved(seat, ownForce, alias, ground);
-        if (improved.isEmpty()) return 0;
-        double swing = win(improved.get(), enemyForce, seatAttacks) - win(ownForce, enemyForce, seatAttacks);
-        return swing * stake(ownForce, enemyForce) * SWING_VALUE_PER_RESOURCE;
+        return force(player, combatants(game, tile, holder, side, other, damaged(holder, side)), ground);
     }
 
     static Optional<Force> improved(Player seat, Force force, String alias, boolean ground) {

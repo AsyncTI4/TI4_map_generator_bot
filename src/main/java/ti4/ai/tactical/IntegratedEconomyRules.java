@@ -55,7 +55,7 @@ public class IntegratedEconomyRules {
                 return prompt.firstEnabled(button -> button.isUnowned() && DECLINE.equals(button.handlerId()))
                         .map(button -> AiDecision.press(prompt, button, "skip the Integrated Economy build"));
             }
-            context.memory().put(PLAN_KEY + context.turnKey(), planet + FIELD + plan.encode());
+            context.memory().put(PLAN_KEY + TacticalRules.actionKey(context), planet + FIELD + plan.encode());
             return Optional.of(
                     AiDecision.press(prompt, offer.get(), "build on " + planet + " with Integrated Economy"));
         }
@@ -63,7 +63,9 @@ public class IntegratedEconomyRules {
     }
 
     private static Optional<AiDecision> continueBuild(AiTurnContext context, List<AiPrompt> visible) {
-        String remembered = context.memory().get(PLAN_KEY + context.turnKey()).orElse("");
+        String remembered = context.memory()
+                .get(PLAN_KEY + TacticalRules.actionKey(context))
+                .orElse("");
         String planet = StringUtils.substringBefore(remembered, FIELD);
         Optional<BuildPlan> plan = BuildPlan.decode(StringUtils.substringAfter(remembered, FIELD));
         Tile tile = planet.isBlank() ? null : context.game().getTileFromPlanet(planet);

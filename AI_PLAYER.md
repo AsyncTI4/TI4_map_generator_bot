@@ -106,7 +106,16 @@ to build one by hand:
     Impulse Core when the cheapest enemy ship is worth at least the destroyer or cruiser it gives up and no enemy
     ship can sustain the hit; Supercharge once per combat; Exotrireme II after a finished round when the two best
     enemy ships cost at least twice a dreadnought; the enemy ship to hit when one of these lets it choose (the most
-    expensive, a sustain counted as 1); taking an opponent's Impulse Core hit like any single hit;
+    expensive, a sustain counted as 1); taking an opponent's Impulse Core hit like any single hit. **Retreats**
+    (`RetreatRules`): before rolling a space combat round it announces a retreat when its chance to win falls below
+    a threshold that slides from 35% for a system it does not need down to 20% for a critical one (its planets
+    there, unspent ones counting more, its structures, and the objective progress its ships hold there; a stake of
+    a victory point or more is critical). It still fights that round, then retreats before the next roll to the
+    legal system it values most (home, its planets and ships, away from enemy reach; Dark Energy Tap widens the
+    choice). It never retreats from its home system. Ground forces on planets there leave with it, within the
+    retreating ships' spare capacity and mechs first, when the enemy's ground forces in orbit would likely take the
+    planet: it evacuates only while the garrison's cost beats the chance it holds times the garrison plus the
+    planet's stake;
   - **technologies used outside combat** (`TechRules` unless noted): Infantry II revival at the start of its turn;
     Yin Spinner's 2 infantry after producing (on its dock planet first); Magen Defense Grid's mandatory infantry;
     Bio-Stims at the end of its turn to ready its best spent planet with a technology specialty; Psychoarchaeology
@@ -114,17 +123,27 @@ to build one by hand:
     always, the rest only with nothing to save for scoring or Leadership); Predictive Intelligence's 3 votes on top
     of its planets (`AgendaVoting`); AI Development Algorithm as a production discount when it has 2 or more unit
     upgrades (or cannot research), and exhausted when a unit upgrade it researches needed its prerequisite skip
-    (`StrategyCardRules`); Production Biomes' 4 trade goods instead of passing while it has a strategy token to
+    (`StrategyCardRules`); Sling Relay before passing (`SlingRelayRules`): the ship worth most at one of its docks
+    (a destroyer at least), weighing any trade goods it would spend against the ship and the extra action of
+    waiting; Fleet Logistics: after its first action it takes a second tactical action when one is worth a token,
+    otherwise plays its strategy card, keeping each action's plan separate; Dark Energy Tap: a spare ship is worth
+    sending to a system with a frontier token (worth 1.5) and it widens retreats; Production Biomes' 4 trade goods
+    instead of passing while it has a strategy token to
     spare (the other 2 to the player furthest behind); Nullification Field when the player activating a system
     with its ships could bring in a bigger fleet; Neural Parasite against the leader, on a planet rather than in space
     and on a planet's last infantry first; Salvage Operations' trade good after a decided space combat (it declines the paid
     rebuild); Self-Assembly Routines' free mech after producing (on the dock planet); Integrated Economy after
-    taking a planet, building mechs and infantry there up to the planet's resources and what it can spare
-    (`IntegratedEconomyRules`); Mirror Computing counts each trade good as 2 in every payment plan;
-  - technologies it does not use: Sling Relay, Transit Diodes, Fleet Logistics' second action, Chaos Mapping,
-    Instinct Training, Quantum Datahub Node, Wormhole Generator and the remaining faction technologies with an
-    action or a choice it has no rule for. They are worth the least when it researches or copies a technology;
-  - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat;
+    taking a planet (`IntegratedEconomyRules`): units an objective wants (a mech for _Mechanize the Military_, ships
+    for fleet objectives), otherwise infantry and fighters (for spare capacity) only when an enemy fleet can reach
+    the system or the money is spare beyond its best dock's production and a research; Mirror Computing counts each
+    trade good as 2 in every payment plan;
+  - technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub Node, Wormhole
+    Generator and the remaining faction technologies with an action or a choice it has no rule for. They are worth
+    the least when it researches or copies a technology;
+  - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat. A technology
+    that changes the rest of that fight (a unit upgrade for its units there, Duranium Armor, X-89 in a ground
+    combat) is worth its swing in the win chance times the resources at stake, and attack odds already count the
+    copy it would make;
   - **strategy card primaries and secondaries** (below), ending its turn and passing;
   - declining whens/afters; **agenda votes**, Nekro's **Galactic Threat** and agenda ties as speaker (below);
   - **scoring** (below), status-phase command tokens, the opening secret objective discard, discarding down to the
@@ -196,7 +215,7 @@ to build one by hand:
   | Card | Primary | Follows when |
   | --- | --- | --- |
   | Imperial | scores the best public objective it qualifies for, then the Imperial point (Mecatol Rex) or a secret | it has a spare strategy token and room in hand for a secret (it never swaps one secret for another) |
-  | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value, informed by the technologies Nekro players most often end games with, plus progress on tech objectives, and Space Dock II for _Produce en Masse_); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
+  | Technology | one free technology, a second for 6 resources if one is worth it (`ResearchPolicy`: generic value, informed by the technologies Nekro players most often end games with, plus progress on tech objectives it can still finish in the rounds left, about 1.5 researches a round until the leader is 2 points a round from winning, and Space Dock II for _Produce en Masse_; minus 0.7 per resource or influence lost exhausting a technology specialty planet for a prerequisite, which it then exhausts when paying, free with Psychoarchaeology, or AI Development Algorithm when that costs less); Nekro takes Propagation's 3 command tokens instead | a technology worth at least 3 (most technologies other than the weakest) is affordable after the scoring reserve; as Nekro, Propagation's 3 command tokens for the strategy token and 4 resources |
   | Leadership | 3 command tokens, plus up to 3 more bought with spare influence, within its reinforcements | spare influence buys up to 3 command tokens (3 influence each, no strategy token) |
   | Politics | makes itself speaker (or the player furthest behind), draws 2 action cards | with a spare strategy token when _Form a Spy Network_ needs cards (right after Imperial when 2 cards complete it), or with 2 or more spare strategy tokens and room for 2 cards; never with no strategy token, a full hand or _Hold No Action Cards_ |
   | Construction | two structures: a space dock while it has a site, otherwise PDS on planets without structures. A dock site is another planet in a home system with more than one planet, or a planet worth 2 or more resources elsewhere, preferring planets worth 3 or more and those in its own slice (next to home or on the way to Mecatol Rex; Styx counts too); any planet for _Fuel the War Machine_ | a revealed or held structure objective is 1 or 2 structures short |
@@ -343,7 +362,8 @@ to build one by hand:
     first; other systems covered by enemy space cannon are avoided. The odds also count its own space cannon (PDS in
     the system, PDS II and other deep space cannon next to it) firing first, Assault Cannon on both sides (the
     cheapest non-fighter ship lost), anti-fighter barrage on both sides, Non-Euclidean Shielding (a sustained hit
-    cancels two), and the expected bombardment hits on the planet the bot will bombard. Damaged ships join attacks but can no longer
+    cancels two), Duranium Armor repairs, X-89 ΩΩ doubling ground combat and bombardment hits, and the expected
+    bombardment hits on the planet the bot will bombard. Damaged ships join attacks but can no longer
     sustain damage, and damaged defenders cannot either. An attack can be worth it for objective
     progress alone. It also weighs the attack with the fighters at the origin riding along in the fleet's capacity
     (the infantry and mechs to land share what is left) and takes whichever plan scores better; the ground odds use

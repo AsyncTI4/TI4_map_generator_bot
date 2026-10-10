@@ -11,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.Threats;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
@@ -49,6 +50,7 @@ public class ProductionPlanner {
     private static final int PAWNS_PER_BUILD = 2;
     private static final double CHEAPEST_UNIT_COST = 0.5;
     private static final int INFANTRY_PER_RESOURCE = 2;
+    private static final int RESEARCH_SAVINGS = 4;
     private static final double CARRIER_VALUE = 2.5;
     private static final double NEEDED_INFANTRY_VALUE = 0.5;
     private static final double SCORING_VALUE_PER_RESOURCE = 0.5;
@@ -178,17 +180,47 @@ public class ProductionPlanner {
     }
 
     public static BuildPlan planIntegrated(Game game, Player seat, Tile tile, String planet) {
-        int resources = Math.min(spendableResources(game, seat), BoardView.planetResources(game, planet));
+        int spendable = spendableResources(game, seat);
+        int resources = Math.min(spendable, BoardView.planetResources(game, planet));
         if (resources <= 0) return new BuildPlan(List.of());
-        Builder builder =
-                new Builder(game, seat, tile, new Budget(resources * INFANTRY_PER_RESOURCE, resources, 0), planet);
-        int wantedMechs =
-                seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) ? MECHANIZE_MECHS : WANTED_MECHS;
-        while (builder.count(UnitType.Mech) < wantedMechs) {
-            if (!builder.ground(UnitType.Mech, 1, builder.fillerValue(UnitType.Mech))) break;
+        int fleetRoom = seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat);
+        Builder builder = new Builder(
+                game, seat, tile, new Budget(resources * INFANTRY_PER_RESOURCE, resources, fleetRoom), planet);
+        planScoringUnits(builder);
+        if (seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)) {
+            while (builder.count(UnitType.Mech) < MECHANIZE_MECHS) {
+                if (!builder.ground(UnitType.Mech, 1, builder.scoringValue(UnitType.Mech))) break;
+            }
         }
-        builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
+        if (Threats.anyEnemyCanReach(game, seat, tile) || spendable - otherUses(game, seat) >= resources) {
+            builder.fighters(builder.fillerValue(UnitType.Fighter));
+            builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
+        }
         return new BuildPlan(builder.orders);
+    }
+
+    public static List<BuildOrder> oneShipOptions(Game game, Player seat, Tile tile, int resources) {
+        if (resources <= 0 || BoardView.hasEnemyShips(game, seat, tile)) return List.of();
+        Builder planned = oneShipBuilder(game, seat, tile, resources);
+        planScoringUnits(planned);
+        planned.shipsUpTo(UnitType.Carrier, WANTED_CARRIERS, CARRIER_VALUE, false);
+        planSurplusShips(planned);
+        Builder cheapest = oneShipBuilder(game, seat, tile, resources);
+        cheapest.ship(UnitType.Destroyer, cheapest.fillerValue(UnitType.Destroyer), false);
+        List<BuildOrder> options = new ArrayList<>(planned.orders);
+        cheapest.orders.stream()
+                .filter(order -> options.stream().noneMatch(other -> other.type() == order.type()))
+                .forEach(options::add);
+        return options;
+    }
+
+    private static Builder oneShipBuilder(Game game, Player seat, Tile tile, int resources) {
+        int fleetRoom = seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat);
+        return new Builder(game, seat, tile, new Budget(1, resources, fleetRoom));
+    }
+
+    private static int otherUses(Game game, Player seat) {
+        return ButtonHelper.checkHighestProductionSystem(seat, game) + RESEARCH_SAVINGS;
     }
 
     public static SpendCost reserve(Game game, Player seat) {
