@@ -43,4 +43,20 @@ class AddFrontierTokensServiceTest extends BaseTi4Test {
         assertThat(hasFrontier(game.getTileByPosition("101"))).isTrue();
         assertThat(hasFrontier(game.getTileByPosition("frac1"))).isFalse();
     }
+
+    // The Empyrean hero places frontier tokens in every empty system, Fracture included.
+    @Test
+    void empyreanHeroPathAlsoCoversFractureSystems() {
+        Game game = new Game();
+        game.setName("frontier-test");
+        game.setTile(new Tile("46", "101"));
+        game.setTile(new Tile("46", "frac1"));
+
+        try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+            AddFrontierTokensService.addFrontierTokensIncludingFracture(null, game);
+        }
+
+        assertThat(hasFrontier(game.getTileByPosition("101"))).isTrue();
+        assertThat(hasFrontier(game.getTileByPosition("frac1"))).isTrue();
+    }
 }

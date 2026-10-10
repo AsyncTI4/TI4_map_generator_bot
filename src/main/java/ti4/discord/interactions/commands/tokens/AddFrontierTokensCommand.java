@@ -12,6 +12,8 @@ import ti4.service.explore.AddFrontierTokensService;
 
 public class AddFrontierTokensCommand extends GameStateCommand {
 
+    private static final String INCLUDE_FRACTURE = "include_fracture";
+
     public AddFrontierTokensCommand() {
         super(true, false);
     }
@@ -28,7 +30,12 @@ public class AddFrontierTokensCommand extends GameStateCommand {
 
     @Override
     public List<OptionData> getOptions() {
-        return List.of(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm").setRequired(true));
+        return List.of(
+                new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm").setRequired(true),
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        INCLUDE_FRACTURE,
+                        "True to also place tokens in empty Fracture systems (default false)"));
     }
 
     @Override
@@ -42,7 +49,11 @@ public class AddFrontierTokensCommand extends GameStateCommand {
             return;
         }
 
-        AddFrontierTokensService.addFrontierTokens(event, getGame());
+        if (event.getOption(INCLUDE_FRACTURE, false, OptionMapping::getAsBoolean)) {
+            AddFrontierTokensService.addFrontierTokensIncludingFracture(event, getGame());
+        } else {
+            AddFrontierTokensService.addFrontierTokens(event, getGame());
+        }
     }
 
     @Override
