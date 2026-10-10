@@ -9,7 +9,7 @@ import ti4.ai.scoring.Wallet.PlanetValue;
 class WalletTest {
 
     private static Wallet wallet(int tradeGoods, PlanetValue... planets) {
-        return new Wallet(List.of(planets), tradeGoods, 3, 2);
+        return new Wallet(List.of(planets), tradeGoods, 3, 2, 1);
     }
 
     @Test
@@ -30,6 +30,17 @@ class WalletTest {
 
         assertThat(payment.tradeGoods()).isEqualTo(1);
         assertThat(wallet.canPay(SpendCost.resources(10))).isFalse();
+    }
+
+    // Mirror Computing makes each trade good worth 2: a 3-resource shortfall takes 2 trade goods, not 3.
+    @Test
+    void countsTradeGoodsDoubleWithMirrorComputing() {
+        Wallet mirrored = new Wallet(List.of(new PlanetValue("a", 4, 1)), 5, 3, 2, 2);
+
+        assertThat(mirrored.plan(SpendCost.resources(7)).orElseThrow().tradeGoods())
+                .isEqualTo(2);
+        assertThat(mirrored.canPay(SpendCost.resources(14))).isTrue();
+        assertThat(mirrored.canPay(SpendCost.resources(15))).isFalse();
     }
 
     // Amass Wealth: each planet pays either resources or influence, never both, and 3 trade goods are always due.

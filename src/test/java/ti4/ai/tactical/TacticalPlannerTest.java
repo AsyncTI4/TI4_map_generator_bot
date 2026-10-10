@@ -393,6 +393,24 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
+    // A dreadnought stays home as the guard, so a carrier and a dreadnought attack Sol's two cruisers: not safe enough.
+    // Non-Euclidean Shielding lets the dreadnought's sustain cancel two hits, and the attack is on.
+    @Test
+    void countsNonEuclideanShieldingInTheOdds() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        Tile lodor = test.place("26", neighbour);
+        test.sol.addPlanet("lodor");
+        test.units(lodor, "space", test.sol, UnitType.Cruiser, 2);
+        test.nekro.setFleetCC(5);
+        assertThat(attackOn(neighbour)).isEmpty();
+
+        test.nekro.addTech("nes");
+
+        assertThat(attackOn(neighbour)).isPresent();
+    }
+
     // A damaged dreadnought can no longer sustain damage, but it still fights: two of the three dreadnoughts are
     // damaged, one stays home as the guard, and the other two join the attack instead of waiting for repairs.
     @Test

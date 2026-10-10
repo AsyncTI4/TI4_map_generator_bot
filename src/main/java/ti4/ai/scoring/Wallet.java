@@ -10,7 +10,8 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 
-public record Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens, int strategyTokens) {
+public record Wallet(
+        List<PlanetValue> planets, int tradeGoods, int tacticTokens, int strategyTokens, int tradeGoodValue) {
 
     public record PlanetValue(String name, int resources, int influence) {}
 
@@ -26,9 +27,12 @@ public record Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens
     private static final int AS_INFLUENCE = 2;
     private static final int UNREACHABLE = Integer.MAX_VALUE;
     private static final int CHOICE_SHIFT = 1_000_000;
+    private static final String MIRROR_COMPUTING = "mc";
+    private static final int MIRRORED_TRADE_GOOD = 2;
 
     public static Wallet of(Game game, Player seat) {
-        Wallet empty = new Wallet(List.of(), seat.getTg(), seat.getTacticalCC(), seat.getStrategicCC());
+        Wallet empty =
+                new Wallet(List.of(), seat.getTg(), seat.getTacticalCC(), seat.getStrategicCC(), tradeGoodValue(seat));
         return empty.withPlanets(game, seat.getReadiedPlanets());
     }
 
@@ -42,11 +46,11 @@ public record Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens
             int influence = Math.max(0, planet.getInfluence());
             if (resources + influence > 0) combined.add(new PlanetValue(name, resources, influence));
         }
-        return new Wallet(combined, tradeGoods, tacticTokens, strategyTokens);
+        return new Wallet(combined, tradeGoods, tacticTokens, strategyTokens, tradeGoodValue);
     }
 
     public Wallet withTradeGoods(int amount) {
-        return new Wallet(planets, Math.max(0, amount), tacticTokens, strategyTokens);
+        return new Wallet(planets, Math.max(0, amount), tacticTokens, strategyTokens, tradeGoodValue);
     }
 
     private static boolean holds(List<PlanetValue> planets, String name) {
@@ -73,7 +77,11 @@ public record Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens
         int tokensLeft = Math.max(0, tacticTokens + strategyTokens - payment.tokens());
         int strategyLeft = Math.min(strategyTokens, tokensLeft);
         return new Wallet(
-                left, Math.max(0, tradeGoods - payment.tradeGoods()), tokensLeft - strategyLeft, strategyLeft);
+                left,
+                Math.max(0, tradeGoods - payment.tradeGoods()),
+                tokensLeft - strategyLeft,
+                strategyLeft,
+                tradeGoodValue);
     }
 
     public boolean canPay(SpendCost cost) {
@@ -113,8 +121,9 @@ public record Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens
         int chosenWaste = UNREACHABLE;
         for (int state = 0; state < states; state++) {
             if (best[count][state] == UNREACHABLE) continue;
-            int tradeGoodsNeeded =
-                    cost.tradeGoods() + (needResources - state / width) + (needInfluence - state % width);
+            int tradeGoodsNeeded = cost.tradeGoods()
+                    + Math.ceilDiv(needResources - state / width, tradeGoodValue)
+                    + Math.ceilDiv(needInfluence - state % width, tradeGoodValue);
             if (tradeGoodsNeeded > tradeGoods) continue;
             if (tradeGoodsNeeded < chosenTradeGoods
                     || (tradeGoodsNeeded == chosenTradeGoods && best[count][state] < chosenWaste)) {
@@ -136,6 +145,10 @@ public record Wallet(List<PlanetValue> planets, int tradeGoods, int tacticTokens
             state = encoded % CHOICE_SHIFT;
         }
         return Optional.of(new Payment(forResources, forInfluence, chosenTradeGoods, cost.tokens()));
+    }
+
+    public static int tradeGoodValue(Player seat) {
+        return seat.hasTech(MIRROR_COMPUTING) ? MIRRORED_TRADE_GOOD : 1;
     }
 
     private static int waste(PlanetValue planet) {

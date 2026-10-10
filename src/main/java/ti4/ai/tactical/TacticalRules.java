@@ -470,6 +470,9 @@ public class TacticalRules {
         Optional<AiDecision> spinner =
                 TechRules.startYinSpinner(context, done.get().prompt());
         if (spinner.isPresent()) return spinner;
+        Optional<AiDecision> assembly =
+                TechRules.startSelfAssembly(context, done.get().prompt());
+        if (assembly.isPresent()) return assembly;
         return Optional.of(done.get().press("done building"));
     }
 
@@ -527,7 +530,7 @@ public class TacticalRules {
             } else if (AIDA_DISCOUNT.equals(thing)) {
                 spent += ButtonHelper.getNumberOfUnitUpgrades(seat);
             } else if (thing.startsWith("tg_")) {
-                spent += parseDouble(StringUtils.substringAfter(thing, "tg_"));
+                spent += parseDouble(StringUtils.substringAfter(thing, "tg_")) * Wallet.tradeGoodValue(seat);
             } else if (seat.getPlanets().contains(thing)) {
                 spent += BoardView.planetResources(game, thing);
             }

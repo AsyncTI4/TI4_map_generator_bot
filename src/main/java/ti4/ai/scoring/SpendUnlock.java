@@ -11,13 +11,10 @@ import ti4.helpers.Helper;
 @UtilityClass
 public class SpendUnlock {
 
-    private static final String MIRROR_COMPUTING = "mc";
-    private static final int MIRROR_COMPUTING_RATE = 2;
-
     public static boolean unlocks(Game game, Player player, Collection<String> readiedPlanets, int extraTradeGoods) {
         Wallet now = Wallet.of(game, player);
         Wallet after = now.withPlanets(game, readiedPlanets).withTradeGoods(now.tradeGoods() + extraTradeGoods);
-        return unlockedPoints(game, player, now, after, false) > 0;
+        return unlockedPoints(game, player, now, after) > 0;
     }
 
     public static int pointDelta(Game game, Player player, int tradeGoodDelta) {
@@ -29,7 +26,7 @@ public class SpendUnlock {
     private static int pointsGained(Game game, Player player, int tradeGoods) {
         Wallet now = Wallet.of(game, player);
         Wallet after = now.withTradeGoods(now.tradeGoods() + tradeGoods);
-        return unlockedPoints(game, player, now, after, player.hasTech(MIRROR_COMPUTING));
+        return unlockedPoints(game, player, now, after);
     }
 
     private static int pointsLost(Game game, Player player, int tradeGoods) {
@@ -42,11 +39,11 @@ public class SpendUnlock {
                 : ObjectivePolicy.victoryPoints(reserved.get().objectiveId());
     }
 
-    private static int unlockedPoints(Game game, Player player, Wallet now, Wallet after, boolean mirrorComputing) {
+    private static int unlockedPoints(Game game, Player player, Wallet now, Wallet after) {
         List<String> unlocked = game.getRevealedPublicObjectives().keySet().stream()
                 .filter(objective -> !ObjectivePolicy.hasScored(game, player, objective))
                 .filter(objective -> ObjectiveCatalog.spendCost(objective)
-                        .filter(cost -> !canPay(now, cost, mirrorComputing) && canPay(after, cost, mirrorComputing))
+                        .filter(cost -> !now.canPay(cost) && after.canPay(cost))
                         .isPresent())
                 .toList();
         if (unlocked.isEmpty() || !Helper.canPlayerScorePOs(game, player)) return 0;
@@ -61,12 +58,5 @@ public class SpendUnlock {
             if (asGood < chances) best = Math.max(best, points);
         }
         return best;
-    }
-
-    private static boolean canPay(Wallet wallet, SpendCost cost, boolean mirrorComputing) {
-        if (!mirrorComputing || wallet.tradeGoods() < cost.tradeGoods()) return wallet.canPay(cost);
-        int spentAsTradeGoods = cost.tradeGoods();
-        int spentAsValue = MIRROR_COMPUTING_RATE * (wallet.tradeGoods() - spentAsTradeGoods);
-        return wallet.withTradeGoods(spentAsTradeGoods + spentAsValue).canPay(cost);
     }
 }

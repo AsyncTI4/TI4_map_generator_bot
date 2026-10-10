@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
@@ -47,6 +48,7 @@ public class ProductionPlanner {
     private static final int WANTED_PAWNS = 4;
     private static final int PAWNS_PER_BUILD = 2;
     private static final double CHEAPEST_UNIT_COST = 0.5;
+    private static final int INFANTRY_PER_RESOURCE = 2;
     private static final double CARRIER_VALUE = 2.5;
     private static final double NEEDED_INFANTRY_VALUE = 0.5;
     private static final double SCORING_VALUE_PER_RESOURCE = 0.5;
@@ -173,6 +175,20 @@ public class ProductionPlanner {
         int upgrades = ButtonHelper.getNumberOfUnitUpgrades(seat);
         boolean worthTheExhaust = upgrades >= AIDA_MIN_DISCOUNT || StrategyCardRules.cannotResearch(seat);
         return worthTheExhaust ? upgrades : 0;
+    }
+
+    public static BuildPlan planIntegrated(Game game, Player seat, Tile tile, String planet) {
+        int resources = Math.min(spendableResources(game, seat), BoardView.planetResources(game, planet));
+        if (resources <= 0) return new BuildPlan(List.of());
+        Builder builder =
+                new Builder(game, seat, tile, new Budget(resources * INFANTRY_PER_RESOURCE, resources, 0), planet);
+        int wantedMechs =
+                seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) ? MECHANIZE_MECHS : WANTED_MECHS;
+        while (builder.count(UnitType.Mech) < wantedMechs) {
+            if (!builder.ground(UnitType.Mech, 1, builder.fillerValue(UnitType.Mech))) break;
+        }
+        builder.infantry(builder.budget.units, builder.fillerValue(UnitType.Infantry));
+        return new BuildPlan(builder.orders);
     }
 
     public static SpendCost reserve(Game game, Player seat) {
@@ -337,12 +353,18 @@ public class ProductionPlanner {
         private final Tile tile;
         private final Budget budget;
         private final List<BuildOrder> orders = new ArrayList<>();
+        private final String groundPlanet;
 
         Builder(Game game, Player seat, Tile tile, Budget budget) {
+            this(game, seat, tile, budget, null);
+        }
+
+        Builder(Game game, Player seat, Tile tile, Budget budget, @Nullable String groundPlanet) {
             this.game = game;
             this.seat = seat;
             this.tile = tile;
             this.budget = budget;
+            this.groundPlanet = groundPlanet;
         }
 
         boolean ship(UnitType type, double value, boolean scoring) {
@@ -406,7 +428,7 @@ public class ProductionPlanner {
         }
 
         boolean ground(UnitType type, int count, double valueEach) {
-            Optional<String> planet = dockPlanet();
+            Optional<String> planet = groundPlanet != null ? Optional.of(groundPlanet) : dockPlanet();
             UnitModel model = seat.getUnitByType(type);
             if (count <= 0 || planet.isEmpty() || model == null) return false;
             if (type == UnitType.Mech && game.isBaseGameMode()) return false;

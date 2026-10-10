@@ -102,7 +102,11 @@ to build one by hand:
     opponent's ability assigns to one of its units (it sustains if it can, otherwise takes the loss), Graviton
     Laser System before its space cannon fires at ships screened by fighters, Magen Defense Grid's hit at the start
     of a ground combat (a damaged mech first, then infantry, then a mech that would only sustain), ground combat
-    automation;
+    automation. Combat technologies (`CombatTechRules`): Dimensional Splicer at the start of a space combat;
+    Impulse Core when the cheapest enemy ship is worth at least the destroyer or cruiser it gives up and no enemy
+    ship can sustain the hit; Supercharge once per combat; Exotrireme II after a finished round when the two best
+    enemy ships cost at least twice a dreadnought; the enemy ship to hit when one of these lets it choose (the most
+    expensive, a sustain counted as 1); taking an opponent's Impulse Core hit like any single hit;
   - **technologies used outside combat** (`TechRules` unless noted): Infantry II revival at the start of its turn;
     Yin Spinner's 2 infantry after producing (on its dock planet first); Magen Defense Grid's mandatory infantry;
     Bio-Stims at the end of its turn to ready its best spent planet with a technology specialty; Psychoarchaeology
@@ -110,7 +114,16 @@ to build one by hand:
     always, the rest only with nothing to save for scoring or Leadership); Predictive Intelligence's 3 votes on top
     of its planets (`AgendaVoting`); AI Development Algorithm as a production discount when it has 2 or more unit
     upgrades (or cannot research), and exhausted when a unit upgrade it researches needed its prerequisite skip
-    (`StrategyCardRules`);
+    (`StrategyCardRules`); Production Biomes' 4 trade goods instead of passing while it has a strategy token to
+    spare (the other 2 to the player furthest behind); Nullification Field when the player activating a system
+    with its ships could bring in a bigger fleet; Neural Parasite against the leader, on a planet rather than in space
+    and on a planet's last infantry first; Salvage Operations' trade good after a decided space combat (it declines the paid
+    rebuild); Self-Assembly Routines' free mech after producing (on the dock planet); Integrated Economy after
+    taking a planet, building mechs and infantry there up to the planet's resources and what it can spare
+    (`IntegratedEconomyRules`); Mirror Computing counts each trade good as 2 in every payment plan;
+  - technologies it does not use: Sling Relay, Transit Diodes, Fleet Logistics' second action, Chaos Mapping,
+    Instinct Training, Quantum Datahub Node, Wormhole Generator and the remaining faction technologies with an
+    action or a choice it has no rule for. They are worth the least when it researches or copies a technology;
   - **Technological Singularity** (Nekro): copying a technology after the first kill in a combat;
   - **strategy card primaries and secondaries** (below), ending its turn and passing;
   - declining whens/afters; **agenda votes**, Nekro's **Galactic Threat** and agenda ties as speaker (below);
@@ -329,8 +342,8 @@ to build one by hand:
     _Darken the Skies_ or _Conquer the Weak_ is unscored, taking the expected space cannon losses off its fleet
     first; other systems covered by enemy space cannon are avoided. The odds also count its own space cannon (PDS in
     the system, PDS II and other deep space cannon next to it) firing first, Assault Cannon on both sides (the
-    cheapest non-fighter ship lost), anti-fighter barrage on both sides, and the expected bombardment hits on the
-    planet the bot will bombard. Damaged ships join attacks but can no longer
+    cheapest non-fighter ship lost), anti-fighter barrage on both sides, Non-Euclidean Shielding (a sustained hit
+    cancels two), and the expected bombardment hits on the planet the bot will bombard. Damaged ships join attacks but can no longer
     sustain damage, and damaged defenders cannot either. An attack can be worth it for objective
     progress alone. It also weighs the attack with the fighters at the origin riding along in the fleet's capacity
     (the infantry and mechs to land share what is left) and takes whichever plan scores better; the ground odds use

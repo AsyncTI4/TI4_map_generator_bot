@@ -51,7 +51,7 @@ public class TokenPurchase {
     }
 
     static Optional<Purchase> best(Game game, Player seat, int reinforcements, Wallet wallet) {
-        Wallet influencePlanets = new Wallet(influenceLeaning(wallet), 0, 0, 0);
+        Wallet influencePlanets = new Wallet(influenceLeaning(wallet), 0, 0, 0, wallet.tradeGoodValue());
         SpendCost keep = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));
         for (int tokens = Math.min(MAX_TOKENS, reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets

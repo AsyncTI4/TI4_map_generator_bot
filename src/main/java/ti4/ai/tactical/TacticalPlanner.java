@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
@@ -56,6 +57,8 @@ public class TacticalPlanner {
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String ASSAULT_CANNON = "asc";
+    private static final String NON_EUCLIDEAN_SHIELDING = "nes";
+    private static final int NEVER_HITS = 11;
     private static final int ASSAULT_CANNON_SHIPS = 3;
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double GROUP_MOVE_COST = 0.3;
@@ -873,7 +876,15 @@ public class TacticalPlanner {
                 combatants.add(new Combatant(hitsOn, profile.diceCount(), sustain, model.getCost()));
             }
         });
+        if (player.hasTech(NON_EUCLIDEAN_SHIELDING)) combatants.addAll(secondCancelledHits(combatants));
         return combatants;
+    }
+
+    private static List<Combatant> secondCancelledHits(List<Combatant> combatants) {
+        long sustaining = combatants.stream().filter(Combatant::sustain).count();
+        return Stream.generate(() -> new Combatant(NEVER_HITS, 0, false, 0))
+                .limit(sustaining)
+                .toList();
     }
 
     private static double fleetCost(Player seat, List<UnitMove> moves) {

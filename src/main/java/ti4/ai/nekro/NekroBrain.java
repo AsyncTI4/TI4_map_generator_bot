@@ -34,6 +34,7 @@ import ti4.ai.strategy.ChecksAndBalances;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.CombatRules;
+import ti4.ai.tactical.IntegratedEconomyRules;
 import ti4.ai.tactical.SingularityRules;
 import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tech.TechRules;
@@ -100,7 +101,13 @@ public class NekroBrain implements FactionBrain {
             NekroRules::dacxiveAnimators,
             TechRules::reviveInfantry,
             TechRules::placeSpinnerInfantry,
+            TechRules::placeSelfAssemblyMech,
             TechRules::placeMagenInfantry,
+            TechRules::continueProductionBiomes,
+            TechRules::nullificationField,
+            TechRules::neuralParasite,
+            TechRules::salvageOperations,
+            IntegratedEconomyRules::next,
             StrategyCardRules::chooseTechnology,
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,

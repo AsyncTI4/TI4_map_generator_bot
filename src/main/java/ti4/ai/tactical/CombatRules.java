@@ -79,6 +79,8 @@ public class CombatRules {
         if (spaceCannon.isPresent()) return spaceCannon;
         Optional<AiDecision> assaultCannon = assaultCannon(context, prompts);
         if (assaultCannon.isPresent()) return assaultCannon;
+        Optional<AiDecision> combatTech = CombatTechRules.next(context, prompts);
+        if (combatTech.isPresent()) return combatTech;
         Optional<AiDecision> afb = antiFighterBarrage(context, prompts);
         if (afb.isPresent()) return afb;
         return combatRound(context, prompts);
@@ -299,11 +301,11 @@ public class CombatRules {
         return Optional.empty();
     }
 
-    private static boolean isSingleUnitLoss(PromptButton button) {
+    static boolean isSingleUnitLoss(PromptButton button) {
         return isSingleUnitPick(button, ASSIGN_HITS);
     }
 
-    private static boolean isSingleUnitSustain(PromptButton button) {
+    static boolean isSingleUnitSustain(PromptButton button) {
         return isSingleUnitPick(button, ASSIGN_DAMAGE);
     }
 
@@ -312,7 +314,7 @@ public class CombatRules {
         return parts.length >= 5 && action.equals(parts[0]) && StringUtils.isNumeric(parts[2]);
     }
 
-    private static double lossCost(Player seat, PromptButton button) {
+    static double lossCost(Player seat, PromptButton button) {
         String[] parts = button.handlerId().split("_");
         UnitModel model = seat.getUnitFromAsyncID(parts[3]);
         double cost = model == null ? Double.MAX_VALUE : model.getCost();
@@ -468,7 +470,7 @@ public class CombatRules {
         return tracker(context.game(), faction, position, holder);
     }
 
-    private static int tracker(Game game, String faction, String position, String holder) {
+    static int tracker(Game game, String faction, String position, String holder) {
         String value = game.getStoredValue("combatRoundTracker" + faction + position + holder);
         return StringUtils.isNumeric(value) ? Integer.parseInt(value) : 0;
     }

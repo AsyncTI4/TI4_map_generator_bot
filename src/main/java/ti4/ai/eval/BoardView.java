@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -144,7 +145,7 @@ public class BoardView {
 
     public static int availableResources(Game game, Player player) {
         Integer planets = Helper.getPlayerResourcesAvailable(player, game);
-        return (planets == null ? 0 : planets) + player.getTg();
+        return (planets == null ? 0 : planets) + player.getTg() * Wallet.tradeGoodValue(player);
     }
 
     public static int planetResources(Game game, String planet) {

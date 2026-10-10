@@ -2,8 +2,10 @@ package ti4.ai.tech;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -13,8 +15,10 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.MovementGraph;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -22,6 +26,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 
 @UtilityClass
 public class TechRules {
@@ -45,6 +50,36 @@ public class TechRules {
     private static final String PSYCHO_OPEN = "getPsychoButtons";
     private static final String PSYCHO_EXHAUST = "psychoExhaust_";
     private static final int TRADE_GOOD_VALUE = 1;
+    private static final String NULLIFICATION_PREFIX = "nullificationField_";
+    private static final String DECLINE = "deleteButtons";
+    private static final String NEURAL_PARASITE = "parasite-obs";
+    private static final String PARASITE_KEY = "neuralParasite|";
+    private static final String PARASITE_START = "startNeuralParasite";
+    private static final String PARASITE_VICTIM = "victim";
+    private static final String PARASITE_UNIT = "unit";
+    private static final String PARASITE_DONE = "done";
+    private static final String PARASITE_VICTIM_PREFIX = "neuralParasiteS2_";
+    private static final String PARASITE_RESOLVE_PREFIX = "resolveNeuralParasite_";
+    private static final double PLANET_TARGET_BONUS = 100;
+    private static final double LAST_DEFENDER_BONUS = 10;
+    private static final String SALVAGE_OPERATIONS = "so";
+    private static final String SALVAGE_PREFIX = "salvageOps_";
+    private static final String SALVAGE_KEY = "salvageOperations|";
+    private static final String SALVAGE_DECLINE = "Decline";
+    private static final String SALVAGE_BUILD_TEXT = "produce 1 ship that was destroyed in the combat";
+    private static final String SELF_ASSEMBLY = "sar";
+    private static final String ASSEMBLY_KEY = "selfAssembly|";
+    private static final String ASSEMBLY_START = "sarMechStep1_";
+    private static final String ASSEMBLY_PLACE = "sarMechStep2_";
+    private static final double DOCK_PLANET_BONUS = 10;
+    private static final String PRODUCTION_BIOMES = "pm";
+    private static final String BIOMES_KEY = "productionBiomes|";
+    private static final String BIOMES_MENU = "menu";
+    private static final String BIOMES_RECIPIENT = "recipient";
+    private static final String BIOMES_DONE = "done";
+    private static final String COMPONENT_ACTION = "componentAction";
+    private static final String BIOMES_EXHAUST = "exhaustTech_pm";
+    private static final String BIOMES_TARGET = "productionBiomes_";
 
     public static Optional<AiDecision> reviveInfantry(AiTurnContext context) {
         Player seat = context.seat();
@@ -63,6 +98,42 @@ public class TechRules {
         context.memory().put(key, "started");
         context.memory().put(SPINNER_KEY + context.turnKey(), "placing");
         return Optional.of(AiDecision.press(production, spinner.get(), "place 2 infantry with Yin Spinner"));
+    }
+
+    public static Optional<AiDecision> startSelfAssembly(AiTurnContext context, AiPrompt production) {
+        Player seat = context.seat();
+        if (!seat.hasTechReady(SELF_ASSEMBLY) || !mechInReinforcements(context.game(), seat)) return Optional.empty();
+        String key = ASSEMBLY_KEY + context.turnKey() + "|" + production.messageId();
+        if (context.memory().has(key)) return Optional.empty();
+        Optional<PromptButton> start = production.firstEnabled(
+                button -> button.isUnowned() && button.handlerId().startsWith(ASSEMBLY_START));
+        if (start.isEmpty()) return Optional.empty();
+        context.memory().put(key, "started");
+        context.memory().put(ASSEMBLY_KEY + context.turnKey(), "placing");
+        return Optional.of(AiDecision.press(production, start.get(), "place a mech with Self-Assembly Routines"));
+    }
+
+    public static Optional<AiDecision> placeSelfAssemblyMech(AiTurnContext context) {
+        String key = ASSEMBLY_KEY + context.turnKey();
+        if (context.memory().get(key).filter("placing"::equals).isEmpty()) return Optional.empty();
+        Game game = context.game();
+        Player seat = context.seat();
+        Optional<Match> best = bestButton(
+                Prompts.newestFirst(context.prompts()),
+                button -> button.isUnowned() && button.handlerId().startsWith(ASSEMBLY_PLACE),
+                button -> {
+                    String planet = StringUtils.substringBefore(
+                            StringUtils.removeStart(button.handlerId(), ASSEMBLY_PLACE), "_");
+                    return (hasDock(game, seat, planet) ? DOCK_PLANET_BONUS : 0)
+                            + BoardView.planetResources(game, planet);
+                });
+        best.ifPresent(match -> context.memory().remove(key));
+        return best.map(match -> match.press("place the Self-Assembly Routines mech"));
+    }
+
+    private static boolean mechInReinforcements(Game game, Player seat) {
+        int cap = seat.getUnitCap(UnitType.Mech.getValue());
+        return cap <= 0 || ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, UnitType.Mech.getValue()) < cap;
     }
 
     public static Optional<AiDecision> placeSpinnerInfantry(AiTurnContext context) {
@@ -115,6 +186,202 @@ public class TechRules {
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return startProductionBiomes(context, thisTurn).or(() -> psychoarchaeology(context, thisTurn));
+    }
+
+    private static Optional<AiDecision> startProductionBiomes(AiTurnContext context, List<AiPrompt> thisTurn) {
+        Player seat = context.seat();
+        String key = BIOMES_KEY + context.turnKey();
+        if (!seat.hasTechReady(PRODUCTION_BIOMES) || context.memory().has(key)) return Optional.empty();
+        int reserved = ScoringReserve.of(context.game(), seat).tokens();
+        if (seat.getStrategicCC() < 1 || seat.getStrategicCC() + seat.getTacticalCC() - 1 < reserved) {
+            return Optional.empty();
+        }
+        Optional<Match> component = Prompts.owned(thisTurn, context.faction(), COMPONENT_ACTION::equals);
+        component.ifPresent(match -> context.memory().put(key, BIOMES_MENU));
+        return component.map(match -> match.press("take 4 trade goods with Production Biomes instead of passing"));
+    }
+
+    public static Optional<AiDecision> continueProductionBiomes(AiTurnContext context) {
+        String key = BIOMES_KEY + context.turnKey();
+        String state = context.memory().get(key).orElse("");
+        List<AiPrompt> visible = Prompts.newestFirst(context.prompts()).stream()
+                .filter(prompt -> !prompt.isHidden())
+                .toList();
+        if (BIOMES_MENU.equals(state)) {
+            Optional<Match> exhaust = Prompts.owned(visible, context.faction(), BIOMES_EXHAUST::equals);
+            exhaust.ifPresent(match -> context.memory().put(key, BIOMES_RECIPIENT));
+            return exhaust.map(match -> match.press("exhaust Production Biomes"));
+        }
+        if (!BIOMES_RECIPIENT.equals(state)) return Optional.empty();
+        Game game = context.game();
+        Optional<Match> recipient = visible.stream()
+                .flatMap(prompt -> prompt.enabledButtons().stream()
+                        .filter(button ->
+                                button.isUnowned() && button.handlerId().startsWith(BIOMES_TARGET))
+                        .map(button -> new Match(prompt, button)))
+                .min(Comparator.comparingInt(match -> victoryPoints(
+                        game, StringUtils.removeStart(match.button().handlerId(), BIOMES_TARGET))));
+        recipient.ifPresent(match -> context.memory().put(key, BIOMES_DONE));
+        return recipient.map(
+                match -> match.press("give Production Biomes' 2 trade goods to the player furthest behind"));
+    }
+
+    public static Optional<AiDecision> nullificationField(AiTurnContext context) {
+        List<AiPrompt> visible = Prompts.newestFirst(context.prompts()).stream()
+                .filter(prompt -> !prompt.isHidden())
+                .toList();
+        Optional<Match> use = Prompts.owned(visible, context.faction(), id -> id.startsWith(NULLIFICATION_PREFIX));
+        if (use.isEmpty()) return Optional.empty();
+        Game game = context.game();
+        Player seat = context.seat();
+        String[] target = StringUtils.removeStart(use.get().button().handlerId(), NULLIFICATION_PREFIX)
+                .split("_");
+        Tile tile = game.getTileByPosition(target[0]);
+        Player active = target.length > 1 ? game.getPlayerFromColorOrFaction(target[1]) : null;
+        int reserved = ScoringReserve.of(game, seat).tokens();
+        boolean spareToken = seat.getStrategicCC() >= 1 && seat.getStrategicCC() + seat.getTacticalCC() - 1 >= reserved;
+        if (tile != null && active != null && spareToken && threatened(game, seat, active, tile)) {
+            return Optional.of(use.get().press("end " + active.getFaction() + "'s turn with Nullification Field"));
+        }
+        return use.get()
+                .prompt()
+                .firstEnabled(button -> button.isOwnedBy(context.faction()) && DECLINE.equals(button.handlerId()))
+                .map(button -> AiDecision.press(use.get().prompt(), button, "let the activation stand"));
+    }
+
+    private static boolean threatened(Game game, Player seat, Player active, Tile tile) {
+        double incoming = reachingFleetCost(game, active, tile);
+        if (incoming <= 0) return false;
+        if (tile == seat.getHomeSystemTile()) return true;
+        double defending = BoardView.ships(BoardView.space(tile), seat).entrySet().stream()
+                .mapToDouble(entry -> BoardView.model(seat, entry.getKey())
+                                .map(model -> (double) model.getCost())
+                                .orElse(0.0)
+                        * entry.getValue())
+                .sum();
+        return incoming >= defending;
+    }
+
+    private static double reachingFleetCost(Game game, Player mover, Tile target) {
+        double total = 0;
+        for (Tile origin : game.getTileMap().values()) {
+            if (origin == target || origin.hasPlayerCC(mover)) continue;
+            for (Map.Entry<UnitType, Integer> ship :
+                    BoardView.ships(BoardView.space(origin), mover).entrySet()) {
+                if (ship.getKey() == UnitType.Fighter) continue;
+                int move = BoardView.moveValueWithGravityDrive(mover, ship.getKey());
+                if (!MovementGraph.reach(game, mover, origin.getPosition(), move)
+                        .containsKey(target.getPosition())) continue;
+                total += BoardView.model(mover, ship.getKey())
+                                .map(UnitModel::getCost)
+                                .orElse(0f)
+                        * ship.getValue();
+            }
+        }
+        return total;
+    }
+
+    public static Optional<AiDecision> neuralParasite(AiTurnContext context) {
+        if (!context.seat().hasTech(NEURAL_PARASITE) || !context.isActivePlayer()) return Optional.empty();
+        String key = PARASITE_KEY + context.turnKey();
+        String state = context.memory().get(key).orElse("");
+        List<AiPrompt> turn = Prompts.thisTurn(context).stream()
+                .filter(prompt -> !prompt.isHidden())
+                .toList();
+        Game game = context.game();
+        Optional<Match> next =
+                switch (state) {
+                    case "" -> Prompts.unowned(turn, PARASITE_START::equals);
+                    case PARASITE_VICTIM ->
+                        bestButton(
+                                turn,
+                                button -> button.isOwnedBy(context.faction())
+                                        && button.handlerId().startsWith(PARASITE_VICTIM_PREFIX),
+                                button -> leaderScore(
+                                        game, StringUtils.removeStart(button.handlerId(), PARASITE_VICTIM_PREFIX)));
+                    case PARASITE_UNIT ->
+                        bestButton(
+                                turn,
+                                button ->
+                                        button.isUnowned() && button.handlerId().startsWith(PARASITE_RESOLVE_PREFIX),
+                                TechRules::parasiteTargetScore);
+                    default -> Optional.empty();
+                };
+        if (next.isEmpty()) return Optional.empty();
+        String following =
+                switch (state) {
+                    case "" -> PARASITE_VICTIM;
+                    case PARASITE_VICTIM -> PARASITE_UNIT;
+                    default -> PARASITE_DONE;
+                };
+        context.memory().put(key, following);
+        return Optional.of(next.get().press("destroy an enemy infantry with Neural Parasite"));
+    }
+
+    private static Optional<Match> bestButton(
+            List<AiPrompt> prompts, Predicate<PromptButton> wanted, ToDoubleFunction<PromptButton> score) {
+        return prompts.stream()
+                .flatMap(prompt ->
+                        prompt.enabledButtons().stream().filter(wanted).map(button -> new Match(prompt, button)))
+                .max(Comparator.comparingDouble(match -> score.applyAsDouble(match.button())));
+    }
+
+    private static double parasiteTargetScore(PromptButton button) {
+        String[] parts = StringUtils.removeStart(button.handlerId(), PARASITE_RESOLVE_PREFIX)
+                .split("_");
+        boolean onPlanet = parts.length > 1 && !BoardView.SPACE.equals(parts[1]);
+        String count = StringUtils.substringBetween(button.label(), "(", ")");
+        int infantry = StringUtils.isNumeric(count) ? Integer.parseInt(count) : Integer.MAX_VALUE;
+        return (onPlanet ? PLANET_TARGET_BONUS : 0) + (infantry == 1 ? LAST_DEFENDER_BONUS : 0) - infantry;
+    }
+
+    public static Optional<AiDecision> salvageOperations(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
+            Optional<PromptButton> decline = prompt.firstEnabled(button ->
+                    button.isUnowned() && DECLINE.equals(button.handlerId()) && SALVAGE_DECLINE.equals(button.label()));
+            if (decline.isPresent() && prompt.content().contains(SALVAGE_BUILD_TEXT) && mentions(prompt, seat)) {
+                return Optional.of(AiDecision.press(prompt, decline.get(), "skip Salvage Operations' rebuild"));
+            }
+            Optional<PromptButton> salvage = prompt.firstEnabled(
+                    button -> button.isUnowned() && button.handlerId().startsWith(SALVAGE_PREFIX));
+            if (salvage.isEmpty() || !seat.hasTech(SALVAGE_OPERATIONS)) continue;
+            String key = SALVAGE_KEY + prompt.messageId();
+            Tile tile =
+                    game.getTileByPosition(StringUtils.removeStart(salvage.get().handlerId(), SALVAGE_PREFIX));
+            if (tile == null || context.memory().has(key) || !spaceCombatDecided(game, seat, tile)) continue;
+            context.memory().put(key, "pressed");
+            return Optional.of(AiDecision.press(prompt, salvage.get(), "gain a trade good with Salvage Operations"));
+        }
+        return Optional.empty();
+    }
+
+    private static boolean mentions(AiPrompt prompt, Player seat) {
+        String content = prompt.content();
+        return content.contains(seat.getRepresentation())
+                || content.contains(seat.getRepresentationUnfogged())
+                || content.contains(seat.getRepresentationNoPing());
+    }
+
+    private static boolean spaceCombatDecided(Game game, Player seat, Tile tile) {
+        boolean own = BoardView.hasOwnShips(seat, tile);
+        boolean enemy = BoardView.hasEnemyShips(game, seat, tile);
+        return own != enemy;
+    }
+
+    private static int victoryPoints(Game game, String faction) {
+        Player player = game.getPlayerFromColorOrFaction(faction);
+        return player == null ? Integer.MAX_VALUE : player.getTotalVictoryPoints();
+    }
+
+    private static int leaderScore(Game game, String faction) {
+        Player player = game.getPlayerFromColorOrFaction(faction);
+        return player == null ? -1 : player.getTotalVictoryPoints();
+    }
+
+    private static Optional<AiDecision> psychoarchaeology(AiTurnContext context, List<AiPrompt> thisTurn) {
         Game game = context.game();
         Player seat = context.seat();
         if (!seat.hasTech(PSYCHOARCHAEOLOGY)) return Optional.empty();
