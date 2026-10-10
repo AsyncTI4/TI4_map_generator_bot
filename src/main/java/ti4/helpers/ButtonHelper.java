@@ -4145,9 +4145,8 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
             List<ActionRowChildComponentUnion> buttonRow = row.getComponents();
-            for (ActionRowChildComponent but : buttonRow) {
-                Button button = (Button) but;
-                if (button != null) {
+            for (ActionRowChildComponent component : buttonRow) {
+                if (component instanceof Button button) {
                     buttons.add(button);
                 }
             }

@@ -151,8 +151,10 @@ public class OPlusPlusCouncilService {
             Object model = modelLookup.apply(id);
             components.add(TextDisplay.of("**" + modelNameOf(model, id) + "**\n> " + modelTextOf(model)));
         }
-        components.add(ActionRow.of(
-                buildMenu(menuCustomID, "Choose " + keepCount + " " + label, ids, keepCount, modelLookup)));
+        if (keepCount > 0) {
+            components.add(ActionRow.of(
+                    buildMenu(menuCustomID, "Choose " + keepCount + " " + label, ids, keepCount, modelLookup)));
+        }
         return Container.of(components).withAccentColor(accentColor);
     }
 
