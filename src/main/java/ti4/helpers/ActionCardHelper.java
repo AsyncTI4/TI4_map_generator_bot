@@ -46,6 +46,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.KnownActionCardsService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
@@ -2636,6 +2637,7 @@ public class ActionCardHelper {
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sa.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(player2, sb.toString());
+        KnownActionCardsService.rememberViewedHand(player2, player);
     }
 
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
