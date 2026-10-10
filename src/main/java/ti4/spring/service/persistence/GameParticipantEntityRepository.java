@@ -12,6 +12,7 @@ public interface GameParticipantEntityRepository extends JpaRepository<GameParti
     @Query("DELETE FROM GameParticipantEntity p WHERE p.game.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);
 
-    @Query("SELECT p FROM GameParticipantEntity p JOIN FETCH p.game g")
-    List<GameParticipantEntity> findAllWithGames();
+    @Query("SELECT new ti4.spring.service.persistence.GameParticipantRow(p.game.gameName, p.userId, p.userName,"
+            + " p.realPlayer) FROM GameParticipantEntity p")
+    List<GameParticipantRow> findAllRows();
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import ti4.game.persistence.ManagedGameState;
 
 class PersistedGameStateTest {
 
@@ -17,12 +18,12 @@ class PersistedGameStateTest {
         PersistedGameState expectedState = PersistedGameState.of(
                 expected,
                 List.of(player(expected, alice, "sol"), player(expected, bob, "hacan")),
-                List.of(participant(expected, "1", true), participant(expected, "2", true)),
+                List.of(participant("1", true), participant("2", true)),
                 List.of(title(expected, alice, "Kingmaker")));
         PersistedGameState actualState = PersistedGameState.of(
                 actual,
                 List.of(player(actual, bob, "hacan"), player(actual, alice, "sol")),
-                List.of(participant(actual, "2", true), participant(actual, "1", true)),
+                List.of(participant("2", true), participant("1", true)),
                 List.of(title(actual, alice, "Kingmaker")));
 
         assertThat(expectedState).isEqualTo(actualState);
@@ -41,10 +42,10 @@ class PersistedGameStateTest {
         PersistedGameState expectedState = PersistedGameState.of(
                 expected,
                 List.of(player(expected, alice, "sol")),
-                List.of(participant(expected, "1", true)),
+                List.of(participant("1", true)),
                 List.of(title(expected, alice, "Kingmaker")));
         PersistedGameState actualState = PersistedGameState.of(
-                actual, List.of(player(actual, alice, "hacan")), List.of(participant(actual, "1", false)), List.of());
+                actual, List.of(player(actual, alice, "hacan")), List.of(participant("1", false)), List.of());
 
         assertThat(expectedState.describeDifferencesFrom(actualState))
                 .containsExactly(
@@ -69,13 +70,8 @@ class PersistedGameStateTest {
         return player;
     }
 
-    private static GameParticipantEntity participant(GameEntity game, String userId, boolean realPlayer) {
-        GameParticipantEntity participant = new GameParticipantEntity();
-        participant.setGame(game);
-        participant.setUserId(userId);
-        participant.setUserName("user " + userId);
-        participant.setRealPlayer(realPlayer);
-        return participant;
+    private static ManagedGameState.Participant participant(String userId, boolean realPlayer) {
+        return new ManagedGameState.Participant(userId, "user " + userId, realPlayer);
     }
 
     private static TitleEntity title(GameEntity game, UserEntity user, String title) {

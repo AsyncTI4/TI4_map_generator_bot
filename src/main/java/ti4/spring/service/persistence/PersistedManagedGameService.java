@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.game.persistence.ManagedGameState;
 import ti4.spring.context.SpringContext;
 
 @Service
@@ -18,10 +19,11 @@ public class PersistedManagedGameService {
 
     @Transactional(readOnly = true)
     public Map<String, PersistedManagedGame> loadAll() {
-        Map<String, List<GameParticipantEntity>> participantsByGame =
-                gameParticipantEntityRepository.findAllWithGames().stream()
+        Map<String, List<ManagedGameState.Participant>> participantsByGame =
+                gameParticipantEntityRepository.findAllRows().stream()
                         .collect(Collectors.groupingBy(
-                                participant -> participant.getGame().getGameName()));
+                                GameParticipantRow::gameName,
+                                Collectors.mapping(GameParticipantRow::toParticipant, Collectors.toList())));
 
         Map<String, PersistedManagedGame> persistedGames = new HashMap<>();
         for (GameEntity game : gameEntityRepository.findAll()) {

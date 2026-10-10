@@ -71,9 +71,9 @@ public class ManagedGame {
         lastActivePlayerChange = state.lastActivePlayerChange();
         endedDate = state.endedDate();
         round = state.round();
-        guild = findById(state.guildId(), id -> JdaService.jda.getGuildById(id));
         mainGameChannel = findById(state.mainGameChannelId(), id -> JdaService.jda.getTextChannelById(id));
         tableTalkChannel = findById(state.tableTalkChannelId(), id -> JdaService.jda.getTextChannelById(id));
+        guild = findGuild(state.guildId(), mainGameChannel, tableTalkChannel);
         launchPostThread = findById(state.launchPostThreadId(), ManagedGame::findPrimaryGuildThread);
 
         players = state.participants().stream()
@@ -87,6 +87,15 @@ public class ManagedGame {
     private static <T> T findById(String id, Function<String, T> lookup) {
         if (JdaService.jda == null || !StringUtils.isNumeric(id)) return null;
         return lookup.apply(id);
+    }
+
+    private static Guild findGuild(String guildId, TextChannel mainGameChannel, TextChannel tableTalkChannel) {
+        if (JdaService.jda != null && StringUtils.isNumeric(guildId)) {
+            return JdaService.jda.getGuildById(guildId);
+        }
+        if (mainGameChannel != null) return mainGameChannel.getGuild();
+        if (tableTalkChannel != null) return tableTalkChannel.getGuild();
+        return null;
     }
 
     private static ThreadChannel findPrimaryGuildThread(String id) {

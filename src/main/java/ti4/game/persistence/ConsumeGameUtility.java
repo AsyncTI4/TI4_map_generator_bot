@@ -33,6 +33,7 @@ public class ConsumeGameUtility {
             if (managed == null) continue;
             ExecutionLockManager.wrapWithLockAndRelease(gameName, lockType, () -> {
                         Game game = managed.getGame();
+                        if (game == null) return;
 
                         if (filter == null || filter.test(game)) {
                             consumer.accept(game);

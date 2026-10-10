@@ -64,18 +64,18 @@ public class GameManager {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
                 Map<String, PersistedManagedGame> persistedGames = loadPersistedManagedGames();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
+                AtomicInteger builtFromGameFiles = new AtomicInteger();
                 try (ExecutorService executorService =
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> {
-                        if (warmupManagedGame(name, persistedGames)) {
-                            builtFromDatabase.incrementAndGet();
-                        }
+                        boolean fromDatabase = warmupManagedGame(name, persistedGames);
+                        (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
                     }));
                 }
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
                         "FINISHED BUILDING MANAGED GAMES: %,d FROM THE DATABASE, %,d FROM GAME FILES",
-                        builtFromDatabase.get(), gameNames.size() - builtFromDatabase.get()));
+                        builtFromDatabase.get(), builtFromGameFiles.get()));
                 if (JdaService.jda != null) {
                     JdaService.updatePresence();
                 }
@@ -102,29 +102,24 @@ public class GameManager {
     }
 
     static boolean warmupManagedGame(String gameName, @Nullable Map<String, PersistedManagedGame> persistedGames) {
-        if (persistedGames == null) {
-            buildManagedGameFromGameFile(gameName, loadGameOrThrow(gameName));
-            return false;
-        }
-        PersistedManagedGame persistedGame = persistedGames.get(gameName);
-        if (persistedGame != null && persistedGame.matchesGameFile(GameLoadService.getGameFileLastModified(gameName))) {
+        PersistedManagedGame persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
+        if (persistedGame != null
+                && persistedGame.gameFileStamp().matches(GameLoadService.getGameFileStamp(gameName))) {
             gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame.state()));
             return true;
         }
-        buildManagedGameFromGameFile(gameName, loadGameAndQueueDatabaseSync(gameName));
+        buildManagedGameFromGameFile(gameName);
+        if (persistedGames != null) {
+            GameDatabaseSyncPipeline.queueSyncFromGameFile(gameName);
+        }
         return false;
     }
 
-    private static Game loadGameAndQueueDatabaseSync(String gameName) {
+    private static ManagedGame buildManagedGameFromGameFile(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             Game game = loadGameOrThrow(gameName);
-            GameDatabaseSyncPipeline.queueSync(game);
-            return game;
+            return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
         });
-    }
-
-    private static ManagedGame buildManagedGameFromGameFile(String gameName, Game game) {
-        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
     }
 
     private static Game loadGameOrThrow(String gameName) {
@@ -136,8 +131,17 @@ public class GameManager {
         return game;
     }
 
-    public static long getGameFileLastModified(String gameName) {
-        return GameLoadService.getGameFileLastModified(gameName);
+    public static GameFileStamp getGameFileStamp(String gameName) {
+        return GameLoadService.getGameFileStamp(gameName);
+    }
+
+    @Nullable
+    public static LoadedGameFile loadGameFile(String gameName) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            Game game = GameLoadService.load(gameName);
+            if (game == null) return null;
+            return new LoadedGameFile(game, GameLoadService.getGameFileStamp(gameName));
+        });
     }
 
     @Nullable
@@ -169,13 +173,14 @@ public class GameManager {
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
-        if (!saveAndQueueDatabaseSync(game, reason)) {
+        ManagedGameState managedGameState = saveAndQueueDatabaseSync(game, reason);
+        if (managedGameState == null) {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
 
         gameNames.add(game.getName());
-        gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        gameNameToManagedGame.put(game.getName(), new ManagedGame(managedGameState));
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -185,13 +190,15 @@ public class GameManager {
         }
     }
 
-    private static boolean saveAndQueueDatabaseSync(Game game, String reason) {
+    @Nullable
+    private static ManagedGameState saveAndQueueDatabaseSync(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
             if (!GameSaveService.save(game, reason)) {
-                return false;
+                return null;
             }
-            GameDatabaseSyncPipeline.queueSync(game);
-            return true;
+            ManagedGameState managedGameState = ManagedGameState.of(game);
+            GameDatabaseSyncPipeline.queueSync(game, managedGameState);
+            return managedGameState;
         });
     }
 
@@ -213,17 +220,18 @@ public class GameManager {
     }
 
     private static Game handleUndo(Game undo) {
-        handleMissingMatchingManagedGame(undo);
-        GameDatabaseSyncPipeline.queueSync(undo);
+        if (undo == null) return null;
+        ManagedGameState managedGameState = ManagedGameState.of(undo);
+        handleMissingMatchingManagedGame(undo, managedGameState);
+        GameDatabaseSyncPipeline.queueSync(undo, managedGameState);
         return undo;
     }
 
-    private static void handleMissingMatchingManagedGame(Game game) {
-        if (game == null) return;
+    private static void handleMissingMatchingManagedGame(Game game, ManagedGameState managedGameState) {
         var managedGame = gameNameToManagedGame.get(game.getName());
         if (managedGame == null || !managedGame.matches(game)) {
             gameNames.add(game.getName());
-            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+            gameNameToManagedGame.put(game.getName(), new ManagedGame(managedGameState));
         }
     }
 
@@ -250,8 +258,9 @@ public class GameManager {
             handleManagedGameRemoval(gameName);
             return null;
         }
-        handleMissingMatchingManagedGame(game);
-        GameDatabaseSyncPipeline.queueSync(game);
+        ManagedGameState managedGameState = ManagedGameState.of(game);
+        handleMissingMatchingManagedGame(game, managedGameState);
+        GameDatabaseSyncPipeline.queueSync(game, managedGameState);
         return game;
     }
 
@@ -277,7 +286,7 @@ public class GameManager {
         if (!isValid(gameName)) return null;
         ManagedGame managedGame = gameNameToManagedGame.get(gameName);
         if (managedGame != null) return managedGame;
-        return buildManagedGameFromGameFile(gameName, loadGameOrThrow(gameName));
+        return buildManagedGameFromGameFile(gameName);
     }
 
     public static List<ManagedGame> getManagedGames() {

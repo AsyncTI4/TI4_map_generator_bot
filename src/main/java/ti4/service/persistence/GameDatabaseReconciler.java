@@ -8,11 +8,10 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.game.Game;
 import ti4.game.persistence.GameManager;
+import ti4.game.persistence.LoadedGameFile;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.GameEntitySnapshot;
@@ -58,12 +57,11 @@ public class GameDatabaseReconciler {
                     existingGameNames.add(gameName);
                     continue;
                 }
-                Game game = loadGame(managedGame);
-                if (game == null) continue;
+                LoadedGameFile gameFile = loadGameFile(gameName);
+                if (gameFile == null) continue;
                 existingGameNames.add(gameName);
-                long gameFileModified = GameManager.getGameFileLastModified(gameName);
-                if (gameFileModified > startedAt) continue;
-                reconcileGame(game, gameFileModified, persistedStates.get(gameName), persistenceService)
+                if (gameFile.stamp().lastModifiedEpochMilliseconds() > startedAt) continue;
+                reconcileGame(gameFile, persistedStates.get(gameName), persistenceService)
                         .ifPresent(discrepancies::add);
             }
             for (String persistedGameName : persistedStates.keySet()) {
@@ -83,12 +81,11 @@ public class GameDatabaseReconciler {
     }
 
     private static Optional<String> reconcileGame(
-            Game game,
-            long gameFileModified,
+            LoadedGameFile gameFile,
             PersistedGameState persistedState,
             GameEntityPersistenceService persistenceService) {
-        String gameName = game.getName();
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, gameFileModified);
+        String gameName = gameFile.game().getName();
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(gameFile.game(), gameFile.stamp());
         if (persistedState == null) {
             return Optional.of(
                     repair(gameName, "missing from the database", () -> persistenceService.replace(snapshot)));
@@ -102,7 +99,7 @@ public class GameDatabaseReconciler {
 
     private static Optional<String> reconcileUnreferencedUsers() {
         if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
-        UnreferencedUserService unreferencedUserService = SpringContext.getBean(UnreferencedUserService.class);
+        UnreferencedUserService unreferencedUserService = UnreferencedUserService.getBean();
         List<String> unreferencedUserIds = unreferencedUserService.findUnreferencedUserIds();
         if (unreferencedUserIds.isEmpty()) return Optional.empty();
 
@@ -121,14 +118,14 @@ public class GameDatabaseReconciler {
     }
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {
-        return GameManager.getGameFileLastModified(gameName) > timestamp;
+        return GameManager.getGameFileStamp(gameName).lastModifiedEpochMilliseconds() > timestamp;
     }
 
-    private static Game loadGame(ManagedGame managedGame) {
+    private static LoadedGameFile loadGameFile(String gameName) {
         try {
-            return managedGame.getGame();
+            return GameManager.loadGameFile(gameName);
         } catch (Exception e) {
-            BotLogger.error(TASK_NAME + " could not load game " + managedGame.getName() + ".", e);
+            BotLogger.error(TASK_NAME + " could not load game " + gameName + ".", e);
             return null;
         }
     }

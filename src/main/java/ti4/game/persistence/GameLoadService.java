@@ -93,8 +93,8 @@ class GameLoadService {
         }
     }
 
-    static long getGameFileLastModified(String gameName) {
-        return Storage.getGameFile(gameName + GAME_FILE_EXTENSION).lastModified();
+    static GameFileStamp getGameFileStamp(String gameName) {
+        return GameFileStamp.of(Storage.getGameFile(gameName + GAME_FILE_EXTENSION));
     }
 
     @Nullable

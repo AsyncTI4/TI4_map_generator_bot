@@ -3,6 +3,7 @@ package ti4.spring.service.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -16,10 +17,12 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.GameFileStamp;
 import ti4.game.persistence.ManagedGameState;
 import ti4.testUtils.BaseTi4Test;
 
@@ -56,6 +59,9 @@ class GameEntityPersistenceDatabaseTest extends BaseTi4Test {
     @Autowired
     private UserEntityRepository userRepository;
 
+    @Autowired
+    private DataSource dataSource;
+
     @DynamicPropertySource
     static void datasource(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", () -> System.getenv("TI4_TEST_POSTGRES_URL"));
@@ -78,22 +84,23 @@ class GameEntityPersistenceDatabaseTest extends BaseTi4Test {
         game.setRound(5);
         game.setActivePlayerID("user-1");
 
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, 1234));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1234, 56)));
 
         PersistedManagedGame persisted = persistedManagedGameService.loadAll().get(game.getName());
         assertThat(persisted.state()).isEqualTo(ManagedGameState.of(game));
-        assertThat(persisted.matchesGameFile(1234)).isTrue();
+        assertThat(persisted.gameFileStamp().matches(new GameFileStamp(1234, 56)))
+                .isTrue();
     }
 
     @Test
     void resavingAGameReplacesItsParticipants() {
         Game game = gameWithRealPlayers("pbd-db-resave", 3);
         game.addPlayer("spectator-id", "Spectator");
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, 1));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1, 1)));
 
         game.removePlayer("spectator-id");
         game.addPlayer("newcomer-id", "Newcomer");
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, 2));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(2, 1)));
 
         assertThat(persistedManagedGameService
                         .loadAll()
@@ -108,7 +115,7 @@ class GameEntityPersistenceDatabaseTest extends BaseTi4Test {
     void statisticsIgnoredGameIsStoredWithoutPlayerRows() {
         Game game = gameWithRealPlayers("pbd-db-ignored", 2);
 
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, 1));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1, 1)));
 
         assertThat(gameRepository.findById(game.getName()))
                 .get()
@@ -136,13 +143,31 @@ class GameEntityPersistenceDatabaseTest extends BaseTi4Test {
         Game game = gameWithRealPlayers("pbd-db-reconcile", 4);
         game.addPlayer("spectator-id", "Spectator");
         game.setStoredValue("TitlesForuser-1", "Kingmaker");
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, 99);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, new GameFileStamp(99, 1));
 
         persistenceService.replace(snapshot);
 
         PersistedGameState persisted = persistedGameStateService.loadAll().get(game.getName());
         assertThat(PersistedGameState.of(snapshot).describeDifferencesFrom(persisted))
                 .isEmpty();
+    }
+
+    @Test
+    void previousReleaseCanStillDeleteGamesThatHaveParticipants() {
+        Game game = gameWithRealPlayers("pbd-db-rollback", 3);
+        game.setStoredValue("TitlesForuser-1", "Kingmaker");
+        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1, 1)));
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+
+        // The release before game_participant existed deletes title, player and game rows only, so the participant
+        // foreign key must cascade or every one of its syncs would fail after a rollback.
+        jdbc.update("DELETE FROM title WHERE game_name = ?", game.getName());
+        jdbc.update("DELETE FROM player WHERE game_name = ?", game.getName());
+        jdbc.update("DELETE FROM game WHERE game_name = ?", game.getName());
+
+        assertThat(jdbc.queryForObject(
+                        "SELECT COUNT(*) FROM game_participant WHERE game_name = ?", Integer.class, game.getName()))
+                .isZero();
     }
 
     private static Game gameWithRealPlayers(String gameName, int playerCount) {

@@ -14,6 +14,8 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -28,6 +30,7 @@ public class GameParticipantEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_name", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private GameEntity game;
 
     @Column(name = "user_id", nullable = false)

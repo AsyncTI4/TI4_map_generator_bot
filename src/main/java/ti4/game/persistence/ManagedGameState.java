@@ -61,10 +61,10 @@ public record ManagedGameState(
                         : game.getLastActivePlayerChange().getTime(),
                 game.getEndedDate(),
                 game.getRound(),
-                resolvedOrStoredId(game.getGuild(), game.getGuildID()),
+                numericOrNull(game.getGuildID()),
                 resolvedOrStoredId(game.getMainGameChannel(), game.getMainChannelID()),
                 resolvedOrStoredId(game.getTableTalkChannel(), game.getTableTalkChannelID()),
-                resolvedOrStoredId(game.getLaunchPostThread(), game.getLaunchPostThreadID()),
+                numericOrNull(game.getLaunchPostThreadID()),
                 game.getPlayers().values().stream()
                         .map(player -> toParticipant(game, player))
                         .toList());
@@ -77,7 +77,11 @@ public record ManagedGameState(
 
     private static String resolvedOrStoredId(ISnowflake resolved, String storedId) {
         if (resolved != null) return resolved.getId();
-        return StringUtils.isNumeric(storedId) ? storedId : null;
+        return numericOrNull(storedId);
+    }
+
+    private static String numericOrNull(String id) {
+        return StringUtils.isNumeric(id) ? id : null;
     }
 
     private static String sanitizeToNull(String str) {

@@ -6,9 +6,13 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import ti4.game.persistence.ManagedGameState;
 
 public record PersistedGameState(
-        GameColumns game, List<PlayerRow> players, List<ParticipantRow> participants, List<TitleRow> titles) {
+        GameColumns game,
+        List<PlayerRow> players,
+        List<ManagedGameState.Participant> participants,
+        List<TitleRow> titles) {
 
     public record GameColumns(
             String gameName,
@@ -43,6 +47,7 @@ public record PersistedGameState(
             boolean injectRulesLinks,
             long lastModifiedEpochMilliseconds,
             long gameFileModifiedEpochMilliseconds,
+            long gameFileSizeBytes,
             String activePlayerUserId,
             long lastActivePlayerChangeEpochMilliseconds,
             String guildId,
@@ -62,27 +67,27 @@ public record PersistedGameState(
             boolean winner,
             boolean replaced) {}
 
-    public record ParticipantRow(String userId, String userName, boolean realPlayer) {}
-
     public record TitleRow(String userId, String title) {}
 
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
-        return of(snapshot.game(), snapshot.game().getPlayers(), snapshot.game().getParticipants(), snapshot.titles());
+        List<ManagedGameState.Participant> participants = snapshot.game().getParticipants().stream()
+                .map(participant -> new ManagedGameState.Participant(
+                        participant.getUserId(), participant.getUserName(), participant.isRealPlayer()))
+                .toList();
+        return of(snapshot.game(), snapshot.game().getPlayers(), participants, snapshot.titles());
     }
 
     static PersistedGameState of(
             GameEntity game,
             Collection<PlayerEntity> players,
-            Collection<GameParticipantEntity> participants,
+            Collection<ManagedGameState.Participant> participants,
             Collection<TitleEntity> titles) {
         List<PlayerRow> playerRows = players.stream()
                 .map(PersistedGameState::toPlayerRow)
                 .sorted(Comparator.comparing(PlayerRow::toString))
                 .toList();
-        List<ParticipantRow> participantRows = participants.stream()
-                .map(participant -> new ParticipantRow(
-                        participant.getUserId(), participant.getUserName(), participant.isRealPlayer()))
-                .sorted(Comparator.comparing(ParticipantRow::toString))
+        List<ManagedGameState.Participant> participantRows = participants.stream()
+                .sorted(Comparator.comparing(ManagedGameState.Participant::toString))
                 .toList();
         List<TitleRow> titleRows = titles.stream()
                 .map(title -> new TitleRow(title.getUser().getId(), title.getTitle()))
@@ -169,6 +174,7 @@ public record PersistedGameState(
                 game.isInjectRulesLinks(),
                 game.getLastModifiedEpochMilliseconds(),
                 game.getGameFileModifiedEpochMilliseconds(),
+                game.getGameFileSizeBytes(),
                 game.getActivePlayerUserId(),
                 game.getLastActivePlayerChangeEpochMilliseconds(),
                 game.getGuildId(),

@@ -1,7 +1,6 @@
 package ti4.spring.service.persistence;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.GameFileStamp;
 import ti4.game.persistence.ManagedGameState;
 import ti4.helpers.TIGLHelper;
 import ti4.service.map.FractureService;
@@ -22,13 +22,14 @@ public class GameEntityMapper {
     private static final String TITLES_KEY_PREFIX = "TitlesFor";
     private static final int MINIMUM_STATISTICS_PLAYER_COUNT = 3;
 
-    public static boolean countsForStatistics(Game game) {
-        return game.getRealAndEliminatedPlayers().size() >= MINIMUM_STATISTICS_PLAYER_COUNT;
+    public static GameEntitySnapshot toSnapshot(Game game, GameFileStamp gameFileStamp) {
+        return toSnapshot(game, ManagedGameState.of(game), gameFileStamp);
     }
 
-    public static GameEntitySnapshot toSnapshot(Game game, long gameFileModifiedEpochMilliseconds) {
+    public static GameEntitySnapshot toSnapshot(
+            Game game, ManagedGameState managedGameState, GameFileStamp gameFileStamp) {
         Map<String, UserEntity> users = new LinkedHashMap<>();
-        GameEntity gameEntity = toGameEntity(game, gameFileModifiedEpochMilliseconds);
+        GameEntity gameEntity = toGameEntity(game, managedGameState, gameFileStamp);
         if (gameEntity.isStatisticsIgnored()) {
             return new GameEntitySnapshot(gameEntity, List.of(), List.of());
         }
@@ -40,7 +41,7 @@ public class GameEntityMapper {
     }
 
     public static PersistedManagedGame toPersistedManagedGame(
-            GameEntity gameEntity, Collection<GameParticipantEntity> participants) {
+            GameEntity gameEntity, List<ManagedGameState.Participant> participants) {
         var state = new ManagedGameState(
                 gameEntity.getGameName(),
                 gameEntity.isEnded(),
@@ -64,19 +65,21 @@ public class GameEntityMapper {
                 gameEntity.getMainGameChannelId(),
                 gameEntity.getTableTalkChannelId(),
                 gameEntity.getLaunchPostThreadId(),
-                participants.stream()
-                        .map(participant -> new ManagedGameState.Participant(
-                                participant.getUserId(), participant.getUserName(), participant.isRealPlayer()))
-                        .toList());
-        return new PersistedManagedGame(state, gameEntity.getGameFileModifiedEpochMilliseconds());
+                participants);
+        var gameFileStamp =
+                new GameFileStamp(gameEntity.getGameFileModifiedEpochMilliseconds(), gameEntity.getGameFileSizeBytes());
+        return new PersistedManagedGame(state, gameFileStamp);
     }
 
     static boolean hasUnknownName(UserEntity user) {
         return user.getName().startsWith(UNKNOWN_USER_PREFIX);
     }
 
-    private static GameEntity toGameEntity(Game game, long gameFileModifiedEpochMilliseconds) {
-        ManagedGameState managedGameState = ManagedGameState.of(game);
+    private static boolean countsForStatistics(Game game) {
+        return game.getRealAndEliminatedPlayers().size() >= MINIMUM_STATISTICS_PLAYER_COUNT;
+    }
+
+    private static GameEntity toGameEntity(Game game, ManagedGameState managedGameState, GameFileStamp gameFileStamp) {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
         gameEntity.setRound(managedGameState.round());
@@ -102,7 +105,8 @@ public class GameEntityMapper {
         gameEntity.setTwilightsFall(managedGameState.twilightsFallMode());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
         gameEntity.setStatisticsIgnored(!countsForStatistics(game));
-        gameEntity.setGameFileModifiedEpochMilliseconds(gameFileModifiedEpochMilliseconds);
+        gameEntity.setGameFileModifiedEpochMilliseconds(gameFileStamp.lastModifiedEpochMilliseconds());
+        gameEntity.setGameFileSizeBytes(gameFileStamp.sizeBytes());
         setManagedGameColumns(gameEntity, managedGameState);
         return gameEntity;
     }
