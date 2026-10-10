@@ -44,6 +44,12 @@ class BorderAnomalyAdjacencyTest extends BaseTi4Test {
         assertAdjacency("nebula", true, true);
     }
 
+    // The "not adjacent for other players" rule is not automated yet; a tether must stay neutral until it is.
+    @Test
+    void voidTetherBlocksNothing() {
+        assertAdjacency("void_tether", true, true);
+    }
+
     @Test
     void legacyUpperCaseTypeStillBlocks() {
         assertAdjacency("SPATIAL_TEAR", false, false);
