@@ -59,6 +59,11 @@ class Undo extends GameStateSubcommand {
         }
         targetUndoIndex--;
 
-        GameManager.undo(game, targetUndoIndex);
+        if (GameManager.undo(game, targetUndoIndex) == null) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Undo failed - `" + gameToUndoBackTo
+                            + "` is no longer available. It may have been removed by another undo; please pick again.");
+        }
     }
 }
