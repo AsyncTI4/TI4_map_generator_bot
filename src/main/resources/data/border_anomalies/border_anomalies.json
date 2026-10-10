@@ -1,0 +1,90 @@
+[
+    {
+        "id": "asteroid",
+        "name": "Asteroid Field",
+        "aliasList": ["asteroid field"],
+        "imagePath": "asteroid_border.png",
+        "source": "other",
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on the map only. Players apply the border's effect themselves."
+    },
+    {
+        "id": "gravity_wave",
+        "name": "Gravity Wave",
+        "aliasList": ["gravitywave"],
+        "imagePath": "gravity_wave_border.png",
+        "source": "other",
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": false } },
+        "automation": "FULL",
+        "automationNotes": "Systems are not adjacent when crossing into the bordered system over this edge."
+    },
+    {
+        "id": "nebula",
+        "name": "Nebula",
+        "imagePath": "nebula_border.png",
+        "source": "other",
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on the map only. Players apply the border's effect themselves."
+    },
+    {
+        "id": "minefield",
+        "name": "Minefield",
+        "imagePath": "minefield_border.png",
+        "source": "other",
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on the map only. Players apply the border's effect themselves."
+    },
+    {
+        "id": "spatial_tear",
+        "name": "Spatial Tear",
+        "aliasList": ["spatialtear"],
+        "imagePath": "spatial_tear_border.png",
+        "source": "other",
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": true } },
+        "automation": "FULL",
+        "automationNotes": "The two systems sharing this edge are not adjacent in either direction."
+    },
+    {
+        "id": "void_tether",
+        "name": "Void Tether",
+        "aliasList": ["voidtether"],
+        "imagePath": "void_tether.png",
+        "source": "thunders_edge",
+        "automation": "PARTIAL",
+        "automationNotes": "Placing and moving tethers is automated. That other players do not treat the systems as adjacent is not enforced."
+    },
+    {
+        "id": "core_border",
+        "name": "Core border",
+        "aliasList": ["coreborder"],
+        "imagePath": "core_border.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "rim_border",
+        "name": "Rim border",
+        "aliasList": ["rimborder"],
+        "imagePath": "rim_border.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "yellow",
+        "name": "Yellow",
+        "imagePath": "yellow.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "redorange",
+        "name": "RedOrange",
+        "imagePath": "redorange.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    }
+]

@@ -41,6 +41,7 @@ import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.AttachmentModel;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.ColorableModelInterface;
@@ -97,6 +98,7 @@ public class Mapper {
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
+    private static final Map<String, BorderAnomalyModel> borderAnomalies = new HashMap<>();
     private static final Map<String, ColorModel> colors = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DeckModel> decks = new HashMap<>();
@@ -157,6 +159,7 @@ public class Mapper {
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
+        importJsonObjectsFromFolder("border_anomalies", borderAnomalies, BorderAnomalyModel.class);
         importJsonObjectsFromFolder("breakthroughs", breakthroughs, BreakthroughModel.class);
         importJsonObjectsFromFolder("colors", colors, ColorModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
@@ -1231,6 +1234,27 @@ public class Mapper {
         List<TechnologyModel> models =
                 getDeck(deckID).getNewDeck().stream().map(Mapper::getTech).toList();
         return getGenericHomebrewReplaceMap(models, TechnologyModel::getHomebrewReplacesID);
+    }
+
+    public static BorderAnomalyModel getBorderAnomaly(String id) {
+        if (id == null) return null;
+        return borderAnomalies.get(id);
+    }
+
+    public static BorderAnomalyModel resolveBorderAnomaly(String input) {
+        if (input == null) return null;
+        BorderAnomalyModel exact = borderAnomalies.get(input);
+        if (exact != null) return exact;
+        return borderAnomalies.values().stream()
+                .filter(model -> model.matches(input))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static List<BorderAnomalyModel> getBorderAnomalies() {
+        return borderAnomalies.values().stream()
+                .sorted(Comparator.comparing(BorderAnomalyModel::getName))
+                .toList();
     }
 
     // ####################

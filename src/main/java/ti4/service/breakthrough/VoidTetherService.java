@@ -20,7 +20,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel.BorderAnomalyType;
+import ti4.model.BorderAnomalyIds;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
@@ -71,7 +71,7 @@ public class VoidTetherService {
     private List<BorderAnomalyHolder> getTethersOnMap(Game game) {
         List<BorderAnomalyHolder> tethers = new ArrayList<>();
         for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
-            if (b != null && b.getType() == BorderAnomalyType.VOID_TETHER) {
+            if (b != null && b.isType(BorderAnomalyIds.VOID_TETHER)) {
                 tethers.add(b);
             }
         }
@@ -197,7 +197,7 @@ public class VoidTetherService {
         RegexService.runMatcher(pattern, buttonID, matcher -> {
             String position = matcher.group("pos");
             int direction = Integer.parseInt(matcher.group("dir"));
-            game.addBorderAnomaly(position, direction, BorderAnomalyType.VOID_TETHER);
+            game.addBorderAnomaly(position, direction, BorderAnomalyIds.VOID_TETHER);
             String msg = String.format(
                     "%s placed a %s token between %s.",
                     player.getRepresentationNoPing(),

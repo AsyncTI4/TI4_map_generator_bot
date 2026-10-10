@@ -91,7 +91,7 @@ public class MapJsonIOService {
                     if (bah.getTile().equals(tile.getPosition())) {
                         BorderAnomalyIO bi = new BorderAnomalyIO();
                         bi.setDirection(bah.getDirection());
-                        bi.setType(bah.getType().toString());
+                        bi.setType(bah.getType());
                         baList.add(bi);
                     }
                 }
@@ -322,13 +322,7 @@ public class MapJsonIOService {
         if (tileIO.getBorderAnomalies() == null) return;
 
         for (BorderAnomalyIO anomalyIO : tileIO.getBorderAnomalies()) {
-            BorderAnomalyModel.BorderAnomalyType anomalyType;
-            try {
-                anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
-                        anomalyIO.getType().toUpperCase());
-            } catch (Exception e) {
-                anomalyType = BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyIO.getType());
-            }
+            BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyIO.getType());
 
             if (anomalyType == null) {
                 appendError(
@@ -338,7 +332,7 @@ public class MapJsonIOService {
                                 + anomalyIO.getDirection());
                 continue;
             }
-            game.addBorderAnomaly(tileIO.getPosition(), anomalyIO.getDirection(), anomalyType);
+            game.addBorderAnomaly(tileIO.getPosition(), anomalyIO.getDirection(), anomalyType.getId());
         }
     }
 

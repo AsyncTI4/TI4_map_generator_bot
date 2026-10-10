@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.map.AddBorderAnomaly;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -47,6 +48,20 @@ public class TestBedComponentService {
                 if (problem != null) warnings.add(problem);
             }
         }
+        for (Map.Entry<String, List<String>> entry : preset.getBorderAnomalies().entrySet()) {
+            for (String border : entry.getValue()) {
+                game.addBorderAnomaly(entry.getKey(), borderDirection(border), borderType(border));
+            }
+        }
+    }
+
+    static Integer borderDirection(String border) {
+        return AddBorderAnomaly.parseDirection(
+                StringUtils.substringBefore(border, ":").trim().toLowerCase());
+    }
+
+    static String borderType(String border) {
+        return StringUtils.substringAfter(border, ":").trim();
     }
 
     static void applySeatComponents(Game game, Player player, Seat seat, List<String> warnings) {
