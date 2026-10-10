@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.spring.context.SpringContext;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +40,9 @@ public class GameEntityPersistenceService {
         titleEntityRepository.deleteByGameName(gameName);
         playerEntityRepository.deleteByGameName(gameName);
         gameEntityRepository.deleteByGameName(gameName);
+    }
+
+    public static GameEntityPersistenceService getBean() {
+        return SpringContext.getBean(GameEntityPersistenceService.class);
     }
 }
