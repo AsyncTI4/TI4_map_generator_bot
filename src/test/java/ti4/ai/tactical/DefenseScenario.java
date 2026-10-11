@@ -1,0 +1,76 @@
+package ti4.ai.tactical;
+
+import ti4.ai.AiTestGame;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
+import ti4.image.PositionMapper;
+
+/**
+ * The board most defence tests share: Nekro's home (Mordai II, one planet, a space dock) in round 4 with three tactical
+ * tokens, a Sardakk seat whose own home is far away, and an empty system next to Nekro's home where the Sardakk fleet
+ * waits.
+ */
+final class DefenseScenario {
+
+    static final String SARDAKK_ID = "200000000000000002";
+    static final String SARDAKK_HOME_POSITION = "310";
+    static final String EMPTY_SYSTEM = "46";
+
+    final AiTestGame test = new AiTestGame();
+    final Tile home;
+    final Player sardakk;
+    final String stagingPosition = AiTestGame.neighbourOf(AiTestGame.HOME);
+    final Tile staging;
+
+    DefenseScenario() {
+        test.game.setRound(4);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setFleetCC(5);
+        home = test.nekroHome();
+        sardakk = test.addSeat(SARDAKK_ID, "sardakk", "red");
+        sardakk.setFleetCC(5);
+        placeSardakkHome();
+        staging = test.place(EMPTY_SYSTEM, stagingPosition);
+    }
+
+    void placeSardakkHome() {
+        test.place("13", SARDAKK_HOME_POSITION);
+        sardakk.addPlanet("trenlak");
+        sardakk.addPlanet("quinarra");
+    }
+
+    void raidingFleet(int carriers, int cruisers, int infantry) {
+        test.units(staging, "space", sardakk, UnitType.Carrier, carriers);
+        test.units(staging, "space", sardakk, UnitType.Cruiser, cruisers);
+        test.units(staging, "space", sardakk, UnitType.Infantry, infantry);
+    }
+
+    void reveal(String objective) {
+        test.game
+                .getRevealedPublicObjectives()
+                .put(objective, test.game.getRevealedPublicObjectives().size() + 1);
+    }
+
+    String beyondStaging() {
+        var nearHome = PositionMapper.getAdjacentTilePositions(AiTestGame.HOME);
+        return PositionMapper.getAdjacentTilePositions(stagingPosition).stream()
+                .filter(candidate -> !"x".equals(candidate)
+                        && !AiTestGame.HOME.equals(candidate)
+                        && !nearHome.contains(candidate)
+                        && !SARDAKK_HOME_POSITION.equals(candidate))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    String otherNeighbourOfHome() {
+        return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(candidate -> !"x".equals(candidate) && !stagingPosition.equals(candidate))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    Defenders defenders() {
+        return Defenders.of(test.nekro, home);
+    }
+}
