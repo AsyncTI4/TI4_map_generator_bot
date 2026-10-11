@@ -88,8 +88,8 @@ public class KryxosUnitHandler {
             return;
         }
 
-								if (player.hasTech("x89c4")) {
-												List<Integer> doubledHits = new ArrayList<>();
+		if (player.hasTech("x89c4")) {
+			List<Integer> doubledHits = new ArrayList<>();
             for (int hits : hitsByMech) {
                 doubledHits.add(hits * 2);
             }
