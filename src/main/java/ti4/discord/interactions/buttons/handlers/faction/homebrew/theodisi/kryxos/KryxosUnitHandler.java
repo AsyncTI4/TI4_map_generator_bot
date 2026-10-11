@@ -95,7 +95,6 @@ public class KryxosUnitHandler {
             }
             hitsByMech = doubledHits;
         }
- 
 
         UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
         int undamagedMechs = unitHolder.getUnitCount(mechKey) - unitHolder.getDamagedUnitCount(mechKey);
