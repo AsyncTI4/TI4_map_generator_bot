@@ -143,6 +143,10 @@ final class OffenseOutlook {
 
     private record Denial(double objective, double homeBlock, double harmPoints) {}
 
+    boolean deniesObjectives(Player opponent, Planet planet) {
+        return readyDenialOfPlanet(opponent, planet) > 0 || progressLossOfPlanet(opponent, planet) > 0;
+    }
+
     double expansionImperial(Tile target, List<Planet> landed, Defenders ours) {
         Optional<Planet> mecatol = landed.stream()
                 .filter(planet -> game.mecatols().contains(planet.getName()))

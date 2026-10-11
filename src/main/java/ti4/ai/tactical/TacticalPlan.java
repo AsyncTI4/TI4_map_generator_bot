@@ -16,7 +16,8 @@ public record TacticalPlan(
         ATTACK,
         PRODUCE,
         POSITION,
-        DEFEND
+        DEFEND,
+        STAGE
     }
 
     public record UnitMove(String origin, String holder, UnitType type, int count) {}

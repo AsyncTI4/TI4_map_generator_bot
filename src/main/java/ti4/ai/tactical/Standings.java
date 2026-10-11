@@ -54,8 +54,16 @@ final class Standings {
     }
 
     boolean holdsImperial(Player player) {
+        return holdsUnplayed(player, StrategyCard.IMPERIAL);
+    }
+
+    boolean holdsUnplayedDiplomacy(Player player) {
+        return holdsUnplayed(player, StrategyCard.DIPLOMACY);
+    }
+
+    private boolean holdsUnplayed(Player player, StrategyCard card) {
         return player.getSCs().stream()
-                .anyMatch(initiative -> StrategyCard.of(game, initiative) == StrategyCard.IMPERIAL
+                .anyMatch(initiative -> StrategyCard.of(game, initiative) == card
                         && !game.getPlayedSCs().contains(initiative));
     }
 
