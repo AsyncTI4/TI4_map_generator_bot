@@ -1,6 +1,7 @@
 package ti4.ai.brain;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,11 +24,20 @@ public final class AiMemory {
         values.put(key, value);
     }
 
+    public synchronized void refresh(String key, String value) {
+        values.remove(key);
+        values.put(key, value);
+    }
+
     public synchronized boolean has(String key) {
         return values.containsKey(key);
     }
 
     public synchronized void remove(String key) {
         values.remove(key);
+    }
+
+    public synchronized List<String> keysStartingWith(String prefix) {
+        return values.keySet().stream().filter(key -> key.startsWith(prefix)).toList();
     }
 }

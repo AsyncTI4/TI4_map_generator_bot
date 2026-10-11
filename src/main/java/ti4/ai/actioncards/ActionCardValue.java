@@ -3,11 +3,10 @@ package ti4.ai.actioncards;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiSettings;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -31,6 +30,7 @@ public class ActionCardValue {
     static final String WAR_EFFORT = "war_effort";
     static final String SUMMIT = "summit";
     static final List<String> COMPONENT_CARDS = List.of(MINING, INDUSTRIAL, ECONOMIC, MESSIAH, FRONTLINE, WAR_EFFORT);
+    static final double ECONOMY_CAP = 3.0;
     private static final double PLAY_THRESHOLD = 2.0;
     private static final double NEAR_LIMIT_THRESHOLD = 1.0;
     private static final double UNLOCKS_OBJECTIVE = 10.0;
@@ -40,47 +40,9 @@ public class ActionCardValue {
     private static final double WAR_EFFORT_VALUE = 2.0;
     private static final int MIN_MESSIAH_PLANETS = 3;
     private static final String TRIAD = "triad";
-    private static final double NEVER_USED = 0.0;
-    private static final double UNKNOWN = 0.5;
-    private static final double LATER_STAGE = 1.0;
-    private static final double SABOTAGE = 1.5;
-    private static final double ECONOMY_CAP = 3.0;
+    private static final double NOT_USABLE = 0.0;
+    private static final double EXTRA_SABOTAGE_SHARE = 0.6;
     private static final double SPARE_BELOW = 2.0;
-    private static final Set<String> USELESS = Set.of(
-            "intercept",
-            "rout",
-            "waylay",
-            "scramble",
-            "reflective",
-            "bunker",
-            "disable",
-            "lost_star",
-            "nav_suite",
-            "silence_space",
-            "solar_flare",
-            "master_plan",
-            "ghost_squad",
-            "bribery",
-            "deadly_plot",
-            "confounding",
-            "confusing",
-            "fire_team",
-            "courageous",
-            "blackmarketdealing",
-            "exchangeprogram",
-            "lieinwait",
-            "crisis",
-            "puppetsonastring",
-            "coup",
-            "disgrace");
-    private static final Map<String, Double> STAGE_ONE_KEEP = Map.of(
-            MINING, 3.0,
-            INDUSTRIAL, 3.0,
-            SUMMIT, 3.0,
-            ECONOMIC, 2.0,
-            MESSIAH, 2.0,
-            FRONTLINE, 2.0,
-            WAR_EFFORT, 2.0);
 
     record Candidate(String alias, double value) {}
 
@@ -117,19 +79,28 @@ public class ActionCardValue {
     }
 
     public static double keepValue(Game game, Player seat, String alias) {
-        if (alias.startsWith("sabo")) return SABOTAGE;
-        if (USELESS.contains(alias) || alias.startsWith("dh")) return NEVER_USED;
-        Double stageOne = STAGE_ONE_KEEP.get(alias);
-        if (stageOne != null) return Math.max(stageOne, Math.min(playValue(game, seat, alias), ECONOMY_CAP));
-        if (alias.startsWith("mb") || alias.startsWith("sh") || alias.contains("rider") || alias.startsWith("veto")) {
-            return LATER_STAGE;
-        }
-        return UNKNOWN;
+        if (AiSettings.usesLegacyActionCards(seat)) return LegacyKeepValue.keepValue(game, seat, alias);
+        Optional<AiCard> card = AiActionCards.of(alias);
+        if (card.isEmpty()) return NOT_USABLE;
+        double prior = ActionCardPrior.keepPrior(alias);
+        if (card.get().isSabotage()) return prior * sabotageCopyShare(seat, alias);
+        double held = prior * card.get().availabilityFor(game, seat);
+        double now = Math.min(card.get().playValueFor(game, seat), ECONOMY_CAP);
+        return Math.max(held, now);
+    }
+
+    private static double sabotageCopyShare(Player seat, String alias) {
+        long earlierCopies = seat.getActionCards().keySet().stream()
+                .filter(AiActionCards::isSabotage)
+                .filter(other -> other.compareTo(alias) < 0)
+                .count();
+        return earlierCopies == 0 ? 1.0 : EXTRA_SABOTAGE_SHARE;
     }
 
     public static List<String> discardOrder(Game game, Player seat) {
         List<String> aliases = new ArrayList<>(seat.getActionCards().keySet());
         aliases.sort(Comparator.comparingDouble((String alias) -> keepValue(game, seat, alias))
+                .thenComparingDouble(ActionCardPrior::keepPrior)
                 .thenComparingDouble(alias -> playValue(game, seat, alias))
                 .thenComparing(Comparator.naturalOrder()));
         return aliases;

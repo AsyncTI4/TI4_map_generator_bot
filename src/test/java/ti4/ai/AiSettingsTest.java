@@ -46,4 +46,20 @@ class AiSettingsTest extends BaseTi4Test {
             else System.setProperty(AiSettings.TRADING_PROPERTY, before);
         }
     }
+
+    // The action card A/B comparison is switched on with -Dai.actioncards.ab=true; it is off by default.
+    @Test
+    void theActionCardComparisonIsOffUnlessAsked() {
+        String before = System.getProperty(AiSettings.ACTION_CARDS_AB_PROPERTY);
+        try {
+            System.clearProperty(AiSettings.ACTION_CARDS_AB_PROPERTY);
+            assertThat(AiSettings.isActionCardAbTest()).isFalse();
+
+            System.setProperty(AiSettings.ACTION_CARDS_AB_PROPERTY, "TRUE");
+            assertThat(AiSettings.isActionCardAbTest()).isTrue();
+        } finally {
+            if (before == null) System.clearProperty(AiSettings.ACTION_CARDS_AB_PROPERTY);
+            else System.setProperty(AiSettings.ACTION_CARDS_AB_PROPERTY, before);
+        }
+    }
 }

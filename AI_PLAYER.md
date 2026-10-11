@@ -316,8 +316,25 @@ to build one by hand:
     that have scrolled out of the messages it reads.
   - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
     (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
-  - **Discards** (hand limit, _Form a Spy Network_, Nekro's agent) go to the cards it can never use first, then by
-    how much each card is worth right now. Nekro's agent only spends a card worth less than its 2 trade goods.
+  - **What a card is worth** (`ActionCardPrior`, `ActionCardValue`). Human players' statistics for the Thunder's
+    Edge action card deck (`data/ai/action_card_stats.json`, made from a pasted statistics report by
+    `scripts/ai-action-card-stats.mjs`) give every card an Impact Score, win, play and cancel rate, and for single
+    copy cards how often it is played again after the first time (almost always after a card like _The Codex_ took it
+    out of the discard pile). The file is a prior, not a truth: players who play more cards win more, and a few
+    factions play far more cards than the rest. From it each card gets (one action card is worth 1.2, a trade good 1):
+    | Figure | Formula | Use |
+    | --- | --- | --- |
+    | strength | Impact Score over the average of 30, kept between 0.5 and 2; a card with few recorded plays is pulled halfway to 1 | how good the card is |
+    | keep prior | 1.2 × (0.5 + 0.5 × strength), so 0.9 for _Maneuvering Jets_ up to 1.8 for _Overrule_ | what holding the card is worth before looking at the board |
+    | cancel appetite | the card's cancel rate, shrunk towards the average with 50 plays, over the average cancel rate of 4.4%, at most 4; 0 for a card that cannot be cancelled | how much human players want the card cancelled |
+    | first-play rate | single copy cards: first plays over the 1072 games a copy is drawn in; four-of cards: the play rate | what the self-play report compares each card's rate with (never a decision input) |
+    | retrieval | single copy cards: replays per first play (0.065 on average) | choosing a card from the discard pile, later |
+  - **Keeping and discarding** (`AiActionCards`). A card is *usable* when a rule of the AI plays it: today the six
+    economy cards, _Summit_ and _Sabotage_ (more as their rules arrive). A card no rule plays is worth 0 and goes
+    first; between such cards the lower keep prior goes first. A usable card is worth the larger of its keep prior and
+    what playing it is worth now (at most 3); a second _Sabotage_ in the hand is worth 0.6 of the first. Discards (hand
+    limit, _Form a Spy Network_, Nekro's agent) follow this order. Nekro's agent only spends a card worth less than
+    its 2 trade goods.
   - Not yet: combat cards (_Morale Boost_, _Shields Holding_), agenda riders and _Sabotage_ against others.
 - **Promissory notes** (`ti4.ai.promissory`). It plays the notes other players gave it, only through the bot's own
   buttons and only in the note's timing window:
@@ -626,6 +643,12 @@ Four small generic changes don't reference `ti4.ai`:
     starts with only its own faction note and the five generic notes; the scoreboard lists the notes each seat holds,
     received and has in its play area.
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
+  - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
+  - The batch summary counts the action cards: plays per seat per game, plays a Sabotage cancelled (per game and as a
+    share of all plays), Sabotage plays per game, and each card's plays per seat per game next to the rate at which
+    human players play it when they draw it. `-Dai.actioncards.ab=true` plays half of the seats, a different half in
+    each game, with the action card rules from before the statistics, and the summary compares the final victory
+    points of the two groups with their seat counts.
 - In a dev guild:
   1. `/testbed apply` a preset that starts in `setup`, or create a game for self-play.
   2. `/ai add` once per AI seat.
@@ -636,7 +659,7 @@ Four small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, economy action cards, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, Sabotage, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, economy action cards, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, action card values from human play statistics. Still to do: combat and agenda action cards, Sabotage, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |

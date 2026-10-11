@@ -55,4 +55,33 @@ class AiMemoryTest {
 
         assertThat(memory.get("plan")).contains("second");
     }
+
+    @Test
+    void listsTheKeysThatStartWithAPrefix() {
+        memory.put("acPlay|msg:1", "a");
+        memory.put("acPlay|turn:2", "b");
+        memory.put("other|msg:3", "c");
+
+        assertThat(memory.keysStartingWith("acPlay|msg:")).containsExactly("acPlay|msg:1");
+        assertThat(memory.keysStartingWith("acPlay|")).containsExactly("acPlay|msg:1", "acPlay|turn:2");
+        assertThat(memory.keysStartingWith("none|")).isEmpty();
+    }
+
+    // The memory drops the entry that was inserted first, whether or not it was used since, so a value that must
+    // outlast newer ones is written again with refresh.
+    @Test
+    void aRefreshedKeyStaysAmongTheYoungestEntries() {
+        memory.put("play", "first");
+        for (int i = 0; i < 400; i++) memory.put("key" + i, String.valueOf(i));
+        memory.refresh("play", "second");
+        for (int i = 400; i < 800; i++) memory.put("key" + i, String.valueOf(i));
+
+        assertThat(memory.get("play")).contains("second");
+
+        memory.put("plain", "first");
+        memory.put("plain", "again");
+        for (int i = 0; i < MANY; i++) memory.put("filler" + i, String.valueOf(i));
+
+        assertThat(memory.has("plain")).isFalse();
+    }
 }

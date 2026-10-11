@@ -111,7 +111,8 @@ class NekroLeaderRulesTest extends BaseTi4Test {
     }
 
     // The bot hands over the 2 trade goods before anything is paid, so the target pays on its own: it discards an
-    // action card and then closes the token prompt without losing a token.
+    // action card (the second Sabotage, which is worth less than the first) and then closes the token prompt without
+    // losing a token.
     @Test
     void paysForTheAgentWithAnActionCard() {
         holdActionCards(2);
@@ -119,9 +120,9 @@ class NekroLeaderRulesTest extends BaseTi4Test {
                 + "! Your current command tokens are 3/3/2. Use buttons to lose tokens.");
 
         assertThat(pressed(NekroLeaderRules.payAgentCost(test.context(discardPrompt(), tokens))))
-                .isEqualTo("ac_discard_from_hand_1");
+                .isEqualTo("ac_discard_from_hand_2");
 
-        test.nekro.getActionCards().remove("sabo1");
+        test.nekro.getActionCards().remove("sabo2");
         assertThat(pressed(NekroLeaderRules.payAgentCost(test.context(tokens)))).isEqualTo("FFCC_nekro_deleteButtons");
     }
 
@@ -135,7 +136,7 @@ class NekroLeaderRulesTest extends BaseTi4Test {
 
         assertThat(NekroLeaderRules.payAgentCost(test.context(tokens))).containsInstanceOf(AiDecision.Wait.class);
         assertThat(pressed(NekroLeaderRules.payAgentCost(test.context(discardPrompt(), tokens))))
-                .isEqualTo("ac_discard_from_hand_1");
+                .isEqualTo("ac_discard_from_hand_2");
     }
 
     // Without an action card it gives up a command token instead. The bot rewrites the token prompt after the first

@@ -60,6 +60,7 @@ final class SelfPlayGame {
             List<Map<String, Double>> stateAtRoundStart,
             int seats,
             TradeSummary trade,
+            ActionCardSummary actionCards,
             String report,
             long wallSeconds) {
 
@@ -133,6 +134,13 @@ final class SelfPlayGame {
             int settlementsAccepted,
             List<String> violations) {}
 
+    // One action card play, with who made it and whether a Sabotage cancelled it.
+    record ActionCardUse(String faction, String card, boolean canceled) {}
+
+    // The action cards played in one game, and which seats played with the pre-existing (legacy) card rules in an
+    // A/B run (-Dai.actioncards.ab=true).
+    record ActionCardSummary(List<ActionCardUse> plays, java.util.Set<String> legacySeats) {}
+
     private static final String TRADE_GOODS = "TGs";
     private static final String COMMODITIES = "Comms";
     private static final int AI_DEBT_CAP = 4;
@@ -148,10 +156,17 @@ final class SelfPlayGame {
     private final List<Map<String, Double>> stateAtRoundStart = new ArrayList<>();
     private int recordedRound;
     private long wallStart = System.nanoTime();
+    private final int slot;
+    private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
+        this(env, name, 0);
+    }
+
+    SelfPlayGame(SelfPlayEnvironment env, String name, int slot) {
         this.env = env;
         this.name = name;
+        this.slot = slot;
     }
 
     Game setUp(List<String> factions) throws Exception {
@@ -175,6 +190,7 @@ final class SelfPlayGame {
             return managed == null ? null : managed.getGame();
         };
         game.setShowBanners(false);
+        markLegacySeats(game);
         // -Dai.selfplay.give=summit,mining_initiative deals those action cards to every seat, to exercise a card flow.
         for (String alias : System.getProperty("ai.selfplay.give", "").split(",")) {
             if (alias.isBlank()) continue;
@@ -192,6 +208,18 @@ final class SelfPlayGame {
                     "The game was not registered after setup: valid=" + GameManager.isValid(name));
         }
         return game;
+    }
+
+    // -Dai.actioncards.ab=true plays half of the seats with the action card rules from before the statistics, rotating
+    // which half by game number, so the two can be compared inside the same games.
+    private void markLegacySeats(Game game) {
+        if (!AiSettings.isActionCardAbTest()) return;
+        List<Player> seats = game.getRealPlayers();
+        for (int index = 0; index < seats.size(); index++) {
+            if ((index + slot) % 2 != 0) continue;
+            AiSettings.markLegacyActionCards(seats.get(index));
+            legacySeats.add(seats.get(index).getFaction());
+        }
     }
 
     Outcome run(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks) {
@@ -418,8 +446,23 @@ final class SelfPlayGame {
                 List.copyOf(stateAtRoundStart),
                 game == null ? 0 : game.getRealPlayers().size(),
                 tradeSummary(ending, game),
+                actionCardSummary(game),
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L);
+    }
+
+    private ActionCardSummary actionCardSummary(Game game) {
+        List<ActionCardUse> uses = new ArrayList<>();
+        if (game != null) {
+            for (Player player : game.getRealPlayers()) {
+                String playerId = ti4.game.GameStats.getTrackedPlayerId(player);
+                game.getGameStats().getActionCardPlays().stream()
+                        .filter(play -> playerId != null && playerId.equals(play.getPlayerId()))
+                        .forEach(play -> uses.add(
+                                new ActionCardUse(player.getFaction(), play.getActionCard(), play.isCanceled())));
+            }
+        }
+        return new ActionCardSummary(List.copyOf(uses), java.util.Set.copyOf(legacySeats));
     }
 
     private List<SelfPlayEnvironment.TradeRecord> ledger() {

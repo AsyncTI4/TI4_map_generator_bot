@@ -5,12 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import ti4.ai.AiSettings;
+import ti4.ai.actioncards.ActionCardPrior;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.testUtils.BaseTi4Test;
@@ -101,6 +103,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.TreeMap::new,
                                 java.util.stream.Collectors.counting())));
         printTrading(outcomes);
+        printActionCards(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
                         outcomes.stream()
@@ -188,6 +191,71 @@ class AiSelfPlayTest extends BaseTi4Test {
         }
     }
 
+    // What the AI did with its action cards over the batch: how many it played and had cancelled, each card's rate next
+    // to how often human players play it when they draw it, and in an A/B run (-Dai.actioncards.ab=true) how the seats
+    // with the statistics-based rules did against the seats with the earlier ones.
+    private static void printActionCards(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        int seats = outcomes.stream().mapToInt(SelfPlayGame.Outcome::seats).sum();
+        List<SelfPlayGame.ActionCardUse> plays = outcomes.stream()
+                .flatMap(outcome -> outcome.actionCards().plays().stream())
+                .toList();
+        long cancelled =
+                plays.stream().filter(SelfPlayGame.ActionCardUse::canceled).count();
+        long sabotages =
+                plays.stream().filter(play -> "Sabotage".equals(play.card())).count();
+        System.out.printf(
+                "Action cards: %.2f played per seat per game (%d plays, %d seat-games), %.2f cancelled per game (%.0f%% of"
+                        + " plays), %.2f Sabotage plays per game%n",
+                seats == 0 ? 0 : (double) plays.size() / seats,
+                plays.size(),
+                seats,
+                (double) cancelled / games,
+                plays.isEmpty() ? 0 : 100.0 * cancelled / plays.size(),
+                (double) sabotages / games);
+        Map<String, Long> byCard = plays.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        SelfPlayGame.ActionCardUse::card, java.util.stream.Collectors.counting()));
+        List<String> perCard = byCard.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> String.format(
+                        "%s %.3f (%.2f per game; human %.2f)",
+                        entry.getKey(),
+                        seats == 0 ? 0 : (double) entry.getValue() / seats,
+                        (double) entry.getValue() / games,
+                        ActionCardPrior.firstPlayRateOfName(entry.getKey())))
+                .toList();
+        System.out.println("Action card plays per seat (per game; human first-play rate when drawn): "
+                + String.join(", ", perCard));
+        if (!AiSettings.isActionCardAbTest()) return;
+        printActionCardAb(outcomes);
+    }
+
+    private static void printActionCardAb(List<SelfPlayGame.Outcome> outcomes) {
+        int newSeats = 0;
+        int legacySeats = 0;
+        int newPoints = 0;
+        int legacyPoints = 0;
+        for (SelfPlayGame.Outcome outcome : outcomes) {
+            for (Map.Entry<String, Integer> seat : outcome.victoryPoints().entrySet()) {
+                if (outcome.actionCards().legacySeats().contains(seat.getKey())) {
+                    legacySeats++;
+                    legacyPoints += seat.getValue();
+                } else {
+                    newSeats++;
+                    newPoints += seat.getValue();
+                }
+            }
+        }
+        System.out.printf(
+                "Action card A/B: new seats average %.2f final victory points over %d seats, legacy seats %.2f over %d"
+                        + " seats%n",
+                newSeats == 0 ? 0 : (double) newPoints / newSeats,
+                newSeats,
+                legacySeats == 0 ? 0 : (double) legacyPoints / legacySeats,
+                legacySeats);
+    }
+
     private static String perRoundDecimal(List<List<Double>> perGame, int firstRound) {
         int rounds = perGame.stream().mapToInt(List::size).max().orElse(0);
         List<String> averages = new ArrayList<>();
@@ -263,7 +331,7 @@ class AiSelfPlayTest extends BaseTi4Test {
     private static SelfPlayGame.Outcome playFullGame(long clockStart, int slot, int games) throws Exception {
         java.lang.management.ThreadMXBean threads = java.lang.management.ManagementFactory.getThreadMXBean();
         long cpuStart = threads.getCurrentThreadCpuTime();
-        SelfPlayGame.Outcome outcome = play(game -> false, 14 * VIRTUAL_DAY, 100_000, clockStart);
+        SelfPlayGame.Outcome outcome = play(game -> false, 14 * VIRTUAL_DAY, 100_000, clockStart, slot);
         long cpuSeconds = (threads.getCurrentThreadCpuTime() - cpuStart) / 1_000_000_000L;
         System.out.println("Game " + (slot + 1) + "/" + games + " finished: " + outcome.ending() + " in round "
                 + outcome.round() + ", victory points " + outcome.victoryPoints() + ", wall time "
@@ -273,14 +341,14 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     private static SelfPlayGame.Outcome play(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks)
             throws Exception {
-        return play(stopWhen, maxVirtualMillis, maxTicks, System.currentTimeMillis());
+        return play(stopWhen, maxVirtualMillis, maxTicks, System.currentTimeMillis(), 0);
     }
 
     private static SelfPlayGame.Outcome play(
-            Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks, long clockStart) throws Exception {
+            Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks, long clockStart, int slot) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
             SelfPlayGame game = new SelfPlayGame(
-                    env, "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
+                    env, "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000), slot);
             try {
                 game.setUp(factions());
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
