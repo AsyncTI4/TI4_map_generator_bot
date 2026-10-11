@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -48,7 +50,7 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class TacticalPlanner {
 
-    static final double MIN_SCORE = 1.0;
+    public static final double MIN_SCORE = 1.0;
     static final double ATTACK_MIN_WIN = 0.8;
     static final double ATTACK_MIN_SCORE = 4.0;
     private static final double DISTANCE_COST = 0.2;
@@ -94,14 +96,7 @@ public class TacticalPlanner {
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
         if (seat.getTacticalCC() + seat.getStrategicCC() - 1 < reservedTokens) return Optional.empty();
         Context context = new Context(game, seat);
-        List<TacticalPlan> plans = game.getTileMap().values().stream()
-                .filter(tile -> !tile.hasPlayerCC(seat))
-                .filter(tile -> ButtonHelper.canActivateTile(game, seat, tile))
-                .map(tile -> bestFor(context, tile))
-                .flatMap(Optional::stream)
-                .filter(plan -> plan.score() >= MIN_SCORE)
-                .sorted(Comparator.comparingDouble(TacticalPlan::score).reversed())
-                .toList();
+        List<TacticalPlan> plans = candidates(context, tile -> activatable(game, seat, tile));
         if (plans.isEmpty()) return Optional.empty();
         TacticalPlan top = plans.getFirst();
         boolean anotherActionAfter =
@@ -113,6 +108,35 @@ public class TacticalPlanner {
                         plan.moves().stream().anyMatch(move -> move.origin().equals(top.target())))
                 .findFirst()
                 .or(() -> Optional.of(top));
+    }
+
+    public static List<TacticalPlan> ranked(Game game, Player seat) {
+        return candidates(new Context(game, seat), tile -> activatable(game, seat, tile));
+    }
+
+    public static List<TacticalPlan> rankedFreeing(Game game, Player seat, String freedPosition) {
+        Set<String> freed = Set.of(freedPosition);
+        return candidates(
+                new Context(game, seat, freed),
+                tile -> freed.contains(tile.getPosition()) || activatable(game, seat, tile));
+    }
+
+    public static double bestScore(List<TacticalPlan> plans) {
+        return plans.isEmpty() ? 0 : plans.getFirst().score();
+    }
+
+    private static boolean activatable(Game game, Player seat, Tile tile) {
+        return !tile.hasPlayerCC(seat) && ButtonHelper.canActivateTile(game, seat, tile);
+    }
+
+    private static List<TacticalPlan> candidates(Context context, Predicate<Tile> activatable) {
+        return context.game.getTileMap().values().stream()
+                .filter(activatable)
+                .map(tile -> bestFor(context, tile))
+                .flatMap(Optional::stream)
+                .filter(plan -> plan.score() >= MIN_SCORE)
+                .sorted(Comparator.comparingDouble(TacticalPlan::score).reversed())
+                .toList();
     }
 
     public static Optional<TacticalPlan> bestForWarfare(Game game, Player seat) {
@@ -1004,6 +1028,7 @@ public class TacticalPlanner {
     private static final class Context {
         private final Game game;
         private final Player seat;
+        private final Set<String> freed;
         private final Map<String, Map<String, Integer>> reachCache = new HashMap<>();
         private final Map<String, Boolean> spaceCannonCache = new HashMap<>();
         private final Map<String, Integer> forwardNeeds = new HashMap<>();
@@ -1014,8 +1039,13 @@ public class TacticalPlanner {
         private final Map<String, Double> exploreValues = new HashMap<>();
 
         Context(Game game, Player seat) {
+            this(game, seat, Set.of());
+        }
+
+        Context(Game game, Player seat, Set<String> freed) {
             this.game = game;
             this.seat = seat;
+            this.freed = freed;
         }
 
         double exploreValue(Tile tile, Planet planet, int infantry, int mechs) {
@@ -1058,7 +1088,7 @@ public class TacticalPlanner {
         List<Tile> origins() {
             if (origins == null) {
                 origins = game.getTileMap().values().stream()
-                        .filter(tile -> !tile.hasPlayerCC(seat))
+                        .filter(tile -> !tile.hasPlayerCC(seat) || freed.contains(tile.getPosition()))
                         .filter(tile -> BoardView.hasOwnShips(seat, tile))
                         .filter(tile -> !tile.isGravityRift(game, seat))
                         .toList();

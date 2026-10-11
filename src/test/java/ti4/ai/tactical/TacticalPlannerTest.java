@@ -704,6 +704,42 @@ class TacticalPlannerTest extends BaseTi4Test {
                         new UnitMove(AiTestGame.HOME, "space", UnitType.Fighter, 2));
     }
 
+    // Home holds Nekro's command token, so its carrier is stuck there: no plan moves out of home. Freeing home (what
+    // PoK Warfare does when it takes the token back) unlocks the expansion to Lodor again.
+    @Test
+    void rankedFreeingHomeMovesOutOfAHomeThatHoldsTheToken() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("26", neighbour);
+        home.addCC(Mapper.getCCID(test.nekro.getColor()));
+
+        assertThat(TacticalPlanner.ranked(test.game, test.nekro)).noneMatch(TacticalPlannerTest::movesOutOfHome);
+        assertThat(TacticalPlanner.rankedFreeing(test.game, test.nekro, AiTestGame.HOME))
+                .anyMatch(TacticalPlannerTest::movesOutOfHome);
+    }
+
+    // ranked lists every plan worth an action, best first, ignoring how many tactic tokens are left.
+    @Test
+    void rankedIgnoresTheTokenGateAndSortsBestFirst() {
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("26", neighbour);
+        test.nekro.setTacticalCC(0);
+
+        List<TacticalPlan> ranked = TacticalPlanner.ranked(test.game, test.nekro);
+
+        assertThat(TacticalPlanner.best(test.game, test.nekro)).isEmpty();
+        assertThat(ranked).isNotEmpty();
+        assertThat(TacticalPlanner.bestScore(ranked))
+                .isEqualTo(ranked.getFirst().score());
+        assertThat(ranked).isSortedAccordingTo((a, b) -> Double.compare(b.score(), a.score()));
+        assertThat(TacticalPlanner.bestScore(List.of())).isZero();
+    }
+
+    private static boolean movesOutOfHome(TacticalPlan plan) {
+        return plan.moves().stream().anyMatch(move -> AiTestGame.HOME.equals(move.origin()));
+    }
+
     private String otherNeighbourOfHome() {
         return PositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
                 .filter(candidate -> !"x".equals(candidate) && !neighbour.equals(candidate))
