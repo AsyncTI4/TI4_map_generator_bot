@@ -41,8 +41,6 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.UnitModel;
@@ -69,8 +67,6 @@ public class TacticalPlanner {
     private static final String DARKEN_THE_SKIES = "dts";
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MAKE_AN_EXAMPLE = "mew";
-    private static final String ASSAULT_CANNON = "asc";
-    private static final int ASSAULT_CANNON_SHIPS = 3;
     private static final int DEMONSTRATION_SHIPS = 3;
     private static final double GROUP_MOVE_COST = 0.3;
     private static final double FORWARD_GROUND_FORCE_VALUE = 0.5;
@@ -78,7 +74,7 @@ public class TacticalPlanner {
     private static final double SHIP_COST_WEIGHT = 0.05;
     private static final double HOME_DEFENCE_VALUE = 6.0;
     private static final int CUSTODIANS_COST = 6;
-    private static final int HOME_GARRISON = 1;
+    static final int HOME_GARRISON = 1;
     private static final int MECATOL_GARRISON = 1;
     private static final List<UnitType> TRANSPORT_PREFERENCE =
             List.of(UnitType.Carrier, UnitType.Flagship, UnitType.Dreadnought, UnitType.Warsun);
@@ -433,32 +429,32 @@ public class TacticalPlanner {
         boolean spaceCombat = BoardView.hasEnemyShips(game, seat, tile);
         UnitHolder space = BoardView.space(tile);
         Side attacking = new Side(seat, shipsOf(ships));
-        Map<UnitType, Integer> attackersDamaged = damagedAmong(originSpace, seat, attacking.units());
+        Map<UnitType, Integer> attackersDamaged = BattleMath.damagedAmong(originSpace, seat, attacking.units());
         int cannonHits = isAnotherPlayersHome(game, seat, tile) && context.coveredByEnemySpaceCannon(tile)
-                ? expectedCannonHits(game, seat, tile)
+                ? BattleMath.expectedCannonHits(game, seat, tile)
                 : 0;
         double cannonLosses = 0;
         if (cannonHits > 0) {
             List<Combatant> arriving = CombatForces.combatants(
                     game, tile, space, attacking, new Side(opponent, Map.of()), attackersDamaged);
-            List<Combatant> survivors = afterCannonFire(arriving, cannonHits);
+            List<Combatant> survivors = BattleMath.afterCannonFire(arriving, cannonHits);
             if (survivors.isEmpty()) return Optional.empty();
             cannonLosses = arriving.stream().mapToDouble(Combatant::cost).sum()
                     - survivors.stream().mapToDouble(Combatant::cost).sum();
         }
         if (spaceCombat) {
             Side defending = new Side(opponent, BoardView.ships(space, opponent));
-            Map<UnitType, Integer> defendersDamaged = damagedAmong(space, opponent, defending.units());
+            Map<UnitType, Integer> defendersDamaged = BattleMath.damagedAmong(space, opponent, defending.units());
             if (CombatForces.combatants(game, tile, space, defending, attacking, defendersDamaged)
                     .isEmpty()) return Optional.empty();
-            Side cannonedDefenders = afterAssaultCannon(defending, attacking);
-            Side cannonedAttackers = afterAssaultCannon(attacking, defending);
-            Side barragedDefenders = afterBarrage(cannonedDefenders, cannonedAttackers);
-            Side barragedAttackers = afterBarrage(cannonedAttackers, cannonedDefenders);
-            List<Combatant> defenders = afterCannonFire(
+            Side cannonedDefenders = BattleMath.afterAssaultCannon(defending, attacking);
+            Side cannonedAttackers = BattleMath.afterAssaultCannon(attacking, defending);
+            Side barragedDefenders = BattleMath.afterBarrage(cannonedDefenders, cannonedAttackers);
+            Side barragedAttackers = BattleMath.afterBarrage(cannonedAttackers, cannonedDefenders);
+            List<Combatant> defenders = BattleMath.afterCannonFire(
                     CombatForces.combatants(game, tile, space, barragedDefenders, barragedAttackers, defendersDamaged),
-                    ownCannonHits(game, seat, tile, origin));
-            List<Combatant> attackers = afterCannonFire(
+                    BattleMath.ownCannonHits(game, seat, tile, origin));
+            List<Combatant> attackers = BattleMath.afterCannonFire(
                     CombatForces.combatants(game, tile, space, barragedAttackers, barragedDefenders, attackersDamaged),
                     cannonHits);
             Force defence = CombatForces.force(opponent, defenders, false);
@@ -547,107 +543,6 @@ public class TacticalPlanner {
         return ObjectiveValue.VICTORY_POINT_VALUE
                 * BombardmentRules.chanceToDestroyAll(
                         seat, bombarding, planet, bombardment.get().defender());
-    }
-
-    private static int expectedCannonHits(Game game, Player seat, Tile tile) {
-        double expected = 0;
-        for (Player other : game.getRealPlayers()) {
-            if (other != seat) expected += cannonFire(game, tile, other, null);
-        }
-        return (int) Math.round(expected);
-    }
-
-    private static int ownCannonHits(Game game, Player seat, Tile tile, Tile origin) {
-        return (int) Math.round(cannonFire(game, tile, seat, BoardView.space(origin)));
-    }
-
-    private static double cannonFire(Game game, Tile tile, Player shooter, @Nullable UnitHolder leaving) {
-        double expected = 0;
-        for (String position : FoWHelper.getAdjacentTiles(game, tile.getPosition(), shooter, false, true)) {
-            Tile nearby = game.getTileByPosition(position);
-            if (nearby == null) continue;
-            boolean inSystem = nearby == tile;
-            for (UnitHolder holder : nearby.getUnitHolders().values()) {
-                if (holder == leaving) continue;
-                for (UnitKey key : holder.getUnitKeysForPlayer(shooter)) {
-                    UnitModel model = shooter.getUnitFromUnitKey(key);
-                    if (model == null || (!inSystem && !model.getDeepSpaceCannon(shooter))) continue;
-                    int dice = model.getSpaceCannonDieCount(shooter) * holder.getUnitCount(key);
-                    expected += dice * hitChance(model.getSpaceCannonHitsOn(shooter));
-                }
-            }
-        }
-        return expected;
-    }
-
-    private static Side afterBarrage(Side target, Side shooter) {
-        int fighters = target.units().getOrDefault(UnitType.Fighter, 0);
-        if (fighters == 0) return target;
-        Player player = shooter.player();
-        double expected = 0;
-        for (Map.Entry<UnitType, Integer> entry : shooter.units().entrySet()) {
-            UnitModel model = player.getUnitByType(entry.getKey());
-            if (model == null) continue;
-            expected += model.getAfbDieCount(player) * entry.getValue() * hitChance(model.getAfbHitsOn(player));
-        }
-        int destroyed = Math.min(fighters, (int) Math.round(expected));
-        if (destroyed == 0) return target;
-        Map<UnitType, Integer> units = new EnumMap<>(UnitType.class);
-        units.putAll(target.units());
-        units.put(UnitType.Fighter, fighters - destroyed);
-        return new Side(target.player(), units);
-    }
-
-    private static Side afterAssaultCannon(Side target, Side shooter) {
-        if (!firesAssaultCannon(shooter)) return target;
-        Player player = target.player();
-        Optional<UnitType> cheapest = target.units().entrySet().stream()
-                .filter(entry -> entry.getKey() != UnitType.Fighter && entry.getValue() > 0)
-                .map(Map.Entry::getKey)
-                .min(Comparator.comparingDouble(type ->
-                        BoardView.model(player, type).map(UnitModel::getCost).orElse(0f)));
-        if (cheapest.isEmpty()) return target;
-        Map<UnitType, Integer> units = new EnumMap<>(UnitType.class);
-        units.putAll(target.units());
-        units.merge(cheapest.get(), -1, Integer::sum);
-        return new Side(player, units);
-    }
-
-    private static boolean firesAssaultCannon(Side side) {
-        int nonFighterShips = side.units().entrySet().stream()
-                .filter(entry -> entry.getKey() != UnitType.Fighter)
-                .mapToInt(Map.Entry::getValue)
-                .sum();
-        return side.player().hasTech(ASSAULT_CANNON) && nonFighterShips >= ASSAULT_CANNON_SHIPS;
-    }
-
-    private static double hitChance(int hitsOn) {
-        return Math.max(0, 11 - hitsOn) / 10.0;
-    }
-
-    private static Map<UnitType, Integer> damagedAmong(UnitHolder holder, Player player, Map<UnitType, Integer> units) {
-        Map<UnitType, Integer> damaged = new EnumMap<>(UnitType.class);
-        units.forEach((type, count) -> {
-            int hurt = Math.min(count, BoardView.damaged(holder, player, type));
-            if (hurt > 0) damaged.put(type, hurt);
-        });
-        return damaged;
-    }
-
-    private static List<Combatant> afterCannonFire(List<Combatant> ships, int hits) {
-        List<Combatant> remaining = new ArrayList<>(ships);
-        remaining.sort(Comparator.comparingDouble(Combatant::cost));
-        for (int hit = 0; hit < hits && !remaining.isEmpty(); hit++) {
-            Optional<Combatant> sustaining =
-                    remaining.stream().filter(Combatant::sustain).findFirst();
-            if (sustaining.isPresent()) {
-                Combatant ship = sustaining.get();
-                remaining.set(remaining.indexOf(ship), ship.withoutSustain());
-            } else {
-                remaining.removeFirst();
-            }
-        }
-        return remaining;
     }
 
     private static boolean isAnotherPlayersHome(Game game, Player seat, Tile tile) {
@@ -1038,10 +933,10 @@ public class TacticalPlanner {
             int bombardmentHits) {
         Side attacking = new Side(seat, sent);
         Side defending = new Side(opponent, groundOn(planet, opponent));
-        Map<UnitType, Integer> defendersDamaged = damagedAmong(planet, opponent, defending.units());
+        Map<UnitType, Integer> defendersDamaged = BattleMath.damagedAmong(planet, opponent, defending.units());
         Force defence = CombatForces.force(
                 opponent,
-                afterCannonFire(
+                BattleMath.afterCannonFire(
                         CombatForces.combatants(game, tile, planet, defending, attacking, defendersDamaged),
                         bombardmentHits),
                 true);
