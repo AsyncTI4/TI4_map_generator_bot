@@ -277,6 +277,8 @@ public class TacticalPlanner {
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
         }
         int spareForces = unitCount(cargo) - landed;
+        value += context.offense()
+                .expansionImperial(tile, targets, defendersAfterExpanding(context, tile, transports, forces));
         value += FORWARD_GROUND_FORCE_VALUE * Math.min(spareForces, forward);
         value += FIGHTER_ESCORT_VALUE * countOf(legal.get(), UnitType.Fighter);
         value += context.objectiveGain(tile, legal.get(), landings.keySet());
@@ -286,6 +288,17 @@ public class TacticalPlanner {
                 - GROUP_MOVE_COST * (movedNonFighterShips(transports) - 1)
                 - context.defense().leaveCost(origin, legal.get());
         return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), legal.get(), landings, score));
+    }
+
+    private static Defenders defendersAfterExpanding(
+            Context context, Tile tile, List<UnitMove> transports, Map<Planet, int[]> forces) {
+        Defenders ours = context.defense().defendersAt(tile);
+        for (UnitMove transport : transports) ours = ours.plusShips(transport.type(), transport.count(), 0);
+        for (Map.Entry<Planet, int[]> landing : forces.entrySet()) {
+            ours = ours.plusGround(landing.getKey().getName(), UnitType.Infantry, landing.getValue()[INFANTRY]);
+            ours = ours.plusGround(landing.getKey().getName(), UnitType.Mech, landing.getValue()[MECH]);
+        }
+        return ours;
     }
 
     private static List<UnitMove> transports(Context context, Tile origin, Tile tile, int wanted) {

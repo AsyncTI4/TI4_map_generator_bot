@@ -42,6 +42,9 @@ final class OffenseOutlook {
     private static final double CAPTURE_VALUE = 1.0;
     private static final double EXTRA_ORIGIN_COST = 0.5;
     private static final double ONE_STEP_SHORT_BLOCK = 0.25;
+    private static final double OWN_IMPERIAL_SHARE = 0.8;
+    private static final double UNCONTROLLED_MECATOL_SHARE = 0.5;
+    private static final int CUSTODIANS_INFLUENCE = 6;
     private static final String NULLIFICATION_FIELD = "nf";
     private static final String ABSOL_NULLIFICATION_FIELD = "absol_nf";
     private static final String SINGULARITY = "technological_singularity";
@@ -95,7 +98,9 @@ final class OffenseOutlook {
         double harmCap = VP * (HARM_CAP_BASE + HARM_CAP_PER_THREAT * standings.winThreat(opponent));
         double harmTerms = heldPlanetValue + economyDenial + denial.objective() + denial.homeBlock() + kills + blockade;
         double cappedHarm = Math.min(harmTerms, harmCap);
-        double value = ownObjective + (planets - heldPlanetValue) + cappedHarm + nekroGain + defenseTerm + existing;
+        double imperial = imperial(strike, estimate, landed, after, planetsAfter);
+        double value =
+                ownObjective + (planets - heldPlanetValue) + cappedHarm + imperial + nekroGain + defenseTerm + existing;
         double losses = estimate.ourExpectedLoss();
         double anger = 0;
         double counter = 0;
@@ -120,7 +125,7 @@ final class OffenseOutlook {
                 economyDenial,
                 denial.objective(),
                 denial.homeBlock(),
-                0,
+                imperial,
                 kills,
                 blockade,
                 nekroGain,
@@ -137,6 +142,77 @@ final class OffenseOutlook {
     }
 
     private record Denial(double objective, double homeBlock, double harmPoints) {}
+
+    double expansionImperial(Tile target, List<Planet> landed, Defenders ours) {
+        Optional<Planet> mecatol = landed.stream()
+                .filter(planet -> game.mecatols().contains(planet.getName()))
+                .findFirst();
+        if (mecatol.isEmpty()) return 0;
+        List<Planet> held = new ArrayList<>(planetsAfter(target, landed));
+        return imperialTerm(target, 1, defense, null, false, ours, held);
+    }
+
+    private double imperial(
+            Strike strike, StrikeEstimate estimate, List<Planet> landed, Defenders after, List<Planet> planetsAfter) {
+        Optional<Planet> mecatol = landed.stream()
+                .filter(planet -> game.mecatols().contains(planet.getName()))
+                .findFirst();
+        if (mecatol.isEmpty()) return 0;
+        double m = estimate.spaceWin() * estimate.groundWins().get(mecatol.get().getName());
+        return imperialTerm(
+                strike.target(),
+                m,
+                world(strike, estimate),
+                strike.opponent(),
+                estimate.escaped(),
+                after,
+                planetsAfter);
+    }
+
+    private double imperialTerm(
+            Tile target,
+            double m,
+            DefenseOutlook world,
+            Player struck,
+            boolean escaped,
+            Defenders after,
+            List<Planet> planetsAfter) {
+        double own = standings.holdsImperial(seat) && !seat.controlsMecatol(false) ? VP * OWN_IMPERIAL_SHARE * m : 0;
+        double holder = standings
+                .imperialHolder()
+                .filter(found -> found != seat)
+                .map(found -> holderImperial(found, target, m, world, struck, escaped, after, planetsAfter))
+                .orElse(0.0);
+        return own + holder;
+    }
+
+    private double holderImperial(
+            Player holder,
+            Tile target,
+            double m,
+            DefenseOutlook world,
+            Player struck,
+            boolean escaped,
+            Defenders after,
+            List<Planet> planetsAfter) {
+        double before = holder.controlsMecatol(false) ? 1 : UNCONTROLLED_MECATOL_SHARE * reachable(holder, target);
+        double takeVsUs = holder == struck && escaped
+                ? 1
+                : world.chancesAgainst(holder, target, Horizon.IMMEDIATE, after, planetsAfter)
+                        .take();
+        double standingShare = holder.controlsMecatol(false) ? 1 : UNCONTROLLED_MECATOL_SHARE;
+        double afterTaking = m * standingShare * takeVsUs + (1 - m) * before;
+        double lost = VP * standings.denialWeight(holder) * Math.max(0, before - afterTaking);
+        double cap = VP * (HARM_CAP_BASE + HARM_CAP_PER_THREAT * standings.winThreat(holder));
+        return Math.min(lost, cap);
+    }
+
+    private double reachable(Player holder, Tile mecatolTile) {
+        IncomingForces.IncomingForce force = defense.force(holder, mecatolTile, Horizon.IMMEDIATE);
+        if (force.isEmpty() || !force.carriesGround()) return 0;
+        boolean custodians = mecatolTile.getPlanetUnitHolders().stream().anyMatch(BoardView::hasCustodians);
+        return !custodians || Wallet.of(game, holder).influence() >= CUSTODIANS_INFLUENCE ? 1 : 0;
+    }
 
     private Denial objectiveDenial(
             Strike strike,

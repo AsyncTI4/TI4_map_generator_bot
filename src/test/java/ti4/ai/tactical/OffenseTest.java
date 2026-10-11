@@ -451,6 +451,63 @@ class OffenseTest extends BaseTi4Test {
         return breakdown(target);
     }
 
+    private double imperialTermOfAnAttackOnMecatol(boolean imperialPlayed) {
+        board = new DefenseScenario();
+        Tile rex = board.test.place("18", "000");
+        sardakk().addPlanet("mr");
+        board.test.units(rex, "mr", sardakk(), UnitType.Infantry, 1);
+        sardakk().addSC(IMPERIAL);
+        if (imperialPlayed) board.test.game.setSCPlayed(IMPERIAL, true);
+        Tile launch = board.test.place("47", nextTo("000"));
+        board.test.units(launch, "space", nekro(), UnitType.Carrier, 1);
+        board.test.units(launch, "space", nekro(), UnitType.Infantry, 4);
+        return breakdown("000").imperial();
+    }
+
+    // Test 5: the neighbour holds Mecatol Rex and the unplayed Imperial card, so taking the planet stops it scoring the
+    // Imperial point. The point is not counted twice (the neighbour is only denied the one point it holds), and once
+    // the card has been played there is nothing left to deny.
+    @Test
+    void takingMecatolFromTheImperialHolderIsWorthItsPoint() {
+        double before = imperialTermOfAnAttackOnMecatol(false);
+        double oneDenied =
+                new DefenseOutlook(board.test.game, nekro()).standings().denialWeight(sardakk())
+                        * ObjectiveValue.VICTORY_POINT_VALUE;
+
+        double after = imperialTermOfAnAttackOnMecatol(true);
+
+        assertThat(before).isPositive().isLessThanOrEqualTo(oneDenied + 1e-9);
+        assertThat(after).isZero();
+    }
+
+    private double expansionToMecatol(boolean someoneHoldsImperial) {
+        board = new DefenseScenario();
+        Tile rex = board.test.place("18", "000");
+        assertThat(rex).isNotNull();
+        sardakk().setTacticalCC(3);
+        if (someoneHoldsImperial) sardakk().addSC(IMPERIAL);
+        Tile rivals = board.test.place("49", nextTo("000"));
+        board.test.units(rivals, "space", sardakk(), UnitType.Carrier, 1);
+        board.test.units(rivals, "space", sardakk(), UnitType.Infantry, 4);
+        Tile launch = board.test.place("47", nextTo("000"));
+        board.test.units(launch, "space", nekro(), UnitType.Carrier, 1);
+        board.test.units(launch, "space", nekro(), UnitType.Infantry, 2);
+        return TacticalPlanner.forTarget(board.test.game, nekro(), "000")
+                .filter(plan -> plan.kind() == Kind.EXPAND)
+                .map(TacticalPlan::score)
+                .orElseThrow();
+    }
+
+    // Test 6: another player holds the unplayed Imperial card and could reach an empty Mecatol Rex; taking it first
+    // denies them that point, so the expansion is worth more than when nobody holds the card.
+    @Test
+    void expandingOntoMecatolBeatsTheImperialHolderToIt() {
+        double withTheCard = expansionToMecatol(true);
+        double withoutTheCard = expansionToMecatol(false);
+
+        assertThat(withTheCard).isGreaterThan(withoutTheCard);
+    }
+
     // Test 22: planning attacks only reads what the table can see of the opponent.
     @Test
     void neverLooksAtTheOpponentsHiddenCards() {
