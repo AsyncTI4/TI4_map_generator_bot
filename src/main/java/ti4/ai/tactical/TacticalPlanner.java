@@ -54,6 +54,7 @@ public class TacticalPlanner {
     private static final double HOME_LANDING_THREAT = 0.25;
     private static final double HOME_LANDING_SHARE = 0.5;
     private static final int FINALISTS = 2;
+    private static final int MAX_ORIGINS = 3;
     static final double ATTACK_MIN_SCORE = 4.0;
     private static final double DISTANCE_COST = 0.2;
     private static final double PLANET_TEMPO_VALUE = 0.8;
@@ -437,7 +438,40 @@ public class TacticalPlanner {
         for (Tile origin : context.origins()) {
             if (origin != tile) pool.addAll(candidatesFrom(context, tile, origin, opponent));
         }
+        pool.addAll(combinations(context, tile, opponent, pool));
         return pool;
+    }
+
+    private static List<Candidate> combinations(Context context, Tile tile, Player opponent, List<Candidate> singles) {
+        Map<Tile, Candidate> bestPerOrigin = new LinkedHashMap<>();
+        for (Candidate single : singles) {
+            Tile origin = single.parts().getFirst().origin();
+            Candidate known = bestPerOrigin.get(origin);
+            if (known == null || single.quick().score() > known.quick().score()) bestPerOrigin.put(origin, single);
+        }
+        if (bestPerOrigin.size() < 2) return List.of();
+        Candidate start = bestPerOrigin.values().stream()
+                .max(Comparator.comparingDouble(found -> found.quick().score()))
+                .orElseThrow();
+        List<Candidate> others = bestPerOrigin.values().stream()
+                .filter(found -> found != start)
+                .sorted(Comparator.comparingDouble((Candidate found) -> fleetCost(context.seat, found.moves()))
+                        .reversed())
+                .toList();
+        List<Candidate> combined = new ArrayList<>();
+        Candidate current = start;
+        for (Candidate next : others) {
+            if (current.parts().size() >= MAX_ORIGINS) break;
+            List<Part> parts = new ArrayList<>(current.parts());
+            parts.addAll(next.parts());
+            Optional<Candidate> merged =
+                    candidate(context, tile, opponent, parts, current.heldBack() || next.heldBack(), null);
+            if (merged.isEmpty()
+                    || merged.get().quick().score() <= current.quick().score()) break;
+            combined.add(merged.get());
+            current = merged.get();
+        }
+        return combined;
     }
 
     static Optional<StrikeValue> explainAttack(Game game, Player seat, String position) {

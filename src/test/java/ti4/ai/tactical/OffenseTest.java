@@ -508,6 +508,43 @@ class OffenseTest extends BaseTi4Test {
         assertThat(withTheCard).isGreaterThan(withoutTheCard);
     }
 
+    private String twoSmallFleetsAgainstOneBig() {
+        String target = board.otherNeighbourOfHome();
+        Tile system = board.test.place("47", target);
+        board.test.units(system, "space", sardakk(), UnitType.Cruiser, 5);
+        board.test.units(board.home, "space", nekro(), UnitType.Dreadnought, 2);
+        Tile second = board.test.place("48", nextTo(target));
+        board.test.units(second, "space", nekro(), UnitType.Dreadnought, 2);
+        nekro().setSecret("sar");
+        return target;
+    }
+
+    // Test 17: two systems each hold two dreadnoughts that would lose to the opponent's five cruisers alone (a win
+    // chance under one fifth) and win together. The strike moves ships out of both, within the fleet supply.
+    @Test
+    void combinesTwoFleetsThatAreTooWeakAlone() {
+        nekro().setFleetCC(4);
+        String target = twoSmallFleetsAgainstOneBig();
+
+        TacticalPlan plan = attackOn(target).orElseThrow();
+
+        assertThat(plan.moves().stream().map(TacticalPlan.UnitMove::origin).distinct())
+                .hasSize(2);
+        assertThat(plan.moves().stream()
+                        .filter(move -> move.type() == UnitType.Dreadnought)
+                        .mapToInt(TacticalPlan.UnitMove::count)
+                        .sum())
+                .isEqualTo(4);
+    }
+
+    @Test
+    void aCombinedStrikeStaysWithinTheFleetSupply() {
+        nekro().setFleetCC(3);
+        String target = twoSmallFleetsAgainstOneBig();
+
+        assertThat(attackOn(target)).isEmpty();
+    }
+
     // Test 22: planning attacks only reads what the table can see of the opponent.
     @Test
     void neverLooksAtTheOpponentsHiddenCards() {
