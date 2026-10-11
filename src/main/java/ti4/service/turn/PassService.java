@@ -41,9 +41,7 @@ public class PassService {
                     "You are not the active player. If you need to, you can force pass with `/player stats passed:y`.");
             return;
         }
-        if (UydaiUnitHandler.offerDeathCommandosPlacementBeforePassing(event, game, player)) {
-            return;
-        }
+        UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
 
         player.setPassed(true);
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
