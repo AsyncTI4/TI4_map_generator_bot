@@ -78,6 +78,12 @@ final class SelfPlayGame {
             return values;
         }
 
+        int total(String kind) {
+            return actionsByRound.values().stream()
+                    .mapToInt(round -> round.getOrDefault(kind, 0))
+                    .sum();
+        }
+
         // The table's average of one seat value at the start of round 2, 3 and so on.
         List<Double> atRoundStart(String key) {
             return stateAtRoundStart.stream()

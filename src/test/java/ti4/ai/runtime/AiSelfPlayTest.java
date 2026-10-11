@@ -102,6 +102,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 java.util.stream.Collectors.counting())));
         printTrading(outcomes);
         printSecrets(outcomes);
+        printPlanKinds(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
                         outcomes.stream()
@@ -180,6 +181,36 @@ class AiSelfPlayTest extends BaseTi4Test {
                         .mapToInt(SelfPlayGame.Outcome::totalVictoryPoints)
                         .average()
                         .orElse(0));
+    }
+
+    // Tactical actions by the kind of plan behind them, per game over the batch: attacks, attacks on another player's
+    // home (and those that landed), attacks on Mecatol Rex against an Imperial holder, and positioning moves.
+    private static void printPlanKinds(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        List<String> kinds = List.of(
+                "expand",
+                "attack",
+                "produce",
+                "position",
+                "defend",
+                "stage",
+                "attack on another home",
+                "attack landing on a home",
+                "attack on Mecatol against Imperial");
+        List<String> parts = new ArrayList<>();
+        for (String kind : kinds) {
+            int total = outcomes.stream()
+                    .mapToInt(outcome -> outcome.total(SelfPlayEnvironment.PLAN_PREFIX + kind))
+                    .sum();
+            parts.add(String.format("%s %.2f", kind, (double) total / games));
+        }
+        System.out.println("Tactical plans per game: " + String.join(", ", parts));
+        long samples = SelfPlayEnvironment.RANKED_SAMPLES.sum();
+        System.out.printf(
+                "TacticalPlanner.ranked on real boards: mean %.1f ms, max %.1f ms over %d samples%n",
+                samples == 0 ? 0 : SelfPlayEnvironment.RANKED_NANOS.sum() / 1e6 / samples,
+                SelfPlayEnvironment.RANKED_MAX_NANOS.get() / 1e6,
+                samples);
     }
 
     // What trading did over the batch, next to the strength measures it should move (run once with -Dai.trading=false
