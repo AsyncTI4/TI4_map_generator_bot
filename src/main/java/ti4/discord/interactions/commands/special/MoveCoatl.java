@@ -1,9 +1,9 @@
 package ti4.discord.interactions.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,9 +19,7 @@ class MoveCoatl extends GameStateSubcommand {
 
     public MoveCoatl() {
         super(Constants.MOVE_COATL, "Moves the Coatl token.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("Target System/Tile name"));
     }
 
     @Override
@@ -31,12 +29,11 @@ class MoveCoatl extends GameStateSubcommand {
 
         String tileName = StringUtils.substringBefore(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
-        Tile tile = TileHelper.getTile(event, tileName, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(
-                    event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event,
+                TileHelper.getTile(event, tileName, game),
+                "Could not resolve tileID:  `" + tileName + "`. Tile not found");
+        if (tile == null) return;
 
         String tokenName = "custc1";
         if (ButtonHelper.isCoatlHealed(game)) {

@@ -1,10 +1,10 @@
 package ti4.discord.interactions.commands.cardspn;
 
-import java.util.Map;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -27,18 +27,11 @@ class ShowPNToAll extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         int pnIndex = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsInt();
-        String pnID = null;
-        for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
-            if (pn.getValue().equals(pnIndex)) {
-                pnID = pn.getKey();
-                break;
-            }
-        }
-
-        if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
-            return;
-        }
+        String pnID = CommandHelper.requireOrReport(
+                event,
+                CommandHelper.cardIdForNumber(player.getPromissoryNotes(), pnIndex),
+                "No such promissory note ID found, please retry.");
+        if (pnID == null) return;
 
         MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(false, false, false);
         player.setPromissoryNote(pnID);

@@ -18,6 +18,7 @@ class PeekAtSecretDeck extends GameStateSubcommand {
 
     PeekAtSecretDeck() {
         super("peek_secret_objective_deck", "Peek at the top of the secret objective deck", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of secrets to peek at, default 1")
                 .setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, "index_to_draw", "Which of the secrets to draw (1, 2, 3, ...)"));
@@ -61,10 +62,5 @@ class PeekAtSecretDeck extends GameStateSubcommand {
         if (shuffle) {
             Collections.shuffle(game.getSecretObjectives());
         }
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

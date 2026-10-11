@@ -11,9 +11,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.ExploreEmojis;
 
 @UtilityClass
 class ArtifactResearchAcd2ButtonHandler {
@@ -32,8 +30,8 @@ class ArtifactResearchAcd2ButtonHandler {
         for (String fragId : player.getFragments()) {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "artifactResearchDiscard_" + fragId,
-                    "Discard " + fragmentLabel(fragId),
-                    fragmentEmoji(fragId)));
+                    "Discard " + HeistAcd2ButtonHandler.fragmentLabel(fragId),
+                    HeistAcd2ButtonHandler.fragmentEmoji(fragId)));
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
@@ -58,26 +56,9 @@ class ArtifactResearchAcd2ButtonHandler {
         game.discardExplore(fragId);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " discarded a " + fragmentEmoji(fragId) + fragmentLabel(fragId)
+                player.getRepresentationUnfogged() + " discarded a " + HeistAcd2ButtonHandler.fragmentEmoji(fragId)
+                        + HeistAcd2ButtonHandler.fragmentLabel(fragId)
                         + " for _Artifact Research_, ignoring 1 of that technology's prerequisites.");
         ButtonHelperStats.gainTGs(event, game, player, 3, false);
-    }
-
-    private static String fragmentLabel(String fragId) {
-        return switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
-            case "cultural" -> "cultural relic fragment";
-            case "industrial" -> "industrial relic fragment";
-            case "hazardous" -> "hazardous relic fragment";
-            default -> "unknown relic fragment";
-        };
-    }
-
-    private static String fragmentEmoji(String fragId) {
-        return switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
-            case "cultural" -> ExploreEmojis.CFrag.toString();
-            case "industrial" -> ExploreEmojis.IFrag.toString();
-            case "hazardous" -> ExploreEmojis.HFrag.toString();
-            default -> ExploreEmojis.UFrag.toString();
-        };
     }
 }

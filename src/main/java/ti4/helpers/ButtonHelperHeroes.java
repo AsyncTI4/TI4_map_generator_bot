@@ -241,12 +241,13 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("argentHeroStep4_")
     public static void argentHeroStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String pos1 = buttonID.split("_")[1];
+        String[] parts = buttonID.split("_");
+        String pos1 = parts[1];
         Tile destination = game.getTileByPosition(pos1);
-        String pos2 = buttonID.split("_")[2];
+        String pos2 = parts[2];
         Tile origin = game.getTileByPosition(pos2);
-        String unitHolderName = buttonID.split("_")[3];
-        String unitName = buttonID.split("_")[4];
+        String unitHolderName = parts[3];
+        String unitName = parts[4];
         boolean damaged = false;
         if (unitName.contains("damaged")) {
             damaged = true;
@@ -896,7 +897,6 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getUnitsToGlimmersHero(Player player, Tile tile) {
-        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -905,32 +905,9 @@ public class ButtonHelperHeroes {
                 UnitType.Flagship,
                 UnitType.Warsun,
                 UnitType.Fighter);
-
-        List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            UnitHolder unitHolder = entry.getValue();
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet) continue;
-
-            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
-            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
-                UnitKey unitKey = unitEntry.getKey();
-                if (!player.unitBelongsToPlayer(unitKey)) continue;
-                if (!allowedUnits.contains(unitKey.unitType())) {
-                    continue;
-                }
-                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
-                String unitName = unitKey.unitName();
-                Button validTile2 = Buttons.red(
-                        factionChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName,
-                        "Duplicate " + prettyName,
-                        unitKey.unitEmoji());
-                buttons.add(validTile2);
-            }
-        }
-        Button validTile2 = Buttons.red(factionChecker + "deleteButtons", "Decline");
-        buttons.add(validTile2);
+        List<Button> buttons = ButtonHelperModifyUnits.getSpaceUnitButtons(
+                player, tile, allowedUnits, false, false, "Duplicate", "glimmersHeroOn_", unitKey -> "");
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
         return buttons;
     }
 
@@ -980,33 +957,15 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getButtonsForGheminaLadyHero(Player player, Game game) {
-        String factionChecker = player.factionButtonChecker();
-        List<Button> buttons = new ArrayList<>();
-        List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                game, player, UnitType.Lady, UnitType.Flagship);
-        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
-                game, tilesWithBombard.getFirst().getPosition(), player, false);
-        for (Tile tile : tilesWithBombard) {
-            adjacentTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
-        }
-        for (String pos : adjacentTiles) {
-            Tile tile = game.getTileByPosition(pos);
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (unitHolder instanceof Planet planet) {
-                    if (!player.getPlanetsAllianceMode().contains(planet.getName())
-                            && !tile.isHomeSystem(game)
-                            && !planet.getName().toLowerCase().contains("rex")) {
-                        buttons.add(Buttons.green(
-                                factionChecker + "gheminaLadyHero_" + planet.getName(),
-                                Helper.getPlanetRepresentation(planet.getName(), game)));
-                    }
-                }
-            }
-        }
-        return buttons;
+        return getButtonsForGheminaHero(player, game, "gheminaLadyHero_", false);
     }
 
     public static List<Button> getButtonsForGheminaLordHero(Player player, Game game) {
+        return getButtonsForGheminaHero(player, game, "gheminaLordHero_", true);
+    }
+
+    private static List<Button> getButtonsForGheminaHero(
+            Player player, Game game, String idPrefix, boolean requireEmpty) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
@@ -1019,16 +978,15 @@ public class ButtonHelperHeroes {
         for (String pos : adjacentTiles) {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (unitHolder instanceof Planet planet) {
-                    Map<UnitKey, Integer> units = unitHolder.getUnits();
-                    if (!player.getPlanetsAllianceMode().contains(planet.getName())
-                            && !tile.isHomeSystem(game)
-                            && !planet.getName().toLowerCase().contains("rex")
-                            && (units == null || units.isEmpty())) {
-                        buttons.add(Buttons.green(
-                                factionChecker + "gheminaLordHero_" + planet.getName(),
-                                Helper.getPlanetRepresentation(planet.getName(), game)));
-                    }
+                if (!(unitHolder instanceof Planet planet)) continue;
+                Map<UnitKey, Integer> units = planet.getUnits();
+                if (!player.getPlanetsAllianceMode().contains(planet.getName())
+                        && !tile.isHomeSystem(game)
+                        && !planet.getName().toLowerCase().contains("rex")
+                        && (!requireEmpty || units == null || units.isEmpty())) {
+                    buttons.add(Buttons.green(
+                            factionChecker + idPrefix + planet.getName(),
+                            Helper.getPlanetRepresentation(planet.getName(), game)));
                 }
             }
         }
@@ -1541,7 +1499,6 @@ public class ButtonHelperHeroes {
                 player.getRepresentationUnfogged() + " put "
                         + Mapper.getPublicObjective(id).getName()
                         + " as next up. Feel free to peek at it to confirm it worked");
-        // GameSaveLoadManager.saveMap(game, event);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1963,7 +1920,6 @@ public class ButtonHelperHeroes {
         List<Button> scButtons = new ArrayList<>();
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
             scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
-            // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
@@ -1995,7 +1951,6 @@ public class ButtonHelperHeroes {
     public static List<Button> getSecondaryButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
-        // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
 
         scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
 

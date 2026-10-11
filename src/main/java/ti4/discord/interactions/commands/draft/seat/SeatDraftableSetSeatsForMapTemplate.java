@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.draft.seat;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -16,22 +17,17 @@ class SeatDraftableSetSeatsForMapTemplate extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        SeatDraftable draftable = SeatDraftableGroup.getDraftable(getGame());
-        if (draftable == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Seats aren't draftable; you may need `/draft manage add_draftable Seat`.");
-            return;
-        }
-        String mapTemplateId = getGame().getMapTemplateID();
-        if (mapTemplateId == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Map template ID is not set for the game.");
-            return;
-        }
-        MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
-        if (mapTemplate == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown map template: " + mapTemplateId);
-            return;
-        }
+        SeatDraftable draftable = CommandHelper.requireOrReport(
+                event,
+                SeatDraftableGroup.getDraftable(getGame()),
+                "Seats aren't draftable; you may need `/draft manage add_draftable Seat`.");
+        if (draftable == null) return;
+        String mapTemplateId = CommandHelper.requireOrReport(
+                event, getGame().getMapTemplateID(), "Map template ID is not set for the game.");
+        if (mapTemplateId == null) return;
+        MapTemplateModel mapTemplate = CommandHelper.requireOrReport(
+                event, Mapper.getMapTemplate(mapTemplateId), "Unknown map template: " + mapTemplateId);
+        if (mapTemplate == null) return;
         int numSeats = mapTemplate.getPlayerCount();
         draftable.setNumSeats(numSeats);
         MessageHelper.sendMessageToChannel(

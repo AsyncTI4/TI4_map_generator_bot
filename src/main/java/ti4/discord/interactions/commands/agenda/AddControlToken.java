@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.agenda;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -11,12 +12,11 @@ class AddControlToken extends GameStateSubcommand {
 
     AddControlToken() {
         super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction that owns the token, default you"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to remove instead of add tokens"));
     }
 
@@ -51,10 +51,5 @@ class AddControlToken extends GameStateSubcommand {
         }
 
         game.setStoredValue("controlTokensOnAgenda" + lawId, msg);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

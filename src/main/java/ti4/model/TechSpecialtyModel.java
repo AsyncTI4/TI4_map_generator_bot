@@ -1,8 +1,5 @@
 package ti4.model;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
 import ti4.service.emoji.TechEmojis;
 
 public class TechSpecialtyModel {
@@ -30,12 +27,5 @@ public class TechSpecialtyModel {
                     })
                     .toString();
         }
-    }
-
-    public static TechSpecialty getTechSpecialtyFromString(String specialty) {
-        Map<String, TechSpecialty> allTypes = Arrays.stream(TechSpecialty.values())
-                .collect(Collectors.toMap(TechSpecialty::toString, (techSpecialty -> techSpecialty)));
-        if (allTypes.containsKey(specialty.toLowerCase())) return allTypes.get(specialty.toLowerCase());
-        return null;
     }
 }

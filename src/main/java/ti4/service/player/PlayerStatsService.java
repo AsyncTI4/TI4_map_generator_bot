@@ -49,7 +49,7 @@ public class PlayerStatsService {
         sb.append("> Base commodities: `").append(player.getCommoditiesBase()).append("`\n");
         sb.append("> Bonus commodities: `").append(player.getCommoditiesBonus()).append("`\n");
         sb.append("> Old total commodities: `")
-                .append(player.getCommoditiesTotal(true))
+                .append(player.getStoredCommoditiesTotal())
                 .append("`\n");
         sb.append("> Command Tokens: `").append(player.getCCRepresentation()).append("`\n");
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");

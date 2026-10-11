@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -21,12 +22,9 @@ class ShufflePublicBack extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        OptionMapping option = event.getOption(Constants.PO_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Please choose what public objective to shuffle back in");
-            return;
-        }
+        OptionMapping option = CommandHelper.requireOrReport(
+                event, event.getOption(Constants.PO_ID), "Please choose what public objective to shuffle back in");
+        if (option == null) return;
         boolean shuffled = game.shuffleObjectiveBackIntoDeck(option.getAsInt());
         if (!shuffled) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -16,9 +17,7 @@ public class MoveTile extends GameStateSubcommand {
 
     public MoveTile() {
         super(Constants.MOVE_TILE, "Move a tile to another location", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("System/Tile name to move"));
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Position to move to (must have no tile)")
                 .setRequired(true));
     }
@@ -27,11 +26,9 @@ public class MoveTile extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        Tile movingTile = CommandHelper.getTile(event, game);
-        if (movingTile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the system you're trying to move.");
-            return;
-        }
+        Tile movingTile = CommandHelper.requireOrReport(
+                event, CommandHelper.getTile(event, game), "Could not find the system you're trying to move.");
+        if (movingTile == null) return;
 
         String tileToPosition = event.getOption(Constants.POSITION).getAsString();
         String tileFromPosition = movingTile.getPosition();

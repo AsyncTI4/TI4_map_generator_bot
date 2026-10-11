@@ -2,8 +2,12 @@ package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -22,6 +26,8 @@ import ti4.service.franken.FrankenDraftBagService;
 public abstract class BagDraft {
     private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
     private final Game owner;
+    private final int picksFromFirstBag;
+    private final int picksFromNextBags;
 
     public static BagDraft generateDraft(String draftType, Game game) {
         return switch (draftType) {
@@ -38,8 +44,10 @@ public abstract class BagDraft {
         };
     }
 
-    BagDraft(Game owner) {
+    BagDraft(Game owner, int picksFromFirstBag, int picksFromNextBags) {
         this.owner = owner;
+        this.picksFromFirstBag = picksFromFirstBag;
+        this.picksFromNextBags = picksFromNextBags;
     }
 
     Game getOwner() {
@@ -58,28 +66,61 @@ public abstract class BagDraft {
     public abstract int getBagSize();
 
     public int getPicksFromFirstBag() {
-        return 3;
+        return picksFromFirstBag;
     }
 
     public int getPicksFromNextBags() {
-        return 2;
+        return picksFromNextBags;
+    }
+
+    static int effectiveItemLimit(BagDraft draft, DraftCategory category, Game game) {
+        if (draft instanceof FrankenDraft) {
+            return FrankenDraft.getItemLimitForCategory(category, game);
+        }
+        return draft.getItemLimitForCategory(category);
+    }
+
+    @Nullable
+    protected List<DraftBag> fillBags(
+            Game game, Map<DraftCategory, List<DraftItem>> allDraftableItems, String draftName) {
+        List<DraftBag> bags = new ArrayList<>();
+        Map<DraftCategory, Integer> missingItems = new HashMap<>();
+        for (int i = 0; i < game.getRealPlayers().size(); i++) {
+            DraftBag bag = new DraftBag();
+            for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
+                DraftCategory category = draftableCollection.getKey();
+                int categoryLimit = effectiveItemLimit(this, category, game);
+                for (int j = 0; j < categoryLimit; j++) {
+                    if (!draftableCollection.getValue().isEmpty()) {
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
+                    } else {
+                        missingItems.merge(category, 1, Integer::sum);
+                    }
+                }
+            }
+
+            if (!missingItems.isEmpty()) {
+                StringBuilder issue = new StringBuilder(
+                        game.getPing() + " an issue was encountered while building the " + draftName + " draft.");
+                issue.append("\nOne or more bags are missing components.");
+                for (var e : missingItems.entrySet()) {
+                    issue.append("\n> ")
+                            .append(e.getKey().toString())
+                            .append(" is missing ")
+                            .append(e.getValue())
+                            .append(" components.");
+                }
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue.toString());
+                return null;
+            }
+            bags.add(bag);
+        }
+        return bags;
     }
 
     public boolean isDraftStageComplete() {
-        List<Player> players = owner.getRealPlayers();
-
-        for (Player p : players) {
-            if (!p.getCurrentDraftBag().Contents.isEmpty()
-                    || !p.getDraftQueue().Contents.isEmpty()) {
-                if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
-                    return false;
-                }
-            }
-            if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
-                return false;
-            }
-        }
-        return true;
+        return owner.getRealPlayers().stream()
+                .allMatch(p -> p.getDraftHand().Contents.size() == owner.getFrankenBagSize());
     }
 
     public void passBags() {
@@ -110,34 +151,27 @@ public abstract class BagDraft {
     public boolean allPlayersReadyToPass() {
         for (Player p : owner.getRealPlayers()) {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
-                setPlayerReadyToPass(p, true);
-                MessageHelper.sendMessageToChannel(
-                        findExistingBagChannel(p),
-                        "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
-                MessageHelper.sendMessageToChannel(
-                        p.getCardsInfoThread(),
-                        "You are passing the following cards to your right:\n"
-                                + FrankenDraftBagService.getBagReceipt(p));
-                FrankenDraftBagService.displayPlayerHand(owner, p);
-            } else {
-                if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
-                    List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
-                    p.getDraftHand().Contents.addAll(draftableItems);
-                    clearBagChannel(p);
-                    p.getCurrentDraftBag().Contents.removeAll(draftableItems);
-                    setPlayerReadyToPass(p, true);
-                    MessageHelper.sendMessageToChannel(
-                            findExistingBagChannel(p),
-                            "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
-                    MessageHelper.sendMessageToChannel(
-                            p.getCardsInfoThread(),
-                            "You are passing the following cards to your right:\n"
-                                    + FrankenDraftBagService.getBagReceipt(p));
-                    FrankenDraftBagService.displayPlayerHand(owner, p);
-                }
+                markReadyToPass(p);
+            } else if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
+                List<DraftItem> draftableItems = draftableItemsInBag(p);
+                p.getDraftHand().Contents.addAll(draftableItems);
+                clearBagChannel(p);
+                p.getCurrentDraftBag().Contents.removeAll(draftableItems);
+                markReadyToPass(p);
             }
         }
         return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
+    }
+
+    private void markReadyToPass(Player p) {
+        setPlayerReadyToPass(p, true);
+        MessageHelper.sendMessageToChannel(
+                findExistingBagChannel(p),
+                "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+        MessageHelper.sendMessageToChannel(
+                p.getCardsInfoThread(),
+                "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(p));
+        FrankenDraftBagService.displayPlayerHand(owner, p);
     }
 
     public static boolean playerHasDraftableItemInBag(Player player) {
@@ -145,9 +179,9 @@ public abstract class BagDraft {
     }
 
     private static List<DraftItem> draftableItemsInBag(Player player) {
-        return new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
+        return player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
-                .toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
@@ -161,14 +195,8 @@ public abstract class BagDraft {
     public String getLongBagRepresentation(DraftBag bag, Game game) {
         StringBuilder sb = new StringBuilder();
         for (DraftCategory cat : DraftCategory.values()) {
-            if (this instanceof FrankenDraft) {
-                if (FrankenDraft.getItemLimitForCategory(cat, game) > 0) {
-                    sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
-                }
-            } else {
-                if (getItemLimitForCategory(cat) > 0) {
-                    sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
-                }
+            if (effectiveItemLimit(this, cat, game) > 0) {
+                sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
             }
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
@@ -243,8 +271,20 @@ public abstract class BagDraft {
     }
 
     private static ThreadChannel findExistingBagChannel(Player player, String threadName) {
+        ThreadChannel byId = findBagThread(
+                player,
+                thread -> thread.getId().equals(player.getBagInfoThreadID()),
+                "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: "
+                        + player.getBagInfoThreadID() + " for potential thread name: " + threadName);
+        if (byId != null) return byId;
+        return findBagThread(
+                player,
+                thread -> thread.getName().equals(threadName),
+                "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName);
+    }
+
+    private static ThreadChannel findBagThread(Player player, Predicate<ThreadChannel> matches, String errorMessage) {
         TextChannel actionsChannel = player.getCorrectChannel();
-        // ATTEMPT TO FIND BY ID
         String bagInfoThread = player.getBagInfoThreadID();
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
@@ -253,65 +293,28 @@ public abstract class BagDraft {
                 ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
 
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(bagInfoThread)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
+                ThreadChannel open = findAndRemember(player, threadChannels, matches);
+                if (open != null) return open;
 
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 // Must `complete` if we're using this channel as part of an interaction that saves the game
-                List<ThreadChannel> hiddenThreadChannels =
-                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getId().equals(bagInfoThread)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
+                return findAndRemember(
+                        player,
+                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete(),
+                        matches);
             }
         } catch (Exception e) {
-            BotLogger.error(
-                    new LogOrigin(player),
-                    "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread
-                            + " for potential thread name: " + threadName,
-                    e);
+            BotLogger.error(new LogOrigin(player), errorMessage, e);
         }
+        return null;
+    }
 
-        // ATTEMPT TO FIND BY NAME
-        try {
-            if (bagInfoThread != null && !bagInfoThread.isBlank() && !"null".equals(bagInfoThread)) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = JdaService.jda.getThreadChannelById(bagInfoThread);
-                if (threadChannel != null) return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                // Must `complete` if we're using this channel as part of an interaction that saves the game
-                List<ThreadChannel> hiddenThreadChannels =
-                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
+    private static ThreadChannel findAndRemember(
+            Player player, List<ThreadChannel> threadChannels, Predicate<ThreadChannel> matches) {
+        for (ThreadChannel threadChannel : threadChannels) {
+            if (matches.test(threadChannel)) {
+                player.setBagInfoThreadID(threadChannel.getId());
+                return threadChannel;
             }
-        } catch (Exception e) {
-            BotLogger.error(
-                    new LogOrigin(player),
-                    "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName,
-                    e);
         }
         return null;
     }

@@ -1,51 +1,36 @@
 package ti4.discord.interactions.commands.fow;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class FOWCommand implements ParentCommand {
+public class FOWCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new AddFogTile(),
-                    new RemoveFogTile(),
-                    new AddVisionToken(),
-                    new RemoveVisionToken(),
-                    new CheckChannels(),
-                    new PingActivePlayer(),
-                    new PingSystem(),
-                    new TargetPlanetPing(),
-                    new TargetSystemPing(),
-                    new TargetPlayerPing(),
-                    new Whisper(),
-                    new Announce(),
-                    new FOWOptions(),
-                    new ShowGameAsPlayer(),
-                    new PrivateCommunicationsCheck(),
-                    new GMCommand(),
-                    new CreateFoWGameButton(),
-                    new SetupWizard(),
-                    new MapSegmentCommand(),
-                    new MapOverviewCommand(),
-                    new GalaxyCommand(),
-                    new FowInfo(),
-                    new FowEndedStats())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.FOW;
-    }
-
-    public String getDescription() {
-        return "Fog of War";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public FOWCommand() {
+        super(
+                Constants.FOW,
+                "Fog of War",
+                new AddFogTile(),
+                new RemoveFogTile(),
+                new AddVisionToken(),
+                new RemoveVisionToken(),
+                new CheckChannels(),
+                new PingActivePlayer(),
+                new PingSystem(),
+                new TargetPlanetPing(),
+                new TargetSystemPing(),
+                new TargetPlayerPing(),
+                new Whisper(),
+                new Announce(),
+                new FOWOptions(),
+                new ShowGameAsPlayer(),
+                new PrivateCommunicationsCheck(),
+                new GMCommand(),
+                new CreateFoWGameButton(),
+                new SetupWizard(),
+                new MapSegmentCommand(),
+                new MapOverviewCommand(),
+                new GalaxyCommand(),
+                new FowInfo(),
+                new FowEndedStats());
     }
 }

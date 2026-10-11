@@ -23,6 +23,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.BombardmentService;
@@ -30,7 +31,6 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class AshenBreakthroughHandler {
@@ -140,7 +140,7 @@ public class AshenBreakthroughHandler {
                 getRollContextKey(player), "pending|" + selected.source().getPosition() + "|" + target.planet());
         game.setStoredValue(
                 "assignedBombardment" + player.getFaction(),
-                new ObjectMapper()
+                JsonMapperManager.basic()
                         .writeValueAsString(List.of(new BombardmentAssignment(
                                 selected.unit().getAsyncId(),
                                 target.planet(),
@@ -221,12 +221,10 @@ public class AshenBreakthroughHandler {
             RemoveUnitService.removeUnits(
                     event, player.getNomboxTile(), game, player.getColor(), infantryToPlace + " infantry");
         }
-        game.setStoredValue("coexistFlag", "yes");
         if (infantryToPlace > 0) {
-            AddUnitService.addUnits(
+            AddUnitService.addUnitsInCoexistence(
                     event, targetTile, game, player.getColor(), infantryToPlace + " infantry " + context.planet());
         }
-        game.removeStoredValue("coexistFlag");
         ButtonHelperAbilities.oceanBoundCheck(game);
         game.removeStoredValue(getRollContextKey(player));
         MessageHelper.sendMessageToChannel(

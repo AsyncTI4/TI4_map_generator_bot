@@ -22,7 +22,6 @@ import ti4.service.button.ReactionService;
 import ti4.service.fow.FowAutoDeclineService;
 import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.turn.StartTurnService;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class FastScFollowCron {
@@ -31,21 +30,20 @@ public class FastScFollowCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                FastScFollowCron.class, FastScFollowCron::handleFastScFollow, 5, 10, TimeUnit.MINUTES);
+                FastScFollowCron.class,
+                CronManager.leasedAndLogged(FastScFollowCron.class, FastScFollowCron::handleFastScFollow),
+                5,
+                10,
+                TimeUnit.MINUTES);
     }
 
     private static void handleFastScFollow() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running FastScFollowCron");
-
         List<String> gameNames = GameManager.getManagedGames().stream()
                 .filter(not(ManagedGame::isHasEnded))
                 .filter(managedGame -> managedGame.isFastScFollowMode() || managedGame.isFogQol01())
                 .map(ManagedGame::getName)
                 .toList();
         ConsumeGameUtility.consumeGames(gameNames, FastScFollowCron::handleFastScFollow, ExecutionLockType.WRITE);
-
-        BotLogger.logCron("Finished FastScFollowCron");
     }
 
     private static void handleFastScFollow(Game game) {

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,17 +17,13 @@ class SendSecretObjectiveCommand extends GameStateSubcommand {
 
     SendSecretObjectiveCommand() {
         super("send_secret", "Send a Secret Objective to a player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor());
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
                 .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Source faction or color (default is you)"));
     }
 
     @Override
@@ -41,11 +38,8 @@ class SendSecretObjectiveCommand extends GameStateSubcommand {
             return;
         }
 
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player otherPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (otherPlayer == null) return;
 
         SecretObjectiveModel secretObjective = player.getSecret(secretObjectiveId);
         player.removeSecret(secretObjectiveId);

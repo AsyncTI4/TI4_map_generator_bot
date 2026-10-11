@@ -48,10 +48,6 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isFakeAttachment).orElse(false);
     }
 
-    public boolean isRealAttachment() {
-        return !isFakeAttachment();
-    }
-
     public boolean isLegendary() {
         return Optional.ofNullable(isLegendary).orElse(false);
     }

@@ -117,17 +117,7 @@ public class SarcosaBreakthroughHandler {
 
         UnitKey neutralStructure = new UnitKey(unitType, neutral.getColorID());
         int before = planet.getUnitCount(neutralStructure);
-        String coexistenceFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        try {
-            AddUnitService.addUnits(event, tile, game, neutral.getColor(), structure + " " + planetName);
-        } finally {
-            if (coexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", coexistenceFlag);
-            }
-        }
+        AddUnitService.addUnitsInCoexistence(event, tile, game, neutral.getColor(), structure + " " + planetName);
 
         if (planet.getUnitCount(neutralStructure) <= before) {
             return;

@@ -1,38 +1,22 @@
 package ti4.discord.interactions.commands.leaders;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class LeaderCommand implements ParentCommand {
+public class LeaderCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new LeaderInfo(),
-                    new UnlockLeader(),
-                    new LockLeader(),
-                    new RefreshLeader(),
-                    new ExhaustLeader(),
-                    new PurgeLeader(),
-                    new ResetLeader(),
-                    new HeroPlay(),
-                    new HeroUnplay())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.LEADERS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Leaders";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public LeaderCommand() {
+        super(
+                Constants.LEADERS,
+                "Leaders",
+                new LeaderInfo(),
+                new UnlockLeader(),
+                new LockLeader(),
+                new RefreshLeader(),
+                new ExhaustLeader(),
+                new PurgeLeader(),
+                new ResetLeader(),
+                new HeroPlay(),
+                new HeroUnplay());
     }
 }

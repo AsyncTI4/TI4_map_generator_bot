@@ -135,12 +135,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return "_" + asyncId + ".png";
     }
 
-    public String getColorAsyncID(String color) {
-        color = AliasHandler.resolveColor(color);
-        color = Mapper.getColorID(color);
-        return color + getImageFileSuffix();
-    }
-
     private String getFactionEmoji() {
         FactionModel factionModel = Mapper.getFaction(getFaction().orElse(""));
         if (factionModel != null) {

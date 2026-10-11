@@ -133,6 +133,25 @@ public class AddUnitService {
         checkFleetCapacity(tile, color, game);
     }
 
+    public static void addUnitsInCoexistence(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+        runWithCoexistence(game, () -> addUnits(event, tile, game, color, unitList));
+    }
+
+    public static void runWithCoexistence(Game game, Runnable action) {
+        String previousFlag = game.getStoredValue("coexistFlag");
+        game.setStoredValue("coexistFlag", "yes");
+        try {
+            action.run();
+        } finally {
+            if (previousFlag.isEmpty()) {
+                game.removeStoredValue("coexistFlag");
+            } else {
+                game.setStoredValue("coexistFlag", previousFlag);
+            }
+        }
+    }
+
     /**
      * Ignore any locations in the provided unit list, and place them all in "default" locations.
      * This is useful when the unitList is for a different tile than what you're placing.

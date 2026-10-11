@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -16,7 +17,6 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
-import ti4.settings.GlobalSettings;
 import ti4.website.model.stats.GameStatsDashboardPayload;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.SequenceWriter;
@@ -26,11 +26,10 @@ public class GameStatisticsUploadService {
 
     private static final int MINIMUM_ROUND = 2;
     private static final int STAT_BATCH_SIZE = 200;
-    private static final Duration THIRTY_DAYS_DURATION = Duration.ofDays(7);
+    private static final Duration RECENTLY_UPDATED_WINDOW = Duration.ofDays(7);
 
-    public static void uploadAllStats() throws IOException {
-        Predicate<ManagedGame> shouldUpload = GameStatisticsUploadService::isValidToUpload;
-        uploadStats("statistics", shouldUpload);
+    public static void uploadAllStats() {
+        uploadStats("statistics", GameStatisticsUploadService::isValidToUpload);
     }
 
     private static boolean isValidToUpload(ManagedGame managedGame) {
@@ -41,23 +40,22 @@ public class GameStatisticsUploadService {
         return managedGame.isHasEnded() && !managedGame.isHasWinner();
     }
 
-    public static void uploadRecentStats() throws IOException {
-        Predicate<ManagedGame> shouldUpload =
-                managedGame -> isValidToUpload(managedGame) && wasRecentlyUpdated(managedGame);
-        uploadStats("recently_changed_statistics", shouldUpload);
+    public static void uploadRecentStats() {
+        uploadStats(
+                "recently_changed_statistics",
+                managedGame -> isValidToUpload(managedGame) && wasRecentlyUpdated(managedGame));
     }
 
     private static boolean wasRecentlyUpdated(ManagedGame managedGame) {
-        var lastModifiedDate = Instant.ofEpochMilli(managedGame.getLastModifiedDate());
-        var thirtyDaysAgo = Instant.now().minus(THIRTY_DAYS_DURATION);
-
-        return lastModifiedDate.isAfter(thirtyDaysAgo);
+        return Instant.ofEpochMilli(managedGame.getLastModifiedDate())
+                .isAfter(Instant.now().minus(RECENTLY_UPDATED_WINDOW));
     }
 
     // If this becomes a resource hog again, the next step would probably be to switch to MultipartUpload
-    private static void uploadStats(String fileName, Predicate<ManagedGame> gamePredicate) throws IOException {
-        if (!uploadsEnabled()) return;
-        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
+    @SneakyThrows(IOException.class)
+    private static void uploadStats(String fileName, Predicate<ManagedGame> gamePredicate) {
+        if (!AsyncTi4WebsiteHelper.uploadsEnabled()) return;
+        String bucket = EgressClientManager.getWebsiteBucket();
         if (bucket == null || bucket.isEmpty()) {
             BotLogger.error("S3 bucket not configured.");
             return;
@@ -133,10 +131,5 @@ public class GameStatisticsUploadService {
                         BotLogger.error("Failed to delete temporary stats file", e);
                     }
                 });
-    }
-
-    private static boolean uploadsEnabled() {
-        return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, Boolean.FALSE);
     }
 }

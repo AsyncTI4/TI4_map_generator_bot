@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -22,21 +23,12 @@ class SendTG extends GameStateSubcommand {
     public SendTG() {
         super(Constants.SEND_TG, "Sent trade goods to player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color receiving the trade goods")
-                .setAutoComplete(true)
-                .setRequired(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color receiving the trade goods"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.CLEAR_DEBT,
                 "True to automatically clear any debt with receiving player"));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.FACTION_COLOR,
-                        "Faction or Color sending the trade goods (defaults to you)")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color sending the trade goods (defaults to you)"));
     }
 
     @Override
@@ -50,11 +42,8 @@ class SendTG extends GameStateSubcommand {
         player.setTg(tg);
         ButtonHelperAbilities.pillageCheck(player, game);
 
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player targetPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (targetPlayer == null) return;
         int targetTG = targetPlayer.getTg();
         targetTG += sendTG;
         targetPlayer.setTg(targetTG);

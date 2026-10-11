@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.ds;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -16,9 +17,7 @@ class SetPlanetTradeGoods extends GameStateSubcommand {
                 "Set commodity count (or trade goods) on a planet per Harvest or Facility powers",
                 true,
                 true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.planet());
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
     }
 

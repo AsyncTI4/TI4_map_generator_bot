@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -41,12 +42,11 @@ class ExportToJson extends GameStateSubcommand {
         boolean includeAttachments = false;
         boolean includeLore = event.getOption("include_lore") == null
                 || event.getOption("include_lore").getAsBoolean();
-        String json = MapJsonIOService.exportMapAsJson(event, game, includeTokens, includeAttachments, includeLore);
-        if (json == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Failed to export map to JSON.\n-# Solax has been pinged");
-            return;
-        }
+        String json = CommandHelper.requireOrReport(
+                event,
+                MapJsonIOService.exportMapAsJson(event, game, includeTokens, includeAttachments, includeLore),
+                "Failed to export map to JSON.\n-# Solax has been pinged");
+        if (json == null) return;
 
         File exportFile = new File(game.getName() + "_map.json");
         try (FileWriter writer = new FileWriter(exportFile, StandardCharsets.UTF_8)) {

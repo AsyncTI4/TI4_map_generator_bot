@@ -5,13 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import ti4.draft.DraftBag;
-import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.logging.BotLogger;
 
 @UtilityClass
 class MigrationHelper {
@@ -118,12 +115,5 @@ class MigrationHelper {
             index = list.indexOf(toReplace);
         }
         return replaced;
-    }
-
-    public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {
-        BotLogger.info(String.format(
-                "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
-        bag.Contents.remove(index);
-        bag.Contents.add(index, newItem);
     }
 }

@@ -44,6 +44,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -857,7 +858,7 @@ public class StartPhaseService {
                 UnitHolder unitHolder = tile.getUnitHolders().get(pl);
                 if (unitHolder != null
                         && unitHolder.getTokenList() != null
-                        && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                        && unitHolder.getTokenList().contains(Constants.TOMB_OF_EMPHIDIA_PNG)) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
                             player.getRepresentationUnfogged()

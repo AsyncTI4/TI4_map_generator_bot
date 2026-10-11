@@ -18,6 +18,7 @@ class RevealSpecificAgenda extends GameStateSubcommand {
 
     RevealSpecificAgenda() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck", true, false);
+        markSuspicious();
         addOptions(new OptionData(
                         OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)")
                 .setRequired(true)
@@ -57,10 +58,5 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         }
         game.putAgendaBackIntoDeckOnTop(uniqueID);
         AgendaHelper.revealAgenda(event, false, game, channel);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -37,7 +38,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                         Constants.COUNT,
                         "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."),
                 new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+                CommonOptions.factionColor());
     }
 
     @Override

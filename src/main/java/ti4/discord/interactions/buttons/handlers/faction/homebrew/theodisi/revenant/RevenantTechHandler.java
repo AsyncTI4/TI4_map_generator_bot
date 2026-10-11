@@ -55,11 +55,7 @@ public class RevenantTechHandler {
                 + ", you may produce up to 2 units in a system containing 1 of your ships due to _Lazarus Pods_. Please choose the system in which you wish to produce.";
         String prefix = player.factionButtonChecker() + SELECT_LAZARUS_SYSTEM;
         List<Button> extraButtons = List.of(Buttons.DECLINE);
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
+        List<Button> displayedButtons = RevenantLeadersHandler.firstButtonPage(buttons, extraButtons, prefix);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, displayedButtons);
     }
 

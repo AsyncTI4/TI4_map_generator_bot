@@ -1,8 +1,7 @@
 package ti4.discord.interactions.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -13,9 +12,7 @@ class StellarConverter extends GameStateSubcommand {
 
     public StellarConverter() {
         super(Constants.STELLAR_CONVERTER, "Stellar Convert a planet.", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to be converted.")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.planet("Planet to be converted."));
     }
 
     @Override

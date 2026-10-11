@@ -1,9 +1,8 @@
 package ti4.discord.interactions.commands.installation;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
@@ -14,9 +13,7 @@ class RemoveSweepToken extends GameStateSubcommand {
 
     public RemoveSweepToken() {
         super(Constants.REMOVE_SWEEP_TOKEN, "Remove a sweep token from the selected system", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System to remove a sweep token from")
-                .setAutoComplete(true)
-                .setRequired(true));
+        addOptions(CommonOptions.tileName("System to remove a sweep token from"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {

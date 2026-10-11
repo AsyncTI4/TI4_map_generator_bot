@@ -46,7 +46,6 @@ public class TestBedPanelService {
         }
     }
 
-    private static final int BUTTONS_PER_ROW = 5;
     private static final int MAX_SELECT_OPTIONS = 25;
     private static final int MAX_OPTION_TEXT = 100;
     private static final int MAX_STATUS = 1500;
@@ -103,7 +102,7 @@ public class TestBedPanelService {
         String turnId = ACT_AS + ACT_AS_TURN;
         seatButtons.add(followingTurn ? Buttons.green(turnId, "Follow Turn") : Buttons.gray(turnId, "Follow Turn"));
 
-        List<ActionRow> rows = new ArrayList<>(rowsOf(seatButtons));
+        List<ActionRow> rows = new ArrayList<>(Buttons.partitionIntoRows(seatButtons));
         rows.add(ActionRow.of(
                 Buttons.gray(TOOL + Tool.active.name(), Tool.active.label),
                 Buttons.blue(TOOL + Tool.turn.name(), Tool.turn.label),
@@ -140,7 +139,7 @@ public class TestBedPanelService {
             TestBedButton button = buttons.get(i);
             shown.add(button.java() != null ? Buttons.gray(id, button.label()) : Buttons.blue(id, button.label()));
         }
-        rows.addAll(rowsOf(shown));
+        rows.addAll(Buttons.partitionIntoRows(shown));
         Button previous = Buttons.gray(PAGE + group.key() + "_" + (page - 1), "◀");
         Button next = Buttons.gray(PAGE + group.key() + "_" + (page + 1), "▶");
         rows.add(ActionRow.of(
@@ -183,7 +182,7 @@ public class TestBedPanelService {
         for (int i = 0; i < buttons.size(); i++) {
             shown.add(buttons.get(i).withCustomId(TURN_PRESS + i));
         }
-        List<ActionRow> rows = new ArrayList<>(rowsOf(shown));
+        List<ActionRow> rows = new ArrayList<>(Buttons.partitionIntoRows(shown));
         List<Button> seats = turn.combat() ? combatSeatButtons(game, turn) : List.of();
         if (!seats.isEmpty()) rows.add(ActionRow.of(seats));
         rows.add(ActionRow.of(Buttons.gray(TOOL + Tool.turn.name(), Tool.refresh.label), Buttons.blue(BACK, "Back")));
@@ -225,14 +224,6 @@ public class TestBedPanelService {
         String rest = buttonId.substring(prefix.length());
         int separator = rest.lastIndexOf('_');
         return new PageRef(rest.substring(0, separator), Integer.parseInt(rest.substring(separator + 1)));
-    }
-
-    private static List<ActionRow> rowsOf(List<Button> buttons) {
-        List<ActionRow> rows = new ArrayList<>();
-        for (int i = 0; i < buttons.size(); i += BUTTONS_PER_ROW) {
-            rows.add(ActionRow.of(buttons.subList(i, Math.min(i + BUTTONS_PER_ROW, buttons.size()))));
-        }
-        return rows;
     }
 
     private static void appendStatus(StringBuilder sb, @Nullable String status) {

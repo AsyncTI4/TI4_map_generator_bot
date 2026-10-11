@@ -10,7 +10,6 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
-import ti4.message.MessageHelper;
 
 class RelicSendFragments extends GameStateSubcommand {
 
@@ -32,11 +31,8 @@ class RelicSendFragments extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player sender = getPlayer();
-        Player receiver = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (receiver == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player receiver = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (receiver == null) return;
         String trait = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         ButtonHelperAbilities.pillageCheck(sender, game);

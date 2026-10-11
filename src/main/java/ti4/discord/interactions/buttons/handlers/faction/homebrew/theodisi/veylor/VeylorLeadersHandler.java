@@ -128,12 +128,6 @@ public class VeylorLeadersHandler {
                 && !"action".equals(game.getPhaseOfGame());
     }
 
-    public static boolean hasHeroAdditionalAgenda(Game game, int aCount) {
-        return isVeylorAgendaPhase(game)
-                && aCount == 3
-                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
-    }
-
     public static void resolveVeylorHeroLosingVote(Game game, String winner) {
         for (Player player : AgendaHelper.getLosingVoters(winner, game)) {
             if (!player.hasLeaderUnlocked("veylorhero")) {

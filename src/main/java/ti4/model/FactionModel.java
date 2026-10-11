@@ -149,20 +149,6 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                                 : new ArrayList<>());
     }
 
-    public String getLinksText() {
-        StringBuilder sb = new StringBuilder();
-        getFactionSheetFrontImageURL()
-                .ifPresent(
-                        url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
-        getFactionSheetBackImageURL()
-                .ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
-        getFactionReferenceImageURL()
-                .ifPresent(
-                        url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
-        getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")\n"));
-        return sb.toString();
-    }
-
     public String getFactionSheetMessage() {
         if (getFactionSheetFrontImageURL().isEmpty()
                 && getFactionSheetBackImageURL().isEmpty()) return null;
@@ -196,8 +182,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+        if (includeID) footer.append(idFooter(alias));
         if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(alias));
         eb.setFooter(footer.toString());
 

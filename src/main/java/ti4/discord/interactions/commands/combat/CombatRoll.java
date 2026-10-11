@@ -4,13 +4,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
-import ti4.message.MessageHelper;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 
@@ -22,9 +23,7 @@ class CombatRoll extends GameStateSubcommand {
                 "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*",
                 true,
                 true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName());
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.PLANET,
@@ -34,8 +33,7 @@ class CombatRoll extends GameStateSubcommand {
                 OptionType.STRING,
                 Constants.COMBAT_ROLL_TYPE,
                 "Switch to afb/bombardment/spacecannonoffence/spacecannondefence"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("roll for player (default you)"));
     }
 
     @Override
@@ -54,11 +52,9 @@ class CombatRoll extends GameStateSubcommand {
 
         // Get tile info
         String tileOption = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
-        Tile tile = TileHelper.getTile(event, tileOption, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption + " not found");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event, TileHelper.getTile(event, tileOption, game), "Tile " + tileOption + " not found");
+        if (tile == null) return;
 
         CombatRollType rollType = CombatRollType.combatround;
         if (rollTypeOption != null) {

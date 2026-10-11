@@ -28,6 +28,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
@@ -47,7 +48,7 @@ public class AshenLeadersHandler {
     private static final String AGENT_PLACE_DESTINATION_PREFIX = "ashenAgentPlace_";
     private static final String COMMANDER_ID = "ashencommander";
     private static final String HERO_TARGET_SYSTEM_PREFIX = "ashenHeroTargetSystem_";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapperManager.basic();
 
     public static Button getAshTenderCardsInfoButton(Player player) {
         return Buttons.gray(player.factionButtonChecker() + AGENT_SELECT_TARGET, "Use Orrun", FactionEmojis.ashen);

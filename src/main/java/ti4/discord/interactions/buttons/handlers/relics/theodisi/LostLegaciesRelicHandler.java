@@ -31,7 +31,6 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.unit.AddUnitService;
@@ -427,39 +426,12 @@ public class LostLegaciesRelicHandler {
     }
 
     // Cosmic Boon
-    public static Button getCosmicBoonButton(Player player) {
-        return Buttons.green(player.factionButtonChecker() + USE_CBOON, "Exhaust Cosmic Boon");
-    }
-
     @ButtonHandler(USE_CBOON)
     public static void resolveCosmicBoon(ButtonInteractionEvent event, Game game, Player player) {
         resolveCosmicBoonTokens(event, game, player);
     }
 
     // Diplomatic Boon
-    public static List<Button> getDiplomaticBoonPlanets(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (game == null || player == null) {
-            return List.of();
-        }
-
-        List<Button> planets = new ArrayList<>();
-        for (String planetName : player.getPlanets()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
-            Tile tile = game.getTileFromPlanet(planetName);
-            if (planet != null
-                    && !planet.isHomePlanet()
-                    && tile != null
-                    && !tile.isMecatol()
-                    && FoWHelper.playerHasShipsInSystem(player, tile)) {
-                planets.add(Buttons.green(
-                        player.factionButtonChecker() + CHOOSE_DBOON_PLANET + planetName,
-                        planet.getRepresentation(game)));
-            }
-        }
-
-        return planets;
-    }
-
     @ButtonHandler(CHOOSE_DBOON_PLANET)
     public static void chooseDBoonInfantryOrFighter(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -585,16 +557,6 @@ public class LostLegaciesRelicHandler {
     }
 
     // Economic Boon
-    public static Button getEconomicBoonCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + USE_EBOON, "Ready Planet with Economic Boon", CardEmojis.RelicCard);
-    }
-
-    public static Button getNaturesBoonSpendButton(Player player, String whatIsItFor) {
-        return Buttons.gray(
-                player.factionButtonChecker() + USE_NBOON + whatIsItFor, "Use Nature's Boon", CardEmojis.RelicCard);
-    }
-
     @ButtonHandler(USE_EBOON)
     public static void resolveEconomicBoon(ButtonInteractionEvent event, Game game, Player player) {
         if (game == null || player == null || !player.hasRelicReady("economicboon")) {

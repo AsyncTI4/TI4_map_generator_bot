@@ -211,17 +211,7 @@ public class XinPnHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        String previousCoexistenceFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        try {
-            AddUnitService.addUnits(event, tile, game, xin.getColor(), "1 " + unit + " " + planet);
-        } finally {
-            if (previousCoexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", previousCoexistenceFlag);
-            }
-        }
+        AddUnitService.addUnitsInCoexistence(event, tile, game, xin.getColor(), "1 " + unit + " " + planet);
         ButtonHelperAbilities.oceanBoundCheck(game);
         xin.removeStoredValue(selectedGroundForceKey(holder));
         MessageHelper.sendMessageToChannel(

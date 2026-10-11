@@ -31,6 +31,7 @@ import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.game.Game;
+import ti4.game.helper.CardIdHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
@@ -422,8 +423,7 @@ public class Mapper {
         if (isBlank(id)) {
             throw new IllegalArgumentException("AC id cannot be blank.");
         }
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
+        id = CardIdHelper.stripExtra(id);
         if (!actionCards.containsKey(id)) {
             BotLogger.critical("Action card not found: " + id);
             return null;
@@ -433,8 +433,7 @@ public class Mapper {
 
     public static boolean isValidActionCard(String id) {
         if (id != null) {
-            id = id.replace("extra1", "");
-            id = id.replace("extra2", "");
+            id = CardIdHelper.stripExtra(id);
         }
         return actionCards.containsKey(id);
     }
@@ -811,8 +810,7 @@ public class Mapper {
     }
 
     public static ExploreModel getExplore(String exploreId) {
-        exploreId = exploreId.replace("extra1", "");
-        exploreId = exploreId.replace("extra2", "");
+        exploreId = CardIdHelper.stripExtra(exploreId);
         return explores.get(exploreId);
     }
 
@@ -1080,8 +1078,7 @@ public class Mapper {
     }
 
     public static RelicModel getRelic(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
+        id = CardIdHelper.stripExtra(id);
         return relics.get(id);
     }
 
@@ -1105,16 +1102,14 @@ public class Mapper {
 
     public static SecretObjectiveModel getSecretObjective(String id) {
         if (id != null) {
-            id = id.replace("extra1", "");
-            id = id.replace("extra2", "");
+            id = CardIdHelper.stripExtra(id);
         }
         return secretObjectives.get(id);
     }
 
     public static boolean isValidSecretObjective(String id) {
         if (id != null) {
-            id = id.replace("extra1", "");
-            id = id.replace("extra2", "");
+            id = CardIdHelper.stripExtra(id);
         }
         return secretObjectives.containsKey(id);
     }

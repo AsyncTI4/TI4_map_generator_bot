@@ -1,9 +1,8 @@
 package ti4.discord.interactions.commands.installation;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,9 +17,7 @@ class AddSweepToken extends GameStateSubcommand {
 
     public AddSweepToken() {
         super(Constants.ADD_SWEEP_TOKEN, "Add a sweep token to the selected system", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System to add a sweep token to")
-                .setAutoComplete(true)
-                .setRequired(true));
+        addOptions(CommonOptions.tileName("System to add a sweep token to"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {

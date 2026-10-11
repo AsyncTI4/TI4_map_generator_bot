@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -21,12 +22,9 @@ class RemoveCustomPO extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        OptionMapping option = event.getOption(Constants.PO_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Please choose which public objective to shuffle back in");
-            return;
-        }
+        OptionMapping option = CommandHelper.requireOrReport(
+                event, event.getOption(Constants.PO_ID), "Please choose which public objective to shuffle back in");
+        if (option == null) return;
         boolean removedCustomPO = game.removeCustomPO(option.getAsInt());
         if (!removedCustomPO) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");

@@ -198,7 +198,7 @@ public class MonumentsButtonHandler {
 
     // Qanoj Shield Array
     public static void offerQanojShieldArray(Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentReady(game, player, "xxcha_monument")) {
+        if (!MonumentsService.isMonumentReady(game, player, "xxcha_monument")) {
             return;
         }
 
@@ -218,7 +218,7 @@ public class MonumentsButtonHandler {
 
     @ButtonHandler(USE_QANOJ)
     public static void resolveQanojShieldArray(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentReady(game, player, "xxcha_monument")) {
+        if (!MonumentsService.isMonumentReady(game, player, "xxcha_monument")) {
             return;
         }
 
@@ -321,37 +321,13 @@ public class MonumentsButtonHandler {
         }
 
         Planet sourcePlanet = sourceTile.getUnitHolderFromPlanet(sourcePlanetName);
-        Tile cenotaphTile = MonumentsService.getMonumentTile(game, player, "sol_monument");
-        Planet cenotaphPlanet = cenotaphTile == null
-                ? null
-                : cenotaphTile.getPlanetUnitHolders().stream()
-                        .filter(planet -> planet.getUnitCount(UnitType.Monument, player) > 0)
-                        .findFirst()
-                        .orElse(null);
+        Planet cenotaphPlanet = getCenotaphPlanet(game, player);
         if (sourcePlanet == null || cenotaphPlanet == null || sourcePlanet == cenotaphPlanet) {
             return;
         }
 
-        List<Button> buttons = new ArrayList<>();
-        if (placedInfantry >= 1) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + USE_CENOTAPH + "1|"
-                            + sourceTile.getPosition() + "|"
-                            + sourcePlanetName + "|"
-                            + cenotaphPlanet.getName() + "|" + placedInfantry,
-                    "Move 1 Infantry",
-                    UnitEmojis.infantry));
-        }
-        if (placedInfantry >= 2) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + USE_CENOTAPH + "2|"
-                            + sourceTile.getPosition() + "|"
-                            + sourcePlanetName + "|"
-                            + cenotaphPlanet.getName() + "|" + placedInfantry,
-                    "Move 2 Infantry",
-                    UnitEmojis.infantry));
-        }
-        buttons.add(Buttons.red(player.factionButtonChecker() + FINISH_CENOTAPH, "Done"));
+        List<Button> buttons =
+                getCenotaphMoveButtons(player, sourceTile, sourcePlanetName, cenotaphPlanet, placedInfantry);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", you placed infantry on "
@@ -361,18 +337,38 @@ public class MonumentsButtonHandler {
                 buttons);
     }
 
-    public static void offerCenotaphAfterProduction(Game game, Player player) {
-        if (player == null || !MonumentsService.isMonumentReady(game, player, "sol_monument")) {
-            return;
-        }
-
+    private static Planet getCenotaphPlanet(Game game, Player player) {
         Tile cenotaphTile = MonumentsService.getMonumentTile(game, player, "sol_monument");
-        Planet cenotaphPlanet = cenotaphTile == null
+        return cenotaphTile == null
                 ? null
                 : cenotaphTile.getPlanetUnitHolders().stream()
                         .filter(planet -> planet.getUnitCount(UnitType.Monument, player) > 0)
                         .findFirst()
                         .orElse(null);
+    }
+
+    private static List<Button> getCenotaphMoveButtons(
+            Player player, Tile sourceTile, String sourcePlanetName, Planet cenotaphPlanet, int placedInfantry) {
+        List<Button> buttons = new ArrayList<>();
+        for (int amount = 1; amount <= Math.min(2, placedInfantry); amount++) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + USE_CENOTAPH + amount + "|"
+                            + sourceTile.getPosition() + "|"
+                            + sourcePlanetName + "|"
+                            + cenotaphPlanet.getName() + "|" + placedInfantry,
+                    "Move " + amount + " Infantry",
+                    UnitEmojis.infantry));
+        }
+        buttons.add(Buttons.red(player.factionButtonChecker() + FINISH_CENOTAPH, "Done"));
+        return buttons;
+    }
+
+    public static void offerCenotaphAfterProduction(Game game, Player player) {
+        if (player == null || !MonumentsService.isMonumentReady(game, player, "sol_monument")) {
+            return;
+        }
+
+        Planet cenotaphPlanet = getCenotaphPlanet(game, player);
         if (cenotaphPlanet == null) {
             return;
         }
@@ -436,37 +432,13 @@ public class MonumentsButtonHandler {
         }
         Tile sourceTile = game.getTileByPosition(payload[1]);
         Planet sourcePlanet = sourceTile == null ? null : sourceTile.getUnitHolderFromPlanet(payload[2]);
-        Tile cenotaphTile = MonumentsService.getMonumentTile(game, player, "sol_monument");
-        Planet cenotaphPlanet = cenotaphTile == null
-                ? null
-                : cenotaphTile.getPlanetUnitHolders().stream()
-                        .filter(planet -> planet.getUnitCount(UnitType.Monument, player) > 0)
-                        .findFirst()
-                        .orElse(null);
+        Planet cenotaphPlanet = getCenotaphPlanet(game, player);
         if (sourcePlanet == null || cenotaphPlanet == null || sourcePlanet == cenotaphPlanet) {
             return;
         }
 
-        List<Button> buttons = new ArrayList<>();
-        if (placedInfantry >= 1) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + USE_CENOTAPH + "1|"
-                            + sourceTile.getPosition() + "|"
-                            + sourcePlanet.getName() + "|"
-                            + cenotaphPlanet.getName() + "|" + placedInfantry,
-                    "Move 1 Infantry",
-                    UnitEmojis.infantry));
-        }
-        if (placedInfantry >= 2) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + USE_CENOTAPH + "2|"
-                            + sourceTile.getPosition() + "|"
-                            + sourcePlanet.getName() + "|"
-                            + cenotaphPlanet.getName() + "|" + placedInfantry,
-                    "Move 2 Infantry",
-                    UnitEmojis.infantry));
-        }
-        buttons.add(Buttons.red(player.factionButtonChecker() + FINISH_CENOTAPH, "Done"));
+        List<Button> buttons =
+                getCenotaphMoveButtons(player, sourceTile, sourcePlanet.getName(), cenotaphPlanet, placedInfantry);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", choose how many infantry produced on "
@@ -616,7 +588,7 @@ public class MonumentsButtonHandler {
 
     // Glory Furnace
     public static void offerGloryFurnace(Game game, Player player, String planetName) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "muaat_monument")) return;
+        if (!MonumentsService.isMonumentOnBoard(game, player, "muaat_monument")) return;
         Tile tile = MonumentsService.getMonumentTile(game, player, "muaat_monument");
         if (tile == null
                 || tile.getUnitHolderFromPlanet(planetName) == null
@@ -653,7 +625,7 @@ public class MonumentsButtonHandler {
 
     @ButtonHandler("resolveGloryFurnace_")
     public static void resolveGloryFurnace(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "muaat_monument")) return;
+        if (!MonumentsService.isMonumentOnBoard(game, player, "muaat_monument")) return;
         String[] parts = buttonID.substring("resolveGloryFurnace_".length()).split("\\|");
         int remaining = Integer.parseInt(parts[0]);
         if (remaining < 1) return;
@@ -694,7 +666,7 @@ public class MonumentsButtonHandler {
 
     // G'hom Firefly Beacon
     public static void sendFireflyProduction(Game game, Player player, int remaining, int page) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) {
             return;
         }
         List<Button> buttons = new ArrayList<>();
@@ -719,7 +691,7 @@ public class MonumentsButtonHandler {
 
     @ButtonHandler(SELECT_FIREFLY_SYSTEM)
     public static void selectFireflySystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) {
             return;
         }
         String[] parts = buttonID.substring(SELECT_FIREFLY_SYSTEM.length()).split("\\|", 2);
@@ -754,7 +726,7 @@ public class MonumentsButtonHandler {
 
     @ButtonHandler(PLACE_FIREFLY_UNIT)
     public static void placeFireflyUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) {
             return;
         }
         String[] parts = buttonID.substring(PLACE_FIREFLY_UNIT.length()).split("\\|", 4);
@@ -809,10 +781,7 @@ public class MonumentsButtonHandler {
         } catch (NumberFormatException e) {
             return;
         }
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "norr_monument")
-                || remaining < 1
-                || remaining > 3) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "norr_monument") || remaining < 1 || remaining > 3) {
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -850,7 +819,7 @@ public class MonumentsButtonHandler {
     }
 
     public static void offerFireflyReplacement(Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) return;
+        if (!MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) return;
         List<Button> buttons = new ArrayList<>();
         for (UnitType type : List.of(UnitType.Pds, UnitType.Spacedock)) {
             UnitModel unit = player.getUnitByType(type);
@@ -872,7 +841,7 @@ public class MonumentsButtonHandler {
 
     @ButtonHandler("replaceFireflyBeacon_")
     public static void replaceFireflyBeacon(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) return;
+        if (!MonumentsService.isMonumentOnBoard(game, player, "norr_monument")) return;
         String type = buttonID.substring("replaceFireflyBeacon_".length());
         if (!"pds".equals(type) && !"sd".equals(type)) return;
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, type) >= player.getUnitCap(type)) return;
@@ -988,7 +957,7 @@ public class MonumentsButtonHandler {
 
     @ButtonHandler(L1_TARGET)
     public static void selectL1MonumentTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "l1z1x_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "l1z1x_monument")) {
             return;
         }
         Tile monumentTile = MonumentsService.getMonumentTile(game, player, "l1z1x_monument");
@@ -1026,9 +995,7 @@ public class MonumentsButtonHandler {
     public static void moveL1MonumentCommandToken(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.replace(L1_MOVE_CC, "").split("\\|", 2);
-        if (payload.length != 2
-                || !game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "l1z1x_monument")) {
+        if (payload.length != 2 || !MonumentsService.isMonumentOnBoard(game, player, "l1z1x_monument")) {
             return;
         }
         Tile monumentTile = MonumentsService.getMonumentTile(game, player, "l1z1x_monument");
@@ -1056,7 +1023,7 @@ public class MonumentsButtonHandler {
 
     // Calm Seas Sanatorium
     public static void offerJolNarMonumentInfantry(Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "jolnar_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "jolnar_monument")) {
             return;
         }
         UnitKey monumentKey = Units.getUnitKey(UnitType.Monument, player.getColor());
@@ -1117,11 +1084,6 @@ public class MonumentsButtonHandler {
                 player.getRepresentationNoPing() + " placed " + amount + " infantry on "
                         + planet.getRepresentation(game) + " with **Calm Seas Sanatorium**.");
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static List<Button> getPlaceUnitOnOrAdjacentToPlayerMonumentButtons(Game game, Player player, String unit) {
-        return MonumentsService.getPlanetsInOrAdjacentToPlayerMonumentButtons(
-                game, player, PLACE_UNIT_ON_MONUMENT_PLANET + unit + "|");
     }
 
     // Mowshir Freeport
@@ -1322,7 +1284,7 @@ public class MonumentsButtonHandler {
     @ButtonHandler(PLACE_ARBOREC_MONUMENT_INFANTRY)
     public static void placeArborecMonumentInfantry(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "arborec_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "arborec_monument")) {
             return;
         }
 
@@ -1340,20 +1302,10 @@ public class MonumentsButtonHandler {
 
         boolean containsAnotherPlayersUnits = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, planet).stream()
                 .anyMatch(otherPlayer -> otherPlayer != player);
-        String previousCoexistenceFlag = game.getStoredValue("coexistFlag");
-
         if (containsAnotherPlayersUnits) {
-            game.setStoredValue("coexistFlag", "yes");
-        }
-
-        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
-
-        if (containsAnotherPlayersUnits) {
-            if (previousCoexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", previousCoexistenceFlag);
-            }
+            AddUnitService.addUnitsInCoexistence(event, tile, game, player.getColor(), "1 infantry " + planetName);
+        } else {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
         }
 
         ButtonHelper.deleteMessage(event);
@@ -1405,8 +1357,7 @@ public class MonumentsButtonHandler {
         String activeSystemPosition = buttonID.replace("revenanceCircuitProduceHits_", "");
         Tile monumentTile = game.getTileByPosition(activeSystemPosition);
 
-        if (!game.isMonumentsMode()
-                || monumentTile == null
+        if (monumentTile == null
                 || !MonumentsService.isMonumentOnBoard(game, player, "creuss_monument")
                 || monumentTile != MonumentsService.getMonumentTile(game, player, "creuss_monument")) {
             ButtonHelper.deleteMessage(event);

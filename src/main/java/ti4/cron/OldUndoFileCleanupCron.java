@@ -11,25 +11,17 @@ import java.time.temporal.ChronoUnit;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class OldUndoFileCleanupCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanup, 3, 0, ZoneId.of("America/New_York"));
-    }
-
-    private static void cleanup() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running OldUndoFileCleanupCron");
-        try {
-            cleanupOldUndoFiles();
-        } catch (Exception e) {
-            BotLogger.error("**OldUndoFileCleanupCron failed.**", e);
-        }
-        BotLogger.logCron("Finished OldUndoFileCleanupCron");
+                OldUndoFileCleanupCron.class,
+                CronManager.leasedAndLogged(OldUndoFileCleanupCron.class, OldUndoFileCleanupCron::cleanupOldUndoFiles),
+                3,
+                0,
+                ZoneId.of("America/New_York"));
     }
 
     private static void cleanupOldUndoFiles() {

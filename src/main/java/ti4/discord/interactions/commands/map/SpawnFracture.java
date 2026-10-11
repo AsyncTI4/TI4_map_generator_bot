@@ -19,11 +19,9 @@ public class SpawnFracture extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Player player = CommandHelper.getPlayerFromEvent(game, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = CommandHelper.requireOrReport(
+                event, CommandHelper.getPlayerFromEvent(game, event), "Player could not be found");
+        if (player == null) return;
 
         if (!FractureService.canFractureEnterPlay(game)) {
             MessageHelper.sendMessageToEventChannel(event, FractureService.whyFractureCannotEnterPlay(game));

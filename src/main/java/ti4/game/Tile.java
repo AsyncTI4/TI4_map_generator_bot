@@ -424,10 +424,6 @@ public class Tile {
         return player == null ? null : fogLabel.get(player.getUserID());
     }
 
-    public void setFogLabel(@NotNull Player player, String fogLabel_) {
-        fogLabel.put(player.getUserID(), fogLabel_);
-    }
-
     @JsonIgnore
     public String getFowTilePath(Player player) {
         String fogTileColor = player == null ? "default" : player.getFogFilter();

@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -20,9 +21,7 @@ class ChangeUnitDecal extends GameStateSubcommand {
                         "Decals for units. Enter 'none' to remove current decals.")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     @Override

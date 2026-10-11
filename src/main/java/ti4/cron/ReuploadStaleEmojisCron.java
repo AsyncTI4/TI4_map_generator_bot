@@ -2,9 +2,7 @@ package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class ReuploadStaleEmojisCron {
@@ -12,21 +10,15 @@ public class ReuploadStaleEmojisCron {
     public static void register() {
         CronManager.scheduleOnce(
                 ReuploadStaleEmojisCron.class,
-                ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging,
+                CronManager.leasedAndLogged(
+                        ReuploadStaleEmojisCron.class, ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging),
                 2,
                 TimeUnit.MINUTES);
     }
 
     private static void reuploadEmojisAndDeleteHanging() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running ReuploadStaleEmojisCron.");
-        try {
-            ApplicationEmojiService.reuploadStaleEmojis();
-            ApplicationEmojiService.deleteHangingEmojis();
-            ApplicationEmojiService.reportMissingEnums();
-        } catch (Exception e) {
-            BotLogger.error("**ReuploadStaleEmojisCron failed.**", e);
-        }
-        BotLogger.logCron("Finished ReuploadStaleEmojisCron.");
+        ApplicationEmojiService.reuploadStaleEmojis();
+        ApplicationEmojiService.deleteHangingEmojis();
+        ApplicationEmojiService.reportMissingEnums();
     }
 }

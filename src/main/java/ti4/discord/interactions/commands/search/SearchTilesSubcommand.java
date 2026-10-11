@@ -1,10 +1,7 @@
 package ti4.discord.interactions.commands.search;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.function.Predicate;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,7 +14,7 @@ import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
-class SearchTilesSubcommand extends SearchComponentModelSubcommand {
+class SearchTilesSubcommand extends SearchComponentModelSubcommand<TileModel> {
 
     private static final String MIN_NUM_PLANET = "min_num_planets";
     private static final String MAX_NUM_PLANET = "max_num_planets";
@@ -30,8 +27,15 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
     private static final String WITH_SUPERNOVA = "with_supernova";
     private static final String WITH_LEGENDARIES = "with_legendary_planets";
 
-    public SearchTilesSubcommand() {
-        super(Constants.SEARCH_TILES, "List all tiles");
+    SearchTilesSubcommand() {
+        super(
+                Constants.SEARCH_TILES,
+                "List all tiles",
+                TileHelper::isValidTile,
+                TileHelper::getTileById,
+                valuesOf(TileHelper::getAllTileModels),
+                tile -> tile.getRepresentationEmbed(false),
+                Comparator.comparing(TileModel::getId));
         addOptions(
                 new OptionData(
                         OptionType.BOOLEAN,
@@ -68,11 +72,17 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, Boolean.FALSE, OptionMapping::getAsBoolean);
+    protected MessageEmbed exactMatchEmbed(TileModel tile, SlashCommandInteractionEvent event) {
+        return tile.getRepresentationEmbed(includeAliases(event));
+    }
+
+    @Override
+    protected MessageEmbed resultEmbed(TileModel tile, SlashCommandInteractionEvent event) {
+        return tile.getRepresentationEmbed(includeAliases(event));
+    }
+
+    @Override
+    protected Predicate<TileModel> extraFilter(SlashCommandInteractionEvent event) {
         int minPlanets = event.getOption(MIN_NUM_PLANET, 0, OptionMapping::getAsInt);
         int maxPlanets = event.getOption(MAX_NUM_PLANET, Integer.MAX_VALUE, OptionMapping::getAsInt);
         boolean includeDraft = event.getOption(INCLUDE_DRAFT_TILES, Boolean.FALSE, OptionMapping::getAsBoolean);
@@ -83,34 +93,20 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         Boolean withNebula = event.getOption(WITH_NEBULA, null, OptionMapping::getAsBoolean);
         Boolean withSupernova = event.getOption(WITH_SUPERNOVA, null, OptionMapping::getAsBoolean);
         Boolean withLegendaries = event.getOption(WITH_LEGENDARIES, null, OptionMapping::getAsBoolean);
+        return tile -> tile.getNumPlanets() <= maxPlanets
+                && tile.getNumPlanets() >= minPlanets
+                && (includeDraft || tile.getSource() != ComponentSource.draft)
+                && (includeHyperlanes || !tile.isHyperlane())
+                && (withAnomalies == null || withAnomalies == tile.isAnomaly())
+                && (withAsteroids == null || withAsteroids == tile.isAsteroidField())
+                && (withGrifts == null || withGrifts == tile.isGravityRift())
+                && (withNebula == null || withNebula == tile.isNebula())
+                && (withSupernova == null || withSupernova == tile.isSupernova())
+                && (withLegendaries == null || withLegendaries == hasLegendaryPlanet(tile));
+    }
 
-        List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
-        if (TileHelper.isValidTile(searchString)) {
-            TileModel tile = TileHelper.getTileById(searchString);
-            tileEmbeds.add(Map.entry(tile, tile.getRepresentationEmbed(includeAliases)));
-        } else {
-            TileHelper.getAllTileModels().stream()
-                    .filter(tile -> tile.search(searchString, source))
-                    .filter(tile -> tile.getNumPlanets() <= maxPlanets)
-                    .filter(tile -> tile.getNumPlanets() >= minPlanets)
-                    .filter(tile -> includeDraft || tile.getSource() != ComponentSource.draft)
-                    .filter(tile -> includeHyperlanes || !tile.isHyperlane())
-                    .filter(tile -> withAnomalies == null || withAnomalies == tile.isAnomaly())
-                    .filter(tile -> withAsteroids == null || withAsteroids == tile.isAsteroidField())
-                    .filter(tile -> withGrifts == null || withGrifts == tile.isGravityRift())
-                    .filter(tile -> withNebula == null || withNebula == tile.isNebula())
-                    .filter(tile -> withSupernova == null || withSupernova == tile.isSupernova())
-                    .filter(tile -> withLegendaries == null
-                            || withLegendaries
-                                    == (tile.getPlanets() != null
-                                            && tile.getPlanets().stream()
-                                                    .map(Mapper::getPlanet)
-                                                    .anyMatch(PlanetModel::isLegendary)))
-                    .sorted(Comparator.comparing(TileModel::getId))
-                    .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
-                    .forEach(tileEmbeds::add);
-        }
-        SearchHelper.sendSearchEmbedsToEventChannel(
-                event, tileEmbeds.stream().map(Entry::getValue).toList());
+    private static boolean hasLegendaryPlanet(TileModel tile) {
+        return tile.getPlanets() != null
+                && tile.getPlanets().stream().map(Mapper::getPlanet).anyMatch(PlanetModel::isLegendary);
     }
 }

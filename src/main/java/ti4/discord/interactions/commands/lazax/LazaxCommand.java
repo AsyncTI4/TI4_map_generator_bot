@@ -1,29 +1,11 @@
 package ti4.discord.interactions.commands.lazax;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class LazaxCommand implements ParentCommand {
+public class LazaxCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(new LazaxMyPoints(), new LazaxTop100())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.LAZAX;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Lazax War Archives";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public LazaxCommand() {
+        super(Constants.LAZAX, "Lazax War Archives", new LazaxMyPoints(), new LazaxTop100());
     }
 }

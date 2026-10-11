@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
@@ -16,8 +17,7 @@ class DiscardACRandom extends GameStateSubcommand {
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1"));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override

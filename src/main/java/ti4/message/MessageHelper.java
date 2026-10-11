@@ -136,11 +136,6 @@ public class MessageHelper {
         splitAndSent(messageText, channel, embeds, null);
     }
 
-    public static void sendMessageToChannelWithEmbedsAndPin(
-            MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
-        splitAndSentWithAction(messageText, channel, pin(), embeds, null);
-    }
-
     public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
         splitAndSent(messageText, channel, null, Collections.singletonList(button));
     }
@@ -1006,33 +1001,6 @@ public class MessageHelper {
         ThreadChannel threadChannel = player.getCardsInfoThread();
 
         sendMessageToChannel(threadChannel, messageText);
-    }
-
-    public static void sendMessageToPlayerCardsInfoThreadAndPin(
-            @NotNull Game game, @NotNull Player player, @NotNull String storedValueKeyPrefix, String messageText) {
-        if (messageText == null || messageText.isEmpty()) {
-            return;
-        }
-
-        sendMessageToPlayerCardsInfoThread(player, messageText);
-    }
-
-    public static void sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
-            @NotNull Game game,
-            @NotNull Player player,
-            @NotNull String storedValueKeyPrefix,
-            String messageText,
-            List<Button> buttons) {
-        if (messageText == null || messageText.isEmpty()) {
-            return;
-        }
-
-        ThreadChannel threadChannel = player.getCardsInfoThread();
-        if (threadChannel == null) {
-            return;
-        }
-
-        sendMessageToChannelWithButtons(threadChannel, messageText, buttons);
     }
 
     /**

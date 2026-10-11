@@ -2,8 +2,8 @@ package ti4.discord.interactions.commands.tokens;
 
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
@@ -17,11 +17,7 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
 
     @Override
     public List<OptionData> getOptions() {
-        return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        return List.of(CommonOptions.tileName(), CommonOptions.factionColor());
     }
 
     @Override

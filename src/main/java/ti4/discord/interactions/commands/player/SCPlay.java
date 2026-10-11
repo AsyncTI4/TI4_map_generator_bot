@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -23,8 +24,7 @@ class SCPlay extends GameStateSubcommand {
                 Constants.STRATEGY_CARD,
                 "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player"));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override

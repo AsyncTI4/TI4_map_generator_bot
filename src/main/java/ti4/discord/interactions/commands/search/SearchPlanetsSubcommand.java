@@ -1,24 +1,26 @@
 package ti4.discord.interactions.commands.search;
 
 import java.util.Comparator;
-import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.logging.BotLogger;
 import ti4.model.PlanetModel;
-import ti4.model.Source.ComponentSource;
 
-class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
+class SearchPlanetsSubcommand extends SearchComponentModelSubcommand<PlanetModel> {
 
-    public SearchPlanetsSubcommand() {
-        super(Constants.SEARCH_PLANETS, "List all planets");
+    SearchPlanetsSubcommand() {
+        super(
+                Constants.SEARCH_PLANETS,
+                "List all planets",
+                Mapper::isValidPlanet,
+                Mapper::getPlanet,
+                valuesOf(TileHelper::getAllPlanetModels),
+                model -> model.getRepresentationEmbed(true),
+                Comparator.comparing(PlanetModel::getId));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.INCLUDE_ALIASES,
@@ -26,24 +28,7 @@ class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, Boolean.FALSE, OptionMapping::getAsBoolean);
-
-        if (Mapper.isValidPlanet(searchString)) {
-            event.getChannel()
-                    .sendMessageEmbeds(Mapper.getPlanet(searchString).getRepresentationEmbed(includeAliases))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-            return;
-        }
-
-        List<MessageEmbed> messageEmbeds = TileHelper.getAllPlanetModels().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(PlanetModel::getId))
-                .map(model -> model.getRepresentationEmbed(true))
-                .toList();
-        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
+    protected MessageEmbed exactMatchEmbed(PlanetModel model, SlashCommandInteractionEvent event) {
+        return model.getRepresentationEmbed(includeAliases(event));
     }
 }

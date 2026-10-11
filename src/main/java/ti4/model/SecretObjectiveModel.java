@@ -12,7 +12,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 
 @Data
-public class SecretObjectiveModel implements ColorableModelInterface<SecretObjectiveModel>, EmbeddableModel {
+public class SecretObjectiveModel implements ColorableModelInterface<SecretObjectiveModel>, SearchTaggedModel {
     private String alias;
     private String name;
     private String phase;
@@ -95,8 +95,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+        if (includeID) footer.append(idFooter(alias));
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -108,12 +107,6 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
             case 2 -> Color.BLACK;
             default -> Color.RED;
         };
-    }
-
-    public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

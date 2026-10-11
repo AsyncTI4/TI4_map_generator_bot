@@ -1,8 +1,7 @@
 package ti4.discord.interactions.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,9 +13,7 @@ class Pass extends GameStateSubcommand {
 
     Pass() {
         super(Constants.PASS, "Pass", true, true);
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     @Override

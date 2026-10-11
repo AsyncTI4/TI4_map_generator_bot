@@ -4,10 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 
 class SetFowFilter extends GameStateSubcommand {
 
@@ -20,11 +20,9 @@ class SetFowFilter extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping fogColorMapping = event.getOption(Constants.FOG_FILTER);
-        if (fogColorMapping == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify color");
-            return;
-        }
+        OptionMapping fogColorMapping =
+                CommandHelper.requireOrReport(event, event.getOption(Constants.FOG_FILTER), "Specify color");
+        if (fogColorMapping == null) return;
 
         String colorSuffix = null;
         switch (fogColorMapping.getAsString()) {

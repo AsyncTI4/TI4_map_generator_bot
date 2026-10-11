@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
@@ -59,11 +60,8 @@ class UpdateThreadArchiveTime extends Subcommand {
             return;
         }
 
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            MessageHelper.sendMessageToEventChannel(event, "What did you do wrong this time?");
-            return;
-        }
+        Guild guild = CommandHelper.requireOrReport(event, event.getGuild(), "What did you do wrong this time?");
+        if (guild == null) return;
 
         AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
         List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()

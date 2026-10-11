@@ -1,11 +1,10 @@
 package ti4.discord.interactions.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,25 +16,17 @@ class RemoveAllianceMember extends GameStateSubcommand {
 
     RemoveAllianceMember() {
         super(Constants.REMOVE_ALLIANCE_MEMBER, "Remove an alliance member", true, true);
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color with which you wish to remove from your alliance")
-                .setAutoComplete(true)
-                .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults you))")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor(
+                "Faction or Color with which you wish to remove from your alliance"));
+        addOptions(CommonOptions.factionColor("Faction or Color (defaults you))"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player targetPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (targetPlayer == null) return;
         if (targetPlayer.getAllianceMembers().contains(player.getFaction())) {
             targetPlayer.removeAllianceMember(player.getFaction());
         }

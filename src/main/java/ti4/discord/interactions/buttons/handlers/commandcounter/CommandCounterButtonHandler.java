@@ -29,42 +29,26 @@ public class CommandCounterButtonHandler {
     @ButtonHandler("decrease_fleet_cc")
     public static void decreaseFleetCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setFleetCC(player.getFleetCC() - 1);
-        String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
-        int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
-                + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        showNetCCGain(event, player, game);
         ButtonHelper.checkFleetInEveryTile(player, game);
     }
 
     @ButtonHandler("decrease_tactic_cc")
     public static void decreaseTacticCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setTacticalCC(player.getTacticalCC() - 1);
-        String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
-        int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
-                + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        showNetCCGain(event, player, game);
     }
 
     @ButtonHandler("decrease_strategy_cc")
     public static void decreaseStrategyCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setStrategicCC(player.getStrategicCC() - 1);
-        String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
-        int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
-                + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        showNetCCGain(event, player, game);
     }
 
     @ButtonHandler("increase_fleet_cc")
     public static void increaseFleetCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setFleetCC(player.getFleetCC() + 1);
-        String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
-        int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
-                + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        showNetCCGain(event, player, game);
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
             String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
             msg += " law in play, which is limiting fleet pool to 4 tokens.";
@@ -75,16 +59,16 @@ public class CommandCounterButtonHandler {
     @ButtonHandler("increase_strategy_cc")
     public static void increaseStrategyCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setStrategicCC(player.getStrategicCC() + 1);
-        String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
-        int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
-                + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        showNetCCGain(event, player, game);
     }
 
     @ButtonHandler("increase_tactic_cc")
     public static void increaseTacticCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setTacticalCC(player.getTacticalCC() + 1);
+        showNetCCGain(event, player, game);
+    }
+
+    private static void showNetCCGain(ButtonInteractionEvent event, Player player, Game game) {
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "

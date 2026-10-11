@@ -13,6 +13,7 @@ class LookAtAgenda extends GameStateSubcommand {
 
     public LookAtAgenda() {
         super(Constants.LOOK, "Look at the agenda deck", false, true);
+        markSuspicious();
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
         addOption(OptionType.BOOLEAN, Constants.LOOK_AT_BOTTOM, "To look at top or bottom");
     }
@@ -26,10 +27,5 @@ class LookAtAgenda extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         LookAgendaService.lookAtAgendas(game, player, count, lookAtBottom);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

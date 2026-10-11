@@ -2,8 +2,6 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
-import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.website.GameStatisticsUploadService;
 
 @UtilityClass
@@ -12,20 +10,10 @@ public class UploadRecentStatsCron {
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
                 UploadRecentStatsCron.class,
-                UploadRecentStatsCron::uploadRecentStats,
+                CronManager.leasedAndLogged(
+                        UploadRecentStatsCron.class, GameStatisticsUploadService::uploadRecentStats),
                 13,
                 45,
                 ZoneId.of("UTC")); // ParsleySage is currently pulling at 14:00 UTC
-    }
-
-    private static void uploadRecentStats() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running UploadRecentStatsCron.");
-        try {
-            GameStatisticsUploadService.uploadRecentStats();
-        } catch (Exception e) {
-            BotLogger.error("**UploadRecentStatsCron failed.**", e);
-        }
-        BotLogger.logCron("Finished UploadRecentStatsCron.");
     }
 }

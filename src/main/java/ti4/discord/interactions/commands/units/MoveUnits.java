@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -29,17 +30,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 public class MoveUnits extends GameStateCommand {
 
     public MoveUnits() {
-        super(true, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.MOVE_UNITS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Move units from one system to another system";
+        super(Constants.MOVE_UNITS, "Move units from one system to another system", true, true);
     }
 
     @Override
@@ -71,8 +62,7 @@ public class MoveUnits extends GameStateCommand {
                         OptionType.BOOLEAN,
                         Constants.COEXIST,
                         "\"True\" to coexist; \"False\" (default) to not, and to start a combat etc. if another player is present"));
-        data.add(new OptionData(
-                OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"));
+        data.add(CommonOptions.noMapGen());
         return data;
     }
 

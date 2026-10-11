@@ -17,6 +17,7 @@ class ExploreLookAtTop extends GameStateSubcommand {
 
     public ExploreLookAtTop() {
         super(Constants.LOOK_AT_TOP, "Privately look at the top card of an exploration deck.", false, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
                 .setAutoComplete(true)
                 .setRequired(true));
@@ -53,10 +54,5 @@ class ExploreLookAtTop extends GameStateSubcommand {
                 player.getCorrectChannel(),
                 "The top card of the " + traitNameWithEmoji + " exploration deck has been set to "
                         + playerFactionNameWithEmoji + " `#cards-info` thread.");
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

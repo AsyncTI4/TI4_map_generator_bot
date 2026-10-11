@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -78,8 +77,7 @@ public class AnonymousCommsService {
     private static final int PREVIEW_LENGTH = 150;
     private static final int MESSAGE_LIMIT = 2000;
     private static final int MODAL_MESSAGE_LIMIT = 1900;
-    private static final int BUTTONS_PER_ROW = 5;
-    private static final int MAX_ROWS = 5;
+    private static final int MAX_BUTTONS = 25;
     // TODO: in-memory only and the cron registers on first touch, so after a restart quiet threads fall back to
     // Discord's 24h auto-archive until the next relay; persisting activity needs startup registration in JdaService.
     private static final Map<String, ThreadActivity> LAST_ACTIVITY = new ConcurrentHashMap<>();
@@ -388,18 +386,12 @@ public class AnonymousCommsService {
     private static void sendWithButtons(MessageChannel channel, String text, List<Button> buttons) {
         try {
             unarchive(channel);
-            channel.sendMessage(text).addComponents(rowsOf(buttons)).complete();
+            channel.sendMessage(text)
+                    .addComponents(Buttons.partitionIntoRows(buttons.subList(0, Math.min(buttons.size(), MAX_BUTTONS))))
+                    .complete();
         } catch (Exception e) {
             BotLogger.error("Could not post to anonymous comms channel " + channel.getName(), e);
         }
-    }
-
-    private static List<ActionRow> rowsOf(List<Button> buttons) {
-        List<ActionRow> rows = new ArrayList<>();
-        for (int i = 0; i < buttons.size() && rows.size() < MAX_ROWS; i += BUTTONS_PER_ROW) {
-            rows.add(ActionRow.of(buttons.subList(i, Math.min(i + BUTTONS_PER_ROW, buttons.size()))));
-        }
-        return rows;
     }
 
     private static void unarchive(MessageChannel channel) {

@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.cardsac;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
@@ -17,8 +18,7 @@ class PlayAC extends GameStateSubcommand {
                         Constants.ACTION_CARD_ID,
                         "Action card ID, which is found between (), or name/part of name")
                 .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override

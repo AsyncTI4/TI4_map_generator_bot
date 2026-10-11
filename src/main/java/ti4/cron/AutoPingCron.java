@@ -23,7 +23,6 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.button.ReactionService;
 import ti4.service.fow.GMService;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class AutoPingCron {
@@ -90,13 +89,15 @@ public class AutoPingCron {
             " They say money can't buy happiness, but I hear that trade goods can buy a war sun, which is basically the same thing.");
 
     public static void register() {
-        CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(
+                AutoPingCron.class,
+                CronManager.leasedAndLogged(AutoPingCron.class, AutoPingCron::autoPingGames),
+                5,
+                10,
+                TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running AutoPingCron.");
-
         removeEndedGamesFromAutoPingMetadata();
 
         GameManager.getManagedGames().stream()
@@ -104,8 +105,6 @@ public class AutoPingCron {
                 .map(ManagedGame::getGame)
                 .filter(game -> game.getAutoPingStatus() && !game.isTemporaryPingDisable())
                 .forEach(AutoPingCron::autoPingGame);
-
-        BotLogger.logCron("Finished AutoPingCron.");
     }
 
     private static void removeEndedGamesFromAutoPingMetadata() {

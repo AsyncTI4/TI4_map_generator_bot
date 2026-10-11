@@ -21,6 +21,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
@@ -35,6 +36,13 @@ public class TaUnitHandler {
     private static final String SELECT_POSITIVE_PREFIX = "taWorldshaperPositive_";
     private static final String SELECT_NEGATIVE_PREFIX = "taWorldshaperNegative_";
     private static final String WORLD_SHAPER_TILE_PREFIX = "taWorldshaperTile_";
+
+    public static void attachAndOfferTaMechDeploy(
+            GenericInteractionCreateEvent event, Player player, Game game, Tile tile, String planetName, String token) {
+        tile.addToken(token, planetName);
+        offerTaMechDeploy(event, player, game, tile, planetName);
+        CommanderUnlockCheckService.checkPlayer(player, "ta");
+    }
 
     public static void offerTaMechDeploy(
             GenericInteractionCreateEvent event, Player player, Game game, Tile tile, String planetName) {

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -27,9 +28,7 @@ class SystemInfo extends GameStateSubcommand {
 
     SystemInfo() {
         super(Constants.SYSTEM_INFO, "Info for system (all units)", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName());
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.EXTRA_RINGS,

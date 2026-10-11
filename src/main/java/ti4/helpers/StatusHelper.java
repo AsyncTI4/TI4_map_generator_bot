@@ -587,7 +587,7 @@ public final class StatusHelper {
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
                     if (unitHolder != null
                             && unitHolder.getTokenList() != null
-                            && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                            && unitHolder.getTokenList().contains(Constants.TOMB_OF_EMPHIDIA_PNG)) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(
                                     player.getCardsInfoThread(),

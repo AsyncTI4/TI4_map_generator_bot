@@ -1,16 +1,12 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
-import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.model.AbilityModel;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -69,38 +65,18 @@ public class AbilityDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.ABILITY, game.isTwilightsFallMode());
-        return allItems;
+        return draftable(
+                DraftCategory.ABILITY,
+                withoutBanned(buildAllItems(factions), game, "bannedAbilities"),
+                game.isTwilightsFallMode());
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.ABILITY);
-        return allItems;
-    }
-
-    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (FactionModel faction : factions) {
-            String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedAbilities"));
-            for (String ability : faction.getAbilities()) {
-                if (Arrays.asList(results).contains(ability)) {
-                    continue;
-                }
-                allItems.add(generate(DraftCategory.ABILITY, ability));
-            }
-        }
-        return allItems;
+        return draftable(DraftCategory.ABILITY, buildAllItems(factions));
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (FactionModel faction : factions) {
-            for (String ability : faction.getAbilities()) {
-                allItems.add(generate(DraftCategory.ABILITY, ability));
-            }
-        }
-        return allItems;
+        return generateAll(
+                DraftCategory.ABILITY, factions.stream().flatMap(faction -> faction.getAbilities().stream()));
     }
 }

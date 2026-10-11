@@ -151,7 +151,7 @@ class HeistAcd2ButtonHandler {
         }
     }
 
-    private static String fragmentLabel(String fragId) {
+    static String fragmentLabel(String fragId) {
         return switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
             case "cultural" -> "cultural relic fragment";
             case "industrial" -> "industrial relic fragment";
@@ -160,7 +160,7 @@ class HeistAcd2ButtonHandler {
         };
     }
 
-    private static String fragmentEmoji(String fragId) {
+    static String fragmentEmoji(String fragId) {
         return switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
             case "cultural" -> ExploreEmojis.CFrag.toString();
             case "industrial" -> ExploreEmojis.IFrag.toString();

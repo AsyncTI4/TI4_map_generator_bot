@@ -1,11 +1,11 @@
 package ti4.discord.interactions.commands.cardsso;
 
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -23,11 +23,8 @@ class ShowSO extends GameStateSubcommand {
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor("Target faction or color"));
+        addOptions(CommonOptions.factionColor("Faction or Color (defaults to you)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.ONLY_PHASE,
@@ -38,17 +35,11 @@ class ShowSO extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         int soIndex = event.getOption(Constants.SECRET_OBJECTIVE_ID).getAsInt();
-        String soID = null;
-        for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
-            if (so.getValue().equals(soIndex)) {
-                soID = so.getKey();
-            }
-        }
-
-        if (soID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such secret objective ID found, please retry.");
-            return;
-        }
+        String soID = CommandHelper.requireOrReport(
+                event,
+                CommandHelper.cardIdForNumber(player.getSecrets(), soIndex),
+                "No such secret objective ID found, please retry.");
+        if (soID == null) return;
 
         String info = SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID);
         boolean onlyPhase = event.getOption(Constants.ONLY_PHASE, Boolean.FALSE, OptionMapping::getAsBoolean);
@@ -63,11 +54,8 @@ class ShowSO extends GameStateSubcommand {
 
         player.setSecret(soID);
 
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player targetPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (targetPlayer == null) return;
 
         MessageHelper.sendMessageToEventChannel(event, "Secret objective shown to player.");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);

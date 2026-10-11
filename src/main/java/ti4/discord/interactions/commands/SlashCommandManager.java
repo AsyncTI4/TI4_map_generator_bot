@@ -65,16 +65,14 @@ import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.SelectionBoxDemoCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowDistancesCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
-import ti4.discord.interactions.commands.units.AddUnitDamage;
 import ti4.discord.interactions.commands.units.AddUnits;
 import ti4.discord.interactions.commands.units.CaptureCommand;
 import ti4.discord.interactions.commands.units.LandUnits;
 import ti4.discord.interactions.commands.units.ModifyUnitsButtons;
 import ti4.discord.interactions.commands.units.MoveUnits;
-import ti4.discord.interactions.commands.units.RemoveAllUnitDamage;
 import ti4.discord.interactions.commands.units.RemoveAllUnits;
-import ti4.discord.interactions.commands.units.RemoveUnitDamage;
 import ti4.discord.interactions.commands.units.RemoveUnits;
+import ti4.discord.interactions.commands.units.UnitDamageCommand;
 import ti4.discord.interactions.commands.user.UserCommand;
 
 @UtilityClass
@@ -84,7 +82,7 @@ public class SlashCommandManager {
                     new AddUnits(),
                     new LandUnits(),
                     new RemoveUnits(),
-                    new RemoveAllUnits(),
+                    RemoveAllUnits.units(),
                     new AllInfoCommand(),
                     new CardsInfoCommand(),
                     new ShowGameCommand(),
@@ -99,9 +97,9 @@ public class SlashCommandManager {
                     new ModifyUnitsButtons(),
                     new RemoveTokenCommand(),
                     new AddTokenCommand(),
-                    new AddUnitDamage(),
-                    new RemoveUnitDamage(),
-                    new RemoveAllUnitDamage(),
+                    UnitDamageCommand.add(),
+                    UnitDamageCommand.remove(),
+                    RemoveAllUnits.damage(),
                     new TransactionCommand(),
                     new MapCommand(),
                     new HelpCommand(),

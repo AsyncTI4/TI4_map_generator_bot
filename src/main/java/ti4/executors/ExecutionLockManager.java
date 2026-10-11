@@ -16,49 +16,28 @@ import ti4.message.MessageHelper;
 public class ExecutionLockManager {
 
     private static final int LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES = 20;
-    private static final Cache<String, ReentrantReadWriteLock> locks;
+    private static final KeyedReadWriteLocks locks;
 
     static {
-        locks = Caffeine.newBuilder()
+        Cache<String, ReentrantReadWriteLock> cache = Caffeine.newBuilder()
                 .expireAfterAccess(LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
-        CacheManager.registerCache("executionLocks", locks);
+        CacheManager.registerCache("executionLocks", cache);
+        locks = KeyedReadWriteLocks.backedBy(cache);
     }
 
     public static void lock(String lockName, ExecutionLockType lockType) {
-        var lock = getLock(lockName);
         long lockStartTime = System.currentTimeMillis();
-        if (lockType == ExecutionLockType.READ) {
-            lock.readLock().lock();
-        } else {
-            lock.writeLock().lock();
-        }
+        locks.get(lockName, lockType).lock();
         long timeToGetLock = System.currentTimeMillis() - lockStartTime;
         if (timeToGetLock >= 1000) {
             BotLogger.warning("Took " + timeToGetLock + " ms to get lock \"" + lockName + "\"");
         }
     }
 
-    private static boolean tryLock(String lockName, ExecutionLockType lockType) {
-        var lock = getLock(lockName);
-        if (lockType == ExecutionLockType.READ) {
-            return lock.readLock().tryLock();
-        }
-        return lock.writeLock().tryLock();
-    }
-
     public static void unlock(String lockName, ExecutionLockType lockType) {
-        var lock = getLock(lockName);
-        if (lockType == ExecutionLockType.READ) {
-            lock.readLock().unlock();
-        } else {
-            lock.writeLock().unlock();
-        }
-    }
-
-    private static ReentrantReadWriteLock getLock(String lockName) {
-        return locks.get(lockName, _ -> new ReentrantReadWriteLock());
+        locks.get(lockName, lockType).unlock();
     }
 
     public static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {
@@ -69,8 +48,7 @@ public class ExecutionLockManager {
             String lockName, ExecutionLockType lockType, Runnable task, MessageChannel messageChannel) {
         if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
-            boolean gotLock = tryLock(lockName, lockType);
-            if (gotLock) {
+            if (locks.get(lockName, lockType).tryLock()) {
                 runAndUnlock(lockName, lockType, task);
                 return;
             }

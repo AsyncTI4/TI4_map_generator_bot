@@ -15,7 +15,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 @Data
-public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
+public class PublicObjectiveModel implements ModelInterface, SearchTaggedModel {
     private String alias;
     private String name;
     private String phase;
@@ -77,8 +77,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+        if (includeID) footer.append(idFooter(alias));
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -91,12 +90,6 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
             case 2 -> Color.BLUE;
             default -> Color.WHITE;
         };
-    }
-
-    public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

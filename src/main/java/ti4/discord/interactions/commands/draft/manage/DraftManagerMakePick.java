@@ -2,6 +2,7 @@ package ti4.discord.interactions.commands.draft.manage;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -35,19 +36,15 @@ class DraftManagerMakePick extends GameStateSubcommand {
                 event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
         String choiceKey =
                 event.getOption(Constants.DRAFTABLE_CHOICE_KEY_OPTION).getAsString();
-        Draftable draftable = draftManager.getDraftable(draftableType);
-        if (draftable == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No draftable of type: " + draftableType);
-            return;
-        }
+        Draftable draftable = CommandHelper.requireOrReport(
+                event, draftManager.getDraftable(draftableType), "No draftable of type: " + draftableType);
+        if (draftable == null) return;
         try {
-            DraftChoice choice = draftable.getDraftChoice(choiceKey);
-            if (choice == null) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        "No choice with key: " + choiceKey + " in draftable of type: " + draftableType);
-                return;
-            }
+            DraftChoice choice = CommandHelper.requireOrReport(
+                    event,
+                    draftable.getDraftChoice(choiceKey),
+                    "No choice with key: " + choiceKey + " in draftable of type: " + draftableType);
+            if (choice == null) return;
             String outcome = draftManager.routeCommand(
                     event,
                     game.getPlayer(playerUserId),

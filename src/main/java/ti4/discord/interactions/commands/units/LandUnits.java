@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -26,40 +27,28 @@ import ti4.service.unit.RemoveUnitService;
 public class LandUnits extends GameStateCommand {
 
     public LandUnits() {
-        super(true, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.LAND_UNITS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Land units on a planet. They can be floating in space or nonexistent before running this command.";
+        super(
+                Constants.LAND_UNITS,
+                "Land units on a planet. They can be floating in space or nonexistent before running this command.",
+                true,
+                true);
     }
 
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
-                        .setRequired(true)
-                        .setAutoComplete(true),
+                CommonOptions.planet(),
                 new OptionData(
                                 OptionType.STRING,
                                 Constants.UNIT_NAMES,
                                 "Comma separated list of '{count} unit ' Eg. 2 infantry")
                         .setRequired(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                        .setAutoComplete(true),
+                CommonOptions.factionColor("Faction or Color for unit"),
                 new OptionData(
                         OptionType.BOOLEAN,
                         Constants.COEXIST,
                         "\"True\" to coexist; \"False\" (default) to not, and to start a combat etc. if another player is present"),
-                new OptionData(
-                        OptionType.BOOLEAN,
-                        Constants.NO_MAPGEN,
-                        "'True' to not generate a map update with this command"));
+                CommonOptions.noMapGen());
     }
 
     @Override

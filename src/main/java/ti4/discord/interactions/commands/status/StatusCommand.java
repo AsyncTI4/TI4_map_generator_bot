@@ -1,48 +1,32 @@
 package ti4.discord.interactions.commands.status;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class StatusCommand implements ParentCommand {
+public class StatusCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new Cleanup(),
-                    new PersonalCleanup(),
-                    new RevealStage1(),
-                    new RevealStage2(),
-                    new ShufflePublicBack(),
-                    new UnrevealPublic(),
-                    new ScorePublic(),
-                    new PeekPublicObjectiveDeck(),
-                    new UnscorePublic(),
-                    new AddCustomPO(),
-                    new RemoveCustomPO(),
-                    new SCTradeGoods(),
-                    new ListTurnOrder(),
-                    new ListTurnStats(),
-                    new ListDiceLuck(),
-                    new ListSpends(),
-                    new MarkFollowed(),
-                    new POInfo(),
-                    new ShufflePublicDeck())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.STATUS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Status Phase";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public StatusCommand() {
+        super(
+                Constants.STATUS,
+                "Status Phase",
+                new Cleanup(),
+                new PersonalCleanup(),
+                new RevealStage1(),
+                new RevealStage2(),
+                new ShufflePublicBack(),
+                new UnrevealPublic(),
+                new ScorePublic(),
+                new PeekPublicObjectiveDeck(),
+                new UnscorePublic(),
+                new AddCustomPO(),
+                new RemoveCustomPO(),
+                new SCTradeGoods(),
+                new ListTurnOrder(),
+                new ListTurnStats(),
+                new ListDiceLuck(),
+                new ListSpends(),
+                new MarkFollowed(),
+                new POInfo(),
+                new ShufflePublicDeck());
     }
 }

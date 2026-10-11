@@ -1,46 +1,30 @@
 package ti4.discord.interactions.commands.cardsso;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class SOCardsCommand implements ParentCommand {
+public class SOCardsCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new DrawSO(),
-                    new ShuffleSecretDeck(),
-                    new DiscardSO(),
-                    new SOInfo(),
-                    new ShowSO(),
-                    new ShowSOToAll(),
-                    new ScoreSO(),
-                    new DealSO(),
-                    new UnscoreSO(),
-                    new ShowAllSO(),
-                    new ShowAllSOToAll(),
-                    new ShowRandomSO(),
-                    new DealSOToAll(),
-                    new DrawSpecificSO(),
-                    new ShowUnScoredSOs(),
-                    new ListAllScored(),
-                    new SendSecretObjectiveCommand())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.CARDS_SO;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Secret Objectives";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public SOCardsCommand() {
+        super(
+                Constants.CARDS_SO,
+                "Secret Objectives",
+                new DrawSO(),
+                new ShuffleSecretDeck(),
+                new DiscardSO(),
+                new SOInfo(),
+                new ShowSO(),
+                new ShowSOToAll(),
+                new ScoreSO(),
+                new DealSO(),
+                new UnscoreSO(),
+                new ShowAllSO(),
+                new ShowAllSOToAll(),
+                new ShowRandomSO(),
+                new DealSOToAll(),
+                new DrawSpecificSO(),
+                new ShowUnScoredSOs(),
+                new ListAllScored(),
+                new SendSecretObjectiveCommand());
     }
 }

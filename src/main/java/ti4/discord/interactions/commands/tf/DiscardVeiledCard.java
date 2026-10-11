@@ -1,11 +1,9 @@
 package ti4.discord.interactions.commands.tf;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
-import ti4.helpers.Constants;
 import ti4.service.VeiledHeartService;
 
 class DiscardVeiledCard extends GameStateSubcommand {
@@ -16,8 +14,7 @@ class DiscardVeiledCard extends GameStateSubcommand {
                 "Discard one or more of your veiled cards (Twilight's Fall: Veiled Heart mode)",
                 true,
                 true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color which will discard")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color which will discard"));
     }
 
     @Override

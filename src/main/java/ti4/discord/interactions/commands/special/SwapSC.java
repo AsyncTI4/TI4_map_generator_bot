@@ -1,9 +1,8 @@
 package ti4.discord.interactions.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,28 +14,16 @@ class SwapSC extends GameStateSubcommand {
 
     public SwapSC() {
         super(Constants.SWAP_SC, "Swap two players' strategy cards", true, true);
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color to swap strategy card with")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.FACTION_COLOR,
-                        "Faction or Color to swap strategy card with (default: you)")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color to swap strategy card with"));
+        addOptions(CommonOptions.factionColor("Faction or Color to swap strategy card with (default: you)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player1 = getPlayer();
-        Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (player2 == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player player2 = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (player2 == null) return;
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Players provided are the same player");
             return;

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -21,15 +22,11 @@ class MoveAllUnits extends GameStateSubcommand {
 
     public MoveAllUnits() {
         super(Constants.MOVE_ALL_UNITS, "Move All Units From One System To Another", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move from")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("System/Tile name to move from"));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to move to")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.CC_USE,
@@ -41,11 +38,9 @@ class MoveAllUnits extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        Tile tileFrom = CommandHelper.getTile(event, game);
-        if (tileFrom == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the system you're moving from.");
-            return;
-        }
+        Tile tileFrom = CommandHelper.requireOrReport(
+                event, CommandHelper.getTile(event, game), "Could not find the system you're moving from.");
+        if (tileFrom == null) return;
 
         Tile tileTo = CommandHelper.getTile(
                 event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());

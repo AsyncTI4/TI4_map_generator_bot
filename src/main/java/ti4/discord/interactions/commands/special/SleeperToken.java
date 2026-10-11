@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,9 +15,7 @@ class SleeperToken extends GameStateSubcommand {
 
     public SleeperToken() {
         super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.planet());
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2nd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET3, "3rd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET4, "4th Planet").setAutoComplete(true));

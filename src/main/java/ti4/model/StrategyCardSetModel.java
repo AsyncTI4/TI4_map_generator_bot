@@ -63,11 +63,6 @@ public class StrategyCardSetModel implements ModelInterface {
                 .findFirst();
     }
 
-    @JsonIgnore
-    public boolean isGroupedSet() {
-        return getStrategyCardModels().stream().anyMatch(sc -> sc.getGroup().isPresent());
-    }
-
     public boolean searchSource(ComponentSource searchSource) {
         return (searchSource == null || (source != null && source == searchSource));
     }

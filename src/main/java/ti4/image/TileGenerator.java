@@ -34,7 +34,6 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -55,13 +54,11 @@ import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
-import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.service.map.CustomHyperlaneService;
 
@@ -83,6 +80,16 @@ public class TileGenerator {
     static final int TILE_WIDTH = 345;
     static final int TILE_HEIGHT = 300;
     private static final Pattern DIGIT_PATTERN = Pattern.compile("[0-9]");
+    private static final Point SPIRAL_OFFSET = new Point(36, 43);
+    private static final List<String> GEAR_PROBLEM_TILES = List.of("25", "26", "64");
+    private static final List<String> WORMHOLE_TOKEN_MARKERS = List.of(
+            "wormhole",
+            "token_creuss",
+            "token_crimsoncreuss",
+            "token_custom_eronous_wh",
+            "token_gamma",
+            "token_ion",
+            "token_wh");
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
@@ -134,20 +141,9 @@ public class TileGenerator {
         this.displayType = displayType;
         this.context = context;
         this.focusTile = focusTile;
-        isFoWPrivate = isFowModeActive();
-        this.fowPlayer = fowPlayer != null
-                ? fowPlayer
-                : (event != null
-                        ? CommandHelper.getPlayerFromGame(
-                                game, event.getMember(), event.getUser().getId())
-                        : null);
-    }
-
-    private boolean isFowModeActive() {
-        return game.isFowMode()
-                && event != null
-                && (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)
-                        || event instanceof UserOverridenGenericInteractionCreateEvent);
+        isFoWPrivate = MapGenerator.isFowPrivateView(game, event);
+        this.fowPlayer =
+                fowPlayer != null ? fowPlayer : (event != null ? MapGenerator.resolveViewingPlayer(game, event) : null);
     }
 
     /**
@@ -169,22 +165,14 @@ public class TileGenerator {
      */
     private void aggregateUnitCoordinates(UnitRenderGenerator unitRenderGenerator) {
         Map<String, Map<String, List<Point>>> renderCoordinates = unitRenderGenerator.getUnitCoordinatesByFaction();
-        if (renderCoordinates != null) {
-            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : renderCoordinates.entrySet()) {
-                String faction = factionEntry.getKey();
-                Map<String, List<Point>> unitMap = factionEntry.getValue();
-
-                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
-                    String unitId = unitEntry.getKey();
-                    List<Point> coordinates = unitEntry.getValue();
-
-                    unitCoordinatesByFaction
-                            .computeIfAbsent(faction, _ -> new HashMap<>())
-                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
-                            .addAll(coordinates);
-                }
-            }
+        if (renderCoordinates == null) {
+            return;
         }
+        renderCoordinates.forEach(
+                (faction, unitMap) -> unitMap.forEach((unitId, coordinates) -> unitCoordinatesByFaction
+                        .computeIfAbsent(faction, _ -> new HashMap<>())
+                        .computeIfAbsent(unitId, _ -> new ArrayList<>())
+                        .addAll(coordinates)));
     }
 
     public FileUpload createFileUpload() {
@@ -192,25 +180,10 @@ public class TileGenerator {
     }
 
     public BufferedImage createMainImage() {
-        Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
-        Set<String> systemsInRange = getTilesToShow(game, context, focusTile);
-        Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
-        keysToRemove.removeAll(systemsInRange);
-        for (String tile_ : keysToRemove) {
-            tilesToDisplay.remove(tile_);
-        }
-
-        // Resolve fog of war vision limitations
+        Map<String, Tile> tileMap = new HashMap<>(game.getTileMap());
+        tileMap.keySet().retainAll(getTilesToShow(game, context, focusTile));
         if (isFoWPrivate) {
-            Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
-            Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
-            keys.removeAll(tilesToShow);
-            for (String key : keys) {
-                tilesToDisplay.remove(key);
-                if (fowPlayer != null) {
-                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
-                }
-            }
+            MapGenerator.replaceHiddenTilesWithFog(game, fowPlayer, tileMap);
         }
 
         int width = TILE_WIDTH + (TILE_EXTRA_WIDTH * 2 * context) + EXTRA_X;
@@ -219,20 +192,13 @@ public class TileGenerator {
         var graphics = mainImage.getGraphics();
 
         try {
-            Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
             tileMap.remove(null);
 
-            Set<String> tiles = tileMap.keySet();
-            Set<String> tilesWithExtra =
-                    new HashSet<>(game.getAdjacentTileOverrides().values());
-            tilesWithExtra.addAll(game.getBorderAnomalies().stream()
-                    .map(BorderAnomalyHolder::getTile)
-                    .collect(Collectors.toSet()));
-
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
-            tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
-            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.TileNumber));
+            List<String> sortedTiles = tileMap.keySet().stream().sorted().toList();
+            sortedTiles.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
+            MapGenerator.tilesWithExtras(game).forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
+            sortedTiles.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
+            sortedTiles.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.TileNumber));
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -298,1252 +264,915 @@ public class TileGenerator {
         BufferedImage tileOutput = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
         Graphics tileGraphics = tileOutput.createGraphics();
         ShipPosition tileShipPositions = tile.getTileModel().getShipPositionsType();
-        var isSpiral = tileShipPositions != null && tileShipPositions.isSpiral();
+        boolean isSpiral = tileShipPositions != null && tileShipPositions.isSpiral();
 
         switch (step) {
-            case Setup -> {} // do nothing
+            case Setup -> {}
             case Tile, TileUnannotated -> {
-                BufferedImage image;
-                if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
-                    image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
-                } else if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getTileFile("51r_Creuss.png"));
-                } else if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getTileFile("17r_DeltaWH.png"));
-                } else {
-                    image = ImageHelper.read(tile.getTilePath());
-                }
-                tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
-
-                // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly(game, null) && tileShipPositions != null) {
-                    BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly.png"));
-                    switch (tileShipPositions.toString().toUpperCase()) {
-                        case "TYPE09":
-                        case "TYPE12":
-                        case "TYPE15":
-                            tileGraphics.drawImage(anomalyImage, TILE_PADDING + 36, TILE_PADDING + 43, null);
-                            break;
-                        default:
-                            tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
-                    }
-                }
-
-                // We've drawn the basic tile; that's all that's needed for some of these
-                if (step == TileStep.TileUnannotated) {
-                    break;
-                }
-
-                // ADD HEX BORDERS FOR CONTROL
-                // display type = unlocked forces border style = solid
-                Player controllingPlayer = game.getPlayerThatControlsTile(tile);
-                if ((!"off".equals(game.getHexBorderStyle()) || displayType == DisplayType.unlocked)
-                        && controllingPlayer != null
-                        && !isSpiral) {
-                    int sideNum = 0;
-                    List<Integer> openSides = new ArrayList<>();
-                    for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
-                        if (game.getPlayerThatControlsTile(adj) == controllingPlayer) {
-                            openSides.add(sideNum);
-                        }
-                        sideNum++;
-                    }
-                    if (isFoWPrivate && fowPlayer == null) openSides.clear();
-                    String hexBorderStyle = displayType == DisplayType.unlocked ? "solid" : game.getHexBorderStyle();
-                    BufferedImage border = DrawingUtil.hexBorder(
-                            hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
-                    tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
-                }
-
-                setTextSize(tileGraphics);
-
-                // FoW stuff
-                if (isFoWPrivate && tile.hasFog(fowPlayer)) {
-                    BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(fowPlayer));
-                    tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
-                    String label = tile.getFogLabel(fowPlayer);
-                    if (label != null) {
-                        // Rnd number label at the bottom
-                        if (label.startsWith("Rnd")) {
-                            int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
-                            int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
-                            DrawingUtil.superDrawString(
-                                    tileGraphics, label, labelX, labelY, Color.WHITE, null, null, null, null);
-                            // Any other custom label wordwrapped in the middle
-                        } else {
-                            int labelX = TILE_PADDING + (TILE_WIDTH / 2);
-                            int labelY = TILE_PADDING + (TILE_HEIGHT / 2);
-                            int lineHeight = tileGraphics.getFontMetrics().getHeight();
-                            List<String> toDraw =
-                                    DrawingUtil.layoutText((Graphics2D) tileGraphics, label, TILE_WIDTH - TILE_PADDING);
-                            int deltaY = 0;
-                            for (String line : toDraw) {
-                                DrawingUtil.superDrawString(
-                                        tileGraphics,
-                                        line,
-                                        labelX,
-                                        labelY + deltaY,
-                                        Color.WHITE,
-                                        MapGenerator.HorizontalAlign.Center,
-                                        null,
-                                        null,
-                                        null);
-                                deltaY += lineHeight;
-                            }
-                        }
-                    }
-                }
-
-                // Draft Stuff
-                if (TileHelper.isDraftTile(tile.getTileModel())) {
-                    String tileID = tile.getTileID();
-                    String draftNum = PatternHelper.LOWERCASE_LETTER_PATTERN
-                            .matcher(tileID)
-                            .replaceAll("");
-                    String draftColor = PatternHelper.BLANK_WORD_PATTERN
-                            .matcher(DIGIT_PATTERN.matcher(tileID).replaceAll(""))
-                            .replaceAll("")
-                            .toUpperCase();
-                    Point draftNumPosition = new Point(85, 140);
-
-                    if (tileID.endsWith("blank")) {
-                        // tiny tile
-                        String greenPath = ResourceHelper.getTileFile("00_green.png");
-                        BufferedImage green = ImageHelper.readScaled(greenPath, 73, 63);
-                        tileGraphics.drawImage(green, TILE_PADDING + 49, TILE_PADDING + 119, null);
-                    } else {
-                        tileGraphics.setFont(Storage.getFont50());
-                        int numX = TILE_PADDING + draftNumPosition.x;
-                        int numY = TILE_PADDING + draftNumPosition.y;
-                        DrawingUtil.superDrawString(
-                                tileGraphics,
-                                draftNum,
-                                numX,
-                                numY,
-                                Color.WHITE,
-                                MapGenerator.HorizontalAlign.Center,
-                                MapGenerator.VerticalAlign.Center,
-                                stroke8,
-                                Color.BLACK);
-                    }
-                    tileGraphics.setFont(Storage.getFont24());
-                    int numX = TILE_PADDING + 172; // 172 //320
-                    int numY = TILE_PADDING + 228; // 50  //161
-                    DrawingUtil.superDrawString(
-                            tileGraphics,
-                            draftColor,
-                            numX,
-                            numY,
-                            Color.WHITE,
-                            MapGenerator.HorizontalAlign.Center,
-                            MapGenerator.VerticalAlign.Bottom,
-                            stroke6,
-                            Color.BLACK);
-                }
-
-                // add icons to wormholes for agendas
-                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other
-                // Travel ban:      For: alpha/beta WH have no effect during movement
-                // Nexus:           For: alpha/beta WH **in Nexus** have no effect during movement
-                // Shared research: For: Units can move through nebulae
-                boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon")
-                        || ButtonHelper.isLawInPlay(game, "absol_recon"));
-                if ((ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))
-                        && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA)
-                                || Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
-                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
-                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
-                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40, true);
-                }
-                if (reconstruction && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA))) {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(
-                            ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
-                    drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "a");
-                }
-                if (reconstruction && (Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(
-                            ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
-                    drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "b");
-                }
-                if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                        && ("82b".equals(tile.getTileID()))
-                        && !(ButtonHelper.isLawInPlay(game, "travel_ban")
-                                || ButtonHelper.isLawInPlay(game, "absol_travelban")) //
-                ) {
-                    // avoid doubling up, which is important when using the transparent symbol
-                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
-                }
-                if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula(game)) {
-                    BufferedImage nebulaBypass =
-                            ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
-                    if (isSpiral) {
-                        switch (tile.getTileID()) {
-                            case "51":
-                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 235, null);
-                                break;
-                            case "82b":
-                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 30, TILE_PADDING + 221, null);
-                                break;
-                            case "82a":
-                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 63, TILE_PADDING + 273, null);
-                                break;
-                            default:
-                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 99, TILE_PADDING + 294, null);
-                        }
-                    } else if (tile.isHomeSystem()) {
-                        tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 193, null);
-                    } else {
-                        tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 80, TILE_PADDING + 236, null);
-                    }
+                drawBaseTileImage(tile, tileGraphics, tileShipPositions);
+                if (step == TileStep.Tile) {
+                    drawTileAnnotations(tile, tileGraphics, isSpiral);
                 }
             }
-            case Extras -> {
-                if (!isFoWPrivate || !tile.hasFog(fowPlayer)) {
-                    List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
-                    int direction = 0;
-                    for (String secondaryTile : adj) {
-                        if (secondaryTile != null) {
-                            addBorderDecoration(direction, secondaryTile, tileGraphics, getAdjacencyArrowImagePath());
-                        }
-                        direction++;
-                    }
-                }
-
-                if (!game.getBorderAnomalies().isEmpty()) {
-                    List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
-                    game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                        BorderAnomalyModel anomalyModel = borderAnomalyHolder.getModel();
-                        if (anomalyModel != null
-                                && borderAnomalyHolder.getTile().equals(tile.getPosition())
-                                && (!isFoWPrivate
-                                        || !tile.hasFog(fowPlayer)
-                                        || FoWHelper.getTilePositionsToShow(game, fowPlayer)
-                                                .contains(orderedAdjacentPositions.get(
-                                                        borderAnomalyHolder.getDirection())))) {
-                            addBorderDecoration(
-                                    borderAnomalyHolder.getDirection(),
-                                    null,
-                                    tileGraphics,
-                                    anomalyModel.getImageFilePath());
-                        }
-                    });
-                }
-            }
-            case Units -> {
-                if (isFoWPrivate && tile.hasFog(fowPlayer)) return tileOutput;
-
-                List<Rectangle> rectangles = new ArrayList<>();
-                Collection<UnitHolder> unitHolders =
-                        new ArrayList<>(tile.getUnitHolders().values());
-                UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
-                if (spaceUnitHolder != null) {
-                    addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
-                    drawTokensOnTile(tile, tileGraphics, spaceUnitHolder, game);
-                    unitHolders.remove(spaceUnitHolder);
-                    unitHolders.add(spaceUnitHolder);
-                }
-
-                int prodInSystem = 0;
-                int capacity = 0;
-                int capacityUsed = 0;
-                int ignoredFs = 0;
-                for (Player player : game.getRealPlayers()) {
-                    prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
-                    if (capacity == 0 && capacityUsed == 0) {
-                        int[] capNCap = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false);
-                        capacityUsed = capNCap[1];
-                        capacity = capNCap[2];
-                        ignoredFs = capNCap[3];
-                    }
-                }
-                for (UnitHolder unitHolder : unitHolders) {
-                    addSleeperToken(tile, tileGraphics, unitHolder, TileGenerator::isValidToken, game);
-                    addControl(tile, tileGraphics, unitHolder, rectangles);
-                }
-                if (game.isShowGears() && !game.isFowMode()) {
-                    if (prodInSystem > 0) {
-                        int textModifer = 0;
-                        if (prodInSystem == 1) {
-                            textModifer = 7;
-                        }
-                        if (prodInSystem > 9) {
-                            textModifer = -5;
-                        }
-                        if (prodInSystem == 11) {
-                            textModifer = 0;
-                        }
-                        var problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
-                        BufferedImage gearImage = ImageHelper.readScaled(
-                                ResourceHelper.getTileFile("production_representation.png"), 64, 64);
-                        int xMod;
-                        int yMod = -290;
-                        if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
-                            xMod = -15;
-                        } else {
-                            xMod = -155;
-                        }
-                        tileGraphics.drawImage(
-                                gearImage,
-                                TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29,
-                                TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4,
-                                null);
-                        tileGraphics.setFont(Storage.getFont35());
-                        tileGraphics.drawString(
-                                prodInSystem + "",
-                                TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25,
-                                TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
-                    }
-
-                    if (capacityUsed > 0 || capacity > 0 || ignoredFs > 0) {
-                        BufferedImage carrierImage = ImageHelper.readScaled(
-                                ResourceHelper.getTileFile("capacity_representation.png"), 64, 21);
-
-                        int xMod = -155;
-                        int yMod = -290;
-                        var problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
-                        if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
-                            xMod = -15;
-                        }
-                        Graphics2D g2d = (Graphics2D) tileGraphics;
-                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                        // Calculate water height
-                        // double waterHeight;
-                        // if (capacity + ignoredFs > 0) {
-                        // waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
-                        // } else {
-                        // waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
-                        // }
-
-                        // Draw brown box (3 sides)
-
-                        g2d.setStroke(new BasicStroke(6));
-
-                        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
-                        int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod + 5;
-
-                        if (prodInSystem == 0) {
-                            gearX -= 27;
-                            gearY -= 55;
-                        }
-
-                        // g2d.setColor(new Color(128, 197, 222));
-                        // g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25,
-                        // (int)waterHeight);
-                        // g2d.setColor(new Color(122, 127, 128));
-
-                        // g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);
-
-                        // Right side
-                        // g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);
-
-                        // Bottom side
-                        // g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);
-                        tileGraphics.drawImage(carrierImage, gearX + 24, gearY + 60, null);
-                        g2d.setColor(Color.WHITE);
-                        tileGraphics.setFont(Storage.getFont12());
-                        String msg = capacityUsed + " / " + capacity;
-                        if (ignoredFs > 0) {
-                            msg = capacityUsed + " / " + (capacity + ignoredFs) + "*";
-                        }
-                        DrawingUtil.superDrawString(
-                                tileGraphics,
-                                msg,
-                                gearX + 39 + 17,
-                                gearY + 95,
-                                Color.WHITE,
-                                HorizontalAlign.Center,
-                                null,
-                                stroke4,
-                                Color.BLACK);
-                    }
-                }
-
-                if (spaceUnitHolder != null) {
-                    addCC(tile, tileGraphics, spaceUnitHolder);
-                }
-                int degree = 180;
-                int degreeChange = 5;
-
-                for (UnitHolder unitHolder : unitHolders) {
-                    int radius =
-                            Constants.SPACE.equals(unitHolder.getName()) ? Constants.SPACE_RADIUS : Constants.RADIUS;
-                    if (unitHolder != spaceUnitHolder) {
-                        addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
-                    }
-                    UnitRenderGenerator unitRenderGenerator = new UnitRenderGenerator(
-                            game,
-                            displayType,
-                            tile,
-                            tileGraphics,
-                            rectangles,
-                            degree,
-                            degreeChange,
-                            unitHolder,
-                            radius,
-                            fowPlayer);
-                    unitRenderGenerator.render();
-                    aggregateUnitCoordinates(unitRenderGenerator);
-                }
-            }
-            case Distance -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                Integer distance = game.getTileDistances().get(tile.getPosition());
-                if (distance == null) {
-                    distance = 100;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-                int x = TILE_PADDING + (isSpiral ? 36 : 0);
-                int y = TILE_PADDING + (isSpiral ? 43 : 0);
-                if (distance > 0) {
-                    BufferedImage distanceColor =
-                            ImageHelper.read(ResourceHelper.getTileFile(getColorFilterForDistance(distance)));
-                    tileGraphics.drawImage(distanceColor, x, y, null);
-                }
-                if (distance < 11) {
-                    tileGraphics.setFont(Storage.getFont110());
-                    DrawingUtil.superDrawString(
-                            tileGraphics,
-                            distance.toString(),
-                            x + tileImage.getWidth() / 2,
-                            y + tileImage.getHeight() / 2,
-                            Color.WHITE,
-                            MapGenerator.HorizontalAlign.Center,
-                            MapGenerator.VerticalAlign.Center,
-                            stroke4,
-                            Color.BLACK);
-                }
-            }
+            case Extras -> drawExtras(tile, tileGraphics);
+            case Units -> drawUnits(tile, tileGraphics);
+            case Distance -> drawDistance(tile, tileGraphics, isSpiral);
             case Wormholes -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-
-                if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else {
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    int count = FoWHelper.getTileWHs(game, tile.getPosition()).size();
-                    x += (count == 1 ? 76 : 30);
-                    y += (count == 1 ? 52 : 26);
-                    for (String wh : FoWHelper.getTileWHs(game, tile.getPosition())) {
-                        String whFile = ResourceHelper.getInstance().getTokenFile("token_wh" + wh + ".png");
-                        if (whFile == null) {
-                            whFile = ResourceHelper.getInstance().getTokenFile("token_custom_eronous_wh" + wh + ".png");
-                        }
-                        if (whFile != null) {
-                            BufferedImage bufferedImage = ImageHelper.readScaled(whFile, 3);
-                            tileGraphics.drawImage(bufferedImage, x, y, null);
-                        }
-                        x += (count <= 1 ? 0 : 91 / (count - 1));
-                        y += (count <= 1 ? 0 : 52 / (count - 1));
-                    }
-                }
+                if (canDrawOverlay(tile)) drawWormholeOverlay(tile, tileGraphics, isSpiral);
             }
             case Anomalies -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-
-                if (!tile.isAnomaly(game, null)) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else {
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    x += 33;
-                    y += 101;
-                    String chevronFile = ResourceHelper.getTileFile("tile_anomaly_chevron.png");
-                    BufferedImage bufferedImage = ImageHelper.read(chevronFile);
-                    tileGraphics.drawImage(bufferedImage, x, y, null);
-                }
+                if (canDrawOverlay(tile)) drawAnomalyOverlay(tile, tileGraphics, isSpiral);
             }
             case Exile -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-                boolean inRangeOfExile = false;
-                for (Player p : game.getRealPlayers()) {
-                    if (FoWHelper.isTileInExileRange(game, tile, p)
-                            || FoWHelper.isTileInUpgradedExileRange(game, tile, p)) {
-                        inRangeOfExile = true;
-                        break;
-                    }
-                }
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-
-                if (!inRangeOfExile) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else {
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    String breachFile = ResourceHelper.getInstance().getTokenFile("token_breachActive.png");
-
-                    BufferedImage bufferedImage = ImageHelper.readScaled(breachFile, 2.0f);
-                    if (bufferedImage != null) {
-                        x += (345 - bufferedImage.getWidth()) / 2;
-                        y += (300 - bufferedImage.getHeight()) / 2;
-                        tileGraphics.drawImage(bufferedImage, x, y, null);
-                    }
-                }
+                if (canDrawOverlay(tile)) drawExileOverlay(tile, tileGraphics, isSpiral);
             }
             case Aetherstream -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-                boolean anomalyIsAdjacent = FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), null);
-
-                if (!anomalyIsAdjacent) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else {
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    String batFile = ResourceHelper.getInstance()
-                            .getGeneralFile("zobat" + (RandomHelper.isOneInX(4096) ? "_shiny" : "") + ".png");
-                    BufferedImage bufferedImage = ImageHelper.read(batFile);
-                    if (bufferedImage != null) {
-                        x += (345 - bufferedImage.getWidth()) / 2;
-                        y += (300 - bufferedImage.getHeight()) / 2;
-                        tileGraphics.drawImage(bufferedImage, x, y, null);
-                    }
-                }
+                if (canDrawOverlay(tile)) drawAetherstreamOverlay(tile, tileGraphics, isSpiral);
             }
             case Legendaries -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-                boolean isLegendary = ButtonHelper.isTileLegendary(tile) || tile.isMecatol(game);
-
-                if (!isLegendary) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else if (tile.isMecatol(game)) {
-                    String councilFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
-                    BufferedImage bufferedImage = ImageHelper.readScaled(councilFile, 2.0f);
-                    if (bufferedImage == null) break;
-
-                    int w = bufferedImage.getWidth();
-                    int h = bufferedImage.getHeight();
-                    int border = 3;
-                    int padding = border + 2;
-                    BufferedImage backgroundImage =
-                            new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                    x += (345 - w) / 2;
-                    y += (300 - w) / 2;
-
-                    for (int i = -padding; i < w + padding; i++) {
-                        for (int j = -padding; j < h + padding; j++) {
-                            int bestAlpha = 0;
-                            for (int p = -padding; p <= padding; p++) {
-                                if (i + p < 0 || i + p >= w) continue;
-                                for (int q = -padding; q <= padding; q++) {
-                                    if (j + q < 0 || j + q >= h) continue;
-                                    int alpha = new Color(bufferedImage.getRGB(i + p, j + q), true).getAlpha();
-                                    if (p * p + q * q <= border * border) {
-                                        bestAlpha = Math.max(bestAlpha, alpha);
-                                    }
-                                }
-                            }
-                            backgroundImage.setRGB(i + padding, j + padding, new Color(0, 0, 0, bestAlpha).getRGB());
-                        }
-                    }
-
-                    tileGraphics.drawImage(backgroundImage, x - padding, y - padding, null);
-                    tileGraphics.drawImage(bufferedImage, x, y, null);
-                } else {
-                    int number = 0;
-                    for (Planet planet : tile.getPlanetUnitHolders()) {
-                        number += (planet.isLegendary() ? 1 : 0);
-                    }
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
-                    BufferedImage bufferedImage = ImageHelper.readScaled(legendaryFile, 0.5f);
-                    if (number >= 2) {
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(Math.sqrt(1.0f / number)));
-                        x += (345 - bufferedImage.getWidth()) / 2;
-                        y += (300 - bufferedImage.getHeight()) / 2;
-                        for (int i = 0; i < number; i++) {
-                            tileGraphics.drawImage(
-                                    bufferedImage,
-                                    x - 30 + i * 60 / (number - 1),
-                                    y - 30 + i * 60 / (number - 1),
-                                    null);
-                        }
-                    } else {
-                        if (bufferedImage == null) break;
-                        x += (345 - bufferedImage.getWidth()) / 2;
-                        y += (300 - bufferedImage.getHeight()) / 2;
-                        tileGraphics.drawImage(bufferedImage, x, y, null);
-                    }
-                }
+                if (canDrawOverlay(tile)) drawLegendaryOverlay(tile, tileGraphics, isSpiral);
             }
             case Empties -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-                boolean isEmpty = tile.getPlanetUnitHolders().isEmpty();
-
-                if (!isEmpty) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else {
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    x += 93;
-                    y += 70;
-                    tileGraphics.setColor(Color.RED);
-                    tileGraphics.fillOval(x, y, 159, 159);
-                    tileGraphics.setColor(Color.WHITE);
-                    DrawingUtil.drawCenteredString(
-                            tileGraphics, "!", new Rectangle(x, y, 159, 159), Storage.getFont80());
-                }
+                if (canDrawOverlay(tile)) drawEmptyOverlay(tile, tileGraphics, isSpiral);
             }
-            case SpaceCannon -> {
-                Map<String, PdsCoverage> pdsCoverageMap = PdsCoverageHelper.calculatePdsCoverage(game, tile);
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int x = TILE_PADDING;
-                int y = TILE_PADDING;
-
-                Map<String, List<Integer>> pdsDice = new HashMap<>();
-                Map<String, PdsCoverage> pdsCoverageByFaction = new HashMap<>();
-                if (pdsCoverageMap != null) {
-                    for (Player player : game.getRealPlayers()) {
-                        PdsCoverage coverage = pdsCoverageMap.get(player.getFaction());
-                        if (coverage != null) {
-                            pdsDice.put(player.getUserID(), coverage.getDiceValues());
-                            pdsCoverageByFaction.put(player.getFaction(), coverage);
-                        }
-                    }
-                }
-
-                if (pdsDice.isEmpty()) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, x, y, null);
-                } else {
-                    x += (isSpiral ? 36 : 0);
-                    y += (isSpiral ? 43 : 0);
-                    float scale = pdsDice.size() >= 3 ? 6.0f / pdsDice.size() : 3.0f;
-
-                    Font bigFont;
-                    Font smallFont =
-                            switch (pdsDice.size()) {
-                                case 1, 2 -> {
-                                    bigFont = Storage.getFont64();
-                                    yield Storage.getFont32();
-                                }
-                                case 3 -> {
-                                    bigFont = Storage.getFont40();
-                                    yield Storage.getFont20();
-                                }
-                                case 4 -> {
-                                    bigFont = Storage.getFont32();
-                                    yield Storage.getFont16();
-                                }
-                                case 5 -> {
-                                    bigFont = Storage.getFont24();
-                                    yield Storage.getFont12();
-                                }
-                                default -> {
-                                    bigFont = Storage.getFont16();
-                                    yield Storage.getFont8();
-                                }
-                            };
-
-                    x += (int) ((345 - 73 * scale) / 2);
-                    y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
-                    for (Map.Entry<String, List<Integer>> entry : pdsDice.entrySet()) {
-                        Player player = game.getPlayer(entry.getKey());
-                        ti4.helpers.PdsCoverage coverage = pdsCoverageByFaction.get(player.getFaction());
-
-                        int numberOfDice = coverage.getCount();
-                        boolean rerolls = coverage.isHasRerolls();
-                        float expectedHits = coverage.getExpected();
-                        if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
-                            tileGraphics.setColor(Color.WHITE);
-                        } else {
-                            tileGraphics.setColor(Color.BLACK);
-                        }
-                        BufferedImage bufferedImage =
-                                ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(player.getColor())), scale);
-                        DrawingUtil.drawControlToken(tileGraphics, bufferedImage, player, x, y, false, scale / 2);
-                        DrawingUtil.drawCenteredString(
-                                tileGraphics,
-                                numberOfDice + (rerolls ? "*" : ""),
-                                new Rectangle(
-                                        Math.round(x + 6 * scale),
-                                        Math.round(y + 12 * scale),
-                                        Math.round(61 * scale / 2),
-                                        Math.round(24 * scale * 2 / 3)),
-                                bigFont);
-                        DrawingUtil.drawCenteredString(
-                                tileGraphics,
-                                "(" + expectedHits + ")",
-                                new Rectangle(
-                                        Math.round(x + 6 * scale),
-                                        Math.round(y + 12 * scale + 24 * scale * 2 / 3),
-                                        Math.round(61 * scale / 2),
-                                        Math.round(24 * scale / 3)),
-                                smallFont);
-                        if (numberOfDice >= 5) {
-                            DrawingUtil.drawCenteredString(
-                                    tileGraphics,
-                                    entry.getValue().subList(0, numberOfDice / 3).stream()
-                                                    .map(Object::toString)
-                                                    .collect(Collectors.joining(","))
-                                            + ",",
-                                    new Rectangle(
-                                            Math.round(x + 73 * scale / 2),
-                                            Math.round(y + 6 * scale),
-                                            Math.round(73 * scale / 2),
-                                            Math.round(36 * scale / 3)),
-                                    smallFont);
-                            DrawingUtil.drawCenteredString(
-                                    tileGraphics,
-                                    entry.getValue().subList(numberOfDice / 3, 2 * numberOfDice / 3).stream()
-                                                    .map(Object::toString)
-                                                    .collect(Collectors.joining(","))
-                                            + ",",
-                                    new Rectangle(
-                                            Math.round(x + 73 * scale / 2),
-                                            Math.round(y + 6 * scale + 36 * scale / 3),
-                                            Math.round(73 * scale / 2),
-                                            Math.round(36 * scale / 3)),
-                                    smallFont);
-                            DrawingUtil.drawCenteredString(
-                                    tileGraphics,
-                                    entry.getValue().subList(2 * numberOfDice / 3, numberOfDice).stream()
-                                            .map(Object::toString)
-                                            .collect(Collectors.joining(",")),
-                                    new Rectangle(
-                                            Math.round(x + 73 * scale / 2),
-                                            Math.round(y + 6 * scale + 36 * scale * 2 / 3),
-                                            Math.round(73 * scale / 2),
-                                            Math.round(36 * scale / 3)),
-                                    smallFont);
-                        } else if (numberOfDice >= 3) {
-                            DrawingUtil.drawCenteredString(
-                                    tileGraphics,
-                                    entry.getValue().subList(0, numberOfDice / 2).stream()
-                                                    .map(Object::toString)
-                                                    .collect(Collectors.joining(","))
-                                            + ",",
-                                    new Rectangle(
-                                            Math.round(x + 73 * scale / 2),
-                                            Math.round(y + 12 * scale),
-                                            Math.round(73 * scale / 2),
-                                            Math.round(24 * scale / 2)),
-                                    smallFont);
-                            DrawingUtil.drawCenteredString(
-                                    tileGraphics,
-                                    entry.getValue().subList(numberOfDice / 2, numberOfDice).stream()
-                                            .map(Object::toString)
-                                            .collect(Collectors.joining(",")),
-                                    new Rectangle(
-                                            Math.round(x + 73 * scale / 2),
-                                            Math.round(y + 12 * scale + 24 * scale / 2),
-                                            Math.round(73 * scale / 2),
-                                            Math.round(24 * scale / 2)),
-                                    smallFont);
-                        } else {
-                            DrawingUtil.drawCenteredString(
-                                    tileGraphics,
-                                    entry.getValue().stream()
-                                            .map(Object::toString)
-                                            .collect(Collectors.joining(",")),
-                                    new Rectangle(
-                                            Math.round(x + 73 * scale / 2),
-                                            y,
-                                            Math.round(73 * scale / 2),
-                                            Math.round(48 * scale)),
-                                    smallFont);
-                        }
-                        y += (int) (48 * scale);
-                    }
-                }
-            }
+            case SpaceCannon -> drawSpaceCannonOverlay(tile, tileGraphics, isSpiral);
             case Traits -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-                BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
-
-                for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (!(uh instanceof Planet planet)) {
-                        continue;
-                    }
-                    String traitFile = "";
-                    List<String> traits = planet.getPlanetType();
-                    if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
-                        traits.add(planet.getOriginalPlanetType());
-                    }
-
-                    if (tile.isMecatol(game)) {
-                        traitFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
-                    } else if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
-                        traitFile = ResourceHelper.getInstance()
-                                .getFactionFile(
-                                        Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
-                    } else if (traits.size() == 1) {
-                        String t = planet.getPlanetType().getFirst();
-                        traitFile = ResourceHelper.getInstance()
-                                .getGeneralFile(("" + t.charAt(0)).toUpperCase()
-                                        + t.substring(1).toLowerCase() + ".png");
-                    } else if (!traits.isEmpty()) {
-                        String t = "";
-                        t += traits.contains("cultural") ? "C" : "";
-                        t += traits.contains("hazardous") ? "H" : "";
-                        t += traits.contains("industrial") ? "I" : "";
-                        if ("CHI".equals(t)) {
-                            traitFile =
-                                    ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
-                        } else {
-                            traitFile =
-                                    ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_" + t + ".png");
-                        }
-                    }
-
-                    if (traitFile != null && !traitFile.isEmpty()) {
-                        BufferedImage bufferedImage = ImageHelper.read(traitFile);
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                                Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                        int w = bufferedImage.getWidth();
-                        int h = bufferedImage.getHeight();
-                        int innerBorder = (tile.isMecatol(game) ? 3 : 2);
-                        int outerBorder = innerBorder + (tile.isMecatol(game) ? -1 : 2);
-                        int padding = outerBorder + (tile.isMecatol(game) ? 3 : 2);
-                        BufferedImage backgroundInner =
-                                new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                        BufferedImage backgroundOuter =
-                                new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                        for (int i = -padding; i < w + padding; i++) {
-                            for (int j = -padding; j < h + padding; j++) {
-                                int bestInnerAlpha = 0;
-                                int bestOuterAlpha = 0;
-                                for (int p = -padding; p <= padding; p++) {
-                                    if (i + p < 0 || i + p >= w) continue;
-                                    for (int q = -padding; q <= padding; q++) {
-                                        if (j + q < 0 || j + q >= h) continue;
-                                        int alpha = new Color(bufferedImage.getRGB(i + p, j + q), true).getAlpha();
-                                        if (p * p + q * q <= innerBorder * innerBorder) {
-                                            bestInnerAlpha = Math.max(bestInnerAlpha, alpha);
-                                        }
-                                        if (p * p + q * q <= outerBorder * outerBorder) {
-                                            bestOuterAlpha = Math.max(bestOuterAlpha, alpha);
-                                        }
-                                    }
-                                }
-                                backgroundInner.setRGB(
-                                        i + padding, j + padding, new Color(0, 0, 0, bestInnerAlpha).getRGB());
-                                backgroundOuter.setRGB(
-                                        i + padding, j + padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
-                            }
-                        }
-
-                        Point position = planet.getHolderCenterPosition(tile);
-                        position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
-
-                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
-                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
-                        tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
-                    }
-                }
+                if (canDrawOverlay(tile)) drawTraitOverlay(tile, tileGraphics);
             }
             case TechSkips -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int planets = tile.getPlanetUnitHolders().size();
-                if (planets == 0) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
-                    break;
-                }
-                boolean anySkips = false;
-                for (Planet planet : tile.getPlanetUnitHolders()) {
-                    List<String> skips = planet.getTechSpecialities();
-                    int number = skips.size();
-                    if (number == 0) {
-                        continue;
-                    }
-                    anySkips = true;
-                    int count = 0;
-
-                    for (String skip : skips) {
-                        String skipFile =
-                                switch (skip.toLowerCase()) {
-                                    case "biotic" ->
-                                        ResourceHelper.getInstance().getGeneralFile("Biotic light.png");
-                                    case "cybernetic" ->
-                                        ResourceHelper.getInstance().getGeneralFile("Cybernetic light.png");
-                                    case "propulsion" ->
-                                        ResourceHelper.getInstance().getGeneralFile("Propulsion_light.png");
-                                    case "warfare" ->
-                                        ResourceHelper.getInstance().getGeneralFile("Warfare_light.png");
-                                    default -> ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png");
-                                };
-
-                        BufferedImage bufferedImage = ImageHelper.read(skipFile);
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f
-                                / bufferedImage.getWidth()
-                                / bufferedImage.getHeight()
-                                / Math.sqrt(1.0f * number)));
-                        int w = bufferedImage.getWidth();
-                        int h = bufferedImage.getHeight();
-                        int innerBorder = 3;
-                        int outerBorder = innerBorder + 3;
-                        int padding = outerBorder + 2;
-                        BufferedImage backgroundInner =
-                                new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                        BufferedImage backgroundOuter =
-                                new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                        for (int i = -padding; i < w + padding; i++) {
-                            for (int j = -padding; j < h + padding; j++) {
-                                int bestInnerAlpha = 0;
-                                int bestOuterAlpha = 0;
-                                for (int p = -padding; p <= padding; p++) {
-                                    if (i + p < 0 || i + p >= w) continue;
-                                    for (int q = -padding; q <= padding; q++) {
-                                        if (j + q < 0 || j + q >= h) continue;
-                                        int alpha = new Color(bufferedImage.getRGB(i + p, j + q), true).getAlpha();
-                                        if (p * p + q * q <= innerBorder * innerBorder) {
-                                            bestInnerAlpha = Math.max(bestInnerAlpha, alpha);
-                                        }
-                                        if (p * p + q * q <= outerBorder * outerBorder) {
-                                            bestOuterAlpha = Math.max(bestOuterAlpha, alpha);
-                                        }
-                                    }
-                                }
-                                backgroundInner.setRGB(
-                                        i + padding, j + padding, new Color(0, 0, 0, bestInnerAlpha).getRGB());
-                                backgroundOuter.setRGB(
-                                        i + padding, j + padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
-                            }
-                        }
-
-                        Point position = planet.getHolderCenterPosition(tile);
-                        if (number > 1) {
-                            int offset = -20 + count * 40 / (number - 1);
-                            position.translate(offset, offset);
-                        }
-                        position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
-
-                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
-                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
-                        tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
-                        count++;
-                    }
-                }
-                if (!anySkips) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
-                }
+                if (canDrawOverlay(tile)) drawTechSkipOverlay(tile, tileGraphics);
             }
             case Attachments -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
-
-                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
-                if (tileImage == null) {
-                    break;
-                }
-
-                int planets = tile.getPlanetUnitHolders().size();
-                if (planets == 0) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
-                    break;
-                }
-                boolean anyAttachments = false;
-                for (Planet planet : tile.getPlanetUnitHolders()) {
-                    List<String> attachments = new ArrayList<>(planet.getAttachments());
-                    int number = attachments.size();
-                    if (number == 0) {
-                        continue;
-                    }
-                    anyAttachments = true;
-
-                    String chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_basic.png");
-                    if (attachments.contains("attachment_tombofemphidia.png")) {
-                        chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_toe.png");
-                    }
-                    BufferedImage bufferedImage = ImageHelper.read(chevronFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    int w = bufferedImage.getWidth();
-                    int h = bufferedImage.getHeight();
-                    int innerBorder = 3;
-                    int outerBorder = innerBorder + 3;
-                    int padding = outerBorder + 2;
-                    BufferedImage backgroundInner =
-                            new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                    BufferedImage backgroundOuter =
-                            new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
-                    for (int i = -padding; i < w + padding; i++) {
-                        for (int j = -padding; j < h + padding; j++) {
-                            int bestInnerAlpha = 0;
-                            int bestOuterAlpha = 0;
-                            for (int p = -padding; p <= padding; p++) {
-                                if (i + p < 0 || i + p >= w) continue;
-                                for (int q = -padding; q <= padding; q++) {
-                                    if (j + q < 0 || j + q >= h) continue;
-                                    int alpha = new Color(bufferedImage.getRGB(i + p, j + q), true).getAlpha();
-                                    if (p * p + q * q <= innerBorder * innerBorder) {
-                                        bestInnerAlpha = Math.max(bestInnerAlpha, alpha);
-                                    }
-                                    if (p * p + q * q <= outerBorder * outerBorder) {
-                                        bestOuterAlpha = Math.max(bestOuterAlpha, alpha);
-                                    }
-                                }
-                            }
-                            backgroundInner.setRGB(
-                                    i + padding, j + padding, new Color(0, 0, 0, bestInnerAlpha).getRGB());
-                            backgroundOuter.setRGB(
-                                    i + padding, j + padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
-                        }
-                    }
-
-                    Point position = planet.getHolderCenterPosition(tile);
-                    position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
-                    if (number == 1) {
-                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
-                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
-                        tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
-                    } else {
-                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding - 36, null);
-                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding - 36, null);
-                        tileGraphics.drawImage(bufferedImage, position.x, position.y - 36, null);
-                        tileGraphics.setColor(Color.WHITE);
-                        tileGraphics.fillOval(position.x + w / 2 - 40, position.y + h / 2 - 8, 80, 80);
-                        tileGraphics.setColor(Color.BLACK);
-                        tileGraphics.fillOval(position.x + w / 2 - 36, position.y + h / 2 - 8 + 4, 72, 72);
-                        tileGraphics.setColor(Color.WHITE);
-                        DrawingUtil.drawCenteredString(
-                                tileGraphics,
-                                "" + number,
-                                new Rectangle(position.x + w / 2 - 40, position.y + h / 2 - 8, 80, 80),
-                                Storage.getFont48());
-                    }
-                }
-                if (!anyAttachments) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
-                }
+                if (canDrawOverlay(tile)) drawAttachmentOverlay(tile, tileGraphics);
             }
-            case TileNumber -> {
-                // Tile number as the last step to put it on top of everything else
-                setTextSize(tileGraphics);
-                int textX = TILE_PADDING + TILE_POSITION_POINT.x;
-                int textY = TILE_PADDING + TILE_POSITION_POINT.y;
-                DrawingUtil.superDrawString(
-                        tileGraphics,
-                        tile.getPosition(),
-                        textX,
-                        textY,
-                        Color.WHITE,
-                        MapGenerator.HorizontalAlign.Right,
-                        MapGenerator.VerticalAlign.Bottom,
-                        stroke7,
-                        Color.BLACK);
+            case TileNumber -> drawTileNumber(tile, tileGraphics);
+            case Nucleus -> drawNucleus(tile, tileGraphics, tileShipPositions);
+        }
+        return tileOutput;
+    }
+
+    private void drawBaseTileImage(Tile tile, Graphics tileGraphics, @Nullable ShipPosition tileShipPositions) {
+        tileGraphics.drawImage(baseTileImage(tile), TILE_PADDING, TILE_PADDING, null);
+        if (tile.isAnomaly(game, null) && tileShipPositions != null) {
+            BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly.png"));
+            Point origin = overlayOrigin(tileShipPositions.isSpiral());
+            tileGraphics.drawImage(anomalyImage, origin.x, origin.y, null);
+        }
+    }
+
+    private BufferedImage baseTileImage(Tile tile) {
+        if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
+            return HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
+        }
+        if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
+            return ImageHelper.read(ResourceHelper.getTileFile("51r_Creuss.png"));
+        }
+        if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
+            return ImageHelper.read(ResourceHelper.getTileFile("17r_DeltaWH.png"));
+        }
+        return ImageHelper.read(tile.getTilePath());
+    }
+
+    private static Point overlayOrigin(boolean isSpiral) {
+        return isSpiral
+                ? new Point(TILE_PADDING + SPIRAL_OFFSET.x, TILE_PADDING + SPIRAL_OFFSET.y)
+                : new Point(TILE_PADDING, TILE_PADDING);
+    }
+
+    private void drawTileAnnotations(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        drawControlBorder(tile, tileGraphics, isSpiral);
+        setTextSize(tileGraphics);
+        if (isFoWPrivate && tile.hasFog(fowPlayer)) {
+            drawFogTile(tile, tileGraphics);
+        }
+        if (TileHelper.isDraftTile(tile.getTileModel())) {
+            drawDraftLabels(tile, tileGraphics);
+        }
+        drawWormholeAgendaIcons(tile, tileGraphics);
+        if (ButtonHelper.isLawInPlay(game, "shared_research") && tile.isNebula(game)) {
+            drawSharedResearchIcon(tile, tileGraphics, isSpiral);
+        }
+    }
+
+    private void drawControlBorder(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        Player controllingPlayer = game.getPlayerThatControlsTile(tile);
+        if (("off".equals(game.getHexBorderStyle()) && displayType != DisplayType.unlocked)
+                || controllingPlayer == null
+                || isSpiral) {
+            return;
+        }
+        int sideNum = 0;
+        List<Integer> openSides = new ArrayList<>();
+        for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
+            if (game.getPlayerThatControlsTile(adj) == controllingPlayer) {
+                openSides.add(sideNum);
             }
-            case Nucleus -> {
-                String mapTemplateId = game.getMapTemplateID();
-                MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
+            sideNum++;
+        }
+        if (isFoWPrivate && fowPlayer == null) openSides.clear();
+        String hexBorderStyle = displayType == DisplayType.unlocked ? "solid" : game.getHexBorderStyle();
+        BufferedImage border =
+                DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
+        tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
+    }
 
-                if (mapTemplate == null || !mapTemplate.isNucleusTemplate()) {
-                    throw new IllegalStateException("Cannot generate Nucleus display without a Nucleus map template");
+    private void drawFogTile(Tile tile, Graphics tileGraphics) {
+        BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(fowPlayer));
+        tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
+        String label = tile.getFogLabel(fowPlayer);
+        if (label == null) {
+            return;
+        }
+        if (label.startsWith("Rnd")) {
+            int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
+            int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
+            DrawingUtil.superDrawString(tileGraphics, label, labelX, labelY, Color.WHITE, null, null, null, null);
+            return;
+        }
+        int labelX = TILE_PADDING + (TILE_WIDTH / 2);
+        int labelY = TILE_PADDING + (TILE_HEIGHT / 2);
+        int lineHeight = tileGraphics.getFontMetrics().getHeight();
+        List<String> toDraw = DrawingUtil.layoutText((Graphics2D) tileGraphics, label, TILE_WIDTH - TILE_PADDING);
+        int deltaY = 0;
+        for (String line : toDraw) {
+            DrawingUtil.superDrawString(
+                    tileGraphics, line, labelX, labelY + deltaY, Color.WHITE, HorizontalAlign.Center, null, null, null);
+            deltaY += lineHeight;
+        }
+    }
+
+    private static void drawDraftLabels(Tile tile, Graphics tileGraphics) {
+        String tileID = tile.getTileID();
+        String draftNum = PatternHelper.LOWERCASE_LETTER_PATTERN.matcher(tileID).replaceAll("");
+        String draftColor = PatternHelper.BLANK_WORD_PATTERN
+                .matcher(DIGIT_PATTERN.matcher(tileID).replaceAll(""))
+                .replaceAll("")
+                .toUpperCase();
+
+        if (tileID.endsWith("blank")) {
+            BufferedImage green = ImageHelper.readScaled(ResourceHelper.getTileFile("00_green.png"), 73, 63);
+            tileGraphics.drawImage(green, TILE_PADDING + 49, TILE_PADDING + 119, null);
+        } else {
+            tileGraphics.setFont(Storage.getFont50());
+            DrawingUtil.superDrawString(
+                    tileGraphics,
+                    draftNum,
+                    TILE_PADDING + 85,
+                    TILE_PADDING + 140,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Center,
+                    stroke8,
+                    Color.BLACK);
+        }
+        tileGraphics.setFont(Storage.getFont24());
+        DrawingUtil.superDrawString(
+                tileGraphics,
+                draftColor,
+                TILE_PADDING + 172,
+                TILE_PADDING + 228,
+                Color.WHITE,
+                HorizontalAlign.Center,
+                VerticalAlign.Bottom,
+                stroke6,
+                Color.BLACK);
+    }
+
+    private void drawWormholeAgendaIcons(Tile tile, Graphics tileGraphics) {
+        boolean reconstruction = anyLawInPlay(game, "wormhole_recon", "absol_recon");
+        boolean travelBan = anyLawInPlay(game, "travel_ban", "absol_travelban");
+        Set<String> wormholes = Mapper.getWormholes(tile.getTileID());
+        boolean hasAlpha = wormholes.contains(Constants.ALPHA);
+        boolean hasBeta = wormholes.contains(Constants.BETA);
+        if (travelBan && (hasAlpha || hasBeta)) {
+            drawOnWormhole(tile, tileGraphics, blockedWormholeImage(reconstruction), 40, "ab", false);
+        } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+            drawOnWormhole(tile, tileGraphics, blockedWormholeImage(reconstruction), 40, "", true);
+        }
+        if (reconstruction && hasAlpha) {
+            drawOnWormhole(tile, tileGraphics, reconstructionWormholeImage("token_whbeta.png"), 0, "a", false);
+        }
+        if (reconstruction && hasBeta) {
+            drawOnWormhole(tile, tileGraphics, reconstructionWormholeImage("token_whalpha.png"), 0, "b", false);
+        }
+        if (anyLawInPlay(game, "nexus", "absol_nexus") && "82b".equals(tile.getTileID()) && !travelBan) {
+            drawOnWormhole(tile, tileGraphics, blockedWormholeImage(reconstruction), 40, "ab", false);
+        }
+    }
+
+    record CreussWormholesOnMap(boolean alpha, boolean beta, boolean gamma) {
+        static CreussWormholesOnMap of(Game game) {
+            String alphaID = Mapper.getTokenID("creussalpha");
+            String betaID = Mapper.getTokenID("creussbeta");
+            String gammaID = Mapper.getTokenID("creussgamma");
+            boolean alphaOnMap = false;
+            boolean betaOnMap = false;
+            boolean gammaOnMap = false;
+            for (Tile tile : game.getTileMap().values()) {
+                Set<String> tileTokens = tile.getSpaceUnitHolder().getTokenList();
+                alphaOnMap |= tileTokens.contains(alphaID);
+                betaOnMap |= tileTokens.contains(betaID);
+                gammaOnMap |= tileTokens.contains(gammaID);
+            }
+            return new CreussWormholesOnMap(alphaOnMap, betaOnMap, gammaOnMap);
+        }
+
+        boolean all() {
+            return alpha && beta && gamma;
+        }
+    }
+
+    static void drawWormholeTokenWithAgendaIcons(
+            Graphics graphics, Game game, String tokenFile, @Nullable String counterpartTokenFile, int x, int y) {
+        graphics.drawImage(ImageHelper.read(tokenFile), x, y, null);
+        if (counterpartTokenFile == null) {
+            return;
+        }
+        boolean reconstruction = anyLawInPlay(game, "wormhole_recon", "absol_recon");
+        if (anyLawInPlay(game, "travel_ban", "absol_travelban")) {
+            graphics.drawImage(blockedWormholeImage(reconstruction), x + 40, y + 40, null);
+        }
+        if (reconstruction) {
+            graphics.drawImage(reconstructionWormholeImage(counterpartTokenFile), x, y, null);
+        }
+    }
+
+    static boolean anyLawInPlay(Game game, String... lawIds) {
+        for (String lawId : lawIds) {
+            if (ButtonHelper.isLawInPlay(game, lawId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static BufferedImage blockedWormholeImage(boolean half) {
+        return ImageHelper.read(
+                ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (half ? "_half" : "") + ".png"));
+    }
+
+    private static BufferedImage reconstructionWormholeImage(String tokenFile) {
+        return ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile(tokenFile), 40.0f / 65);
+    }
+
+    private static void drawSharedResearchIcon(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        BufferedImage nebulaBypass =
+                ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
+        Point offset;
+        if (isSpiral) {
+            offset = switch (tile.getTileID()) {
+                case "51" -> new Point(42, 235);
+                case "82b" -> new Point(30, 221);
+                case "82a" -> new Point(63, 273);
+                default -> new Point(99, 294);
+            };
+        } else if (tile.isHomeSystem()) {
+            offset = new Point(42, 193);
+        } else {
+            offset = new Point(80, 236);
+        }
+        tileGraphics.drawImage(nebulaBypass, TILE_PADDING + offset.x, TILE_PADDING + offset.y, null);
+    }
+
+    private void drawExtras(Tile tile, Graphics tileGraphics) {
+        if (!isFoWPrivate || !tile.hasFog(fowPlayer)) {
+            List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
+            int direction = 0;
+            for (String secondaryTile : adj) {
+                if (secondaryTile != null) {
+                    addBorderDecoration(direction, secondaryTile, tileGraphics, getAdjacencyArrowImagePath());
                 }
+                direction++;
+            }
+        }
 
-                MapTemplateTile mapTile = mapTemplate.getTemplateTiles().stream()
-                        .filter(t -> t.getPos().equals(tile.getPosition()))
-                        .findFirst()
-                        .orElse(null);
-                if (mapTile == null) {
-                    throw new IllegalStateException("Cannot find tile " + tile.getPosition()
-                            + " in Nucleus map template " + mapTemplate.getAlias());
-                }
+        if (game.getBorderAnomalies().isEmpty()) {
+            return;
+        }
+        List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
+        game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
+            BorderAnomalyModel anomalyModel = borderAnomalyHolder.getModel();
+            if (anomalyModel != null
+                    && borderAnomalyHolder.getTile().equals(tile.getPosition())
+                    && (!isFoWPrivate
+                            || !tile.hasFog(fowPlayer)
+                            || FoWHelper.getTilePositionsToShow(game, fowPlayer)
+                                    .contains(orderedAdjacentPositions.get(borderAnomalyHolder.getDirection())))) {
+                addBorderDecoration(
+                        borderAnomalyHolder.getDirection(), null, tileGraphics, anomalyModel.getImageFilePath());
+            }
+        });
+    }
 
-                // COPY BASE TILE GEN
-                BufferedImage image;
-                if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
-                    image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
-                } else if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getTileFile("51r_Creuss.png"));
-                } else if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
-                    image = ImageHelper.read(ResourceHelper.getTileFile("17r_DeltaWH.png"));
-                } else {
-                    image = ImageHelper.read(tile.getTilePath());
-                }
-                tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
+    private void drawUnits(Tile tile, Graphics tileGraphics) {
+        if (isFoWPrivate && tile.hasFog(fowPlayer)) return;
 
-                // COPY BASE TILE GEN - ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly(game, null) && tileShipPositions != null) {
-                    BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly.png"));
-                    switch (tileShipPositions.toString().toUpperCase()) {
-                        case "TYPE09":
-                        case "TYPE12":
-                        case "TYPE15":
-                            tileGraphics.drawImage(anomalyImage, TILE_PADDING + 36, TILE_PADDING + 43, null);
-                            break;
-                        default:
-                            tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
-                    }
-                }
+        List<Rectangle> rectangles = new ArrayList<>();
+        Collection<UnitHolder> unitHolders =
+                new ArrayList<>(tile.getUnitHolders().values());
+        UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
+        if (spaceUnitHolder != null) {
+            addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
+            drawTokensOnTile(tile, tileGraphics, spaceUnitHolder, game);
+            unitHolders.remove(spaceUnitHolder);
+            unitHolders.add(spaceUnitHolder);
+        }
 
-                // Use Hex borders to show which Nucleus slice a tile is a part of
-                // Remember they can be in more than 1!
-                if (mapTile.getNucleusNumbers() != null
-                        && !mapTile.getNucleusNumbers().isEmpty()) {
-                    int nucleusNumberIndex = 0;
-                    Map<Integer, List<Integer>> nucleusNumberToSides = new HashMap<>();
-                    for (int i = 0; i < 6; ++i) {
-                        Integer nucleusNumber = mapTile.getNucleusNumbers().get(nucleusNumberIndex);
-                        nucleusNumberIndex = (nucleusNumberIndex + 1)
-                                % mapTile.getNucleusNumbers().size();
-                        nucleusNumberToSides.putIfAbsent(nucleusNumber, new ArrayList<>());
-                        nucleusNumberToSides.get(nucleusNumber).add(i);
-                    }
+        int prodInSystem = 0;
+        int capacity = 0;
+        int capacityUsed = 0;
+        int ignoredFs = 0;
+        for (Player player : game.getRealPlayers()) {
+            prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
+            if (capacity == 0 && capacityUsed == 0) {
+                int[] capNCap = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false);
+                capacityUsed = capNCap[1];
+                capacity = capNCap[2];
+                ignoredFs = capNCap[3];
+            }
+        }
+        for (UnitHolder unitHolder : unitHolders) {
+            addSleeperToken(tile, tileGraphics, unitHolder, TileGenerator::isValidToken, game);
+            addControl(tile, tileGraphics, unitHolder, rectangles);
+        }
+        if (game.isShowGears() && !game.isFowMode()) {
+            int xMod = tile.getUnitHolders().size() != 4 || GEAR_PROBLEM_TILES.contains(tile.getTileID()) ? -15 : -155;
+            if (prodInSystem > 0) {
+                drawProductionGear(tileGraphics, prodInSystem, xMod);
+            }
+            if (capacityUsed > 0 || capacity > 0 || ignoredFs > 0) {
+                drawCapacity(tileGraphics, prodInSystem, capacity, capacityUsed, ignoredFs, xMod);
+            }
+        }
 
-                    for (Map.Entry<Integer, List<Integer>> entry : nucleusNumberToSides.entrySet()) {
-                        Integer nucleusNumber = entry.getKey();
-                        List<Integer> sidesToColor = entry.getValue();
-                        String color = NUCLEUS_SLICE_COLORS.getOrDefault(nucleusNumber, "black");
-                        String hexBorderStyle = "solid";
-                        List<Integer> openSides = new ArrayList<>(List.of(0, 1, 2, 3, 4, 5));
-                        openSides.removeAll(sidesToColor);
-                        BufferedImage border =
-                                DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(color), openSides, 2.5f);
-                        tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
-                    }
-                }
+        if (spaceUnitHolder != null) {
+            addCC(tile, tileGraphics, spaceUnitHolder);
+        }
+        for (UnitHolder unitHolder : unitHolders) {
+            int radius = Constants.SPACE.equals(unitHolder.getName()) ? Constants.SPACE_RADIUS : Constants.RADIUS;
+            if (unitHolder != spaceUnitHolder) {
+                addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
+            }
+            UnitRenderGenerator unitRenderGenerator = new UnitRenderGenerator(
+                    game, displayType, tile, tileGraphics, rectangles, 180, 5, unitHolder, radius, fowPlayer);
+            unitRenderGenerator.render();
+            aggregateUnitCoordinates(unitRenderGenerator);
+        }
+    }
 
-                // Draw fog tile on non-Nucleus game tiles
-                if (!tile.getTileModel().isHyperlane()
-                        && (mapTile.getNucleusNumbers() == null
-                                || mapTile.getNucleusNumbers().isEmpty())) {
-                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
-                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
-                }
+    private static void drawProductionGear(Graphics tileGraphics, int prodInSystem, int xMod) {
+        int textModifier = prodInSystem == 1 ? 7 : (prodInSystem > 9 && prodInSystem != 11 ? -5 : 0);
+        int yMod = -290;
+        BufferedImage gearImage =
+                ImageHelper.readScaled(ResourceHelper.getTileFile("production_representation.png"), 64, 64);
+        tileGraphics.drawImage(
+                gearImage,
+                TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29,
+                TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4,
+                null);
+        tileGraphics.setFont(Storage.getFont35());
+        tileGraphics.drawString(
+                prodInSystem + "",
+                TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifier - 25,
+                TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
+    }
 
-                // Also draw borders around the seats for a given Nucleus slice
-                if (mapTile.getHome() != null && mapTile.getHome() && mapTile.getPlayerNumber() != null) {
-                    Integer nucleusNumber = mapTile.getPlayerNumber();
-                    String color = NUCLEUS_SLICE_COLORS.getOrDefault(nucleusNumber, "black");
-                    String hexBorderStyle = "solid";
-                    BufferedImage border =
-                            DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(color), List.of(), 4.0f);
-                    tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
+    private static void drawCapacity(
+            Graphics tileGraphics, int prodInSystem, int capacity, int capacityUsed, int ignoredFs, int xMod) {
+        BufferedImage carrierImage =
+                ImageHelper.readScaled(ResourceHelper.getTileFile("capacity_representation.png"), 64, 21);
+        Graphics2D g2d = (Graphics2D) tileGraphics;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setStroke(new BasicStroke(6));
+
+        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
+        int gearY = TILE_PADDING + TILE_POSITION_POINT.y - 290 + 5;
+        if (prodInSystem == 0) {
+            gearX -= 27;
+            gearY -= 55;
+        }
+
+        tileGraphics.drawImage(carrierImage, gearX + 24, gearY + 60, null);
+        g2d.setColor(Color.WHITE);
+        tileGraphics.setFont(Storage.getFont12());
+        String msg =
+                ignoredFs > 0 ? capacityUsed + " / " + (capacity + ignoredFs) + "*" : capacityUsed + " / " + capacity;
+        DrawingUtil.superDrawString(
+                tileGraphics,
+                msg,
+                gearX + 39 + 17,
+                gearY + 95,
+                Color.WHITE,
+                HorizontalAlign.Center,
+                null,
+                stroke4,
+                Color.BLACK);
+    }
+
+    private void drawDistance(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        if (game.isFowMode()) {
+            return;
+        }
+        Integer distance = game.getTileDistances().get(tile.getPosition());
+        if (distance == null) {
+            distance = 100;
+        }
+
+        BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+        if (tileImage == null) {
+            return;
+        }
+        Point origin = overlayOrigin(isSpiral);
+        if (distance > 0) {
+            BufferedImage distanceColor =
+                    ImageHelper.read(ResourceHelper.getTileFile(getColorFilterForDistance(distance)));
+            tileGraphics.drawImage(distanceColor, origin.x, origin.y, null);
+        }
+        if (distance < 11) {
+            tileGraphics.setFont(Storage.getFont110());
+            DrawingUtil.superDrawString(
+                    tileGraphics,
+                    distance.toString(),
+                    origin.x + tileImage.getWidth() / 2,
+                    origin.y + tileImage.getHeight() / 2,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Center,
+                    stroke4,
+                    Color.BLACK);
+        }
+    }
+
+    private boolean canDrawOverlay(Tile tile) {
+        return !game.isFowMode() && !tile.getTileModel().isHyperlane() && ImageHelper.read(tile.getTilePath()) != null;
+    }
+
+    private static void drawFogOverlay(Tile tile, Graphics tileGraphics) {
+        tileGraphics.drawImage(ImageHelper.read(tile.getFowTilePath(null)), TILE_PADDING, TILE_PADDING, null);
+    }
+
+    private static void drawCenteredInTile(Graphics tileGraphics, BufferedImage image, Point origin) {
+        tileGraphics.drawImage(
+                image, origin.x + (345 - image.getWidth()) / 2, origin.y + (300 - image.getHeight()) / 2, null);
+    }
+
+    private void drawWormholeOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        Point origin = overlayOrigin(isSpiral);
+        int count = FoWHelper.getTileWHs(game, tile.getPosition()).size();
+        int x = origin.x + (count == 1 ? 76 : 30);
+        int y = origin.y + (count == 1 ? 52 : 26);
+        for (String wh : FoWHelper.getTileWHs(game, tile.getPosition())) {
+            String whFile = ResourceHelper.getInstance().getTokenFile("token_wh" + wh + ".png");
+            if (whFile == null) {
+                whFile = ResourceHelper.getInstance().getTokenFile("token_custom_eronous_wh" + wh + ".png");
+            }
+            if (whFile != null) {
+                tileGraphics.drawImage(ImageHelper.readScaled(whFile, 3), x, y, null);
+            }
+            x += (count <= 1 ? 0 : 91 / (count - 1));
+            y += (count <= 1 ? 0 : 52 / (count - 1));
+        }
+    }
+
+    private void drawAnomalyOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        if (!tile.isAnomaly(game, null)) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        Point origin = overlayOrigin(isSpiral);
+        BufferedImage chevron = ImageHelper.read(ResourceHelper.getTileFile("tile_anomaly_chevron.png"));
+        tileGraphics.drawImage(chevron, origin.x + 33, origin.y + 101, null);
+    }
+
+    private void drawExileOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        boolean inRangeOfExile = game.getRealPlayers().stream()
+                .anyMatch(p -> FoWHelper.isTileInExileRange(game, tile, p)
+                        || FoWHelper.isTileInUpgradedExileRange(game, tile, p));
+        if (!inRangeOfExile) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        String breachFile = ResourceHelper.getInstance().getTokenFile("token_breachActive.png");
+        BufferedImage breachImage = ImageHelper.readScaled(breachFile, 2.0f);
+        if (breachImage != null) {
+            drawCenteredInTile(tileGraphics, breachImage, overlayOrigin(isSpiral));
+        }
+    }
+
+    private void drawAetherstreamOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        if (!FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), null)) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        String batFile = ResourceHelper.getInstance()
+                .getGeneralFile("zobat" + (RandomHelper.isOneInX(4096) ? "_shiny" : "") + ".png");
+        BufferedImage batImage = ImageHelper.read(batFile);
+        if (batImage != null) {
+            drawCenteredInTile(tileGraphics, batImage, overlayOrigin(isSpiral));
+        }
+    }
+
+    private void drawLegendaryOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        if (tile.isMecatol(game)) {
+            drawCouncilIcon(tileGraphics);
+            return;
+        }
+        if (!ButtonHelper.isTileLegendary(tile)) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        int number = 0;
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            number += (planet.isLegendary() ? 1 : 0);
+        }
+        Point origin = overlayOrigin(isSpiral);
+        String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
+        BufferedImage legendaryImage = ImageHelper.readScaled(legendaryFile, 0.5f);
+        if (number < 2) {
+            if (legendaryImage != null) {
+                drawCenteredInTile(tileGraphics, legendaryImage, origin);
+            }
+            return;
+        }
+        legendaryImage = ImageHelper.scale(legendaryImage, (float) Math.sqrt(Math.sqrt(1.0f / number)));
+        int x = origin.x + (345 - legendaryImage.getWidth()) / 2;
+        int y = origin.y + (300 - legendaryImage.getHeight()) / 2;
+        for (int i = 0; i < number; i++) {
+            tileGraphics.drawImage(
+                    legendaryImage, x - 30 + i * 60 / (number - 1), y - 30 + i * 60 / (number - 1), null);
+        }
+    }
+
+    private static void drawCouncilIcon(Graphics tileGraphics) {
+        String councilFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
+        BufferedImage councilImage = ImageHelper.readScaled(councilFile, 2.0f);
+        if (councilImage == null) return;
+
+        int padding = 5;
+        int x = TILE_PADDING + (345 - councilImage.getWidth()) / 2;
+        int y = TILE_PADDING + (300 - councilImage.getWidth()) / 2;
+        tileGraphics.drawImage(halo(councilImage, padding, 3, Color.BLACK), x - padding, y - padding, null);
+        tileGraphics.drawImage(councilImage, x, y, null);
+    }
+
+    private static BufferedImage halo(BufferedImage image, int padding, int radius, Color color) {
+        return DrawingUtil.halo(image, padding, radius, color, image.getType());
+    }
+
+    private static void drawWithOutline(
+            Graphics tileGraphics, BufferedImage image, int x, int y, int innerBorder, int outerBorder, int padding) {
+        tileGraphics.drawImage(halo(image, padding, outerBorder, Color.WHITE), x - padding, y - padding, null);
+        tileGraphics.drawImage(halo(image, padding, innerBorder, Color.BLACK), x - padding, y - padding, null);
+        tileGraphics.drawImage(image, x, y, null);
+    }
+
+    private static BufferedImage scaleToIconArea(BufferedImage image, double divisor) {
+        return ImageHelper.scale(image, (float) Math.sqrt(9200.0f / image.getWidth() / image.getHeight() / divisor));
+    }
+
+    private void drawEmptyOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        if (!tile.getPlanetUnitHolders().isEmpty()) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        Point origin = overlayOrigin(isSpiral);
+        int x = origin.x + 93;
+        int y = origin.y + 70;
+        tileGraphics.setColor(Color.RED);
+        tileGraphics.fillOval(x, y, 159, 159);
+        tileGraphics.setColor(Color.WHITE);
+        DrawingUtil.drawCenteredString(tileGraphics, "!", new Rectangle(x, y, 159, 159), Storage.getFont80());
+    }
+
+    private void drawSpaceCannonOverlay(Tile tile, Graphics tileGraphics, boolean isSpiral) {
+        Map<String, PdsCoverage> pdsCoverageMap = PdsCoverageHelper.calculatePdsCoverage(game, tile);
+        if (ImageHelper.read(tile.getTilePath()) == null) {
+            return;
+        }
+
+        Map<String, List<Integer>> pdsDice = new HashMap<>();
+        Map<String, PdsCoverage> pdsCoverageByFaction = new HashMap<>();
+        if (pdsCoverageMap != null) {
+            for (Player player : game.getRealPlayers()) {
+                PdsCoverage coverage = pdsCoverageMap.get(player.getFaction());
+                if (coverage != null) {
+                    pdsDice.put(player.getUserID(), coverage.getDiceValues());
+                    pdsCoverageByFaction.put(player.getFaction(), coverage);
                 }
             }
         }
-        return tileOutput;
+
+        if (pdsDice.isEmpty()) {
+            drawFogOverlay(tile, tileGraphics);
+            return;
+        }
+        float scale = pdsDice.size() >= 3 ? 6.0f / pdsDice.size() : 3.0f;
+        Font bigFont;
+        Font smallFont =
+                switch (pdsDice.size()) {
+                    case 1, 2 -> {
+                        bigFont = Storage.getFont64();
+                        yield Storage.getFont32();
+                    }
+                    case 3 -> {
+                        bigFont = Storage.getFont40();
+                        yield Storage.getFont20();
+                    }
+                    case 4 -> {
+                        bigFont = Storage.getFont32();
+                        yield Storage.getFont16();
+                    }
+                    case 5 -> {
+                        bigFont = Storage.getFont24();
+                        yield Storage.getFont12();
+                    }
+                    default -> {
+                        bigFont = Storage.getFont16();
+                        yield Storage.getFont8();
+                    }
+                };
+
+        Point origin = overlayOrigin(isSpiral);
+        int x = origin.x + (int) ((345 - 73 * scale) / 2);
+        int y = origin.y + (int) ((300 - pdsDice.size() * 48 * scale) / 2);
+        for (Map.Entry<String, List<Integer>> entry : pdsDice.entrySet()) {
+            Player player = game.getPlayer(entry.getKey());
+            PdsCoverage coverage = pdsCoverageByFaction.get(player.getFaction());
+
+            int numberOfDice = coverage.getCount();
+            if ("_wht.png".equals(DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()))) {
+                tileGraphics.setColor(Color.WHITE);
+            } else {
+                tileGraphics.setColor(Color.BLACK);
+            }
+            BufferedImage controlImage =
+                    ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(player.getColor())), scale);
+            DrawingUtil.drawControlToken(tileGraphics, controlImage, player, x, y, false, scale / 2);
+            DrawingUtil.drawCenteredString(
+                    tileGraphics,
+                    numberOfDice + (coverage.isHasRerolls() ? "*" : ""),
+                    new Rectangle(
+                            Math.round(x + 6 * scale),
+                            Math.round(y + 12 * scale),
+                            Math.round(61 * scale / 2),
+                            Math.round(24 * scale * 2 / 3)),
+                    bigFont);
+            DrawingUtil.drawCenteredString(
+                    tileGraphics,
+                    "(" + coverage.getExpected() + ")",
+                    new Rectangle(
+                            Math.round(x + 6 * scale),
+                            Math.round(y + 12 * scale + 24 * scale * 2 / 3),
+                            Math.round(61 * scale / 2),
+                            Math.round(24 * scale / 3)),
+                    smallFont);
+            drawDiceValues(tileGraphics, entry.getValue(), numberOfDice, x, y, scale, smallFont);
+            y += (int) (48 * scale);
+        }
+    }
+
+    private static void drawDiceValues(
+            Graphics tileGraphics, List<Integer> dice, int numberOfDice, int x, int y, float scale, Font font) {
+        if (numberOfDice < 3) {
+            DrawingUtil.drawCenteredString(
+                    tileGraphics,
+                    joinDice(dice),
+                    new Rectangle(
+                            Math.round(x + 73 * scale / 2), y, Math.round(73 * scale / 2), Math.round(48 * scale)),
+                    font);
+            return;
+        }
+        int rows = numberOfDice >= 5 ? 3 : 2;
+        int top = numberOfDice >= 5 ? 6 : 12;
+        int span = numberOfDice >= 5 ? 36 : 24;
+        for (int row = 0; row < rows; row++) {
+            List<Integer> rowDice = dice.subList(row * numberOfDice / rows, (row + 1) * numberOfDice / rows);
+            DrawingUtil.drawCenteredString(
+                    tileGraphics,
+                    joinDice(rowDice) + (row < rows - 1 ? "," : ""),
+                    new Rectangle(
+                            Math.round(x + 73 * scale / 2),
+                            Math.round(y + top * scale + row * span * scale / rows),
+                            Math.round(73 * scale / 2),
+                            Math.round(span * scale / rows)),
+                    font);
+        }
+    }
+
+    private static String joinDice(List<Integer> dice) {
+        return dice.stream().map(Object::toString).collect(Collectors.joining(","));
+    }
+
+    private void drawTraitOverlay(Tile tile, Graphics tileGraphics) {
+        drawFogOverlay(tile, tileGraphics);
+        for (UnitHolder uh : tile.getUnitHolders().values()) {
+            if (!(uh instanceof Planet planet)) {
+                continue;
+            }
+            String traitFile = traitIconFile(tile, planet);
+            if (traitFile == null || traitFile.isEmpty()) {
+                continue;
+            }
+            BufferedImage traitImage = scaleToIconArea(ImageHelper.read(traitFile), 1.0);
+            boolean mecatol = tile.isMecatol(game);
+            int innerBorder = mecatol ? 3 : 2;
+            int outerBorder = innerBorder + (mecatol ? -1 : 2);
+            int padding = outerBorder + (mecatol ? 3 : 2);
+            Point position = planet.getHolderCenterPosition(tile);
+            drawWithOutline(
+                    tileGraphics,
+                    traitImage,
+                    position.x - traitImage.getWidth() / 2 + TILE_PADDING,
+                    position.y - traitImage.getHeight() / 2 + TILE_PADDING,
+                    innerBorder,
+                    outerBorder,
+                    padding);
+        }
+    }
+
+    private String traitIconFile(Tile tile, Planet planet) {
+        List<String> traits = planet.getPlanetType();
+        if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
+            traits.add(planet.getOriginalPlanetType());
+        }
+        if (tile.isMecatol(game)) {
+            return ResourceHelper.getInstance().getFactionFile("agenda.png");
+        }
+        if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
+            return ResourceHelper.getInstance()
+                    .getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
+        }
+        if (traits.size() == 1) {
+            String t = planet.getPlanetType().getFirst();
+            return ResourceHelper.getInstance()
+                    .getGeneralFile(
+                            ("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
+        }
+        if (traits.isEmpty()) {
+            return "";
+        }
+        String t = (traits.contains("cultural") ? "C" : "")
+                + (traits.contains("hazardous") ? "H" : "")
+                + (traits.contains("industrial") ? "I" : "");
+        return ResourceHelper.getInstance()
+                .getPlanetResource("pc_attribute_combo_" + ("CHI".equals(t) ? "CHI_big" : t) + ".png");
+    }
+
+    private static void drawTechSkipOverlay(Tile tile, Graphics tileGraphics) {
+        boolean anySkips = false;
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            List<String> skips = planet.getTechSpecialities();
+            int number = skips.size();
+            if (number == 0) {
+                continue;
+            }
+            anySkips = true;
+            int count = 0;
+            for (String skip : skips) {
+                BufferedImage skipImage =
+                        scaleToIconArea(ImageHelper.read(techSkipIconFile(skip)), Math.sqrt(1.0f * number));
+                Point position = planet.getHolderCenterPosition(tile);
+                if (number > 1) {
+                    int offset = -20 + count * 40 / (number - 1);
+                    position.translate(offset, offset);
+                }
+                drawWithOutline(
+                        tileGraphics,
+                        skipImage,
+                        position.x - skipImage.getWidth() / 2 + TILE_PADDING,
+                        position.y - skipImage.getHeight() / 2 + TILE_PADDING,
+                        3,
+                        6,
+                        8);
+                count++;
+            }
+        }
+        if (!anySkips) {
+            drawFogOverlay(tile, tileGraphics);
+        }
+    }
+
+    static String techSkipIconFile(String skip) {
+        return ResourceHelper.getInstance()
+                .getGeneralFile(
+                        switch (skip.toLowerCase()) {
+                            case "biotic" -> "Biotic light.png";
+                            case "cybernetic" -> "Cybernetic light.png";
+                            case "propulsion" -> "Propulsion_light.png";
+                            case "warfare" -> "Warfare_light.png";
+                            default -> "Generic_Technology.png";
+                        });
+    }
+
+    private static void drawAttachmentOverlay(Tile tile, Graphics tileGraphics) {
+        boolean anyAttachments = false;
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            List<String> attachments = new ArrayList<>(planet.getAttachments());
+            int number = attachments.size();
+            if (number == 0) {
+                continue;
+            }
+            anyAttachments = true;
+
+            String chevronFile = ResourceHelper.getInstance()
+                    .getGeneralFile(
+                            attachments.contains(Constants.TOMB_OF_EMPHIDIA_PNG)
+                                    ? "misc_chevrons_toe.png"
+                                    : "misc_chevrons_basic.png");
+            BufferedImage chevronImage = scaleToIconArea(ImageHelper.read(chevronFile), 1.0);
+            int w = chevronImage.getWidth();
+            int h = chevronImage.getHeight();
+            Point center = planet.getHolderCenterPosition(tile);
+            int x = center.x - w / 2 + TILE_PADDING;
+            int y = center.y - h / 2 + TILE_PADDING;
+            if (number == 1) {
+                drawWithOutline(tileGraphics, chevronImage, x, y, 3, 6, 8);
+                continue;
+            }
+            drawWithOutline(tileGraphics, chevronImage, x, y - 36, 3, 6, 8);
+            tileGraphics.setColor(Color.WHITE);
+            tileGraphics.fillOval(x + w / 2 - 40, y + h / 2 - 8, 80, 80);
+            tileGraphics.setColor(Color.BLACK);
+            tileGraphics.fillOval(x + w / 2 - 36, y + h / 2 - 8 + 4, 72, 72);
+            tileGraphics.setColor(Color.WHITE);
+            DrawingUtil.drawCenteredString(
+                    tileGraphics,
+                    "" + number,
+                    new Rectangle(x + w / 2 - 40, y + h / 2 - 8, 80, 80),
+                    Storage.getFont48());
+        }
+        if (!anyAttachments) {
+            drawFogOverlay(tile, tileGraphics);
+        }
+    }
+
+    private void drawTileNumber(Tile tile, Graphics tileGraphics) {
+        setTextSize(tileGraphics);
+        DrawingUtil.superDrawString(
+                tileGraphics,
+                tile.getPosition(),
+                TILE_PADDING + TILE_POSITION_POINT.x,
+                TILE_PADDING + TILE_POSITION_POINT.y,
+                Color.WHITE,
+                HorizontalAlign.Right,
+                VerticalAlign.Bottom,
+                stroke7,
+                Color.BLACK);
+    }
+
+    private void drawNucleus(Tile tile, Graphics tileGraphics, @Nullable ShipPosition tileShipPositions) {
+        String mapTemplateId = game.getMapTemplateID();
+        MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
+
+        if (mapTemplate == null || !mapTemplate.isNucleusTemplate()) {
+            throw new IllegalStateException("Cannot generate Nucleus display without a Nucleus map template");
+        }
+
+        MapTemplateTile mapTile = mapTemplate.getTemplateTiles().stream()
+                .filter(t -> t.getPos().equals(tile.getPosition()))
+                .findFirst()
+                .orElse(null);
+        if (mapTile == null) {
+            throw new IllegalStateException(
+                    "Cannot find tile " + tile.getPosition() + " in Nucleus map template " + mapTemplate.getAlias());
+        }
+
+        drawBaseTileImage(tile, tileGraphics, tileShipPositions);
+
+        List<Integer> nucleusNumbers = mapTile.getNucleusNumbers();
+        boolean inNucleus = nucleusNumbers != null && !nucleusNumbers.isEmpty();
+        if (inNucleus) {
+            Map<Integer, List<Integer>> nucleusNumberToSides = new HashMap<>();
+            for (int i = 0; i < 6; ++i) {
+                nucleusNumberToSides
+                        .computeIfAbsent(nucleusNumbers.get(i % nucleusNumbers.size()), _ -> new ArrayList<>())
+                        .add(i);
+            }
+            for (Map.Entry<Integer, List<Integer>> entry : nucleusNumberToSides.entrySet()) {
+                List<Integer> openSides = new ArrayList<>(List.of(0, 1, 2, 3, 4, 5));
+                openSides.removeAll(entry.getValue());
+                drawNucleusBorder(tileGraphics, entry.getKey(), openSides, 2.5f);
+            }
+        }
+
+        if (!tile.getTileModel().isHyperlane() && !inNucleus) {
+            drawFogOverlay(tile, tileGraphics);
+        }
+
+        if (mapTile.getHome() != null && mapTile.getHome() && mapTile.getPlayerNumber() != null) {
+            drawNucleusBorder(tileGraphics, mapTile.getPlayerNumber(), List.of(), 4.0f);
+        }
+    }
+
+    private static void drawNucleusBorder(
+            Graphics tileGraphics, Integer nucleusNumber, List<Integer> openSides, float thickness) {
+        String color = NUCLEUS_SLICE_COLORS.getOrDefault(nucleusNumber, "black");
+        BufferedImage border = DrawingUtil.hexBorder("solid", Mapper.getColor(color), openSides, thickness);
+        tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
     }
 
     private void setTextSize(Graphics tileGraphics) {
@@ -1685,48 +1314,35 @@ public class TileGenerator {
                         DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID);
                 boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
 
-                Point position = unitTokenPosition.getPosition(controlID);
-                position = offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
+                Point position =
+                        offsetTokenPositionForTokenPlanets(unitTokenPosition.getPosition(controlID), unitHolder, tile);
 
                 float scale = 1.0f;
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
                 if (controlTokenImage == null) continue;
 
+                int imgX;
+                int imgY;
                 if (position != null) {
-                    int imgX = TILE_PADDING + position.x;
-                    int imgY = TILE_PADDING + position.y;
-                    DrawingUtil.drawControlToken(
-                            tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
-                    rectangles.add(
-                            new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
-                    if (player != null
-                            && player.isRealPlayer()
-                            && player.getExhaustedPlanets().contains(unitHolder.getName())) {
-                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(
-                                ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl.png"), scale);
-                        DrawingUtil.drawControlToken(
-                                tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
-                        rectangles.add(
-                                new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
-                    }
+                    imgX = TILE_PADDING + position.x;
+                    imgY = TILE_PADDING + position.y;
                 } else {
-                    int imgX = TILE_PADDING + centerPosition.x + xDelta;
-                    int imgY = TILE_PADDING + centerPosition.y;
+                    imgX = TILE_PADDING + centerPosition.x + xDelta;
+                    imgY = TILE_PADDING + centerPosition.y;
+                    xDelta += 10;
+                }
+                DrawingUtil.drawControlToken(
+                        tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
+                rectangles.add(new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                if (player != null
+                        && player.isRealPlayer()
+                        && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                    BufferedImage exhaustedTokenImage = ImageHelper.readScaled(
+                            ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl.png"), scale);
                     DrawingUtil.drawControlToken(
-                            tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
+                            tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                             new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
-                    if (player != null
-                            && player.isRealPlayer()
-                            && player.getExhaustedPlanets().contains(unitHolder.getName())) {
-                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(
-                                ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl"), scale);
-                        DrawingUtil.drawControlToken(
-                                tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
-                        rectangles.add(
-                                new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
-                    }
-                    xDelta += 10;
                 }
             }
 
@@ -1881,29 +1497,20 @@ public class TileGenerator {
                 } else if (tokenPath.contains("custodiavigilia")) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 140, TILE_PADDING + 185, null);
                 } else {
-                    Point position = unitTokenPosition.getPosition(tokenID);
-                    position = offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
-
+                    Point position = offsetTokenPositionForTokenPlanets(
+                            unitTokenPosition.getPosition(tokenID), unitHolder, tile);
+                    int tokenX;
+                    int tokenY;
                     if (position != null) {
-                        tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y, null);
-                        rectangles.add(new Rectangle(
-                                TILE_PADDING + position.x,
-                                TILE_PADDING + position.y,
-                                tokenImage.getWidth(),
-                                tokenImage.getHeight()));
+                        tokenX = TILE_PADDING + position.x;
+                        tokenY = TILE_PADDING + position.y;
                     } else {
-                        tileGraphics.drawImage(
-                                tokenImage,
-                                TILE_PADDING + centerPosition.x + xDelta,
-                                TILE_PADDING + centerPosition.y,
-                                null);
-                        rectangles.add(new Rectangle(
-                                TILE_PADDING + centerPosition.x + xDelta,
-                                TILE_PADDING + centerPosition.y,
-                                tokenImage.getWidth(),
-                                tokenImage.getHeight()));
+                        tokenX = TILE_PADDING + centerPosition.x + xDelta;
+                        tokenY = TILE_PADDING + centerPosition.y;
                         xDelta += 10;
                     }
+                    tileGraphics.drawImage(tokenImage, tokenX, tokenY, null);
+                    rectangles.add(new Rectangle(tokenX, tokenY, tokenImage.getWidth(), tokenImage.getHeight()));
                 }
             }
         } else {
@@ -1970,8 +1577,6 @@ public class TileGenerator {
 
     private static void oldFormatPlanetTokenAdd(
             Tile tile, Graphics tileGraphics, UnitHolder unitHolder, List<String> tokenList) {
-        int deltaY = 0;
-        int offSet = 0;
         Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         int x = centerPosition.x;
         int y = centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
@@ -1984,10 +1589,7 @@ public class TileGenerator {
             BufferedImage image = ImageHelper.readScaled(tokenPath, 0.85f);
             if (image == null) continue;
             tileGraphics.drawImage(
-                    image,
-                    TILE_PADDING + x - (image.getWidth() / 2),
-                    TILE_PADDING + y + offSet + deltaY - (image.getHeight() / 2),
-                    null);
+                    image, TILE_PADDING + x - (image.getWidth() / 2), TILE_PADDING + y - (image.getHeight() / 2), null);
             y += image.getHeight();
         }
     }
@@ -1998,29 +1600,8 @@ public class TileGenerator {
     }
 
     private static boolean isWormholeToken(String tokenPath) {
-        tokenPath = tokenPath.toLowerCase();
-        if (tokenPath.contains("wormhole")) {
-            return true;
-        }
-        if (tokenPath.contains("token_creuss")) {
-            return true;
-        }
-        if (tokenPath.contains("token_crimsoncreuss")) {
-            return true;
-        }
-        if (tokenPath.contains("token_custom_eronous_wh")) {
-            return true;
-        }
-        if (tokenPath.toLowerCase().contains("token_custom_eronous_wh")) {
-            return !tokenPath.contains("token_custom_eronous_whno");
-        }
-        if (tokenPath.contains("token_gamma")) {
-            return true;
-        }
-        if (tokenPath.contains("token_ion")) {
-            return true;
-        }
-        return tokenPath.contains("token_wh");
+        String lowerPath = tokenPath.toLowerCase();
+        return WORMHOLE_TOKEN_MARKERS.stream().anyMatch(lowerPath::contains);
     }
 
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
@@ -2110,53 +1691,45 @@ public class TileGenerator {
                 tileGraphics.drawImage(tokenImage, drawX, drawY, null);
                 drawTheodisiTokenCount(tileGraphics, tokenPath, game, tile, drawX, drawY, tokenImage);
 
-                // add icons to wormholes for agendas
-                boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon")
-                        || ButtonHelper.isLawInPlay(game, "absol_recon"));
-                int offsetX = (tokenImage.getWidth() - 80) / 2;
-                int offsetY = (tokenImage.getWidth() - 80) / 2;
-                if ((ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))
-                        && (tokenPath.toLowerCase().contains("alpha")
-                                || tokenPath.toLowerCase().contains("beta"))) {
-                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
-                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)
-                        && isWormholeToken(tokenPath)) {
-                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                            .getTokenFile("agenda_wormhole_blocked"
-                                    + (reconstruction
-                                                    && (tokenPath.toLowerCase().contains("alpha")
-                                                            || tokenPath
-                                                                    .toLowerCase()
-                                                                    .contains("beta"))
-                                            ? "_half"
-                                            : "")
-                                    + ".png"));
-                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
-                }
-                if (reconstruction && tokenPath.toLowerCase().contains("alpha")) {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(
-                            ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
-                    tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
-                }
-                if (reconstruction && tokenPath.toLowerCase().contains("beta")) {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(
-                            ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
-                    tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
-                }
-                if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                        && ("82b".equals(tile.getTileID()))
-                        && !(ButtonHelper.isLawInPlay(game, "travel_ban")
-                                || ButtonHelper.isLawInPlay(game, "absol_travelban"))
-                        && (tokenPath.toLowerCase().contains("alpha")
-                                || tokenPath.toLowerCase().contains("beta"))) {
-                    // avoid doubling up, which is important when using the transparent symbol
-                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
-                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
-                }
+                drawWormholeTokenAgendaIcons(tileGraphics, tokenPath, game, tile, drawX, drawY, tokenImage);
             }
+        }
+    }
+
+    private static void drawWormholeTokenAgendaIcons(
+            Graphics tileGraphics,
+            String tokenPath,
+            Game game,
+            Tile tile,
+            int drawX,
+            int drawY,
+            BufferedImage tokenImage) {
+        boolean reconstruction = anyLawInPlay(game, "wormhole_recon", "absol_recon");
+        boolean travelBan = anyLawInPlay(game, "travel_ban", "absol_travelban");
+        String lowerPath = tokenPath.toLowerCase();
+        boolean isAlpha = lowerPath.contains("alpha");
+        boolean isBeta = lowerPath.contains("beta");
+        int offset = (tokenImage.getWidth() - 80) / 2;
+        int iconX = drawX + offset;
+        int iconY = drawY + offset;
+        if (travelBan && (isAlpha || isBeta)) {
+            tileGraphics.drawImage(blockedWormholeImage(reconstruction), iconX + 40, iconY + 40, null);
+        } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)
+                && isWormholeToken(tokenPath)) {
+            tileGraphics.drawImage(
+                    blockedWormholeImage(reconstruction && (isAlpha || isBeta)), iconX + 40, iconY + 40, null);
+        }
+        if (reconstruction && isAlpha) {
+            tileGraphics.drawImage(reconstructionWormholeImage("token_whbeta.png"), iconX, iconY, null);
+        }
+        if (reconstruction && isBeta) {
+            tileGraphics.drawImage(reconstructionWormholeImage("token_whalpha.png"), iconX, iconY, null);
+        }
+        if (anyLawInPlay(game, "nexus", "absol_nexus")
+                && "82b".equals(tile.getTileID())
+                && !travelBan
+                && (isAlpha || isBeta)) {
+            tileGraphics.drawImage(blockedWormholeImage(reconstruction), iconX + 40, iconY + 40, null);
         }
     }
 
@@ -2189,115 +1762,50 @@ public class TileGenerator {
                 Color.BLACK);
     }
 
-    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {
-        drawOnWormhole(tile, graphics, icon, offset, "ab", false);
-    }
+    private record WormholeSpot(char type, int x, int y) {}
 
-    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, String types) {
-        drawOnWormhole(tile, graphics, icon, offset, types, false);
-    }
-
-    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, boolean all) {
-        drawOnWormhole(tile, graphics, icon, offset, "", all);
-    }
+    private static final Map<String, List<WormholeSpot>> WORMHOLE_SPOTS = Map.ofEntries(
+            Map.entry("17", List.of(new WormholeSpot('d', 187, 206))),
+            Map.entry("51", List.of(new WormholeSpot('d', 239, 251))),
+            Map.entry("82a", List.of(new WormholeSpot('g', 169, 273))),
+            Map.entry(
+                    "82b",
+                    List.of(
+                            new WormholeSpot('a', 95, 249),
+                            new WormholeSpot('b', 169, 273),
+                            new WormholeSpot('g', 243, 249))),
+            Map.entry("94", List.of(new WormholeSpot('e', 45, 152))),
+            Map.entry("118", List.of(new WormholeSpot('e', 250, 236))),
+            Map.entry("c02", List.of(new WormholeSpot('a', 37, 158), new WormholeSpot('b', 223, 62))),
+            Map.entry("c10", List.of(new WormholeSpot('a', 182, 22), new WormholeSpot('b', 259, 241))),
+            Map.entry("c11", List.of(new WormholeSpot('a', 54, 138), new WormholeSpot('b', 159, 275))),
+            Map.entry("d119", List.of(new WormholeSpot('b', 94, 170))),
+            Map.entry("d123", List.of(new WormholeSpot('a', 22, 110), new WormholeSpot('b', 190, 206))),
+            Map.entry("er19", List.of(new WormholeSpot('a', 60, 44), new WormholeSpot('b', 192, 184))),
+            Map.entry("er119", List.of(new WormholeSpot('a', 60, 44), new WormholeSpot('b', 192, 184))),
+            Map.entry("er94", List.of(new WormholeSpot('b', 157, 165))),
+            Map.entry("er95", List.of(new WormholeSpot('a', 60, 155), new WormholeSpot('b', 215, 61))),
+            Map.entry("m05", List.of(new WormholeSpot('a', 185, 180))),
+            Map.entry("m32", List.of(new WormholeSpot('b', 49, 147))));
 
     private static void drawOnWormhole(
             Tile tile, Graphics graphics, BufferedImage icon, int offset, String types, boolean all) {
-        switch (tile.getTileID()) {
-            case "17": // creuss gate
-                if (all || types.contains("d"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 187, TILE_PADDING + offset + 206, null);
-                break;
-            case "51": // creuss hs
-                if (all || types.contains("d"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 239, TILE_PADDING + offset + 251, null);
-                break;
-            case "82a": // inactuve wormhole nexus
-                if (all || types.contains("g"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
-                break;
-            case "82b": // wormhole nexus
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 95, TILE_PADDING + offset + 249, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
-                if (all || types.contains("g"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 243, TILE_PADDING + offset + 249, null);
-                break;
-            case "94": // sorrow
-                if (all || types.contains("e"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 45, TILE_PADDING + offset + 152, null);
-                break;
-            case "118": // rebellion hs
-                if (all || types.contains("e"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 250, TILE_PADDING + offset + 236, null);
-                break;
-            case "c02": // Locke/Bentham
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 37, TILE_PADDING + offset + 158, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 223, TILE_PADDING + offset + 62, null);
-                break;
-            case "c10": // Kwon
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 182, TILE_PADDING + offset + 22, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 259, TILE_PADDING + offset + 241, null);
-                break;
-            case "c11": // Ethan
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 54, TILE_PADDING + offset + 138, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 159, TILE_PADDING + offset + 275, null);
-                break;
-            case "d119": // beta/nebula
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 94, TILE_PADDING + offset + 170, null);
-                break;
-            case "d123": // alpha/beta/supernova
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 22, TILE_PADDING + offset + 110, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 190, TILE_PADDING + offset + 206, null);
-                break;
-            case "er19": // alpha/beta/rift
-            case "er119": // alpha/beta/nebula
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 60, TILE_PADDING + offset + 44, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 192, TILE_PADDING + offset + 184, null);
-                break;
-            case "er94": // Iynntani
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 157, TILE_PADDING + offset + 165, null);
-                break;
-            case "er95": // Kytos/Prymis
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 60, TILE_PADDING + offset + 155, null);
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 215, TILE_PADDING + offset + 61, null);
-                break;
-            case "m05": // Shanh
-                if (all || types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 185, TILE_PADDING + offset + 180, null);
-                break;
-            case "m32": // Vespa/Apis
-                if (all || types.contains("b"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 49, TILE_PADDING + offset + 147, null);
-                break;
-            default:
-                Point wormholeLocation = TileHelper.getTileById(tile.getTileID())
-                        .getShipPositionsType()
-                        .getWormholeLocation();
-                if (wormholeLocation == null) {
-                    graphics.drawImage(icon, TILE_PADDING + offset + 86, TILE_PADDING + 260, null);
-                } else {
-                    graphics.drawImage(
-                            icon,
-                            TILE_PADDING + offset + wormholeLocation.x,
-                            TILE_PADDING + offset + wormholeLocation.y,
-                            null);
+        List<WormholeSpot> spots = WORMHOLE_SPOTS.get(tile.getTileID());
+        if (spots != null) {
+            for (WormholeSpot spot : spots) {
+                if (all || types.indexOf(spot.type()) >= 0) {
+                    graphics.drawImage(icon, TILE_PADDING + offset + spot.x(), TILE_PADDING + offset + spot.y(), null);
                 }
+            }
+            return;
+        }
+        Point wormholeLocation =
+                TileHelper.getTileById(tile.getTileID()).getShipPositionsType().getWormholeLocation();
+        if (wormholeLocation == null) {
+            graphics.drawImage(icon, TILE_PADDING + offset + 86, TILE_PADDING + 260, null);
+        } else {
+            graphics.drawImage(
+                    icon, TILE_PADDING + offset + wormholeLocation.x, TILE_PADDING + offset + wormholeLocation.y, null);
         }
     }
 }

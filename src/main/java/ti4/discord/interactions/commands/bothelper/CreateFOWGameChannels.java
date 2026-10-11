@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -55,11 +56,8 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         // CHECK IF GIVEN CATEGORY IS VALID
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Guild was null");
-            return;
-        }
+        Guild guild = CommandHelper.requireOrReport(event, event.getGuild(), "Guild was null");
+        if (guild == null) return;
 
         // PLAYERS
         Member gameOwner = CreateFoWGameService.getGM(event);

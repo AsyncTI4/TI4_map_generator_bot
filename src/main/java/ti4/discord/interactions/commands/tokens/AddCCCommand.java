@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.CommandCounterHelper;
@@ -45,14 +46,12 @@ public class AddCCCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
+                CommonOptions.tileName(),
                 new OptionData(
                                 OptionType.STRING,
                                 Constants.CC_USE,
                                 "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
                         .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+                CommonOptions.factionColor());
     }
 }

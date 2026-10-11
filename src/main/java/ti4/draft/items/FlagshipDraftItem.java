@@ -1,16 +1,11 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
-import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.TI4Emoji;
@@ -56,30 +51,14 @@ public class FlagshipDraftItem extends DraftItem {
         if (unit == null) {
             return getItemId();
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Cost: ");
-        float cost = unit.getCost();
-        sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
-        sb.append(" Combat: ");
-        sb.append(unit.getCombatHitsOn());
-        if (unit.getCombatDieCount() > 1) {
-            sb.append("x").append(unit.getCombatDieCount());
-        }
+        StringBuilder sb = new StringBuilder("Cost: ").append(UnitDescription.cost(unit));
+        UnitDescription.appendCombat(sb, unit);
         sb.append(" Move: ");
         sb.append(unit.getMoveValue());
         sb.append(" Capacity: ");
         sb.append(unit.getCapacityValue());
         sb.append(' ');
-        if (unit.getSustainDamage()) {
-            sb.append("SUSTAIN DAMAGE ");
-        }
-        if (unit.getAfbDieCount() > 0) {
-            sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x")
-                    .append(unit.getAfbDieCount())
-                    .append(' ');
-        }
+        UnitDescription.appendSustainAndAfb(sb, unit);
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();
     }
@@ -91,42 +70,14 @@ public class FlagshipDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.FLAGSHIP);
-        return allItems;
+        return draftable(DraftCategory.FLAGSHIP, buildAllItems(factions));
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = new ArrayList<>();
-        Map<String, UnitModel> allUnits = Mapper.getUnits();
-        for (FactionModel faction : factions) {
-            var units = faction.getUnits();
-            units.removeIf(
-                    (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(DraftCategory.FLAGSHIP, units.getFirst()));
-        }
-        return allItems;
+        return buildFactionUnitItems(DraftCategory.FLAGSHIP, "flagship", factions);
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.FLAGSHIP);
-        return allItems;
-    }
-
-    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        Map<String, UnitModel> allUnits = Mapper.getUnits();
-        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFSs"));
-        for (FactionModel faction : factions) {
-            if (Arrays.asList(results).contains(faction.getAlias())) {
-                continue;
-            }
-            var units = faction.getUnits();
-            units.removeIf(
-                    (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(DraftCategory.FLAGSHIP, units.getFirst()));
-        }
-        return allItems;
+        return draftable(DraftCategory.FLAGSHIP, buildAllItems(withoutBannedFactions(factions, game, "bannedFSs")));
     }
 }

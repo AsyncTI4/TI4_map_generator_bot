@@ -54,9 +54,7 @@ public class MonumentsPoKButtonHandler {
 
     @ButtonHandler(USE_PHOENIXCAULDRON)
     public static void startPhoenixCauldron(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "argent_monument")
-                || !MonumentsService.isMonumentReady(game, player, "argent_monument")) {
+        if (!MonumentsService.isMonumentReady(game, player, "argent_monument")) {
             return;
         }
 
@@ -467,9 +465,7 @@ public class MonumentsPoKButtonHandler {
 
     @ButtonHandler(USE_SCEPTER)
     public static void getScepterPlanetButtons(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "titans_monument")
-                || !MonumentsService.isMonumentReady(game, player, "titans_monument")) {
+        if (!MonumentsService.isMonumentReady(game, player, "titans_monument")) {
             return;
         }
 
@@ -502,9 +498,7 @@ public class MonumentsPoKButtonHandler {
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         Tile planetTile = game.getTileFromPlanet(planetName);
 
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "titans_monument")
-                || !MonumentsService.isMonumentReady(game, player, "titans_monument")
+        if (!MonumentsService.isMonumentReady(game, player, "titans_monument")
                 || planet == null
                 || planetTile == null
                 || planet.getPlanetTypes().isEmpty()

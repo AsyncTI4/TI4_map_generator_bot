@@ -13,17 +13,7 @@ import ti4.message.MessageHelper;
 public class ModifyUnitsButtons extends GameStateCommand {
 
     public ModifyUnitsButtons() {
-        super(true, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.MODIFY_UNITS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Modify units on map";
+        super(Constants.MODIFY_UNITS, "Modify units on map", true, true);
     }
 
     @Override

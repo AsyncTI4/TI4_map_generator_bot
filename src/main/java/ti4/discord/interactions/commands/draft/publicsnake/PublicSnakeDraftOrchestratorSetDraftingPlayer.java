@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.draft.publicsnake;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -16,13 +17,11 @@ class PublicSnakeDraftOrchestratorSetDraftingPlayer extends GameStateSubcommand 
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        PublicSnakeDraftOrchestrator orchestrator = PublicSnakeDraftGroup.getOrchestrator(getGame());
-        if (orchestrator == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "The draft isn't using the Public Snake Draft Orchestrator; you may need `/draft manage set_orchestrator public_snake`.");
-            return;
-        }
+        PublicSnakeDraftOrchestrator orchestrator = CommandHelper.requireOrReport(
+                event,
+                PublicSnakeDraftGroup.getOrchestrator(getGame()),
+                "The draft isn't using the Public Snake Draft Orchestrator; you may need `/draft manage set_orchestrator public_snake`.");
+        if (orchestrator == null) return;
 
         String userId = event.getOption(Constants.PLAYER).getAsUser().getId();
         List<String> playerOrder =

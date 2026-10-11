@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -24,14 +25,7 @@ class CreateGameButton extends Subcommand {
                         Constants.GAME_FUN_NAME,
                         "Fun name for the channel; a single underscore alone will generate a random name")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8"));
+        addOptions(CommonOptions.playerOptions(true, i -> "Player" + i));
     }
 
     @Override

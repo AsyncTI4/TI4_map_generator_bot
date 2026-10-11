@@ -66,6 +66,16 @@ import ti4.settings.users.UserSettingsManager;
 
 public final class ButtonHelperAbilities {
 
+    private static final Map<String, Integer> AXIS_ORDER_COSTS = Map.of(
+            "axisorderdd", 1,
+            "axisorderddduplicate", 1,
+            "axisordercr", 1,
+            "axisordercrduplicate", 1,
+            "axisordercv", 2,
+            "axisordercvduplicate", 2,
+            "axisorderdn", 3,
+            "axisorderdnduplicate", 3);
+
     @ButtonHandler("dataRecovery_")
     public static void dataRecovery(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -510,10 +520,11 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("mercenariesStep3_")
     public static void mercenariesStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String pos2 = buttonID.split("_")[1];
+        String[] parts = buttonID.split("_");
+        String pos2 = parts[1];
         Tile tile = game.getTileByPosition(pos2);
-        String pos = buttonID.split("_")[2];
-        String fighters = buttonID.split("_")[3];
+        String pos = parts[2];
+        String fighters = parts[3];
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
@@ -532,12 +543,13 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("mercenariesStep4_")
     public static void mercenariesStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String pos2 = buttonID.split("_")[1];
+        String[] parts = buttonID.split("_");
+        String pos2 = parts[1];
         Tile tile = game.getTileByPosition(pos2);
-        String pos = buttonID.split("_")[2];
+        String pos = parts[2];
         Tile tile2 = game.getTileByPosition(pos);
-        String fighters = buttonID.split("_")[3];
-        String faction = buttonID.split("_")[4];
+        String fighters = parts[3];
+        String faction = parts[4];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         RemoveUnitService.removeUnits(event, tile2, game, player.getColor(), fighters + " fighters");
         AddUnitService.addUnits(event, tile, game, p2.getColor(), fighters + " fighters");
@@ -573,7 +585,6 @@ public final class ButtonHelperAbilities {
         trapNames.add("Feint");
         trapNames.add("Gravitic Inhibitor");
         trapNames.add("Account Siphon");
-        // trapNames.add("Saboteurs");
         return trapNames;
     }
 
@@ -605,7 +616,6 @@ public final class ButtonHelperAbilities {
         if (scPlayed > 1
                 && (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1))) {
             scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
-            // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
         }
         if (scPlayed > 2
                 && (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2))) {
@@ -730,16 +740,6 @@ public final class ButtonHelperAbilities {
         String trap = translateNameIntoTrapIDOrReverse(buttonID.split("_")[2]);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         DiscordantStarsHelper.setTrapForPlanet(event, game, planet, trap, player);
-    }
-
-    public static List<String> getPlanetsWithTraps(Game game) {
-        List<String> trappedPlanets = new ArrayList<>();
-        for (String trapName : getTrapNames()) {
-            if (!game.getStoredValue(trapName).isEmpty()) {
-                trappedPlanets.add(game.getStoredValue(trapName));
-            }
-        }
-        return trappedPlanets;
     }
 
     private static List<String> getUnusedTraps(Game game, Player player) {
@@ -1376,8 +1376,9 @@ public final class ButtonHelperAbilities {
 
     @ButtonHandler("exhaustSuperweapon_")
     public static void exhaustSuperweapon(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        String name = buttonID.split("_")[1];
-        String superweapon = "superweapon" + buttonID.split("_")[1];
+        String[] parts = buttonID.split("_");
+        String name = parts[1];
+        String superweapon = "superweapon" + parts[1];
         if (!player.hasRelicReady(superweapon)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
@@ -1389,7 +1390,7 @@ public final class ButtonHelperAbilities {
             }
             if (buttonID.split("_").length < 3
                     || !canUseCaled(game, player)
-                    || !game.getActiveSystem().equals(buttonID.split("_")[2])) {
+                    || !game.getActiveSystem().equals(parts[2])) {
                 MessageHelper.sendEphemeralMessageToEventChannel(
                         event, "Caled cannot target an opposing ship right now.");
                 return;
@@ -1440,7 +1441,7 @@ public final class ButtonHelperAbilities {
             }
             case "caled" -> {
                 ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander(
-                        "id_caled_" + buttonID.split("_")[2], event, player, game);
+                        "id_caled_" + parts[2], event, player, game);
                 return;
             }
             case "availyn" -> {
@@ -1697,26 +1698,11 @@ public final class ButtonHelperAbilities {
 
     public static int getNumberOfDifferentAxisOrdersBought(Player player, Game game) {
         int num = 0;
-        String relicName = "axisorderdd";
-        String extra = "duplicate";
-        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)
-                || ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName + extra)) {
-            num++;
-        }
-        relicName = "axisordercr";
-        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)
-                || ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName + extra)) {
-            num++;
-        }
-        relicName = "axisordercv";
-        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)
-                || ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName + extra)) {
-            num++;
-        }
-        relicName = "axisorderdn";
-        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)
-                || ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName + extra)) {
-            num++;
+        for (String relicName : List.of("axisorderdd", "axisordercr", "axisordercv", "axisorderdn")) {
+            if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName)
+                    || ButtonHelperFactionSpecific.somebodyHasThisRelic(game, relicName + "duplicate")) {
+                num++;
+            }
         }
         return num;
     }
@@ -1725,16 +1711,7 @@ public final class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         int maxCost = player.getCommodities();
 
-        Map<String, Integer> orderDeck = Map.of(
-                "axisorderdd", 1,
-                "axisorderddduplicate", 1,
-                "axisordercr", 1,
-                "axisordercrduplicate", 1,
-                "axisordercv", 2,
-                "axisordercvduplicate", 2,
-                "axisorderdn", 3,
-                "axisorderdnduplicate", 3);
-        for (Map.Entry<String, Integer> order : orderDeck.entrySet()) {
+        for (Map.Entry<String, Integer> order : AXIS_ORDER_COSTS.entrySet()) {
             String orderName = order.getKey();
             int orderCost = order.getValue();
             if (orderCost <= maxCost) {
@@ -1754,16 +1731,7 @@ public final class ButtonHelperAbilities {
     private static List<Button> getReturnableAxisOrders(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
 
-        Map<String, Integer> orderDeck = Map.of(
-                "axisorderdd", 1,
-                "axisorderddduplicate", 1,
-                "axisordercr", 1,
-                "axisordercrduplicate", 1,
-                "axisordercv", 2,
-                "axisordercvduplicate", 2,
-                "axisorderdn", 3,
-                "axisorderdnduplicate", 3);
-        for (Map.Entry<String, Integer> order : orderDeck.entrySet()) {
+        for (Map.Entry<String, Integer> order : AXIS_ORDER_COSTS.entrySet()) {
             String orderName = order.getKey();
 
             if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, orderName)) {
@@ -2068,8 +2036,6 @@ public final class ButtonHelperAbilities {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is doing a simultaneous tactical action with "
                         + game.getActivePlayer().getRepresentation() + ".");
-        // MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use
-        // buttons to move ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }
 
     public static void pillageCheck(Player player, Game game) {
@@ -2532,9 +2498,10 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("mitoMechPlacement_")
     public static void resolveMitosisMechPlacement(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        String uH = buttonID.split("_")[2];
-        String reason = buttonID.split("_")[3];
+        String[] parts = buttonID.split("_");
+        Tile tile = game.getTileByPosition(parts[1]);
+        String uH = parts[2];
+        String reason = parts[3];
         switch (reason) {
             case "mitosis" -> reason = "**Mitosis**";
             case "refit" -> reason = "_Refit Troops_";

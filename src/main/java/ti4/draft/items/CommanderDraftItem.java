@@ -1,29 +1,17 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
-import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-import ti4.service.emoji.TI4Emoji;
 
-public class CommanderDraftItem extends DraftItem {
+public class CommanderDraftItem extends LeaderDraftItem {
 
     public CommanderDraftItem(String itemId) {
         super(DraftCategory.COMMANDER, itemId);
-    }
-
-    @JsonIgnore
-    private LeaderModel getLeader() {
-        return Mapper.getLeader(getItemId());
     }
 
     @JsonIgnore
@@ -32,85 +20,20 @@ public class CommanderDraftItem extends DraftItem {
         return getLongDescriptionImpl();
     }
 
-    @JsonIgnore
     @Override
-    public String getTitle(Game game) {
-        LeaderModel leader = getLeader();
-        return leader.getNameRepresentation();
-    }
-
-    @JsonIgnore
-    @Override
-    public String getShortDescription() {
-        LeaderModel leader = getLeader();
-        if (leader == null) {
-            return getAlias();
-        }
-        return getLeader().getName();
-    }
-
-    @JsonIgnore
-    @Override
-    public String getLongDescriptionImpl() {
-        LeaderModel leader = getLeader();
-        if (leader != null) {
-            return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText() + " **Unlock:** "
-                    + leader.getUnlockCondition();
-        }
-        return "";
-    }
-
-    @JsonIgnore
-    @Override
-    public TI4Emoji getItemEmoji() {
-        LeaderModel leader = getLeader();
-        if (leader != null) {
-            return leader.getLeaderEmoji();
-        }
-        return null;
+    protected String describe(LeaderModel leader, boolean twilightsFall) {
+        return abilityText(leader, false) + " **Unlock:** " + leader.getUnlockCondition();
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.COMMANDER);
-        return allItems;
+        return draftable(DraftCategory.COMMANDER, buildAllItems(factions));
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = new ArrayList<>();
-        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        for (FactionModel faction : factions) {
-            List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) ->
-                    !"commander".equals(allLeaders.get(leader).getType()));
-            for (String leader : leaders) {
-                allItems.add(generate(DraftCategory.COMMANDER, leader));
-            }
-        }
-        return allItems;
+        return buildLeaderItems(DraftCategory.COMMANDER, factions);
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.COMMANDER);
-        return allItems;
-    }
-
-    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
-        for (FactionModel faction : factions) {
-            List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) ->
-                    !"commander".equals(allLeaders.get(leader).getType()));
-            for (String leader : leaders) {
-                if (Arrays.asList(results).contains(leader)) {
-                    continue;
-                }
-                allItems.add(generate(DraftCategory.COMMANDER, leader));
-            }
-        }
-        return allItems;
+        return draftable(DraftCategory.COMMANDER, withoutBanned(buildAllItems(factions), game, "bannedLeaders"));
     }
 }

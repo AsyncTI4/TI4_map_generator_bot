@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -22,9 +23,7 @@ class SetFactionIcon extends GameStateSubcommand {
         addOptions(new OptionData(
                         OptionType.STRING, Constants.FACTION_EMOJI, "Custom emoji to use. Enter jibberish to reset.")
                 .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "YES to override Franken-only setting")
                 .setAutoComplete(true));
     }

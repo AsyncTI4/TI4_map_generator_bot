@@ -150,12 +150,12 @@ public final class DiscordantStarsHelper {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (unitHolder instanceof Planet planet) {
                         if (player.getPlanets().contains(planet.getName())) {
-                            if (!oneMechCheck(planet.getName(), activeMap, player)
+                            if (!hasMechOnPlanet(planet.getName(), activeMap, player)
                                     && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG))
                                             || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {
                                 planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
                                 planet.removeToken(Constants.OLRADIN_MECH_RES_PNG);
-                            } else if (oneMechCheck(planet.getName(), activeMap, player)) {
+                            } else if (hasMechOnPlanet(planet.getName(), activeMap, player)) {
                                 planet.addToken(tokenToAdd);
                                 planet.removeToken(tokenToRemove);
                             }
@@ -192,17 +192,10 @@ public final class DiscordantStarsHelper {
         }
     }
 
-    private static boolean oneMechCheck(String planetName, Game activeMap, Player player) {
-        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
-        if (tile == null) return false;
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-
+    public static boolean hasMechOnPlanet(String planetName, Game game, Player player) {
+        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         String colorID = Mapper.getColorID(player.getColor());
-        if (unitHolder.getUnits() != null) {
-            numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-        }
-        return numMechs == 1;
+        return tile != null && tile.getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, colorID) >= 1;
     }
 
     public static void handleOlradinPoliciesWhenExhaustingPlanets(Game game, Player player, String planet) {

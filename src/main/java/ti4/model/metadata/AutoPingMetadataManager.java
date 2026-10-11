@@ -2,51 +2,32 @@ package ti4.model.metadata;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import ti4.json.PersistenceManager;
-import ti4.logging.BotLogger;
+import ti4.json.JsonFileStore;
 
 @UtilityClass
 public class AutoPingMetadataManager {
 
-    private static final String AUTO_PING_FILE = "AutoPing.json";
+    private static final JsonFileStore<AutoPings> store =
+            new JsonFileStore<>("AutoPing.json", AutoPings.class, () -> new AutoPings(new HashMap<>()));
     private static final Duration MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS = Duration.ofMinutes(1);
     private static final Cache<String, Boolean> recentlyDelayedGameNames = Caffeine.newBuilder()
             .expireAfterWrite(MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS)
             .build();
 
     public static synchronized void setupAutoPing(String gameName) {
-        AutoPings autoPings = readFile();
-        if (autoPings == null) {
-            autoPings = new AutoPings(new HashMap<>());
-        }
-
-        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0, false));
-
-        persistFile(autoPings);
+        putAutoPing(store.readOrEmpty(), gameName, 0, false);
     }
 
     public static synchronized void addPing(String gameName) {
-        AutoPings autoPings = readFile();
-        if (autoPings == null) {
-            autoPings = new AutoPings(new HashMap<>());
-        }
-
+        AutoPings autoPings = store.readOrEmpty();
         AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
-        if (autoPing == null) {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 1, false));
-        } else {
-            autoPings.gameNameToAutoPing.put(
-                    gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1, false));
-        }
-
-        persistFile(autoPings);
+        putAutoPing(autoPings, gameName, autoPing == null ? 1 : autoPing.pingCount + 1, false);
     }
 
     public static void delayPing(String gameName) {
@@ -57,76 +38,40 @@ public class AutoPingMetadataManager {
     }
 
     private static synchronized void persistDelayedPing(String gameName) {
-        AutoPings autoPings = readFile();
+        AutoPings autoPings = store.read();
         if (autoPings == null) {
             return;
         }
-
         AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
         if (autoPing == null) {
             return;
         }
-
-        autoPings.gameNameToAutoPing.put(
-                gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, autoPing.quickPing));
-
-        persistFile(autoPings);
+        putAutoPing(autoPings, gameName, autoPing.pingCount, autoPing.quickPing);
     }
 
     public static synchronized void setupQuickPing(String gameName) {
-        AutoPings autoPings = readFile();
-        if (autoPings == null) {
-            autoPings = new AutoPings(new HashMap<>());
-        }
-
+        AutoPings autoPings = store.readOrEmpty();
         AutoPing autoPing = autoPings.gameNameToAutoPing.get(gameName);
-        if (autoPing == null) {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0, true));
-        } else {
-            autoPings.gameNameToAutoPing.put(
-                    gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, true));
-        }
+        putAutoPing(autoPings, gameName, autoPing == null ? 0 : autoPing.pingCount, true);
+    }
 
-        persistFile(autoPings);
+    private static void putAutoPing(AutoPings autoPings, String gameName, int pingCount, boolean quickPing) {
+        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), pingCount, quickPing));
+        store.write(autoPings);
     }
 
     public static synchronized void remove(List<String> gameNames) {
-        AutoPings autoPings = readFile();
+        AutoPings autoPings = store.read();
         if (autoPings == null) {
             return;
         }
-
         gameNames.forEach(autoPings.gameNameToAutoPing::remove);
-
-        persistFile(autoPings);
+        store.write(autoPings);
     }
 
     @Nullable
     public static synchronized AutoPing getLatestAutoPing(String gameName) {
-        AutoPings autoPings = readFile();
-        if (autoPings == null) {
-            autoPings = new AutoPings(new HashMap<>());
-        }
-
-        return autoPings.gameNameToAutoPing.get(gameName);
-    }
-
-    private static AutoPings readFile() {
-        try {
-            AutoPings autoPings = PersistenceManager.readObjectFromJsonFile(AUTO_PING_FILE, AutoPings.class);
-            return autoPings != null ? autoPings : new AutoPings(new HashMap<>());
-        } catch (IOException e) {
-            BotLogger.error("Failed to read json data for AutoPings.", e);
-            return null;
-        }
-    }
-
-    private static void persistFile(AutoPings toPersist) {
-        try {
-            PersistenceManager.writeObjectToJsonFile(AUTO_PING_FILE, toPersist);
-        } catch (Exception e) {
-            BotLogger.error("Failed to write json data for AutoPings.", e);
-        }
+        return store.readOrEmpty().gameNameToAutoPing.get(gameName);
     }
 
     private record AutoPings(Map<String, AutoPing> gameNameToAutoPing) {}

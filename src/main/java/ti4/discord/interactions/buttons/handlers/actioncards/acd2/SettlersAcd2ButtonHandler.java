@@ -107,9 +107,7 @@ class SettlersAcd2ButtonHandler {
         }
 
         if ("allow".equals(choice)) {
-            game.setStoredValue("coexistFlag", "yes");
-            AddUnitService.addUnits(event, tile, game, acting.getColor(), "2 infantry " + planet);
-            game.removeStoredValue("coexistFlag");
+            AddUnitService.addUnitsInCoexistence(event, tile, game, acting.getColor(), "2 infantry " + planet);
             ButtonHelperAbilities.oceanBoundCheck(game);
             MessageHelper.sendMessageToChannel(
                     acting.getCorrectChannel(),

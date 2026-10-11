@@ -5,22 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.Data;
-import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Helper;
-import ti4.helpers.Storage;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 
 @Data
-public class GalacticEventModel implements ModelInterface, EmbeddableModel {
-    @Getter
+public class GalacticEventModel implements ModelInterface, SearchTaggedModel {
     private String alias;
-
-    @Getter
     private String name;
 
     private String text;
@@ -58,12 +53,6 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
 
     public int getComplexity() {
         return complexity == null ? 1 : complexity;
-    }
-
-    public String complexityImagePath() {
-        String basepath = Storage.getResourcePath() + "/extra/complexity";
-        int complexity = Math.clamp(getComplexity(), 1, 3);
-        return basepath + complexity + ".png";
     }
 
     public String complexityString() {
@@ -115,14 +104,8 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         }
 
         eb.setColor(Color.black);
-        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
+        if (includeID) eb.setFooter(compactIdFooter(alias));
         return eb.build();
-    }
-
-    public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

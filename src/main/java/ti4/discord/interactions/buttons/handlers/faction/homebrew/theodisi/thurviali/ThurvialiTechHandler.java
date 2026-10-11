@@ -230,17 +230,8 @@ public class ThurvialiTechHandler {
         }
         UnitKey placedUnitKey = new UnitKey(unit.getUnitType(), player.getColorID());
         int existingUnits = planet.getUnitCount(placedUnitKey);
-        String coexistenceFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        try {
-            AddUnitService.addUnits(event, tile, game, player.getColor(), unit.getAsyncId() + " " + planet.getName());
-        } finally {
-            if (coexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", coexistenceFlag);
-            }
-        }
+        AddUnitService.addUnitsInCoexistence(
+                event, tile, game, player.getColor(), unit.getAsyncId() + " " + planet.getName());
         if (planet.getUnitCount(placedUnitKey) <= existingUnits) {
             ButtonHelper.deleteMessage(event);
             return;

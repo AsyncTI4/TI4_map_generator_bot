@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -21,12 +23,10 @@ class ExplorePlanet extends GameStateSubcommand {
 
     public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore")
-                .setRequired(true)
-                .setAutoComplete(true));
+        markSuspicious();
+        addOptions(CommonOptions.planet("Planet to explore"));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
         addOptions(new OptionData(
                 OptionType.STRING,
                 Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ,
@@ -42,11 +42,9 @@ class ExplorePlanet extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Planet not found in map");
             return;
         }
-        Tile tile = game.getTileFromPlanet(planetName);
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event, game.getTileFromPlanet(planetName), "System not found that contains planet");
+        if (tile == null) return;
         planetName = PlanetService.getPlanet(tile, AliasHandler.resolvePlanet(planetName));
         PlanetModel planet = Mapper.getPlanet(planetName);
         if (Optional.ofNullable(planet).isEmpty()) {
@@ -70,10 +68,5 @@ class ExplorePlanet extends GameStateSubcommand {
             over = true;
         }
         ExploreService.explorePlanet(event, tile, planetName, drawColor, getPlayer(), false, game, 1, over);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

@@ -20,17 +20,7 @@ import ti4.service.info.UnitInfoService;
 public class AllInfoCommand extends GameStateCommand {
 
     public AllInfoCommand() {
-        super(false, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.ALL_INFO;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Send all available information to your #cards-info thread";
+        super(Constants.ALL_INFO, "Send all available information to your #cards-info thread", false, true);
     }
 
     @Override

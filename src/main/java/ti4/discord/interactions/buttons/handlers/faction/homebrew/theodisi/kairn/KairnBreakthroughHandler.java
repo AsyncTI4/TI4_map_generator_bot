@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.helper.CardIdHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
@@ -175,7 +176,7 @@ public class KairnBreakthroughHandler {
     }
 
     private static String normalizeRelic(String relic) {
-        return relic.replace("extra1", "").replace("extra2", "");
+        return CardIdHelper.stripExtra(relic);
     }
 
     private static List<String> getStoredRelics(Game game, Player player) {

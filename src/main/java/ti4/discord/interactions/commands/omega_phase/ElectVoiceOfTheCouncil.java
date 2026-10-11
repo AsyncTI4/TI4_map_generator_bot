@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.omega_phase;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
@@ -15,8 +16,7 @@ class ElectVoiceOfTheCouncil extends GameStateSubcommand {
                 true,
                 true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to elect as Voice of the Council"))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elect another Faction or Color")
-                        .setAutoComplete(true));
+                .addOptions(CommonOptions.factionColor("Elect another Faction or Color"));
     }
 
     @Override

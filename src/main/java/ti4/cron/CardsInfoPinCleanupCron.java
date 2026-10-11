@@ -9,9 +9,7 @@ import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.logging.BotLogger;
 import ti4.message.CardsInfoPinCleanupService;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CardsInfoPinCleanupCron {
@@ -20,23 +18,18 @@ public class CardsInfoPinCleanupCron {
 
     public static void register() {
         CronManager.scheduleOnce(
-                CardsInfoPinCleanupCron.class, CardsInfoPinCleanupCron::cleanup, MANUAL_ONLY_DELAY_DAYS, TimeUnit.DAYS);
+                CardsInfoPinCleanupCron.class,
+                CronManager.leasedAndLogged(CardsInfoPinCleanupCron.class, CardsInfoPinCleanupCron::cleanup),
+                MANUAL_ONLY_DELAY_DAYS,
+                TimeUnit.DAYS);
     }
 
     private static void cleanup() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running CardsInfoPinCleanupCron.");
-        try {
-            List<String> gameNames = GameManager.getManagedGames().stream()
-                    .filter(ManagedGame::isActive)
-                    .map(ManagedGame::getName)
-                    .toList();
-
-            ConsumeGameUtility.consumeGames(gameNames, CardsInfoPinCleanupCron::cleanupGame, ExecutionLockType.READ);
-        } catch (Exception e) {
-            BotLogger.error("**CardsInfoPinCleanupCron failed.**", e);
-        }
-        BotLogger.logCron("Finished CardsInfoPinCleanupCron.");
+        List<String> gameNames = GameManager.getManagedGames().stream()
+                .filter(ManagedGame::isActive)
+                .map(ManagedGame::getName)
+                .toList();
+        ConsumeGameUtility.consumeGames(gameNames, CardsInfoPinCleanupCron::cleanupGame, ExecutionLockType.READ);
     }
 
     private static void cleanupGame(Game game) {

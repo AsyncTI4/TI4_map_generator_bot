@@ -25,7 +25,6 @@ public class EgressClientManager {
     private static final S3AsyncClient s3AsyncClient =
             S3AsyncClient.builder().region(Region.US_EAST_1).build();
 
-    @Getter
     private static final Properties webProperties;
 
     static {
@@ -36,5 +35,9 @@ public class EgressClientManager {
         } catch (IOException e) {
             BotLogger.error("Could not load web properties.", e);
         }
+    }
+
+    public static String getWebsiteBucket() {
+        return webProperties.getProperty("website.bucket");
     }
 }

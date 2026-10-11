@@ -49,22 +49,6 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(flavorText);
     }
 
-    /**
-     * @deprecated This only exists to support legacy code reliant on String.split(";")
-     */
-    @Deprecated
-    public String getRepresentation() {
-        return String.format(
-                "%s;%s;%s;%s;%s;%s;%s",
-                name,
-                type.toLowerCase(),
-                -1,
-                resolution,
-                text,
-                getAttachmentId().orElse(""),
-                source);
-    }
-
     public String getNameRepresentation() {
         return getTypeEmoji() + " _" + name + "_ " + source.emoji();
     }
@@ -110,7 +94,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
             StringBuilder sb = new StringBuilder();
             if (getAttachmentId().isPresent())
                 sb.append("Attachment: ").append(getAttachmentId().get()).append('\n');
-            sb.append("ID: ").append(id).append("  Source: ").append(source);
+            sb.append(compactIdFooter(id));
             eb.setFooter(sb.toString());
         }
 

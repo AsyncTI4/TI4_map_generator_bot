@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -19,9 +21,7 @@ class HeroPlay extends GameStateSubcommand {
         super(Constants.ACTIVE_LEADER, "Play Hero", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     @Override
@@ -30,13 +30,11 @@ class HeroPlay extends GameStateSubcommand {
         Player player = getPlayer();
         String leader = event.getOption(Constants.LEADER, "hero", OptionMapping::getAsString);
 
-        Leader playerLeader = player.unsafeGetLeader(leader);
-
-        if (playerLeader == null) {
-            MessageHelper.sendMessageToEventChannel(
-                    event, "Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
-            return;
-        }
+        Leader playerLeader = CommandHelper.requireOrReport(
+                event,
+                player.unsafeGetLeader(leader),
+                "Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
+        if (playerLeader == null) return;
 
         if (playerLeader.isLocked()) {
             MessageHelper.sendMessageToEventChannel(

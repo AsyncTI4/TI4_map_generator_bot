@@ -16,17 +16,7 @@ import ti4.service.ShowGameService;
 public class ShowGameCommand extends GameStateCommand {
 
     public ShowGameCommand() {
-        super(false, false);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.SHOW_GAME;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Show selected map";
+        super(Constants.SHOW_GAME, "Show selected map", false, false);
     }
 
     @Override

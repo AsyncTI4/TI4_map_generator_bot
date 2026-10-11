@@ -17,17 +17,11 @@ import ti4.service.info.CardsInfoService;
 public class CardsInfoCommand extends GameStateCommand {
 
     public CardsInfoCommand() {
-        super(false, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.CARDS_INFO;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Send to your `#cards-info` thread: secret objectives, action cards, and promissory notes";
+        super(
+                Constants.CARDS_INFO,
+                "Send to your `#cards-info` thread: secret objectives, action cards, and promissory notes",
+                false,
+                true);
     }
 
     @Override

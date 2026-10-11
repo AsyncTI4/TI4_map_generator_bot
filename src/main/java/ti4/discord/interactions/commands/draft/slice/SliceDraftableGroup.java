@@ -11,6 +11,7 @@ import ti4.discord.interactions.commands.SubcommandGroup;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftTileManager;
@@ -35,6 +36,15 @@ public class SliceDraftableGroup extends SubcommandGroup {
     public static SliceDraftable getDraftable(Game game) {
         DraftManager draftManager = game.getDraftManager();
         return (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
+    }
+
+    static SliceDraftable getDraftableOrReply(SlashCommandInteractionEvent event, Game game) {
+        SliceDraftable draftable = getDraftable(game);
+        if (draftable == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Slice isn't draftable; you may need `/draft manage add_draftable Slice`.");
+        }
+        return draftable;
     }
 
     public static MiltyDraftTile getTileFromOption(SlashCommandInteractionEvent event, String optionName) {

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -21,11 +22,9 @@ class UnrevealPublic extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        OptionMapping option = event.getOption(Constants.PO_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please choose what public objective to unreveal");
-            return;
-        }
+        OptionMapping option = CommandHelper.requireOrReport(
+                event, event.getOption(Constants.PO_ID), "Please choose what public objective to unreveal");
+        if (option == null) return;
 
         boolean unrevealed = game.unrevealPublicObjective(option.getAsInt());
         if (!unrevealed) {

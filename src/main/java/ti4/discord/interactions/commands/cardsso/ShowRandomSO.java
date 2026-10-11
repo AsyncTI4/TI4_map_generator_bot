@@ -3,13 +3,11 @@ package ti4.discord.interactions.commands.cardsso;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Constants;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.message.MessageHelper;
 
@@ -17,12 +15,8 @@ class ShowRandomSO extends GameStateSubcommand {
 
     ShowRandomSO() {
         super("show_random", "Show a Secret Objective to a player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor());
+        addOptions(CommonOptions.factionColor("Source faction or color (default is you)"));
     }
 
     @Override
@@ -36,11 +30,8 @@ class ShowRandomSO extends GameStateSubcommand {
             return;
         }
 
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player otherPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (otherPlayer == null) return;
 
         SecretObjectiveHelper.resolveShowRandomSecretObjective(game, player, otherPlayer, event);
     }

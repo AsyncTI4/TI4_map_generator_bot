@@ -106,7 +106,6 @@ public class MonumentsDSButtonHandler {
     public static void drawAylorAc(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.substring(DRAW_AYLOR_AC.length()));
         if (tile == null
-                || !game.isMonumentsMode()
                 || !MonumentsService.isMonumentReady(game, player, "vaylerian_monument")
                 || !MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "vaylerian_monument", tile)) {
             ButtonHelper.deleteTheOneButton(event);
@@ -123,8 +122,7 @@ public class MonumentsDSButtonHandler {
 
     // Perdition Array
     public static boolean hasVaylerianMonumentCommodityBonus(Game game, Player player) {
-        return game.isMonumentsMode()
-                && MonumentsService.isMonumentOnBoard(game, player, "vaylerian_monument")
+        return MonumentsService.isMonumentOnBoard(game, player, "vaylerian_monument")
                 && MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
                         .anyMatch(tile -> game.getRealPlayers().stream()
                                 .anyMatch(otherPlayer -> otherPlayer != player
@@ -155,13 +153,7 @@ public class MonumentsDSButtonHandler {
     }
 
     public static void offerBountyBrokerage(Game game, Player player, Player target, boolean wasWashed) {
-        if (!game.isMonumentsMode()
-                || player == target
-                || (target.getCommodities() < 1 && (!wasWashed || target.getTg() < 1))
-                || !MonumentsService.isMonumentOnBoard(game, player, "vaden_monument")
-                || player.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) < 1
-                || MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
-                        .noneMatch(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile))) {
+        if (!canUseBountyBrokerage(game, player, target, wasWashed)) {
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -179,20 +171,22 @@ public class MonumentsDSButtonHandler {
                         Buttons.DECLINE));
     }
 
+    private static boolean canUseBountyBrokerage(Game game, Player player, Player target, boolean wasWashed) {
+        return player != target
+                && (target.getCommodities() >= 1 || (wasWashed && target.getTg() >= 1))
+                && MonumentsService.isMonumentOnBoard(game, player, "vaden_monument")
+                && player.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) >= 1
+                && MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
+                        .anyMatch(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile));
+    }
+
     @ButtonHandler(RESOLVE_BB)
     public static void resolveBountyBrokerage(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(RESOLVE_BB.length()).split("\\|", 2);
         String targetFaction = payload[0];
         boolean wasWashed = payload.length > 1 && "washed".equals(payload[1]);
         Player target = targetFaction.isBlank() ? null : game.getPlayerFromColorOrFaction(targetFaction);
-        if (!game.isMonumentsMode()
-                || target == null
-                || target == player
-                || (target.getCommodities() < 1 && (!wasWashed || target.getTg() < 1))
-                || !MonumentsService.isMonumentOnBoard(game, player, "vaden_monument")
-                || player.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) < 1
-                || MonumentsService.getTilesInOrAdjacentToPlayerMonument(game, player).stream()
-                        .noneMatch(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile))) {
+        if (target == null || !canUseBountyBrokerage(game, player, target, wasWashed)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -230,7 +224,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(FLIP_VAULT)
     public static void flipVaultToReliquat(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "rhodun_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "rhodun_monument")) {
             return;
         }
 
@@ -254,7 +248,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(FLIP_RELIQUAT)
     public static void flipReliquatToVault(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "rhodun_monumentback")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "rhodun_monumentback")) {
             return;
         }
 
@@ -526,7 +520,7 @@ public class MonumentsDSButtonHandler {
     @ButtonHandler(REMOVE_NIGHTFALL_CC)
     public static void resolveNightfallCCRemoval(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "lizho_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "lizho_monument")) {
             return;
         }
 
@@ -560,7 +554,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(GAIN_NIGHTFALL_CC)
     public static void resolveNightfallCCGain(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "lizho_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "lizho_monument")) {
             return;
         }
 
@@ -1062,8 +1056,7 @@ public class MonumentsDSButtonHandler {
                         .split("\\|")));
         exhaustedPlanets.removeIf(String::isBlank);
 
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
+        if (!MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
                 || exhaustedPlanets.size() >= 2
                 || planet == null
                 || !player.getReadiedPlanets().contains(planetName)
@@ -1100,8 +1093,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(USE_HALO)
     public static void useVerdantHalo(ButtonInteractionEvent event, Player player, Game game) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
+        if (!MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
                 || !hasTwoReadiedCorePlanets(player, game)) {
             ButtonHelper.deleteTheOneButton(event);
             return;
@@ -1120,8 +1112,7 @@ public class MonumentsDSButtonHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.substring(SELECT_VERDANT_HALO_PLAYER.length()));
         String exhaustedPlanets = game.getStoredValue(VERDANT_HALO_EXHAUSTED_PLANETS + player.getFaction());
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
+        if (!MonumentsService.isMonumentOnBoard(game, player, "gledge_monument")
                 || target == null
                 || exhaustedPlanets.split("\\|").length != 2) {
             ButtonHelper.deleteMessage(event);
@@ -1144,9 +1135,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(USE_TWILIGHT_THRONE)
     public static void resolveTwilightThrone(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "edyn_monument")
-                || !MonumentsService.isMonumentReady(game, player, "edyn_monument")) {
+        if (!MonumentsService.isMonumentReady(game, player, "edyn_monument")) {
             return;
         }
 
@@ -1180,9 +1169,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(USE_CYCLOTRON)
     public static void resolveCyclotron(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "dihmohn_monument")
-                || !MonumentsService.isMonumentReady(game, player, "dihmohn_monument")) {
+        if (!MonumentsService.isMonumentReady(game, player, "dihmohn_monument")) {
             return;
         }
         Tile monumentTile = MonumentsService.getMonumentTile(game, player, "dihmohn_monument");
@@ -1260,17 +1247,8 @@ public class MonumentsDSButtonHandler {
             return;
         }
 
-        String coexistFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-
-        AddUnitService.addUnits(
+        AddUnitService.addUnitsInCoexistence(
                 event, game.getTileFromPlanet(planetName), game, player.getColor(), "1 monument " + planetName);
-
-        if (coexistFlag.isEmpty()) {
-            game.removeStoredValue("coexistFlag");
-        } else {
-            game.setStoredValue("coexistFlag", coexistFlag);
-        }
 
         planet = MonumentsService.getPlayerMonumentPlanet(game, player);
 
@@ -1458,9 +1436,7 @@ public class MonumentsDSButtonHandler {
     }
 
     public static boolean canUseFlorzenStasisProduction(Game game, Player player) {
-        return game.isMonumentsMode()
-                && player.getStasisFighters() > 0
-                && MonumentsService.isMonumentOnBoard(game, player, "florzen_monument");
+        return player.getStasisFighters() > 0 && MonumentsService.isMonumentOnBoard(game, player, "florzen_monument");
     }
 
     public static Button getFlorzenStasisProductionButton(Player player) {
@@ -1683,8 +1659,7 @@ public class MonumentsDSButtonHandler {
 
     // Shades' Den
     public static boolean canUseKolleccMonument(Game game, Player player, Tile tile) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "kollecc_monument")
+        if (!MonumentsService.isMonumentOnBoard(game, player, "kollecc_monument")
                 || MonumentsService.getMonumentTile(game, player, "kollecc_monument") != tile
                 || player.getNomboxTile().getUnitHolders().values().stream()
                         .flatMap(unitHolder -> unitHolder.getUnitKeysForPlayer(player).stream())
@@ -1986,7 +1961,7 @@ public class MonumentsDSButtonHandler {
 
     @ButtonHandler(USE_CONCLAVE)
     public static void resolveAiConclave(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "augurs_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "augurs_monument")) {
             return;
         }
 

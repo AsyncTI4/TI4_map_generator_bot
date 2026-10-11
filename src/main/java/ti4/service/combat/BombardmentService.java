@@ -14,8 +14,8 @@ import ti4.helpers.BombardmentAssignment;
 import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.json.JsonMapperManager;
 import ti4.model.UnitModel;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class BombardmentService {
@@ -65,7 +65,8 @@ public class BombardmentService {
                     new BombardmentAssignment("argentcommander", planet, false, BombardmentAssignmentType.LEADER));
         }
         game.setStoredValue(
-                "assignedBombardment" + player.getFaction(), new ObjectMapper().writeValueAsString(assignments));
+                "assignedBombardment" + player.getFaction(),
+                JsonMapperManager.basic().writeValueAsString(assignments));
     }
 
     private static String getBestBombardablePlanet(Player player, Game game, Tile tile) {

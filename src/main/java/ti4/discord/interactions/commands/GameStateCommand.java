@@ -7,10 +7,28 @@ import ti4.game.Player;
 
 public abstract class GameStateCommand implements ParentCommand, GameStateContainer {
 
+    private final String name;
+    private final String description;
     private final CommandGameState commandGameState;
 
     protected GameStateCommand(boolean saveGame, boolean playerCommand) {
+        this(null, null, saveGame, playerCommand);
+    }
+
+    protected GameStateCommand(String name, String description, boolean saveGame, boolean playerCommand) {
+        this.name = name;
+        this.description = description;
         commandGameState = new CommandGameState(saveGame, playerCommand);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

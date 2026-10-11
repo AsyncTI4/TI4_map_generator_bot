@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.cardsso;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.objectives.DiscardSecretService;
@@ -16,8 +17,7 @@ class DiscardSO extends GameStateSubcommand {
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who discards")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color who discards"));
     }
 
     @Override

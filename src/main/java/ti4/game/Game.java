@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -57,6 +58,7 @@ import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
+import ti4.game.helper.CardIdHelper;
 import ti4.game.helper.StoredValueHelper;
 import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.game.manager.BorderAnomalyManager;
@@ -804,22 +806,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return winners;
     }
 
-    public void storeCommandMessageID(String id) {
-        String currentCommandRecords = getStoredValue("commandRecords");
-        if (currentCommandRecords.isEmpty()) {
-            setStoredValue("commandRecords", id);
-        } else {
-            setStoredValue("commandRecords", currentCommandRecords + "_" + id);
-        }
-        List<String> commandRecordIds = List.of(getStoredValue("commandRecords").split("_"));
-        if (commandRecordIds.size() > 100) {
-            // Prevent the command record string from getting too long.
-            setStoredValue(
-                    "commandRecords",
-                    String.join("_", commandRecordIds.subList(commandRecordIds.size() - 100, commandRecordIds.size())));
-        }
-    }
-
     private boolean meetsVictoryRequirement(Player player) {
         if (player.getTotalVictoryPoints() < getVp()) {
             return false;
@@ -1445,37 +1431,20 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void addPlayersWhoHitPersistentNoAfter(String faction) {
-        String existing = getPlayersWhoHitPersistentNoAfter();
-        if (existing != null && !existing.isEmpty()) existing += "_";
-        setPlayersWhoHitPersistentNoAfter(existing + faction);
+        setPlayersWhoHitPersistentNoAfter(StoredValueHelper.appendToList(getPlayersWhoHitPersistentNoAfter(), faction));
     }
 
     public void addPlayersWhoHitPersistentNoWhen(String faction) {
-        String existing = getPlayersWhoHitPersistentNoWhen();
-        if (existing != null && !existing.isEmpty()) existing += "_";
-        setPlayersWhoHitPersistentNoWhen(existing + faction);
+        setPlayersWhoHitPersistentNoWhen(StoredValueHelper.appendToList(getPlayersWhoHitPersistentNoWhen(), faction));
     }
 
     public void removePlayersWhoHitPersistentNoAfter(String faction) {
-        String existing = getPlayersWhoHitPersistentNoAfter();
-        if (existing != null && !existing.isEmpty()) {
-            if (existing.contains(faction + "_")) {
-                faction += "_";
-            }
-            existing = existing.replace(faction, "");
-        }
-        setPlayersWhoHitPersistentNoAfter(existing);
+        setPlayersWhoHitPersistentNoAfter(
+                StoredValueHelper.removeFromList(getPlayersWhoHitPersistentNoAfter(), faction));
     }
 
     public void removePlayersWhoHitPersistentNoWhen(String faction) {
-        String existing = getPlayersWhoHitPersistentNoWhen();
-        if (existing != null && !existing.isEmpty()) {
-            if (existing.contains(faction + "_")) {
-                faction += "_";
-            }
-            existing = existing.replace(faction, "");
-        }
-        setPlayersWhoHitPersistentNoWhen(existing);
+        setPlayersWhoHitPersistentNoWhen(StoredValueHelper.removeFromList(getPlayersWhoHitPersistentNoWhen(), faction));
     }
 
     public Player getActivePlayer() {
@@ -1493,10 +1462,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         return null;
-    }
-
-    public void setTyrant(Player speaker) {
-        setTyrantUserID(speaker.getUserID());
     }
 
     public Player getTyrant() {
@@ -1569,33 +1534,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return autoPingEnabled;
     }
 
-    private void setSentAgenda(String id) {
-        Collection<Integer> values = sentAgendas.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        sentAgendas.put(id, identifier);
-    }
-
     private int addDiscardAgenda(String id) {
-        Collection<Integer> values = discardAgendas.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        discardAgendas.put(id, identifier);
-        return identifier;
+        return CardIdHelper.putWithUnusedId(discardAgendas, id);
     }
 
     public int discardEvent(String eventID) {
-        Collection<Integer> values = discardedEvents.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        discardedEvents.put(eventID, identifier);
-        return identifier;
+        return CardIdHelper.putWithUnusedId(discardedEvents, eventID);
     }
 
     private void addRevealedPublicObjective(String id) {
@@ -1646,17 +1590,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Map.Entry<String, Integer> revealStage1() {
-        if (publicObjectives1Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
-            return revealNextPublicObjective(publicObjectives1);
-        }
-        return revealNextPublicObjective(publicObjectives1Peekable);
+        return revealStage(publicObjectives1, publicObjectives1Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2() {
-        if (publicObjectives2Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
-            return revealNextPublicObjective(publicObjectives2);
+        return revealStage(publicObjectives2, publicObjectives2Peekable);
+    }
+
+    private Map.Entry<String, Integer> revealStage(List<String> deck, List<String> peekable) {
+        if (peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
+            return revealNextPublicObjective(deck);
         }
-        return revealNextPublicObjective(publicObjectives2Peekable);
+        return revealNextPublicObjective(peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2Random() {
@@ -1770,14 +1715,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void swapPublicObjectiveOut(int stage1Or2, int place, String id) {
-        String removed;
-        if (stage1Or2 == 1) {
-            removed = publicObjectives1Peekable.remove(place);
-            publicObjectives1Peekable.add(place, id);
-        } else {
-            removed = publicObjectives2Peekable.remove(place);
-            publicObjectives2Peekable.add(place, id);
-        }
+        List<String> peekable = stage1Or2 == 1 ? publicObjectives1Peekable : publicObjectives2Peekable;
+        String removed = peekable.set(place, id);
         addPublicObjectiveToDeck(removed);
     }
 
@@ -1788,26 +1727,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public String getTopPublicObjective(int stage1Or2) {
-        String id;
-        if (stage1Or2 == 1) {
-            id = publicObjectives1.getFirst();
-            publicObjectives1.remove(id);
-        } else {
-            id = publicObjectives2.getFirst();
-            publicObjectives2.remove(id);
-        }
-        return id;
+        return (stage1Or2 == 1 ? publicObjectives1 : publicObjectives2).removeFirst();
     }
 
     private void addPublicObjectiveToDeck(String id) {
         if (Mapper.getPublicObjective(id) == null) return;
-        if (isStage1PublicObjective(id)) {
-            publicObjectives1.add(id);
-            Collections.shuffle(publicObjectives1);
-        } else {
-            publicObjectives2.add(id);
-            Collections.shuffle(publicObjectives2);
-        }
+        shuffleIntoObjectiveDeck(id);
+    }
+
+    private void shuffleIntoObjectiveDeck(String id) {
+        List<String> deck = isStage1PublicObjective(id) ? publicObjectives1 : publicObjectives2;
+        deck.add(id);
+        Collections.shuffle(deck);
     }
 
     private Entry<String, Integer> revealNextPublicObjective(List<String> objectives) {
@@ -1821,12 +1752,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!removedFromDeck) return null;
 
         addRevealedPublicObjective(objective);
-        for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
-            if (entry.getKey().equals(objective)) {
-                return entry;
-            }
-        }
-        return null;
+        return CardIdHelper.entryForKey(revealedPublicObjectives, objective);
     }
 
     public Entry<String, Integer> revealSecretObjective() {
@@ -1834,35 +1760,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         String id = getSecretObjectives().getFirst();
         removeSOFromGame(id);
         addToSoToPoList(id);
-        addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
-        for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
-            if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
-                return entry;
-            }
-        }
-        return null;
+        String name = Mapper.getSecretObjectivesJustNames().get(id);
+        addCustomPO(name, 1);
+        return CardIdHelper.entryForKey(revealedPublicObjectives, name);
     }
 
     public boolean shuffleObjectiveBackIntoDeck(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(idNumber)) {
-                id = po.getKey();
-                break;
-            }
-        }
+        String id = CardIdHelper.keyForId(revealedPublicObjectives, idNumber);
         if (id.isEmpty()) return false;
 
         revealedPublicObjectives.remove(id);
-        if (isStage1PublicObjective(id)) {
-            publicObjectives1Peeked.remove(id);
-            publicObjectives1.add(id);
-            Collections.shuffle(publicObjectives1);
-        } else {
-            publicObjectives2Peeked.remove(id);
-            publicObjectives2.add(id);
-            Collections.shuffle(publicObjectives2);
-        }
+        (isStage1PublicObjective(id) ? publicObjectives1Peeked : publicObjectives2Peeked).remove(id);
+        shuffleIntoObjectiveDeck(id);
         return true;
     }
 
@@ -1872,13 +1781,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean unrevealPublicObjective(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(idNumber)) {
-                id = po.getKey();
-                break;
-            }
-        }
+        String id = CardIdHelper.keyForId(revealedPublicObjectives, idNumber);
         if (id.isEmpty()) return false;
 
         PublicObjectiveModel publicObjective = Mapper.getPublicObjective(id);
@@ -1921,46 +1824,21 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!isCustodiansScored()) {
             return null;
         }
-        String idC = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(0)) {
-                idC = po.getKey();
-                break;
-            }
-        }
-        if (!idC.isEmpty()) {
-            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
-            if (!scoredPlayerList.isEmpty()) {
-                String playerID = scoredPlayerList.getFirst();
-                for (Player player : getRealAndEliminatedPlayers()) {
-                    if (player.getUserID().equalsIgnoreCase(playerID)) {
-                        return player.getFaction();
-                    }
-                }
-            }
-        }
-
-        return null;
+        Player taker = getCustodiansTakerPlayer();
+        return taker == null ? null : taker.getFaction();
     }
 
     public boolean doesSomeoneControlRex() {
-        boolean custodiansTaken = false;
         for (Player p : getRealPlayersNDummies()) {
             if (p.controlsMecatol(false)) {
                 return true;
             }
         }
-        return custodiansTaken;
+        return false;
     }
 
     public Player getCustodiansTakerPlayer() {
-        String idC = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(0)) {
-                idC = po.getKey();
-                break;
-            }
-        }
+        String idC = CardIdHelper.keyForId(revealedPublicObjectives, 0);
         if (!idC.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
             if (!scoredPlayerList.isEmpty()) {
@@ -1987,13 +1865,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (isLiberationC4Mode()) {
             return true;
         }
-        String idC = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(0)) {
-                idC = po.getKey();
-                break;
-            }
-        }
+        String idC = CardIdHelper.keyForId(revealedPublicObjectives, 0);
         if (!idC.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
             for (String playerID : players.keySet()) {
@@ -2003,23 +1875,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
             }
         }
-
-        for (Player p : getRealPlayersNDummies()) {
-            if (p.controlsMecatol(false)) {
-                return true;
-            }
-        }
-        return custodiansTaken;
+        return doesSomeoneControlRex() || custodiansTaken;
     }
 
     public boolean scorePublicObjective(String userID, Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(idNumber)) {
-                id = po.getKey();
-                break;
-            }
-        }
+        String id = CardIdHelper.keyForId(revealedPublicObjectives, idNumber);
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
             if (!Constants.CUSTODIAN.equals(id)
@@ -2040,15 +1900,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean unscorePublicObjective(String userID, Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(idNumber)) {
-                id = po.getKey();
-                break;
-            }
-        }
-
-        return unscorePublicObjective(userID, id);
+        return unscorePublicObjective(userID, CardIdHelper.keyForId(revealedPublicObjectives, idNumber));
     }
 
     public boolean unscorePublicObjective(String userID, String id) {
@@ -2076,22 +1928,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean removeCustomPO(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(idNumber)) {
-                id = po.getKey();
-                break;
-            }
-        }
-        return removeCustomPO(id);
+        return removeCustomPO(CardIdHelper.keyForId(revealedPublicObjectives, idNumber));
     }
 
     public boolean removeCustomPO(String id) {
         if (!id.isEmpty() && customPublicVP.containsKey(id)) {
-            revealedPublicObjectives.remove(id);
-            soToPoList.remove(id);
-            customPublicVP.remove(id);
-            scoredPublicObjectives.remove(id);
+            removeRevealedObjective(id);
             return true;
         }
         return false;
@@ -2233,242 +2075,114 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean addEventInEffect(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> event : discardedEvents.entrySet()) {
-            if (event.getValue().equals(idNumber)) {
-                id = event.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            Collection<Integer> values = eventsInEffect.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
-            while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
-            }
-            discardedEvents.remove(id);
-            eventsInEffect.put(id, identifier);
-            return true;
-        }
-        return false;
+        String id = CardIdHelper.keyForId(discardedEvents, idNumber);
+        if (id.isEmpty()) return false;
+        discardedEvents.remove(id);
+        CardIdHelper.putWithUnusedId(eventsInEffect, id);
+        return true;
     }
 
     public boolean addLaw(Integer idNumber, String optionalText) {
-        String id = "";
-        for (Entry<String, Integer> agendas : discardAgendas.entrySet()) {
-            if (agendas.getValue().equals(idNumber)) {
-                id = agendas.getKey();
-                break;
-            }
-        }
-        return addLaw(id, optionalText);
+        return addLaw(CardIdHelper.keyForId(discardAgendas, idNumber), optionalText);
     }
 
     public boolean addLaw(String id, String optionalText) {
-        if (!id.isEmpty()) {
-            Collection<Integer> values = laws.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
-            while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
-            }
-            discardAgendas.remove(id);
-            laws.put(id, identifier);
-            if (optionalText != null) {
-                lawsInfo.put(id, optionalText);
-            }
-            if (laws.size() > 2) {
-                for (Player p : getRealPlayers()) {
-                    if (p.getSecretsUnscored().containsKey("dp")) {
-                        MessageHelper.sendMessageToChannel(
-                                p.getCardsInfoThread(),
-                                p.getRepresentationUnfogged()
-                                        + ", a reminder that you have _Dictate Policy_, and a 3rd law just got put into play.");
-                    }
+        if (id.isEmpty()) return false;
+        enactLaw(id, optionalText);
+        if (laws.size() > 2) {
+            for (Player p : getRealPlayers()) {
+                if (p.getSecretsUnscored().containsKey("dp")) {
+                    MessageHelper.sendMessageToChannel(
+                            p.getCardsInfoThread(),
+                            p.getRepresentationUnfogged()
+                                    + ", a reminder that you have _Dictate Policy_, and a 3rd law just got put into play.");
                 }
             }
-            MonumentsTEButtonHandler.offerKeleresMonumentCommandToken(this);
-            return true;
         }
-        return false;
+        MonumentsTEButtonHandler.offerKeleresMonumentCommandToken(this);
+        return true;
+    }
+
+    private void enactLaw(String id, String optionalText) {
+        discardAgendas.remove(id);
+        CardIdHelper.putWithUnusedId(laws, id);
+        if (optionalText != null) {
+            lawsInfo.put(id, optionalText);
+        }
     }
 
     public boolean reviseLaw(Integer idNumber, String optionalText) {
-        String id = "";
-        for (Entry<String, Integer> ac : laws.entrySet()) {
-            if (ac.getValue().equals(idNumber)) {
-                id = ac.getKey();
-                break;
-            }
-        }
+        String id = CardIdHelper.keyForId(laws, idNumber);
         if (!id.isEmpty()) {
             if ("warrant".equalsIgnoreCase(id)) {
-                for (Player p2 : getRealPlayers()) {
-                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
-                        p2.setSearchWarrant(false);
-                    }
-                }
+                removeSearchWarrant(id);
             }
             laws.remove(id);
             lawsInfo.remove(id);
             idNumber = addDiscardAgenda(id);
         }
-        for (Entry<String, Integer> agendas : discardAgendas.entrySet()) {
-            if (agendas.getValue().equals(idNumber)) {
-                id = agendas.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            Collection<Integer> values = laws.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
-            while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
-            }
-            discardAgendas.remove(id);
-            laws.put(id, identifier);
-            if (optionalText != null) {
-                lawsInfo.put(id, optionalText);
-            }
-            return true;
-        }
-        return false;
+        id = CardIdHelper.keyForId(discardAgendas, idNumber);
+        if (id.isEmpty()) return false;
+        enactLaw(id, optionalText);
+        return true;
     }
 
     public boolean shuffleEventBackIntoDeck(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> event : discardedEvents.entrySet()) {
-            if (event.getValue().equals(idNumber)) {
-                id = event.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            discardedEvents.remove(id);
-            getEvents().add(id);
-            shuffleEvents();
-            return true;
-        }
-        return false;
+        return shuffleIntoDeck(discardedEvents, CardIdHelper.keyForId(discardedEvents, idNumber), getEvents());
     }
 
     public void shuffleAllAgendasBackIntoDeck() {
-        List<String> discardedAgendasIDs = new ArrayList<>(discardAgendas.keySet());
-        for (String id : discardedAgendasIDs) {
-            discardAgendas.remove(id);
-            getAgendas().add(id);
-            shuffleAgendas();
-        }
+        if (discardAgendas.isEmpty()) return;
+        getAgendas().addAll(discardAgendas.keySet());
+        discardAgendas.clear();
+        shuffleAgendas();
     }
 
     public boolean shuffleAgendaBackIntoDeck(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> agendas : discardAgendas.entrySet()) {
-            if (agendas.getValue().equals(idNumber)) {
-                id = agendas.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            discardAgendas.remove(id);
-            getAgendas().add(id);
-            shuffleAgendas();
-            return true;
-        }
-        return false;
+        return shuffleIntoDeck(discardAgendas, CardIdHelper.keyForId(discardAgendas, idNumber), getAgendas());
+    }
+
+    private static boolean shuffleIntoDeck(Map<String, Integer> discard, String id, List<String> deck) {
+        if (id.isEmpty()) return false;
+        discard.remove(id);
+        deck.add(id);
+        Collections.shuffle(deck);
+        return true;
+    }
+
+    private static boolean putOnTopOfDeck(Map<String, Integer> discard, String id, List<String> deck) {
+        if (id.isEmpty()) return false;
+        discard.remove(id);
+        deck.addFirst(id);
+        return true;
     }
 
     public boolean putEventBackIntoDeckOnTop(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> event : discardedEvents.entrySet()) {
-            if (event.getValue().equals(idNumber)) {
-                id = event.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            discardedEvents.remove(id);
-            getEvents().addFirst(id);
-            return true;
-        }
-        return false;
+        return putOnTopOfDeck(discardedEvents, CardIdHelper.keyForId(discardedEvents, idNumber), getEvents());
     }
 
     public boolean putAgendaBackIntoDeckOnTop(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> entry : discardAgendas.entrySet()) {
-            if (entry.getValue().equals(idNumber)) {
-                id = entry.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            discardAgendas.remove(id);
-            getAgendas().addFirst(id);
-            return true;
-        }
-        return false;
+        return putAgendaBackIntoDeckOnTop(CardIdHelper.keyForId(discardAgendas, idNumber));
     }
 
     public boolean putAgendaBackIntoDeckOnTop(String id) {
-        if (!id.isEmpty()) {
-            discardAgendas.remove(id);
-            getAgendas().addFirst(id);
-            return true;
-        }
-        return false;
+        return putOnTopOfDeck(discardAgendas, id, getAgendas());
     }
 
     public boolean removeEventInEffect(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> event : eventsInEffect.entrySet()) {
-            if (event.getValue().equals(idNumber)) {
-                id = event.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            eventsInEffect.remove(id);
-            discardEvent(id);
-            return true;
-        }
-        return false;
+        String id = CardIdHelper.keyForId(eventsInEffect, idNumber);
+        if (id.isEmpty()) return false;
+        eventsInEffect.remove(id);
+        discardEvent(id);
+        return true;
     }
 
     public boolean removeLaw(Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> ac : laws.entrySet()) {
-            if (ac.getValue().equals(idNumber)) {
-                id = ac.getKey();
-                break;
-            }
-        }
-        if (id.isEmpty()) {
-            return false;
-        }
-        if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
-            VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
-            return true;
-        }
-        if ("warrant".equalsIgnoreCase(id)) {
-            for (Player p2 : getRealPlayers()) {
-                if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
-                    p2.setSearchWarrant(false);
-                }
-            }
-        }
+        String id = CardIdHelper.keyForId(laws, idNumber);
         if ("censure".equalsIgnoreCase(id)) {
-            Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
-            for (Entry<String, Integer> entry : customPOs.entrySet()) {
-                if (entry.getKey().toLowerCase().contains("political censure")) {
-                    removeCustomPO(entry.getValue());
-                }
-            }
+            removeCensuredObjectives();
         }
-
-        laws.remove(id);
-        lawsInfo.remove(id);
-        addDiscardAgenda(id);
-        return true;
+        return removeLaw(id);
     }
 
     public boolean removeLaw(String id) {
@@ -2510,6 +2224,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (customPublicVP.get("Political Censure") == null) {
             return;
         }
+        removeCensuredObjectives();
+    }
+
+    private void removeCensuredObjectives() {
         Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
         for (Entry<String, Integer> entry : customPOs.entrySet()) {
             if (entry.getKey().toLowerCase().contains("political censure")) {
@@ -2519,137 +2237,72 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean putEventTop(Integer idNumber, Player player) {
-        if (player.getEvents().containsValue(idNumber)) {
-            String id = "";
-            for (Entry<String, Integer> event : player.getEvents().entrySet()) {
-                if (event.getValue().equals(idNumber)) {
-                    id = event.getKey();
-                    break;
-                }
-            }
-            if (!id.isEmpty()) {
-                getEvents().addFirst(id);
-                player.removeEvent(id);
-                return true;
-            }
-        }
-        return false;
+        return returnPlayerEventToDeck(idNumber, player, true);
     }
 
     public boolean putEventBottom(Integer idNumber, Player player) {
-        if (player.getEvents().containsValue(idNumber)) {
-            String id = "";
-            for (Entry<String, Integer> event : player.getEvents().entrySet()) {
-                if (event.getValue().equals(idNumber)) {
-                    id = event.getKey();
-                    break;
-                }
-            }
-            if (!id.isEmpty()) {
-                getEvents().add(id);
-                player.removeEvent(id);
-                return true;
-            }
+        return returnPlayerEventToDeck(idNumber, player, false);
+    }
+
+    private boolean returnPlayerEventToDeck(Integer idNumber, Player player, boolean onTop) {
+        String id = CardIdHelper.keyForId(player.getEvents(), idNumber);
+        if (id.isEmpty()) return false;
+        if (onTop) {
+            getEvents().addFirst(id);
+        } else {
+            getEvents().add(id);
         }
-        return false;
+        player.removeEvent(id);
+        return true;
     }
 
     public boolean putAgendaTop(Integer idNumber) {
-        if (sentAgendas.containsValue(idNumber)) {
-            String id = "";
-            for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
-                if (entry.getValue().equals(idNumber)) {
-                    id = entry.getKey();
-                    break;
-                }
-            }
-            if (!id.isEmpty()) {
-                getAgendas().remove(id);
-                getAgendas().addFirst(id);
-                sentAgendas.remove(id);
-                return true;
-            }
-        }
-        return false;
+        String id = CardIdHelper.keyForId(sentAgendas, idNumber);
+        if (id.isEmpty()) return false;
+        getAgendas().remove(id);
+        getAgendas().addFirst(id);
+        sentAgendas.remove(id);
+        return true;
     }
 
     public boolean putAgendaBottom(Integer idNumber) {
-        if (sentAgendas.containsValue(idNumber)) {
-            String id = "";
-            for (Entry<String, Integer> ac : sentAgendas.entrySet()) {
-                if (ac.getValue().equals(idNumber)) {
-                    id = ac.getKey();
-                    break;
-                }
-            }
-            if (!id.isEmpty()) {
-                getAgendas().remove(id);
-                getAgendas().add(id);
-                sentAgendas.remove(id);
-                return true;
-            }
-        }
-        return false;
+        return putAgendaBottom(CardIdHelper.keyForId(sentAgendas, idNumber));
     }
 
     public boolean putAgendaBottom(String id) {
-        if (!id.isEmpty()) {
-            getAgendas().remove(id);
-            getAgendas().add(id);
-            sentAgendas.remove(id);
-            return true;
-        }
-        return false;
+        if (!moveToBottom(getAgendas(), id)) return false;
+        sentAgendas.remove(id);
+        return true;
+    }
+
+    private static boolean moveToBottom(List<String> deck, String id) {
+        if (id.isEmpty()) return false;
+        deck.remove(id);
+        deck.add(id);
+        return true;
     }
 
     public boolean putExploreBottom(String id) {
-        if (!id.isEmpty()) {
-            explore.remove(id);
-            explore.add(id);
-            return true;
-        }
-        return false;
+        return moveToBottom(explore, id);
     }
 
     public boolean putRelicBottom(String id) {
-        if (!id.isEmpty()) {
-            relics.remove(id);
-            relics.add(id);
-            return true;
-        }
-        return false;
+        return moveToBottom(relics, id);
     }
 
     public boolean putACBottom(String id) {
-        if (!id.isEmpty()) {
-            getActionCards().remove(id);
-            getActionCards().add(id);
-            return true;
-        }
-        return false;
+        return moveToBottom(getActionCards(), id);
     }
 
     public boolean putSOBottom(String id) {
-        if (!id.isEmpty()) {
-            getSecretObjectives().remove(id);
-            getSecretObjectives().add(id);
-            return true;
-        }
-        return false;
+        return moveToBottom(getSecretObjectives(), id);
     }
 
     @Nullable
     public Entry<String, Integer> drawAgenda() {
-        if (!getAgendas().isEmpty()) {
-            for (String id : getAgendas()) {
-                if (!sentAgendas.containsKey(id)) {
-                    setSentAgenda(id);
-                    for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
-                        if (entry.getKey().equals(id)) {
-                            return entry;
-                        }
-                    }
-                }
+        for (String id : getAgendas()) {
+            if (!sentAgendas.containsKey(id)) {
+                return sendAgenda(id);
             }
         }
         return null;
@@ -2657,16 +2310,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Nullable
     public Map.Entry<String, Integer> drawSpecificAgenda(String agendaID) {
-        if (!getAgendas().isEmpty()) {
-            for (String id : getAgendas()) {
-                if (agendaID.equalsIgnoreCase(id)) {
-                    setSentAgenda(id);
-                    for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
-                        if (entry.getKey().equals(id)) {
-                            return entry;
-                        }
-                    }
-                }
+        for (String id : getAgendas()) {
+            if (agendaID.equalsIgnoreCase(id)) {
+                return sendAgenda(id);
             }
         }
         return null;
@@ -2674,20 +2320,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Nullable
     public Entry<String, Integer> drawBottomAgenda() {
-        if (!getAgendas().isEmpty()) {
-            for (int i = getAgendas().size() - 1; i >= 0; i--) {
-                String id = getAgendas().get(i);
-                if (!sentAgendas.containsKey(id)) {
-                    setSentAgenda(id);
-                    for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
-                        if (entry.getKey().equals(id)) {
-                            return entry;
-                        }
-                    }
-                }
+        for (String id : getAgendas().reversed()) {
+            if (!sentAgendas.containsKey(id)) {
+                return sendAgenda(id);
             }
         }
         return null;
+    }
+
+    private Entry<String, Integer> sendAgenda(String id) {
+        CardIdHelper.putWithUnusedId(sentAgendas, id);
+        return CardIdHelper.entryForKey(sentAgendas, id);
     }
 
     public String lookAtTopAgenda(int index) {
@@ -2737,11 +2380,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean discardSpecificAgenda(String agendaID) {
-        boolean succeeded = getAgendas().remove(agendaID);
-        if (succeeded) {
-            addDiscardAgenda(agendaID);
-        }
-        return succeeded;
+        return revealAgenda(agendaID, false);
     }
 
     public String getNextAgenda(boolean revealFromBottom) {
@@ -2839,17 +2478,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private static List<String> getExplores(String reqType, List<String> superDeck) {
-        List<String> deck = new ArrayList<>();
-        for (String id : superDeck) {
-            ExploreModel card = Mapper.getExplore(id);
-            if (card != null) {
-                String type = card.getType();
-                if (reqType.equalsIgnoreCase(type)) {
-                    deck.add(id);
-                }
-            }
-        }
-        return deck;
+        return superDeck.stream()
+                .filter(id -> isExploreOfType(id, reqType))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private static boolean isExploreOfType(String id, String reqType) {
+        ExploreModel card = Mapper.getExplore(id);
+        return card != null && reqType.equalsIgnoreCase(card.getType());
     }
 
     public List<String> getExploreDeck(String reqType) {
@@ -2884,41 +2520,29 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public List<TechnologyModel> getPropulsionTechDeck() {
-        return getTechnologyDeck().stream()
-                .map(Mapper::getTech)
-                .filter(TechnologyModel::isPropulsionTech)
-                .sorted(TechnologyModel.sortByTechRequirements)
-                .toList();
+        return getTechDeck(TechnologyModel::isPropulsionTech);
     }
 
     public List<TechnologyModel> getWarfareTechDeck() {
-        return getTechnologyDeck().stream()
-                .map(Mapper::getTech)
-                .filter(TechnologyModel::isWarfareTech)
-                .sorted(TechnologyModel.sortByTechRequirements)
-                .toList();
+        return getTechDeck(TechnologyModel::isWarfareTech);
     }
 
     public List<TechnologyModel> getCyberneticTechDeck() {
-        return getTechnologyDeck().stream()
-                .map(Mapper::getTech)
-                .filter(TechnologyModel::isCyberneticTech)
-                .sorted(TechnologyModel.sortByTechRequirements)
-                .toList();
+        return getTechDeck(TechnologyModel::isCyberneticTech);
     }
 
     public List<TechnologyModel> getBioticTechDeck() {
-        return getTechnologyDeck().stream()
-                .map(Mapper::getTech)
-                .filter(TechnologyModel::isBioticTech)
-                .sorted(TechnologyModel.sortByTechRequirements)
-                .toList();
+        return getTechDeck(TechnologyModel::isBioticTech);
     }
 
     public List<TechnologyModel> getUnitUpgradeTechDeck() {
+        return getTechDeck(TechnologyModel::isUnitUpgrade);
+    }
+
+    private List<TechnologyModel> getTechDeck(Predicate<TechnologyModel> filter) {
         return getTechnologyDeck().stream()
                 .map(Mapper::getTech)
-                .filter(TechnologyModel::isUnitUpgrade)
+                .filter(filter)
                 .sorted(TechnologyModel.sortByTechRequirements)
                 .toList();
     }
@@ -2978,38 +2602,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void resetExploresOfCertainType(String reqType) {
-        List<String> deck = new ArrayList<>(explore);
-        for (String id : deck) {
-            ExploreModel card = Mapper.getExplore(id);
-            if (card != null) {
-                String type = card.getType();
-                if (reqType.equalsIgnoreCase(type)) {
-                    explore.remove(id);
-                }
-            }
-        }
-        deck = new ArrayList<>(discardExplore);
-        for (String id : deck) {
-            ExploreModel card = Mapper.getExplore(id);
-            if (card != null) {
-                String type = card.getType();
-                if (reqType.equalsIgnoreCase(type)) {
-                    discardExplore.remove(id);
-                }
-            }
-        }
-        deck = new ArrayList<>(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
-        List<String> deck2 =
+        explore.removeIf(id -> isExploreOfType(id, reqType));
+        discardExplore.removeIf(id -> isExploreOfType(id, reqType));
+        List<String> deck =
                 new ArrayList<>(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
-        for (String id : deck2) {
-            ExploreModel card = Mapper.getExplore(id);
-            if (card != null) {
-                String type = card.getType();
-                if (!reqType.equalsIgnoreCase(type) || id.contains("starchart") || id.contains("mirage")) {
-                    deck.remove(id);
-                }
-            }
-        }
+        deck.removeIf(id -> Mapper.getExplore(id) != null
+                && (!isExploreOfType(id, reqType) || id.contains("starchart") || id.contains("mirage")));
         Collections.shuffle(deck);
         explore.addAll(deck);
     }
@@ -3206,12 +2804,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private void setDiscardActionCard(String id, ACStatus status, boolean played) {
-        Collection<Integer> values = getDiscardActionCards().values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        getDiscardActionCards().put(id, identifier);
+        CardIdHelper.putWithUnusedId(getDiscardActionCards(), id);
         if (status != null) getDiscardACStatus().put(id, status);
         if (played) {
             getPlayedActionCards().add(id);
@@ -3241,14 +2834,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (player == null) {
             return false;
         }
-        Map<String, Integer> actionCards = player.getActionCards();
-        String acID = "";
-        for (Entry<String, Integer> ac : actionCards.entrySet()) {
-            if (ac.getValue().equals(acIDNumber)) {
-                acID = ac.getKey();
-                break;
-            }
-        }
+        String acID = CardIdHelper.keyForId(player.getActionCards(), acIDNumber);
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
@@ -3268,14 +2854,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (player == null) {
             return false;
         }
-        Map<String, Integer> actionCards = player.getActionCards();
-        String acID = "";
-        for (Entry<String, Integer> ac : actionCards.entrySet()) {
-            if (ac.getValue().equals(acIDNumber)) {
-                acID = ac.getKey();
-                break;
-            }
-        }
+        String acID = CardIdHelper.keyForId(player.getActionCards(), acIDNumber);
         if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
             for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
                 if (ac.getValue().equals(acIDNumber) && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
@@ -3303,55 +2882,36 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean pickActionCard(String userID, Integer acIDNumber) {
-        Player player = getPlayer(userID);
-        if (player == null) {
-            return false;
-        }
-        String acID = "";
-        for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-            ACStatus status = getDiscardACStatus().get(ac.getKey());
-            if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
-                acID = ac.getKey();
-                break;
-            }
-        }
-        if (!acID.isEmpty()) {
-            removeFromDiscard(acID);
-            player.setActionCard(acID);
-            return true;
-        }
-        return false;
+        return pickActionCardFromDiscard(userID, acIDNumber, false);
     }
 
     public boolean pickActionCardFromPurged(String userID, Integer acIDNumber) {
+        return pickActionCardFromDiscard(userID, acIDNumber, true);
+    }
+
+    private boolean pickActionCardFromDiscard(String userID, Integer acIDNumber, boolean purged) {
         Player player = getPlayer(userID);
         if (player == null) {
             return false;
         }
         String acID = "";
-        for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-            ACStatus status = getDiscardACStatus().get(ac.getKey());
-            if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
+        for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+            boolean isPurged = getDiscardACStatus().get(ac.getKey()) == ACStatus.purged;
+            if (ac.getValue().equals(acIDNumber) && isPurged == purged) {
                 acID = ac.getKey();
                 break;
             }
         }
-        if (!acID.isEmpty()) {
-            removeFromDiscard(acID);
-            player.setActionCard(acID);
-            return true;
+        if (acID.isEmpty()) {
+            return false;
         }
-        return false;
+        removeFromDiscard(acID);
+        player.setActionCard(acID);
+        return true;
     }
 
     public boolean shuffleActionCardBackIntoDeck(Integer acIDNumber) {
-        String acID = "";
-        for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-            if (ac.getValue().equals(acIDNumber)) {
-                acID = ac.getKey();
-                break;
-            }
-        }
+        String acID = CardIdHelper.keyForId(getDiscardActionCards(), acIDNumber);
         if (!acID.isEmpty()) {
             removeFromDiscard(acID);
             getActionCards().add(acID);
@@ -3365,14 +2925,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         Player player = getPlayer(userID);
         if (player == null) return false;
 
-        Map<String, Integer> actionCards = player.getActionCards();
-        String acId = "";
-        for (Entry<String, Integer> ac : actionCards.entrySet()) {
-            if (ac.getValue().equals(acIdNumber)) {
-                acId = ac.getKey();
-                break;
-            }
-        }
+        String acId = CardIdHelper.keyForId(player.getActionCards(), acIdNumber);
         if (acId.isEmpty()) return false;
 
         player.removeActionCard(acIdNumber);
@@ -3383,91 +2936,53 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player == null) {
+        String soID = player == null ? "" : CardIdHelper.keyForId(player.getSecrets(), soIDNumber);
+        if (soID.isEmpty()) {
             return false;
         }
-        Map<String, Integer> secrets = player.getSecrets();
-        String soID = "";
-        for (Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(soIDNumber)) {
-                soID = so.getKey();
-                break;
-            }
-        }
-        if (!soID.isEmpty()) {
-            player.removeSecret(soIDNumber);
-            player.setSecretScored(soID);
-            return true;
-        }
-        return false;
+        player.removeSecret(soIDNumber);
+        player.setSecretScored(soID);
+        return true;
     }
 
     public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player == null) {
+        String soID = player == null ? "" : CardIdHelper.keyForId(player.getSecretsScored(), soIDNumber);
+        if (soID.isEmpty()) {
             return false;
         }
-        Map<String, Integer> secrets = player.getSecretsScored();
-        String soID = "";
-        for (Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(soIDNumber)) {
-                soID = so.getKey();
-                break;
-            }
-        }
-        if (!soID.isEmpty()) {
-            player.removeSecretScored(soIDNumber);
-            player.setSecret(soID);
-            return true;
-        }
-        return false;
+        player.removeSecretScored(soIDNumber);
+        player.setSecret(soID);
+        return true;
     }
 
     public boolean unscoreAndShuffleSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player == null) {
+        String soID = player == null ? "" : CardIdHelper.keyForId(player.getSecretsScored(), soIDNumber);
+        if (soID.isEmpty()) {
             return false;
         }
-        Map<String, Integer> secrets = player.getSecretsScored();
-        String soID = "";
-        for (Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(soIDNumber)) {
-                soID = so.getKey();
-                break;
-            }
-        }
-        if (!soID.isEmpty()) {
-            player.removeSecretScored(soIDNumber);
-            getSecretObjectives().add(soID);
-            Collections.shuffle(getSecretObjectives());
-            return true;
-        }
-        return false;
+        player.removeSecretScored(soIDNumber);
+        shuffleSecretIntoDeck(soID);
+        return true;
     }
 
     public boolean discardSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player == null) {
+        String soID = player == null ? "" : CardIdHelper.keyForId(player.getSecrets(), soIDNumber);
+        if (soID.isEmpty()) {
             return false;
         }
-        Map<String, Integer> secrets = player.getSecrets();
-        String soID = "";
-        for (Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(soIDNumber)) {
-                soID = so.getKey();
-                break;
-            }
+        player.removeSecret(soIDNumber);
+        if (Mapper.getSecretObjective(soID).getSource() != ComponentSource.erwans_gambit) {
+            shuffleSecretIntoDeck(soID);
         }
-        if (!soID.isEmpty()) {
-            player.removeSecret(soIDNumber);
-            if (Mapper.getSecretObjective(soID).getSource() == ComponentSource.erwans_gambit) {
-                return true;
-            }
-            getSecretObjectives().add(soID);
-            Collections.shuffle(getSecretObjectives());
-            return true;
-        }
-        return false;
+        return true;
+    }
+
+    private void shuffleSecretIntoDeck(String soID) {
+        getSecretObjectives().add(soID);
+        Collections.shuffle(getSecretObjectives());
     }
 
     public List<String> getAllExplores() {
@@ -3719,19 +3234,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean isOverrulePurged() {
         return "true".equals(getStoredValue("removeOverrule"));
-    }
-
-    public void addTeACs() {
-        List<String> oldDeck =
-                new ArrayList<>(Mapper.getDeck("action_cards_pok").getNewShuffledDeck());
-        List<String> newDeck = new ArrayList<>(Mapper.getDeck("action_cards_te").getNewShuffledDeck());
-        for (String ac : oldDeck) {
-            newDeck.remove(ac);
-        }
-        for (String acID : newDeck) {
-            getActionCards().add(acID);
-        }
-        Collections.shuffle(getActionCards());
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {
@@ -5167,20 +4669,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ??
         // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
         return tileMap.values().stream().map(Tile::getHexTileSummary).collect(Collectors.joining(","));
-    }
-
-    public boolean hasUser(User user) {
-        if (user == null) return false;
-        String id = user.getId();
-        for (Player player : players.values()) {
-            if (player.getUserID().equals(id)) {
-                return true;
-            }
-            if (player.getTeamMateIDs().contains(id)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public List<String> peekAtSecrets(int count) {

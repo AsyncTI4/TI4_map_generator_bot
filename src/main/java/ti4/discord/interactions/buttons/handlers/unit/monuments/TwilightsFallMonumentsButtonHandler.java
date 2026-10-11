@@ -18,7 +18,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -38,7 +37,14 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 public class TwilightsFallMonumentsButtonHandler {
     private static final String BLUETF_CAPACITY = "bluetfMonumentCapacity_";
     private static final String ORANGETF_MECHS = "orangetfMonumentMechs_";
-    private static final String YELLOWTF_COMMAND_TOKENS = "yellowtfMonumentCommandTokens_";
+    private static final MonumentCommandTokenPool AURA_VAULT = new MonumentCommandTokenPool(
+            "yellowtf_monument",
+            "yellowtfMonumentCommandTokens_",
+            (game, player) -> player.hasUnit("yellowtf_monument"),
+            "Aura Vault",
+            "**Aura Vault**",
+            "checkYellowTfMonumentTokens",
+            FactionEmojis.yellowtf);
     private static final String YELLOWTF_HIT_CONTEXT = "yellowtfMonumentHitContext_";
 
     // Halo Cortex
@@ -104,9 +110,7 @@ public class TwilightsFallMonumentsButtonHandler {
     }
 
     public static void sendBlueTfMonumentButton(Game game, Player player) {
-        if (game.isMonumentsMode()
-                && player.hasUnit("bluetf_monument")
-                && MonumentsService.isMonumentOnBoard(game, player, "bluetf_monument")) {
+        if (player.hasUnit("bluetf_monument") && MonumentsService.isMonumentOnBoard(game, player, "bluetf_monument")) {
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing() + ", you may use **Caracas**.",
@@ -201,8 +205,7 @@ public class TwilightsFallMonumentsButtonHandler {
     // The Starlit Redoubt
     @ButtonHandler("useOrangeTfMonument")
     public static void useOrangeTfMonument(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !player.hasUnit("orangetf_monument")
+        if (!player.hasUnit("orangetf_monument")
                 || !MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
             return;
         }
@@ -234,7 +237,6 @@ public class TwilightsFallMonumentsButtonHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.replace("selectOrangeTfMonumentTarget_", ""));
         if (target == null
-                || !game.isMonumentsMode()
                 || !player.hasUnit("orangetf_monument")
                 || !MonumentsService.isMonumentOnBoard(game, player, "orangetf_monument")) {
             return;
@@ -300,19 +302,11 @@ public class TwilightsFallMonumentsButtonHandler {
     }
 
     public static int getYellowTfMonumentCommandTokenCount(Game game, Player player) {
-        if (game == null || player == null || !game.isMonumentsMode() || !player.hasUnit("yellowtf_monument")) {
-            return 0;
-        }
-        String storedCount = game.getStoredValue(YELLOWTF_COMMAND_TOKENS + player.getFaction());
-        return storedCount.isBlank() ? 0 : Integer.parseInt(storedCount);
+        return AURA_VAULT.count(game, player);
     }
 
     public static Button getYellowTfMonumentStatusButton(Game game, Player player) {
-        int tokens = getYellowTfMonumentCommandTokenCount(game, player);
-        return Buttons.gray(
-                player.factionButtonChecker() + "checkYellowTfMonumentTokens",
-                "Aura Vault: " + tokens + " Command Token" + (tokens == 1 ? "" : "s"),
-                FactionEmojis.yellowtf);
+        return AURA_VAULT.statusButton(game, player);
     }
 
     public static Button getYellowTfMonumentCancelHitButton(Player player) {
@@ -322,32 +316,15 @@ public class TwilightsFallMonumentsButtonHandler {
                 FactionEmojis.yellowtf);
     }
 
-    private static boolean isInOrAdjacentToYellowTfMonument(Game game, Player player, Tile tile) {
-        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "yellowtf_monument");
-        return monumentTile != null
-                && tile != null
-                && (monumentTile == tile
-                        || FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, false)
-                                .contains(tile.getPosition()));
-    }
-
     public static void addYellowTfMonumentGeneralCombatButton(
             List<Button> buttons, Game game, Player player, Tile tile) {
-        if (getYellowTfMonumentCommandTokenCount(game, player) > 0
-                && isInOrAdjacentToYellowTfMonument(game, player, tile)) {
+        if (AURA_VAULT.canSpendIn(game, player, tile)) {
             buttons.add(getYellowTfMonumentCancelHitButton(player));
         }
     }
 
-    private static boolean canPlaceYellowTfMonumentCommandToken(Game game, Player player) {
-        if (!game.isMonumentsMode() || !player.hasUnit("yellowtf_monument")) {
-            return false;
-        }
-        return Helper.getCCCount(game, player.getColor()) < player.getCommandTokenLimit();
-    }
-
     public static void offerYellowTfMonumentCommandToken(Game game, Player player) {
-        if (!canPlaceYellowTfMonumentCommandToken(game, player)) {
+        if (!AURA_VAULT.canPlace(game, player)) {
             return;
         }
         List<Button> buttons = List.of(
@@ -365,37 +342,22 @@ public class TwilightsFallMonumentsButtonHandler {
 
     @ButtonHandler("placeYellowTfMonumentCommandToken")
     public static void placeYellowTfMonumentCommandToken(ButtonInteractionEvent event, Game game, Player player) {
-        if (!canPlaceYellowTfMonumentCommandToken(game, player)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Aura Vault cannot take a command token right now.");
-            return;
-        }
-        int tokens = getYellowTfMonumentCommandTokenCount(game, player) + 1;
-        game.setStoredValue(YELLOWTF_COMMAND_TOKENS + player.getFaction(), Integer.toString(tokens));
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " placed a command token on **Aura Vault** (" + tokens + ").");
+        AURA_VAULT.place(event, game, player);
     }
 
     @ButtonHandler("checkYellowTfMonumentTokens")
     public static void checkYellowTfMonumentTokens(ButtonInteractionEvent event, Game game, Player player) {
-        int tokens = getYellowTfMonumentCommandTokenCount(game, player);
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "**Aura Vault** has " + tokens + " command token" + (tokens == 1 ? "" : "s") + " on it.");
+        AURA_VAULT.check(event, game, player);
     }
 
     public static void addYellowTfMonumentCancelHitButton(
             List<Button> buttons, Game game, Player player, Tile tile, String hitType, int hits) {
-        if (!game.isMonumentsMode()
-                || !player.hasUnit("yellowtf_monument")
+        if (!player.hasUnit("yellowtf_monument")
                 || !MonumentsService.isMonumentOnBoard(game, player, "yellowtf_monument")) {
             return;
         }
         game.removeStoredValue(YELLOWTF_HIT_CONTEXT + player.getFaction());
-        if (hits < 1
-                || getYellowTfMonumentCommandTokenCount(game, player) < 1
-                || !isInOrAdjacentToYellowTfMonument(game, player, tile)) {
+        if (hits < 1 || !AURA_VAULT.canSpendIn(game, player, tile)) {
             return;
         }
         if ("ground".equals(hitType)) {
@@ -437,14 +399,10 @@ public class TwilightsFallMonumentsButtonHandler {
             return;
         }
         String[] hitType = payload[1].split(":", 2);
-        if (tile == null
-                || hits < 1
-                || getYellowTfMonumentCommandTokenCount(game, player) < 1
-                || !isInOrAdjacentToYellowTfMonument(game, player, tile)) {
+        if (hits < 1 || !AURA_VAULT.canSpendIn(game, player, tile)) {
             return;
         }
-        int remainingTokens = getYellowTfMonumentCommandTokenCount(game, player) - 1;
-        game.setStoredValue(YELLOWTF_COMMAND_TOKENS + player.getFaction(), Integer.toString(remainingTokens));
+        AURA_VAULT.spend(game, player);
         game.removeStoredValue(YELLOWTF_HIT_CONTEXT + player.getFaction());
         int remainingHits = hits - 1;
         if ("ground".equals(hitType[0]) || "space".equals(hitType[0])) {

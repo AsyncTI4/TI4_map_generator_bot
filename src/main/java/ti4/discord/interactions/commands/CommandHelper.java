@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -31,6 +32,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.service.testbed.TestBedService;
 
@@ -182,6 +184,45 @@ public class CommandHelper {
         }
 
         return null;
+    }
+
+    @Nullable
+    public static String cardIdForNumber(Map<String, Integer> cards, Integer number) {
+        return cards.entrySet().stream()
+                .filter(card -> card.getValue().equals(number))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static boolean confirmedWithYes(GenericInteractionCreateEvent event, @Nullable OptionMapping confirmation) {
+        return confirmedWithYes(event, confirmation == null ? null : confirmation.getAsString());
+    }
+
+    public static boolean confirmedWithYes(GenericInteractionCreateEvent event, @Nullable String confirmation) {
+        if ("YES".equals(confirmation)) return true;
+        MessageHelper.replyToMessage(
+                event,
+                "Must confirm with `YES`" + ("YES".equalsIgnoreCase(confirmation) ? " - this is case sensitive" : "")
+                        + ".");
+        return false;
+    }
+
+    @Nullable
+    public static <T> T requireOrReport(SlashCommandInteractionEvent event, @Nullable T value, String message) {
+        if (value == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        }
+        return value;
+    }
+
+    @Nullable
+    public static Player getOtherPlayerOrReply(Game game, SlashCommandInteractionEvent event) {
+        Player target = getOtherPlayerFromEvent(game, event);
+        if (target == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
+        }
+        return target;
     }
 
     // Return game.getRealPlayers() if target is ALL, otherwise supports comma separated list

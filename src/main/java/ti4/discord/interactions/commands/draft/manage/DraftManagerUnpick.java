@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -33,11 +34,9 @@ class DraftManagerUnpick extends GameStateSubcommand {
         DraftableType draftableType = DraftableType.of(
                 event.getOption(Constants.DRAFTABLE_TYPE_OPTION).getAsString());
         String choiceKey = event.getOption(Constants.PLAYER_PICKS_OPTION).getAsString();
-        Draftable draftable = draftManager.getDraftable(draftableType);
-        if (draftable == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No draftable of type: " + draftableType);
-            return;
-        }
+        Draftable draftable = CommandHelper.requireOrReport(
+                event, draftManager.getDraftable(draftableType), "No draftable of type: " + draftableType);
+        if (draftable == null) return;
         List<String> playerIds = draftManager.getPlayersWithChoiceKey(draftableType, choiceKey);
         if (playerIds.isEmpty()) {
             MessageHelper.sendMessageToChannel(

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.AliasHandler;
@@ -16,9 +17,7 @@ class TargetPlanetPing extends GameStateSubcommand {
 
     public TargetPlanetPing() {
         super(Constants.TARGET_PLANET_PING, "Ping a planet as the target of your action card", false, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet you are targeting")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.planet("Planet you are targeting"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.PUBLIC, "Tell everyone who can see it").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD, "Action card you are resolving"));

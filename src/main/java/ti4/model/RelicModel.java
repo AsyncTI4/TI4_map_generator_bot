@@ -110,9 +110,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
 
         // Footer
         StringBuilder footer = new StringBuilder();
-        if (includeID) {
-            footer.append("ID: ").append(alias).append("  Source: ").append(source);
-        }
+        if (includeID) footer.append(compactIdFooter(alias));
         if (isFakeRelic()) footer.append("\nNOTE: NOT ACTUALLY A RELIC");
         if (!footer.isEmpty()) eb.setFooter(footer.toString());
 

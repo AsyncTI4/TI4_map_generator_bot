@@ -10,13 +10,11 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
-import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class SabotageAutoReactCron {
@@ -27,24 +25,19 @@ public class SabotageAutoReactCron {
     public static void register() {
         CronManager.schedulePeriodically(
                 SabotageAutoReactCron.class,
-                SabotageAutoReactCron::autoReact,
+                CronManager.leasedAndLogged(SabotageAutoReactCron.class, SabotageAutoReactCron::autoReact),
                 5,
                 SCHEDULED_PERIOD_MINUTES,
                 TimeUnit.MINUTES);
     }
 
     private static void autoReact() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running SabotageAutoReactCron.");
-
         Map<String, List<GameMessage>> acMessagesByGame = GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
 
         ConsumeGameUtility.consumeGames(
                 acMessagesByGame.keySet(),
                 game -> automaticallyReactToSabotageWindows(game, acMessagesByGame.get(game.getName())),
                 ExecutionLockType.WRITE);
-
-        BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
 
     private static void automaticallyReactToSabotageWindows(Game game, List<GameMessage> acMessages) {

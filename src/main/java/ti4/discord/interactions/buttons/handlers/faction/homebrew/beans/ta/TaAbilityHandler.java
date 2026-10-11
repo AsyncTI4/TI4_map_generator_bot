@@ -21,7 +21,6 @@ import ti4.message.MessageHelper;
 import ti4.model.AttachmentModel;
 import ti4.model.ExploreModel;
 import ti4.service.explore.ExploreService;
-import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class TaAbilityHandler {
@@ -75,21 +74,6 @@ public class TaAbilityHandler {
         }
 
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message.toString());
-    }
-
-    public static int getControlledPlanetCountWithAnyDesign(Player player, Game game) {
-        if (player == null || game == null) {
-            return 0;
-        }
-
-        int count = 0;
-        for (String planetName : player.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planetName);
-            if (tile != null && planetHasAnyDesignAttached(tile, planetName)) {
-                count++;
-            }
-        }
-        return count;
     }
 
     public static void offerPlanetaryReconfigurationButtons(Player player, Game game, Tile tile, String planetName) {
@@ -262,9 +246,7 @@ public class TaAbilityHandler {
             return;
         }
 
-        tile.addToken(tokenPath, planetName);
-        TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetName);
-        CommanderUnlockCheckService.checkPlayer(player, "ta");
+        TaUnitHandler.attachAndOfferTaMechDeploy(event, player, game, tile, planetName, tokenPath);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " attached _" + getDesignName(design) + "_ to "

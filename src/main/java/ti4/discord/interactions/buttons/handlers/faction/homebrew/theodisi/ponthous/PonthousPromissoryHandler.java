@@ -103,12 +103,7 @@ public class PonthousPromissoryHandler {
         // remain populated. The button already carries the exact system in which this combat was started.
         Tile tile = game.getTileByPosition(values[0]);
         UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
-        UnitKey unitKey = holder == null
-                ? null
-                : holder.getUnitKeysForPlayer(player).stream()
-                        .filter(key -> key.asyncID().equals(values[2]))
-                        .findFirst()
-                        .orElse(null);
+        UnitKey unitKey = PonthousTechHandler.findPlayerUnitKey(holder, player, values[2]);
         UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
         if (!canPlayThunderbirdPrototype(game, player, tile)
                 || unitKey == null
@@ -153,12 +148,7 @@ public class PonthousPromissoryHandler {
         if (values.length != 5 || tile == null || !tile.getPosition().equals(values[0])) return null;
 
         UnitHolder holder = tile.getUnitHolders().get(values[1]);
-        UnitKey unitKey = holder == null
-                ? null
-                : holder.getUnitKeysForPlayer(player).stream()
-                        .filter(key -> key.asyncID().equals(values[2]))
-                        .findFirst()
-                        .orElse(null);
+        UnitKey unitKey = PonthousTechHandler.findPlayerUnitKey(holder, player, values[2]);
         UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
         if (unit == null || !unit.getIsGroundForce() || holder.getUnitCount(unitKey) < 1) return null;
         return UnitModelValueInjectionService.injectTemporaryValues(
@@ -185,12 +175,7 @@ public class PonthousPromissoryHandler {
             String[] values = state.split("\\|", 5);
             Tile tile = values.length == 5 ? game.getTileByPosition(values[0]) : null;
             UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
-            UnitKey unitKey = holder == null
-                    ? null
-                    : holder.getUnitKeysForPlayer(player).stream()
-                            .filter(key -> key.asyncID().equals(values[2]))
-                            .findFirst()
-                            .orElse(null);
+            UnitKey unitKey = PonthousTechHandler.findPlayerUnitKey(holder, player, values[2]);
             if (unitKey != null) {
                 int baseline = NumberUtils.toInt(values[3]);
                 int added = NumberUtils.toInt(values[4]);

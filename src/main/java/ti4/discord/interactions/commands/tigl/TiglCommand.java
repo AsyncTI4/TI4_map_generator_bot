@@ -1,30 +1,17 @@
 package ti4.discord.interactions.commands.tigl;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class TiglCommand implements ParentCommand {
+public class TiglCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ChangeNickname(), new IsFractured(), new Games(), new ReportManually())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.TIGL;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Twilight Imperium Global League";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public TiglCommand() {
+        super(
+                Constants.TIGL,
+                "Twilight Imperium Global League",
+                new ChangeNickname(),
+                new IsFractured(),
+                new Games(),
+                new ReportManually());
     }
 }

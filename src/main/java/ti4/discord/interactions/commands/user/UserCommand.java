@@ -1,40 +1,24 @@
 package ti4.discord.interactions.commands.user;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class UserCommand implements ParentCommand {
+public class UserCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ShowUserSettings(),
-                    new SetPreferredColourList(),
-                    new SetPersonalPingInterval(),
-                    new SetPingOnNextTurn(),
-                    new OfferAFKTimeOptions(),
-                    new Survey(),
-                    new MessageMyGames(),
-                    new SetPreferredSettings(),
-                    new WipeTurnTime(),
-                    new SetFowFilter(),
-                    new SetFogGhostHexes())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.USER;
-    }
-
-    @Override
-    public String getDescription() {
-        return "User";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public UserCommand() {
+        super(
+                Constants.USER,
+                "User",
+                new ShowUserSettings(),
+                new SetPreferredColourList(),
+                new SetPersonalPingInterval(),
+                new SetPingOnNextTurn(),
+                new OfferAFKTimeOptions(),
+                new Survey(),
+                new MessageMyGames(),
+                new SetPreferredSettings(),
+                new WipeTurnTime(),
+                new SetFowFilter(),
+                new SetFogGhostHexes());
     }
 }

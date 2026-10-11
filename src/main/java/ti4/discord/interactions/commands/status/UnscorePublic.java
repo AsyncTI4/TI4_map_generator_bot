@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.status;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,9 +18,7 @@ class UnscorePublic extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which to score Public Objective"));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
@@ -37,14 +38,7 @@ class Undo extends GameStateSubcommand {
             return;
         }
 
-        OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(
-                    event,
-                    "Must confirm with `YES`"
-                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
-            return;
-        }
+        if (!CommandHelper.confirmedWithYes(event, event.getOption(Constants.CONFIRM))) return;
 
         String gameToUndoBackTo = event.getOption(Constants.UNDO_TO_COMMAND, null, OptionMapping::getAsString);
         if (gameToUndoBackTo == null || gameToUndoBackTo.isEmpty()) {

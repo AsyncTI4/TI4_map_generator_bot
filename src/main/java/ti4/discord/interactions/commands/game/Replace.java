@@ -44,6 +44,7 @@ class Replace extends GameStateSubcommand {
 
     Replace() {
         super(Constants.REPLACE, "Replace player in game", true, false);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
                 .setAutoComplete(true)
                 .setRequired(true));
@@ -315,10 +316,5 @@ class Replace extends GameStateSubcommand {
                         .replaceAll("-{2,}", "-"))
                 .replaceAll("");
         return name;
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

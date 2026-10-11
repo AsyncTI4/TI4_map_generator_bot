@@ -134,9 +134,8 @@ public class VanguardBreakthroughHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        game.setStoredValue("coexistFlag", "yes");
-        AddUnitService.addUnits(event, tile, game, game.getNeutral().getColor(), "1 infantry " + planet.getName());
-        game.removeStoredValue("coexistFlag");
+        AddUnitService.addUnitsInCoexistence(
+                event, tile, game, game.getNeutral().getColor(), "1 infantry " + planet.getName());
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " placed 1 neutral infantry on " + planet.getRepresentation(game)

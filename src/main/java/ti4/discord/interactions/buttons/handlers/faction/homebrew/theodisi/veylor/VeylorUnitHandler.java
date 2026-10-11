@@ -14,10 +14,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Units.UnitType;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -79,10 +78,10 @@ public class VeylorUnitHandler {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
-                                if (!oneMechCheck(planet.getName(), activeMap, player)
+                                if (!DiscordantStarsHelper.hasMechOnPlanet(planet.getName(), activeMap, player)
                                         && ((planet.getTokenList().contains(tokenToAddOrRemove)))) {
                                     planet.removeToken(tokenToAddOrRemove);
-                                } else if (oneMechCheck(planet.getName(), activeMap, player)) {
+                                } else if (DiscordantStarsHelper.hasMechOnPlanet(planet.getName(), activeMap, player)) {
                                     planet.addToken(tokenToAddOrRemove);
                                 }
                             }
@@ -91,18 +90,5 @@ public class VeylorUnitHandler {
                 }
             }
         }
-    }
-
-    private static boolean oneMechCheck(String planetName, Game activeMap, Player player) {
-        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
-        if (tile == null) return false;
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-
-        String colorID = Mapper.getColorID(player.getColor());
-        if (unitHolder.getUnits() != null) {
-            numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-        }
-        return numMechs >= 1;
     }
 }

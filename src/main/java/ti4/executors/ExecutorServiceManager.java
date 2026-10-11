@@ -35,34 +35,25 @@ public class ExecutorServiceManager {
             runnable = ExecutionLockManager.wrapWithTryLockAndRelease(lockName, lockType, runnable, messageChannel);
         }
 
-        var timedRunnable = new TimedRunnable(taskName, runnable);
-        runAsync(timedRunnable);
+        runAsync(new TimedRunnable(taskName, runnable));
     }
 
     public static void runAsyncWithLock(String taskName, Runnable runnable) {
-        if (CircuitBreaker.isOpen()) {
-            return;
-        }
-        var lockReleaseRunnable =
-                ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockType.WRITE, runnable);
-        var timedRunnable = new TimedRunnable(taskName, lockReleaseRunnable);
-        runAsync(timedRunnable);
+        runAsync(taskName, ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockType.WRITE, runnable));
     }
 
     public static void runAsync(String name, Runnable runnable) {
         if (CircuitBreaker.isOpen()) {
             return;
         }
-        var timedRunnable = new TimedRunnable(name, runnable);
-        runAsync(timedRunnable);
+        runAsync(new TimedRunnable(name, runnable));
     }
 
     public static void runAsync(String name, int executionTimeWarningThresholdSeconds, Runnable runnable) {
         if (CircuitBreaker.isOpen()) {
             return;
         }
-        var timedRunnable = new TimedRunnable(name, executionTimeWarningThresholdSeconds, runnable);
-        runAsync(timedRunnable);
+        runAsync(new TimedRunnable(name, executionTimeWarningThresholdSeconds, runnable));
     }
 
     private static void runAsync(TimedRunnable timedRunnable) {

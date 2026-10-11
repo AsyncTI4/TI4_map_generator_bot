@@ -1,6 +1,5 @@
 package ti4.model.metadata;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,41 +10,36 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.json.PersistenceManager;
-import ti4.logging.BotLogger;
+import ti4.json.JsonFileStore;
 
 @UtilityClass
 public class TechSummariesMetadataManager {
 
-    private static final String TECH_SUMMARIES_FILE = "TechSummaries.json";
+    private static final JsonFileStore<TechSummaries> store =
+            new JsonFileStore<>("TechSummaries.json", TechSummaries.class, () -> new TechSummaries(new HashMap<>()));
 
     public static synchronized void addTech(Game game, Player player, String techId, boolean isResearchAgreement) {
         if (game.isFowMode() || game.isHomebrewSCMode()) {
             return;
         }
 
-        TechSummaries techSummaries = readFile();
+        TechSummaries techSummaries = store.read();
         if (techSummaries == null) {
             return;
         }
 
-        RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary.computeIfAbsent(
-                game.getName(), _ -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
-        if (roundTechSummaries.round != game.getRound()) {
-            roundTechSummaries = new RoundTechSummaries(game.getRound(), new ArrayList<>());
-            techSummaries.gameNameToTechSummary.put(game.getName(), roundTechSummaries);
-        }
+        RoundTechSummaries existing = techSummaries.gameNameToTechSummary.get(game.getName());
+        RoundTechSummaries roundTechSummaries = existing != null && existing.round == game.getRound()
+                ? existing
+                : new RoundTechSummaries(game.getRound(), new ArrayList<>());
+        techSummaries.gameNameToTechSummary.put(game.getName(), roundTechSummaries);
 
         FactionTechSummary factionTechSummary = roundTechSummaries.techSummaries.stream()
                 .filter(summary -> summary.faction.equals(player.getFaction()))
                 .findFirst()
                 .orElseGet(() -> {
                     var newFactionTechSummary = new FactionTechSummary(player.getFaction());
-                    techSummaries
-                            .gameNameToTechSummary
-                            .get(game.getName())
-                            .techSummaries
-                            .add(newFactionTechSummary);
+                    roundTechSummaries.techSummaries.add(newFactionTechSummary);
                     return newFactionTechSummary;
                 });
 
@@ -55,31 +49,13 @@ public class TechSummariesMetadataManager {
             factionTechSummary.addTech(techId);
         }
 
-        persistFile(techSummaries);
+        store.write(techSummaries);
     }
 
     public static synchronized void consumeAndPersist(Consumer<TechSummaries> consumer) {
-        TechSummaries techSummaries = readFile();
+        TechSummaries techSummaries = store.read();
         consumer.accept(techSummaries);
-        persistFile(techSummaries);
-    }
-
-    private static TechSummaries readFile() {
-        try {
-            var techSummary = PersistenceManager.readObjectFromJsonFile(TECH_SUMMARIES_FILE, TechSummaries.class);
-            return techSummary != null ? techSummary : new TechSummaries(new HashMap<>());
-        } catch (IOException e) {
-            BotLogger.error("Failed to read json data for TechSummaries.", e);
-            return null;
-        }
-    }
-
-    private static void persistFile(TechSummaries toPersist) {
-        try {
-            PersistenceManager.writeObjectToJsonFile(TECH_SUMMARIES_FILE, toPersist);
-        } catch (Exception e) {
-            BotLogger.error("Failed to write json data for TechSummaries.", e);
-        }
+        store.write(techSummaries);
     }
 
     public record TechSummaries(Map<String, RoundTechSummaries> gameNameToTechSummary) {}

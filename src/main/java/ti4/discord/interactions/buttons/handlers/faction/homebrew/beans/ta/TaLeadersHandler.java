@@ -20,7 +20,6 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 public class TaLeadersHandler {
@@ -136,10 +135,8 @@ public class TaLeadersHandler {
             String attachment = explore.getAttachmentId().get();
             String attachmentPath = Mapper.getAttachmentImagePath(attachment);
             if (attachmentPath != null) {
-                tile.addToken(attachmentPath, parts[0]);
                 game.purgeExplore(cardID);
-                TaUnitHandler.offerTaMechDeploy(event, target, game, tile, parts[0]);
-                CommanderUnlockCheckService.checkPlayer(target, "ta");
+                TaUnitHandler.attachAndOfferTaMechDeploy(event, target, game, tile, parts[0], attachmentPath);
                 MessageHelper.sendMessageToChannel(
                         target.getCorrectChannel(),
                         target.getRepresentationUnfogged() + " attached _"
@@ -322,9 +319,7 @@ public class TaLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        tile.addToken(tokenPath, planetName);
-        TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetName);
-        CommanderUnlockCheckService.checkPlayer(player, "ta");
+        TaUnitHandler.attachAndOfferTaMechDeploy(event, player, game, tile, planetName, tokenPath);
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

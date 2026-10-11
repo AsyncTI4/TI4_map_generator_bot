@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -56,11 +57,9 @@ class PlayEvent extends GameStateSubcommand {
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElse(null);
-        EventModel eventModel = Mapper.getEvent(eventID);
-        if (eventModel == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Event ID `" + eventID + "` could not be found.");
-            return;
-        }
+        EventModel eventModel = CommandHelper.requireOrReport(
+                event, Mapper.getEvent(eventID), "Event ID `" + eventID + "` could not be found.");
+        if (eventModel == null) return;
 
         playEventFromHand(event, getGame(), player, eventModel);
     }

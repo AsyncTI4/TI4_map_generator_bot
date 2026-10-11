@@ -1,51 +1,33 @@
 package ti4.discord.interactions.commands.search;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.apache.commons.lang3.function.Consumers;
+import java.util.stream.Stream;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.logging.BotLogger;
 import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
 
-class SearchGenomesSubcommand extends SearchComponentModelSubcommand {
+class SearchGenomesSubcommand extends SearchComponentModelSubcommand<LeaderModel> {
 
     SearchGenomesSubcommand() {
-        super(Constants.SEARCH_GENOMES, "List all genomes (Twilight's Fall agents) the bot can use");
+        super(
+                Constants.SEARCH_GENOMES,
+                "List all genomes (Twilight's Fall agents) the bot can use",
+                s -> Mapper.isValidLeader(s) && Mapper.getLeader(s).isGenome(),
+                Mapper::getLeader,
+                SearchGenomesSubcommand::allGenomes,
+                model -> model.getRepresentationEmbed(true, true, false, true, true),
+                null);
     }
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-
-        if (Mapper.isValidLeader(searchString)) {
-            LeaderModel leaderModel = Mapper.getLeader(searchString);
-            if (leaderModel.isGenome()) {
-                event.getChannel()
-                        .sendMessageEmbeds(leaderModel.getRepresentationEmbed(true, true, false, true, true))
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                return;
-            }
-        }
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        messageEmbeds.addAll(Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
-                .map(Mapper::getLeader)
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(LeaderModel::getId))
-                .map(model -> model.getRepresentationEmbed(true, true, false, true, true))
-                .toList());
-        messageEmbeds.addAll(Mapper.getLeaders().values().stream()
-                .filter(model -> model.searchSource(ComponentSource.tk_nova_cup) && model.search(searchString, source))
-                .sorted(Comparator.comparing(LeaderModel::getId))
-                .map(model -> model.getRepresentationEmbed(true, true, false, true, true))
-                .toList());
-        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
+    private static Stream<LeaderModel> allGenomes() {
+        Comparator<LeaderModel> byId = Comparator.comparing(LeaderModel::getId);
+        return Stream.concat(
+                Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
+                        .map(Mapper::getLeader)
+                        .sorted(byId),
+                Mapper.getLeaders().values().stream()
+                        .filter(model -> model.searchSource(ComponentSource.tk_nova_cup))
+                        .sorted(byId));
     }
 }

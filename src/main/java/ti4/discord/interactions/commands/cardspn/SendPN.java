@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardPromissoryHandler;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -29,12 +30,8 @@ class SendPN extends GameStateSubcommand {
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory note ID, which is found between (), or name/part of name")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor());
+        addOptions(CommonOptions.factionColor("Source faction or color (default is you)"));
     }
 
     @Override
@@ -76,18 +73,13 @@ class SendPN extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
             return;
         }
-        PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(id);
-        if (pnModel == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such promissory note found, please retry.");
-            return;
-        }
+        PromissoryNoteModel pnModel = CommandHelper.requireOrReport(
+                event, Mapper.getPromissoryNotes().get(id), "No such promissory note found, please retry.");
+        if (pnModel == null) return;
 
         Game game = getGame();
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player targetPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (targetPlayer == null) return;
 
         Player pnOwner = game.getPNOwner(id);
         if (player.getPromissoryNotesInPlayArea().contains(id)) {

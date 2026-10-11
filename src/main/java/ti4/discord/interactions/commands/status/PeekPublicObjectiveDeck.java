@@ -22,6 +22,7 @@ class PeekPublicObjectiveDeck extends GameStateSubcommand {
 
     PeekPublicObjectiveDeck() {
         super("po_peek", "Peek Public Objective Deck", false, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, STAGE_COMMAND_NAME, "1 or 2").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Number of cards to peek."));
     }
@@ -44,10 +45,5 @@ class PeekPublicObjectiveDeck extends GameStateSubcommand {
 
         Player player = getPlayer();
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), null, publicObjectiveEmbedMessages);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

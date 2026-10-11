@@ -3,8 +3,8 @@ package ti4.discord.interactions.commands.ds;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -27,23 +27,18 @@ class ZelianHero extends GameStateSubcommand {
 
     public ZelianHero() {
         super(Constants.ZELIAN_HERO, "Celestial Impact a system (replace with Zelian Asteroid field)", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(new OptionData(
-                        OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using Zelian R, the Zelian heRo")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName());
+        addOptions(CommonOptions.factionColor("Faction or Color using Zelian R, the Zelian heRo"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileID = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
-        Tile tile = TileHelper.getTile(event, tileID, getGame());
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event,
+                TileHelper.getTile(event, tileID, getGame()),
+                "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+        if (tile == null) return;
 
         secondHalfOfCelestialImpact(getPlayer(), event, tile, getGame());
     }

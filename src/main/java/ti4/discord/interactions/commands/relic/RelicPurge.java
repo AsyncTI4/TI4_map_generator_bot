@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -20,8 +21,7 @@ class RelicPurge extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to purge")
                 .setAutoComplete(true)
                 .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override

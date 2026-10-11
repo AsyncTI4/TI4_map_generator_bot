@@ -11,6 +11,7 @@ class RemoveLaw extends GameStateSubcommand {
 
     RemoveLaw() {
         super(Constants.REMOVE_LAW, "Remove Law", true, false);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -25,10 +26,5 @@ class RemoveLaw extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

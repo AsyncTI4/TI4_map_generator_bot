@@ -1,13 +1,11 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
 import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -45,48 +43,16 @@ public class UnitDraftItem extends DraftItem {
         UnitModel unit = getUnit();
         StringBuilder sb = new StringBuilder();
         if (unit.getCost() > 0) {
-            sb.append("Cost: ");
-            float cost = unit.getCost();
-            sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
+            sb.append("Cost: ").append(UnitDescription.cost(unit));
         }
         if (unit.getCombatHitsOn() > 0) {
-            sb.append(" Combat: ");
-            sb.append(unit.getCombatHitsOn());
-            if (unit.getCombatDieCount() > 1) {
-                sb.append("x").append(unit.getCombatDieCount());
-            }
+            UnitDescription.appendCombat(sb, unit);
             sb.append(' ');
         }
-
-        if (unit.getSustainDamage()) {
-            sb.append("SUSTAIN DAMAGE ");
-        }
-        if (unit.getAfbDieCount() > 0) {
-            sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x")
-                    .append(unit.getAfbDieCount())
-                    .append(' ');
-        }
-        if (unit.getSpaceCannonDieCount() > 0) {
-            sb.append("SPACE CANNON ")
-                    .append(unit.getSpaceCannonHitsOn())
-                    .append("x")
-                    .append(unit.getSpaceCannonDieCount())
-                    .append(' ');
-        }
-        if (unit.getBombardDieCount() > 0) {
-            sb.append("BOMBARDMENT ")
-                    .append(unit.getBombardHitsOn())
-                    .append("x")
-                    .append(unit.getBombardDieCount())
-                    .append(' ');
-        }
-        if (unit.getProductionValue() > 0) {
-            sb.append("PRODUCTION ");
-            sb.append(unit.getProductionValue());
-            sb.append(' ');
-        }
+        UnitDescription.appendSustainAndAfb(sb, unit);
+        UnitDescription.appendDice(sb, "SPACE CANNON", unit.getSpaceCannonHitsOn(), unit.getSpaceCannonDieCount());
+        UnitDescription.appendDice(sb, "BOMBARDMENT", unit.getBombardHitsOn(), unit.getBombardDieCount());
+        UnitDescription.appendProduction(sb, unit);
         if (unit.getCapacityValue() > 0) {
             sb.append("Capacity ");
             sb.append(unit.getCapacityValue());
@@ -111,15 +77,11 @@ public class UnitDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(Game game) {
-        List<DraftItem> allItems = buildAllItems(game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.UNIT, game.isTwilightsFallMode());
-        return allItems;
+        return draftable(DraftCategory.UNIT, buildAllItems(game), game.isTwilightsFallMode());
     }
 
     public static List<DraftItem> buildAllDraftableItems() {
-        List<DraftItem> allItems = buildAllItems();
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.UNIT);
-        return allItems;
+        return draftable(DraftCategory.UNIT, buildAllItems());
     }
 
     public static List<DraftItem> buildAllItems(Game game) {
@@ -131,10 +93,6 @@ public class UnitDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllItems(String deck) {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (String id : Mapper.getDeck(deck).getCardIDs()) {
-            allItems.add(generate(DraftCategory.UNIT, id));
-        }
-        return allItems;
+        return generateAll(DraftCategory.UNIT, Mapper.getDeck(deck).getCardIDs().stream());
     }
 }

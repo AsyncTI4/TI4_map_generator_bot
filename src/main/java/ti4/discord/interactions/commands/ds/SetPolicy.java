@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -38,9 +39,7 @@ class SetPolicy extends GameStateSubcommand {
                         Constants.SET_ECONOMY,
                         "Policy - The Economy: \"Empower ➕\" or \"Exploit ➖\"")
                 .addChoices(economy));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to set Olradin Policies")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color to set Olradin Policies"));
     }
 
     @Override

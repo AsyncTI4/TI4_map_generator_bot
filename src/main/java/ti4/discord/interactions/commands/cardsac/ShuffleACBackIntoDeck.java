@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.cardsac;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.ActionCardHelper;
@@ -28,11 +29,9 @@ class ShuffleACBackIntoDeck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
         Game game = getGame();
-        String acID = ActionCardHelper.getDiscardedAcID(game, acIndex);
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
-            return;
-        }
+        String acID = CommandHelper.requireOrReport(
+                event, ActionCardHelper.getDiscardedAcID(game, acIndex), "No such action card ID found, please retry.");
+        if (acID == null) return;
         boolean picked = game.shuffleActionCardBackIntoDeck(acIndex);
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");

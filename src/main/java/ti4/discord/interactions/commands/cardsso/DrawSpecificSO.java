@@ -16,6 +16,7 @@ class DrawSpecificSO extends GameStateSubcommand {
 
     DrawSpecificSO() {
         super(Constants.DRAW_SPECIFIC_SO, "Draw specific secret objective", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -49,10 +50,5 @@ class DrawSpecificSO extends GameStateSubcommand {
         }
         MessageHelper.sendMessageToEventChannel(event, "Secret objective sent to player's hand");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

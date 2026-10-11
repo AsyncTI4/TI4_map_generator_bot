@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -97,7 +98,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
@@ -106,8 +106,6 @@ import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
-import ti4.model.TechSpecialtyModel.TechSpecialty;
-import ti4.model.TechnologyModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -193,39 +191,20 @@ public final class Helper {
         return false;
     }
 
+    private static Player findRealPlayer(Game game, String id, Predicate<Player> matches) {
+        if (id == null) {
+            return null;
+        }
+        for (Player player : game.getPlayers().values()) {
+            if (player.isRealPlayer() && matches.test(player)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public static Player getPlayerFromAbility(Game game, String ability) {
-        Player player = null;
-        if (ability != null) {
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.isRealPlayer() && player_.hasAbility(ability)) {
-                    player = player_;
-                    break;
-                }
-            }
-        }
-        return player;
-    }
-
-    public static List<Player> getPlayersFromTech(Game game, String tech) {
-        if (tech == null || Mapper.getTech(tech) == null) return Collections.emptyList();
-        List<Player> players = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer() && player.hasTech(tech)) {
-                players.add(player);
-            }
-        }
-        return players;
-    }
-
-    public static List<Player> getPlayersFromReadyTech(Game game, String tech) {
-        if (tech == null || Mapper.getTech(tech) == null) return Collections.emptyList();
-        List<Player> players = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer() && player.hasTechReady(tech)) {
-                players.add(player);
-            }
-        }
-        return players;
+        return findRealPlayer(game, ability, p -> p.hasAbility(ability));
     }
 
     // TODO: (Jazz): This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
@@ -526,42 +505,15 @@ public final class Helper {
     }
 
     public static Player getPlayerFromUnlockedLeader(Game game, String leader) {
-        Player player = null;
-        if (leader != null) {
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.isRealPlayer() && player_.hasLeaderUnlocked(leader)) {
-                    player = player_;
-                    break;
-                }
-            }
-        }
-        return player;
+        return findRealPlayer(game, leader, p -> p.hasLeaderUnlocked(leader));
     }
 
     public static Player getPlayerFromLeader(Game game, String leader) {
-        Player player = null;
-        if (leader != null) {
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.isRealPlayer() && player_.hasLeader(leader)) {
-                    player = player_;
-                    break;
-                }
-            }
-        }
-        return player;
+        return findRealPlayer(game, leader, p -> p.hasLeader(leader));
     }
 
     public static Player getPlayerFromUnit(Game game, String unit) {
-        Player player = null;
-        if (unit != null) {
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.isRealPlayer() && player_.getUnitsOwned().contains(unit)) {
-                    player = player_;
-                    break;
-                }
-            }
-        }
-        return player;
+        return findRealPlayer(game, unit, p -> p.getUnitsOwned().contains(unit));
     }
 
     @Nullable
@@ -761,15 +713,12 @@ public final class Helper {
         if (date1 == null || date1.isEmpty()) {
             return 1000;
         }
-        date1 = date1.replace(".", "_");
-        date2 = date2.replace(".", "_");
-        int year1 = Integer.parseInt(date1.split("_")[0]);
-        int year2 = Integer.parseInt(date2.split("_")[0]);
-        int month1 = Integer.parseInt(date1.split("_")[1]);
-        int month2 = Integer.parseInt(date2.split("_")[1]);
-        int day1 = Integer.parseInt(date1.split("_")[2]);
-        int day2 = Integer.parseInt(date2.split("_")[2]);
-        return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
+        String[] parts1 = date1.replace(".", "_").split("_");
+        String[] parts2 = date2.replace(".", "_").split("_");
+        int years = Integer.parseInt(parts2[0]) - Integer.parseInt(parts1[0]);
+        int months = Integer.parseInt(parts2[1]) - Integer.parseInt(parts1[1]);
+        int days = Integer.parseInt(parts2[2]) - Integer.parseInt(parts1[2]);
+        return years * 365 + months * 30 + days;
     }
 
     @Deprecated
@@ -843,64 +792,56 @@ public final class Helper {
             return "Unable to find planet unitholder for " + planetID;
         }
         boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
-        if (containsDMZ) {
-            return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " ("
-                    + unitHolder.getResources() + "/" + unitHolder.getInfluence() + ") [DMZ]";
-        }
         return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " ("
-                + unitHolder.getResources() + "/" + unitHolder.getInfluence() + ")";
+                + unitHolder.getResources() + "/" + unitHolder.getInfluence() + ")" + (containsDMZ ? " [DMZ]" : "");
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game game) {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
-        } else {
-            StringBuilder techType = new StringBuilder();
-            String techEmoji = "";
-            if (Mapper.getPlanet(planetID) != null
-                    && Mapper.getPlanet(planetID).getTechSpecialties() != null
-                    && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
-                if (Mapper.getPlanet(planetID).getTechSpecialties().size() > 1) {
-                    for (TechSpecialty type : Mapper.getPlanet(planetID).getTechSpecialties()) {
-                        techType.append(type.toString().toLowerCase());
-                    }
-                } else {
-                    techType = new StringBuilder(Mapper.getPlanet(planetID)
-                            .getTechSpecialties()
-                            .getFirst()
-                            .toString()
-                            .toLowerCase());
-                }
-            } else {
-                techType = new StringBuilder(
-                        ButtonHelper.getTechSkipAttachments(game, AliasHandler.resolvePlanet(planetID)));
-            }
-            if (!"".equalsIgnoreCase(techType.toString())) {
-                switch (techType.toString()) {
-                    case "propulsion" -> techEmoji = TechEmojis.PropulsionTech.toString();
-                    case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
-                    case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
-                    case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
-                    case "propulsionpropulsion" -> techEmoji = TechEmojis.PropulsionPropulsion.toString();
-                    case "warfarewarfare" -> techEmoji = TechEmojis.WarfareWarfare.toString();
-                    case "cyberneticcybernetic" -> techEmoji = TechEmojis.CyberneticCybernetic.toString();
-                    case "bioticbiotic" -> techEmoji = TechEmojis.BioticBiotic.toString();
-                    case "warfarepropulsion", "propulsionwarfare" ->
-                        techEmoji = TechEmojis.WarfarePropulsion.toString();
-                    case "cyberneticpropulsion", "propulsioncybernetic" ->
-                        techEmoji = TechEmojis.CyberneticPropulsion.toString();
-                    case "cyberneticwarfare", "warfarecybernetic" ->
-                        techEmoji = TechEmojis.CyberneticWarfare.toString();
-                    case "bioticwarfare", "warfarebiotic" -> techEmoji = TechEmojis.BioticWarfare.toString();
-                    case "bioticcybernetic", "cyberneticbiotic" -> techEmoji = TechEmojis.BioticCybernetic.toString();
-                    case "bioticpropulsion", "propulsionbiotic" -> techEmoji = TechEmojis.BioticPropulsion.toString();
-                }
-            }
-            return getPlanetRepresentationPlusEmoji(planetID) + " "
-                    + MiscEmojis.getResourceEmoji(unitHolder.getResources())
-                    + MiscEmojis.getInfluenceEmoji(unitHolder.getInfluence()) + techEmoji;
         }
+        return getPlanetRepresentationPlusEmoji(planetID) + " "
+                + MiscEmojis.getResourceEmoji(unitHolder.getResources())
+                + MiscEmojis.getInfluenceEmoji(unitHolder.getInfluence())
+                + getPlanetTechSpecialtyEmojiString(planetID, game);
+    }
+
+    private static String getPlanetTechSpecialtyEmojiString(String planetID, Game game) {
+        TI4Emoji emoji = getPlanetTechSpecialtyEmoji(planetID, game);
+        return emoji == null ? "" : emoji.toString();
+    }
+
+    @Nullable
+    private static TI4Emoji getPlanetTechSpecialtyEmoji(String planetID, Game game) {
+        PlanetModel planetModel = Mapper.getPlanet(planetID);
+        String techType;
+        if (planetModel != null
+                && planetModel.getTechSpecialties() != null
+                && !planetModel.getTechSpecialties().isEmpty()) {
+            techType = planetModel.getTechSpecialties().stream()
+                    .map(type -> type.toString().toLowerCase())
+                    .collect(Collectors.joining());
+        } else {
+            techType = ButtonHelper.getTechSkipAttachments(game, AliasHandler.resolvePlanet(planetID));
+        }
+        return switch (techType) {
+            case "propulsion" -> TechEmojis.PropulsionTech;
+            case "warfare" -> TechEmojis.WarfareTech;
+            case "cybernetic" -> TechEmojis.CyberneticTech;
+            case "biotic" -> TechEmojis.BioticTech;
+            case "propulsionpropulsion" -> TechEmojis.PropulsionPropulsion;
+            case "warfarewarfare" -> TechEmojis.WarfareWarfare;
+            case "cyberneticcybernetic" -> TechEmojis.CyberneticCybernetic;
+            case "bioticbiotic" -> TechEmojis.BioticBiotic;
+            case "warfarepropulsion", "propulsionwarfare" -> TechEmojis.WarfarePropulsion;
+            case "cyberneticpropulsion", "propulsioncybernetic" -> TechEmojis.CyberneticPropulsion;
+            case "cyberneticwarfare", "warfarecybernetic" -> TechEmojis.CyberneticWarfare;
+            case "bioticwarfare", "warfarebiotic" -> TechEmojis.BioticWarfare;
+            case "bioticcybernetic", "cyberneticbiotic" -> TechEmojis.BioticCybernetic;
+            case "bioticpropulsion", "propulsionbiotic" -> TechEmojis.BioticPropulsion;
+            default -> null;
+        };
     }
 
     private static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game game) {
@@ -917,49 +858,10 @@ public final class Helper {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
-        } else {
-            StringBuilder techType = new StringBuilder();
-            String techEmoji = "";
-            if (Mapper.getPlanet(planetID).getTechSpecialties() != null
-                    && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
-                if (Mapper.getPlanet(planetID).getTechSpecialties().size() > 1) {
-                    for (TechSpecialty type : Mapper.getPlanet(planetID).getTechSpecialties()) {
-                        techType.append(type.toString().toLowerCase());
-                    }
-                } else {
-                    techType = new StringBuilder(Mapper.getPlanet(planetID)
-                            .getTechSpecialties()
-                            .getFirst()
-                            .toString()
-                            .toLowerCase());
-                }
-            } else {
-                techType = new StringBuilder(ButtonHelper.getTechSkipAttachments(game, planetID));
-            }
-            if (!"".equalsIgnoreCase(techType.toString())) {
-                switch (techType.toString()) {
-                    case "propulsion" -> techEmoji = TechEmojis.PropulsionTech.toString();
-                    case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
-                    case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
-                    case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
-                    case "propulsionpropulsion" -> techEmoji = TechEmojis.PropulsionPropulsion.toString();
-                    case "warfarewarfare" -> techEmoji = TechEmojis.WarfareWarfare.toString();
-                    case "cyberneticcybernetic" -> techEmoji = TechEmojis.CyberneticCybernetic.toString();
-                    case "bioticbiotic" -> techEmoji = TechEmojis.BioticBiotic.toString();
-                    case "warfarepropulsion", "propulsionwarfare" ->
-                        techEmoji = TechEmojis.WarfarePropulsion.toString();
-                    case "cyberneticpropulsion", "propulsioncybernetic" ->
-                        techEmoji = TechEmojis.CyberneticPropulsion.toString();
-                    case "cyberneticwarfare", "warfarecybernetic" ->
-                        techEmoji = TechEmojis.CyberneticWarfare.toString();
-                    case "bioticwarfare", "warfarebiotic" -> techEmoji = TechEmojis.BioticWarfare.toString();
-                    case "bioticcybernetic", "cyberneticbiotic" -> techEmoji = TechEmojis.BioticCybernetic.toString();
-                    case "bioticpropulsion", "propulsionbiotic" -> techEmoji = TechEmojis.BioticPropulsion.toString();
-                }
-            }
-            return getPlanetRepresentationPlusEmoji(planetID) + " "
-                    + MiscEmojis.getResourceEmoji(unitHolder.getResources()) + techEmoji;
         }
+        return getPlanetRepresentationPlusEmoji(planetID) + " "
+                + MiscEmojis.getResourceEmoji(unitHolder.getResources())
+                + getPlanetTechSpecialtyEmojiString(planetID, game);
     }
 
     public static List<Button> getPlanetRefreshButtons(Player player, Game game) {
@@ -979,20 +881,7 @@ public final class Helper {
 
     public static List<Button> getRemainingSCButtons(Game game, Player playerPicker, boolean checkTart) {
         List<Button> scButtons = new ArrayList<>();
-
-        for (Integer sc : game.getSCList()) {
-            if (sc <= 0) continue; // some older games have a 0 in the list of SCs
-            boolean held = false;
-            for (Player player : game.getPlayers().values()) {
-                if (player == null || player.getFaction() == null) {
-                    continue;
-                }
-                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
-                    held = true;
-                    break;
-                }
-            }
-            if (held) continue;
+        for (Integer sc : getRemainingSCs(game)) {
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
             Button button;
             String label = getSCName(sc, game);
@@ -1089,54 +978,9 @@ public final class Helper {
                 planetButtons.add(button);
                 continue;
             }
-            StringBuilder techType = new StringBuilder();
-            if (Mapper.getPlanet(planet).getTechSpecialties() != null
-                    && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty()) {
-                if (Mapper.getPlanet(planet).getTechSpecialties().size() > 1) {
-                    for (TechSpecialty type : Mapper.getPlanet(planet).getTechSpecialties()) {
-                        techType.append(type.toString().toLowerCase());
-                    }
-                } else {
-                    techType = new StringBuilder(Mapper.getPlanet(planet)
-                            .getTechSpecialties()
-                            .getFirst()
-                            .toString()
-                            .toLowerCase());
-                }
-            } else {
-                techType = new StringBuilder(ButtonHelper.getTechSkipAttachments(game, planet));
-            }
-            if ("none".equalsIgnoreCase(techType.toString()) || "".equalsIgnoreCase(techType.toString())) {
-                Button button =
-                        Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
-                planetButtons.add(button);
-            } else {
-                Button techB =
-                        Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
-                switch (techType.toString()) {
-                    case "propulsion" -> techB = techB.withEmoji(TechEmojis.PropulsionTech.asEmoji());
-                    case "warfare" -> techB = techB.withEmoji(TechEmojis.WarfareTech.asEmoji());
-                    case "cybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticTech.asEmoji());
-                    case "biotic" -> techB = techB.withEmoji(TechEmojis.BioticTech.asEmoji());
-                    case "propulsionpropulsion" -> techB = techB.withEmoji(TechEmojis.PropulsionPropulsion.asEmoji());
-                    case "warfarewarfare" -> techB = techB.withEmoji(TechEmojis.WarfareWarfare.asEmoji());
-                    case "cyberneticcybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticCybernetic.asEmoji());
-                    case "bioticbiotic" -> techB = techB.withEmoji(TechEmojis.BioticBiotic.asEmoji());
-                    case "warfarepropulsion", "propulsionwarfare" ->
-                        techB = techB.withEmoji(TechEmojis.WarfarePropulsion.asEmoji());
-                    case "cyberneticpropulsion", "propulsioncybernetic" ->
-                        techB = techB.withEmoji(TechEmojis.CyberneticPropulsion.asEmoji());
-                    case "cyberneticwarfare", "warfarecybernetic" ->
-                        techB = techB.withEmoji(TechEmojis.CyberneticWarfare.asEmoji());
-                    case "bioticwarfare", "warfarebiotic" ->
-                        techB = techB.withEmoji(TechEmojis.BioticWarfare.asEmoji());
-                    case "bioticcybernetic", "cyberneticbiotic" ->
-                        techB = techB.withEmoji(TechEmojis.BioticCybernetic.asEmoji());
-                    case "bioticpropulsion", "propulsionbiotic" ->
-                        techB = techB.withEmoji(TechEmojis.BioticPropulsion.asEmoji());
-                }
-                planetButtons.add(techB);
-            }
+            Button button = Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
+            TI4Emoji techEmoji = getPlanetTechSpecialtyEmoji(planet, game);
+            planetButtons.add(techEmoji == null ? button : button.withEmoji(techEmoji.asEmoji()));
         }
         return planetButtons;
     }
@@ -1248,22 +1092,19 @@ public final class Helper {
     }
 
     public static List<Button> getTileWithTrapsPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
-        List<Button> planetButtons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(game);
-        for (Tile tile : tiles) {
-            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
-                planetButtons.add(
-                        Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
-            }
-        }
-        return planetButtons;
+        return getUncontestedTilePlaceUnitButtons(
+                player, game, unit, prefix, ButtonHelper.getTilesWithTrapsInTheSystem(game));
     }
 
     public static List<Button> getTileForCheiranHeroPlaceUnitButtons(
             Player player, Game game, String unit, String prefix) {
+        return getUncontestedTilePlaceUnitButtons(
+                player, game, unit, prefix, ButtonHelper.getTilesForCheiranHero(player, game));
+    }
+
+    private static List<Button> getUncontestedTilePlaceUnitButtons(
+            Player player, Game game, String unit, String prefix, List<Tile> tiles) {
         List<Button> planetButtons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                 String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
@@ -1307,7 +1148,7 @@ public final class Helper {
             if (flavor.contains("planet")) {
                 count = AgendaHelper.getSpecificPlanetsVoteWorth(player, game, secondHalf);
             } else {
-                count = Integer.parseInt(thing.split("_")[1]);
+                count = Integer.parseInt(secondHalf);
             }
             if (flavor.contains("tg") && !flavor.contains("dsgh")) {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
@@ -1321,23 +1162,12 @@ public final class Helper {
             msg.append("> ");
             switch (flavor) {
                 case "tg" -> {
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
-                        msg.append("Spent ")
-                                .append(tg)
-                                .append(" trade good")
-                                .append(tg == 1 ? "" : "s")
-                                .append(" for ")
-                                .append(tg * 2)
-                                .append(" votes.\n");
-                    } else {
-                        msg.append("Spent ")
-                                .append(tg)
-                                .append(" trade good")
-                                .append(tg == 1 ? "" : "s")
-                                .append(" for ")
-                                .append(tg)
-                                .append(" votes.\n");
-                    }
+                    int tgVotes = game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander") ? tg * 2 : tg;
+                    msg.append("Spent ")
+                            .append(StringHelper.pluralize(tg, "trade good"))
+                            .append(" for ")
+                            .append(tgVotes)
+                            .append(" votes.\n");
                 }
                 case "infantry" ->
                     msg.append("Spent ")
@@ -1941,10 +1771,10 @@ public final class Helper {
         List<String> uniquePlaces = new ArrayList<>();
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         for (String unit : producedUnits.keySet()) {
-            String tilePos = unit.split("_")[1];
-            String planetOrSpace = unit.split("_")[2];
-            if (!uniquePlaces.contains(tilePos + "_" + planetOrSpace)) {
-                uniquePlaces.add(tilePos + "_" + planetOrSpace);
+            String[] unitInfo = unit.split("_");
+            String place = unitInfo[1] + "_" + unitInfo[2];
+            if (!uniquePlaces.contains(place)) {
+                uniquePlaces.add(place);
             }
         }
         Tile tile = null;
@@ -1970,14 +1800,11 @@ public final class Helper {
                         .append(".\n");
             }
             for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
-                String unit = entry.getKey();
-                String tilePos = unit.split("_")[1];
-                String planetOrSpace = unit.split("_")[2];
-                String un = unit.split("_")[0];
-                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
+                String[] unitInfo = entry.getKey().split("_");
+                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitInfo[0]), player.getColor());
                 UnitModel removedUnit =
                         player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
-                if (uniquePlace.equalsIgnoreCase(tilePos + "_" + planetOrSpace)) {
+                if (uniquePlace.equalsIgnoreCase(unitInfo[1] + "_" + unitInfo[2])) {
                     if (entry.getValue() < 10) {
                         localPlace
                                 .append("> ")
@@ -2146,21 +1973,109 @@ public final class Helper {
             if (amount < 1) {
                 continue;
             }
-            String tilePos = unit.split("_")[1];
-            String planetOrSpace = unit.split("_")[2];
-            if ("space".equalsIgnoreCase(planetOrSpace)) {
-                planetOrSpace = "";
-            } else {
-                planetOrSpace = " " + planetOrSpace;
-            }
-            Tile tile = game.getTileByPosition(tilePos);
-            String un = unit.split("_")[0];
+            String[] unitInfo = unit.split("_");
+            String planetOrSpace = "space".equalsIgnoreCase(unitInfo[2]) ? "" : " " + unitInfo[2];
+            Tile tile = game.getTileByPosition(unitInfo[1]);
             RemoveUnitService.removeUnits(
-                    event, tile, game, player.getColor(), amount + " " + AliasHandler.resolveUnit(un) + planetOrSpace);
+                    event,
+                    tile,
+                    game,
+                    player.getColor(),
+                    amount + " " + AliasHandler.resolveUnit(unitInfo[0]) + planetOrSpace);
         }
 
         MonumentsDSButtonHandler.resetFlorzenStasisFighters(game, player);
         player.resetProducedUnits();
+    }
+
+    private static int getFlatProductionBonus(Player player, boolean cosmicSuper, boolean includeSynthesis) {
+        int bonus = player.hasRelic("boon_of_the_cerulean_god") ? 1 : 0;
+        if (cosmicSuper) {
+            bonus++;
+        }
+        if (includeSynthesis && player.hasAbility("synthesis")) {
+            bonus++;
+        }
+        return bonus;
+    }
+
+    private static boolean isAdjacentToCosmicSupernova(Game game, Tile tile, Player player) {
+        if (!game.isCosmicPhenomenaeMode()) {
+            return false;
+        }
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            Tile adjacentTile = game.getTileByPosition(pos);
+            if (adjacentTile != null && adjacentTile.isSupernova()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Nullable
+    private static UnitModel getUsableForeignStructure(Game game, Player player, UnitHolder uH, UnitKey unit) {
+        if (SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit)) {
+            return SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit);
+        }
+        if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)) {
+            return null;
+        }
+        Player structureOwner = game.getPlayerByColorID(unit.colorID()).orElse(null);
+        return structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
+    }
+
+    private static int foreignStructureBaseProduction(
+            Game game, Player player, UnitHolder uH, UnitKey unit, UnitModel structure) {
+        if ("sd".equals(structure.getAsyncId())
+                && SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit)) {
+            return 3;
+        }
+        return structure.getProductionValue();
+    }
+
+    private static int adjustDockProductionValue(
+            Player player, Game game, UnitHolder uH, UnitModel unitModel, int productionValue, boolean singleDock) {
+        if ("mech".equalsIgnoreCase(unitModel.getBaseType()) && ButtonHelper.isLawInPlay(game, "articles_war")) {
+            productionValue = 0;
+        }
+        if (!"sd".equals(unitModel.getAsyncId())
+                || !(productionValue == 2
+                        || productionValue == 4
+                        || player.ownsUnit("mykomentori_spacedock2")
+                        || player.ownsUnit("miltymod_spacedock2"))) {
+            return productionValue;
+        }
+        if (uH instanceof Planet planet) {
+            if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
+                productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
+            } else {
+                productionValue = planet.getResources() + productionValue;
+            }
+            if (player.hasUnit("axis_mech")
+                    && !ButtonHelper.isLawInPlay(game, "articles_war")
+                    && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                productionValue = Math.max(5, productionValue);
+            }
+        } else if (!singleDock && (productionValue == 2 || productionValue == 4)) {
+            productionValue = 0;
+        }
+        if (!singleDock && IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
+            productionValue += 4;
+        }
+        return productionValue;
+    }
+
+    private static int applyProductionBonuses(Player player, boolean cosmicSuper, int productionValue) {
+        if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
+            productionValue++;
+        }
+        if (productionValue > 0 && cosmicSuper) {
+            productionValue++;
+        }
+        if (productionValue > 0 && player.hasAbility("synthesis")) {
+            productionValue++;
+        }
+        return productionValue;
     }
 
     public static int getProductionValueOfUnitHolder(Player player, Game game, Tile tile, UnitHolder uH) {
@@ -2170,16 +2085,7 @@ public final class Helper {
     public static int getProductionValueOfUnitHolder(
             Player player, Game game, Tile tile, UnitHolder uH, boolean unitsOnly) {
         int productionValueTotal = 0;
-        boolean cosmicSuper = false;
-        if (game.isCosmicPhenomenaeMode()) {
-            for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-                Tile adjacentTile = game.getTileByPosition(pos);
-                if (adjacentTile != null && adjacentTile.isSupernova()) {
-                    cosmicSuper = true;
-                    break;
-                }
-            }
-        }
+        boolean cosmicSuper = isAdjacentToCosmicSupernova(game, tile, player);
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
                 if (unit.unitType() == UnitType.TyrantsLament
@@ -2230,44 +2136,8 @@ public final class Helper {
                             .max()
                             .orElse(0);
                 }
-                if ("mech".equalsIgnoreCase(unitModel.getBaseType())
-                        && ButtonHelper.isLawInPlay(game, "articles_war")) {
-                    productionValue = 0;
-                }
-                if ("sd".equals(unitModel.getAsyncId())
-                        && (productionValue == 2
-                                || productionValue == 4
-                                || player.ownsUnit("mykomentori_spacedock2")
-                                || player.ownsUnit("miltymod_spacedock2"))) {
-                    if (uH instanceof Planet planet) {
-                        if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
-                            productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
-                        } else {
-                            productionValue = planet.getResources() + productionValue;
-                        }
-                        if (player.hasUnit("axis_mech")
-                                && !ButtonHelper.isLawInPlay(game, "articles_war")
-                                && uH.getUnitCount(UnitType.Mech, player) > 0) {
-                            productionValue = Math.max(5, productionValue);
-                        }
-                    } else {
-                        if (productionValue == 2 || productionValue == 4) {
-                            productionValue = 0;
-                        }
-                    }
-                    if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
-                        productionValue += 4;
-                    }
-                }
-                if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValue++;
-                }
-                if (productionValue > 0 && cosmicSuper) {
-                    productionValue++;
-                }
-                if (productionValue > 0 && player.hasAbility("synthesis")) {
-                    productionValue++;
-                }
+                productionValue = adjustDockProductionValue(player, game, uH, unitModel, productionValue, false);
+                productionValue = applyProductionBonuses(player, cosmicSuper, productionValue);
                 if ("cruiser".equalsIgnoreCase(unitModel.getBaseType())
                         && player.hasUnit("atokera_cruiser")
                         && player.hasAbility("synthesis")) {
@@ -2276,57 +2146,11 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
             } else {
-                boolean graveholdControlled =
-                        SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
-                if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit) && !graveholdControlled) {
-                    continue;
-                }
-                Player structureOwner = game.getPlayerByColorID(unit.colorID()).orElse(null);
-                UnitModel structure = graveholdControlled
-                        ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit)
-                        : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
+                UnitModel structure = getUsableForeignStructure(game, player, uH, unit);
                 if (structure != null) {
-                    int productionValue = structure.getProductionValue();
-                    if (graveholdControlled && "sd".equals(structure.getAsyncId())) {
-                        productionValue = 3;
-                    }
-                    if ("mech".equalsIgnoreCase(structure.getBaseType())
-                            && ButtonHelper.isLawInPlay(game, "articles_war")) {
-                        productionValue = 0;
-                    }
-                    if ("sd".equals(structure.getAsyncId())
-                            && (productionValue == 2
-                                    || productionValue == 4
-                                    || player.ownsUnit("mykomentori_spacedock2")
-                                    || player.ownsUnit("miltymod_spacedock2"))) {
-                        if (uH instanceof Planet planet) {
-                            if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
-                                productionValue =
-                                        Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
-                            } else {
-                                productionValue = planet.getResources() + productionValue;
-                            }
-                            if (player.hasUnit("axis_mech")
-                                    && !ButtonHelper.isLawInPlay(game, "articles_war")
-                                    && uH.getUnitCount(UnitType.Mech, player) > 0) {
-                                productionValue = Math.max(5, productionValue);
-                            }
-                        } else if (productionValue == 2 || productionValue == 4) {
-                            productionValue = 0;
-                        }
-                        if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
-                            productionValue += 4;
-                        }
-                    }
-                    if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
-                        productionValue++;
-                    }
-                    if (productionValue > 0 && cosmicSuper) {
-                        productionValue++;
-                    }
-                    if (productionValue > 0 && player.hasAbility("synthesis")) {
-                        productionValue++;
-                    }
+                    int productionValue = foreignStructureBaseProduction(game, player, uH, unit, structure);
+                    productionValue = adjustDockProductionValue(player, game, uH, structure, productionValue, false);
+                    productionValue = applyProductionBonuses(player, cosmicSuper, productionValue);
                     productionValueTotal += productionValue * uH.getUnits().get(unit);
                 }
             }
@@ -2374,108 +2198,37 @@ public final class Helper {
         }
         for (String token : uH.getTokenList()) {
             if (token.contains("orbital_foundries") && planetUnitVal < 2) {
-                productionValueTotal += 2;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += 2 + getFlatProductionBonus(player, cosmicSuper, true);
                 planetUnitVal = 2;
             }
 
             if (token.contains("factoryleaseh") && uH instanceof Planet p) {
-                productionValueTotal += p.getResources();
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += p.getResources() + getFlatProductionBonus(player, cosmicSuper, true);
             }
             if (token.contains("factoryleasec") && uH instanceof Planet p) {
-                productionValueTotal += p.getInfluence();
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += p.getInfluence() + getFlatProductionBonus(player, cosmicSuper, true);
             }
             if (token.contains("factoryleasei")) {
-                productionValueTotal += tile.getPlanetUnitHolders().size();
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal +=
+                        tile.getPlanetUnitHolders().size() + getFlatProductionBonus(player, cosmicSuper, true);
             }
 
             if (token.contains("automatons") && planetUnitVal < 3) {
                 productionValueTotal -= planetUnitVal;
                 planetUnitVal = 3;
-                productionValueTotal += 3;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += 3 + getFlatProductionBonus(player, cosmicSuper, true);
             }
             if (token.contains("availyn")) {
-                productionValueTotal += 3;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += 3 + getFlatProductionBonus(player, cosmicSuper, true);
             }
 
             if (token.contains("facilitycorefactory")) {
                 planetUnitVal += 1;
-                productionValueTotal += 1;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += 1 + getFlatProductionBonus(player, cosmicSuper, true);
             }
             if (token.contains("facilitynavalbase")) {
                 planetUnitVal += 3;
-                productionValueTotal += 3;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (player.hasAbility("synthesis")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += 3 + getFlatProductionBonus(player, cosmicSuper, true);
             }
         }
         if (player.hasTech("absol_ah")
@@ -2483,43 +2236,22 @@ public final class Helper {
                         || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
             int structures = uH.getUnitCount(UnitType.Spacedock, player.getColor())
                     + uH.getUnitCount(UnitType.Pds, player.getColor());
-            productionValueTotal += structures;
+            productionValueTotal += structures + getFlatProductionBonus(player, cosmicSuper, false);
             planetUnitVal = structures;
-            if (player.hasRelic("boon_of_the_cerulean_god")) {
-                productionValueTotal++;
-            }
-            if (cosmicSuper) {
-                productionValueTotal++;
-            }
         }
         if (player.hasTech("ah")
                 && planetUnitVal < 1
                 && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
                         || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
                         || (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) && player.hasAbility("byssus"))) {
-            productionValueTotal += 1;
+            productionValueTotal += 1 + getFlatProductionBonus(player, cosmicSuper, true);
             planetUnitVal = 1;
-            if (player.hasRelic("boon_of_the_cerulean_god")) {
-                productionValueTotal++;
-            }
-            if (player.hasAbility("synthesis")) {
-                productionValueTotal++;
-            }
-            if (cosmicSuper) {
-                productionValueTotal++;
-            }
         } else {
             if (player.hasTech("absol_ie")
                     && planetUnitVal < 1
                     && player.getPlanets().contains(uH.getName())) {
-                productionValueTotal += 1;
+                productionValueTotal += 1 + getFlatProductionBonus(player, cosmicSuper, false);
                 planetUnitVal = 1;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
             } else {
                 if (player.getPlanets().contains(uH.getName())
                         && player.hasTech("dsbentg")
@@ -2529,40 +2261,20 @@ public final class Helper {
                                         && !Mapper.getPlanet(planet)
                                                 .getTechSpecialties()
                                                 .isEmpty()))) {
-                    productionValueTotal += 1;
-                    if (player.hasRelic("boon_of_the_cerulean_god")) {
-                        productionValueTotal++;
-                    }
-                    if (cosmicSuper) {
-                        productionValueTotal++;
-                    }
+                    productionValueTotal += 1 + getFlatProductionBonus(player, cosmicSuper, false);
                     planetUnitVal = 1;
                 }
                 if (player.getReadiedPlanets().contains(uH.getName())
                         && player.hasAbility("synthesis")
                         && planetUnitVal < 1) {
-                    productionValueTotal += 1;
-                    if (player.hasRelic("boon_of_the_cerulean_god")) {
-                        productionValueTotal++;
-                    }
-                    if (cosmicSuper) {
-                        productionValueTotal++;
-                    }
-
+                    productionValueTotal += 1 + getFlatProductionBonus(player, cosmicSuper, false);
                     planetUnitVal = 1;
                 }
             }
         }
         if (player.getPlanets().contains(uH.getName())
                 && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
-            productionValueTotal += 3;
-            productionValueTotal -= planetUnitVal;
-            if (player.hasRelic("boon_of_the_cerulean_god")) {
-                productionValueTotal++;
-            }
-            if (cosmicSuper) {
-                productionValueTotal++;
-            }
+            productionValueTotal += 3 - planetUnitVal + getFlatProductionBonus(player, cosmicSuper, false);
         }
         if (player.getPlanets().contains(uH.getName())
                 && uH.getName()
@@ -2583,16 +2295,7 @@ public final class Helper {
     }
 
     public static int getProductionValue(Player player, Game game, Tile tile, boolean singleDock, boolean ignoreScar) {
-        boolean cosmicSuper = false;
-        if (game.isCosmicPhenomenaeMode()) {
-            for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-                Tile adjacentTile = game.getTileByPosition(pos);
-                if (adjacentTile != null && adjacentTile.isSupernova()) {
-                    cosmicSuper = true;
-                    break;
-                }
-            }
-        }
+        boolean cosmicSuper = isAdjacentToCosmicSupernova(game, tile, player);
         if (tile.isScar(game)
                 && !player.hasUnlockedBreakthrough("nivynbt")
                 && !player.hasTech("tf-singularitypoint")
@@ -2626,110 +2329,36 @@ public final class Helper {
             if (tile.getUnitHolders().size() == 1
                     && player.hasTech("dsmorty")
                     && FoWHelper.playerHasShipsInSystem(player, tile)) {
-                productionValueTotal += 2;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-                if (cosmicSuper) {
-                    productionValueTotal++;
-                }
+                productionValueTotal += 2 + getFlatProductionBonus(player, cosmicSuper, false);
             }
         } else {
             int highestProd = 0;
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 for (UnitKey unit : uH.getUnits().keySet()) {
+                    UnitModel unitModel;
+                    int productionValue;
                     if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                        UnitModel unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
-                        if (!"sd".equals(unitModel.getAsyncId())) {
+                        unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
+                        if (!"sd".equals(unitModel.getAsyncId())
+                                || ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, uH, unitModel)) {
                             continue;
                         }
-                        if (ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, uH, unitModel)) {
-                            continue;
-                        }
-                        int productionValue = unitModel.getProductionValue();
-                        if ("mech".equalsIgnoreCase(unitModel.getBaseType())
-                                && ButtonHelper.isLawInPlay(game, "articles_war")) {
-                            productionValue = 0;
-                        }
-                        if ("sd".equals(unitModel.getAsyncId())
-                                && (productionValue == 2
-                                        || productionValue == 4
-                                        || player.ownsUnit("mykomentori_spacedock2")
-                                        || player.ownsUnit("miltymod_spacedock2"))) {
-                            if (uH instanceof Planet planet) {
-                                if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
-                                    productionValue =
-                                            Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
-                                } else {
-                                    productionValue = planet.getResources() + productionValue;
-                                }
-                                if (player.hasUnit("axis_mech")
-                                        && !ButtonHelper.isLawInPlay(game, "articles_war")
-                                        && uH.getUnitCount(UnitType.Mech, player) > 0) {
-                                    productionValue = Math.max(5, productionValue);
-                                }
-                            }
-                        }
-                        if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
-                            productionValue++;
-                        }
-                        if (cosmicSuper) {
-                            productionValue++;
-                        }
-                        if (productionValue > highestProd) {
-                            highestProd = productionValue;
-                        }
+                        productionValue = unitModel.getProductionValue();
                     } else {
-                        boolean graveholdControlled =
-                                SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
-                        if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)
-                                && !graveholdControlled) {
+                        unitModel = getUsableForeignStructure(game, player, uH, unit);
+                        if (unitModel == null) {
                             continue;
                         }
-                        Player structureOwner =
-                                game.getPlayerByColorID(unit.colorID()).orElse(null);
-                        UnitModel structure = graveholdControlled
-                                ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(game, player, uH, unit)
-                                : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unit);
-                        if (structure != null) {
-                            int productionValue = structure.getProductionValue();
-                            if (graveholdControlled && "sd".equals(structure.getAsyncId())) {
-                                productionValue = 3;
-                            }
-                            if ("mech".equalsIgnoreCase(structure.getBaseType())
-                                    && ButtonHelper.isLawInPlay(game, "articles_war")) {
-                                productionValue = 0;
-                            }
-                            if ("sd".equals(structure.getAsyncId())
-                                    && (productionValue == 2
-                                            || productionValue == 4
-                                            || player.ownsUnit("mykomentori_spacedock2")
-                                            || player.ownsUnit("miltymod_spacedock2"))) {
-                                if (uH instanceof Planet planet) {
-                                    if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
-                                        productionValue = Math.max(planet.getResources(), planet.getInfluence())
-                                                + productionValue;
-                                    } else {
-                                        productionValue = planet.getResources() + productionValue;
-                                    }
-                                    if (player.hasUnit("axis_mech")
-                                            && !ButtonHelper.isLawInPlay(game, "articles_war")
-                                            && uH.getUnitCount(UnitType.Mech, player) > 0) {
-                                        productionValue = Math.max(5, productionValue);
-                                    }
-                                }
-                            }
-                            if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
-                                productionValue++;
-                            }
-                            if (cosmicSuper) {
-                                productionValue++;
-                            }
-                            if (productionValue > highestProd) {
-                                highestProd = productionValue;
-                            }
-                        }
+                        productionValue = foreignStructureBaseProduction(game, player, uH, unit, unitModel);
                     }
+                    productionValue = adjustDockProductionValue(player, game, uH, unitModel, productionValue, true);
+                    if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
+                        productionValue++;
+                    }
+                    if (cosmicSuper) {
+                        productionValue++;
+                    }
+                    highestProd = Math.max(highestProd, productionValue);
                 }
             }
             productionValueTotal = highestProd;
@@ -3489,10 +3118,6 @@ public final class Helper {
         return getLeaderRepresentation(leader, false, false, false);
     }
 
-    public static String getLeaderMediumRepresentation(Leader leader) {
-        return getLeaderRepresentation(leader, true, false, false);
-    }
-
     public static String getLeaderFullRepresentation(Leader leader) {
         return getLeaderRepresentation(leader, true, true, false);
     }
@@ -3567,38 +3192,24 @@ public final class Helper {
     }
 
     private static Integer getTotalPlanetSumValue(Game game, Player player, ToIntFunction<Planet> valueFunction) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            valueFunction = p -> p.getResources() + p.getInfluence();
-        } else if (player.hasUnlockedBreakthrough("xxchabt")) {
-            valueFunction = p -> Math.max(p.getResources(), p.getInfluence());
-        }
-
-        return planets.stream()
-                .map(planetsInfo::get)
-                .filter(Objects::nonNull)
-                .mapToInt(valueFunction)
-                .sum();
+        return getPlanetSumValue(game, player, player.getPlanets(), valueFunction);
     }
 
     private static Integer getAvailablePlanetSumValue(Game game, Player player, ToIntFunction<Planet> valueFunction) {
+        return getPlanetSumValue(game, player, player.getReadiedPlanets(), valueFunction);
+    }
+
+    private static Integer getPlanetSumValue(
+            Game game, Player player, List<String> planets, ToIntFunction<Planet> valueFunction) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-
         if (player.hasLeaderUnlocked("xxchahero")) {
             valueFunction = p -> p.getResources() + p.getInfluence();
         } else if (player.hasUnlockedBreakthrough("xxchabt")) {
             valueFunction = p -> Math.max(p.getResources(), p.getInfluence());
         }
-
         return planets.stream()
                 .map(planetsInfo::get)
                 .filter(Objects::nonNull)
@@ -3671,15 +3282,6 @@ public final class Helper {
         return String.format("%" + length + "." + length + "s", text);
     }
 
-    /**
-     * @param text string to add spaces on the right
-     * @param length minimum length of string
-     * @return right padded string
-     */
-    public static String rightpad(String text, int length) {
-        return String.format("%-" + length + "." + length + "s", text);
-    }
-
     public static boolean isInteger(String str) {
         if (str == null) {
             return false;
@@ -3702,10 +3304,6 @@ public final class Helper {
             }
         }
         return true;
-    }
-
-    public static boolean isBoolean(String value) {
-        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
@@ -3867,46 +3465,6 @@ public final class Helper {
         }
     }
 
-    /**
-     * DEPRECATED - Use TechnologyModel.getRepresentation() instead
-     */
-    @Deprecated
-    public static String getTechRepresentation(String techID) {
-        TechnologyModel tech = Mapper.getTechs().get(techID);
-        return tech.getRepresentation(false);
-    }
-
-    /**
-     * DEPRECATED - Use TechnologyModel.getRepresentation(true) instead
-     */
-    @Deprecated
-    public static String getTechRepresentationLong(String techID) {
-        TechnologyModel tech = Mapper.getTechs().get(techID);
-        return tech.getRepresentation(true);
-    }
-
-    /**
-     * DEPRECATED - Use AgendaModel.getRepresentation() instead
-     */
-    @Deprecated
-    public static String getAgendaRepresentation(@NotNull String agendaID) {
-        return getAgendaRepresentation(agendaID, null);
-    }
-
-    @Deprecated
-    public static String getAgendaRepresentation(@NotNull String agendaID, @Nullable Integer uniqueID) {
-        AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
-        return agendaDetails.getRepresentation(uniqueID);
-    }
-
-    public static Role getEventGuildRole(GenericInteractionCreateEvent event, String roleName) {
-        try {
-            return event.getGuild().getRolesByName(roleName, true).getFirst();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public static void reverseSpeakerOrder(Game game) {
         Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
         Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
@@ -4058,7 +3616,7 @@ public final class Helper {
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
                     if (unitHolder != null
                             && unitHolder.getTokenList() != null
-                            && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                            && unitHolder.getTokenList().contains(Constants.TOMB_OF_EMPHIDIA_PNG)) {
                         player.removeRelic("emphidia");
                         player.removeExhaustedRelic("emphidia");
 

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -26,11 +27,9 @@ abstract class AddRemoveTokenCommand extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
+                CommonOptions.tileName(),
                 new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+                CommonOptions.factionColor());
     }
 
     @Override

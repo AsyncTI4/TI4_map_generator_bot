@@ -606,24 +606,16 @@ public class ThurvialiLeadersHandler {
             return;
         }
 
-        String coexistenceFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        try {
-            MoveUnitService.moveUnits(
-                    event,
-                    sourceTile,
-                    game,
-                    mover.getColor(),
-                    "1 gf " + source.getName(),
-                    destinationTile,
-                    destination.getName());
-        } finally {
-            if (coexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", coexistenceFlag);
-            }
-        }
+        AddUnitService.runWithCoexistence(
+                game,
+                () -> MoveUnitService.moveUnits(
+                        event,
+                        sourceTile,
+                        game,
+                        mover.getColor(),
+                        "1 gf " + source.getName(),
+                        destinationTile,
+                        destination.getName()));
 
         ThurvialiAbilityHandler.checkRadiantGrafting(game);
         MessageHelper.sendMessageToChannel(

@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -71,9 +72,7 @@ class Stats extends GameStateSubcommand {
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NPC, "Player is an NPC"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-                .addOptions(new OptionData(
-                                OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color")
-                        .setAutoComplete(true));
+                .addOptions(CommonOptions.factionColor("Set stats for another Faction or Color"));
     }
 
     @Override

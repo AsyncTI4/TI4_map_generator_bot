@@ -16,6 +16,7 @@ class PickACFromPurged extends GameStateSubcommand {
 
     PickACFromPurged() {
         super(Constants.PICK_AC_FROM_PURGED, "Pick an Action Card from the purged pile into your hand", true, true);
+        markSuspicious();
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
                 .setRequired(true));
@@ -51,10 +52,5 @@ class PickACFromPurged extends GameStateSubcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
         ActionCardHelper.sendActionCardInfo(game, player);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

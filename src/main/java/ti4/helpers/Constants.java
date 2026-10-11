@@ -496,6 +496,20 @@ public final class Constants {
             BROKENPLANET5,
             BROKENPLANET6);
 
+    public static final List<String> FAKE_PLANETS = List.of(
+            "custodiavigilia",
+            "ghoti",
+            "ocean1",
+            "ocean2",
+            "ocean3",
+            "ocean4",
+            "ocean5",
+            "triad",
+            "grove",
+            "bannerhall1",
+            "bannerhall2",
+            "bannerhall3");
+
     public static final String FRONTIER = "frontier";
 
     public static final String CREATION_DATE_TIME = "creation_date_time";
@@ -1107,6 +1121,7 @@ public final class Constants {
     public static final String HS_TILE_POSITION = "hs_tile_position";
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
+    public static final String TOMB_OF_EMPHIDIA_PNG = "attachment_tombofemphidia.png";
     public static final String ATTACHMENT_IIHQ_1 = "attachment_custodiavigilia_1.png";
     public static final String ATTACHMENT_IIHQ_2 = "attachment_custodiavigilia_2.png";
     public static final String TERRAFORM = "terraform";

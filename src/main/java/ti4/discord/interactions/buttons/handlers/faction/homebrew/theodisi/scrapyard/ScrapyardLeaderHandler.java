@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -235,12 +236,7 @@ public class ScrapyardLeaderHandler {
         String[] values = buttonID.substring(DESTROY_HERO_UNIT.length()).split("\\|", 4);
         Tile tile = values.length == 4 ? game.getTileByPosition(values[0]) : null;
         UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
-        UnitKey unitKey = holder == null
-                ? null
-                : holder.getUnitKeysForPlayer(player).stream()
-                        .filter(key -> key.asyncID().equals(values[2]))
-                        .findFirst()
-                        .orElse(null);
+        UnitKey unitKey = PonthousTechHandler.findPlayerUnitKey(holder, player, values[2]);
         UnitState state;
         try {
             state = values.length == 4 ? UnitState.valueOf(values[3]) : null;

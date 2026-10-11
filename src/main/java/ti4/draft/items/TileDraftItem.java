@@ -93,4 +93,11 @@ public abstract class TileDraftItem extends DraftItem {
     public MiltyDraftTile getMiltyTile() {
         return DraftTileManager.findTile(getItemId());
     }
+
+    public static List<DraftItem> buildAllDraftableItems(
+            DraftCategory category, List<MiltyDraftTile> tiles, Game game) {
+        List<DraftItem> items =
+                generateAll(category, tiles.stream().map(tile -> tile.getTile().getTileID()));
+        return draftable(category, withoutBanned(items, game, "bannedTiles"));
+    }
 }

@@ -19,7 +19,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 @Data
-public class AgendaModel implements ModelInterface, EmbeddableModel {
+public class AgendaModel implements ModelInterface, SearchTaggedModel {
     @Getter
     private String alias;
 
@@ -181,7 +181,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         }
         eb.setDescription(text.toString());
 
-        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
+        if (includeID) eb.setFooter(compactIdFooter(alias));
         return eb.build();
     }
 
@@ -194,12 +194,6 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         // DESCRIPTION
         eb.setDescription("This agenda is in somebody's hand");
         return eb.build();
-    }
-
-    public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

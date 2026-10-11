@@ -1,9 +1,9 @@
 package ti4.discord.interactions.commands.cardsac;
 
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,18 +25,11 @@ class ShowACToAll extends GameStateSubcommand {
         Player player = getPlayer();
         int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
 
-        String acID = null;
-        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-            if (ac.getValue().equals(acIndex)) {
-                acID = ac.getKey();
-                break;
-            }
-        }
-
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
-            return;
-        }
+        String acID = CommandHelper.requireOrReport(
+                event,
+                CommandHelper.cardIdForNumber(player.getActionCards(), acIndex),
+                "No such action card ID found, please retry.");
+        if (acID == null) return;
 
         Game game = getGame();
         String sb = "Game: " + game.getName() + "\n" + "Player: "

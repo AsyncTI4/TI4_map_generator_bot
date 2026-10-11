@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thro
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,7 +21,7 @@ import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class ThronesAbilityHandler {
-    private static final Set<String> THRONE_PLANETS = Set.of("cineron", "gyraxis", "lethara", "skarnath");
+    private static final List<String> THRONE_PLANETS = List.of("cineron", "gyraxis", "lethara", "skarnath");
     private static final String CHOOSE_THRONE = "chooseThroneForAbility_";
 
     public static boolean isThronePlanet(String planetName) {
@@ -34,52 +33,48 @@ public class ThronesAbilityHandler {
     }
 
     public static void getUnplacedThronePlanetButtons(GenericInteractionCreateEvent event, Game game, Player player) {
+        sendUnplacedThronePlanetButtons(
+                event,
+                game,
+                player,
+                CHOOSE_THRONE,
+                ", please choose the Throne planet to place in your home system.",
+                List.of());
+    }
+
+    static void sendUnplacedThronePlanetButtons(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            String choosePrefix,
+            String prompt,
+            List<Button> extraButtons) {
         if (game == null || player == null) {
             return;
         }
-
+        List<String> unplaced = THRONE_PLANETS.stream()
+                .filter(planet -> game.getTileFromPlanet(planet) == null)
+                .toList();
         List<Button> buttons = new ArrayList<>();
-
-        for (String planet : THRONE_PLANETS) {
-            if (game.getTileFromPlanet(planet) != null) {
-                continue;
-            }
-
+        for (String planet : unplaced) {
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + CHOOSE_THRONE + planet,
+                    player.factionButtonChecker() + choosePrefix + planet,
                     "Place " + Mapper.getPlanet(planet).getName(),
                     FactionEmojis.thrones));
         }
-
-        List<MessageEmbed> thronesEmbed = new ArrayList<>();
-        for (String planet : THRONE_PLANETS) {
-            if (game.getTileFromPlanet(planet) != null) {
-                continue;
-            }
-
-            thronesEmbed.add(Mapper.getPlanet(planet).getRepresentationEmbed());
-        }
-
+        buttons.addAll(extraButtons);
+        List<MessageEmbed> thronesEmbed = unplaced.stream()
+                .map(planet -> Mapper.getPlanet(planet).getRepresentationEmbed())
+                .toList();
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", please choose the Throne planet to place in your home system.",
-                thronesEmbed,
-                buttons);
+                event.getMessageChannel(), player.getRepresentation() + prompt, thronesEmbed, buttons);
     }
 
-    @ButtonHandler(CHOOSE_THRONE)
-    public static void placeChosenThronePlanetInHs(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    static boolean placeThronePlanetInHomeSystem(
+            ButtonInteractionEvent event, Game game, Player player, String planet) {
         if (game == null || player == null) {
-            return;
+            return false;
         }
-
-        String planet = buttonID.replace(CHOOSE_THRONE, "");
-        if (planet == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
         Tile homeSystem = player.getHomeSystemTile();
         String tokenID = Mapper.getTokenID(planet);
         if (!THRONE_PLANETS.contains(planet)
@@ -87,20 +82,29 @@ public class ThronesAbilityHandler {
                 || tokenID == null
                 || game.getTileFromPlanet(planet) != null) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-            return;
+            return false;
         }
-
         homeSystem.addToken(tokenID, Constants.SPACE);
         Helper.addTokenPlanetToTile(game, homeSystem, planet);
         game.clearPlanetsCache();
         player.addPlanet(planet);
+        return true;
+    }
 
-        String planetName = Mapper.getPlanet(planet).getName();
+    static void announceThronePlanetPlacement(ButtonInteractionEvent event, Player player, String planet) {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " placed " + planetName
-                        + " in their home system and gained control of it.");
+                player.getRepresentation() + " placed "
+                        + Mapper.getPlanet(planet).getName() + " in their home system and gained control of it.");
+    }
 
-        ButtonHelper.deleteMessage(event);
+    @ButtonHandler(CHOOSE_THRONE)
+    public static void placeChosenThronePlanetInHs(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String planet = buttonID.replace(CHOOSE_THRONE, "");
+        if (placeThronePlanetInHomeSystem(event, game, player, planet)) {
+            announceThronePlanetPlacement(event, player, planet);
+            ButtonHelper.deleteMessage(event);
+        }
     }
 }

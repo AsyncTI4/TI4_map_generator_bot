@@ -237,14 +237,6 @@ public final class Buttons {
         return null;
     }
 
-    public static Button declineAndEdit(String buttonLabel, String editMessage) {
-        return gray("editMessage_" + editMessage, buttonLabel);
-    }
-
-    public static Button declineAndNotify(String buttonLabel, String notificationMessage) {
-        return gray("deleteMessage_" + notificationMessage, buttonLabel);
-    }
-
     public static List<ActionRow> paginateButtons(
             List<Button> mainButtons, List<Button> persistentButtons, int page, String pageButtonId) {
         Page pagination = paginate(mainButtons, page);
@@ -269,7 +261,7 @@ public final class Buttons {
         return new Page(current, total, buttons.subList(from, to));
     }
 
-    private static List<ActionRow> partitionIntoRows(List<Button> buttons) {
+    public static List<ActionRow> partitionIntoRows(List<Button> buttons) {
         List<ActionRow> rows = new ArrayList<>();
         for (int i = 0; i < buttons.size(); i += 5) {
             rows.add(ActionRow.of(buttons.subList(i, Math.min(i + 5, buttons.size()))));

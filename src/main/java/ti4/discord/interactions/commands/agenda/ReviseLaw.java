@@ -29,11 +29,9 @@ class ReviseLaw extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping agendaIdOption = event.getOption(Constants.AGENDA_ID);
-        if (agendaIdOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No agenda ID defined.");
-            return;
-        }
+        OptionMapping agendaIdOption =
+                CommandHelper.requireOrReport(event, event.getOption(Constants.AGENDA_ID), "No agenda ID defined.");
+        if (agendaIdOption == null) return;
 
         Game game = getGame();
         Player player = CommandHelper.getOtherPlayerFromEvent(game, event);

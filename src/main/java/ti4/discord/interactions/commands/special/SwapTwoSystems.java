@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -20,9 +21,8 @@ class SwapTwoSystems extends GameStateSubcommand {
 
     SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND")
-                .setRequired(true)
-                .setAutoComplete(true));
+        markSuspicious();
+        addOptions(CommonOptions.tileName("System/Tile name to swap from or RND"));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -34,17 +34,17 @@ class SwapTwoSystems extends GameStateSubcommand {
         String from = event.getOption(Constants.TILE_NAME).getAsString();
         String to = event.getOption(Constants.TILE_NAME_TO).getAsString();
 
-        Tile tileFrom = "RND".equalsIgnoreCase(from) ? getRandomTile() : CommandHelper.getTile(event, game);
-        if (tileFrom == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find tile: " + from);
-            return;
-        }
+        Tile tileFrom = CommandHelper.requireOrReport(
+                event,
+                "RND".equalsIgnoreCase(from) ? getRandomTile() : CommandHelper.getTile(event, game),
+                "Could not find tile: " + from);
+        if (tileFrom == null) return;
 
-        Tile tileTo = "RND".equalsIgnoreCase(to) ? getRandomTile() : CommandHelper.getTile(event, game, to);
-        if (tileTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find tile: " + to);
-            return;
-        }
+        Tile tileTo = CommandHelper.requireOrReport(
+                event,
+                "RND".equalsIgnoreCase(to) ? getRandomTile() : CommandHelper.getTile(event, game, to),
+                "Could not find tile: " + to);
+        if (tileTo == null) return;
 
         String positionFrom = tileFrom.getPosition();
 
@@ -76,10 +76,5 @@ class SwapTwoSystems extends GameStateSubcommand {
         }
 
         return RandomHelper.pickRandomFromList(availableTiles);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

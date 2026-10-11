@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.bothelper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
@@ -19,11 +20,8 @@ public class ReloadGame extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
-        Game game = GameManager.reload(gameName);
-        if (game == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Failed to reload game.");
-            return;
-        }
+        Game game = CommandHelper.requireOrReport(event, GameManager.reload(gameName), "Failed to reload game.");
+        if (game == null) return;
 
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " reloaded.");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getName() + " was reloaded.");

@@ -5,23 +5,17 @@ import lombok.experimental.UtilityClass;
 import ti4.cache.CacheManager;
 import ti4.cache.CacheStatsToStringConverter;
 import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class LogCacheStatsCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                LogCacheStatsCron.class, LogCacheStatsCron::logCacheStats, 1, 4, TimeUnit.HOURS);
+                LogCacheStatsCron.class, CronManager.leased(LogCacheStatsCron::logCacheStats), 1, 4, TimeUnit.HOURS);
     }
 
     private static void logCacheStats() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        try {
-            String cacheStats = CacheStatsToStringConverter.convert(CacheManager.getNamesToCaches());
-            BotLogger.info("Cache Stats\n```\n" + cacheStats + "\n```");
-        } catch (Exception e) {
-            BotLogger.error("**LogCacheStatsCron failed.**", e);
-        }
+        String cacheStats = CacheStatsToStringConverter.convert(CacheManager.getNamesToCaches());
+        BotLogger.info("Cache Stats\n```\n" + cacheStats + "\n```");
     }
 }

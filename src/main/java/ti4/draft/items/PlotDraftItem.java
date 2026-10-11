@@ -1,13 +1,11 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
 import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.GenericCardModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -55,16 +53,11 @@ public class PlotDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems() {
-        List<DraftItem> allItems = buildAllItems();
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.PLOT);
-        return allItems;
+        return draftable(DraftCategory.PLOT, buildAllItems());
     }
 
     public static List<DraftItem> buildAllItems() {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (GenericCardModel plot : Mapper.getPlots().values()) {
-            allItems.add(generate(DraftCategory.PLOT, plot.getAlias()));
-        }
-        return allItems;
+        return generateAll(
+                DraftCategory.PLOT, Mapper.getPlots().values().stream().map(GenericCardModel::getAlias));
     }
 }

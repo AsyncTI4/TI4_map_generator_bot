@@ -12,7 +12,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 
 @Data
-public class ActionCardModel implements ModelInterface, EmbeddableModel {
+public class ActionCardModel implements ModelInterface, SearchTaggedModel {
 
     public enum PlayTiming {
         NONE, // Catch-all for cards without a modeled play timing restriction; this is currently most cards.
@@ -125,18 +125,11 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+        if (includeID) footer.append(idFooter(alias));
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.orange);
         return eb.build();
-    }
-
-    public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

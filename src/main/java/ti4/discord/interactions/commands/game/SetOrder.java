@@ -5,8 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -16,14 +15,7 @@ class SetOrder extends GameStateSubcommand {
 
     public SetOrder() {
         super(Constants.SET_ORDER, "Set player order in game", true, false);
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8"));
+        addOptions(CommonOptions.playerOptions(false, i -> "Player" + i));
     }
 
     @Override

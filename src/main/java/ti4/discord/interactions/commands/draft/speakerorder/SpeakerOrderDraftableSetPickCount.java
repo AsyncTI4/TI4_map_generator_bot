@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.draft.speakerorder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -22,13 +23,11 @@ class SpeakerOrderDraftableSetPickCount extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        SpeakerOrderDraftable draftable = SpeakerOrderDraftableGroup.getDraftable(getGame());
-        if (draftable == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Speaker order isn't draftable; you may need `/draft manage add_draftable SpeakerOrder`.");
-            return;
-        }
+        SpeakerOrderDraftable draftable = CommandHelper.requireOrReport(
+                event,
+                SpeakerOrderDraftableGroup.getDraftable(getGame()),
+                "Speaker order isn't draftable; you may need `/draft manage add_draftable SpeakerOrder`.");
+        if (draftable == null) return;
         OptionMapping optionData = event.getOption(Constants.PICK_COUNT_OPTION);
         int numPicks;
         if (optionData != null) {

@@ -49,7 +49,6 @@ public class MonumentsTEButtonHandler {
     private static final String START_EPIPHANYHOLLOW = "startEpiphanyHollow";
     private static final String SELECT_HOLLOW_SYSTEM = "selectEpiphanyHollowSystem_";
     private static final String REPLACE_HOLLOW_INFANTRY = "replaceEpiphanyHollowInfantry_";
-    private static final String KELERES_MONUMENT_COMMAND_TOKENS = "keleresMonumentCommandTokens_";
     private static final String RESOLVE_KELERES_MONUMENT_TOKEN = "resolveKeleresMonumentToken_";
     private static final String USE_RALNEL_MONUMENT = "useRalnelMonument";
     private static final String SELECT_RALNEL_MONUMENT_STRUCTURE = "selectRalnelMonumentStructure_";
@@ -58,21 +57,23 @@ public class MonumentsTEButtonHandler {
     private static final String USE_EPIPHANY_CONTROL_TOKEN = "useEpiphanyControlToken_";
     private static final String SELECT_EPIPHANY_PLOT = "selectEpiphanyPlot_";
 
+    private static final MonumentCommandTokenPool PHARUS_IUSTITIAE = new MonumentCommandTokenPool(
+            "keleres_monument",
+            "keleresMonumentCommandTokens_",
+            (game, player) -> player.hasUnit("keleres_monument")
+                    || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument"),
+            "Pharus Iustitiae",
+            "_Pharus Iustitiae_",
+            "checkKeleresMonumentTokens",
+            FactionEmojis.Keleres);
+
     // Pharus Iustitiae
     public static int getKeleresMonumentCommandTokenCount(Game game, Player player) {
-        if (game == null || player == null || !game.isMonumentsMode() || !hasKeleresMonument(game, player)) {
-            return 0;
-        }
-        String storedCount = game.getStoredValue(KELERES_MONUMENT_COMMAND_TOKENS + player.getFaction());
-        return storedCount.isBlank() ? 0 : Integer.parseInt(storedCount);
+        return PHARUS_IUSTITIAE.count(game, player);
     }
 
     public static Button getKeleresMonumentStatusButton(Game game, Player player) {
-        int tokens = getKeleresMonumentCommandTokenCount(game, player);
-        return Buttons.gray(
-                player.factionButtonChecker() + "checkKeleresMonumentTokens",
-                "Pharus Iustitiae: " + tokens + " Command Token" + (tokens == 1 ? "" : "s"),
-                FactionEmojis.Keleres);
+        return PHARUS_IUSTITIAE.statusButton(game, player);
     }
 
     public static void offerKeleresMonumentCommandToken(Game game) {
@@ -80,7 +81,7 @@ public class MonumentsTEButtonHandler {
             return;
         }
         for (Player player : game.getRealPlayers()) {
-            if (!canPlaceKeleresMonumentCommandToken(game, player) || player.getCorrectChannel() == null) {
+            if (!PHARUS_IUSTITIAE.canPlace(game, player) || player.getCorrectChannel() == null) {
                 continue;
             }
             MessageHelper.sendMessageToChannelWithButtons(
@@ -98,33 +99,18 @@ public class MonumentsTEButtonHandler {
 
     @ButtonHandler("placeKeleresMonumentCommandToken")
     public static void placeKeleresMonumentCommandToken(ButtonInteractionEvent event, Game game, Player player) {
-        if (!canPlaceKeleresMonumentCommandToken(game, player)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Pharus Iustitiae cannot take a command token right now.");
-            return;
-        }
-        int tokens = getKeleresMonumentCommandTokenCount(game, player) + 1;
-        game.setStoredValue(KELERES_MONUMENT_COMMAND_TOKENS + player.getFaction(), Integer.toString(tokens));
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " placed a command token on _Pharus Iustitiae_ (" + tokens + ").");
+        PHARUS_IUSTITIAE.place(event, game, player);
     }
 
     @ButtonHandler("checkKeleresMonumentTokens")
     public static void checkKeleresMonumentTokens(ButtonInteractionEvent event, Game game, Player player) {
-        int tokens = getKeleresMonumentCommandTokenCount(game, player);
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "_Pharus Iustitiae_ has " + tokens + " command token" + (tokens == 1 ? "" : "s") + " on it.");
+        PHARUS_IUSTITIAE.check(event, game, player);
     }
 
     public static boolean offerKeleresMonumentTokenReplacement(
             GenericInteractionCreateEvent event, Player player, Tile tile, boolean ping, boolean useTactic) {
         Game game = player == null ? null : player.getGame();
-        if (game == null
-                || tile == null
-                || getKeleresMonumentCommandTokenCount(game, player) < 1
-                || !MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "keleres_monument", tile)) {
+        if (game == null || !PHARUS_IUSTITIAE.canSpendIn(game, player, tile)) {
             return false;
         }
         String payload = tile.getPosition() + "|" + (ping ? "1" : "0") + "|" + (useTactic ? "1" : "0");
@@ -158,34 +144,15 @@ public class MonumentsTEButtonHandler {
             return;
         }
         if (useMonumentToken) {
-            if (getKeleresMonumentCommandTokenCount(game, player) < 1
-                    || !MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "keleres_monument", tile)) {
+            if (!PHARUS_IUSTITIAE.canSpendIn(game, player, tile)) {
                 MessageHelper.sendEphemeralMessageToEventChannel(
                         event, "Pharus Iustitiae cannot provide a command token for that system.");
                 return;
             }
-            int remainingTokens = getKeleresMonumentCommandTokenCount(game, player) - 1;
-            if (remainingTokens == 0) {
-                game.removeStoredValue(KELERES_MONUMENT_COMMAND_TOKENS + player.getFaction());
-            } else {
-                game.setStoredValue(
-                        KELERES_MONUMENT_COMMAND_TOKENS + player.getFaction(), Integer.toString(remainingTokens));
-            }
+            PHARUS_IUSTITIAE.spend(game, player);
         }
         CommandCounterHelper.addCC(event, player, tile, ping, !useMonumentToken && useTactic, true);
         ButtonHelper.deleteMessage(event);
-    }
-
-    private static boolean hasKeleresMonument(Game game, Player player) {
-        return player.hasUnit("keleres_monument")
-                || MonumentsService.isMonumentOnBoard(game, player, "keleres_monument");
-    }
-
-    private static boolean canPlaceKeleresMonumentCommandToken(Game game, Player player) {
-        if (!game.isMonumentsMode() || !hasKeleresMonument(game, player)) {
-            return false;
-        }
-        return Helper.getCCCount(game, player.getColor()) < player.getCommandTokenLimit();
     }
 
     // Epiphany Hollow
@@ -311,14 +278,8 @@ public class MonumentsTEButtonHandler {
             return;
         }
         RemoveUnitService.removeUnit(event, tile, game, puppetedPlayer, planet, UnitType.Infantry, amount);
-        String coexistFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " infantry " + planet.getName());
-        if (coexistFlag.isEmpty()) {
-            game.removeStoredValue("coexistFlag");
-        } else {
-            game.setStoredValue("coexistFlag", coexistFlag);
-        }
+        AddUnitService.addUnitsInCoexistence(
+                event, tile, game, player.getColor(), amount + " infantry " + planet.getName());
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " replaced " + amount + " "

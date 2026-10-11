@@ -192,17 +192,7 @@ public class KaltrimUnitHandler {
             return;
         }
 
-        String coexistenceFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        try {
-            AddUnitService.addUnits(event, activeSystem, game, owner.getColor(), "pds " + planet.getName());
-        } finally {
-            if (coexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", coexistenceFlag);
-            }
-        }
+        AddUnitService.addUnitsInCoexistence(event, activeSystem, game, owner.getColor(), "pds " + planet.getName());
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
                 target.getRepresentationNoPing() + " placed " + owner.getRepresentationNoPing()

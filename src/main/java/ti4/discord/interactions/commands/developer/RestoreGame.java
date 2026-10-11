@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
@@ -46,11 +47,8 @@ class RestoreGame extends Subcommand {
             return;
         }
 
-        Game game = GameManager.reload(gameName);
-        if (game == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Failed to restore game.");
-            return;
-        }
+        Game game = CommandHelper.requireOrReport(event, GameManager.reload(gameName), "Failed to restore game.");
+        if (game == null) return;
 
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getName() + " was restored.");

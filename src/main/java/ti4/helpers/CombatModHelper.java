@@ -27,6 +27,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.model.AbilityModel;
 import ti4.model.AgendaModel;
 import ti4.model.BreakthroughModel;
@@ -42,7 +43,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.game.MonumentsService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
@@ -1054,7 +1054,7 @@ public class CombatModHelper {
 
         if (isBombardment) {
             String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
-            List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
+            List<BombardmentAssignment> bombardmentAssignments = JsonMapperManager.basic()
                     .readValue(
                             game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             return bombardmentAssignments.stream()

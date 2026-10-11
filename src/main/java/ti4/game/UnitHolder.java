@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -28,7 +27,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.model.SpaceTokenModel;
 import ti4.model.UnitModel;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "javaClassType")
@@ -476,30 +474,11 @@ public abstract class UnitHolder {
                 .sum();
     }
 
-    @JsonIgnore
-    public List<SpaceTokenModel> getSpaceTokensList() {
-        return tokenList.stream()
-                .map(Mapper::getSpaceTokenFromTokenIdOrFileName)
-                .filter(Objects::nonNull)
-                .toList();
-    }
-
     private static int getGalvanizedUnitStateCount(List<Integer> counts) {
         if (counts == null) return 0;
         int tot = 0;
         for (UnitState state : UnitState.values()) tot += state.isGalvanized() ? getUnitStateCount(counts, state) : 0;
         return tot;
-    }
-
-    @Deprecated
-    @JsonIgnore
-    public Map<UnitKey, Integer> getUnitGalvanize() {
-        Map<UnitKey, Integer> units = new HashMap<>();
-        for (UnitKey uk : unitsByState.keySet()) {
-            int amt = getGalvanizedUnitCount(uk);
-            if (amt > 0) units.put(uk, amt);
-        }
-        return units;
     }
 
     public void removeAllGalvanize(String color) {

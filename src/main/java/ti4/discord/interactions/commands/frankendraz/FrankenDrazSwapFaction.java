@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,8 +21,7 @@ class FrankenDrazSwapFaction extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION2, "Faction to add")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Player faction or color")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Player faction or color"));
     }
 
     @Override

@@ -15,6 +15,7 @@ class DealSO extends GameStateSubcommand {
 
     DealSO() {
         super(Constants.DEAL_SO, "Deal Secret Objective", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -34,10 +35,5 @@ class DealSO extends GameStateSubcommand {
         }
         MessageHelper.sendMessageToEventChannel(event, count + " Secret objective dealt.");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

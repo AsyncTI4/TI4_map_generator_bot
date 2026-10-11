@@ -73,12 +73,7 @@ public class PonthousTechHandler {
 
         Tile tile = game.getTileByPosition(values[0]);
         UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
-        UnitKey unitKey = holder == null
-                ? null
-                : holder.getUnitKeysForPlayer(player).stream()
-                        .filter(key -> key.asyncID().equals(values[2]))
-                        .findFirst()
-                        .orElse(null);
+        UnitKey unitKey = findPlayerUnitKey(holder, player, values[2]);
         UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
         int selectedCount = getThunderbirdProtocolSelectionCount(game, player);
         if (!canUseThunderbirdProtocol(game, player, tile)
@@ -124,12 +119,7 @@ public class PonthousTechHandler {
             if (values.length != 5 || tile == null || !tile.getPosition().equals(values[0])) continue;
 
             UnitHolder holder = tile.getUnitHolders().get(values[1]);
-            UnitKey unitKey = holder == null
-                    ? null
-                    : holder.getUnitKeysForPlayer(player).stream()
-                            .filter(key -> key.asyncID().equals(values[2]))
-                            .findFirst()
-                            .orElse(null);
+            UnitKey unitKey = findPlayerUnitKey(holder, player, values[2]);
             UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
             if (unit == null || !unit.getIsGroundForce() || holder.getUnitCount(unitKey) < 1) continue;
             units.add(getThunderbirdCombatGroundForce(unit, holder));
@@ -149,12 +139,7 @@ public class PonthousTechHandler {
 
                 Tile tile = game.getTileByPosition(values[0]);
                 UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
-                UnitKey unitKey = holder == null
-                        ? null
-                        : holder.getUnitKeysForPlayer(player).stream()
-                                .filter(key -> key.asyncID().equals(values[2]))
-                                .findFirst()
-                                .orElse(null);
+                UnitKey unitKey = findPlayerUnitKey(holder, player, values[2]);
                 if (unitKey != null) {
                     int baseline = NumberUtils.toInt(values[3]);
                     int added = NumberUtils.toInt(values[4]);
@@ -277,5 +262,14 @@ public class PonthousTechHandler {
 
     private static String getThunderbirdProtocolStateKey(Player player, int selection) {
         return THUNDERBIRD_PROTOCOL_STATE + player.getFaction() + "_" + selection;
+    }
+
+    public static UnitKey findPlayerUnitKey(UnitHolder holder, Player player, String asyncId) {
+        return holder == null
+                ? null
+                : holder.getUnitKeysForPlayer(player).stream()
+                        .filter(key -> key.asyncID().equals(asyncId))
+                        .findFirst()
+                        .orElse(null);
     }
 }

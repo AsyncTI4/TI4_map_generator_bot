@@ -1,17 +1,16 @@
 package ti4.discord.interactions.commands.cardsac;
 
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 
 class SendAC extends GameStateSubcommand {
@@ -20,11 +19,8 @@ class SendAC extends GameStateSubcommand {
         super(Constants.SEND_AC, "Send an action card to a player", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID to send")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color to send to"));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override
@@ -32,24 +28,15 @@ class SendAC extends GameStateSubcommand {
         Player player = getPlayer();
         int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
 
-        String acID = null;
-        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-            if (ac.getValue().equals(acIndex)) {
-                acID = ac.getKey();
-            }
-        }
-
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
-            return;
-        }
+        String acID = CommandHelper.requireOrReport(
+                event,
+                CommandHelper.cardIdForNumber(player.getActionCards(), acIndex),
+                "No such action card ID found, please retry.");
+        if (acID == null) return;
 
         Game game = getGame();
-        Player playerToSendTo = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (playerToSendTo == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player playerToSendTo = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (playerToSendTo == null) return;
 
         // FoW specific pinging
         if (game.isFowMode()) {

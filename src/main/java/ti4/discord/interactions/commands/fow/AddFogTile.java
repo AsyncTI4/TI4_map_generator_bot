@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
@@ -21,7 +22,7 @@ class AddFogTile extends GameStateSubcommand {
     public AddFogTile() {
         super(Constants.ADD_FOG_TILE, "Add a Fog of War tile to the map.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
+        addOptions(CommonOptions.tileName("Tile name"));
         addOptions(new OptionData(OptionType.STRING, Constants.LABEL, "How you want the system to be labelled")
                 .setMaxLength(30));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to add to")

@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.cardsac;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -18,13 +19,7 @@ class ShuffleACDeck extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String confirm = event.getOption(Constants.CONFIRM).getAsString();
-        if (!"YES".equals(confirm)) {
-            MessageHelper.replyToMessage(
-                    event,
-                    "Must confirm with `YES`" + ("YES".equalsIgnoreCase(confirm) ? " - this is case sensitive" : "")
-                            + ".");
-            return;
-        }
+        if (!CommandHelper.confirmedWithYes(event, confirm)) return;
 
         getGame().shuffleActionCards();
         MessageHelper.replyToMessage(event, "Action card deck was shuffled");

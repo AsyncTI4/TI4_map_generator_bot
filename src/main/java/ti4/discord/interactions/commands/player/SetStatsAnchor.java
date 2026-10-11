@@ -1,9 +1,8 @@
 package ti4.discord.interactions.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -14,13 +13,8 @@ class SetStatsAnchor extends GameStateSubcommand {
 
     public SetStatsAnchor() {
         super(Constants.SET_STATS_ANCHOR, "Set the location your stats anchor appears on the map", true, true);
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name or coordinate to anchor stats block")
-                        .setRequired(true)
-                        .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("Tile name or coordinate to anchor stats block"));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     @Override

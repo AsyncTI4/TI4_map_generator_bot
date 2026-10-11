@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,17 +21,7 @@ import ti4.message.MessageHelper;
 public class ShowDistancesCommand extends GameStateCommand {
 
     public ShowDistancesCommand() {
-        super(false, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.SHOW_DISTANCES;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Shows map with distances to each tile from specified tile";
+        super(Constants.SHOW_DISTANCES, "Shows map with distances to each tile from specified tile", false, true);
     }
 
     @Override
@@ -44,20 +35,17 @@ public class ShowDistancesCommand extends GameStateCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
-            return;
-        }
+        OptionMapping tileOption =
+                CommandHelper.requireOrReport(event, event.getOption(Constants.TILE_NAME), "Specify a tile");
+        if (tileOption == null) return;
         Game game = getGame();
         Player player = getPlayer();
         String tileID = tileOption.getAsString().toLowerCase();
-        Tile tile = TileHelper.getTile(event, tileID, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event,
+                TileHelper.getTile(event, tileID, game),
+                "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+        if (tile == null) return;
 
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
         game.setTileDistances(

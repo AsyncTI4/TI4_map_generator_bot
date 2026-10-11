@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.relic;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -16,8 +17,7 @@ class RelicExhaust extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust")
                 .setAutoComplete(true)
                 .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override

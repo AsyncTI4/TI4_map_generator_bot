@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.ResourceHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -20,7 +21,7 @@ class AddTile extends GameStateSubcommand {
 
     public AddTile() {
         super(Constants.ADD_TILE, "Add tile to map", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
+        addOptions(CommonOptions.tileName("Tile name"));
         addOptions(new OptionData(
                 OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true));
     }

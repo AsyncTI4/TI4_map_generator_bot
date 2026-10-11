@@ -5,18 +5,20 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CategoryCleanupCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 6, 24, TimeUnit.HOURS);
+                CategoryCleanupCron.class,
+                CronManager.leased(CategoryCleanupCron::cleanupCategories),
+                6,
+                24,
+                TimeUnit.HOURS);
     }
 
     private static void cleanupCategories() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         JdaService.guilds.forEach(guild -> guild.getCategories().stream()
                 .filter(category -> category.getName().startsWith("PBD #"))
                 .filter(category -> category.getChannels().isEmpty())

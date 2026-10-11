@@ -183,13 +183,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                 footer.append('\n');
             }
         }
-        if (includeID) {
-            footer.append("ID: ")
-                    .append(alias)
-                    .append("    Source: ")
-                    .append(source)
-                    .append('\n');
-        }
+        if (includeID) footer.append(idFooter(alias)).append('\n');
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.blue);
@@ -235,19 +229,6 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public boolean isNotWellKnown() {
         return getFaction().isPresent() || (source != ComponentSource.base && source != ComponentSource.pok);
-    }
-
-    /**
-     * @deprecated This only exists to simulate the old text based promissory note .property files
-     */
-    @Deprecated
-    public String getShortText() {
-        String promStr = text;
-        // if we would break trying to split the note, just return whatever is there
-        if (promStr == null || !promStr.contains(";")) {
-            return promStr;
-        }
-        return name + ";" + getFaction() + getColor();
     }
 
     public boolean search(String searchString) {

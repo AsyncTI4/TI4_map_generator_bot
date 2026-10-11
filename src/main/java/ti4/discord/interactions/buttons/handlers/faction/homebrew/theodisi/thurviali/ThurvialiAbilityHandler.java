@@ -106,17 +106,7 @@ public class ThurvialiAbilityHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        String coexistenceFlag = game.getStoredValue("coexistFlag");
-        game.setStoredValue("coexistFlag", "yes");
-        try {
-            AddUnitService.addUnits(event, tile, game, player.getColor(), "gf " + planet.getName());
-        } finally {
-            if (coexistenceFlag.isEmpty()) {
-                game.removeStoredValue("coexistFlag");
-            } else {
-                game.setStoredValue("coexistFlag", coexistenceFlag);
-            }
-        }
+        AddUnitService.addUnitsInCoexistence(event, tile, game, player.getColor(), "gf " + planet.getName());
         game.setStoredValue(useKey, "used");
         checkRadiantGrafting(game);
         ThurvialiBreakthroughHandler.offerNeurografting(event, game, player, planet);

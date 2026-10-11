@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
@@ -51,14 +52,12 @@ class Observer extends Subcommand {
         }
 
         ManagedGame game = GameManager.getManagedGame(gameName);
-        Guild guild = game.getGuild();
-        if (guild == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Could not determine the server for game: " + gameName
-                            + ". Please make sure the game channels still exist.");
-            return;
-        }
+        Guild guild = CommandHelper.requireOrReport(
+                event,
+                game.getGuild(),
+                "Could not determine the server for game: " + gameName
+                        + ". Please make sure the game channels still exist.");
+        if (guild == null) return;
 
         Member member = guild.getMemberById(user.getId());
 

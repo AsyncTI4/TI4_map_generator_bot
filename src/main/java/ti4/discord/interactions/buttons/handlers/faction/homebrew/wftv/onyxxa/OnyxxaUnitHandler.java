@@ -10,20 +10,13 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class OnyxxaUnitHandler {
-
-    public static int getObeliskCombatModifier(Player player, UnitHolder unitHolder) {
-        int totalMechs = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
-        return Math.max(0, totalMechs - 1);
-    }
 
     public static boolean isFlagshipInOrAdjacentSystem(Game game, Player player, Tile tile) {
         if (tile == null) {

@@ -1,8 +1,7 @@
 package ti4.discord.interactions.commands.relic;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.RelicHelper;
@@ -11,8 +10,7 @@ class RelicDraw extends GameStateSubcommand {
 
     RelicDraw() {
         super(Constants.RELIC_DRAW, "Draw a relic", true, true);
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override

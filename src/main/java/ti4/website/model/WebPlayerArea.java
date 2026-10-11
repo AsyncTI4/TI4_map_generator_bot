@@ -211,8 +211,7 @@ public class WebPlayerArea {
         webPlayerArea.strategicCC = player.getStrategicCC();
 
         // Calculate CC reinforcements
-        int ccReinf = calculateCCReinforcements(player, game);
-        webPlayerArea.ccReinf = ccReinf;
+        webPlayerArea.ccReinf = calculateCCReinforcements(player, game);
 
         // Resources
         webPlayerArea.tg = player.getTg();
@@ -220,33 +219,20 @@ public class WebPlayerArea {
         webPlayerArea.commoditiesTotal = player.getCommoditiesTotal();
 
         // Resource and influence totals
-        Integer resources = Helper.getPlayerResourcesAvailable(player, game);
-        Integer influence = Helper.getPlayerInfluenceAvailable(player, game);
-        Integer totResources = Helper.getPlayerResourcesTotal(player, game);
-        Integer totInfluence = Helper.getPlayerInfluenceTotal(player, game);
-
-        webPlayerArea.resources = resources != null ? resources : 0;
-        webPlayerArea.influence = influence != null ? influence : 0;
-        webPlayerArea.totResources = totResources != null ? totResources : 0;
-        webPlayerArea.totInfluence = totInfluence != null ? totInfluence : 0;
+        webPlayerArea.resources = Helper.getPlayerResourcesAvailable(player, game);
+        webPlayerArea.influence = Helper.getPlayerInfluenceAvailable(player, game);
+        webPlayerArea.totResources = Helper.getPlayerResourcesTotal(player, game);
+        webPlayerArea.totInfluence = Helper.getPlayerInfluenceTotal(player, game);
 
         // Optimal resource and influence calculations
-        Integer optimalResources = Helper.getPlayerOptimalResourcesAvailable(player, game);
-        Integer optimalInfluence = Helper.getPlayerOptimalInfluenceAvailable(player, game);
-        Integer flexValue = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
-
-        webPlayerArea.optimalResources = optimalResources != null ? optimalResources : 0;
-        webPlayerArea.optimalInfluence = optimalInfluence != null ? optimalInfluence : 0;
-        webPlayerArea.flexValue = flexValue != null ? flexValue : 0;
+        webPlayerArea.optimalResources = Helper.getPlayerOptimalResourcesAvailable(player, game);
+        webPlayerArea.optimalInfluence = Helper.getPlayerOptimalInfluenceAvailable(player, game);
+        webPlayerArea.flexValue = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
 
         // Total optimal resource and influence calculations (all planets)
-        Integer totOptimalResources = Helper.getPlayerOptimalResourcesTotal(player, game);
-        Integer totOptimalInfluence = Helper.getPlayerOptimalInfluenceTotal(player, game);
-        Integer totFlexValue = Helper.getPlayerFlexResourcesInfluenceTotal(player, game);
-
-        webPlayerArea.totOptimalResources = totOptimalResources != null ? totOptimalResources : 0;
-        webPlayerArea.totOptimalInfluence = totOptimalInfluence != null ? totOptimalInfluence : 0;
-        webPlayerArea.totFlexValue = totFlexValue != null ? totFlexValue : 0;
+        webPlayerArea.totOptimalResources = Helper.getPlayerOptimalResourcesTotal(player, game);
+        webPlayerArea.totOptimalInfluence = Helper.getPlayerOptimalInfluenceTotal(player, game);
+        webPlayerArea.totFlexValue = Helper.getPlayerFlexResourcesInfluenceTotal(player, game);
 
         // Fragments
         webPlayerArea.crf = player.getCrf();
@@ -300,12 +286,7 @@ public class WebPlayerArea {
 
         Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
         // Known unscored secrets (populated if search warrant is in play)
-        if (player.isSearchWarrant()) {
-            webPlayerArea.knownUnscoredSecrets = unscoredSecrets;
-        } else {
-            webPlayerArea.knownUnscoredSecrets = new HashMap<>();
-        }
-
+        webPlayerArea.knownUnscoredSecrets = player.isSearchWarrant() ? unscoredSecrets : new HashMap<>();
         webPlayerArea.numUnscoredSecrets = unscoredSecrets.size();
 
         // Additional properties
@@ -346,12 +327,9 @@ public class WebPlayerArea {
         // Parse valefarZ stored value which contains factions whose flagships have been assimilated
         List<String> valefarZTargets = new ArrayList<>();
         if (player.hasUnlockedBreakthrough("nekrobt")) {
-            String valefarZValue = game.getStoredValue("valefarZ");
-            if (!valefarZValue.isEmpty()) {
-                for (String faction : valefarZValue.split("\\|")) {
-                    if (!faction.isEmpty()) {
-                        valefarZTargets.add(faction);
-                    }
+            for (String faction : game.getStoredValue("valefarZ").split("\\|")) {
+                if (!faction.isEmpty()) {
+                    valefarZTargets.add(faction);
                 }
             }
         }
@@ -373,11 +351,7 @@ public class WebPlayerArea {
             }
 
             // TODO: MemePhilosopher make this a list
-            if (!breakthroughs.isEmpty()) {
-                webPlayerArea.breakthrough = breakthroughs.getFirst();
-            } else {
-                webPlayerArea.breakthrough = null;
-            }
+            webPlayerArea.breakthrough = breakthroughs.isEmpty() ? null : breakthroughs.getFirst();
         } else {
             webPlayerArea.breakthrough = null;
         }
@@ -487,8 +461,7 @@ public class WebPlayerArea {
             Units.UnitKey unitKey = Mapper.getUnitKey(unitID, playerColor);
             int unitCap = player.getUnitCap(unitID);
             int count = unitMapCount.getOrDefault(unitKey, 0);
-            UnitCountInfo unitCountInfo = new UnitCountInfo(unitCap, count);
-            unitInfoMap.put(unitID, unitCountInfo);
+            unitInfoMap.put(unitID, new UnitCountInfo(unitCap, count));
         }
 
         webPlayerArea.unitCounts = unitInfoMap;
@@ -507,9 +480,9 @@ public class WebPlayerArea {
                     String unitFaction = unitOwner.getFaction();
                     int count = nombox.getUnitCount(unitKey);
 
-                    unitsByFaction.computeIfAbsent(unitFaction, _ -> new HashMap<>());
-                    Map<String, Integer> unitCounts = unitsByFaction.get(unitFaction);
-                    unitCounts.put(unitId, unitCounts.getOrDefault(unitId, 0) + count);
+                    unitsByFaction
+                            .computeIfAbsent(unitFaction, _ -> new HashMap<>())
+                            .merge(unitId, count, Integer::sum);
                 }
             }
 
@@ -533,12 +506,8 @@ public class WebPlayerArea {
         }
 
         // Debt tokens: debt that this player is OWED by other players (only include entries with count > 0)
-        Map<String, Integer> debtTokens = new HashMap<>();
-        for (Map.Entry<String, Integer> debtEntry : player.getDebtTokens().entrySet()) {
-            if (debtEntry.getValue() > 0) {
-                debtTokens.put(debtEntry.getKey(), debtEntry.getValue());
-            }
-        }
+        Map<String, Integer> debtTokens = new HashMap<>(player.getDebtTokens());
+        debtTokens.values().removeIf(count -> count <= 0);
         webPlayerArea.debtTokens = debtTokens;
 
         return webPlayerArea;
@@ -548,14 +517,12 @@ public class WebPlayerArea {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
             if (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter) {
                 if (!isCaptured) {
-                    unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
+                    unitCount.merge(uk, 1, Integer::sum);
                 }
                 continue;
             }
 
-            int count = unitCount.getOrDefault(uk, 0);
-            count += unitHolder.getUnitCount(uk);
-            unitCount.put(uk, count);
+            unitCount.merge(uk, unitHolder.getUnitCount(uk), Integer::sum);
         }
     }
 

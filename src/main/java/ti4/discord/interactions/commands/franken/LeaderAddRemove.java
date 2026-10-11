@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -26,9 +27,7 @@ abstract class LeaderAddRemove extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_2, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_3, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_4, "Leader Name").setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     public void execute(SlashCommandInteractionEvent event) {

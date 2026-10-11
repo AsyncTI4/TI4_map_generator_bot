@@ -1,8 +1,7 @@
 package ti4.discord.interactions.commands.statistics;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.spring.service.statistics.LifeTimeRecordService;
@@ -11,14 +10,7 @@ class LifetimeRecord extends Subcommand {
 
     LifetimeRecord() {
         super(Constants.LIFETIME_RECORD, "Dice luck for all games of specific players");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8"));
+        addOptions(CommonOptions.playerOptions(true, i -> "Player" + i));
     }
 
     @Override

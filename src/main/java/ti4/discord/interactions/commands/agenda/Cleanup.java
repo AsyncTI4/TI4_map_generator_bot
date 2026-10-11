@@ -2,13 +2,12 @@ package ti4.discord.interactions.commands.agenda;
 
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 
 class Cleanup extends GameStateSubcommand {
 
@@ -19,14 +18,7 @@ class Cleanup extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(
-                    event,
-                    "Must confirm with `YES`"
-                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
-            return;
-        }
+        if (!CommandHelper.confirmedWithYes(event, event.getOption(Constants.CONFIRM))) return;
 
         Map<String, Player> players = getGame().getPlayers();
         for (Player player : players.values()) {

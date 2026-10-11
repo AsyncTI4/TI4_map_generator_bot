@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.tf;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,11 +15,11 @@ class DrawSpecificParadigm extends GameStateSubcommand {
 
     DrawSpecificParadigm() {
         super("draw_specific_paradigm", "Draw a specific Twilight's Fall Paradigm", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.TF_PARADIGM, "Name of the paradigm you wish to draw")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you draw")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color for which you draw"));
     }
 
     @Override
@@ -34,10 +35,5 @@ class DrawSpecificParadigm extends GameStateSubcommand {
                 ? " successfully drew a specific paradigm."
                 : " tried to draw a specific paradigm, but was unable to.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

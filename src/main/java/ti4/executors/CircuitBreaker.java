@@ -92,16 +92,14 @@ public class CircuitBreaker {
 
     private static Duration getDurationUtilClose() {
         if (!open || closeDateTime == null) return Duration.ZERO;
-        return Duration.between(LocalDateTime.now(), closeDateTime).isNegative()
-                ? Duration.ZERO
-                : Duration.between(LocalDateTime.now(), closeDateTime);
+        Duration untilClose = Duration.between(LocalDateTime.now(), closeDateTime);
+        return untilClose.isNegative() ? Duration.ZERO : untilClose;
     }
 
     private static String formatOpenReasons() {
         if (openReasons.isEmpty()) {
             return "";
         }
-        String formattedReasons = String.join("\n - ", openReasons);
-        return "\nCircuit breaker reasons:\n - " + formattedReasons;
+        return "\nCircuit breaker reasons:\n - " + String.join("\n - ", openReasons);
     }
 }

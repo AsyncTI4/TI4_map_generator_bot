@@ -10,9 +10,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.ExploreEmojis;
 
 @UtilityClass
 class ArtifactHuntersAcd2ButtonHandler {
@@ -64,8 +62,8 @@ class ArtifactHuntersAcd2ButtonHandler {
         for (String fragId : player.getFragments()) {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "artifactHuntersPurge_" + fragId,
-                    "Purge " + fragmentLabel(fragId),
-                    fragmentEmoji(fragId)));
+                    "Purge " + HeistAcd2ButtonHandler.fragmentLabel(fragId),
+                    HeistAcd2ButtonHandler.fragmentEmoji(fragId)));
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
@@ -96,28 +94,11 @@ class ArtifactHuntersAcd2ButtonHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " spent " + RELIC_TG_COST + " trade goods and purged a "
-                        + fragmentEmoji(fragId) + fragmentLabel(fragId) + " for _Artifact Hunters_.");
+                        + HeistAcd2ButtonHandler.fragmentEmoji(fragId) + HeistAcd2ButtonHandler.fragmentLabel(fragId)
+                        + " for _Artifact Hunters_.");
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", use the button to draw your relic.",
                 Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw Relic"));
-    }
-
-    private static String fragmentLabel(String fragId) {
-        return switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
-            case "cultural" -> "cultural relic fragment";
-            case "industrial" -> "industrial relic fragment";
-            case "hazardous" -> "hazardous relic fragment";
-            default -> "unknown relic fragment";
-        };
-    }
-
-    private static String fragmentEmoji(String fragId) {
-        return switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
-            case "cultural" -> ExploreEmojis.CFrag.toString();
-            case "industrial" -> ExploreEmojis.IFrag.toString();
-            case "hazardous" -> ExploreEmojis.HFrag.toString();
-            default -> ExploreEmojis.UFrag.toString();
-        };
     }
 }

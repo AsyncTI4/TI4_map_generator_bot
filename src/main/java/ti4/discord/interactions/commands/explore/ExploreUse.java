@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -26,8 +27,7 @@ class ExploreUse extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.FORCE, "True to force the draw, even if none are in the deck"));
     }

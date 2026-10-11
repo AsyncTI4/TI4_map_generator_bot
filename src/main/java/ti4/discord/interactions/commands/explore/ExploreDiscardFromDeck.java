@@ -1,54 +1,20 @@
 package ti4.discord.interactions.commands.explore;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
-import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-class ExploreDiscardFromDeck extends GameStateSubcommand {
+class ExploreDiscardFromDeck extends ExploreCardIdsSubcommand {
 
     ExploreDiscardFromDeck() {
-        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.EXPLORE_CARD_ID,
-                        "Exploration card ids. May include multiple comma-separated ids.")
-                .setRequired(true));
+        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.");
+        markSuspicious();
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        String ids = PatternHelper.SPACE_PATTERN
-                .matcher(event.getOption(Constants.EXPLORE_CARD_ID).getAsString())
-                .replaceAll("");
-        String[] idList = ids.split(",");
-        StringBuilder sb = new StringBuilder();
-        for (String id : idList) {
-            ExploreModel explore = Mapper.getExplore(id);
-            if (explore != null) {
-                game.discardExplore(id);
-                sb.append("Card discarded: ")
-                        .append(explore.textRepresentation())
-                        .append(System.lineSeparator());
-            } else {
-                sb.append("Card ID ")
-                        .append(id)
-                        .append(" not found, please retry")
-                        .append(System.lineSeparator());
-            }
-        }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
+    protected String handleCard(Game game, String id, ExploreModel explore) {
+        if (explore == null) return notFound(id);
+        game.discardExplore(id);
+        return "Card discarded: " + explore.textRepresentation();
     }
 }

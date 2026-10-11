@@ -19,6 +19,7 @@ class RelicDrawSpecific extends GameStateSubcommand {
 
     RelicDrawSpecific() {
         super(Constants.RELIC_DRAW_SPECIFIC, "Draw a specific relic", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust")
                 .setAutoComplete(true)
                 .setRequired(true));
@@ -51,10 +52,5 @@ class RelicDrawSpecific extends GameStateSubcommand {
                 event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         RelicHelper.resolveRelicEffects(event, game, player, relicID);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

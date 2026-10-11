@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
@@ -24,13 +25,11 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MantisTileDraftable draftable = MantisTileDraftableGroup.getDraftable(getGame());
-        if (draftable == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Mantis tile isn't draftable; you may need `/draft manage add_draftable MantisTile`.");
-            return;
-        }
+        MantisTileDraftable draftable = CommandHelper.requireOrReport(
+                event,
+                MantisTileDraftableGroup.getDraftable(getGame()),
+                "Mantis tile isn't draftable; you may need `/draft manage add_draftable MantisTile`.");
+        if (draftable == null) return;
         if (event.getOption("tiles") == null) {
             return;
         }
@@ -47,11 +46,9 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
                 .filter(s -> !s.isEmpty())
                 .toList();
         for (String tileID : tileIDs) {
-            TileModel tile = TileHelper.getTileById(tileID);
-            if (tile == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown tile ID: " + tileID + ".");
-                return;
-            }
+            TileModel tile = CommandHelper.requireOrReport(
+                    event, TileHelper.getTileById(tileID), "Unknown tile ID: " + tileID + ".");
+            if (tile == null) return;
             if (tile.getTileBack() != TileBack.BLUE && tile.getTileBack() != TileBack.RED) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "Tile ID " + tileID + " is not a blue or red tile.");

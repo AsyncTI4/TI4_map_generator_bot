@@ -23,6 +23,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -37,7 +38,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 class BombardmentButtonHandler {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = JsonMapperManager.basic();
 
     @ButtonHandler("unassignBombardUnit_")
     public static void unassignBombardUnit(ButtonInteractionEvent event, Player player, String buttonID, Game game) {

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -28,9 +29,7 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                 new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
                         .setRequired(true)
                         .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
+                CommonOptions.tileName(),
                 new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
     }
 

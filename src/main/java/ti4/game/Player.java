@@ -41,7 +41,6 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -66,6 +65,7 @@ import ti4.discord.utility.DiscordErrorUtility;
 import ti4.discord.utility.DiscordThreadUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.game.helper.CardIdHelper;
 import ti4.game.helper.StoredValueHelper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
@@ -263,27 +263,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public boolean removeSingularityTech(String tech) {
-        boolean singularity = false;
-        if (getSingularityTechs().contains(tech)) {
-            singularity = true;
-            String oldVal = game.getStoredValue(getFaction() + "singularityTechs");
-            if (oldVal.contains(tech + "_")) {
-                oldVal = oldVal.replace(tech + "_", "");
-            } else {
-                oldVal = oldVal.replace(tech, "");
-            }
-            game.setStoredValue(getFaction() + "singularityTechs", oldVal);
+        if (!getSingularityTechs().contains(tech)) {
+            return false;
         }
-        return singularity;
+        String key = getFaction() + "singularityTechs";
+        game.setStoredValue(key, StoredValueHelper.removeFromList(game.getStoredValue(key), tech));
+        return true;
     }
 
     public void addSingularityTech(String tech) {
         if (!getSingularityTechs().contains(tech)) {
-            String prev = game.getStoredValue(getFaction() + "singularityTechs");
-            if (!prev.isEmpty()) {
-                prev += "_";
-            }
-            game.setStoredValue(getFaction() + "singularityTechs", prev + tech);
+            String key = getFaction() + "singularityTechs";
+            game.setStoredValue(key, StoredValueHelper.appendToList(game.getStoredValue(key), tech));
         }
     }
 
@@ -382,12 +373,23 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public int getSpentTgsThisWindow() {
+        return getSpentCountThisWindow("tg_");
+    }
+
+    private int getSpentCountThisWindow(String prefix) {
         for (String thing : getSpentThingsThisWindow()) {
-            if (thing.contains("tg_")) {
+            if (thing.contains(prefix)) {
                 return Integer.parseInt(thing.split("_")[1]);
             }
         }
         return 0;
+    }
+
+    private void increaseSpentCountThisWindow(String prefix, int oldCount, int amount) {
+        if (oldCount != 0) {
+            removeSpentThing(prefix + oldCount);
+        }
+        addSpentThing(prefix + (oldCount + amount));
     }
 
     public List<String> getTransactionItemsWithPlayer(Player player) {
@@ -561,47 +563,23 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public int getSpentInfantryThisWindow() {
-        for (String thing : getSpentThingsThisWindow()) {
-            if (thing.contains("infantry_")) {
-                return Integer.parseInt(thing.split("_")[1]);
-            }
-        }
-        return 0;
+        return getSpentCountThisWindow("infantry_");
     }
 
     public void increaseTgsSpentThisWindow(int amount) {
-        int oldTgSpent = getSpentTgsThisWindow();
-        int newTgSpent = oldTgSpent + amount;
-        if (oldTgSpent != 0) {
-            removeSpentThing("tg_" + oldTgSpent);
-        }
-        addSpentThing("tg_" + newTgSpent);
+        increaseSpentCountThisWindow("tg_", getSpentTgsThisWindow(), amount);
     }
 
     public void increaseInfantrySpentThisWindow(int amount) {
-        int oldTgSpent = getSpentInfantryThisWindow();
-        int newTgSpent = oldTgSpent + amount;
-        if (oldTgSpent != 0) {
-            removeSpentThing("infantry_" + oldTgSpent);
-        }
-        addSpentThing("infantry_" + newTgSpent);
+        increaseSpentCountThisWindow("infantry_", getSpentInfantryThisWindow(), amount);
     }
 
     public void setProducedUnit(String unit, int count) {
         currentProducedUnits.put(unit, count);
     }
 
-    private int getProducedUnit(String unit) {
-        if (currentProducedUnits.get(unit) == null) {
-            return 0;
-        } else {
-            return currentProducedUnits.get(unit);
-        }
-    }
-
     public void produceUnit(String unit) {
-        int amount = getProducedUnit(unit) + 1;
-        currentProducedUnits.put(unit, amount);
+        currentProducedUnits.merge(unit, 1, Integer::sum);
     }
 
     public void addMahactCC(String cc) {
@@ -814,19 +792,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
     }
 
-    private void logCardsInfoThreadLookupFailure(String message, Exception error, boolean createIfMissing) {
-        if (!createIfMissing && error instanceof MissingAccessException) {
-            return;
-        }
-        if (createIfMissing) {
-            BotLogger.error(new LogOrigin(this), message, error);
-            return;
-        }
-        if (!game.isHasEnded()) {
-            BotLogger.warning(new LogOrigin(this), message, error);
-        }
-    }
-
     /**
      * @param abilityID The ID of the ability - does not check if valid
      */
@@ -949,18 +914,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void setPlotCard(String id) {
         if (getPlotCardsRaw().containsKey(id)) return;
 
-        Collection<Integer> values = getPlotCardsRaw().values();
-        int identifier = ThreadLocalRandom.current().nextInt(100);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(100);
-        }
-        getPlotCardsRaw().put(id, identifier);
+        getPlotCardsRaw().put(id, CardIdHelper.unusedId(getPlotCardsRaw().values(), 100));
     }
 
     public void setPlotCardFaction(String id, String faction) {
-        if (!getPlotCardsFactionsRaw().containsKey(id))
-            getPlotCardsFactionsRaw().put(id, new ArrayList<>());
-        getPlotCardsFactionsRaw().get(id).add(faction);
+        getPlotCardsFactionsRaw().computeIfAbsent(id, k -> new ArrayList<>()).add(faction);
     }
 
     public void removePlotCardFaction(String id) {
@@ -1193,12 +1151,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setActionCard(String id) {
-        Set<Integer> values = getReservedActionCardIdentifiers();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        actionCards.put(id, identifier);
+        actionCards.put(id, CardIdHelper.unusedId(getReservedActionCardIdentifiers()));
         if ("tf-stasis".equals(id)) {
             ButtonHelperActionCards.checkForAssigningStasis(game, this);
         }
@@ -1211,21 +1164,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setEvent(String id) {
-        Collection<Integer> values = events.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        events.put(id, identifier);
+        CardIdHelper.putWithUnusedId(events, id);
     }
 
     public void setTrapCard(String id) {
-        Collection<Integer> values = trapCards.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        trapCards.put(id, identifier);
+        CardIdHelper.putWithUnusedId(trapCards, id);
     }
 
     public void setTrapCardPlanet(String id, String planet) {
@@ -1261,11 +1204,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void setPromissoryNote(String id) {
         Collection<Integer> values = promissoryNotes.values();
-        int identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
-        }
-        promissoryNotes.put(id, identifier);
+        promissoryNotes.put(id, CardIdHelper.unusedId(values, values.size() < 80 ? 100 : 1000));
     }
 
     public void clearPromissoryNotes() {
@@ -1319,25 +1258,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void removeActionCard(Integer identifier) {
-        String idToRemove = "";
-        for (Map.Entry<String, Integer> so : actionCards.entrySet()) {
-            if (so.getValue().equals(identifier)) {
-                idToRemove = so.getKey();
-                break;
-            }
-        }
-        actionCards.remove(idToRemove);
+        actionCards.remove(CardIdHelper.keyForId(actionCards, identifier));
     }
 
     public void removePromissoryNote(Integer identifier) {
-        String idToRemove = "";
-        for (Map.Entry<String, Integer> so : promissoryNotes.entrySet()) {
-            if (so.getValue().equals(identifier)) {
-                idToRemove = so.getKey();
-                break;
-            }
-        }
-        promissoryNotes.remove(idToRemove);
+        promissoryNotes.remove(CardIdHelper.keyForId(promissoryNotes, identifier));
     }
 
     public void removePromissoryNote(String id) {
@@ -1359,53 +1284,26 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setSecret(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
-        Collection<Integer> values = secrets.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        secrets.put(id, identifier);
+        CardIdHelper.putWithUnusedId(secrets, CardIdHelper.stripExtra(id));
     }
 
     public void setSecret(String id, Integer identifier) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
-        secrets.put(id, identifier);
+        secrets.put(CardIdHelper.stripExtra(id), identifier);
     }
 
     public void removeSecret(Integer identifier) {
-        String idToRemove = "";
-        for (Map.Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(identifier)) {
-                idToRemove = so.getKey();
-                break;
-            }
-        }
-        secrets.remove(idToRemove);
+        secrets.remove(CardIdHelper.keyForId(secrets, identifier));
     }
 
     public SecretObjectiveModel getSecret(Integer identifier) {
-        String idToRemove = "";
-        for (Map.Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(identifier)) {
-                idToRemove = so.getKey();
-                break;
-            }
-        }
-        idToRemove = idToRemove.replace("extra1", "");
-        idToRemove = idToRemove.replace("extra2", "");
-        return Mapper.getSecretObjective(idToRemove);
+        return Mapper.getSecretObjective(CardIdHelper.stripExtra(CardIdHelper.keyForId(secrets, identifier)));
     }
 
     @NotNull
     public Map<String, Integer> getSecretsUnscored() {
         Map<String, Integer> secretsUnscored = new HashMap<>();
         for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
-            String id = secret.getKey();
-            id = id.replace("extra1", "");
-            id = id.replace("extra2", "");
+            String id = CardIdHelper.stripExtra(secret.getKey());
             if (!secretsScored.containsKey(id)) {
                 secretsUnscored.put(id, secret.getValue());
             }
@@ -1414,34 +1312,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setSecretScored(String id) {
-        Collection<Integer> values = secretsScored.values();
-        List<Integer> allIDs = game.getPlayers().values().stream()
-                .flatMap(player -> player.secretsScored.values().stream())
-                .toList();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
-        while (values.contains(identifier) || allIDs.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
-        secretsScored.put(id, identifier);
+        Set<Integer> takenIds = new HashSet<>(secretsScored.values());
+        game.getPlayers().values().forEach(player -> takenIds.addAll(player.secretsScored.values()));
+        secretsScored.put(CardIdHelper.stripExtra(id), CardIdHelper.unusedId(takenIds));
     }
 
     public void setSecretScored(String id, Integer identifier) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
-        secretsScored.put(id, identifier);
+        secretsScored.put(CardIdHelper.stripExtra(id), identifier);
     }
 
     public void removeSecretScored(Integer identifier) {
-        String idToRemove = "";
-        for (Map.Entry<String, Integer> so : secretsScored.entrySet()) {
-            if (so.getValue().equals(identifier)) {
-                idToRemove = so.getKey();
-                break;
-            }
-        }
-        secretsScored.remove(idToRemove);
+        secretsScored.remove(CardIdHelper.keyForId(secretsScored, identifier));
     }
 
     public boolean enoughFragsForRelic() {
@@ -1547,8 +1428,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public int getCommoditiesTotal() {
         if (getCommoditiesBase() == 0) {
             if (getFaction().contains("franken")) {
-                if (getCommoditiesTotal(true) - getCommoditiesBonus() > 0) {
-                    setCommoditiesBase(getCommoditiesTotal(true) - getCommoditiesBonus());
+                if (getStoredCommoditiesTotal() - getCommoditiesBonus() > 0) {
+                    setCommoditiesBase(getStoredCommoditiesTotal() - getCommoditiesBonus());
                 }
             } else {
                 FactionModel setupInfo = getFactionSetupInfo();
@@ -1562,7 +1443,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         int commodityValue = getCommoditiesBase();
         if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
-            return commodityValue = 2 + getCommoditiesBonus();
+            return 2 + getCommoditiesBonus();
         }
 
         return commodityValue + getCommoditiesBonus();
@@ -1650,7 +1531,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return bonus;
     }
 
-    public int getCommoditiesTotal(boolean old) {
+    public int getStoredCommoditiesTotal() {
         return commoditiesTotal;
     }
 
@@ -2716,13 +2597,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
                 .filter(r -> !Mapper.getRelic(r).isFakeRelic())
-                .collect(Collectors.toSet());
-    }
-
-    public Set<String> getFakeRelics() {
-        return getRelics().stream()
-                .filter(Mapper::isValidRelic)
-                .filter(r -> Mapper.getRelic(r).isFakeRelic())
                 .collect(Collectors.toSet());
     }
 

@@ -12,7 +12,6 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
@@ -73,27 +72,10 @@ public class MahactKingDraftItem extends DraftItem {
             }
 
             sb.append("\n> ").append(type.humanReadableName()).append(": ");
-            sb.append(" Combat: ");
-            sb.append(unit.getCombatHitsOn());
-            if (unit.getCombatDieCount() > 1) {
-                sb.append("x").append(unit.getCombatDieCount());
-            }
+            UnitDescription.appendCombat(sb, unit);
             sb.append(' ');
-            if (unit.getSustainDamage()) {
-                sb.append("SUSTAIN DAMAGE ");
-            }
-            if (unit.getAfbDieCount() > 0) {
-                sb.append("ANTI-FIGHTER BARRAGE ")
-                        .append(unit.getAfbHitsOn())
-                        .append("x")
-                        .append(unit.getAfbDieCount())
-                        .append(' ');
-            }
-            if (unit.getProductionValue() > 0) {
-                sb.append("PRODUCTION ");
-                sb.append(unit.getProductionValue());
-                sb.append(' ');
-            }
+            UnitDescription.appendSustainAndAfb(sb, unit);
+            UnitDescription.appendProduction(sb, unit);
             if (unit.getAbility().isPresent()) {
                 sb.append(unit.getAbility().get());
             }
@@ -112,14 +94,11 @@ public class MahactKingDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems() {
-        List<DraftItem> allItems = buildAllItems();
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MAHACTKING);
-        return allItems;
+        return draftable(DraftCategory.MAHACTKING, buildAllItems());
     }
 
     public static List<DraftItem> buildAllDraftableItems(Game game) {
-        List<DraftItem> allItems = buildAllItems(game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MAHACTKING);
+        List<DraftItem> allItems = draftable(DraftCategory.MAHACTKING, buildAllItems(game));
         if (game.isTkNovaCup() && "onePerColor".equals(game.getStoredValue(Constants.TK_NOVA_CUP + "_setup_option"))) {
             List<DraftItem> output = new ArrayList<>();
             for (DraftItem item : allItems) {
@@ -134,19 +113,15 @@ public class MahactKingDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllItems() {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (FactionModel faction : Mapper.getFactions().values()) {
-            if (faction.getSource() == ComponentSource.twilights_fall) {
-                allItems.add(generate(DraftCategory.MAHACTKING, faction.getID()));
-            }
-        }
-        return allItems;
+        return generateAll(
+                DraftCategory.MAHACTKING,
+                Mapper.getFactions().values().stream()
+                        .filter(faction -> faction.getSource() == ComponentSource.twilights_fall)
+                        .map(FactionModel::getID));
     }
 
     public static List<DraftItem> buildAllItems(Game game) {
-        return new ArrayList<>(getAllFactions(game)
-                .map(king -> generate(DraftCategory.MAHACTKING, king.getAlias()))
-                .toList());
+        return generateAll(DraftCategory.MAHACTKING, getAllFactions(game).map(FactionModel::getAlias));
     }
 
     public static Stream<FactionModel> getAllFactions(Game game) {

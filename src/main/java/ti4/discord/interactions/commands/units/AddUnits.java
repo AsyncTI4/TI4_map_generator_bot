@@ -11,6 +11,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -28,25 +29,13 @@ import ti4.service.unit.ParsedUnit;
 public class AddUnits extends GameStateCommand {
 
     public AddUnits() {
-        super(true, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.ADD_UNITS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Add units to map";
+        super(Constants.ADD_UNITS, "Add units to map", true, true);
     }
 
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
+                CommonOptions.tileName(),
                 new OptionData(
                                 OptionType.STRING,
                                 Constants.UNIT_NAMES,
@@ -57,18 +46,14 @@ public class AddUnits extends GameStateCommand {
                                 Constants.CC_USE,
                                 "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
                         .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                        .setAutoComplete(true),
+                CommonOptions.factionColor("Faction or Color for unit"),
                 new OptionData(
                         OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay technology"),
                 new OptionData(
                         OptionType.BOOLEAN,
                         Constants.COEXIST,
                         "\"True\" to coexist; \"False\" (default) to not, and to start a combat etc. if another player is present"),
-                new OptionData(
-                        OptionType.BOOLEAN,
-                        Constants.NO_MAPGEN,
-                        "'True' to not generate a map update with this command"));
+                CommonOptions.noMapGen());
     }
 
     @Override

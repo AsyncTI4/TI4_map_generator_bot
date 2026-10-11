@@ -8,7 +8,6 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
@@ -53,15 +52,11 @@ public class MonumentDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(Game game) {
-        List<DraftItem> monuments = new ArrayList<>(buildAllItems(game));
-        DraftErrataModel.filterUndraftablesAndShuffle(monuments, DraftCategory.MONUMENT);
-        return monuments;
+        return draftable(DraftCategory.MONUMENT, new ArrayList<>(buildAllItems(game)));
     }
 
     public static List<DraftItem> buildAllDraftableItems() {
-        List<DraftItem> monuments = new ArrayList<>(buildAllItems());
-        DraftErrataModel.filterUndraftablesAndShuffle(monuments, DraftCategory.MONUMENT);
-        return monuments;
+        return draftable(DraftCategory.MONUMENT, new ArrayList<>(buildAllItems()));
     }
 
     public static List<DraftItem> buildAllItems(Game game) {

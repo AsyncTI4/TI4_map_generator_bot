@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.status;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -11,22 +12,16 @@ class ScorePublic extends GameStateSubcommand {
 
     ScorePublic() {
         super(Constants.SCORE_OBJECTIVE, "Score Public Objective", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int poID = event.getOption(Constants.PO_ID).getAsInt();
         ScorePublicObjectiveService.scorePO(event, getGame(), getPlayer(), poID);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

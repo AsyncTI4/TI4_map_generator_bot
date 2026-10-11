@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.helper.CardIdHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -117,9 +118,8 @@ public class AlfheimLegendaryButtonHandler {
 
     private static List<MessageEmbed> getCardEmbeds(String deck, List<String> cards) {
         return cards.stream()
-                .map(card -> "RELIC".equals(deck)
-                        ? Mapper.getRelic(card.replace("extra1", "").replace("extra2", ""))
-                        : Mapper.getExplore(card))
+                .map(card ->
+                        "RELIC".equals(deck) ? Mapper.getRelic(CardIdHelper.stripExtra(card)) : Mapper.getExplore(card))
                 .map(model -> {
                     if (model instanceof RelicModel relic) return relic.getRepresentationEmbed();
                     if (model instanceof ExploreModel explore) return explore.getRepresentationEmbed();
@@ -131,7 +131,7 @@ public class AlfheimLegendaryButtonHandler {
 
     private static String getCardName(String deck, String card) {
         if ("RELIC".equals(deck)) {
-            RelicModel relic = Mapper.getRelic(card.replace("extra1", "").replace("extra2", ""));
+            RelicModel relic = Mapper.getRelic(CardIdHelper.stripExtra(card));
             return relic == null ? card : relic.getName();
         }
         ExploreModel explore = Mapper.getExplore(card);

@@ -1,10 +1,10 @@
 package ti4.discord.interactions.commands.cardsac;
 
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,11 +20,8 @@ class ShowAC extends GameStateSubcommand {
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor());
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override
@@ -32,17 +29,11 @@ class ShowAC extends GameStateSubcommand {
         Player player = getPlayer();
         int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
 
-        String acID = null;
-        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-            if (ac.getValue().equals(acIndex)) {
-                acID = ac.getKey();
-            }
-        }
-
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
-            return;
-        }
+        String acID = CommandHelper.requireOrReport(
+                event,
+                CommandHelper.cardIdForNumber(player.getActionCards(), acIndex),
+                "No such action card ID found, please retry.");
+        if (acID == null) return;
 
         Game game = getGame();
         String sb = "---------\n" + "Game: "
@@ -52,11 +43,8 @@ class ShowAC extends GameStateSubcommand {
                 + "\n" + "---------\n";
         player.setActionCard(acID);
 
-        Player playerToShowTo = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (playerToShowTo == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player playerToShowTo = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (playerToShowTo == null) return;
 
         ActionCardHelper.sendActionCardInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(playerToShowTo, sb);

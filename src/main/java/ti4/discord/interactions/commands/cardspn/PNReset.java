@@ -3,8 +3,7 @@ package ti4.discord.interactions.commands.cardspn;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -22,8 +21,8 @@ class PNReset extends GameStateSubcommand {
                 "Reset your promissory notes and send details to your #cards-info thread",
                 true,
                 true);
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        markSuspicious();
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override
@@ -41,10 +40,5 @@ class PNReset extends GameStateSubcommand {
         game.checkPromissoryNotes();
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, true, event);
         MessageHelper.sendMessageToEventChannel(event, "Promissory note information sent.");
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

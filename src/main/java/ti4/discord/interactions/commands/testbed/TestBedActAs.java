@@ -2,8 +2,7 @@ package ti4.discord.interactions.commands.testbed;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,7 +15,7 @@ class TestBedActAs extends GameStateSubcommand {
 
     TestBedActAs() {
         super("act_as", "Act as a seat, or `turn` to follow the active player (empty: yourself)", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Seat to act as").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Seat to act as"));
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -29,92 +30,25 @@ public class KairnPromissoryHandler {
 
     public static void offerArchaeologicalOutpostButtons(
             GenericInteractionCreateEvent event, Player player, Game game) {
-        if (game == null
-                || player == null
-                || player.ownsPromissoryNote(PN_ID)
-                || !player.getPromissoryNotesInPlayArea().contains(PN_ID)) {
-            return;
-        }
-
-        List<String> legalPlanets = new ArrayList<>();
-        for (String planetName : player.getPlanets()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
-            if (planet == null
-                    || planet.isHomePlanet()
-                    || planet.getAttachments().contains(ATTACHMENT_TOKEN)) {
-                continue;
-            }
-            legalPlanets.add(planetName);
-        }
-
-        if (legalPlanets.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", there are no legal planets to attach _Archaeological Outpost_ to.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (String planetName : legalPlanets) {
-            Tile tile = game.getTileFromPlanet(planetName);
-            if (tile == null) {
-                continue;
-            }
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + KAIRN_PN_ATTACH + tile.getPosition() + "|" + planetName,
-                    Helper.getPlanetRepresentation(planetName, game)));
-        }
-        buttons.add(Buttons.DECLINE);
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose a non-home planet to attach _Archaeological Outpost_ to.",
-                buttons);
+        TaPromissoryHandler.offerNonHomePlanetAttachButtons(
+                event,
+                player,
+                game,
+                PN_ID,
+                ATTACHMENT_TOKEN,
+                KAIRN_PN_ATTACH,
+                ", there are no legal planets to attach _Archaeological Outpost_ to.",
+                ", please choose a non-home planet to attach _Archaeological Outpost_ to.");
     }
 
     @ButtonHandler(KAIRN_PN_ATTACH)
     public static void resolveKairnPnAttach(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (event == null || game == null || player == null) {
-            return;
-        }
-
-        if (player.ownsPromissoryNote(PN_ID)
-                || !player.getPromissoryNotesInPlayArea().contains(PN_ID)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String payload = buttonID.substring(KAIRN_PN_ATTACH.length());
-        String[] parts = payload.split("\\|", 2);
-        if (parts.length != 2) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String tilePosition = parts[0];
-        String planetName = parts[1];
-
-        Tile tile = game.getTileByPosition(tilePosition);
+        Tile tile = TaPromissoryHandler.attachToNonHomePlanet(
+                event, game, player, PN_ID, ATTACHMENT_TOKEN, buttonID, KAIRN_PN_ATTACH);
         if (tile == null) {
-            ButtonHelper.deleteMessage(event);
             return;
         }
-
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
-        if (planet == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        if (!player.getPlanets().contains(planetName)
-                || planet.isHomePlanet()
-                || planet.getAttachments().contains(ATTACHMENT_TOKEN)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        planet.addToken(ATTACHMENT_TOKEN);
+        String planetName = buttonID.split("\\|", 2)[1];
         TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetName);
         ButtonHelper.deleteMessage(event);
 
@@ -177,9 +111,5 @@ public class KairnPromissoryHandler {
         }
         ExploreService.explorePlanet(event, tile, planet.getName(), parts[2], player, false, game, 1, true);
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static boolean planetHasArchaeologicalOutpost(Planet planet) {
-        return planet != null && planet.getAttachments().contains(ATTACHMENT_TOKEN);
     }
 }

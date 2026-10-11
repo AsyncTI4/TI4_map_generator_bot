@@ -3,9 +3,9 @@ package ti4.discord.interactions.commands.draft.mantistile;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 import ti4.service.draft.draftables.MantisTileDraftable;
 
 class MantisTileDraftableConfigure extends GameStateSubcommand {
@@ -20,13 +20,11 @@ class MantisTileDraftableConfigure extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MantisTileDraftable draftable = MantisTileDraftableGroup.getDraftable(getGame());
-        if (draftable == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Mantis tile isn't draftable; you may need `/draft manage add_draftable MantisTile`.");
-            return;
-        }
+        MantisTileDraftable draftable = CommandHelper.requireOrReport(
+                event,
+                MantisTileDraftableGroup.getDraftable(getGame()),
+                "Mantis tile isn't draftable; you may need `/draft manage add_draftable MantisTile`.");
+        if (draftable == null) return;
         if (event.getOption("mulligans") != null) {
             draftable.setMulligans(event.getOption("mulligans").getAsInt());
         }

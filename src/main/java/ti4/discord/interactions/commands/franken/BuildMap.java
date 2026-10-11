@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.franken;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -53,11 +54,8 @@ class BuildMap extends GameStateSubcommand {
         // Put draft tiles onto the board for rendering purposes
         PartialMapService.placeFromTemplate(mapTemplate, game);
 
-        BagDraft draft = game.getActiveBagDraft();
-        if (draft == null) {
-            MessageHelper.sendMessageToEventChannel(event, "There is no active draft.");
-            return;
-        }
+        BagDraft draft = CommandHelper.requireOrReport(event, game.getActiveBagDraft(), "There is no active draft.");
+        if (draft == null) return;
 
         // Check that the draft is complete
         if (!draft.isDraftStageComplete()) {

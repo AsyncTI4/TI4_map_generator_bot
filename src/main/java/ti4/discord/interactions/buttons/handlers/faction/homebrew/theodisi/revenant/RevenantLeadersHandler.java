@@ -396,15 +396,10 @@ public class RevenantLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        String coexistFlag = game.getStoredValue("coexistFlag");
-        if (!planet.getUnitKeysForPlayer(target).isEmpty()) {
-            game.setStoredValue("coexistFlag", "yes");
-        }
-        AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet.getName());
-        if (coexistFlag.isEmpty()) {
-            game.removeStoredValue("coexistFlag");
+        if (planet.getUnitKeysForPlayer(target).isEmpty()) {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet.getName());
         } else {
-            game.setStoredValue("coexistFlag", coexistFlag);
+            AddUnitService.addUnitsInCoexistence(event, tile, game, player.getColor(), "inf " + planet.getName());
         }
         List<String> remainingTargets = new ArrayList<>(List.of(remaining.split("\\|", -1)));
         remainingTargets.remove(target.getFaction());
@@ -632,11 +627,7 @@ public class RevenantLeadersHandler {
         String prefix = agentOwner.factionButtonChecker() + MOVE_REVARDENTIA_TOKEN + tokenOwner.getFaction() + "|";
         List<Button> extraButtons =
                 List.of(Buttons.red(agentOwner.factionButtonChecker() + "deleteButtons", "Decline"));
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
+        List<Button> displayedButtons = firstButtonPage(buttons, extraButtons, prefix);
         MessageHelper.sendMessageToChannelWithButtons(
                 agentOwner.getCorrectChannel(),
                 agentOwner.getRepresentation() + ", choose where to move " + tokenOwner.getRepresentationNoPing()
@@ -875,11 +866,7 @@ public class RevenantLeadersHandler {
                 event, componentOwner.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
             return;
         }
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
+        List<Button> displayedButtons = firstButtonPage(buttons, extraButtons, prefix);
         MessageHelper.sendMessageToChannelWithButtons(componentOwner.getCorrectChannel(), message, displayedButtons);
     }
 
@@ -956,11 +943,7 @@ public class RevenantLeadersHandler {
                         event, target.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
             return;
         }
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
+        List<Button> displayedButtons = firstButtonPage(buttons, extraButtons, prefix);
         MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message, displayedButtons);
     }
 
@@ -1575,11 +1558,7 @@ public class RevenantLeadersHandler {
         List<Button> buttons = getRevKryxosTechButtons(player, technologies, step);
         List<Button> extraButtons = List.of(Buttons.red(player.factionButtonChecker() + DECLINE_REVKRYXOS, "Decline"));
         String prefix = player.factionButtonChecker() + SELECT_REVKRYXOS_TECH + step + "|";
-        List<Button> displayedButtons = new ArrayList<>(buttons);
-        displayedButtons.addAll(extraButtons);
-        if (displayedButtons.size() > 25) {
-            displayedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
-        }
+        List<Button> displayedButtons = firstButtonPage(buttons, extraButtons, prefix);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, displayedButtons);
     }
 
@@ -2459,5 +2438,13 @@ public class RevenantLeadersHandler {
                 player.getRepresentation() + " placed the lich token on " + target.getRepresentationNoPing() + "'s "
                         + commander.getName() + " commander.");
         ButtonHelper.deleteMessage(event);
+    }
+
+    static List<Button> firstButtonPage(List<Button> buttons, List<Button> extraButtons, String prefix) {
+        List<Button> displayedButtons = new ArrayList<>(buttons);
+        displayedButtons.addAll(extraButtons);
+        return displayedButtons.size() > 25
+                ? NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false)
+                : displayedButtons;
     }
 }

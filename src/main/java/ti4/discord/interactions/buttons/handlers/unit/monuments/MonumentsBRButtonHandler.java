@@ -66,8 +66,7 @@ public class MonumentsBRButtonHandler {
 
     @ButtonHandler(CHANGE_PATH)
     public static void resolveChangePath(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, "uydai_monument")
+        if (!MonumentsService.isMonumentOnBoard(game, player, "uydai_monument")
                 || !MonumentsService.getMonumentTile(game, player, "uydai_monument")
                         .hasPlayerCC(player)
                 || !MonumentsService.isMonumentReady(game, player, "uydai_monument")) {
@@ -153,7 +152,7 @@ public class MonumentsBRButtonHandler {
 
     // Charnel Fane
     public static void checkDishonorMonumentCondition(Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "toldar_monumentdishonor")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "toldar_monumentdishonor")) {
             return;
         }
 
@@ -178,7 +177,6 @@ public class MonumentsBRButtonHandler {
     public static boolean preventsCharnelFaneSpaceCombat(Game game, Tile tile) {
         Player owner = MonumentsService.getMonumentOwner(game, "toldar_monumentdishonor");
         return owner != null
-                && game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, owner, "toldar_monumentdishonor")
                 && tile == MonumentsService.getMonumentTile(game, owner, "toldar_monumentdishonor")
                 && tile.getSpaceUnitHolder().getUnitCount(UnitType.Monument, owner) > 0
@@ -425,7 +423,7 @@ public class MonumentsBRButtonHandler {
 
     // Deepmantle Interface
     public static void offerDeepmantle(Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "atokera_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "atokera_monument")) {
             return;
         }
 
@@ -443,7 +441,7 @@ public class MonumentsBRButtonHandler {
 
     @ButtonHandler(RESOLVE_DEEPMANTLE)
     public static void resolveDeepmantle(ButtonInteractionEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode() || !MonumentsService.isMonumentOnBoard(game, player, "atokera_monument")) {
+        if (!MonumentsService.isMonumentOnBoard(game, player, "atokera_monument")) {
             return;
         }
 
@@ -470,9 +468,7 @@ public class MonumentsBRButtonHandler {
 
     // Armageddon Project
     public static void offerArmageddonProject(Game game, Player player) {
-        if (game == null
-                || !game.isMonumentsMode()
-                || !MonumentsService.hasMonument(game, player, "belkosea_monument")) {
+        if (game == null || !MonumentsService.hasMonument(game, player, "belkosea_monument")) {
             return;
         }
         List<Button> buttons = new ArrayList<>();
@@ -505,7 +501,6 @@ public class MonumentsBRButtonHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String relic = buttonID.substring(SELECT_ARMAGEDDON_PROJECT.length());
         if (game == null
-                || !game.isMonumentsMode()
                 || !MonumentsService.isMonumentOnBoard(game, player, "belkosea_monument")
                 || !player.hasRelic(relic)
                 || !relic.startsWith("superweapon")) {
@@ -527,7 +522,6 @@ public class MonumentsBRButtonHandler {
 
     public static boolean hasArmageddonProjectSuperweapon(Game game, Player player, String relic) {
         return game != null
-                && game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, player, "belkosea_monument")
                 && player.hasRelic(relic)
                 && getArmageddonProjectSuperweapons(game, player).contains(relic);
@@ -552,9 +546,7 @@ public class MonumentsBRButtonHandler {
     }
 
     public static void addArmageddonProjectCardsInfoButtons(List<Button> buttons, Game game, Player player) {
-        if (game == null
-                || !game.isMonumentsMode()
-                || !MonumentsService.isMonumentReady(game, player, "belkosea_monument")) {
+        if (game == null || !MonumentsService.isMonumentReady(game, player, "belkosea_monument")) {
             return;
         }
         if (getArmageddonProjectSuperweapons(game, player).stream().anyMatch(player::hasRelic)) {
@@ -567,9 +559,7 @@ public class MonumentsBRButtonHandler {
 
     @ButtonHandler(SHOW_ARMAGEDDON_PROJECT_OPTIONS)
     public static void showArmageddonProjectOptions(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null
-                || !game.isMonumentsMode()
-                || !MonumentsService.isMonumentReady(game, player, "belkosea_monument")) {
+        if (game == null || !MonumentsService.isMonumentReady(game, player, "belkosea_monument")) {
             return;
         }
         List<Button> buttons = new ArrayList<>();
@@ -596,7 +586,6 @@ public class MonumentsBRButtonHandler {
 
     public static Button getArmageddonProjectCaledButton(Game game, Player player, Tile tile) {
         if (game == null
-                || !game.isMonumentsMode()
                 || !MonumentsService.isMonumentReady(game, player, "belkosea_monument")
                 || !hasArmageddonProjectSuperweapon(game, player, "superweaponcaled")) {
             return null;

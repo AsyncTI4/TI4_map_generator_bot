@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,8 +16,7 @@ class AddTeamMate extends GameStateSubcommand {
     public AddTeamMate() {
         super(Constants.ADD_TEAMMATE, "Add a teammate", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "User who is on your team").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to add the user to")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color to add the user to"));
     }
 
     @Override

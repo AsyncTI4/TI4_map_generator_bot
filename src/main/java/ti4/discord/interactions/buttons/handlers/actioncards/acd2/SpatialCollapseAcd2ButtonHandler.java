@@ -18,23 +18,6 @@ import ti4.message.MessageHelper;
 @UtilityClass
 class SpatialCollapseAcd2ButtonHandler {
 
-    private static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t")
-                    || tile.getPosition().contains("b")
-                    || tile.isHomeSystem(game)
-                    || tile.isMecatol(game)) {
-                continue;
-            }
-            if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                buttons.add(Buttons.gray(
-                        "spatialCollapseStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-            }
-        }
-        return buttons;
-    }
-
     @ButtonHandler("spatialCollapseStep2_")
     public static void resolveSpatialCollapseStep2(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {

@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -15,6 +17,7 @@ class AddLaw extends GameStateSubcommand {
 
     AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between the ()")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -22,16 +25,14 @@ class AddLaw extends GameStateSubcommand {
                 OptionType.STRING,
                 Constants.ELECTED,
                 "Elected non-player game object (e.g. secret objective, planet, etc.)"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected faction").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Elected faction"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.AGENDA_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No agenda ID defined.");
-            return;
-        }
+        OptionMapping option =
+                CommandHelper.requireOrReport(event, event.getOption(Constants.AGENDA_ID), "No agenda ID defined.");
+        if (option == null) return;
 
         Game game = getGame();
         Player player = getPlayer();
@@ -55,10 +56,5 @@ class AddLaw extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

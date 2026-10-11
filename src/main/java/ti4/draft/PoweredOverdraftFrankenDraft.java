@@ -2,25 +2,10 @@ package ti4.draft;
 
 import ti4.game.Game;
 
-public class PoweredOverdraftFrankenDraft extends FrankenDraft {
+public class PoweredOverdraftFrankenDraft extends PoweredFrankenDraft {
 
     public PoweredOverdraftFrankenDraft(Game owner) {
         super(owner);
-    }
-
-    @Override
-    public int getItemLimitForCategory(DraftCategory category) {
-        if (isFowExcludedCategory(category)) return 0;
-        return switch (category) {
-            case ABILITY -> 4;
-            case TECH, BLUETILE -> 3;
-            case AGENT, COMMANDER, HERO -> 2;
-            case STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 2;
-            case FLAGSHIP, MECH, BREAKTHROUGH, MONUMENT -> 2;
-            case PN, COMMODITIES, REDTILE -> 2;
-            case DRAFTORDER -> 1;
-            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
-        };
     }
 
     @Override

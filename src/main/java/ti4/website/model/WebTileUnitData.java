@@ -18,6 +18,7 @@ import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
+import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.website.WebPdsCoverage;
 
@@ -90,7 +91,7 @@ public final class WebTileUnitData {
 
             if (isSpace) {
                 extractUnits(game, unitHolder, tileData.space);
-                extractTokens(unitHolder, tileData.space, false);
+                extractTokens(unitHolder, tileData.space);
             } else {
                 // For planets and space stations
                 if (unitHolder instanceof Planet planet) {
@@ -98,7 +99,7 @@ public final class WebTileUnitData {
 
                     // Extract units, tokens, and action cards
                     extractUnits(game, unitHolder, planetData.getEntities());
-                    extractTokens(unitHolder, planetData.getEntities(), false);
+                    extractTokens(unitHolder, planetData.getEntities());
                     extractActionCards(game, planet, planetData.getEntities());
 
                     // Determine controller
@@ -132,7 +133,7 @@ public final class WebTileUnitData {
         if (pdsCoverageDetailed != null && !pdsCoverageDetailed.isEmpty()) {
             Map<String, WebPdsCoverage> pdsCoverage = new HashMap<>();
             for (Map.Entry<String, PdsCoverage> entry : pdsCoverageDetailed.entrySet()) {
-                ti4.helpers.PdsCoverage detailed = entry.getValue();
+                PdsCoverage detailed = entry.getValue();
                 pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
             }
             tileData.pds = pdsCoverage;
@@ -184,10 +185,14 @@ public final class WebTileUnitData {
      * Determines the controller based on player planet ownership (space stations).
      */
     private static String getSpaceStationController(Game game, Planet station) {
-        String holderName = station.getName();
+        Player owner = findPlanetOwner(game, station.getName());
+        return owner != null ? owner.getFaction() : null;
+    }
+
+    private static Player findPlanetOwner(Game game, String planetId) {
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(holderName)) {
-                return player.getFaction();
+            if (player.getPlanets().contains(planetId)) {
+                return player;
             }
         }
         return null;
@@ -202,9 +207,6 @@ public final class WebTileUnitData {
             return;
         }
 
-        // Group units by faction
-        Map<String, List<WebEntityData>> factionEntities = new HashMap<>();
-
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             int unitCount = unitHolder.getUnitCount(unitKey);
@@ -214,12 +216,10 @@ public final class WebTileUnitData {
                 continue;
             }
 
-            String faction = player.getFaction();
-
             // Get sustained damage count for this unit
             Integer sustainedDamage = null;
-            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().containsKey(unitKey)) {
-                int damagedCount = unitHolder.getUnitDamage().get(unitKey);
+            if (unitHolder.getUnitDamage() != null) {
+                int damagedCount = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
                 if (damagedCount > 0) {
                     sustainedDamage = damagedCount;
                 }
@@ -228,60 +228,22 @@ public final class WebTileUnitData {
             // Get unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
             List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
             WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage, unitStates);
-            factionEntities.computeIfAbsent(faction, _ -> new ArrayList<>()).add(entityData);
-        }
-
-        if (!factionEntities.isEmpty()) {
-            // Add units to target entities
-            for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
-                targetEntities
-                        .computeIfAbsent(factionEntry.getKey(), _ -> new ArrayList<>())
-                        .addAll(factionEntry.getValue());
-            }
+            targetEntities
+                    .computeIfAbsent(player.getFaction(), _ -> new ArrayList<>())
+                    .add(entityData);
         }
     }
 
-    /**
-     * Extract tokens and/or attachments from a UnitHolder and add them to the target entities map.
-     *
-     * @param unitHolder The source of tokens
-     * @param targetEntities The map to add the extracted entities to
-     * @param attachmentsOnly If true, only extracts tokens that are identified as attachments
-     */
-    private static void extractTokens(
-            UnitHolder unitHolder, Map<String, List<WebEntityData>> targetEntities, boolean attachmentsOnly) {
-        List<String> holderTokens = new ArrayList<>(unitHolder.getTokenList());
-        // Remove null entries that might exist in token lists
-        holderTokens.removeIf(token -> token == null || token.trim().isEmpty());
-
-        if (holderTokens.isEmpty()) {
-            return;
+    private static void extractTokens(UnitHolder unitHolder, Map<String, List<WebEntityData>> targetEntities) {
+        for (String token : unitHolder.getTokenList()) {
+            if (token == null || token.trim().isEmpty()) continue;
+            String entityType = Mapper.getAttachmentInfo(token) != null ? "attachment" : "token";
+            addNeutral(targetEntities, new WebEntityData(Mapper.getTokenIDFromTokenPath(token), entityType, 1));
         }
+    }
 
-        // Group tokens by faction and add them to the entity data
-        Map<String, List<WebEntityData>> factionTokens = new HashMap<>();
-
-        for (String token : holderTokens) {
-            boolean isAttachment = ti4.image.Mapper.getAttachmentInfo(token) != null;
-
-            // Skip if we only want attachments and this isn't one
-            if (attachmentsOnly && !isAttachment) {
-                continue;
-            }
-
-            String entityType = isAttachment ? "attachment" : "token";
-
-            // For now, we'll treat all tokens as non-faction specific
-            WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
-            factionTokens.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(tokenData);
-        }
-
-        // Merge token data with existing data
-        for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
-            targetEntities
-                    .computeIfAbsent(factionEntry.getKey(), _ -> new ArrayList<>())
-                    .addAll(factionEntry.getValue());
-        }
+    private static void addNeutral(Map<String, List<WebEntityData>> targetEntities, WebEntityData entity) {
+        targetEntities.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(entity);
     }
 
     /**
@@ -297,8 +259,7 @@ public final class WebTileUnitData {
         }
 
         for (String cardId : ActionCardHelper.getGarboziaActionCards(game).keySet()) {
-            WebEntityData cardData = new WebEntityData(cardId, "actioncard", 1);
-            targetEntities.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(cardData);
+            addNeutral(targetEntities, new WebEntityData(cardId, "actioncard", 1));
         }
     }
 
@@ -341,26 +302,15 @@ public final class WebTileUnitData {
             WebTilePlanet planetData = new WebTilePlanet();
 
             // Determine controlling player by checking which players have the planet
-            String controllingFaction = null;
-            Player controllingPlayer = null;
-            for (Player player : game.getRealPlayers()) {
-                if (player.getPlanets().contains(planetId)) {
-                    controllingFaction = player.getFaction();
-                    controllingPlayer = player;
-                    break;
-                }
-            }
-            planetData.setControlledBy(controllingFaction);
+            Player controllingPlayer = findPlanetOwner(game, planetId);
+            planetData.setControlledBy(controllingPlayer != null ? controllingPlayer.getFaction() : null);
 
             // Set exhausted status based on controlling player's exhausted planets
-            boolean isExhausted = false;
-            if (controllingPlayer != null) {
-                isExhausted = controllingPlayer.getExhaustedPlanets().contains(planetId);
-            }
-            planetData.setExhausted(isExhausted);
+            planetData.setExhausted(controllingPlayer != null
+                    && controllingPlayer.getExhaustedPlanets().contains(planetId));
 
             // Extract tokens and attachments (no units, no commodities)
-            extractTokens(planet, planetData.getEntities(), false);
+            extractTokens(planet, planetData.getEntities());
 
             // Set resources and influence
             planetData.setResources(planet.getResources());

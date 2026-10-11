@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.objectives.DrawSecretService;
@@ -12,9 +13,9 @@ class DrawSO extends GameStateSubcommand {
 
     DrawSO() {
         super(Constants.DRAW_SO, "Draw Secret Objective", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who draws")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color who draws"));
     }
 
     @Override
@@ -23,10 +24,5 @@ class DrawSO extends GameStateSubcommand {
         count = Math.max(count, 1);
         count = Math.min(count, 10);
         DrawSecretService.drawSO(event, getGame(), getPlayer(), count, false);
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

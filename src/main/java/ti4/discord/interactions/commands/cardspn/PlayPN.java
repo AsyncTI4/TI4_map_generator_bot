@@ -4,6 +4,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -20,9 +21,7 @@ class PlayPN extends GameStateSubcommand {
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory note ID, which is found between (), or name/part of name")
                 .setRequired(true));
-        addOptions(new OptionData(
-                        OptionType.STRING, Constants.FACTION_COLOR, "Faction or color who plays the promissory note")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or color who plays the promissory note"));
     }
 
     @Override

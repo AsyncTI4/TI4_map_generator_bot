@@ -2,9 +2,13 @@ package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
@@ -32,9 +36,11 @@ import ti4.draft.items.TechDraftItem;
 import ti4.draft.items.UnitDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.TI4Emoji;
 
 @Getter
@@ -164,6 +170,50 @@ public abstract class DraftItem {
         return items;
     }
 
+    protected static List<DraftItem> generateAll(DraftCategory category, Stream<String> itemIds) {
+        return itemIds.map(id -> generate(category, id)).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    protected static List<DraftItem> buildFactionUnitItems(
+            DraftCategory category, String baseType, List<FactionModel> factions) {
+        Map<String, UnitModel> allUnits = Mapper.getUnits();
+        return generateAll(
+                category,
+                factions.stream()
+                        .map(faction -> faction.getUnits().stream()
+                                .filter(unit ->
+                                        baseType.equals(allUnits.get(unit).getBaseType()))
+                                .toList()
+                                .getFirst()));
+    }
+
+    protected static List<DraftItem> draftable(DraftCategory category, List<DraftItem> items) {
+        return draftable(category, items, false);
+    }
+
+    protected static List<DraftItem> draftable(DraftCategory category, List<DraftItem> items, boolean twilightsFall) {
+        DraftErrataModel.filterUndraftablesAndShuffle(items, category, twilightsFall);
+        return items;
+    }
+
+    protected static List<DraftItem> withoutBanned(List<DraftItem> items, Game game, String bannedKey) {
+        List<String> banned = getStoredList(game, bannedKey);
+        items.removeIf(item -> banned.contains(item.getItemId()));
+        return items;
+    }
+
+    protected static List<FactionModel> withoutBannedFactions(
+            List<FactionModel> factions, Game game, String bannedKey) {
+        List<String> banned = getStoredList(game, bannedKey);
+        return factions.stream()
+                .filter(faction -> !banned.contains(faction.getAlias()))
+                .toList();
+    }
+
+    protected static List<String> getStoredList(Game game, String key) {
+        return Arrays.asList(PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue(key)));
+    }
+
     public static List<DraftItem> getAlwaysIncludeItems(DraftCategory type) {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
@@ -195,77 +245,62 @@ public abstract class DraftItem {
         }
         textFields.add(TextDisplay.of(details));
 
-        if (hasAdditionalComponents() && !game.isTwilightsFallMode()) {
-            List<String> adds = new ArrayList<>();
-            adds.add("**__Additional Added Components:__**");
-            for (DraftErrataModel i2 : Errata.getAdditionalComponents()) {
-                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
-                adds.add("> + " + item2.getTitle(game));
+        if (!game.isTwilightsFallMode()) {
+            if (hasAdditionalComponents()) {
+                textFields.add(errataTitles(
+                        game, "**__Additional Added Components:__**", "> + ", Errata.getAdditionalComponents()));
             }
-            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), adds)));
-        }
-
-        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
-        if (!optionalSwaps.isEmpty() && !game.isTwilightsFallMode()) {
-            List<String> swaps = new ArrayList<>();
-            swaps.add("**__Optional Component Swaps:__**");
-            for (DraftErrataModel i2 : optionalSwaps) {
-                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
-                swaps.add("> ♻️ " + item2.getTitle(game));
+            List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
+            if (!optionalSwaps.isEmpty()) {
+                textFields.add(errataTitles(game, "**__Optional Component Swaps:__**", "> ♻️ ", optionalSwaps));
             }
-            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), swaps)));
         }
         return textFields;
     }
 
+    private static TextDisplay errataTitles(Game game, String header, String prefix, List<DraftErrataModel> errata) {
+        List<String> lines = new ArrayList<>();
+        lines.add(header);
+        for (DraftErrataModel model : errata) {
+            lines.add(prefix + generate(model).getTitle(game));
+        }
+        return TextDisplay.of(String.join(System.lineSeparator(), lines));
+    }
+
+    private static DraftItem generate(DraftErrataModel model) {
+        return generate(model.getItemCategory(), model.getItemId());
+    }
+
     @JsonIgnore
     public String getLongDescription() {
-        StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
-        if (hasAdditionalComponents()) {
-            sb.append("\n>  - *Also adds: ");
-            for (DraftErrataModel i : Errata.getAdditionalComponents()) {
-                DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
-                sb.append(", ");
-            }
-            sb.append("*");
-        }
-        List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(null);
-        if (!optionalSwaps.isEmpty()) {
-            sb.append("\n>  - *Includes optional swaps: ");
-            for (DraftErrataModel i : optionalSwaps) {
-                DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
-                sb.append(", ");
-            }
-            sb.append("*");
-        }
-        return sb.toString();
+        return withErrataSummary(getLongDescriptionImpl(), null);
     }
 
     @JsonIgnore
     public String getLongDescription(Game game) {
-        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game)));
+        return withErrataSummary(getDisplayDescription(game, getLongDescriptionImpl(game)), game);
+    }
+
+    private String withErrataSummary(String description, Game game) {
+        StringBuilder sb = new StringBuilder(description);
         if (hasAdditionalComponents()) {
-            sb.append("\n>  - *Also adds: ");
-            for (DraftErrataModel i : Errata.getAdditionalComponents()) {
-                DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
-                sb.append(", ");
-            }
-            sb.append("*");
+            appendErrataSummary(sb, "\n>  - *Also adds: ", Errata.getAdditionalComponents());
         }
         List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
         if (!optionalSwaps.isEmpty()) {
-            sb.append("\n>  - *Includes optional swaps: ");
-            for (DraftErrataModel i : optionalSwaps) {
-                DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
-                sb.append(", ");
-            }
-            sb.append("*");
+            appendErrataSummary(sb, "\n>  - *Includes optional swaps: ", optionalSwaps);
         }
         return sb.toString();
+    }
+
+    private static void appendErrataSummary(StringBuilder sb, String header, List<DraftErrataModel> errata) {
+        sb.append(header);
+        for (DraftErrataModel model : errata) {
+            DraftItem item = generate(model);
+            sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
+            sb.append(", ");
+        }
+        sb.append("*");
     }
 
     private List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
@@ -316,17 +351,9 @@ public abstract class DraftItem {
     }
 
     private static boolean isAtHandLimit(Player player, DraftCategory cat) {
-        BagDraft draftRules = player.getGame().getActiveBagDraft();
-        DraftBag draftHand = player.getDraftHand();
-        boolean isAtHandLimit =
-                draftHand.getCategoryCount(cat) + player.getDraftQueue().getCategoryCount(cat)
-                        >= draftRules.getItemLimitForCategory(cat);
-        if (draftRules instanceof FrankenDraft) {
-            isAtHandLimit =
-                    draftHand.getCategoryCount(cat) + player.getDraftQueue().getCategoryCount(cat)
-                            >= FrankenDraft.getItemLimitForCategory(cat, player.getGame());
-        }
-        return isAtHandLimit;
+        return player.getDraftHand().getCategoryCount(cat)
+                        + player.getDraftQueue().getCategoryCount(cat)
+                >= BagDraft.effectiveItemLimit(player.getGame().getActiveBagDraft(), cat, player.getGame());
     }
 
     private static boolean alreadyDraftedThisCategory(Player player, DraftCategory category) {
@@ -335,16 +362,10 @@ public abstract class DraftItem {
 
     private static boolean otherCategoriesAvailable(Player player, DraftCategory category) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
-        DraftBag draftHand = player.getDraftHand();
-
         for (DraftCategory cat : DraftCategory.values()) {
-            if (category == cat) continue;
-            int catLimit = draftRules.getItemLimitForCategory(cat);
-
-            if (draftRules instanceof FrankenDraft) {
-                catLimit = FrankenDraft.getItemLimitForCategory(cat, player.getGame());
-            }
-            if (draftHand.getCategoryCount(cat) >= catLimit) {
+            if (category != cat
+                    && player.getDraftHand().getCategoryCount(cat)
+                            >= BagDraft.effectiveItemLimit(draftRules, cat, player.getGame())) {
                 return true;
             }
         }

@@ -31,4 +31,15 @@ public interface StoredValueHelper {
     String removeStoredValue(String key);
 
     void setStoredValue(String key, String value);
+
+    static String appendToList(String list, String item) {
+        return list == null || list.isEmpty() ? list + item : list + "_" + item;
+    }
+
+    static String removeFromList(String list, String item) {
+        if (list == null || list.isEmpty()) {
+            return list;
+        }
+        return list.contains(item + "_") ? list.replace(item + "_", "") : list.replace(item, "");
+    }
 }

@@ -126,9 +126,7 @@ class ArbitrationAcd2ButtonHandler {
 
     private static void placeInfantryIntoCoexistence(
             Game game, ButtonInteractionEvent event, Tile tile, Player infantryPlayer, String planetName) {
-        game.setStoredValue("coexistFlag", "yes");
-        AddUnitService.addUnits(event, tile, game, infantryPlayer.getColor(), "inf " + planetName);
-        game.removeStoredValue("coexistFlag");
+        AddUnitService.addUnitsInCoexistence(event, tile, game, infantryPlayer.getColor(), "inf " + planetName);
         ButtonHelperAbilities.oceanBoundCheck(game);
     }
 

@@ -33,6 +33,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.FractureService;
 import ti4.service.unit.AddUnitService;
@@ -289,68 +290,52 @@ public class LostLegciesExploreHandler {
     @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_MECH)
     public static void resolveImmediateAssemblyMech(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = FINAL_UNDERSCORE_PATTERN.split(buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_MECH.length()));
-        String planetName = payload[0];
-        String result = payload.length > 1 ? payload[1] : "";
-        Tile tile = game == null ? null : game.getTileFromPlanet(planetName);
-        if (player == null
-                || tile == null
-                || !("production".equals(result) || "mech".equals(result))
-                || !ExploreHelper.checkForMech(planetName, game, player)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        if ("production".equals(result)) {
-            game.setStoredValue(IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction(), planetName);
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentationNoPing() + " is using a mech to resolve _Immediate Assembly_. "
-                            + Helper.getPlanetRepresentation(planetName, game)
-                            + " has **PRODUCTION 3** until the end of their turn.");
-        } else if ("mech".equals(result)) {
-            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 mech " + planetName);
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentationNoPing() + " is using a mech to resolve _Immediate Assembly_. "
-                            + "Placed 1 mech on " + Helper.getPlanetRepresentation(planetName, game) + ".");
-        }
-        ButtonHelper.deleteMessage(event);
+        resolveImmediateAssembly(event, game, player, buttonID, true);
     }
 
-    // Immediate Assembly
     @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_INF)
     public static void resolveImmediateAssemblyInf(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = FINAL_UNDERSCORE_PATTERN.split(buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_INF.length()));
+        resolveImmediateAssembly(event, game, player, buttonID, false);
+    }
+
+    private static void resolveImmediateAssembly(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID, boolean mech) {
+        String prefix = mech ? RESOLVE_IMMEDIATE_ASSEMBLY_MECH : RESOLVE_IMMEDIATE_ASSEMBLY_INF;
+        String[] payload = FINAL_UNDERSCORE_PATTERN.split(buttonID.substring(prefix.length()));
         String planetName = payload[0];
         String result = payload.length > 1 ? payload[1] : "";
         Tile tile = game == null ? null : game.getTileFromPlanet(planetName);
-        UnitHolder planet = game == null ? null : game.getUnitHolderFromPlanet(planetName);
+        UnitHolder planet = game == null || mech ? null : game.getUnitHolderFromPlanet(planetName);
         if (player == null
                 || tile == null
-                || planet == null
+                || (!mech && planet == null)
                 || !("production".equals(result) || "mech".equals(result))
-                || !ExploreHelper.checkForInf(planetName, game, player)) {
+                || !(mech
+                        ? ExploreHelper.checkForMech(planetName, game, player)
+                        : ExploreHelper.checkForInf(planetName, game, player))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1, null);
-        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
+        if (!mech) {
+            RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1, null);
+            ButtonHelper.resolveInfantryRemoval(player, 1, tile);
+        }
+        String resolving = player.getRepresentationNoPing()
+                + (mech ? " is using a mech" : " removed 1 infantry")
+                + " to resolve _Immediate Assembly_. ";
         if ("production".equals(result)) {
             game.setStoredValue(IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction(), planetName);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentationNoPing() + " removed 1 infantry to resolve _Immediate Assembly_. "
-                            + Helper.getPlanetRepresentation(planetName, game)
+                    resolving + Helper.getPlanetRepresentation(planetName, game)
                             + " has **PRODUCTION 3** until the end of their turn.");
-        } else if ("mech".equals(result)) {
+        } else {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 mech " + planetName);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentationNoPing() + " removed 1 infantry to resolve _Immediate Assembly_. "
-                            + "Placed 1 mech on " + Helper.getPlanetRepresentation(planetName, game) + ".");
+                    resolving + "Placed 1 mech on " + Helper.getPlanetRepresentation(planetName, game) + ".");
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -542,17 +527,8 @@ public class LostLegciesExploreHandler {
             return;
         }
 
-        String commOrTg;
-        if (player.getCommodities() > 0) {
-            player.setCommodities(player.getCommodities() - 1);
-            commOrTg = "commodity";
-            if (player.getPromissoryNotesInPlayArea().contains("dark_pact")) {
-                commOrTg += " (though you may wish to manually spend a trade good instead because of _Dark Pact_)";
-            }
-        } else if (player.getTg() > 0) {
-            player.setTg(player.getTg() - 1);
-            commOrTg = "trade good";
-        } else {
+        String commOrTg = ExploreService.spendCommodityOrTg(player);
+        if (commOrTg == null) {
             ReactionService.addReaction(
                     event,
                     game,

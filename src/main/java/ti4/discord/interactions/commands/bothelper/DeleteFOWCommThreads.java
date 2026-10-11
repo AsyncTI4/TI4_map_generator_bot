@@ -2,9 +2,9 @@ package ti4.discord.interactions.commands.bothelper;
 
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
@@ -23,14 +23,7 @@ class DeleteFOWCommThreads extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (!"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(
-                    event,
-                    "Must confirm with `YES`"
-                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
-            return;
-        }
+        if (!CommandHelper.confirmedWithYes(event, event.getOption(Constants.CONFIRM))) return;
 
         String gameName = GameNameService.getGameName(event);
         Game game = GameManager.getManagedGame(gameName).getGame();

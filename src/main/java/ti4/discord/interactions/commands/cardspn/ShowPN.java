@@ -1,13 +1,13 @@
 package ti4.discord.interactions.commands.cardspn;
 
 import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,12 +25,8 @@ class ShowPN extends GameStateSubcommand {
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory Note ID which is found between ()")
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
-                .setRequired(true)
-                .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor());
+        addOptions(CommonOptions.factionColor("Source faction or color (default is you)"));
         addOptions(new OptionData(
                 OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, \"y\" or \"yes\" to enable"));
     }
@@ -39,17 +35,11 @@ class ShowPN extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         int index = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsInt();
-        String pnID = null;
-        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-            if (so.getValue().equals(index)) {
-                pnID = so.getKey();
-            }
-        }
-
-        if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
-            return;
-        }
+        String pnID = CommandHelper.requireOrReport(
+                event,
+                CommandHelper.cardIdForNumber(player.getPromissoryNotes(), index),
+                "No such promissory note ID found, please retry.");
+        if (pnID == null) return;
 
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
@@ -59,11 +49,8 @@ class ShowPN extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player targetPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (targetPlayer == null) return;
 
         MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(!longPNDisplay, false, false);
         player.setPromissoryNote(pnID);

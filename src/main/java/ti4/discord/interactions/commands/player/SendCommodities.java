@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -21,18 +22,12 @@ class SendCommodities extends GameStateSubcommand {
     SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color to which you send Commodities")
-                .setAutoComplete(true)
-                .setRequired(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color to which you send Commodities"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.CLEAR_DEBT,
                 "True to automatically clear any debt with receiving player"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or Color (defaults to you)"));
     }
 
     @Override
@@ -54,11 +49,8 @@ class SendCommodities extends GameStateSubcommand {
         commodities -= sendCommodities;
         player.setCommodities(commodities);
 
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player targetPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (targetPlayer == null) return;
         if (!player.isPlayerMemberOfAlliance(targetPlayer)) {
             int targetTG = targetPlayer.getTg();
             targetTG += sendCommodities;

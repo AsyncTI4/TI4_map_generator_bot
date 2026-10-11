@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -206,44 +207,23 @@ public class PlayerStatsDashboardPayload {
                         "total", Helper.getPlayerResourcesTotal(player, player.getGame())));
 
         // Legendary Count
-        long legendaryCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(Planet::isLegendary)
-                .count();
-        planetTotals.put("legendary", legendaryCount);
+        planetTotals.put(
+                "legendary", controlledPlanets().filter(Planet::isLegendary).count());
 
         // Traits
-        long culturalCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getPlanetTypes().contains("cultural"))
-                .count();
-        long hazardousCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getPlanetTypes().contains("hazardous"))
-                .count();
-        long industrialCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getPlanetTypes().contains("industrial"))
-                .count();
         planetTotals.put(
                 "traits",
                 Map.of(
-                        "cultural", culturalCount,
-                        "hazardous", hazardousCount,
-                        "industrial", industrialCount));
+                        "cultural", countPlanetsWithType("cultural"),
+                        "hazardous", countPlanetsWithType("hazardous"),
+                        "industrial", countPlanetsWithType("industrial")));
 
         // Techs
         AtomicInteger blueCount = new AtomicInteger();
         AtomicInteger yellowCount = new AtomicInteger();
         AtomicInteger greenCount = new AtomicInteger();
         AtomicInteger redCount = new AtomicInteger();
-        player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
+        controlledPlanets()
                 .map(Planet::getTechSpecialities)
                 .flatMap(Collection::stream)
                 .map(String::toLowerCase)
@@ -267,6 +247,18 @@ public class PlayerStatsDashboardPayload {
                         "yellow", yellowCount.get()));
 
         return planetTotals;
+    }
+
+    private Stream<Planet> controlledPlanets() {
+        return player.getPlanets().stream()
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull);
+    }
+
+    private long countPlanetsWithType(String planetType) {
+        return controlledPlanets()
+                .filter(p -> p.getPlanetTypes().contains(planetType))
+                .count();
     }
 
     public List<String> getRelicCards() {

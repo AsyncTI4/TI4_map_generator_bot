@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -18,9 +20,7 @@ class ExploreFrontier extends GameStateSubcommand {
 
     public ExploreFrontier() {
         super(Constants.FRONTIER, "Explore a Frontier token on a Tile", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("Location of the frontier tile"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.FORCE,
@@ -48,11 +48,9 @@ class ExploreFrontier extends GameStateSubcommand {
             return;
         }
 
-        Tile tile = TileHelper.getTile(event, tileName, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Invalid tile: `" + tileName + "`");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event, TileHelper.getTile(event, tileName, game), "Invalid tile: `" + tileName + "`");
+        if (tile == null) return;
 
         if (cardID != null || force) {
             ExploreService.expFront(event, tile, game, getPlayer(), force, cardID);

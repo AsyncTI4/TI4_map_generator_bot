@@ -1,30 +1,18 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
-import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.model.DeckModel;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-import ti4.service.emoji.TI4Emoji;
 
-public class AgentDraftItem extends DraftItem {
+public class AgentDraftItem extends LeaderDraftItem {
 
     public AgentDraftItem(String itemId) {
         super(DraftCategory.AGENT, itemId);
-    }
-
-    @JsonIgnore
-    private LeaderModel getLeader() {
-        return Mapper.getLeader(getItemId());
     }
 
     @JsonIgnore
@@ -34,101 +22,24 @@ public class AgentDraftItem extends DraftItem {
         return getLeader().getNameRepresentation();
     }
 
-    @JsonIgnore
     @Override
-    public String getShortDescription() {
-        LeaderModel leader = getLeader();
-        if (leader == null) {
-            return getAlias();
-        }
-        return leader.getName();
-    }
-
-    @JsonIgnore
-    @Override
-    public String getLongDescriptionImpl() {
-        LeaderModel leader = getLeader();
-        if (leader != null) {
-            return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
-        }
-        return "";
-    }
-
-    @JsonIgnore
-    @Override
-    public String getLongDescriptionImpl(Game game) {
-        LeaderModel leader = getLeader();
-        if (leader != null) {
-            if (game.isTwilightsFallMode()) {
-                return "*" + leader.getTFAbilityWindowIfAble() + "* " + leader.getTFAbilityTextIfAble();
-            } else {
-                return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
-            }
-        }
-        return "";
-    }
-
-    @JsonIgnore
-    @Override
-    public TI4Emoji getItemEmoji() {
-        LeaderModel leader = getLeader();
-        if (leader != null) {
-            return leader.getLeaderEmoji();
-        }
-        return null;
+    protected String describe(LeaderModel leader, boolean twilightsFall) {
+        return abilityText(leader, twilightsFall);
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.AGENT);
-        return allItems;
+        return draftable(DraftCategory.AGENT, buildAllItems(factions));
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = new ArrayList<>();
-        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        for (FactionModel faction : factions) {
-            List<String> agents = faction.getLeaders();
-            agents.removeIf(
-                    (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
-            for (String agent : agents) {
-                allItems.add(generate(DraftCategory.AGENT, agent));
-            }
-        }
-        return allItems;
+        return buildLeaderItems(DraftCategory.AGENT, factions);
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.AGENT);
-        return allItems;
-    }
-
-    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
-        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
-        if (game.isTwilightsFallMode()) {
-            DeckModel deck = Mapper.getDeck(game.getGenomeSpliceDeckID());
-            for (String leader : deck.getNewShuffledDeck()) {
-                if (Arrays.asList(results).contains(leader)) {
-                    continue;
-                }
-                allItems.add(generate(DraftCategory.AGENT, leader));
-            }
-        } else {
-            for (FactionModel faction : factions) {
-                List<String> agents = faction.getLeaders();
-                agents.removeIf((String leader) ->
-                        !"agent".equals(allLeaders.get(leader).getType()));
-                for (String agent : agents) {
-                    if (Arrays.asList(results).contains(agent)) {
-                        continue;
-                    }
-                    allItems.add(generate(DraftCategory.AGENT, agent));
-                }
-            }
-        }
-        return allItems;
+        List<DraftItem> items = game.isTwilightsFallMode()
+                ? generateAll(
+                        DraftCategory.AGENT, Mapper.getDeck(game.getGenomeSpliceDeckID()).getNewShuffledDeck().stream())
+                : buildAllItems(factions);
+        return draftable(DraftCategory.AGENT, withoutBanned(items, game, "bannedLeaders"));
     }
 }

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -57,11 +58,9 @@ class SetupGameChannels extends GameStateSubcommand {
         Game game = getGame();
 
         // Set main channel where SC's get played
-        OptionMapping channel = event.getOption(Constants.MAIN_GAME_CHANNEL);
-        if (channel == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify main game channel");
-            return;
-        }
+        OptionMapping channel = CommandHelper.requireOrReport(
+                event, event.getOption(Constants.MAIN_GAME_CHANNEL), "Must specify main game channel");
+        if (channel == null) return;
         if (channel.getChannelType() != ChannelType.TEXT) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify text channel");
             return;
@@ -102,12 +101,9 @@ class SetupGameChannels extends GameStateSubcommand {
             return;
         }
         User asUser = player.getAsUser();
-        Player player_ = game.getPlayer(asUser.getId());
-        if (player_ == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
-            return;
-        }
+        Player player_ = CommandHelper.requireOrReport(
+                event, game.getPlayer(asUser.getId()), "Must specify game player: " + playerConstant + " is invalid.");
+        if (player_ == null) return;
 
         // set community mode data
         if (game.isCommunityMode()) {

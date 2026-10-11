@@ -96,10 +96,6 @@ public class PrecisionTargetingLLButtonHandler {
         }
     }
 
-    public static boolean requiresManualAssignment(Game game, Player defender, Tile tile) {
-        return !getTargetDescription(game, defender, tile).isEmpty();
-    }
-
     public static String getTargetDescription(Game game, Player defender, Tile tile) {
         String[] state = game.getStoredValue(STATE + defender.getFaction()).split("\\|", 3);
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);

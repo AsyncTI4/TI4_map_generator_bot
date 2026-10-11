@@ -31,11 +31,11 @@ public class TourneyWinner extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        User selectedUser = event.getOption("user", null, OptionMapping::getAsUser);
-        if (selectedUser == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve user, please try again.");
-            return;
-        }
+        User selectedUser = CommandHelper.requireOrReport(
+                event,
+                event.getOption("user", null, OptionMapping::getAsUser),
+                "Could not resolve user, please try again.");
+        if (selectedUser == null) return;
 
         String tourneyName = event.getOption("tournament_name", null, OptionMapping::getAsString);
         if (tourneyName == null || tourneyName.isBlank()) {

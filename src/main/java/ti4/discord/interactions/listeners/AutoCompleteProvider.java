@@ -16,11 +16,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.requests.restaction.interactions.AutoCompleteCallbackAction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
@@ -44,9 +43,12 @@ import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.AbilityModel;
+import ti4.model.AttachmentModel;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
+import ti4.model.DeckModel.DeckType;
 import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -54,15 +56,12 @@ import ti4.model.MapTemplateModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
-import ti4.model.PublicObjectiveModel;
-import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.UnitDecalService;
 import ti4.service.draft.DraftChoice;
@@ -92,6 +91,145 @@ import ti4.settings.GlobalSettings;
 
 @UtilityClass
 class AutoCompleteProvider {
+
+    private static final List<String> GAME_TYPES = List.of(
+            "base",
+            "pok",
+            "absol",
+            "ds",
+            "tigl",
+            "action_deck_2",
+            "franken",
+            "milty_mod",
+            "red_tape",
+            "age_of_exploration",
+            "minor_factions",
+            "alliance",
+            "age_of_commerce",
+            "facilities",
+            "total_war",
+            "liberation",
+            "ordinian",
+            "te",
+            "tf",
+            "twilightds",
+            "tedemo",
+            "noswap",
+            Constants.TWILIGHT_KART,
+            Constants.TK_DESTROYER_CUP,
+            Constants.TK_NOVA_CUP);
+
+    private static final Map<String, List<String>> FIXED_CHOICES = Map.ofEntries(
+            Map.entry(
+                    Constants.VOLTRON_STYLE,
+                    List.of(
+                            "eyes",
+                            "arms",
+                            "link",
+                            "saiyan",
+                            "at_field",
+                            "nyan",
+                            "fancy",
+                            "royal",
+                            "baba",
+                            "minis",
+                            "lightning",
+                            "panther")),
+            Map.entry(Constants.CC_USE, List.of("t/tactic", "r/retreat/reinforcements", "no")),
+            Map.entry(
+                    Constants.DISPLAY_TYPE,
+                    List.of(
+                            "all",
+                            "map",
+                            "stats",
+                            "split",
+                            "landscape",
+                            "wormholes",
+                            "anomalies",
+                            "legendaries",
+                            "empties",
+                            "aetherstream",
+                            "space_cannon_offense",
+                            "traits",
+                            "technology_specialties",
+                            "attachments",
+                            "unlocked_units",
+                            "shipless",
+                            "googly",
+                            "none")),
+            Map.entry(
+                    Constants.TRAIT,
+                    List.of(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER)),
+            Map.entry(Constants.FOG_FILTER, List.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple")),
+            Map.entry(
+                    Constants.PRIMARY_TILE_DIRECTION,
+                    List.of("north", "northeast", "southeast", "south", "southwest", "northwest")),
+            Map.entry(Constants.ANON, List.of("y", "n")),
+            Map.entry(Constants.TEXT_SIZE, List.of("tiny", "small", "medium", "large")),
+            Map.entry(Constants.SPLICE_TYPE, List.of("ability", "units", "genome")),
+            Map.entry(
+                    Constants.EXPEDITION,
+                    List.of("secret", "actionCards", "fiveInf", "fiveRes", "tradeGoods", "techSkip")),
+            Map.entry(Constants.TECH_TYPE, List.of("cybernetic", "biotic", "warfare", "propulsion")),
+            Map.entry(
+                    Constants.SPECIFIC_PHASE,
+                    List.of(
+                            "strategy",
+                            "voting",
+                            "statusScoring",
+                            "statusHomework",
+                            "action",
+                            "agendaResolve",
+                            "playerSetup",
+                            "setupHomebrew",
+                            "ixthian",
+                            "agenda")),
+            Map.entry(Constants.CREUSS_TOKEN_NAME, List.of("alpha", "beta", "gamma")),
+            Map.entry(
+                    Constants.SCENARIO,
+                    List.of(
+                            "ordinian (codex 1)",
+                            "liberation (codex 4)",
+                            "erwan's gambit (homebrew)",
+                            "muaat mania (homebrew)")),
+            Map.entry(GameStatisticsFilterer.GAME_TYPES_FILTER, GAME_TYPES),
+            Map.entry(GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER, GAME_TYPES),
+            Map.entry(Constants.ADD_REMOVE, List.of("add", "remove")));
+
+    private static final Map<String, DeckType> DECK_TYPE_OPTIONS = Map.of(
+            Constants.SO_DECK, DeckType.SECRET_OBJECTIVE,
+            Constants.STAGE_1_PUBLIC_DECK, DeckType.PUBLIC_STAGE_1_OBJECTIVE,
+            Constants.STAGE_2_PUBLIC_DECK, DeckType.PUBLIC_STAGE_2_OBJECTIVE,
+            Constants.RELIC_DECK, DeckType.RELIC,
+            Constants.AGENDA_DECK, DeckType.AGENDA,
+            Constants.EVENT_DECK, DeckType.EVENT,
+            Constants.EXPLORATION_DECKS, DeckType.EXPLORE,
+            Constants.TECHNOLOGY_DECK, DeckType.TECHNOLOGY);
+
+    private static final Map<String, String> HUES = hashMapOf(new String[][] {
+        {"RED", "Reds"},
+        {"ORANGE", "Oranges"},
+        {"BROWN", "Browns"},
+        {"YELLOW", "Yellows"},
+        {"GREEN", "Greens"},
+        {"BLUE", "Blues"},
+        {"PURPLE", "Purples"},
+        {"PINK", "Pinks"},
+        {"WHITE", "Whites"},
+        {"BLACK", "Blacks"},
+        {"MULTI", "Multi-Colours"},
+        {Constants.ALL, "ALL COLOURS"}
+    });
+
+    private static final Map<String, String> DECAL_HUES = hashMapOf(new String[][] {
+        {"Pattern", "Pattern"},
+        {"Icon", "Icon"},
+        {"Symbol", "Symbol"},
+        {"Texture", "Texture"},
+        {"Line", "Line"},
+        {"Other", "Other"},
+        {Constants.ALL, "ALL DECALS"}
+    });
 
     static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
@@ -140,10 +278,9 @@ class AutoCompleteProvider {
             if (event.isAcknowledged()) return;
         }
 
-        // GENERIC HANDLING OF OPTIONS
         handleOptions(event, optionName, subCommandName, gameName);
         if (!event.isAcknowledged()) {
-            event.replyChoices(Collections.emptyList()).queue(Consumers.nop(), BotLogger::catchRestError);
+            reply(event, Collections.emptyList());
         }
     }
 
@@ -152,16 +289,30 @@ class AutoCompleteProvider {
             @NotNull String optionName,
             String subcommandName,
             String gameName) {
+        List<String> fixedChoices = FIXED_CHOICES.get(optionName);
+        if (fixedChoices != null) {
+            replyContaining(event, fixedChoices);
+            return;
+        }
+        DeckType deckType = DECK_TYPE_OPTIONS.get(optionName);
+        if (deckType != null) {
+            List<DeckModel> decks = Mapper.getDecks().values().stream()
+                    .filter(deckModel -> deckModel.getType() == deckType)
+                    .toList();
+            reply(event, searchModels(event, decks, null));
+            return;
+        }
         switch (optionName) {
             case Constants.COLOR -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Mapper.getColors().stream()
-                        .filter(color -> color.getName().startsWith(enteredValue)
-                                || color.getAliases().contains(enteredValue))
-                        .limit(25)
-                        .map(color -> new Command.Choice(color.getName(), color.getName()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Mapper.getColors().stream()
+                                        .filter(color -> color.getName().startsWith(enteredValue)
+                                                || color.getAliases().contains(enteredValue)),
+                                color -> color.getName(),
+                                color -> color.getName()));
             }
             case Constants.FACTION,
                     Constants.FACTION2,
@@ -176,578 +327,219 @@ class AutoCompleteProvider {
                     GameStatisticsFilterer.WINNING_FACTION_FILTER,
                     Constants.HOMESYSTEM_FACTION_OPTION,
                     Constants.STARTING_FLEET_FACTION_OPTION,
-                    Constants.PRIORITY_NUMBER_FACTION_OPTION -> {
-                var options = searchModels(event, Mapper.getFactionsValues(), null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.HUE -> {
-                String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "")
-                        .toLowerCase();
-                Map<String, String> values = new HashMap<>() {
-                    {
-                        put("RED", "Reds");
-                        put("ORANGE", "Oranges");
-                        put("BROWN", "Browns");
-                        put("YELLOW", "Yellows");
-                        put("GREEN", "Greens");
-                        put("BLUE", "Blues");
-                        put("PURPLE", "Purples");
-                        put("PINK", "Pinks");
-                        put("WHITE", "Whites");
-                        put("BLACK", "Blacks");
-                        put("MULTI", "Multi-Colours");
-                        put(Constants.ALL, "ALL COLOURS");
-                    }
-                };
-                List<Command.Choice> options = values.entrySet().stream()
-                        .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue(), entry.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.DECAL_HUE -> {
-                String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "")
-                        .toLowerCase();
-                Map<String, String> values = new HashMap<>() {
-                    {
-                        put("Pattern", "Pattern");
-                        put("Icon", "Icon");
-                        put("Symbol", "Symbol");
-                        put("Texture", "Texture");
-                        put("Line", "Line");
-                        put("Other", "Other");
-                        put(Constants.ALL, "ALL DECALS");
-                    }
-                };
-                List<Command.Choice> options = values.entrySet().stream()
-                        .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue(), entry.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.VOLTRON_STYLE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = List.of(
-                        "eyes",
-                        "arms",
-                        "link",
-                        "saiyan",
-                        "at_field",
-                        "nyan",
-                        "fancy",
-                        "royal",
-                        "baba",
-                        "minis",
-                        "lightning",
-                        "panther");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.CC_USE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("t/tactic", "r/retreat/reinforcements", "no");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TOKEN -> {
-                List<String> tokenNames = Mapper.getTokensFromProperties().stream()
-                        .map(str -> {
-                            if (Mapper.getAttachmentInfo(str) != null) {
-                                return Mapper.getAttachmentInfo(str).getAutoCompleteName();
-                            }
-                            return str;
-                        })
-                        .toList();
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(tokenNames, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+                    Constants.PRIORITY_NUMBER_FACTION_OPTION ->
+                reply(event, searchModels(event, Mapper.getFactionsValues(), null));
+            case Constants.HUE -> reply(event, labelledChoices(event, HUES));
+            case Constants.DECAL_HUE -> reply(event, labelledChoices(event, DECAL_HUES));
+            case Constants.TOKEN ->
+                replyContaining(
+                        event,
+                        Mapper.getTokensFromProperties().stream()
+                                .map(str -> {
+                                    AttachmentModel attachment = Mapper.getAttachmentInfo(str);
+                                    return attachment != null ? attachment.getAutoCompleteName() : str;
+                                })
+                                .toList());
             case Constants.MAP_SEGMENT -> {
-                String enteredValue = event.getFocusedOption().getValue();
+                Game game = getGame(gameName);
                 List<String> names = List.of();
-                if (GameManager.isValid(gameName)) {
-                    Game game = GameManager.getManagedGame(gameName).getGame();
+                if (game != null) {
                     boolean foggedView = MapSegmentService.isFoggedView(game, event.getChannel());
                     names = MapSegmentService.viewableNames(
                             game, event.getUser().getId(), foggedView);
                 }
-                List<Command.Choice> options = mapTo25ChoicesThatContain(names, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                replyContaining(event, names);
             }
-            case Constants.DISPLAY_TYPE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of(
-                        "all",
-                        "map",
-                        "stats",
-                        "split",
-                        "landscape",
-                        "wormholes",
-                        "anomalies",
-                        "legendaries",
-                        "empties",
-                        "aetherstream",
-                        "space_cannon_offense",
-                        "traits",
-                        "technology_specialties",
-                        "attachments",
-                        "unlocked_units",
-                        "shipless",
-                        "googly",
-                        "none");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.RELIC_ALL -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, RelicModel> relics = Mapper.getRelics();
-                List<Command.Choice> options = relics.entrySet().stream()
-                        .filter(value ->
-                                value.getValue().getName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.PO_ID -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
-                List<Command.Choice> options = publicObjectives.entrySet().stream()
-                        .filter(value ->
-                                value.getValue().getName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.SO_ID -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, String> actionCards = Mapper.getSecretObjectivesJustNamesAndSource();
-                List<Command.Choice> options = actionCards.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.AC_ID -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, String> actionCards = Mapper.getACJustNames();
-                List<Command.Choice> options = actionCards.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.PROMISSORY_NOTE_ID -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
-                List<Command.Choice> options = PNs.values().stream()
-                        .filter(pn -> (pn.getAlias() + " " + pn.getName() + " " + pn.getOwner())
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .limit(25)
-                        .map(pn -> new Command.Choice(
-                                pn.getAlias() + " " + pn.getName() + " " + pn.getOwner(), pn.getAlias()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.RELIC_ALL ->
+                reply(
+                        event,
+                        containing(
+                                Mapper.getRelics().entrySet().stream(),
+                                enteredLower(event),
+                                entry -> entry.getValue().getName(),
+                                Map.Entry::getKey));
+            case Constants.PO_ID ->
+                reply(
+                        event,
+                        containing(
+                                Mapper.getPublicObjectives().entrySet().stream(),
+                                enteredLower(event),
+                                entry -> entry.getValue().getName(),
+                                Map.Entry::getKey));
+            case Constants.SO_ID ->
+                reply(event, containingByValue(event, Mapper.getSecretObjectivesJustNamesAndSource()));
+            case Constants.AC_ID -> reply(event, containingByValue(event, Mapper.getACJustNames()));
+            case Constants.PROMISSORY_NOTE_ID ->
+                reply(
+                        event,
+                        containing(
+                                Mapper.getPromissoryNotes().values().stream(),
+                                enteredLower(event),
+                                pn -> pn.getAlias() + " " + pn.getName() + " " + pn.getOwner(),
+                                PromissoryNoteModel::getAlias));
             case Constants.UNIT_ID,
                     Constants.UNIT_ID_1,
                     Constants.UNIT_ID_2,
                     Constants.UNIT_ID_3,
                     Constants.UNIT_ID_4,
                     Constants.UNIT_ID_5 -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, UnitModel> units = Mapper.getUnits();
-                List<Command.Choice> options = units.values().stream()
-                        .filter(unit -> (unit.getId() + " " + unit.getName())
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .filter(model -> !model.getSource().isHiddenFromSearch())
-                        .limit(25)
-                        .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() + ")", unit.getId()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TRAIT -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER);
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                Mapper.getUnits().values().stream()
+                                        .filter(unit -> (unit.getId() + " " + unit.getName())
+                                                .toLowerCase()
+                                                .contains(enteredValue))
+                                        .filter(model -> !model.getSource().isHiddenFromSearch()),
+                                unit -> unit.getId() + " (" + unit.getName() + ")",
+                                unit -> unit.getId()));
             }
             case Constants.DECAL_SET -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Mapper.getDecals().stream()
-                        .filter(value -> value.contains(enteredValue)
-                                || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
-                        .filter(decalID ->
-                                UnitDecalService.userMayUseDecal(event.getUser().getId(), decalID))
-                        .limit(25)
-                        .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.FOG_FILTER -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.PRIMARY_TILE_DIRECTION -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("north", "northeast", "southeast", "south", "southwest", "northwest");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                Mapper.getDecals().stream()
+                                        .filter(value -> value.contains(enteredValue)
+                                                || Mapper.getDecalName(value)
+                                                        .toLowerCase()
+                                                        .contains(enteredValue))
+                                        .filter(decalID -> UnitDecalService.userMayUseDecal(
+                                                event.getUser().getId(), decalID)),
+                                value -> Mapper.getDecalName(value),
+                                value -> value));
             }
             case Constants.CATEGORY -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Category> categories = new ArrayList<>();
-                for (Guild guild : JdaService.guilds) {
-                    categories.addAll(guild.getCategories());
-                }
-                List<Command.Choice> options = categories.stream()
-                        .filter(c -> c.getName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(c -> new Command.Choice(c.getGuild().getName() + ": #" + c.getName(), c.getName()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                JdaService.guilds.stream()
+                                        .flatMap(guild -> guild.getCategories().stream())
+                                        .filter(c -> c.getName().toLowerCase().contains(enteredValue)),
+                                c -> c.getGuild().getName() + ": #" + c.getName(),
+                                c -> c.getName()));
             }
-            case Constants.ANON -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(List.of("y", "n"), enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TEXT_SIZE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("tiny", "small", "medium", "large");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.SPLICE_TYPE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("ability", "units", "genome");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.EXPEDITION -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("secret", "actionCards", "fiveInf", "fiveRes", "tradeGoods", "techSkip");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TECH_TYPE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("cybernetic", "biotic", "warfare", "propulsion");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.SPECIFIC_PHASE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var phases = List.of(
-                        "strategy",
-                        "voting",
-                        "statusScoring",
-                        "statusHomework",
-                        "action",
-                        "agendaResolve",
-                        "playerSetup",
-                        "setupHomebrew",
-                        "ixthian",
-                        "agenda");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(phases, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.CREUSS_TOKEN_NAME -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("alpha", "beta", "gamma");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.SCENARIO -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of(
-                        "ordinian (codex 1)",
-                        "liberation (codex 4)",
-                        "erwan's gambit (homebrew)",
-                        "muaat mania (homebrew)");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case GameStatisticsFilterer.GAME_TYPES_FILTER, GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of(
-                        "base",
-                        "pok",
-                        "absol",
-                        "ds",
-                        "tigl",
-                        "action_deck_2",
-                        "franken",
-                        "milty_mod",
-                        "red_tape",
-                        "age_of_exploration",
-                        "minor_factions",
-                        "alliance",
-                        "age_of_commerce",
-                        "facilities",
-                        "total_war",
-                        "liberation",
-                        "ordinian",
-                        "te",
-                        "tf",
-                        "twilightds",
-                        "tedemo",
-                        "noswap",
-                        Constants.TWILIGHT_KART,
-                        Constants.TK_DESTROYER_CUP,
-                        Constants.TK_NOVA_CUP);
-                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.DECK_NAME -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
-                        .filter(value -> value.getAlias().contains(enteredValue))
-                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                        .limit(25)
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.AC_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.ACTION_CARD)
-                        .filter(value -> value.getAlias().contains(enteredValue))
-                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                        .limit(25)
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.SO_DECK -> {
-                List<DeckModel> secretDecks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.SECRET_OBJECTIVE)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, secretDecks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.STAGE_1_PUBLIC_DECK -> {
-                List<DeckModel> public1Decks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, public1Decks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.STAGE_2_PUBLIC_DECK -> {
-                List<DeckModel> public2Decks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, public2Decks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.RELIC_DECK -> {
-                List<DeckModel> relicDecks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.RELIC)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, relicDecks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.AGENDA_DECK -> {
-                List<DeckModel> agendaDecks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.AGENDA)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, agendaDecks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.EVENT_DECK -> {
-                List<DeckModel> eventDecks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.EVENT)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, eventDecks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.EXPLORATION_DECKS -> {
-                List<DeckModel> exploreDecks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.EXPLORE)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, exploreDecks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TECHNOLOGY_DECK -> {
-                List<DeckModel> techDecks = Mapper.getDecks().values().stream()
-                        .filter(deckModel -> deckModel.getType() == DeckModel.DeckType.TECHNOLOGY)
-                        .toList();
-                List<Command.Choice> options = searchModels(event, techDecks, null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.DECK_NAME -> reply(event, decksByAlias(event, deck -> true));
+            case Constants.AC_DECK -> reply(event, decksByAlias(event, deck -> deck.getType() == DeckType.ACTION_CARD));
             case Constants.STRATEGY_CARD_SET -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, StrategyCardSetModel> decks = Mapper.getStrategyCardSets();
-                List<Command.Choice> options = decks.values().stream()
-                        .filter(scSet -> !"template".equals(scSet.getAlias()))
-                        .filter(value -> value.getAlias().contains(enteredValue))
-                        .map((scSet) -> new Command.Choice(scSet.getName(), scSet.getAlias()))
-                        .limit(25)
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                Mapper.getStrategyCardSets().values().stream()
+                                        .filter(scSet -> !"template".equals(scSet.getAlias()))
+                                        .filter(scSet -> scSet.getAlias().contains(enteredValue)),
+                                StrategyCardSetModel::getName,
+                                StrategyCardSetModel::getAlias));
             }
-            case Constants.BORDER_TYPE -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = Mapper.getBorderAnomalies().stream()
-                        .filter(anomaly -> anomaly.getName().toLowerCase().contains(enteredValue))
-                        .map(anomaly -> new Command.Choice(anomaly.getAutoCompleteName(), anomaly.getId()))
-                        .limit(25)
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.BORDER_TYPE ->
+                reply(
+                        event,
+                        toChoices(
+                                Mapper.getBorderAnomalies().stream()
+                                        .filter(anomaly ->
+                                                anomaly.getName().toLowerCase().contains(enteredLower(event))),
+                                BorderAnomalyModel::getAutoCompleteName,
+                                BorderAnomalyModel::getId));
             case Constants.AUTO_ARCHIVE_DURATION ->
-                event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK")
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
-            case Constants.PLANET_TYPE -> {
-                List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
-                        .map(PlanetTypeModel.PlanetType::toString)
-                        .toList();
-                event.replyChoiceStrings(allPlanetTypes).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.PLANET_TECH_SKIPS -> {
-                List<String> allTechSkips = Arrays.stream(TechSpecialtyModel.TechSpecialty.values())
-                        .map(TechSpecialtyModel.TechSpecialty::toString)
-                        .toList();
-                event.replyChoiceStrings(allTechSkips).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TILE_TYPE -> {
-                List<String> allTileTypes = Arrays.stream(ShipPositionModel.ShipPosition.values())
-                        .map(ShipPositionModel.ShipPosition::getTypeString)
-                        .toList();
-                event.replyChoiceStrings(allTileTypes).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.TILE_WORMHOLES -> {
-                List<String> allWormholeTypes = Arrays.stream(WormholeModel.Wormhole.values())
-                        .limit(25)
-                        .map(WormholeModel.Wormhole::toString)
-                        .toList();
-                event.replyChoiceStrings(allWormholeTypes).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.ADD_REMOVE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = List.of("add", "remove");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+                queue(event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK"));
+            case Constants.PLANET_TYPE ->
+                replyStrings(
+                        event,
+                        Arrays.stream(PlanetTypeModel.PlanetType.values()).map(Object::toString));
+            case Constants.PLANET_TECH_SKIPS ->
+                replyStrings(
+                        event,
+                        Arrays.stream(TechSpecialtyModel.TechSpecialty.values()).map(Object::toString));
+            case Constants.TILE_TYPE ->
+                replyStrings(
+                        event,
+                        Arrays.stream(ShipPositionModel.ShipPosition.values())
+                                .map(ShipPositionModel.ShipPosition::getTypeString));
+            case Constants.TILE_WORMHOLES ->
+                replyStrings(
+                        event,
+                        Arrays.stream(WormholeModel.Wormhole.values()).limit(25).map(Object::toString));
             case Constants.UNIT_SOURCE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Mapper.getUnitSourcesDistinct().stream()
-                        .filter(token -> token.contains(enteredValue))
-                        .limit(25)
-                        .map(token -> new Command.Choice(token, token))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Mapper.getUnitSourcesDistinct().stream().filter(token -> token.contains(enteredValue)),
+                                token -> token,
+                                token -> token));
             }
             case Constants.SOURCE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of(ComponentSource.values())
-                        .filter(token -> token.toString().contains(enteredValue))
-                        .limit(25)
-                        .map(token -> new Command.Choice(token.toString(), token.toString()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Stream.of(ComponentSource.values())
+                                        .map(ComponentSource::toString)
+                                        .filter(token -> token.contains(enteredValue)),
+                                token -> token,
+                                token -> token));
             }
-            case Constants.GAME_NAME -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(GameManager.getGameNames(), enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.GAME_NAME -> replyContaining(event, GameManager.getGameNames());
             case Constants.GAME_STATISTIC -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<GameStatTypes> stats = Arrays.asList(GameStatTypes.values());
-                List<Command.Choice> options = stats.stream()
-                        .filter(stat -> stat.search(enteredValue))
-                        .limit(25)
-                        .sorted(Comparator.comparing(GameStatTypes::getAutoCompleteName))
-                        .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Arrays.stream(GameStatTypes.values())
+                                        .filter(stat -> stat.search(enteredValue))
+                                        .limit(25)
+                                        .sorted(Comparator.comparing(GameStatTypes::getAutoCompleteName)),
+                                GameStatTypes::getAutoCompleteName,
+                                GameStatTypes::toString));
             }
             case Constants.PLAYER_STATISTIC -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<PlayerStatTypes> stats = Arrays.asList(PlayerStatTypes.values());
-                List<Command.Choice> options = stats.stream()
-                        .filter(stat -> stat.search(enteredValue))
-                        .limit(25)
-                        .sorted(Comparator.comparing(PlayerStatTypes::getAutoCompleteName))
-                        .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Arrays.stream(PlayerStatTypes.values())
+                                        .filter(stat -> stat.search(enteredValue))
+                                        .limit(25)
+                                        .sorted(Comparator.comparing(PlayerStatTypes::getAutoCompleteName)),
+                                PlayerStatTypes::getAutoCompleteName,
+                                PlayerStatTypes::toString));
             }
-            case Constants.USE_MAP_TEMPLATE, Constants.MAP_TEMPLATE -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<MapTemplateModel> templates = Mapper.getMapTemplates();
-                List<Command.Choice> options = templates.stream()
-                        .filter(tmp -> tmp.autoCompleteString().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(tmp -> new Command.Choice(tmp.autoCompleteString(), tmp.getAlias()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.USE_MAP_TEMPLATE, Constants.MAP_TEMPLATE ->
+                reply(
+                        event,
+                        containing(
+                                Mapper.getMapTemplates().stream(),
+                                enteredLower(event),
+                                MapTemplateModel::autoCompleteString,
+                                MapTemplateModel::getAlias));
             case Constants.DRAFT_MODE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<FrankenDraftMode> modes = new ArrayList<>(Arrays.asList(FrankenDraftMode.values()));
-                List<Command.Choice> options = modes.stream()
-                        .filter(mode -> mode.search(enteredValue))
-                        .limit(25)
-                        .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
-                        .map(mode -> new Command.Choice(mode.getAutoCompleteName(), mode.toString()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Arrays.stream(FrankenDraftMode.values())
+                                        .filter(mode -> mode.search(enteredValue))
+                                        .limit(25)
+                                        .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName)),
+                                FrankenDraftMode::getAutoCompleteName,
+                                FrankenDraftMode::toString));
             }
-            case Constants.PROMOTE_TARGET -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = ServerPromoteCommand.servers.keySet().stream()
-                        .filter(key -> ServerPromoteCommand.servers
-                                .get(key)
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .limit(25)
-                        .map(key -> new Command.Choice(key, ServerPromoteCommand.servers.get(key)))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.PROMOTE_RANK -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = ServerPromoteCommand.servers.keySet().stream()
-                        .filter(key -> ServerPromoteCommand.ranks
-                                .get(key)
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .limit(25)
-                        .map(key -> new Command.Choice(key, ServerPromoteCommand.ranks.get(key)))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.PROMOTE_TARGET -> reply(event, promoteChoices(event, ServerPromoteCommand.servers));
+            case Constants.PROMOTE_RANK -> reply(event, promoteChoices(event, ServerPromoteCommand.ranks));
             case "draft_pick" -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> availablePicks = game.getMiltyDraftManager().allRemainingOptionsForActive();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(availablePicks, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                Game game = getGame(gameName);
+                if (game == null) return;
+                replyContaining(event, game.getMiltyDraftManager().allRemainingOptionsForActive());
             }
             case Constants.RELIC -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-
-                List<String> relicDeck =
-                        Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
-                List<String> tableRelics = new ArrayList<>(relicDeck);
-                boolean fogRestricted = game.isFowMode()
-                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
-                if (!fogRestricted) {
+                Game game = getGame(gameName);
+                if (game == null) return;
+                List<String> tableRelics = new ArrayList<>(
+                        Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck());
+                if (!isFogRestricted(event, game)) {
                     for (Player player : game.getRealPlayers()) {
                         for (String relic : player.getRelics()) {
                             if (Mapper.getRelic(relic) != null
@@ -759,59 +551,48 @@ class AutoCompleteProvider {
                     }
                 }
                 Collections.shuffle(tableRelics);
-
-                List<Command.Choice> options = mapTo25ChoicesThatContain(tableRelics, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                replyContaining(event, tableRelics);
             }
             case Constants.LATEST_COMMAND -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String latestCommand;
-                if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
-                    latestCommand = "Game is Fog of War mode - last command is hidden.";
-                } else {
-                    latestCommand = StringUtils.left(game.getLatestCommand(), 100);
-                }
-                event.replyChoice(latestCommand, Constants.LATEST_COMMAND)
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                Game game = getGame(gameName);
+                if (game == null) return;
+                String latestCommand = isFogRestricted(event, game)
+                        ? "Game is Fog of War mode - last command is hidden."
+                        : StringUtils.left(game.getLatestCommand(), 100);
+                queue(event.replyChoice(latestCommand, Constants.LATEST_COMMAND));
             }
             case Constants.UNDO_TO_COMMAND -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
-                    event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.")
-                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                Game game = getGame(gameName);
+                if (game == null) return;
+                if (isFogRestricted(event, game)) {
+                    queue(event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing."));
                     return;
                 }
-
-                List<Command.Choice> options =
-                        GameUndoNameService.getUndoNamesToCommandText(game, 25).entrySet().stream()
-                                .sorted(Map.Entry.comparingByKey(
-                                        Comparator.comparing(GameUndoNameService::getUndoNumberFromFileName)
-                                                .reversed()))
-                                .limit(25)
-                                .map(entry ->
-                                        new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
-                                .toList();
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(
+                        event,
+                        toChoices(
+                                GameUndoNameService.getUndoNamesToCommandText(game, 25).entrySet().stream()
+                                        .sorted(Map.Entry.comparingByKey(
+                                                Comparator.comparing(GameUndoNameService::getUndoNumberFromFileName)
+                                                        .reversed())),
+                                entry -> StringUtils.left(entry.getValue(), 100),
+                                Map.Entry::getKey));
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Game game = getGame(gameName);
+                if (game == null) return;
                 if (Constants.ADD_FOG_TILE.equals(subcommandName) && Constants.TILE_NAME.equals(optionName)) {
-                    var options = searchModels(event, TileHelper.getAllTileModels(), null);
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                    reply(event, searchModels(event, TileHelper.getAllTileModels(), null));
                 } else if (game.isFowMode()) {
-                    var options = mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue);
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                    replyContaining(event, game.getTileMap().keySet());
                 } else {
-                    List<Command.Choice> options = game.getTileNameAutocompleteOptionsCache().stream()
-                            .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(value -> new Command.Choice(value.getKey(), value.getValue()))
-                            .collect(Collectors.toList());
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                    reply(
+                            event,
+                            containing(
+                                    game.getTileNameAutocompleteOptionsCache().stream(),
+                                    enteredLower(event),
+                                    Map.Entry::getKey,
+                                    Map.Entry::getValue));
                 }
             }
             case Constants.PLANET,
@@ -820,115 +601,81 @@ class AutoCompleteProvider {
                     Constants.PLANET4,
                     Constants.PLANET5,
                     Constants.PLANET6 -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, String> planets = Mapper.getPlanetRepresentations();
+                String enteredValue = enteredLower(event);
+                Stream<Map.Entry<String, String>> planets = Mapper.getPlanetRepresentations().entrySet().stream()
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue));
                 ManagedGame managedGame = GameManager.getManagedGame(gameName);
                 if (managedGame != null && !managedGame.isFowMode()) {
                     Game game = managedGame.getGame();
                     Set<String> planetIDs = game.getPlanets();
-                    List<Command.Choice> options = planets.entrySet().stream()
-                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                            .filter(value -> planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
-                            .limit(25)
-                            .map(value -> new Command.Choice(
-                                    value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), game) + "/"
+                    reply(
+                            event,
+                            toChoices(
+                                    planets.filter(value -> planetIDs.isEmpty() || planetIDs.contains(value.getKey())),
+                                    value -> value.getValue() + " ("
+                                            + Helper.getPlanetResources(value.getKey(), game) + "/"
                                             + Helper.getPlanetInfluence(value.getKey(), game) + ")",
-                                    value.getKey()))
-                            .collect(Collectors.toList());
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                                    Map.Entry::getKey));
                 } else {
-                    List<Command.Choice> options = planets.entrySet().stream()
-                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                            .collect(Collectors.toList());
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                    reply(event, toChoices(planets, Map.Entry::getValue, Map.Entry::getKey));
                 }
             }
             case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
+                Game game = getGame(gameName);
+                if (game == null) return;
                 List<String> leaderIDs = new ArrayList<>();
                 if (game.isFowMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {
                     leaderIDs.addAll(Mapper.getLeaders().keySet());
                 } else {
                     leaderIDs.addAll(List.of("agent", "commander", "hero"));
-                    for (Player player_ : game.getPlayers().values()) {
-                        leaderIDs.addAll(player_.getLeaderIDs());
+                    for (Player player : game.getPlayers().values()) {
+                        leaderIDs.addAll(player.getLeaderIDs());
                     }
                 }
-
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(leaderIDs, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                replyContaining(event, leaderIDs);
             }
             case Constants.TF_PARADIGM -> {
-                String deckID = "tf_paradigm";
-                if (GameManager.isValid(gameName)) {
-                    Game game = GameManager.getManagedGame(gameName).getGame();
-                    deckID = game.getParadigmSpliceDeckID();
-                }
-                List<String> paradigms = Mapper.getDeck(deckID).getNewDeck();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(paradigms, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                Game game = getGame(gameName);
+                String deckID = game == null ? "tf_paradigm" : game.getParadigmSpliceDeckID();
+                replyContaining(event, Mapper.getDeck(deckID).getNewDeck());
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                boolean fogRestricted = game != null
-                        && game.isFowMode()
-                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
-                Map<String, TechnologyModel> techs = fogRestricted
+                Game game = getGame(gameName);
+                if (game == null) return;
+                Map<String, TechnologyModel> techs = isFogRestricted(event, game)
                         ? Mapper.getTechs()
                         : Mapper.getTechs().entrySet().stream()
-                                .filter(entry ->
-                                        game != null && game.getTechnologyDeck().contains(entry.getKey()))
+                                .filter(entry -> game.getTechnologyDeck().contains(entry.getKey()))
                                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-                List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(value ->
-                                value.getValue().getName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(
-                                value.getValue().getName() + " ("
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                techs.entrySet().stream()
+                                        .filter(value -> value.getValue()
+                                                .getName()
+                                                .toLowerCase()
+                                                .contains(enteredValue)),
+                                value -> value.getValue().getName() + " ("
                                         + value.getValue().getSource() + ")",
-                                value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                                Map.Entry::getKey));
             }
             case Constants.BREAKTHROUGH -> {
-                if (!GameManager.isValid(gameName)) return;
-
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-
-                boolean fogRestricted = game.isFowMode()
-                        && !FoWHelper.isGameMaster(event.getUser().getId(), game);
-                Set<BreakthroughModel> btSet;
-                boolean addAllOpt;
-                if (Constants.FRANKEN.equals(event.getName()) || fogRestricted) {
-                    btSet = new HashSet<>(Mapper.getBreakthroughs().values());
-                    addAllOpt = false;
-                } else {
-                    btSet = game.getPlayers().values().stream()
-                            .flatMap(p -> p.getBreakthroughIDs().stream())
-                            .map(Mapper::getBreakthrough)
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toSet());
-
-                    addAllOpt = false;
-                    for (Player p : game.getPlayers().values()) {
-                        if (p.getBreakthroughIDs().size() > 1) {
-                            addAllOpt = true;
-                            break;
-                        }
-                    }
-                }
-                if (Constants.BREAKTHROUGH_SET_TG.equalsIgnoreCase(subcommandName)) {
-                    addAllOpt = false;
-                }
+                Game game = getGame(gameName);
+                if (game == null) return;
+                String enteredValue = enteredLower(event);
+                boolean allBreakthroughs = Constants.FRANKEN.equals(event.getName()) || isFogRestricted(event, game);
+                Set<BreakthroughModel> btSet = allBreakthroughs
+                        ? new HashSet<>(Mapper.getBreakthroughs().values())
+                        : game.getPlayers().values().stream()
+                                .flatMap(p -> p.getBreakthroughIDs().stream())
+                                .map(Mapper::getBreakthrough)
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toSet());
+                boolean addAllOpt = !allBreakthroughs
+                        && !Constants.BREAKTHROUGH_SET_TG.equalsIgnoreCase(subcommandName)
+                        && game.getPlayers().values().stream()
+                                .anyMatch(p -> p.getBreakthroughIDs().size() > 1);
 
                 List<Command.Choice> options = btSet.stream()
                         .filter(bt -> bt.getAutoCompleteName(game).toLowerCase().contains(enteredValue))
@@ -938,51 +685,46 @@ class AutoCompleteProvider {
                 if (addAllOpt) {
                     options.addFirst(new Command.Choice("all", "all"));
                 }
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(event, options);
             }
             case Constants.PLAYER_FACTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue =
-                        event.getFocusedOption().getValue().toLowerCase().trim();
-
+                Game game = getGame(gameName);
+                if (game == null) return;
                 Function<Player, String> getDisp =
                         p -> game.isFowMode() ? p.getUserName() : p.getAutoCompleteRepresentation();
-                List<Command.Choice> options = game.getPlayers().values().stream()
-                        .filter(p -> getDisp.apply(p).toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(p -> new Command.Choice(getDisp.apply(p), p.getUserID()))
-                        .toList();
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(
+                        event,
+                        containing(
+                                game.getPlayers().values().stream(),
+                                enteredLower(event).trim(),
+                                getDisp,
+                                Player::getUserID));
             }
             case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Game game = getGame(gameName);
+                if (game == null) return;
                 if (game.isFowMode()) {
                     List<String> factionColors = new ArrayList<>(Mapper.getFactionIDs());
                     factionColors.addAll(Mapper.getColorNames());
 
                     List<String> factionColorsRetain = new ArrayList<>();
                     boolean privateGame = FoWHelper.isPrivateGame(game, null, event.getChannel());
-                    for (Player player_ : game.getPlayers().values()) {
+                    for (Player player : game.getPlayers().values()) {
                         if (!privateGame) {
-                            factionColorsRetain.add(player_.getFaction());
+                            factionColorsRetain.add(player.getFaction());
                         }
-                        factionColorsRetain.add(player_.getColor());
+                        factionColorsRetain.add(player.getColor());
                     }
                     factionColors.retainAll(factionColorsRetain);
-                    List<Command.Choice> options = mapTo25ChoicesThatContain(factionColors, enteredValue);
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                    replyContaining(event, factionColors);
                 } else {
-                    List<Command.Choice> options = game.getPlayers().values().stream()
-                            .filter(p -> p.getAutoCompleteRepresentation()
-                                    .toLowerCase()
-                                    .contains(enteredValue))
-                            .limit(25)
-                            .map(p -> new Command.Choice(p.getAutoCompleteRepresentation(), p.getColor()))
-                            .toList();
-                    event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                    reply(
+                            event,
+                            containing(
+                                    game.getPlayers().values().stream(),
+                                    enteredLower(event),
+                                    Player::getAutoCompleteRepresentation,
+                                    Player::getColor));
                 }
             }
             case Constants.ABILITY,
@@ -991,279 +733,160 @@ class AutoCompleteProvider {
                     Constants.ABILITY_3,
                     Constants.ABILITY_4,
                     Constants.ABILITY_5 -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, AbilityModel> abilities = new HashMap<>();
-                try {
-                    Player player = CommandHelper.getPlayerFromGame(
-                            game, event.getMember(), event.getUser().getId());
-                    if (player != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
-                        for (String abilityID : player.getAbilities()) {
-                            abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
-                        }
-                    } else if (player != null && Constants.ABILITY_ADD.equals(subcommandName)) {
-                        abilities = Mapper.getAbilities();
-                        for (String abilityID : player.getAbilities()) {
-                            abilities.remove(abilityID);
-                        }
-                    } else {
-                        abilities = Mapper.getAbilities();
-                    }
-                } catch (Exception e) {
-                    BotLogger.error(new LogOrigin(event), "Ability Autocomplete Setup Error", e);
-                    abilities = Mapper.getAbilities();
-                }
-
-                List<Command.Choice> options = abilities.entrySet().stream()
-                        .filter(value -> value.getValue().search(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue().getAutoCompleteName(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                Game game = getGame(gameName);
+                if (game == null) return;
+                String enteredValue = enteredLower(event);
+                Map<String, AbilityModel> abilities = abilityOptions(event, game, subcommandName);
+                reply(
+                        event,
+                        toChoices(
+                                abilities.entrySet().stream()
+                                        .filter(value -> value.getValue().search(enteredValue)),
+                                value -> value.getValue().getAutoCompleteName(),
+                                Map.Entry::getKey));
             }
             case Constants.RANDOM_TYPE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.stream(RandomOption.values())
-                        .filter(value -> value.search(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Arrays.stream(RandomOption.values()).filter(value -> value.search(enteredValue)),
+                                RandomOption::getAutoCompleteName,
+                                RandomOption::toString));
             }
             case Constants.PRIORITY_TRACK -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.stream(PriorityTrackMode.values())
-                        .filter(value -> value.search(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = entered(event);
+                reply(
+                        event,
+                        toChoices(
+                                Arrays.stream(PriorityTrackMode.values()).filter(value -> value.search(enteredValue)),
+                                PriorityTrackMode::getAutoCompleteName,
+                                PriorityTrackMode::toString));
             }
             case Constants.ADD_DRAFTABLE_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<String> draftableOptions = DraftComponentFactory.getKnownDraftableClasses();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
                 List<Draftable> alreadyInDraft = draftManager.getDraftables();
-
-                List<Command.Choice> options = draftableOptions.stream()
-                        .filter(option -> option.toLowerCase().contains(enteredValue))
-                        .filter(option -> alreadyInDraft.stream()
-                                .noneMatch(draftable -> draftable.getType().equals(DraftableType.of(option))))
-                        .limit(25)
-                        .map(option -> new Command.Choice(option, option))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(
+                        event,
+                        containingSelf(
+                                DraftComponentFactory.getKnownDraftableClasses().stream()
+                                        .filter(option -> alreadyInDraft.stream()
+                                                .noneMatch(draftable ->
+                                                        draftable.getType().equals(DraftableType.of(option)))),
+                                enteredLower(event)));
             }
             case Constants.SET_ORCHESTRATOR_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<String> draftableOptions = DraftComponentFactory.getKnownOrchestratorClasses();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                List<String> orchestratorOptions = DraftComponentFactory.getKnownOrchestratorClasses();
                 DraftOrchestrator alreadyInDraft = draftManager.getOrchestrator();
-
                 if (alreadyInDraft != null) {
-                    draftableOptions.remove(alreadyInDraft.getClass().getSimpleName());
+                    orchestratorOptions.remove(alreadyInDraft.getClass().getSimpleName());
                 }
-
-                List<Command.Choice> options = draftableOptions.stream()
-                        .filter(option -> option.toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(option -> new Command.Choice(option, option))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(event, containingSelf(orchestratorOptions.stream(), enteredLower(event)));
             }
             case Constants.UNKNOWN_DRAFT_USER_ID_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                Game game = draftManager.getGame();
                 Predicate<String> isUnknownUserId =
                         id -> game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null;
                 List<String> userIDs = draftManager.getPlayerUserIds().stream()
                         .filter(isUnknownUserId)
                         .toList();
-
-                List<Command.Choice> options = userIDs.stream()
-                        .filter(option -> option.toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(option -> new Command.Choice(option, option))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(event, containingSelf(userIDs.stream(), enteredLower(event)));
             }
             case Constants.DRAFTABLE_TYPE_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-
-                List<Command.Choice> options = draftManager.getDraftables().stream()
-                        .map(Draftable::getType)
-                        .map(DraftableType::toString)
-                        .distinct()
-                        .filter(option -> option.toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(option -> new Command.Choice(option, option))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                reply(
+                        event,
+                        containingSelf(
+                                draftManager.getDraftables().stream()
+                                        .map(Draftable::getType)
+                                        .map(DraftableType::toString)
+                                        .distinct(),
+                                enteredLower(event)));
             }
             case Constants.DRAFTABLE_CHOICE_KEY_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                String enteredValue = enteredLower(event);
+                DraftableType draftableType = focusedDraftableType(event, draftManager);
+                if (draftableType == null) return;
 
-                DraftManager draftManager = game.getDraftManager();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                String draftableTypeStr =
-                        event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
-                if (draftableTypeStr == null) return;
-
-                DraftableType draftableType = DraftableType.of(draftableTypeStr);
-                Draftable draftable = draftManager.getDraftable(draftableType);
-                if (draftable == null) return;
-
-                List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<DraftChoice> alreadyPicked = draftManager.getAllPicksOfType(draftableType);
                 Predicate<DraftChoice> notPicked = choice -> alreadyPicked.stream()
                         .noneMatch(picked -> picked.choiceKey().equals(choice.choiceKey()));
                 Predicate<DraftChoice> matchesEnteredText =
                         choice -> choice.choiceKey().toLowerCase().contains(enteredValue)
                                 || choice.unformattedName().toLowerCase().contains(enteredValue);
-
-                List<Command.Choice> options = choices.stream()
-                        .filter(notPicked)
-                        .filter(matchesEnteredText)
-                        .limit(25)
-                        .map(option -> new Command.Choice(option.unformattedName(), option.choiceKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(
+                        event,
+                        toChoices(
+                                draftManager.getDraftable(draftableType).getAllDraftChoices().stream()
+                                        .filter(notPicked)
+                                        .filter(matchesEnteredText),
+                                DraftChoice::unformattedName,
+                                DraftChoice::choiceKey));
             }
             case Constants.DRAFT_FACTION_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
                 FactionDraftable draftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
                 if (draftable == null) return;
-
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<DraftChoice> choices = draftable.getAllDraftChoices();
-                List<FactionModel> availableFactions = choices.stream()
-                        .map(choice -> Mapper.getFactions().get(choice.choiceKey()))
-                        .filter(Objects::nonNull)
-                        .toList();
-                List<Command.Choice> options = availableFactions.stream()
-                        .filter(faction ->
-                                faction.getAutoCompleteName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(faction -> new Command.Choice(faction.getFactionName(), faction.getAlias()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                draftable.getAllDraftChoices().stream()
+                                        .map(choice -> Mapper.getFactions().get(choice.choiceKey()))
+                                        .filter(Objects::nonNull)
+                                        .filter(faction -> faction.getAutoCompleteName()
+                                                .toLowerCase()
+                                                .contains(enteredValue)),
+                                FactionModel::getFactionName,
+                                FactionModel::getAlias));
             }
             case Constants.KELERES_FLAVOR_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
                 FactionDraftable draftable = (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
                 if (draftable == null) return;
-
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<DraftChoice> choices = draftable.getAllDraftChoices();
-                List<DraftChoice> pickedFactions = draftManager.getAllPicksOfType(FactionDraftable.TYPE);
-
-                List<String> keleresFlavors = FactionDraftable.getKeleresFlavors();
-                List<String> alreadyPickedFlavors = keleresFlavors.stream()
-                        .filter(faction -> pickedFactions.stream()
-                                .anyMatch(picked -> picked.choiceKey().equals(faction)))
-                        .toList();
-                List<String> possiblyPickedFlavors = keleresFlavors.stream()
-                        .filter(faction -> alreadyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
-                        .filter(faction -> choices.stream()
-                                .anyMatch(choice -> choice.choiceKey().equals(faction)))
-                        .toList();
-                List<String> safeFlavors = keleresFlavors.stream()
-                        .filter(faction -> possiblyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
-                        .toList();
-                List<Command.Choice> options = new ArrayList<>();
-                options.addAll(safeFlavors.stream()
-                        .filter(faction -> faction.toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(faction -> new Command.Choice(
-                                Mapper.getFactions().get(faction).getFactionName(), faction))
-                        .toList());
-                options.addAll(possiblyPickedFlavors.stream()
-                        .filter(faction -> faction.toLowerCase().contains(enteredValue))
-                        .limit(25 - options.size())
-                        .map(faction -> new Command.Choice(
-                                Mapper.getFactions().get(faction).getFactionName() + " (may be taken!!)", faction))
-                        .toList());
-                if (options.isEmpty()) {
-                    options.addAll(keleresFlavors.stream()
-                            .filter(faction -> faction.toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(faction -> new Command.Choice(
-                                    Mapper.getFactions().get(faction).getFactionName() + " (all playable)", faction))
-                            .toList());
-                }
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(event, keleresFlavorChoices(event, draftManager, draftable));
             }
             case Constants.DEBT_POOL -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Game game = getGame(gameName);
+                if (game == null) return;
                 Set<String> pools = new HashSet<>(game.getAllDebtPoolIcons().keySet());
                 pools.add(Constants.DEBT_DEFAULT_POOL.toLowerCase());
-                List<Command.Choice> options = mapTo25ChoicesThatContain(pools, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                replyContaining(event, pools);
             }
             case Constants.SEAT_COUNT_OPTION -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                if (!enteredValue.isBlank()) return;
-
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
-                SeatDraftable draftable = (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
-                if (draftable == null) return;
-                String mapTemplateId = game.getMapTemplateID();
+                if (!entered(event).isBlank()) return;
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                if (draftManager.getDraftable(SeatDraftable.TYPE) == null) return;
+                String mapTemplateId = draftManager.getGame().getMapTemplateID();
                 if (mapTemplateId == null) return;
                 MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
                 if (mapTemplate == null) return;
                 int maxSeats = mapTemplate.getPlayerCount();
-                event.replyChoice(maxSeats + " seats", maxSeats).queue(Consumers.nop(), BotLogger::catchRestError);
+                queue(event.replyChoice(maxSeats + " seats", maxSeats));
             }
             case Constants.DRAFT_SLICE_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
                 SliceDraftable draftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
                 if (draftable == null) return;
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-
-                event.replyChoices(draftable.getDraftSlices().stream()
-                                .filter(slice -> slice.getName().toLowerCase().contains(enteredValue))
-                                .map(slice -> new Command.Choice(slice.getName(), slice.getName()))
-                                .limit(25)
-                                .toList())
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(
+                        event,
+                        containing(
+                                draftable.getDraftSlices().stream(),
+                                enteredLower(event),
+                                slice -> slice.getName(),
+                                slice -> slice.getName()));
             }
             case Constants.DRAFT_TILE_1_OPTION,
                     Constants.DRAFT_TILE_2_OPTION,
@@ -1274,91 +897,130 @@ class AutoCompleteProvider {
                     Constants.DRAFT_TILE_7_OPTION,
                     Constants.DRAFT_TILE_8_OPTION,
                     Constants.DRAFT_TILE_9_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
+                Game game = getGame(gameName);
+                if (game == null) return;
                 DraftTileManager draftTileManager = game.getDraftTileManager();
                 if (draftTileManager.getAll().isEmpty()) {
                     DraftTileManager.resetForGame(game);
                 }
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Predicate<MiltyDraftTile> matchesEnteredText = tile -> {
-                    String representation =
-                            Mapper.getTileRepresentations().get(tile.getTile().getTileID());
-                    return representation != null
-                            && representation.toLowerCase().contains(enteredValue);
-                };
-
-                List<MiltyDraftTile> tiles = draftTileManager.getAll().stream()
-                        .filter(matchesEnteredText)
-                        .limit(25)
-                        .toList();
-                event.replyChoices(tiles.stream()
-                                .map(t -> new Command.Choice(
-                                        Mapper.getTileRepresentations()
-                                                        .get(t.getTile().getTileID()) + " ("
-                                                + t.getTile().getTileID() + ")",
-                                        t.getTile().getTileID()))
-                                .toList())
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                String enteredValue = enteredLower(event);
+                Function<MiltyDraftTile, String> representation = tile ->
+                        Mapper.getTileRepresentations().get(tile.getTile().getTileID());
+                reply(
+                        event,
+                        toChoices(
+                                draftTileManager.getAll().stream().filter(tile -> {
+                                    String text = representation.apply(tile);
+                                    return text != null && text.toLowerCase().contains(enteredValue);
+                                }),
+                                tile -> representation.apply(tile) + " ("
+                                        + tile.getTile().getTileID() + ")",
+                                tile -> tile.getTile().getTileID()));
             }
             case Constants.PICK_COUNT_OPTION -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                if (!enteredValue.isBlank()) return;
-
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-
-                DraftManager draftManager = game.getDraftManager();
-                SpeakerOrderDraftable draftable =
-                        (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
-                if (draftable == null) return;
-
-                int playerCount = draftManager.getPlayerStates().size();
-                int maxSeats = Math.min(playerCount, 8);
-                event.replyChoice(maxSeats + " speaker order positions", maxSeats)
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                if (!entered(event).isBlank()) return;
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                if (draftManager.getDraftable(SpeakerOrderDraftable.TYPE) == null) return;
+                int maxSeats = Math.min(draftManager.getPlayerStates().size(), 8);
+                queue(event.replyChoice(maxSeats + " speaker order positions", maxSeats));
             }
             case Constants.PLAYER_PICKS_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-                DraftManager draftManager = game.getDraftManager();
-
-                String draftableTypeStr =
-                        event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
-                if (draftableTypeStr == null) return;
-
-                DraftableType draftableType = DraftableType.of(draftableTypeStr);
-                // Verify type is in draft
-                Draftable draftable = draftManager.getDraftable(draftableType);
-                if (draftable == null) return;
-
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-
-                List<DraftChoice> allPicks = draftManager.getAllPicksOfType(draftableType);
-                event.replyChoices(allPicks.stream()
-                                .filter(option ->
-                                        option.unformattedName().toLowerCase().contains(enteredValue))
-                                .limit(25)
-                                .map(option -> new Command.Choice(option.unformattedName(), option.choiceKey()))
-                                .collect(Collectors.toList()))
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
+                DraftableType draftableType = focusedDraftableType(event, draftManager);
+                if (draftableType == null) return;
+                reply(
+                        event,
+                        containing(
+                                draftManager.getAllPicksOfType(draftableType).stream(),
+                                enteredLower(event),
+                                DraftChoice::unformattedName,
+                                DraftChoice::choiceKey));
             }
             case Constants.PACKAGE_KEY_OPTION -> {
-                if (!GameManager.isValid(gameName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                if (!DraftManager.hasDraftManager(game)) return;
-                DraftManager draftManager = game.getDraftManager();
+                DraftManager draftManager = getDraftManager(gameName);
+                if (draftManager == null) return;
                 AndcatReferenceCardsDraftable draftable =
                         (AndcatReferenceCardsDraftable) draftManager.getDraftable(AndcatReferenceCardsDraftable.TYPE);
                 if (draftable == null) return;
-                event.replyChoices(draftable.getReferenceCardPackages().keySet().stream()
+                reply(
+                        event,
+                        draftable.getReferenceCardPackages().keySet().stream()
                                 .map(key -> new Command.Choice(key.toString(), key))
-                                .collect(Collectors.toList()))
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                                .collect(Collectors.toList()));
             }
         }
+    }
+
+    private static Map<String, AbilityModel> abilityOptions(
+            CommandAutoCompleteInteractionEvent event, Game game, String subcommandName) {
+        try {
+            Player player = CommandHelper.getPlayerFromGame(
+                    game, event.getMember(), event.getUser().getId());
+            if (player != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
+                Map<String, AbilityModel> abilities = new HashMap<>();
+                for (String abilityID : player.getAbilities()) {
+                    abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
+                }
+                return abilities;
+            }
+            Map<String, AbilityModel> abilities = Mapper.getAbilities();
+            if (player != null && Constants.ABILITY_ADD.equals(subcommandName)) {
+                for (String abilityID : player.getAbilities()) {
+                    abilities.remove(abilityID);
+                }
+            }
+            return abilities;
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(event), "Ability Autocomplete Setup Error", e);
+            return Mapper.getAbilities();
+        }
+    }
+
+    private static List<Command.Choice> keleresFlavorChoices(
+            CommandAutoCompleteInteractionEvent event, DraftManager draftManager, FactionDraftable draftable) {
+        String enteredValue = enteredLower(event);
+        List<DraftChoice> choices = draftable.getAllDraftChoices();
+        List<DraftChoice> pickedFactions = draftManager.getAllPicksOfType(FactionDraftable.TYPE);
+
+        List<String> keleresFlavors = FactionDraftable.getKeleresFlavors();
+        List<String> alreadyPickedFlavors = keleresFlavors.stream()
+                .filter(faction -> pickedFactions.stream()
+                        .anyMatch(picked -> picked.choiceKey().equals(faction)))
+                .toList();
+        List<String> possiblyPickedFlavors = keleresFlavors.stream()
+                .filter(faction -> alreadyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
+                .filter(faction ->
+                        choices.stream().anyMatch(choice -> choice.choiceKey().equals(faction)))
+                .toList();
+        List<String> safeFlavors = keleresFlavors.stream()
+                .filter(faction -> possiblyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
+                .toList();
+        List<Command.Choice> options = new ArrayList<>(keleresChoices(safeFlavors, enteredValue, "", 25));
+        options.addAll(keleresChoices(possiblyPickedFlavors, enteredValue, " (may be taken!!)", 25 - options.size()));
+        if (options.isEmpty()) {
+            options.addAll(keleresChoices(keleresFlavors, enteredValue, " (all playable)", 25));
+        }
+        return options;
+    }
+
+    private static List<Command.Choice> keleresChoices(
+            List<String> flavors, String enteredValue, String suffix, int limit) {
+        return flavors.stream()
+                .filter(faction -> faction.toLowerCase().contains(enteredValue))
+                .limit(limit)
+                .map(faction ->
+                        new Command.Choice(Mapper.getFactions().get(faction).getFactionName() + suffix, faction))
+                .toList();
+    }
+
+    private static DraftableType focusedDraftableType(
+            CommandAutoCompleteInteractionEvent event, DraftManager draftManager) {
+        String draftableTypeStr = event.getOption(Constants.DRAFTABLE_TYPE_OPTION, null, OptionMapping::getAsString);
+        if (draftableTypeStr == null) return null;
+        DraftableType draftableType = DraftableType.of(draftableTypeStr);
+        return draftManager.getDraftable(draftableType) == null ? null : draftableType;
     }
 
     private static void resolveActionCardDiscardAutoComplete(
@@ -1367,25 +1029,22 @@ class AutoCompleteProvider {
             @NotNull String optionName,
             @NotNull String gameName) {
         if (!Constants.ACTION_CARD_ID.equals(optionName)) return;
-        switch (subCommandName) {
-            case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                Player viewer = TestBedService.resolveActingPlayer(
-                        game, event, game.getPlayer(event.getUser().getId()));
-                boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
-                Map<String, Integer> discardActionCardIDs = game.getDiscardActionCards();
-                List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
-                        .filter(entry -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, entry.getKey()))
-                        .map(entry -> Map.entry(Mapper.getActionCard(entry.getKey()), entry.getValue()))
-                        .filter(entry -> entry.getKey().getName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(
-                                entry.getKey().getName() + " (" + entry.getValue() + ")", entry.getValue()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-        }
+        if (!Constants.PICK_AC_FROM_DISCARD.equals(subCommandName)
+                && !Constants.SHUFFLE_AC_BACK_INTO_DECK.equals(subCommandName)) return;
+        String enteredValue = enteredLower(event);
+        Game game = getGame(gameName);
+        Player viewer = TestBedService.resolveActingPlayer(
+                game, event, game.getPlayer(event.getUser().getId()));
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
+        List<Command.Choice> options = game.getDiscardActionCards().entrySet().stream()
+                .filter(entry -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, entry.getKey()))
+                .map(entry -> Map.entry(Mapper.getActionCard(entry.getKey()), entry.getValue()))
+                .filter(entry -> entry.getKey().getName().toLowerCase().contains(enteredValue))
+                .limit(25)
+                .map(entry ->
+                        new Command.Choice(entry.getKey().getName() + " (" + entry.getValue() + ")", entry.getValue()))
+                .toList();
+        reply(event, options);
     }
 
     private static void resolveDeveloperCommandAutoComplete(
@@ -1395,20 +1054,18 @@ class AutoCompleteProvider {
         switch (subCommandName) {
             case Constants.SET_SETTING -> {
                 switch (optionName) {
-                    case Constants.SETTING_TYPE ->
-                        event.replyChoiceStrings("string", "number", "bool")
-                                .queue(Consumers.nop(), BotLogger::catchRestError);
-                    case Constants.SETTING_NAME -> {
-                        var settings = Arrays.stream(GlobalSettings.ImplementedSettings.values())
-                                .map(GlobalSettings.ImplementedSettings::toString)
-                                .toList();
-                        replyWith25ChoicesThatContainValue(event, settings);
-                    }
+                    case Constants.SETTING_TYPE -> queue(event.replyChoiceStrings("string", "number", "bool"));
+                    case Constants.SETTING_NAME ->
+                        replyContaining(
+                                event,
+                                Arrays.stream(GlobalSettings.ImplementedSettings.values())
+                                        .map(GlobalSettings.ImplementedSettings::toString)
+                                        .toList());
                 }
             }
             case Constants.RUN_CRON -> {
                 if (!Constants.CRON_NAME.equals(optionName)) return;
-                replyWith25ChoicesThatContainValue(event, CronManager.getCronNames());
+                replyContaining(event, CronManager.getCronNames());
             }
             default -> {}
         }
@@ -1421,66 +1078,51 @@ class AutoCompleteProvider {
         if (!Constants.SEARCH.equals(optionName)) return;
         ComponentSource source =
                 ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        List<Command.Choice> options = null;
-        switch (subCommandName) {
-
-            /* From \data\ */
-            case Constants.SEARCH_ABILITIES ->
-                options = searchModels(event, Mapper.getAbilities().values(), source, true);
-            case Constants.SEARCH_ACTION_CARDS ->
-                options = searchModels(event, Mapper.getActionCards().values(), source, true);
-            case Constants.SEARCH_AGENDAS ->
-                options = searchModels(event, Mapper.getAgendas().values(), source, true);
-            case Constants.SEARCH_GALACTIC_EVENTS ->
-                options = searchModels(event, Mapper.getGalacticEvents().values(), source, true);
-            case Constants.SEARCH_RULES ->
-                options = searchModels(event, Mapper.getRules().values(), source);
-            case Constants.SEARCH_BREAKTHROUGHS ->
-                options = searchModels(event, Mapper.getBreakthroughs().values(), source, true);
-            case Constants.SEARCH_ATTACHMENTS ->
-                options = searchModels(event, Mapper.getAttachments().values(), source);
-            // no /search colors yet, but there is /help sample_colors
-            // no /search combat_modifiers yet
-            case Constants.SEARCH_DECKS ->
-                options = searchModels(event, Mapper.getDecks().values(), source);
-            case Constants.SEARCH_EVENTS ->
-                options = searchModels(event, Mapper.getEvents().values(), source);
-            case Constants.SEARCH_EXPLORES ->
-                options = searchModels(event, Mapper.getExplores().values(), source, true);
-            case Constants.SEARCH_FACTIONS ->
-                options = searchModels(event, Mapper.getFactions().values(), source);
-            // no /search franken_errata yet
-            // no /search generic_cards yet
-            case Constants.SEARCH_LEADERS, Constants.SEARCH_GENOMES, Constants.SEARCH_PARADIGMS ->
-                options = searchModels(event, Mapper.getLeaders().values(), source, true);
-            // no /search map_templates yet
-            case Constants.SEARCH_PROMISSORY_NOTES ->
-                options = searchModels(event, Mapper.getPromissoryNotes().values(), source, true);
-            case Constants.SEARCH_PUBLIC_OBJECTIVES ->
-                options = searchModels(event, Mapper.getPublicObjectives().values(), source, true);
-            case Constants.SEARCH_RELICS ->
-                options = searchModels(event, Mapper.getRelics().values(), source, true);
-            case Constants.SEARCH_SECRET_OBJECTIVES ->
-                options = searchModels(event, Mapper.getSecretObjectives().values(), source, true);
-            // /search sources options are not populated from here
-            // no /search strategy_card_sets yet
-            case Constants.SEARCH_TECHS ->
-                options = searchModels(event, Mapper.getTechs().values(), source, true);
-            case Constants.SEARCH_TOKENS ->
-                options = searchModels(event, Mapper.getTokens().values(), source);
-            case Constants.SEARCH_UNITS ->
-                options = searchModels(event, Mapper.getUnits().values(), source, true);
-
-            /* From \resources\ */
-            // /search emojis options are not populated from here
-            case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getAllTileModels(), source);
-            case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getAllPlanetModels(), source);
-
-            /* From others */
-            // none of them are populated from here
-        }
-        event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        List<Command.Choice> options =
+                switch (subCommandName) {
+                    case Constants.SEARCH_ABILITIES ->
+                        searchModels(event, Mapper.getAbilities().values(), source, true);
+                    case Constants.SEARCH_ACTION_CARDS ->
+                        searchModels(event, Mapper.getActionCards().values(), source, true);
+                    case Constants.SEARCH_AGENDAS ->
+                        searchModels(event, Mapper.getAgendas().values(), source, true);
+                    case Constants.SEARCH_GALACTIC_EVENTS ->
+                        searchModels(event, Mapper.getGalacticEvents().values(), source, true);
+                    case Constants.SEARCH_RULES ->
+                        searchModels(event, Mapper.getRules().values(), source);
+                    case Constants.SEARCH_BREAKTHROUGHS ->
+                        searchModels(event, Mapper.getBreakthroughs().values(), source, true);
+                    case Constants.SEARCH_ATTACHMENTS ->
+                        searchModels(event, Mapper.getAttachments().values(), source);
+                    case Constants.SEARCH_DECKS ->
+                        searchModels(event, Mapper.getDecks().values(), source);
+                    case Constants.SEARCH_EVENTS ->
+                        searchModels(event, Mapper.getEvents().values(), source);
+                    case Constants.SEARCH_EXPLORES ->
+                        searchModels(event, Mapper.getExplores().values(), source, true);
+                    case Constants.SEARCH_FACTIONS ->
+                        searchModels(event, Mapper.getFactions().values(), source);
+                    case Constants.SEARCH_LEADERS, Constants.SEARCH_GENOMES, Constants.SEARCH_PARADIGMS ->
+                        searchModels(event, Mapper.getLeaders().values(), source, true);
+                    case Constants.SEARCH_PROMISSORY_NOTES ->
+                        searchModels(event, Mapper.getPromissoryNotes().values(), source, true);
+                    case Constants.SEARCH_PUBLIC_OBJECTIVES ->
+                        searchModels(event, Mapper.getPublicObjectives().values(), source, true);
+                    case Constants.SEARCH_RELICS ->
+                        searchModels(event, Mapper.getRelics().values(), source, true);
+                    case Constants.SEARCH_SECRET_OBJECTIVES ->
+                        searchModels(event, Mapper.getSecretObjectives().values(), source, true);
+                    case Constants.SEARCH_TECHS ->
+                        searchModels(event, Mapper.getTechs().values(), source, true);
+                    case Constants.SEARCH_TOKENS ->
+                        searchModels(event, Mapper.getTokens().values(), source);
+                    case Constants.SEARCH_UNITS ->
+                        searchModels(event, Mapper.getUnits().values(), source, true);
+                    case Constants.SEARCH_TILES -> searchModels(event, TileHelper.getAllTileModels(), source);
+                    case Constants.SEARCH_PLANETS -> searchModels(event, TileHelper.getAllPlanetModels(), source);
+                    default -> Collections.emptyList();
+                };
+        reply(event, options);
     }
 
     private static void resolveFindAutoComplete(
@@ -1491,101 +1133,81 @@ class AutoCompleteProvider {
                     case Constants.SOURCE -> FindService.autoCompleteSource(event);
                     default -> Collections.emptyList();
                 };
-        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+        reply(event, options);
     }
 
     private static void resolveTestBedAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
         if (!TestBedService.isEnabled() || !TestBedService.isDeveloper(event.getMember())) {
-            event.replyChoices(List.of()).queue(Consumers.nop(), BotLogger::catchRestError);
+            reply(event, List.of());
             return;
         }
-        String gameName = GameNameService.getGameNameFromChannel(event);
-        Game game = GameManager.isValid(gameName)
-                ? GameManager.getManagedGame(gameName).getGame()
-                : null;
-        List<Command.Choice> choices = TestBedAutoComplete.choices(
-                optionName, game, event.getFocusedOption().getValue());
+        Game game = getGame(GameNameService.getGameNameFromChannel(event));
+        List<Command.Choice> choices = TestBedAutoComplete.choices(optionName, game, entered(event));
         if (choices == null) return;
-        event.replyChoices(choices).queue(Consumers.nop(), BotLogger::catchRestError);
+        reply(event, choices);
     }
 
     private static void resolveFrankenAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event,
             @NotNull String subCommandName,
             @NotNull String optionName) {
+        boolean leaderOption =
+                switch (optionName) {
+                    case Constants.LEADER,
+                            Constants.LEADER_1,
+                            Constants.LEADER_2,
+                            Constants.LEADER_3,
+                            Constants.LEADER_4 -> true;
+                    default -> false;
+                };
+        boolean techOption =
+                switch (optionName) {
+                    case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> true;
+                    default -> false;
+                };
         switch (subCommandName) {
             case Constants.FACTION_TECH_ADD, Constants.FACTION_TECH_REMOVE -> {
-                switch (optionName) {
-                    case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
-                        String enteredValue =
-                                event.getFocusedOption().getValue().toLowerCase();
-                        List<Command.Choice> options = Mapper.getTechs().values().stream()
-                                .filter(entry -> entry.getFaction().isPresent())
-                                .filter(entry -> entry.search(enteredValue))
-                                .filter(model -> !model.getSource().isHiddenFromSearch())
-                                .limit(25)
-                                .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
-                                .collect(Collectors.toList());
-                        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-                    }
-                }
+                if (techOption) reply(event, factionTechChoices(event, true));
             }
             case Constants.LEADER_ADD, Constants.LEADER_REMOVE -> {
-                switch (optionName) {
-                    case Constants.LEADER,
-                            Constants.LEADER_1,
-                            Constants.LEADER_2,
-                            Constants.LEADER_3,
-                            Constants.LEADER_4 -> {
-                        List<Command.Choice> options =
-                                searchModels(event, Mapper.getLeaders().values(), null);
-                        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-                    }
-                }
+                if (leaderOption)
+                    reply(event, searchModels(event, Mapper.getLeaders().values(), null));
             }
             case Constants.BAN -> {
-                switch (optionName) {
-                    case Constants.LEADER,
-                            Constants.LEADER_1,
-                            Constants.LEADER_2,
-                            Constants.LEADER_3,
-                            Constants.LEADER_4 -> {
-                        List<Command.Choice> options =
-                                searchModels(event, Mapper.getLeaders().values(), null);
-                        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-                    }
-                    case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
-                        String enteredValue =
-                                event.getFocusedOption().getValue().toLowerCase();
-                        List<Command.Choice> options = Mapper.getTechs().values().stream()
-                                .filter(entry -> entry.getFaction().isPresent())
-                                .filter(entry -> entry.search(enteredValue))
-                                .limit(25)
-                                .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
-                                .collect(Collectors.toList());
-                        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-                    }
-                    case Constants.TILE_NAME -> {
-                        var options = searchModels(event, TileHelper.getAllTileModels(), null);
-                        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-                    }
+                if (leaderOption) {
+                    reply(event, searchModels(event, Mapper.getLeaders().values(), null));
+                } else if (techOption) {
+                    reply(event, factionTechChoices(event, false));
+                } else if (Constants.TILE_NAME.equals(optionName)) {
+                    reply(event, searchModels(event, TileHelper.getAllTileModels(), null));
                 }
             }
         }
     }
 
+    private static List<Command.Choice> factionTechChoices(
+            CommandAutoCompleteInteractionEvent event, boolean excludeHidden) {
+        String enteredValue = enteredLower(event);
+        return toChoices(
+                Mapper.getTechs().values().stream()
+                        .filter(entry -> entry.getFaction().isPresent())
+                        .filter(entry -> entry.search(enteredValue))
+                        .filter(model -> !excludeHidden || !model.getSource().isHiddenFromSearch()),
+                TechnologyModel::getAutoCompleteName,
+                TechnologyModel::getAlias);
+    }
+
     private static void resolvePlotAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
         if (!Constants.PLOT_CARDS.equals(optionName)) return;
-
-        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-        List<Command.Choice> options = Mapper.getPlots().values().stream()
-                .filter(plot -> plot.search(enteredValue))
-                .limit(25)
-                .map(plot -> new Command.Choice(plot.getAutoCompleteName(), plot.getAlias()))
-                .collect(Collectors.toList());
-        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+        String enteredValue = enteredLower(event);
+        reply(
+                event,
+                toChoices(
+                        Mapper.getPlots().values().stream().filter(plot -> plot.search(enteredValue)),
+                        plot -> plot.getAutoCompleteName(),
+                        plot -> plot.getAlias()));
     }
 
     private static void resolveMapAutoComplete(
@@ -1596,25 +1218,23 @@ class AutoCompleteProvider {
         switch (subCommandName) {
             case Constants.ADD_TILE -> {
                 if (!Constants.TILE_NAME.equals(optionName)) return;
-                var options = searchModels(event, TileHelper.getAllTileModels(), null);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(event, searchModels(event, TileHelper.getAllTileModels(), null));
             }
             case Constants.REMOVE_TILE -> {
                 if (!Constants.POSITION.equals(optionName)) return;
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = game.getTileMap().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                Game game = getGame(gameName);
+                String enteredValue = enteredLower(event);
+                reply(
+                        event,
+                        toChoices(
+                                game.getTileMap().entrySet().stream()
+                                        .filter(entry -> entry.getValue().search(enteredValue)),
+                                entry -> entry.getValue().getAutoCompleteName(),
+                                Map.Entry::getKey));
             }
             case Constants.PRESET -> {
                 if (!Constants.MAP_TEMPLATE.equals(optionName)) return;
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(MapPresetService.templates, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                replyContaining(event, MapPresetService.templates);
             }
         }
     }
@@ -1623,17 +1243,17 @@ class AutoCompleteProvider {
             CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, String gameName) {
         if (!Constants.EVENT_PLAY.equals(subCommandName)) return;
         if (!Constants.EVENT_ID.equals(optionName)) return;
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        Game game = getGame(gameName);
         Player player = CommandHelper.getPlayerFromGame(
                 game, event.getMember(), event.getUser().getId());
-        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-        Map<String, Integer> events = new HashMap<>(player.getEvents());
-        List<Command.Choice> options = events.entrySet().stream()
-                .filter(entry -> entry.getKey().contains(enteredValue))
-                .limit(25)
-                .map(entry -> new Command.Choice(entry.getValue() + " " + entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+        String enteredValue = enteredLower(event);
+        List<Command.Choice> options = new HashMap<>(player.getEvents())
+                .entrySet().stream()
+                        .filter(entry -> entry.getKey().contains(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getValue() + " " + entry.getKey(), entry.getValue()))
+                        .toList();
+        reply(event, options);
     }
 
     private static void resolveExploreAutoComplete(
@@ -1645,23 +1265,22 @@ class AutoCompleteProvider {
         if (!Constants.EXPLORE_CARD_ID.equals(optionName)) return;
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode()) {
-            event.replyChoice("You cannot see the autocomplete in Fog of War", "[error]")
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            queue(event.replyChoice("You cannot see the autocomplete in Fog of War", "[error]"));
             return;
         }
 
-        Game game = managedGame.getGame();
-        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-        List<String> explores = game.getAllExplores();
-        List<Command.Choice> options = explores.stream()
-                .map(Mapper::getExplore)
-                .filter(Objects::nonNull)
-                .filter(e -> e.search(enteredValue))
-                .limit(25)
-                .sorted(Comparator.comparing(ExploreModel::getAutoCompleteName))
-                .map(e -> new Command.Choice(e.getAutoCompleteName(), e.getId()))
-                .collect(Collectors.toList());
-        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+        String enteredValue = enteredLower(event);
+        reply(
+                event,
+                toChoices(
+                        managedGame.getGame().getAllExplores().stream()
+                                .map(Mapper::getExplore)
+                                .filter(Objects::nonNull)
+                                .filter(e -> e.search(enteredValue))
+                                .limit(25)
+                                .sorted(Comparator.comparing(ExploreModel::getAutoCompleteName)),
+                        ExploreModel::getAutoCompleteName,
+                        ExploreModel::getId));
     }
 
     private static void resolveStatusAutoComplete(
@@ -1677,16 +1296,13 @@ class AutoCompleteProvider {
         if (!Constants.PO_ID.equals(optionName)) {
             return;
         }
-        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        List<Command.Choice> options = game.getRevealedPublicObjectives().entrySet().stream()
-                .filter(entry ->
-                        (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
-                .sorted(Map.Entry.comparingByValue())
-                .limit(25)
-                .map(e -> new Command.Choice(e.getValue() + " - " + e.getKey(), e.getValue()))
-                .collect(Collectors.toList());
-        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+        reply(
+                event,
+                numberedChoices(
+                        event,
+                        getGame(gameName).getRevealedPublicObjectives(),
+                        Map.Entry.comparingByValue(),
+                        e -> e.getValue() + " - " + e.getKey()));
     }
 
     private static void resolveAgendaAutoComplete(
@@ -1697,40 +1313,21 @@ class AutoCompleteProvider {
         if (!Constants.AGENDA_ID.equals(optionName)) {
             return;
         }
-        switch (subCommandName) {
-            case Constants.ADD_LAW, Constants.PUT_DISCARD_BACK_INTO_DECK -> { // Agendas in Discard
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = game.getDiscardAgendas().entrySet().stream()
-                        .filter(entry -> (entry.getValue() + entry.getKey())
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .sorted(Map.Entry.comparingByKey())
-                        .limit(25)
-                        .map(e -> new Command.Choice(
-                                e.getValue() + " - "
-                                        + Mapper.getAgenda(e.getKey()).getAutoCompleteName(),
-                                e.getValue()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.REVISE_LAW, Constants.ADD_CONTROL_TOKEN, Constants.REMOVE_LAW -> { // Agendas In Play
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = game.getLaws().entrySet().stream()
-                        .filter(entry -> (entry.getValue() + entry.getKey())
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .sorted(Map.Entry.comparingByKey())
-                        .limit(25)
-                        .map(e -> new Command.Choice(
-                                e.getValue() + " - "
-                                        + Mapper.getAgenda(e.getKey()).getAutoCompleteName(),
-                                e.getValue()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-        }
+        Game game = getGame(gameName);
+        Map<String, Integer> agendas =
+                switch (subCommandName) {
+                    case Constants.ADD_LAW, Constants.PUT_DISCARD_BACK_INTO_DECK -> game.getDiscardAgendas();
+                    case Constants.REVISE_LAW, Constants.ADD_CONTROL_TOKEN, Constants.REMOVE_LAW -> game.getLaws();
+                    default -> null;
+                };
+        if (agendas == null) return;
+        reply(
+                event,
+                numberedChoices(
+                        event,
+                        agendas,
+                        Map.Entry.comparingByKey(),
+                        e -> e.getValue() + " - " + Mapper.getAgenda(e.getKey()).getAutoCompleteName()));
     }
 
     private static void resolveSecretObjectiveAutoComplete(
@@ -1739,92 +1336,175 @@ class AutoCompleteProvider {
             @NotNull String optionName,
             @NotNull String gameName) {
         if (!Constants.SECRET_OBJECTIVE_ID.equals(optionName) && !Constants.SO_ID.equals(optionName)) return;
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        Game game = getGame(gameName);
         Player player = CommandHelper.getPlayerFromGame(
                 game, event.getMember(), event.getUser().getId());
         if (player == null) return;
         switch (subCommandName) {
-            case Constants.UNSCORE_SO -> { // Scored, safe to show Name/ID
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = player.getSecretsScored().entrySet().stream()
-                        .filter(entry -> (entry.getValue() + entry.getKey())
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .sorted(Map.Entry.comparingByKey())
-                        .limit(25)
-                        .map(e -> new Command.Choice(
-                                e.getValue() + " - "
-                                        + Mapper.getSecretObjective(e.getKey()).getAutoCompleteName(),
-                                e.getValue()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case Constants.SCORE_SO,
-                    Constants.DISCARD_SO,
-                    Constants.SHOW_SO,
-                    Constants.SHOW_TO_ALL -> { // In hand, not safe to show Name/ID
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = player.getSecretsUnscored().entrySet().stream()
-                        .filter(entry -> (entry.getValue() + entry.getKey())
-                                .toLowerCase()
-                                .contains(enteredValue))
-                        .sorted(Map.Entry.comparingByValue())
-                        .limit(25)
-                        .map(e -> new Command.Choice(e.getValue() + "", e.getValue()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
+            case Constants.UNSCORE_SO ->
+                reply(
+                        event,
+                        numberedChoices(
+                                event,
+                                player.getSecretsScored(),
+                                Map.Entry.comparingByKey(),
+                                e -> e.getValue() + " - "
+                                        + Mapper.getSecretObjective(e.getKey()).getAutoCompleteName()));
+            case Constants.SCORE_SO, Constants.DISCARD_SO, Constants.SHOW_SO, Constants.SHOW_TO_ALL ->
+                reply(
+                        event,
+                        numberedChoices(
+                                event,
+                                player.getSecretsUnscored(),
+                                Map.Entry.comparingByValue(),
+                                e -> e.getValue() + ""));
             case Constants.DRAW_SPECIFIC_SO -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                String enteredValue = enteredLower(event);
                 DeckModel soDeck = Mapper.getDeck(player.getGame().getSoDeckID());
-                List<SecretObjectiveModel> possibleSecretObjectives = soDeck.getNewDeck().stream()
-                        .map(Mapper::getSecretObjective)
-                        .toList();
-                List<Command.Choice> options = possibleSecretObjectives.stream()
-                        .filter(soModel -> soModel.search(enteredValue))
-                        .sorted(Comparator.comparing(SecretObjectiveModel::getName))
-                        .limit(25)
-                        .map(soModel -> new Command.Choice(soModel.getAutoCompleteName(), soModel.getAlias()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+                reply(
+                        event,
+                        toChoices(
+                                soDeck.getNewDeck().stream()
+                                        .map(Mapper::getSecretObjective)
+                                        .filter(soModel -> soModel.search(enteredValue))
+                                        .sorted(Comparator.comparing(SecretObjectiveModel::getName)),
+                                SecretObjectiveModel::getAutoCompleteName,
+                                SecretObjectiveModel::getAlias));
             }
         }
     }
 
+    private static Game getGame(String gameName) {
+        return GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame()
+                : null;
+    }
+
+    private static DraftManager getDraftManager(String gameName) {
+        Game game = getGame(gameName);
+        return game != null && DraftManager.hasDraftManager(game) ? game.getDraftManager() : null;
+    }
+
+    private static boolean isFogRestricted(CommandAutoCompleteInteractionEvent event, Game game) {
+        return game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game);
+    }
+
+    private static String entered(CommandAutoCompleteInteractionEvent event) {
+        return event.getFocusedOption().getValue();
+    }
+
+    private static String enteredLower(CommandAutoCompleteInteractionEvent event) {
+        return entered(event).toLowerCase();
+    }
+
+    private static void queue(AutoCompleteCallbackAction action) {
+        action.queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void reply(CommandAutoCompleteInteractionEvent event, List<Command.Choice> choices) {
+        queue(event.replyChoices(choices));
+    }
+
+    private static void replyStrings(CommandAutoCompleteInteractionEvent event, Stream<String> values) {
+        queue(event.replyChoiceStrings(values.toList()));
+    }
+
+    private static void replyContaining(CommandAutoCompleteInteractionEvent event, Collection<String> toFilter) {
+        reply(event, mapTo25ChoicesThatContain(toFilter, entered(event)));
+    }
+
+    private static <T> List<Command.Choice> toChoices(
+            Stream<T> items, Function<T, String> label, Function<T, String> value) {
+        return items.limit(25)
+                .map(item -> new Command.Choice(label.apply(item), value.apply(item)))
+                .toList();
+    }
+
+    private static <T> List<Command.Choice> containing(
+            Stream<T> items, String enteredLower, Function<T, String> label, Function<T, String> value) {
+        return toChoices(items.filter(item -> label.apply(item).toLowerCase().contains(enteredLower)), label, value);
+    }
+
+    private static List<Command.Choice> containingSelf(Stream<String> items, String enteredLower) {
+        return containing(items, enteredLower, option -> option, option -> option);
+    }
+
+    private static List<Command.Choice> containingByValue(
+            CommandAutoCompleteInteractionEvent event, Map<String, String> values) {
+        return containing(values.entrySet().stream(), enteredLower(event), Map.Entry::getValue, Map.Entry::getKey);
+    }
+
+    private static List<Command.Choice> labelledChoices(
+            CommandAutoCompleteInteractionEvent event, Map<String, String> values) {
+        String enteredValue = Objects.toString(entered(event), "").toLowerCase();
+        return containing(values.entrySet().stream(), enteredValue, Map.Entry::getValue, Map.Entry::getKey);
+    }
+
+    private static List<Command.Choice> decksByAlias(
+            CommandAutoCompleteInteractionEvent event, Predicate<DeckModel> filter) {
+        String enteredValue = enteredLower(event);
+        return toChoices(
+                Mapper.getDecks().values().stream()
+                        .filter(filter)
+                        .filter(deck -> deck.getAlias().contains(enteredValue)),
+                DeckModel::getName,
+                DeckModel::getAlias);
+    }
+
+    private static List<Command.Choice> promoteChoices(
+            CommandAutoCompleteInteractionEvent event, Map<String, String> values) {
+        String enteredValue = entered(event);
+        return toChoices(
+                ServerPromoteCommand.servers.keySet().stream()
+                        .filter(key -> values.get(key).toLowerCase().contains(enteredValue)),
+                key -> key,
+                values::get);
+    }
+
+    private static List<Command.Choice> numberedChoices(
+            CommandAutoCompleteInteractionEvent event,
+            Map<String, Integer> entries,
+            Comparator<Map.Entry<String, Integer>> order,
+            Function<Map.Entry<String, Integer>, String> label) {
+        String enteredValue = enteredLower(event);
+        return entries.entrySet().stream()
+                .filter(entry ->
+                        (entry.getValue() + entry.getKey()).toLowerCase().contains(enteredValue))
+                .sorted(order)
+                .limit(25)
+                .map(entry -> new Command.Choice(label.apply(entry), entry.getValue()))
+                .toList();
+    }
+
     private static <T extends ModelInterface & EmbeddableModel> List<Command.Choice> searchModels(
             CommandAutoCompleteInteractionEvent event, Collection<T> models, ComponentSource source) {
-        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-        return models.stream()
-                .filter(model -> model.getSource() != null)
-                .filter(model -> model.search(enteredValue, source))
-                .filter(model -> !model.getSource().isHiddenFromSearch())
-                .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
-                .limit(25)
-                .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
-                .toList();
+        return searchModels(event, models, source, false);
     }
 
     private static <T extends ModelInterface & EmbeddableModel> List<Command.Choice> searchModels(
             CommandAutoCompleteInteractionEvent event,
             Collection<T> models,
             ComponentSource source,
-            boolean limithomebrew) {
-        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+            boolean hideBySource) {
+        String enteredValue = enteredLower(event);
         return models.stream()
                 .filter(model -> model.getSource() != null)
                 .filter(model -> model.search(enteredValue, source))
-                .filter(model -> !model.getSource().isHiddenFromSearch(source))
+                .filter(model -> hideBySource
+                        ? !model.getSource().isHiddenFromSearch(source)
+                        : !model.getSource().isHiddenFromSearch())
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
                 .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
                 .toList();
     }
 
-    private static void replyWith25ChoicesThatContainValue(
-            CommandAutoCompleteInteractionEvent event, Collection<String> toFilter) {
-        String enteredValue = event.getFocusedOption().getValue();
-        var options = mapTo25ChoicesThatContain(toFilter, enteredValue);
-        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+    private static Map<String, String> hashMapOf(String[][] entries) {
+        Map<String, String> map = new HashMap<>();
+        for (String[] entry : entries) {
+            map.put(entry[0], entry[1]);
+        }
+        return map;
     }
 
     private static List<Command.Choice> mapTo25ChoicesThatContain(Collection<String> toFilter, String toContain) {

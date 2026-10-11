@@ -2,46 +2,31 @@ package ti4.discord.interactions.commands.help;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class HelpCommand implements ParentCommand {
+public class HelpCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    new HelpAction(),
-                    new HowToMoveUnits(),
-                    new SampleColors(),
-                    new SampleDecals(),
-                    new WhatsTIGL(),
-                    new Absol(),
-                    new Monuments(),
-                    new DiscordantStars(),
-                    new NewPlayerInfo(),
-                    new HowToPlayTI4(),
-                    new FoWHelp(),
-                    new FoWPlusHelp())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.HELP;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Help";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public HelpCommand() {
+        super(
+                Constants.HELP,
+                "Help",
+                new HelpAction(),
+                new HowToMoveUnits(),
+                new SampleColors(),
+                new SampleDecals(),
+                new WhatsTIGL(),
+                new HelpTextSubcommand("absol", "Show Helpful Absol stuff", "Absol.txt"),
+                new HelpTextSubcommand("monuments", "Show Helpful Monuments stuff", "Monuments.txt"),
+                new HelpTextSubcommand("discordant_stars", "Display DS Help Text", "DS.txt"),
+                new NewPlayerInfo(),
+                new HelpTextSubcommand(
+                        "how_to_play_ti4", "Display some helpful stuff for learning TI4", "HowToPlayTI4.txt"),
+                new HelpTextSubcommand("fow", "Explain Fog of War", "FoWHelp.txt"),
+                new FoWPlusHelp());
     }
 
     static void showHelpText(GenericInteractionCreateEvent event, String helpFileName) {

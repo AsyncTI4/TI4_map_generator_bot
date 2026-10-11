@@ -8,6 +8,7 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.json.JsonMapperManager;
+import ti4.website.WebPdsCoverage;
 
 /**
  * Deterministic, compact serialization of the map data sent to the website.
@@ -118,7 +119,7 @@ public class CompactMapState {
                 .toList();
     }
 
-    private static List<Object> serializePds(Map<String, ti4.website.WebPdsCoverage> pds) {
+    private static List<Object> serializePds(Map<String, WebPdsCoverage> pds) {
         if (pds == null) return List.of();
         return pds.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())

@@ -531,15 +531,43 @@ public class DrawingUtil {
         BufferedImage resourceBufferedImage = getPlayerFactionIconImageScaled(player, width, height);
         if (resourceBufferedImage == null) return;
         try {
-            Graphics2D g2 = (Graphics2D) graphics;
-            float opacityToSet = opacity == null ? 1.0f : opacity;
-            boolean setOpacity = opacity != null && !opacity.equals(1.0f);
-            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacityToSet));
-            g2.drawImage(resourceBufferedImage, x, y, null);
-            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+            drawImageWithOpacity(graphics, resourceBufferedImage, x, y, opacity);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(player), "Could not display player's faction icon image", e);
         }
+    }
+
+    public static void drawImageWithOpacity(Graphics graphics, BufferedImage image, int x, int y, Float opacity) {
+        Graphics2D g2 = (Graphics2D) graphics;
+        boolean setOpacity = opacity != null && !opacity.equals(1.0f);
+        if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+        g2.drawImage(image, x, y, null);
+        if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+    }
+
+    public static BufferedImage halo(BufferedImage image, int padding, int radius, Color color, int imageType) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+        BufferedImage halo = new BufferedImage(w + 2 * padding, h + 2 * padding, imageType);
+        for (int i = -padding; i < w + padding; i++) {
+            for (int j = -padding; j < h + padding; j++) {
+                int bestAlpha = 0;
+                for (int p = -padding; p <= padding; p++) {
+                    if (i + p < 0 || i + p >= w) continue;
+                    for (int q = -padding; q <= padding; q++) {
+                        if (j + q < 0 || j + q >= h) continue;
+                        if (p * p + q * q <= radius * radius) {
+                            bestAlpha = Math.max(bestAlpha, image.getRGB(i + p, j + q) >>> 24);
+                        }
+                    }
+                }
+                halo.setRGB(
+                        i + padding,
+                        j + padding,
+                        new Color(color.getRed(), color.getGreen(), color.getBlue(), bestAlpha).getRGB());
+            }
+        }
+        return halo;
     }
 
     public static void drawPlayerFactionIconImageUnderlay(

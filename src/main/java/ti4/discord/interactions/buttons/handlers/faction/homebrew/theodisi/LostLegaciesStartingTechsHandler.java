@@ -164,12 +164,6 @@ public class LostLegaciesStartingTechsHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void clearThurvialiStartingTech(Game game, Player player) {
-        if (game != null && player != null) {
-            game.removeStoredValue(THURVIALI_STARTING_TECH + player.getFaction());
-        }
-    }
-
     public static void offerArcanumStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
         sendTechPrompt(

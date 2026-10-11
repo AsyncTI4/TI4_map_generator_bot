@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.cardsac;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
@@ -12,10 +13,10 @@ class DrawSpecificAC extends GameStateSubcommand {
 
     DrawSpecificAC() {
         super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the card you wish to draw")
                 .setRequired(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(CommonOptions.factionColor());
     }
 
     @Override
@@ -38,10 +39,5 @@ class DrawSpecificAC extends GameStateSubcommand {
         }
 
         ActionCardHelper.sendActionCardInfo(game, getPlayer());
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

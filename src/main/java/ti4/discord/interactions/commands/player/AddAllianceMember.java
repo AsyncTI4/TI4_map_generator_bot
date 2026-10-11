@@ -2,9 +2,8 @@ package ti4.discord.interactions.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,12 +15,7 @@ public class AddAllianceMember extends GameStateSubcommand {
 
     public AddAllianceMember() {
         super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member", true, true);
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color with which you are in an alliance")
-                .setAutoComplete(true)
-                .setRequired(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color with which you are in an alliance"));
     }
 
     @Override
@@ -32,11 +26,8 @@ public class AddAllianceMember extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player otherPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (otherPlayer == null) return;
         makeAlliancePartners(player, otherPlayer, event, game);
     }
 

@@ -1122,7 +1122,7 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
-            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
+            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getStoredCommoditiesTotal());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
             writer.write(System.lineSeparator());

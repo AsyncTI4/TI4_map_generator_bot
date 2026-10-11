@@ -17,6 +17,7 @@ class ShuffleBackInUnrevealedObj extends GameStateSubcommand {
                 "Shuffle an unrevealed objective back in and redraw one in its place",
                 true,
                 true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location of the unrevealed objective")
                 .setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.STAGE_1_OR_2, "Stage 1 or 2").setRequired(true));
@@ -32,10 +33,5 @@ class ShuffleBackInUnrevealedObj extends GameStateSubcommand {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 "Shuffle objective at position " + loc1.getAsInt() + " back into the deck and drew a new one there.");
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

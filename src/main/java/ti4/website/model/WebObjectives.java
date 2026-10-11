@@ -63,27 +63,15 @@ public class WebObjectives {
 
     public static WebObjectives fromGame(Game game) {
         WebObjectives webObjectives = new WebObjectives();
-
-        // Initialize lists
-        webObjectives.stage1Objectives = new ArrayList<>();
-        webObjectives.stage2Objectives = new ArrayList<>();
-        webObjectives.customObjectives = new ArrayList<>();
+        webObjectives.stage1Objectives =
+                stageObjectives(game, Mapper.getPublicObjectivesStage1(), game.getPublicObjectives1Peekable());
+        webObjectives.stage2Objectives =
+                stageObjectives(game, Mapper.getPublicObjectivesStage2(), game.getPublicObjectives2Peekable());
+        webObjectives.customObjectives = customObjectives(game);
         webObjectives.allObjectives = new ArrayList<>();
-
-        // Process Stage 1 objectives (1VP)
-        processStage1Objectives(game, webObjectives);
-
-        // Process Stage 2 objectives (2VP)
-        processStage2Objectives(game, webObjectives);
-
-        // Process custom objectives (mutiny, custodian, imperial rider, etc.)
-        processCustomObjectives(game, webObjectives);
-
-        // Combine all objectives
         webObjectives.allObjectives.addAll(webObjectives.stage1Objectives);
         webObjectives.allObjectives.addAll(webObjectives.stage2Objectives);
         webObjectives.allObjectives.addAll(webObjectives.customObjectives);
-
         return webObjectives;
     }
 
@@ -96,76 +84,38 @@ public class WebObjectives {
                 .findFirst();
     }
 
-    private static void processStage1Objectives(Game game, WebObjectives webObjectives) {
-        Map<String, Integer> revealedObjectives = game.getRevealedPublicObjectives();
-        Map<String, String> stage1Objectives = Mapper.getPublicObjectivesStage1();
+    private static List<ObjectiveInfo> stageObjectives(
+            Game game, Map<String, String> stageObjectives, List<String> unrevealed) {
+        List<ObjectiveInfo> objectives = new ArrayList<>();
+        for (String key : game.getRevealedPublicObjectives().keySet()) {
+            if (stageObjectives.containsKey(key)) {
+                addIfPresent(objectives, createObjectiveInfo(game, key, true, false));
+            }
+        }
+
         boolean isRedTapeMode = game.isRedTapeMode();
-        boolean isCivilizedSocietyMode = game.isCivilizedSocietyMode();
-
-        // Process revealed Stage 1 objectives
-        for (Map.Entry<String, Integer> entry : revealedObjectives.entrySet()) {
-            String key = entry.getKey();
-            if (stage1Objectives.containsKey(key)) {
-                ObjectiveInfo objInfo = createObjectiveInfo(game, key, true, false, 1);
-                if (objInfo != null) {
-                    webObjectives.stage1Objectives.add(objInfo);
-                }
-            }
+        boolean isRevealed = isRedTapeMode || game.isCivilizedSocietyMode();
+        for (String key : unrevealed) {
+            addIfPresent(objectives, createObjectiveInfo(game, key, isRevealed, isRedTapeMode));
         }
+        return objectives;
+    }
 
-        // Process unrevealed Stage 1 objectives
-        List<String> unrevealed1 = game.getPublicObjectives1Peekable();
-        boolean isRevealed = isRedTapeMode || isCivilizedSocietyMode;
-        for (String key : unrevealed1) {
-            ObjectiveInfo objInfo = createObjectiveInfo(game, key, isRevealed, isRedTapeMode, 1);
-            if (objInfo != null) {
-                webObjectives.stage1Objectives.add(objInfo);
-            }
+    private static void addIfPresent(List<ObjectiveInfo> objectives, ObjectiveInfo objectiveInfo) {
+        if (objectiveInfo != null) {
+            objectives.add(objectiveInfo);
         }
     }
 
-    private static void processStage2Objectives(Game game, WebObjectives webObjectives) {
-        Map<String, Integer> revealedObjectives = game.getRevealedPublicObjectives();
-        Map<String, String> stage2Objectives = Mapper.getPublicObjectivesStage2();
-        boolean isRedTapeMode = game.isRedTapeMode();
-        boolean isCivilizedSocietyMode = game.isCivilizedSocietyMode();
-
-        // Process revealed Stage 2 objectives
-        for (Map.Entry<String, Integer> entry : revealedObjectives.entrySet()) {
-            String key = entry.getKey();
-            if (stage2Objectives.containsKey(key)) {
-                ObjectiveInfo objInfo = createObjectiveInfo(game, key, true, false, 2);
-                if (objInfo != null) {
-                    webObjectives.stage2Objectives.add(objInfo);
-                }
-            }
+    private static List<ObjectiveInfo> customObjectives(Game game) {
+        List<ObjectiveInfo> objectives = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : game.getCustomPublicVP().entrySet()) {
+            objectives.add(createCustomObjectiveInfo(game, entry.getKey(), entry.getValue()));
         }
-
-        // Process unrevealed Stage 2 objectives
-        List<String> unrevealed2 = game.getPublicObjectives2Peekable();
-        boolean isRevealed = isRedTapeMode || isCivilizedSocietyMode;
-        for (String key : unrevealed2) {
-            ObjectiveInfo objInfo = createObjectiveInfo(game, key, isRevealed, isRedTapeMode, 2);
-            if (objInfo != null) {
-                webObjectives.stage2Objectives.add(objInfo);
-            }
-        }
+        return objectives;
     }
 
-    private static void processCustomObjectives(Game game, WebObjectives webObjectives) {
-        Map<String, Integer> customPublicVP = game.getCustomPublicVP();
-
-        for (Map.Entry<String, Integer> entry : customPublicVP.entrySet()) {
-            String key = entry.getKey();
-            int pointValue = entry.getValue();
-
-            ObjectiveInfo objInfo = createCustomObjectiveInfo(game, key, pointValue);
-            webObjectives.customObjectives.add(objInfo);
-        }
-    }
-
-    private static ObjectiveInfo createObjectiveInfo(
-            Game game, String key, boolean revealed, boolean hasRedTape, int defaultPointValue) {
+    private static ObjectiveInfo createObjectiveInfo(Game game, String key, boolean revealed, boolean hasRedTape) {
         PublicObjectiveModel po = Mapper.getPublicObjective(key);
         if (po == null) {
             return null;
@@ -219,36 +169,21 @@ public class WebObjectives {
     }
 
     private static List<String> getScoredFactions(Game game, String objectiveKey) {
-        List<String> scoredPlayerIDs =
-                game.getScoredPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList());
-
-        return scoredPlayerIDs.stream()
-                .map(playerID -> {
-                    Player player = game.getPlayers().get(playerID);
-                    return player != null ? player.getFaction() : null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return toFactions(game, game.getScoredPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList()));
     }
 
     private static List<String> getPeekingFactions(Game game, String objectiveKey) {
         List<String> peekingPlayerIDs = new ArrayList<>();
+        peekingPlayerIDs.addAll(game.getPublicObjectives1Peeked().getOrDefault(objectiveKey, Collections.emptyList()));
+        peekingPlayerIDs.addAll(game.getPublicObjectives2Peeked().getOrDefault(objectiveKey, Collections.emptyList()));
+        return toFactions(game, peekingPlayerIDs);
+    }
 
-        // Check Stage 1 peeked objectives
-        if (game.getPublicObjectives1Peeked().containsKey(objectiveKey)) {
-            peekingPlayerIDs.addAll(game.getPublicObjectives1Peeked().get(objectiveKey));
-        }
-
-        // Check Stage 2 peeked objectives
-        if (game.getPublicObjectives2Peeked().containsKey(objectiveKey)) {
-            peekingPlayerIDs.addAll(game.getPublicObjectives2Peeked().get(objectiveKey));
-        }
-
-        return peekingPlayerIDs.stream()
-                .map(playerID -> {
-                    Player player = game.getPlayers().get(playerID);
-                    return player != null ? player.getFaction() : null;
-                })
+    private static List<String> toFactions(Game game, List<String> playerIDs) {
+        return playerIDs.stream()
+                .map(playerID -> game.getPlayers().get(playerID))
+                .filter(Objects::nonNull)
+                .map(Player::getFaction)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

@@ -3,6 +3,7 @@ package ti4.discord.interactions.commands.omega_phase;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
@@ -20,9 +21,7 @@ class AssignPlayerPriority extends GameStateSubcommand {
                         Constants.PRIORITY_POSITION,
                         "Position on priority track (uses lowest available position if not set)"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-                .addOptions(new OptionData(
-                                OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color")
-                        .setAutoComplete(true));
+                .addOptions(CommonOptions.factionColor("Set stats for another Faction or Color"));
     }
 
     @Override

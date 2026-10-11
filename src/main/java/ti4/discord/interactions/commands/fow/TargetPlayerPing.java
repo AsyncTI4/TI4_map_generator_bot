@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,9 +18,7 @@ class TargetPlayerPing extends GameStateSubcommand {
 
     public TargetPlayerPing() {
         super(Constants.TARGET_PLAYER_PING, "Ping a player as the target of your action card", false, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Player you are targeting")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor("Player you are targeting"));
         addOptions(new OptionData(
                         OptionType.BOOLEAN,
                         Constants.PUBLIC,
@@ -35,11 +34,8 @@ class TargetPlayerPing extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "This command is only for Fog of War games.");
             return;
         }
-        Player target = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (target == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player target = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (target == null) return;
         boolean isPublic = event.getOption(Constants.PUBLIC).getAsBoolean();
         String cardTitle = event.getOption(Constants.ACTION_CARD, "", OptionMapping::getAsString);
 

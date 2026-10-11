@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieReli
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.helper.CardIdHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
@@ -138,8 +139,7 @@ public class RelicHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Relic deck is empty");
             return;
         }
-        relicID = relicID.replace("extra1", "");
-        relicID = relicID.replace("extra2", "");
+        relicID = CardIdHelper.stripExtra(relicID);
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
 

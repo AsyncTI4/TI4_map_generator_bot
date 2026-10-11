@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -12,6 +13,7 @@ class ShuffleAgendas extends GameStateSubcommand {
 
     ShuffleAgendas() {
         super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck", true, false);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
                 .setRequired(true));
     }
@@ -19,20 +21,9 @@ class ShuffleAgendas extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String confirm = event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString);
-        if (!"YES".equals(confirm)) {
-            MessageHelper.replyToMessage(
-                    event,
-                    "Must confirm with `YES`" + ("YES".equalsIgnoreCase(confirm) ? " - this is case sensitive" : "")
-                            + ".");
-            return;
-        }
+        if (!CommandHelper.confirmedWithYes(event, confirm)) return;
 
         getGame().shuffleAgendas();
         MessageHelper.replyToMessage(event, "Agenda deck shuffled");
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

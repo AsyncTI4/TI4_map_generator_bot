@@ -19,6 +19,14 @@ public interface EmbeddableModel {
                 && (searchString == null || search(searchString));
     }
 
+    default String idFooter(String id) {
+        return "ID: " + id + "    Source: " + getSource();
+    }
+
+    default String compactIdFooter(String id) {
+        return "ID: " + id + "  Source: " + getSource();
+    }
+
     default boolean searchSource(ComponentSource searchSource) {
         return (searchSource == null || (getSource() != null && getSource() == searchSource));
     }

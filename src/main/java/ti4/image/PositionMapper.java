@@ -404,23 +404,6 @@ public final class PositionMapper {
         return false;
     }
 
-    private static Integer getPositionWithinHexSide(String tileID) {
-        if (!Helper.isInteger(tileID)) return null;
-        int ring = Integer.parseInt(tileID) / 100;
-        int tileNumber = Integer.parseInt(tileID) % 100;
-        for (int corner = 1; corner <= 6; corner++) {
-            int upperBound = 1 + ring * (corner);
-            int lowerBound = 1 + ring * (corner - 1);
-            if (tileNumber >= lowerBound && tileNumber < upperBound) return tileNumber - lowerBound;
-        }
-        return null;
-    }
-
-    private static String getTileIDAtPositionInRingSide(Integer ring, Integer side, Integer position) {
-        if (ring == null || side == null || position == null) return null;
-        return ring + String.format("%02d", 1 + ring * (side - 1) + position);
-    }
-
     @Nullable
     public static Integer getRingSideNumberOfTileID(String tileID) {
         if (!Helper.isInteger(tileID)) return null;

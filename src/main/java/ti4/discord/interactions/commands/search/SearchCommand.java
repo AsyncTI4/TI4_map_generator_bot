@@ -3,64 +3,52 @@ package ti4.discord.interactions.commands.search;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class SearchCommand implements ParentCommand {
+public class SearchCommand extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(
-                    // TO DO:
-                    // - keep in this command /search commands, sources, emojis, games, forgames, mygames, mytitles
-                    // - create a new command /search_comps for all the rest
+    public SearchCommand() {
+        super(
+                Constants.SEARCH,
+                "Search game component descriptions",
+                // TO DO:
+                // - keep in this command /search commands, sources, emojis, games, forgames, mygames, mytitles
+                // - create a new command /search_comps for all the rest
 
-                    /* From \data\ */
-                    new SearchAbilitiesSubcommand(),
-                    new SearchActionCardsSubcommand(),
-                    new SearchAgendasSubcommand(),
-                    new SearchAttachmentsSubcommand(),
-                    // no /search colors yet, but there is /help sample_colors
-                    // no /search combat_modifiers yet
-                    new SearchExploresSubcommand(),
-                    // no /search franken_errata yet
-                    // no /search generic_cards yet
-                    new SearchLeadersSubcommand(),
-                    new SearchGenomesSubcommand(),
-                    new SearchParadigmsSubcommand(),
-                    // no /search map_templates yet
-                    new SearchPromissoryNotesSubcommand(),
-                    new SearchPublicObjectivesSubcommand(),
-                    new SearchRelicsSubcommand(),
-                    new SearchSecretObjectivesSubcommand(),
-                    // new SearchSources(),
-                    new SearchTechsSubcommand(),
-                    new SearchTokensSubcommand(),
-                    new SearchUnitsSubcommand(),
-                    new SearchPlanetsSubcommand(),
-                    new SearchTilesSubcommand(),
-                    new SearchBreakthroughs(),
-                    new SearchRules(),
-                    new SearchGalacticEventsSubcommand(),
+                /* From \data\ */
+                new SearchAbilitiesSubcommand(),
+                new SearchActionCardsSubcommand(),
+                new SearchAgendasSubcommand(),
+                new SearchAttachmentsSubcommand(),
+                // no /search colors yet, but there is /help sample_colors
+                // no /search combat_modifiers yet
+                new SearchExploresSubcommand(),
+                // no /search franken_errata yet
+                // no /search generic_cards yet
+                new SearchLeadersSubcommand(),
+                new SearchGenomesSubcommand(),
+                new SearchParadigmsSubcommand(),
+                // no /search map_templates yet
+                new SearchPromissoryNotesSubcommand(),
+                new SearchPublicObjectivesSubcommand(),
+                new SearchRelicsSubcommand(),
+                new SearchSecretObjectivesSubcommand(),
+                // new SearchSources(),
+                new SearchTechsSubcommand(),
+                new SearchTokensSubcommand(),
+                new SearchUnitsSubcommand(),
+                new SearchPlanetsSubcommand(),
+                new SearchTilesSubcommand(),
+                new SearchBreakthroughs(),
+                new SearchRules(),
+                new SearchGalacticEventsSubcommand(),
 
-                    /* From others */
-                    // new SearchGames(),
-                    new SearchForGame(),
-                    new SearchMyGames())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.SEARCH;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Search game component descriptions";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+                /* From others */
+                // new SearchGames(),
+                new SearchForGame(),
+                new SearchMyGames());
     }
 
     private final Map<String, Subcommand> searchSubcommands = Stream.of(

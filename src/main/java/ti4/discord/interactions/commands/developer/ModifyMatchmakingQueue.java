@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -49,11 +50,9 @@ class ModifyMatchmakingQueue extends Subcommand {
     }
 
     private static void removePlayer(SlashCommandInteractionEvent event) {
-        OptionMapping userOption = event.getOption(Constants.USER);
-        if (userOption == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Choose a `user` to remove from the queue.");
-            return;
-        }
+        OptionMapping userOption = CommandHelper.requireOrReport(
+                event, event.getOption(Constants.USER), "Choose a `user` to remove from the queue.");
+        if (userOption == null) return;
 
         User user = userOption.getAsUser();
         List<String> removed = MatchmakerService.get().removePlayer(user.getId());

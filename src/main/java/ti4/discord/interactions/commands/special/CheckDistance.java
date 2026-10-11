@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,9 +20,7 @@ class CheckDistance extends GameStateSubcommand {
 
     public CheckDistance() {
         super(Constants.CHECK_DISTANCE, "Check Distance", false, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName());
         addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
     }
 
@@ -29,12 +29,11 @@ class CheckDistance extends GameStateSubcommand {
         Game game = getGame();
 
         String tileID = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
-        Tile tile = TileHelper.getTile(event, tileID, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event,
+                TileHelper.getTile(event, tileID, game),
+                "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+        if (tile == null) return;
 
         Player player = getPlayer();
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 8, OptionMapping::getAsInt);

@@ -39,14 +39,8 @@ public class CrystellumUnitHandler {
     private static final String PLACE_REFRACTUM_DEPLOY = "placeRefractumDeploy_";
 
     public static void offerFractalRebuild(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
-        int capturedFighters = player.getNomboxTile().getUnitHolders().values().stream()
-                .mapToInt(holder -> holder.getUnitCount(UnitType.Fighter, player))
-                .sum();
-        int capacity = player.getUnitModels().stream()
-                .filter(unit -> "crystellum_flagship".equals(unit.getId()))
-                .mapToInt(UnitModel::getCapacityValue)
-                .findFirst()
-                .orElse(0);
+        int capturedFighters = getCapturedFighterCount(player);
+        int capacity = getFlagshipCapacity(player);
         if (capacity < 1
                 || capturedFighters == 0
                 || player.getUnitModels().stream()
@@ -71,9 +65,7 @@ public class CrystellumUnitHandler {
     }
 
     public static void addRefractumDeployButton(List<Button> buttons, Player player, Tile tile) {
-        int capturedFighters = player.getNomboxTile().getUnitHolders().values().stream()
-                .mapToInt(holder -> holder.getUnitCount(UnitType.Fighter, player))
-                .sum();
+        int capturedFighters = getCapturedFighterCount(player);
         if (!player.hasUnit("crystellum_mech")
                 || capturedFighters < 2
                 || tile == null
@@ -133,14 +125,8 @@ public class CrystellumUnitHandler {
     @ButtonHandler(USE_FRACTAL_REBUILD)
     public static void useFractalRebuild(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.substring(USE_FRACTAL_REBUILD.length()));
-        int capturedFighters = player.getNomboxTile().getUnitHolders().values().stream()
-                .mapToInt(holder -> holder.getUnitCount(UnitType.Fighter, player))
-                .sum();
-        int capacity = player.getUnitModels().stream()
-                .filter(unit -> "crystellum_flagship".equals(unit.getId()))
-                .mapToInt(UnitModel::getCapacityValue)
-                .findFirst()
-                .orElse(0);
+        int capturedFighters = getCapturedFighterCount(player);
+        int capacity = getFlagshipCapacity(player);
         if (tile == null
                 || capacity < 1
                 || capturedFighters == 0
@@ -183,14 +169,8 @@ public class CrystellumUnitHandler {
         if (payload.length != 2) return;
         Tile tile = game.getTileByPosition(payload[0]);
         int returned = NumberUtils.toInt(payload[1]);
-        int capturedFighters = player.getNomboxTile().getUnitHolders().values().stream()
-                .mapToInt(holder -> holder.getUnitCount(UnitType.Fighter, player))
-                .sum();
-        int capacity = player.getUnitModels().stream()
-                .filter(unit -> "crystellum_flagship".equals(unit.getId()))
-                .mapToInt(UnitModel::getCapacityValue)
-                .findFirst()
-                .orElse(0);
+        int capturedFighters = getCapturedFighterCount(player);
+        int capacity = getFlagshipCapacity(player);
         if (tile == null || returned < 1 || returned > capacity || returned > capturedFighters) return;
 
         List<Button> buttons = new ArrayList<>();
@@ -224,14 +204,8 @@ public class CrystellumUnitHandler {
         if (payload.length != 3) return;
         Tile tile = game.getTileByPosition(payload[0]);
         int returned = NumberUtils.toInt(payload[1]);
-        int capturedFighters = player.getNomboxTile().getUnitHolders().values().stream()
-                .mapToInt(holder -> holder.getUnitCount(UnitType.Fighter, player))
-                .sum();
-        int capacity = player.getUnitModels().stream()
-                .filter(unit -> "crystellum_flagship".equals(unit.getId()))
-                .mapToInt(UnitModel::getCapacityValue)
-                .findFirst()
-                .orElse(0);
+        int capturedFighters = getCapturedFighterCount(player);
+        int capacity = getFlagshipCapacity(player);
         UnitModel ship = tile == null ? null : player.getPriorityUnitByAsyncID(payload[2], tile.getSpaceUnitHolder());
         if (returned < 1
                 || returned > capacity
@@ -383,5 +357,19 @@ public class CrystellumUnitHandler {
 
         return NewStuffHelper.buttonPagination(
                 systemButtons, null, player.factionButtonChecker() + SHARD_SWARM_SYSTEM, 25, 0, true);
+    }
+
+    private static int getCapturedFighterCount(Player player) {
+        return player.getNomboxTile().getUnitHolders().values().stream()
+                .mapToInt(holder -> holder.getUnitCount(UnitType.Fighter, player))
+                .sum();
+    }
+
+    private static int getFlagshipCapacity(Player player) {
+        return player.getUnitModels().stream()
+                .filter(unit -> "crystellum_flagship".equals(unit.getId()))
+                .mapToInt(UnitModel::getCapacityValue)
+                .findFirst()
+                .orElse(0);
     }
 }

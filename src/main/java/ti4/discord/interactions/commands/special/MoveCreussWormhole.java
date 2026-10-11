@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -26,9 +28,7 @@ class MoveCreussWormhole extends GameStateSubcommand {
                 "Adds or moves a Creuss wormhole token to the target system.",
                 true,
                 true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("Target System/Tile name"));
         addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -41,12 +41,11 @@ class MoveCreussWormhole extends GameStateSubcommand {
 
         String tileName = StringUtils.substringBefore(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
-        Tile tile = TileHelper.getTile(event, tileName, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(
-                    event, "Could not resolve tileID:  `" + tileName + "`. Tile not found");
-            return;
-        }
+        Tile tile = CommandHelper.requireOrReport(
+                event,
+                TileHelper.getTile(event, tileName, game),
+                "Could not resolve tileID:  `" + tileName + "`. Tile not found");
+        if (tile == null) return;
 
         String tokenName = event.getOption(Constants.CREUSS_TOKEN_NAME, null, OptionMapping::getAsString);
         tokenName = AliasHandler.resolveToken(tokenName);

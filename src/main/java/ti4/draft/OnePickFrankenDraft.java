@@ -5,17 +5,7 @@ import ti4.game.Game;
 public class OnePickFrankenDraft extends FrankenDraft {
 
     public OnePickFrankenDraft(Game owner) {
-        super(owner);
-    }
-
-    @Override
-    public int getPicksFromFirstBag() {
-        return 1;
-    }
-
-    @Override
-    public int getPicksFromNextBags() {
-        return 1;
+        super(owner, 1, 1);
     }
 
     @Override

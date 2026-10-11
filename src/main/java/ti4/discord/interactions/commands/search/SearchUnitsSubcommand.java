@@ -1,23 +1,25 @@
 package ti4.discord.interactions.commands.search;
 
 import java.util.Comparator;
-import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.logging.BotLogger;
-import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
 
-class SearchUnitsSubcommand extends SearchComponentModelSubcommand {
+class SearchUnitsSubcommand extends SearchComponentModelSubcommand<UnitModel> {
 
-    public SearchUnitsSubcommand() {
-        super(Constants.SEARCH_UNITS, "List all units");
+    SearchUnitsSubcommand() {
+        super(
+                Constants.SEARCH_UNITS,
+                "List all units",
+                Mapper::isValidUnit,
+                Mapper::getUnit,
+                valuesOf(() -> Mapper.getUnits().values()),
+                model -> model.getRepresentationEmbed(true),
+                Comparator.comparing(UnitModel::getId));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.INCLUDE_ALIASES,
@@ -25,24 +27,7 @@ class SearchUnitsSubcommand extends SearchComponentModelSubcommand {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        ComponentSource source =
-                ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, Boolean.FALSE, OptionMapping::getAsBoolean);
-
-        if (Mapper.isValidUnit(searchString)) {
-            event.getChannel()
-                    .sendMessageEmbeds(Mapper.getUnit(searchString).getRepresentationEmbed(includeAliases))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-            return;
-        }
-
-        List<MessageEmbed> messageEmbeds = Mapper.getUnits().values().stream()
-                .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(UnitModel::getId))
-                .map(model -> model.getRepresentationEmbed(true))
-                .toList();
-        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
+    protected MessageEmbed exactMatchEmbed(UnitModel model, SlashCommandInteractionEvent event) {
+        return model.getRepresentationEmbed(includeAliases(event));
     }
 }

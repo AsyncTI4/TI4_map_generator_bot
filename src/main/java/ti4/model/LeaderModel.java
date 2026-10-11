@@ -265,7 +265,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(id).append("    Source: ").append(source);
+        if (includeID) footer.append(idFooter(id));
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);

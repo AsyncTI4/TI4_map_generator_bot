@@ -5,10 +5,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.Constants;
+import ti4.game.helper.CardIdHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
@@ -28,6 +29,7 @@ class PlaceDrawableCard extends GameStateSubcommand {
 
     PlaceDrawableCard() {
         super("place_drawable_card", "Place a drawable card on the top or bottom of its deck", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, DECK_TYPE, "Deck containing the card")
                 .addChoice("Action card", ACTION_CARD)
                 .addChoice("Secret objective", SECRET_OBJECTIVE)
@@ -41,8 +43,7 @@ class PlaceDrawableCard extends GameStateSubcommand {
                 .addChoice("Top", TOP)
                 .addChoice("Bottom", BOTTOM)
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color holding the card")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Faction or color holding the card"));
     }
 
     @Override
@@ -165,11 +166,6 @@ class PlaceDrawableCard extends GameStateSubcommand {
     }
 
     private String normalizeCardId(String cardId) {
-        return cardId.replace("extra1", "").replace("extra2", "");
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
+        return CardIdHelper.stripExtra(cardId);
     }
 }

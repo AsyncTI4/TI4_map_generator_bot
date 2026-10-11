@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.PublicObjectiveModel;
@@ -101,14 +103,11 @@ public class WebScoreBreakdown {
             CUSTOM_PO_SUPPORT_FOR_THRONE);
 
     public static WebScoreBreakdown fromPlayer(Player player, Game game, WebObjectives webObjectives) {
-        if (player == null || game == null) {
-            WebScoreBreakdown breakdown = new WebScoreBreakdown();
-            breakdown.entries = new ArrayList<>();
-            return breakdown;
-        }
-
         WebScoreBreakdown breakdown = new WebScoreBreakdown();
         breakdown.entries = new ArrayList<>();
+        if (player == null || game == null) {
+            return breakdown;
+        }
 
         addScoredEntries(player, game, breakdown.entries);
         addQualifiesAndPotentialEntries(player, game, webObjectives, breakdown.entries);
@@ -118,10 +117,6 @@ public class WebScoreBreakdown {
     }
 
     private static void addScoredEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
-        if (player == null || game == null || entries == null) {
-            return;
-        }
-
         // Collect scored entries first, then add them in the correct order
         List<ScoreBreakdownEntry> po1Entries = new ArrayList<>();
         List<ScoreBreakdownEntry> po2Entries = new ArrayList<>();
@@ -284,10 +279,6 @@ public class WebScoreBreakdown {
 
     private static void addQualifiesAndPotentialEntries(
             Player player, Game game, WebObjectives webObjectives, List<ScoreBreakdownEntry> entries) {
-        if (player == null || game == null || entries == null) {
-            return;
-        }
-
         // This method handles all QUALIFIES and POTENTIAL entries
         // The state is determined by whether the player meets the requirements
 
@@ -458,10 +449,6 @@ public class WebScoreBreakdown {
     }
 
     private static void addUnscoredEntries(Player player, Game game, List<ScoreBreakdownEntry> entries) {
-        if (player == null || game == null || entries == null) {
-            return;
-        }
-
         // If can legally draw another secret this round
         if (canDrawAnotherSecret(player, game)) {
             ScoreBreakdownEntry entry =
@@ -592,31 +579,24 @@ public class WebScoreBreakdown {
     }
 
     private static boolean isTombInPlay(Game game) {
-        if (game == null || game.getTileMap() == null) return false;
-
-        return game.getTileMap().values().stream()
-                .filter(Objects::nonNull)
-                .flatMap(tile -> tile.getUnitHolders().values().stream())
-                .filter(Objects::nonNull)
-                .anyMatch(uh -> uh.getTokenList().contains("attachment_tombofemphidia.png"));
+        return tombUnitHolders(game).findAny().isPresent();
     }
 
     private static boolean controlsTombOfEmphidia(Player player, Game game) {
-        if (player == null || game == null || game.getTileMap() == null) return false;
+        return tombUnitHolders(game)
+                .anyMatch(
+                        uh -> uh instanceof Planet planet && player.getPlanets().contains(planet.getName()));
+    }
 
+    private static Stream<UnitHolder> tombUnitHolders(Game game) {
         return game.getTileMap().values().stream()
                 .filter(Objects::nonNull)
                 .flatMap(tile -> tile.getUnitHolders().values().stream())
                 .filter(Objects::nonNull)
-                .filter(uh -> uh.getTokenList().contains("attachment_tombofemphidia.png"))
-                .filter(uh -> uh instanceof Planet)
-                .map(uh -> (Planet) uh)
-                .anyMatch(planet -> player.getPlanets().contains(planet.getName()));
+                .filter(uh -> uh.getTokenList().contains(Constants.TOMB_OF_EMPHIDIA_PNG));
     }
 
     private static int countUniqueTechSkips(Player player, Game game) {
-        if (player == null || game == null) return 0;
-
         Set<String> skips = new HashSet<>();
         for (String planetName : player.getPlanetsAllianceMode()) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
@@ -628,14 +608,11 @@ public class WebScoreBreakdown {
     }
 
     private static boolean hasImperialUntapped(Player player) {
-        if (player == null) return false;
         return player.getSCs().contains(IMPERIAL_STRATEGY_CARD)
                 && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
     }
 
     private static boolean hasWinnuHeroAvailable(Player player) {
-        if (player == null) return false;
-
         Optional<Leader> heroOpt = player.getLeader("winnuhero");
         if (heroOpt.isEmpty()) return false;
 
@@ -644,13 +621,10 @@ public class WebScoreBreakdown {
     }
 
     private static boolean hasControlOfMecatol(Player player) {
-        if (player == null) return false;
         return player.getPlanets().contains(MECATOL_REX_PLANET);
     }
 
     private static boolean canImperialHolderDrawSecret(Player player, Game game) {
-        if (player == null || game == null) return false;
-
         // Check if player is the Imperial holder
         if (!player.getSCs().contains(IMPERIAL_STRATEGY_CARD)) {
             return false;
@@ -666,8 +640,6 @@ public class WebScoreBreakdown {
     }
 
     private static boolean canDrawAnotherSecret(Player player, Game game) {
-        if (player == null || game == null) return false;
-
         // Check secret limit
         int maxSecrets = player.getMaxSOCount();
         int currentSecrets =
@@ -708,33 +680,22 @@ public class WebScoreBreakdown {
     }
 
     private static boolean hasStyx(Player player, Game game) {
-        if (player == null || game == null) return false;
-        // Check if player has scored "A Song Like Marrow" (the custom PO for Styx)
-        Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
-        if (scoredPublics != null) {
-            List<String> scoringPlayers = scoredPublics.get(CUSTOM_PO_STYX);
-            return scoringPlayers != null && scoringPlayers.contains(player.getUserID());
-        }
-        return false;
+        return hasPlayerScoredObjective(player, CUSTOM_PO_STYX, game);
     }
 
     private static boolean alreadyHasEntry(List<ScoreBreakdownEntry> entries, EntryType type) {
-        if (entries == null) return false;
         return entries.stream().anyMatch(e -> e.getType() == type);
     }
 
     private static boolean hasShardOfTheThrone(Player player) {
-        if (player == null) return false;
         return player.hasRelic(RELIC_SHARD) || player.hasRelic(RELIC_SHARD_ABSOL);
     }
 
     private static boolean hasCrownOfEmphidia(Player player) {
-        if (player == null) return false;
         return player.hasRelic(RELIC_CROWN) || player.hasRelic(RELIC_CROWN_BALDRICK);
     }
 
     private static boolean hasBookOfLatvinia(Player player) {
-        if (player == null) return false;
         return player.hasRelic(RELIC_LATVINIA) || player.hasRelic(RELIC_LATVINIA_BALDRICK);
     }
 

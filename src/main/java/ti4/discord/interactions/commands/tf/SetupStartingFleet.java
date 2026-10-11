@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -28,8 +29,7 @@ class SetupStartingFleet extends GameStateSubcommand {
                         "Place where you want to add the fleet. E.g. '305' or '305 Moll Primus (Mentak)'")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Player who is being set up")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.factionColor("Player who is being set up"));
     }
 
     @Override

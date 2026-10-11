@@ -2,8 +2,7 @@ package ti4.discord.interactions.commands.combat;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -16,9 +15,7 @@ class StartCombat extends GameStateSubcommand {
 
     public StartCombat() {
         super(Constants.START_COMBAT, "Start a new combat in a given tile.", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to start combat")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.tileName("System/Tile to start combat"));
     }
 
     @Override

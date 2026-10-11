@@ -194,9 +194,7 @@ public class WhiteTfUnitHandler {
     }
 
     public static void resolveMonumentRelicDraw(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (!game.isMonumentsMode()
-                || !game.isTwilightsFallMode()
-                || !MonumentsService.isMonumentOnBoard(game, player, MONUMENT)) {
+        if (!game.isTwilightsFallMode() || !MonumentsService.isMonumentOnBoard(game, player, MONUMENT)) {
             return;
         }
         Tile tile = MonumentsService.getMonumentTile(game, player, MONUMENT);

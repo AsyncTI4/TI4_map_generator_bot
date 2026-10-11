@@ -8,6 +8,10 @@ public class PoweredFrankenDraft extends FrankenDraft {
         super(owner);
     }
 
+    protected PoweredFrankenDraft(Game owner, int picksFromFirstBag, int picksFromNextBags) {
+        super(owner, picksFromFirstBag, picksFromNextBags);
+    }
+
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
         if (isFowExcludedCategory(category)) return 0;
@@ -28,8 +32,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
         if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case ABILITY -> 4;
-            case TECH -> 3;
-            case BLUETILE -> 3;
+            case TECH, BLUETILE -> 3;
             case REDTILE -> 2;
             case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;

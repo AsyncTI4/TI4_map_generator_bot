@@ -1,29 +1,11 @@
 package ti4.discord.interactions.commands.plot;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.AbstractParentCommand;
 import ti4.helpers.Constants;
 
-public class FrankenCommand2 implements ParentCommand {
+public class FrankenCommand2 extends AbstractParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(new PlotAdd(), new PlotRemove())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
-    @Override
-    public String getName() {
-        return Constants.FRANKEN2;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Overflow Franken commands";
-    }
-
-    @Override
-    public Map<String, Subcommand> getSubcommands() {
-        return subcommands;
+    public FrankenCommand2() {
+        super(Constants.FRANKEN2, "Overflow Franken commands", new PlotAdd(), new PlotRemove());
     }
 }

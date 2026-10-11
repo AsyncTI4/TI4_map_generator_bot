@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -18,9 +19,7 @@ class TrapSwap extends GameStateSubcommand {
 
     public TrapSwap() {
         super(Constants.LIZHO_SWAP_TRAP, "Select planets for which to swap traps", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(CommonOptions.planet());
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "Planet2")
                 .setRequired(true)
                 .setAutoComplete(true));

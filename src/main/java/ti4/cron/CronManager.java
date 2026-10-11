@@ -13,6 +13,7 @@ import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CronManager {
@@ -67,6 +68,21 @@ public class CronManager {
 
     public static ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    public static Runnable leased(Runnable work) {
+        return () -> {
+            if (ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) work.run();
+        };
+    }
+
+    public static Runnable leasedAndLogged(Class<?> clazz, Runnable work) {
+        String cronName = clazz.getSimpleName();
+        return leased(() -> {
+            BotLogger.logCron("Running " + cronName + ".");
+            work.run();
+            BotLogger.logCron("Finished " + cronName + ".");
+        });
     }
 
     private static Runnable nonThrowingCronTask(String cronName, Runnable runnable) {

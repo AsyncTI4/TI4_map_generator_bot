@@ -12,13 +12,11 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
@@ -28,7 +26,6 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.ExploreService;
-import ti4.service.planet.PlanetService;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
@@ -131,26 +128,7 @@ public class NatauDoctrineHandler {
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                     + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                    && game.getPhaseOfGame().contains("agenda")) {
-                PlanetService.refreshPlanet(player, planetName);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
-            }
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
-                UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-                tile.getUnitHolders().get(planetName).addUnit(infKey, 1);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "Added 1 infantry to planet because of Master Halbert, the Lanefir Commander.");
-            }
-            if (player.hasTech("dslaner")) {
-                player.setAtsCount(player.getAtsCount() + 1);
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
-            }
+            ExploreService.postPlanetExploreChecks(event, game, player, planetName, player.getCorrectChannel());
         } else {
             int oldTg = player.getTg();
             player.setTg(oldTg + 1);

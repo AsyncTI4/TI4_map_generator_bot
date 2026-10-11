@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,12 +17,7 @@ class Whisper extends GameStateSubcommand {
 
     Whisper() {
         super(Constants.WHISPER, "Send a private message to a player in fog mode", true, true);
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color to which you send the message")
-                .setAutoComplete(true)
-                .setRequired(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color to which you send the message"));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
     }
@@ -37,11 +33,8 @@ class Whisper extends GameStateSubcommand {
             return;
         }
 
-        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (otherPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player otherPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (otherPlayer == null) return;
 
         String msg = event.getOption(Constants.MSG).getAsString();
         String anonY = event.getOption(Constants.ANON, "", OptionMapping::getAsString);

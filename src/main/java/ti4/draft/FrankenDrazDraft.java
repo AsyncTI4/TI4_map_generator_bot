@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -23,11 +22,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.MonumentDraftItem;
-import ti4.draft.items.RedTileDraftItem;
-import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
@@ -39,7 +35,6 @@ import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
-import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyService;
 
 public class FrankenDrazDraft extends FrankenDraft {
@@ -48,20 +43,9 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String DISCORDANT_STARS_FACTION_LIMITS_KEY = "frankenDrazDiscordantStarsFactionLimits";
     public static final String BLUE_REVERIE_FACTION_LIMITS_KEY = "frankenDrazBlueReverieFactionLimits";
     public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
-    private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
-    private static final Set<String> EXCLUDED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "stoneborn",
-            "morpha");
+    private static final List<DraftCategory> MAP_CATEGORIES =
+            List.of(DraftCategory.BLUETILE, DraftCategory.REDTILE, DraftCategory.DRAFTORDER);
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,
@@ -79,7 +63,7 @@ public class FrankenDrazDraft extends FrankenDraft {
             DraftCategory.MONUMENT);
 
     public FrankenDrazDraft(Game owner) {
-        super(owner);
+        super(owner, 2, 1);
     }
 
     @Override
@@ -95,8 +79,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     }
 
     private int getFactionDraftLimit() {
-        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.FACTION);
-        return configuredLimit.isEmpty() ? DEFAULT_FACTION_LIMIT : Integer.parseInt(configuredLimit);
+        return getConfiguredLimit(DraftCategory.FACTION, DEFAULT_FACTION_LIMIT);
     }
 
     @Override
@@ -109,7 +92,7 @@ public class FrankenDrazDraft extends FrankenDraft {
                     case REDTILE -> 2;
                     case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
                     case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
-                    case MONUMENT -> getMonumentKeptLimit();
+                    case MONUMENT -> getConfiguredMonumentLimit();
                     case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
                     case FACTION, UNIT, PLOT, MAHACTKING -> 0;
                 };
@@ -121,25 +104,6 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     public static boolean hasUnlimitedKeptComponents(Game game) {
         return "true".equals(game.getStoredValue(UNLIMITED_KEPT_COMPONENTS_KEY));
-    }
-
-    public static int getDefaultMonumentLimit() {
-        return DEFAULT_MONUMENT_LIMIT;
-    }
-
-    private int getMonumentKeptLimit() {
-        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.MONUMENT);
-        return configuredLimit.isEmpty() ? DEFAULT_MONUMENT_LIMIT : Integer.parseInt(configuredLimit);
-    }
-
-    @Override
-    public int getPicksFromFirstBag() {
-        return 2;
-    }
-
-    @Override
-    public int getPicksFromNextBags() {
-        return 1;
     }
 
     @Override
@@ -177,49 +141,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         List<DraftItem> selectedFactionItems = FactionDraftItem.buildAllItems(selectedFactions);
         Collections.shuffle(selectedFactionItems);
         allDraftableItems.put(DraftCategory.FACTION, selectedFactionItems);
-        allDraftableItems.put(DraftCategory.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
-
-        MiltyDraftManager draftManager = game.getMiltyDraftManager();
-        draftManager.clear();
-        initFrankenDraftTiles(draftManager, game);
-        allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
-        allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
-
-        List<DraftBag> bags = new ArrayList<>();
-        Map<DraftCategory, Integer> missingItems = new HashMap<>();
-        for (int i = 0; i < game.getRealPlayers().size(); i++) {
-            DraftBag bag = new DraftBag();
-
-            for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
-                DraftCategory category = draftableCollection.getKey();
-                int categoryLimit = getItemLimitForCategory(category, game);
-                for (int j = 0; j < categoryLimit; j++) {
-                    if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().removeFirst());
-                    } else {
-                        missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
-                    }
-                }
-            }
-
-            if (!missingItems.isEmpty()) {
-                StringBuilder issue = new StringBuilder(
-                        game.getPing() + " an issue was encountered while building the FrankenDraz draft.");
-                issue.append("\nOne or more bags are missing components.");
-                for (var e : missingItems.entrySet()) {
-                    issue.append("\n> ")
-                            .append(e.getKey().toString())
-                            .append(" is missing ")
-                            .append(e.getValue())
-                            .append(" components.");
-                }
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue.toString());
-                return null;
-            }
-            bags.add(bag);
-        }
-
-        return bags;
+        putSharedDraftableItems(allDraftableItems, game);
+        return fillBags(game, allDraftableItems, "FrankenDraz");
     }
 
     @Override
@@ -233,12 +156,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (Player player : getOwnerPlayers()) {
             DraftBag hand = player.getDraftHand();
             if (hand.getCategoryCount(DraftCategory.FACTION) > 0
-                    || hand.getCategoryCount(DraftCategory.BLUETILE)
-                            != getItemLimitForCategory(DraftCategory.BLUETILE, getOwner())
-                    || hand.getCategoryCount(DraftCategory.REDTILE)
-                            != getItemLimitForCategory(DraftCategory.REDTILE, getOwner())
-                    || hand.getCategoryCount(DraftCategory.DRAFTORDER)
-                            != getItemLimitForCategory(DraftCategory.DRAFTORDER, getOwner())) {
+                    || MAP_CATEGORIES.stream()
+                            .anyMatch(cat -> hand.getCategoryCount(cat) != getItemLimitForCategory(cat, getOwner()))) {
                 return false;
             }
         }
@@ -290,9 +209,8 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @ButtonHandler(value = "frankenFactionComponents", save = false)
     private static void showFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
-        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
-            String faction = buttonID.split(";")[1];
-            FrankenDrazDraft.sendFactionComponentCards(event, player, faction);
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft) {
+            sendFactionComponentCards(event, player, buttonID.split(";")[1]);
         }
     }
 
@@ -302,21 +220,18 @@ public class FrankenDrazDraft extends FrankenDraft {
         if (components.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(), "## " + item.getTitle(player.getGame()) + " Components\nNone.");
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
-            return;
+        } else {
+            List<Color> accents = FrankenDraftBagService.getAccents();
+            MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
+            builder.append("## " + item.getTitle(player.getGame()) + " Components");
+            for (DraftItem component : components) {
+                List<ContainerChildComponent> cardComponents =
+                        new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
+                builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
+                Collections.rotate(accents, -1);
+            }
+            builder.send();
         }
-
-        List<Color> accents = FrankenDraftBagService.getAccents();
-        MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
-        builder.append("## " + item.getTitle(player.getGame()) + " Components");
-        for (DraftItem component : components) {
-            List<ContainerChildComponent> cardComponents =
-                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
-            builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
-            Collections.rotate(accents, -1);
-        }
-        builder.send();
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
     }
@@ -409,9 +324,9 @@ public class FrankenDrazDraft extends FrankenDraft {
     @Override
     public int getBagSize() {
         return getItemLimitForCategory(DraftCategory.FACTION, getOwner())
-                + getItemLimitForCategory(DraftCategory.BLUETILE, getOwner())
-                + getItemLimitForCategory(DraftCategory.REDTILE, getOwner())
-                + getItemLimitForCategory(DraftCategory.DRAFTORDER, getOwner());
+                + MAP_CATEGORIES.stream()
+                        .mapToInt(cat -> getItemLimitForCategory(cat, getOwner()))
+                        .sum();
     }
 
     private List<Player> getOwnerPlayers() {
@@ -554,19 +469,9 @@ public class FrankenDrazDraft extends FrankenDraft {
     }
 
     private static boolean hasExpandedFactionComponents(DraftBag hand) {
-        return hand.getCategoryCount(DraftCategory.HOMESYSTEM) > 0
-                || hand.getCategoryCount(DraftCategory.STARTINGFLEET) > 0
-                || hand.getCategoryCount(DraftCategory.ABILITY) > 0
-                || hand.getCategoryCount(DraftCategory.TECH) > 0
-                || hand.getCategoryCount(DraftCategory.AGENT) > 0
-                || hand.getCategoryCount(DraftCategory.COMMANDER) > 0
-                || hand.getCategoryCount(DraftCategory.HERO) > 0
-                || hand.getCategoryCount(DraftCategory.MECH) > 0
-                || hand.getCategoryCount(DraftCategory.FLAGSHIP) > 0
-                || hand.getCategoryCount(DraftCategory.PN) > 0
-                || hand.getCategoryCount(DraftCategory.STARTINGTECH) > 0
-                || hand.getCategoryCount(DraftCategory.BREAKTHROUGH) > 0
-                || hand.getCategoryCount(DraftCategory.MONUMENT) > 0;
+        return POST_DRAFT_COMPONENT_CATEGORIES.stream()
+                .filter(category -> category != DraftCategory.COMMODITIES)
+                .anyMatch(category -> hand.getCategoryCount(category) > 0);
     }
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
@@ -585,7 +490,6 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);
         }
-        factions.entrySet().removeIf(entry -> EXCLUDED_FACTIONS.contains(entry.getKey()));
         return new ArrayList<>(factions.values());
     }
 }

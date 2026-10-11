@@ -12,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
-import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -310,8 +309,7 @@ public class TransactionHelper {
                 if (item.contains("sending" + sender.getFaction())
                         && item.contains("receiving" + receiver.getFaction())) {
                     String thingToTransact = item.split("_")[2];
-                    String furtherDetail = item.replace(
-                            item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
+                    String furtherDetail = getTransactionItemDetail(item);
                     int amountToTransact = 1;
                     boolean isGeneralized =
                             List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
@@ -538,8 +536,7 @@ public class TransactionHelper {
                 trans.append("> - ");
                 sendingNothing = false;
                 String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.replace(
-                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
+                String furtherDetail = getTransactionItemDetail(item);
                 int amountToTransact = 1;
                 boolean isGeneralized =
                         List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
@@ -1377,40 +1374,6 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
-    // TODO: unused - nothing calls this and no handler routes "transactionModelFinish_".
-    // Left for future reference.
-    private static Modal buildTransactionModel(Player p1, Player p2) {
-        Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
-        List<Player> players = new ArrayList<>();
-        players.add(p1);
-        players.add(p2);
-
-        for (Player player : players) {
-            Player otherPlayer = p1;
-            if (player == otherPlayer) {
-                otherPlayer = p2;
-            }
-            if (player.getTg() > 0) {
-                StringSelectMenu.Builder tgs = StringSelectMenu.create("TGs" + player.getFaction());
-                for (int tg = 1; tg < player.getTg() + 1; tg++) {
-                    tgs.addOption("" + tg, "" + tg);
-                }
-                modal.addComponents(
-                        Label.of("Trade Goods From " + player.getFactionModel().getFactionName(), tgs.build()));
-            }
-            if (player.getCommodities() > 0) {
-                StringSelectMenu.Builder comms = StringSelectMenu.create("Comms" + player.getFaction());
-                for (int comm = 1; comm < player.getCommodities() + 1; comm++) {
-                    comms.addOption("" + comm, "" + comm);
-                }
-                modal.addComponents(
-                        Label.of("Commodities From " + player.getFactionModel().getFactionName(), comms.build()));
-            }
-        }
-
-        return modal.build();
-    }
-
     private static boolean resolveAgeOfCommerceTechCheck(Player owner, Player receiver, String tech, Game game) {
         if (!Mapper.getTech(AliasHandler.resolveTech(tech))
                 .getFaction()
@@ -1466,30 +1429,37 @@ public class TransactionHelper {
     }
 
     @ButtonHandler("offerToTransact_")
+    private static int getWashableCommodities(Player player, Player partner) {
+        return Math.min(player.getCommodities(), partner.getCommodities() + partner.getTg());
+    }
+
+    private static String clearDebtWithPayment(Player p1, Player p2, int payment, String ident, String ident2) {
+        if (p2.getDebtTokenCount(p1.getColor()) <= 0 || p2.hasAbility("data_recovery")) {
+            return "";
+        }
+        int amount = Math.min(payment, p2.getDebtTokenCount(p1.getColor()));
+        p2.clearDebt(p1, amount);
+        return "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token") + " owned by " + ident
+                + ", from their \"Debt Account\" pool.";
+    }
+
+    private static String getTransactionItemDetail(String item) {
+        String[] parts = item.split("_");
+        return item.replace(parts[0] + "_" + parts[1] + "_" + parts[2] + "_", "");
+    }
+
     public static void resolveOfferToTransact(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String item = buttonID.split("_")[1];
-        String sender = buttonID.split("_")[2];
-        String receiver = buttonID.split("_")[3];
-        String extraDetail =
-                buttonID.replace(buttonID.split("_")[0] + "_" + item + "_" + sender + "_" + receiver + "_", "");
+        String[] buttonInfo = buttonID.split("_");
+        String item = buttonInfo[1];
+        String sender = buttonInfo[2];
+        String receiver = buttonInfo[3];
+        String extraDetail = buttonID.replace(buttonInfo[0] + "_" + item + "_" + sender + "_" + receiver + "_", "");
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
         if (p1 == null || p2 == null) return;
         if ("washComms".equalsIgnoreCase(item)) {
-            int oldP1Comms = p1.getCommodities();
-            int newP1Comms = 0;
-            int totalWashPowerP1 = p1.getCommodities() + p1.getTg();
-            int totalWashPowerP2 = p2.getCommodities() + p2.getTg();
-            if (oldP1Comms > totalWashPowerP2) {
-                newP1Comms = oldP1Comms - totalWashPowerP2;
-            }
-            int commsOfP1Washed = oldP1Comms - newP1Comms;
-            int oldP2Comms = p2.getCommodities();
-            int newP2Comms = 0;
-            if (oldP2Comms > totalWashPowerP1) {
-                newP2Comms = oldP2Comms - totalWashPowerP1;
-            }
-            int commsOfP2Washed = oldP2Comms - newP2Comms;
+            int commsOfP1Washed = getWashableCommodities(p1, p2);
+            int commsOfP2Washed = getWashableCommodities(p2, p1);
             int tgP1Sent = commsOfP2Washed - commsOfP1Washed;
             int tgP2Sent = commsOfP1Washed - commsOfP2Washed;
             if (commsOfP1Washed > 0) {
@@ -2000,11 +1970,8 @@ public class TransactionHelper {
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
                 message2 = ident + " sent " + StringHelper.pluralize(tgAmount, "trade good") + " to " + ident2 + ".";
-                if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
-                    int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
-                    p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token")
-                            + " owned by " + ident + ", from their \"Debt Account\" pool.";
+                if (oldWay) {
+                    message2 += clearDebtWithPayment(p1, p2, tgAmount, ident, ident2);
                 }
             }
             case "Comms" -> {
@@ -2012,65 +1979,49 @@ public class TransactionHelper {
                 tgAmount = Math.min(p1.getCommodities(), tgAmount);
                 p1.setCommodities(p1.getCommodities() - tgAmount);
                 if (!p1.isPlayerMemberOfAlliance(p2)) {
-                    int targetTG = p2.getTg();
-                    targetTG += tgAmount;
-                    p2.setTg(targetTG);
+                    p2.setTg(p2.getTg() + tgAmount);
                 } else {
-                    int targetTG = p2.getCommodities();
-                    targetTG += tgAmount;
-                    p2.setCommodities(targetTG);
+                    p2.setCommodities(p2.getCommodities() + tgAmount);
                 }
-                if (Integer.parseInt(amountToTrans) > tgAmount
-                        && p1.getTg() + 1 > Integer.parseInt(amountToTrans) - tgAmount) {
-                    p1.setTg(p1.getTg() - (Integer.parseInt(amountToTrans) - tgAmount));
-                    p2.setTg(p2.getTg() + (Integer.parseInt(amountToTrans) - tgAmount));
+                int shortfall = Integer.parseInt(amountToTrans) - tgAmount;
+                if (shortfall > 0 && p1.getTg() + 1 > shortfall) {
+                    p1.setTg(p1.getTg() - shortfall);
+                    p2.setTg(p2.getTg() + shortfall);
                     MessageHelper.sendMessageToChannel(
                             p1.getCorrectChannel(),
-                            ident + " sent " + (Integer.parseInt(amountToTrans) - tgAmount) + " trade good"
-                                    + ((Integer.parseInt(amountToTrans) - tgAmount) == 1 ? "" : "s") + " to " + ident2
+                            ident + " sent " + StringHelper.pluralize(shortfall, "trade good") + " to " + ident2
                                     + " because they didn't have enough commodities to cover the full amount.");
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " commodit" + (tgAmount == 1 ? "y" : "ies") + " to " + ident2
                         + ".";
-                if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
-                    int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
-                    p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token")
-                            + " owned by " + ident + ", from their \"Debt Account\" pool.";
+                if (oldWay) {
+                    message2 += clearDebtWithPayment(p1, p2, tgAmount, ident, ident2);
                 }
             }
             case "WashComms" -> {
                 int oldP1Tg = p1.getTg();
                 int oldP2tg = p2.getTg();
                 int oldP1Comms = p1.getCommodities();
-                int newP1Comms = 0;
-                int totalWashPowerP1 = p1.getCommodities() + p1.getTg();
-                int totalWashPowerP2 = p2.getCommodities() + p2.getTg();
-                if (oldP1Comms > totalWashPowerP2) {
-                    newP1Comms = oldP1Comms - totalWashPowerP2;
-                }
                 int oldP2Comms = p2.getCommodities();
-                int newP2Comms = 0;
-                if (oldP2Comms > totalWashPowerP1) {
-                    newP2Comms = oldP2Comms - totalWashPowerP1;
-                }
-                p1.setCommodities(newP1Comms);
-                p2.setCommodities(newP2Comms);
-                p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
-                p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
+                int deltaP1 = getWashableCommodities(p1, p2);
+                int deltaP2 = getWashableCommodities(p2, p1);
+                p1.setCommodities(oldP1Comms - deltaP1);
+                p2.setCommodities(oldP2Comms - deltaP2);
+                p1.setTg(p1.getTg() + deltaP1);
+                p2.setTg(p2.getTg() + deltaP2);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 String id1 = p1.getFactionEmojiOrColor();
                 String id2 = p2.getFactionEmojiOrColor();
-                int deltaP1 = oldP1Comms - newP1Comms;
-                int deltaP2 = oldP2Comms - newP2Comms;
-                message2 = ident + " washed their " + StringHelper.pluralize(deltaP1, "commodit") + " with " + id2
-                        + "; "
-                        + id1 + " trade goods went from " + oldP1Tg + " to " + p1.getTg() + ".\n"
-                        + ident2 + " washed their " + StringHelper.pluralize(deltaP2, "commodit") + " with " + id1
-                        + "; "
-                        + id2 + " trade goods went from " + oldP2tg + " to " + p2.getTg() + ".";
+                message2 =
+                        ident + " washed their " + deltaP1 + " commodit" + (deltaP1 == 1 ? "y" : "ies") + " with " + id2
+                                + "; "
+                                + id1 + " trade goods went from " + oldP1Tg + " to " + p1.getTg() + ".\n"
+                                + ident2 + " washed their " + deltaP2 + " commodit" + (deltaP2 == 1 ? "y" : "ies")
+                                + " with " + id1
+                                + "; "
+                                + id2 + " trade goods went from " + oldP2tg + " to " + p2.getTg() + ".";
             }
             case "shipOrders", "starCharts" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;

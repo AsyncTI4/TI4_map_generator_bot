@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -24,9 +25,7 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Technology Name").setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        addOptions(CommonOptions.factionColorForStats());
     }
 
     public void execute(SlashCommandInteractionEvent event) {

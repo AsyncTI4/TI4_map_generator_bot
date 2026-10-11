@@ -93,16 +93,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 && text != null;
     }
 
-    /**
-     * @return the first techType in the list of techTypes - this will be broken for techs with multiple types
-     * @deprecated Added to handle the switch from [TechnologyType type] -> [List(TechnologyType)] types. Use helpers isPropulsionTech, isCyberneticTech, isBioticTech, isWarfareTech, and isUnitUpgrade instead
-     */
-    @Deprecated
-    @JsonIgnore
-    public TechnologyType getType() {
-        return types.getFirst();
-    }
-
     @JsonIgnore
     public TechnologyType getFirstType() {
         return types.getFirst();
@@ -160,10 +150,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return isWarfareTech() && isBioticTech();
     }
 
-    public boolean hasMoreThanOneType() {
-        return types.size() > 1;
-    }
-
     public boolean isFactionTech() {
         return getFaction().isPresent();
     }
@@ -184,7 +170,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 return "warfarebiotic";
             }
         }
-        return getType().toString();
+        return getFirstType().toString();
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = TechnologyModel::sortTechsByRequirements;
@@ -205,14 +191,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return -1;
     }
 
-    public static int sortFactionTechsLast(TechnologyModel t1, TechnologyModel t2) {
-        return sortFactionTechsFirst(t1, t2) * -1;
-    }
-
     public static final Comparator<TechnologyModel> sortByType = TechnologyModel::sortByType;
 
     private static int sortByType(TechnologyModel t1, TechnologyModel t2) {
-        return t1.getType().compareTo(t2.getType());
+        return t1.getFirstType().compareTo(t2.getFirstType());
     }
 
     public Optional<String> getBaseUpgrade() {
@@ -257,7 +239,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getRepresentation(boolean includeCardText) {
         String techName = name;
-        TechnologyType techType = getType();
+        TechnologyType techType = getFirstType();
         String techFaction = getFaction().orElse("");
         String factionEmoji = "";
         if (!techFaction.isBlank())
@@ -306,8 +288,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+        if (includeID) footer.append(idFooter(alias));
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -331,7 +312,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     private Color getEmbedColor() {
-        return switch (getType()) {
+        return switch (getFirstType()) {
             case PROPULSION -> Color.blue; // Color.decode("#00FF00");
             case CYBERNETIC -> Color.yellow;
             case BIOTIC -> Color.green;
@@ -342,7 +323,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public TI4Emoji getSingleTechEmoji() {
-        return TechEmojis.getBasicTechEmoji(getType().toString());
+        return TechEmojis.getBasicTechEmoji(getFirstType().toString());
     }
 
     public String getCondensedReqsEmojis(boolean single) {

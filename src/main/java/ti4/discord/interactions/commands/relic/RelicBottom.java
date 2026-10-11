@@ -15,6 +15,7 @@ class RelicBottom extends GameStateSubcommand {
 
     RelicBottom() {
         super("put_on_bottom", "Put a specific relic on the bottom", true, false);
+        markSuspicious();
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to bottom")
                 .setAutoComplete(true)
                 .setRequired(true));
@@ -37,10 +38,5 @@ class RelicBottom extends GameStateSubcommand {
 
         MessageHelper.sendMessageToChannelWithEmbed(
                 event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

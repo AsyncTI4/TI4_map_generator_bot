@@ -15,7 +15,6 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class EndOldGamesCron {
@@ -24,22 +23,19 @@ public class EndOldGamesCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                EndOldGamesCron.class, EndOldGamesCron::endOldGames, 2, 0, ZoneId.of("America/New_York"));
+                EndOldGamesCron.class,
+                CronManager.leasedAndLogged(EndOldGamesCron.class, EndOldGamesCron::endOldGames),
+                2,
+                0,
+                ZoneId.of("America/New_York"));
     }
 
     private static void endOldGames() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running EndOldGamesCron.");
-        try {
-            List<String> gameNames = GameManager.getManagedGames().stream()
-                    .filter(not(ManagedGame::isHasEnded))
-                    .map(ManagedGame::getName)
-                    .toList();
-            ConsumeGameUtility.consumeGames(gameNames, EndOldGamesCron::endIfOld, ExecutionLockType.WRITE);
-        } catch (Exception e) {
-            BotLogger.error("**Error ending inactive games!**", e);
-        }
-        BotLogger.logCron("Finished EndOldGamesCron.");
+        List<String> gameNames = GameManager.getManagedGames().stream()
+                .filter(not(ManagedGame::isHasEnded))
+                .map(ManagedGame::getName)
+                .toList();
+        ConsumeGameUtility.consumeGames(gameNames, EndOldGamesCron::endIfOld, ExecutionLockType.WRITE);
     }
 
     private static void endIfOld(Game game) {

@@ -10,21 +10,19 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.TechSummariesMetadataManager;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class TechSummaryCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                TechSummaryCron.class, TechSummaryCron::postTechSummaries, 5, 10, TimeUnit.MINUTES);
-    }
-
-    private static void postTechSummaries() {
-        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
-        BotLogger.logCron("Running TechSummaryCron.");
-        TechSummariesMetadataManager.consumeAndPersist(TechSummaryCron::postTechSummaries);
-        BotLogger.logCron("Finished TechSummaryCron.");
+                TechSummaryCron.class,
+                CronManager.leasedAndLogged(
+                        TechSummaryCron.class,
+                        () -> TechSummariesMetadataManager.consumeAndPersist(TechSummaryCron::postTechSummaries)),
+                5,
+                10,
+                TimeUnit.MINUTES);
     }
 
     private static void postTechSummaries(TechSummariesMetadataManager.TechSummaries techSummaries) {

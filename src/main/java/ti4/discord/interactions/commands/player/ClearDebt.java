@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,16 +17,11 @@ class ClearDebt extends GameStateSubcommand {
 
     ClearDebt() {
         super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction", true, true);
+        markSuspicious();
         addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear")
                 .setRequired(true));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color having their debt cleared ")
-                .setAutoComplete(true)
-                .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color clearing the debt")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color having their debt cleared "));
+        addOptions(CommonOptions.factionColor("Faction or Color clearing the debt"));
         addOptions(new OptionData(OptionType.STRING, Constants.DEBT_POOL, "Which debt pool to send to")
                 .setAutoComplete(true));
     }
@@ -40,11 +36,8 @@ class ClearDebt extends GameStateSubcommand {
 
         Game game = getGame();
         Player clearingPlayer = getPlayer();
-        Player clearedPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (clearedPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player clearedPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (clearedPlayer == null) return;
         String pool = event.getOption(Constants.DEBT_POOL, Constants.DEBT_DEFAULT_POOL, OptionMapping::getAsString);
 
         if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor(), pool)) {
@@ -58,10 +51,5 @@ class ClearDebt extends GameStateSubcommand {
                 clearingPlayer.getRepresentation() + " cleared "
                         + StringHelper.pluralize(debtCountToClear, "debt token") + " owned by "
                         + clearedPlayer.getRepresentation() + ", from their \"" + pool + "\" pool.");
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Data;
-import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import software.amazon.awssdk.utils.StringUtils;
@@ -15,11 +14,8 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data
-public class EventModel implements ModelInterface, EmbeddableModel {
-    @Getter
+public class EventModel implements ModelInterface, SearchTaggedModel {
     private String alias;
-
-    @Getter
     private String name;
 
     private String category;
@@ -126,14 +122,8 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
         eb.setColor(Color.black);
         eb.addField(StringUtils.capitalize(getCategoryDescription()) + " " + getType(), getText(), false);
-        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
+        if (includeID) eb.setFooter(compactIdFooter(alias));
         return eb.build();
-    }
-
-    public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {

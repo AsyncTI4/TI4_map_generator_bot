@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -15,37 +16,21 @@ import ti4.service.unit.RemoveUnitService;
 public class RemoveUnits extends GameStateCommand {
 
     public RemoveUnits() {
-        super(true, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.REMOVE_UNITS;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Remove units from map";
+        super(Constants.REMOVE_UNITS, "Remove units from map", true, true);
     }
 
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
+                CommonOptions.tileName(),
                 new OptionData(
                                 OptionType.STRING,
                                 Constants.UNIT_NAMES,
                                 "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
                         .setRequired(true),
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                        .setAutoComplete(true),
+                CommonOptions.factionColor("Faction or Color for unit"),
                 new OptionData(OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Priority for not damaged units."),
-                new OptionData(
-                        OptionType.BOOLEAN,
-                        Constants.NO_MAPGEN,
-                        "'True' to not generate a map update with this command"));
+                CommonOptions.noMapGen());
     }
 
     @Override

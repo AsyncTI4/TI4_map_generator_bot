@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import ti4.game.Game;
+import ti4.game.helper.CardIdHelper;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
@@ -99,8 +100,7 @@ public record Objective(
                 .collect(Collectors.toMap(
                         key -> key,
                         name -> {
-                            name = name.replace("extra1", "");
-                            name = name.replace("extra2", "");
+                            name = CardIdHelper.stripExtra(name);
                             String nameOfPO =
                                     Mapper.getSecretObjectivesJustNames().get(name);
                             return nameOfPO != null ? nameOfPO : name;

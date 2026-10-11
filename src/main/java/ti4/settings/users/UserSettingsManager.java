@@ -18,28 +18,25 @@ public class UserSettingsManager {
     private static final String USER_SETTINGS_PATH = Storage.getStoragePath() + File.separator + "user_settings";
 
     public static UserSettings get(String userId) {
-        var userSettings = readFile(userId);
-        if (userSettings == null) {
-            userSettings = new UserSettings(userId);
-        }
-        return userSettings;
+        return Objects.requireNonNullElseGet(readFile(userId), () -> new UserSettings(userId));
     }
 
     public static void save(UserSettings userSettings) {
-        persistFile(userSettings);
+        try {
+            UserSettingsFileLockManager.wrapWithWriteLock(
+                    userSettings.getUserId(), () -> writeFileWithoutLock(userSettings));
+        } catch (UncheckedIOException e) {
+            BotLogger.error("Failed to write json data for UserSettingsManager.", e);
+        }
     }
 
     static void addActiveHourCheckins(String userId, int[] checkinsByUtcHour) {
         try {
             UserSettingsFileLockManager.wrapWithWriteLock(userId, () -> {
-                try {
-                    UserSettings userSettings =
-                            Objects.requireNonNullElseGet(readFileWithoutLock(userId), () -> new UserSettings(userId));
-                    userSettings.addActiveHourCheckins(checkinsByUtcHour);
-                    writeFileWithoutLock(userSettings);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                UserSettings userSettings =
+                        Objects.requireNonNullElseGet(readFileWithoutLock(userId), () -> new UserSettings(userId));
+                userSettings.addActiveHourCheckins(checkinsByUtcHour);
+                writeFileWithoutLock(userSettings);
             });
         } catch (RuntimeException e) {
             BotLogger.error("Failed to record active hours for user " + userId + ".", e);
@@ -47,40 +44,20 @@ public class UserSettingsManager {
     }
 
     private static UserSettings readFile(String userId) {
-        try {
-            return UserSettingsFileLockManager.wrapWithReadLock(userId, () -> {
-                try {
-                    return readFileWithoutLock(userId);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            BotLogger.error("Failed to read json data for UserSettingsManager.", e);
-            return null;
-        }
+        return UserSettingsFileLockManager.wrapWithReadLock(userId, () -> readFileWithoutLock(userId));
     }
 
-    private static void persistFile(UserSettings userSettings) {
-        try {
-            UserSettingsFileLockManager.wrapWithWriteLock(userSettings.getUserId(), () -> {
-                try {
-                    writeFileWithoutLock(userSettings);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            BotLogger.error("Failed to write json data for UserSettingsManager.", e);
-        }
-    }
-
-    private static UserSettings readFileWithoutLock(String userId) throws IOException {
+    private static UserSettings readFileWithoutLock(String userId) {
         return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
     }
 
-    private static void writeFileWithoutLock(UserSettings userSettings) throws IOException {
-        PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+    private static void writeFileWithoutLock(UserSettings userSettings) {
+        try {
+            PersistenceManager.writeObjectToJsonFile(
+                    USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public static List<UserSettings> getAllUserSettings() {

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.CommonOptions;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,14 +21,8 @@ class SendDebt extends GameStateSubcommand {
         super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction", true, true);
         addOptions(
                 new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
-        addOptions(new OptionData(
-                        OptionType.STRING,
-                        Constants.TARGET_FACTION_OR_COLOR,
-                        "Faction or Color receiving the debt token")
-                .setAutoComplete(true)
-                .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color sending the debt token")
-                .setAutoComplete(true));
+        addOptions(CommonOptions.targetFactionOrColor("Faction or Color receiving the debt token"));
+        addOptions(CommonOptions.factionColor("Faction or Color sending the debt token"));
         addOptions(new OptionData(OptionType.STRING, Constants.DEBT_POOL, "Which debt pool to send to")
                 .setAutoComplete(true));
     }
@@ -42,11 +37,8 @@ class SendDebt extends GameStateSubcommand {
 
         Game game = getGame();
         Player sendingPlayer = getPlayer();
-        Player receivingPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
-        if (receivingPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
-        }
+        Player receivingPlayer = CommandHelper.getOtherPlayerOrReply(game, event);
+        if (receivingPlayer == null) return;
         String pool = event.getOption(Constants.DEBT_POOL, Constants.DEBT_DEFAULT_POOL, OptionMapping::getAsString);
         SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend, pool);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");

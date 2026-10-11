@@ -1,16 +1,12 @@
 package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.helpers.Helper;
-import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
@@ -57,35 +53,17 @@ public class StartingFleetDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.STARTINGFLEET);
-        return allItems;
+        return draftable(DraftCategory.STARTINGFLEET, buildAllItems(factions));
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (FactionModel faction : factions) {
-            allItems.add(generate(DraftCategory.STARTINGFLEET, faction.getAlias()));
-        }
-        return allItems;
+        return generateAll(DraftCategory.STARTINGFLEET, factions.stream().map(FactionModel::getAlias));
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(
-                allItems, DraftCategory.STARTINGFLEET, game.isTwilightsFallMode());
-        return allItems;
-    }
-
-    private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFleets"));
-        for (FactionModel faction : factions) {
-            if (Arrays.asList(results).contains(faction.getAlias())) {
-                continue;
-            }
-            allItems.add(generate(DraftCategory.STARTINGFLEET, faction.getAlias()));
-        }
-        return allItems;
+        return draftable(
+                DraftCategory.STARTINGFLEET,
+                withoutBanned(buildAllItems(factions), game, "bannedFleets"),
+                game.isTwilightsFallMode());
     }
 }

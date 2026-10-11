@@ -2,7 +2,6 @@ package ti4.draft.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,9 +12,7 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.UnitModel;
@@ -254,9 +251,8 @@ public class FactionDraftItem extends DraftItem {
         };
     }
 
-    public static boolean storedListContains(Game game, String key, String value) {
-        return Arrays.asList(PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue(key)))
-                .contains(value);
+    private static boolean storedListContains(Game game, String key, String value) {
+        return getStoredList(game, key).contains(value);
     }
 
     @JsonIgnore
@@ -265,16 +261,10 @@ public class FactionDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.FACTION);
-        return allItems;
+        return draftable(DraftCategory.FACTION, buildAllItems(factions));
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (FactionModel faction : factions) {
-            allItems.add(generate(DraftCategory.FACTION, faction.getAlias()));
-        }
-        return allItems;
+        return generateAll(DraftCategory.FACTION, factions.stream().map(FactionModel::getAlias));
     }
 }

@@ -2,6 +2,7 @@ package ti4.discord.interactions.commands.draft.manage;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -28,11 +29,9 @@ class DraftManagerSendCustomOrchestratorCommand extends GameStateSubcommand {
         DraftManager draftManager = game.getDraftManager();
         String playerUserId = event.getOption(Constants.PLAYER).getAsUser().getId();
         String commandKey = event.getOption(Constants.DRAFT_COMMAND_OPTION).getAsString();
-        DraftOrchestrator orchestrator = draftManager.getOrchestrator();
-        if (orchestrator == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No orchestrator in the draft manager");
-            return;
-        }
+        DraftOrchestrator orchestrator = CommandHelper.requireOrReport(
+                event, draftManager.getOrchestrator(), "No orchestrator in the draft manager");
+        if (orchestrator == null) return;
         try {
             String outcome = draftManager.routeCommand(
                     event,
