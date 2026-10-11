@@ -32,6 +32,37 @@ class TacticalPlannerTest extends BaseTi4Test {
         neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
     }
 
+    // A carrier already sits in the system with its infantry aboard: activating that system lands them without
+    // moving anything in.
+    @Test
+    void landsGroundForcesAlreadyInTheSystem() {
+        Tile lodor = test.place("26", neighbour);
+        test.units(lodor, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(lodor, "space", test.nekro, UnitType.Infantry, 1);
+
+        TacticalPlan plan =
+                TacticalPlanner.forTarget(test.game, test.nekro, neighbour).orElseThrow();
+
+        assertThat(plan.kind()).isEqualTo(Kind.EXPAND);
+        assertThat(plan.moves()).isEmpty();
+        assertThat(plan.landings()).containsEntry("lodor", 1);
+    }
+
+    // The same carrier under Nekro's own token: only freeing that token makes the landing possible.
+    @Test
+    void landsInPlaceOnlyOnceTheSystemIsFreed() {
+        Tile lodor = test.place("26", neighbour);
+        test.units(lodor, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(lodor, "space", test.nekro, UnitType.Infantry, 1);
+        lodor.addCC(Mapper.getCCID(test.nekro.getColor()));
+
+        assertThat(TacticalPlanner.ranked(test.game, test.nekro))
+                .noneMatch(plan -> plan.target().equals(neighbour));
+        assertThat(TacticalPlanner.rankedFreeing(test.game, test.nekro, neighbour))
+                .anyMatch(plan ->
+                        plan.target().equals(neighbour) && plan.landings().containsKey("lodor"));
+    }
+
     // The classic opening: a carrier takes one infantry to an empty neighbouring planet, leaving one infantry
     // and the dreadnought at home.
     @Test

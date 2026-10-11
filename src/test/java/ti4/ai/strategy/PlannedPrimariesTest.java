@@ -86,6 +86,32 @@ class PlannedPrimariesTest extends BaseTi4Test {
                 .orElseThrow();
     }
 
+    // The token on the neighbouring system holds a loaded carrier above a free planet. Taking it back lets the
+    // carrier's infantry land there, which beats taking back the token on an empty home.
+    @Test
+    void takesBackTheTokenThatLetsStrandedInfantryLand() {
+        test.game.setStrategyCardSet("pok");
+        String ccId = Mapper.getCCID(test.nekro.getColor());
+        home.addCC(ccId);
+        Tile lodor = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(lodor, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(lodor, "space", test.nekro, UnitType.Infantry, 2);
+        lodor.addCC(ccId);
+        changed();
+        AiPrompt card = prompt("warfare", PromptSource.PUBLIC, NOW, "sc_no_follow_6", "primaryOfWarfare");
+        play(card, 6);
+        resolve(card);
+
+        AiPrompt removals = prompt(
+                "removals",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_removeCCFromBoard_warfare_" + AiTestGame.HOME,
+                "FFCC_nekro_removeCCFromBoard_warfare_" + lodor.getPosition());
+
+        assertThat(resolve(card, removals)).isEqualTo("FFCC_nekro_removeCCFromBoard_warfare_" + lodor.getPosition());
+    }
+
     // A fleet next to home: Diplomacy first locks the home system, then readies planets as before.
     @Test
     void locksTheThreatenedSystemWithDiplomacy() {

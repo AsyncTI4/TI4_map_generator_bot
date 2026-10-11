@@ -187,7 +187,7 @@ public class TacticalPlanner {
                 .sorted(Comparator.comparingDouble(BoardView::planetValue).reversed())
                 .toList();
         if (free.isEmpty()) return Optional.empty();
-        TacticalPlan best = null;
+        TacticalPlan best = landInPlace(context, tile, free).orElse(null);
         for (Tile origin : context.origins()) {
             if (origin == tile) continue;
             Optional<TacticalPlan> plan = expandFrom(context, tile, origin, free);
@@ -195,6 +195,42 @@ public class TacticalPlanner {
         }
         if (best == null || context.coveredByEnemySpaceCannon(tile)) return Optional.empty();
         return Optional.of(best);
+    }
+
+    private static Optional<TacticalPlan> landInPlace(Context context, Tile tile, List<Planet> free) {
+        Player seat = context.seat;
+        UnitHolder space = BoardView.space(tile);
+        List<UnitMove> groundForces = new ArrayList<>();
+        addMove(
+                groundForces,
+                tile.getPosition(),
+                BoardView.SPACE,
+                UnitType.Infantry,
+                BoardView.count(space, seat, UnitType.Infantry));
+        addMove(
+                groundForces,
+                tile.getPosition(),
+                BoardView.SPACE,
+                UnitType.Mech,
+                BoardView.count(space, seat, UnitType.Mech));
+        int landed = Math.min(unitCount(groundForces), free.size());
+        if (landed == 0) return Optional.empty();
+        List<Planet> targets = free.subList(0, landed);
+        List<UnitMove> landing = take(mechsFirstForHazardousPlanets(groundForces, targets), landed);
+        Map<Planet, int[]> forces =
+                distribute(targets, countOf(landing, UnitType.Infantry), countOf(landing, UnitType.Mech));
+        Map<String, Integer> landings = new LinkedHashMap<>();
+        double value = 0;
+        for (Planet planet : targets) {
+            int[] split = forces.get(planet);
+            landings.put(planet.getName(), split[INFANTRY] + split[MECH]);
+            value += BoardView.planetValue(planet)
+                    + planetTempo(context.game)
+                    + context.exploreValue(tile, planet, split[INFANTRY], split[MECH]);
+            if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+        }
+        value += context.objectiveGain(tile, List.of(), landings.keySet());
+        return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), List.of(), landings, value));
     }
 
     private static Optional<TacticalPlan> expandFrom(Context context, Tile tile, Tile origin, List<Planet> free) {

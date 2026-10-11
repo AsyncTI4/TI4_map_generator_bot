@@ -6,6 +6,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
 
+// TODO: WIP, needs a redesign. Election odds are guessed from total influence (votes are unknown in the action
+// phase), and only three agenda groups from AgendaPolicy are judged; everything else stays on top.
 @UtilityClass
 public class AgendaPeek {
 
