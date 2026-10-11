@@ -40,7 +40,9 @@ class DiplomacyUses {
 
     static boolean isLockable(Game game, Player seat, String position) {
         Tile tile = game.getTileByPosition(position);
-        return tile != null && tile != game.getMecatolTile() && lockableTiles(game, seat).contains(tile);
+        return tile != null
+                && tile != game.getMecatolTile()
+                && lockableTiles(game, seat).contains(tile);
     }
 
     private static Set<Tile> lockableTiles(Game game, Player seat) {

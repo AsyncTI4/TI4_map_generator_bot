@@ -54,8 +54,8 @@ class ImperialUses {
         if (mecatol.isEmpty()) return false;
         return takesCustodiansThisRound(in.game(), in.seat())
                 || in.ranked().stream()
-                        .filter(plan -> plan.kind() == TacticalPlan.Kind.EXPAND
-                                || plan.kind() == TacticalPlan.Kind.ATTACK)
+                        .filter(plan ->
+                                plan.kind() == TacticalPlan.Kind.EXPAND || plan.kind() == TacticalPlan.Kind.ATTACK)
                         .anyMatch(plan -> plan.target().equals(mecatol));
     }
 

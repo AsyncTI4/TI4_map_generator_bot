@@ -11,8 +11,10 @@ class LeadershipUses {
 
     static List<Benefit> benefits(PlanInputs in, int initiative) {
         return List.of(
-                new Benefit(CardUse.LEADERSHIP_TOKENS, TokenValue.tacticTokens(in, StrategyCardRules.LEADERSHIP_TOKENS)),
-                new Benefit(CardUse.LEADERSHIP_TEMPO, racesForCustodians(in) ? CardValueScale.CUSTODIANS_RACE_TEMPO : 0));
+                new Benefit(
+                        CardUse.LEADERSHIP_TOKENS, TokenValue.tacticTokens(in, StrategyCardRules.LEADERSHIP_TOKENS)),
+                new Benefit(
+                        CardUse.LEADERSHIP_TEMPO, racesForCustodians(in) ? CardValueScale.CUSTODIANS_RACE_TEMPO : 0));
     }
 
     private static boolean racesForCustodians(PlanInputs in) {

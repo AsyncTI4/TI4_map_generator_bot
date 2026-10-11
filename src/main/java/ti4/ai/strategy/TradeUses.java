@@ -23,14 +23,11 @@ class TradeUses {
                 new Benefit(CardUse.TRADE_COMMODITIES, replenished * CardValueScale.COMMODITY),
                 new Benefit(
                         CardUse.TRADE_SPEND_OBJECTIVE,
-                        Math.max(0, unlockedPoints)
-                                * CardValueScale.SPEND_UNLOCK_SHARE
-                                * CardValueScale.VICTORY_POINT),
+                        Math.max(0, unlockedPoints) * CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT),
                 new Benefit(CardUse.TRADE_LEVERAGE, hasTradePartner(game, seat) ? CardValueScale.TRADE_LEVERAGE : 0));
     }
 
     private static boolean hasTradePartner(Game game, Player seat) {
-        return AiSettings.isTradingEnabled()
-                && game.getRealPlayers().stream().anyMatch(other -> other != seat);
+        return AiSettings.isTradingEnabled() && game.getRealPlayers().stream().anyMatch(other -> other != seat);
     }
 }

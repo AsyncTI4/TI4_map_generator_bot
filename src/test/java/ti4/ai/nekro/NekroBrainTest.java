@@ -59,15 +59,32 @@ class NekroBrainTest extends BaseTi4Test {
 
     // ---- strategy phase ---------------------------------------------------------------------
 
+    // Construction is only worth two PDS on this empty board, but the 3 trade goods on it lift it above every other
+    // card. Nekro's commodities are already full, so Trade is worth no more than its own 3 trade goods.
     @Test
     void picksTheHighestValueStrategyCardIncludingTradeGoods() {
         becomeActive("strategy");
+        nekro.setCommodities(nekro.getCommoditiesTotal());
         game.setScTradeGood(4, 3);
         AiPrompt picks = publicPrompt("picks", NOW, scPickButtons());
 
         AiDecision decision = decide(picks);
 
         assertPressed(decision, "FFCC_nekro_scPick_4");
+    }
+
+    // The pick explains itself with the plan behind it, and remembers that plan for the action phase.
+    @Test
+    void explainsAndRemembersThePlanBehindAPick() {
+        becomeActive("strategy");
+        nekro.setCommodities(nekro.getCommoditiesTotal());
+        game.setScTradeGood(4, 3);
+        AiPrompt picks = publicPrompt("picks", NOW, scPickButtons());
+
+        AiDecision decision = decide(picks);
+
+        assertThat(((AiDecision.Press) decision).reason()).startsWith("pick Construction: ");
+        assertThat(memory.get("scPlan|1|4")).isPresent();
     }
 
     @Test

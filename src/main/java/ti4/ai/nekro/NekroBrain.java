@@ -33,9 +33,11 @@ import ti4.ai.secrets.ActionSecretRules;
 import ti4.ai.secrets.SecretCostRules;
 import ti4.ai.secrets.SecretRules;
 import ti4.ai.secrets.SecretValue;
+import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.ChecksAndBalances;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
+import ti4.ai.strategy.StrategyCardTurn;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.IntegratedEconomyRules;
 import ti4.ai.tactical.SingularityRules;
@@ -87,6 +89,7 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules.GREYFIRE_TARGET,
             TIED_PLANETS,
             "sendTGTo_",
+            "deleteButtons_construction",
             "integratedBuild_",
             "resolveVolatile",
             "resolveExpedition",
@@ -137,6 +140,7 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::placeStructure,
             StrategyCardRules::readyPlanets,
             StrategyCardRules::buildWithWarfare,
+            StrategyCardRules::buildWithConstruction,
             NekroLeaderRules::chooseAgentTarget,
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
@@ -357,8 +361,13 @@ public class NekroBrain implements FactionBrain {
                             prompt, plan.get().card(), plan.get().reason()));
                 }
             }
-            Optional<PromptButton> best = StrategyCardRanking.best(context.game(), context.seat(), picks);
-            if (best.isPresent()) return Optional.of(AiDecision.press(prompt, best.get(), "pick a strategy card"));
+            Optional<StrategyCardRanking.Pick> best =
+                    StrategyCardRanking.bestPick(context.game(), context.seat(), picks);
+            if (best.isPresent()) {
+                CardPlanMemory.write(context, best.get().plan());
+                return Optional.of(AiDecision.press(
+                        prompt, best.get().button(), "pick " + best.get().plan().describe()));
+            }
         }
         return Optional.empty();
     }
@@ -405,6 +414,8 @@ public class NekroBrain implements FactionBrain {
         if (sling.isPresent()) return sling;
         Optional<AiDecision> relicAction = RelicActionRules.insteadOfTacticalAction(context, thisTurn);
         if (relicAction.isPresent()) return relicAction;
+        Optional<AiDecision> planned = StrategyCardTurn.playIfDue(context, thisTurn);
+        if (planned.isPresent()) return planned;
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {
@@ -451,6 +462,7 @@ public class NekroBrain implements FactionBrain {
     }
 
     private static boolean worthPlayingNow(AiTurnContext context, int initiative) {
+        if (StrategyCardTurn.dueNow(context, initiative)) return true;
         return StrategyCard.of(context.game(), initiative) == StrategyCard.IMPERIAL
                 && StrategyCardRanking.imperialScoresNow(context.game(), context.seat());
     }

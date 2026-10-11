@@ -31,10 +31,7 @@ public class StrategyCardRanking {
                 offered.stream().map(StrategyCardRanking::initiative).toList(),
                 PlanMoment.PICK);
         return java.util.stream.IntStream.range(0, offered.size())
-                .mapToObj(index -> new Pick(
-                        offered.get(index),
-                        plans.get(index),
-                        value(game, seat, plans.get(index))))
+                .mapToObj(index -> new Pick(offered.get(index), plans.get(index), value(game, seat, plans.get(index))))
                 .max(Comparator.comparingDouble(Pick::value)
                         .thenComparing(pick -> pick.plan().initiative(), Comparator.reverseOrder()));
     }

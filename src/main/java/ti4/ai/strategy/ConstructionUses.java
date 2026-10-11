@@ -62,7 +62,8 @@ class ConstructionUses {
 
     static List<TacticalPlan> movingOutOf(List<TacticalPlan> ranked, String position) {
         return ranked.stream()
-                .filter(plan -> plan.moves().stream().anyMatch(move -> move.origin().equals(position)))
+                .filter(plan ->
+                        plan.moves().stream().anyMatch(move -> move.origin().equals(position)))
                 .toList();
     }
 
@@ -95,14 +96,18 @@ class ConstructionUses {
                 ? CardValueScale.DOCK_EARLY
                 : CardValueScale.DOCK_LATE;
         String planet = StructurePolicy.planetFor(
-                        in.game(), in.seat(), StructurePolicy.SPACE_DOCK, in.seat().getPlanets())
+                        in.game(),
+                        in.seat(),
+                        StructurePolicy.SPACE_DOCK,
+                        in.seat().getPlanets())
                 .orElse("");
         return Optional.of(new Benefit(CardUse.CONSTRUCTION_DOCK, dock, planet));
     }
 
     private static Benefit objective() {
         return new Benefit(
-                CardUse.CONSTRUCTION_OBJECTIVE, CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT);
+                CardUse.CONSTRUCTION_OBJECTIVE,
+                CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT);
     }
 
     private static Optional<String> threatenedSeatTile(PlanInputs in) {

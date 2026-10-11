@@ -158,8 +158,9 @@ public class TacticalRules {
         List<AiPrompt> turn = Prompts.thisTurn(context);
         List<AiPrompt> pickers = pickers(context, turn);
         Optional<AiPrompt> picker = pickers.stream().findFirst();
+        List<SetupHint> hints = setupHints(context);
         Optional<TacticalPlan> plan = rememberedPlan(context).or(() -> {
-            Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat());
+            Optional<TacticalPlan> computed = TacticalPlanner.best(context.game(), context.seat(), hints);
             computed.ifPresent(found -> context.memory().put(PLAN_KEY + actionKey(context), found.encode()));
             return computed;
         });
@@ -169,7 +170,13 @@ public class TacticalRules {
         if (picker.isPresent()) return Optional.of(pickSystem(context, pickers, plan.get()));
         return Prompts.owned(turn, context.faction(), TACTICAL_ACTION::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()))
-                .map(match -> match.press("start a tactical action: " + describe(plan.get())));
+                .map(match -> match.press("start a tactical action: " + describe(plan.get())
+                        + (SetupHint.bonusFor(hints, plan.get()) > 0 ? " (sets up a strategy card)" : "")));
+    }
+
+    private static List<SetupHint> setupHints(AiTurnContext context) {
+        return SetupHint.decodeAll(
+                context.memory().get(SetupHint.key(context.game())).orElse(""));
     }
 
     public static void remember(AiTurnContext context, TacticalPlan plan) {

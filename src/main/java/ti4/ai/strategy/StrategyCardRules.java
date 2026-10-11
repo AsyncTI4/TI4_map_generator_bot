@@ -68,6 +68,7 @@ public class StrategyCardRules {
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
     private static final long PRIMARY_WAIT_MILLIS = 60_000L;
     private static final String WARFARE_FINISHED = "warfareFinished";
+    static final String CONSTRUCTION_FIRST = "constructionFirst";
     private static final String REMOVE_TOKEN_PREFIX = "removeCCFromBoard_warfare_";
     private static final int PROPAGATION_TOKENS = 3;
     private static final String LEADERSHIP_BUTTON = "leadershipGenerateCCButtons";
@@ -106,9 +107,14 @@ public class StrategyCardRules {
             StrategyCard.TRADE);
 
     public static AiDecision play(AiTurnContext context, AiPrompt prompt, PromptButton button, int initiative) {
+        return play(context, prompt, button, initiative, StrategyCardTurn.playReason(context, initiative));
+    }
+
+    public static AiDecision play(
+            AiTurnContext context, AiPrompt prompt, PromptButton button, int initiative, String reason) {
         context.memory().put(PLAYED_KEY + context.turnKey(), String.valueOf(initiative));
         if (StrategyCard.of(context.game(), initiative) == StrategyCard.TRADE) TradeCardRules.recordPlay(context);
-        return AiDecision.press(prompt, button, "play a strategy card");
+        return AiDecision.press(prompt, button, reason);
     }
 
     public static boolean playedThisTurn(AiTurnContext context) {
@@ -133,8 +139,8 @@ public class StrategyCardRules {
             case TECHNOLOGY -> technology(context, card);
             case LEADERSHIP -> leadership(context, card);
             case POLITICS -> politics(context, card);
-            case CONSTRUCTION -> construction(context, card);
-            case DIPLOMACY -> diplomacy(context, card);
+            case CONSTRUCTION -> construction(context, card, initiative.get());
+            case DIPLOMACY -> diplomacy(context, card, initiative.get());
             case WARFARE -> warfare(context, card, initiative.get());
             case TRADE -> trade(context);
             default -> Optional.empty();
@@ -156,7 +162,7 @@ public class StrategyCardRules {
         if (!isThundersEdgeWarfare(game, initiative)) return removeTokenWithWarfare(context, card.get());
         if (!CardMessages.done(context, "warfarePlan")) {
             CardMessages.markDone(context, "warfarePlan");
-            Optional<TacticalPlan> plan = TacticalPlanner.bestForWarfare(game, context.seat());
+            Optional<TacticalPlan> plan = PlannedPrimaries.warfareTarget(context, initiative);
             if (plan.isEmpty()) {
                 CardMessages.markDone(context, WARFARE_FINISHED);
                 return Optional.empty();
@@ -220,9 +226,14 @@ public class StrategyCardRules {
         if (!removals.isEmpty() && !CardMessages.done(context, "warfareRemoved")) {
             CardMessages.markDone(context, "warfareRemoved");
             CardMessages.markDone(context, WARFARE_FINISHED);
-            Tile home = seat.getHomeSystemTile();
+            List<String> offered = removals.stream()
+                    .map(StrategyCardRules::positionOf)
+                    .distinct()
+                    .toList();
+            String position =
+                    PlannedPrimaries.tokenToRemove(game, seat, offered).orElse(offered.getFirst());
             PromptButton choice = removals.stream()
-                    .filter(button -> home != null && positionOf(button).equals(home.getPosition()))
+                    .filter(button -> positionOf(button).equals(position))
                     .findFirst()
                     .orElse(removals.getFirst());
             AiPrompt prompt = Prompts.thisTurn(context).stream()
@@ -426,6 +437,10 @@ public class StrategyCardRules {
         if (home == null || !TacticalPlanner.worthProducingAt(game, seat, home)) return Optional.empty();
         BuildPlan plan = ProductionPlanner.plan(game, seat, home);
         return plan.isEmpty() ? Optional.empty() : Optional.of(plan);
+    }
+
+    public static Optional<AiDecision> buildWithConstruction(AiTurnContext context) {
+        return PlannedPrimaries.buildWithConstruction(context);
     }
 
     public static Optional<AiDecision> buildWithWarfare(AiTurnContext context) {
@@ -808,17 +823,26 @@ public class StrategyCardRules {
         }
         if (card.isPresent() && !CardMessages.done(context, "politicsCards")) {
             CardMessages.markDone(context, "politicsCards");
-            return CardMessages.pressOnce(context, card.get(), "sc_ac_draw", "draw action cards with Politics");
+            Optional<AiDecision> draw =
+                    CardMessages.pressOnce(context, card.get(), "sc_ac_draw", "draw action cards with Politics");
+            if (draw.isPresent()) return draw;
         }
-        return Optional.empty();
+        if (!CardMessages.done(context, "speaker")) return Optional.empty();
+        return PlannedPrimaries.peekAgendas(context);
     }
 
-    private static Optional<AiDecision> construction(AiTurnContext context, Optional<AiPrompt> card) {
+    private static Optional<AiDecision> construction(AiTurnContext context, Optional<AiPrompt> card, int initiative) {
         if (card.isEmpty()) return Optional.empty();
-        for (String step : List.of("constructionFirst", "constructionSecond")) {
+        Optional<AiDecision> produce = PlannedPrimaries.produceWithConstruction(context, card.get(), initiative);
+        if (produce.isPresent()) return produce;
+        if (PlannedPrimaries.productionOpen(context)) {
+            return Optional.of(
+                    new AiDecision.Wait(PlannedPrimaries.productionWaitUntil(context), "Construction production"));
+        }
+        for (String step : List.of(CONSTRUCTION_FIRST, "constructionSecond")) {
             if (CardMessages.done(context, step)) continue;
             CardMessages.markDone(context, step);
-            Optional<String> unit = "constructionFirst".equals(step)
+            Optional<String> unit = CONSTRUCTION_FIRST.equals(step)
                     ? StructurePolicy.next(context.game(), context.seat())
                     : StructurePolicy.pds(context.game(), context.seat());
             if (unit.isEmpty()) return Optional.empty();
@@ -827,8 +851,11 @@ public class StrategyCardRules {
         return Optional.empty();
     }
 
-    private static Optional<AiDecision> diplomacy(AiTurnContext context, Optional<AiPrompt> card) {
-        if (card.isEmpty() || CardMessages.done(context, "diplomacyReady")) return Optional.empty();
+    private static Optional<AiDecision> diplomacy(AiTurnContext context, Optional<AiPrompt> card, int initiative) {
+        if (card.isEmpty()) return Optional.empty();
+        Optional<AiDecision> lock = PlannedPrimaries.lockWithDiplomacy(context, card.get(), initiative);
+        if (lock.isPresent()) return lock;
+        if (CardMessages.done(context, "diplomacyReady")) return Optional.empty();
         CardMessages.markDone(context, "diplomacyReady");
         Player seat = context.seat();
         if (seat.getExhaustedPlanets().isEmpty()) return Optional.empty();

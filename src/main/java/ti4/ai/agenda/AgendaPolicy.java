@@ -66,6 +66,18 @@ public class AgendaPolicy {
             Set.of("core_mining", "demilitarized_zone", "disarmament", "redistribution");
     private static final String ELECT_PLAYER = "elect player";
 
+    public static boolean favoursElectedPlayer(String agenda) {
+        return GOOD_FOR_ELECTED_PLAYER.contains(agenda);
+    }
+
+    public static boolean punishesElectedPlayer(String agenda) {
+        return BAD_FOR_ELECTED_PLAYER.contains(agenda);
+    }
+
+    public static boolean punishesPlanetOwner(String agenda) {
+        return BAD_FOR_PLANET_OWNER.contains(agenda);
+    }
+
     public static boolean isTieOutcome(PromptButton button) {
         return button.handlerId().startsWith(TIE_PREFIX);
     }

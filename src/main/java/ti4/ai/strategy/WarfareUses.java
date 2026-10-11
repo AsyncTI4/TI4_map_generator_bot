@@ -18,7 +18,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 class WarfareUses {
@@ -32,15 +31,12 @@ class WarfareUses {
         List<Benefit> options = new ArrayList<>();
         options.add(new Benefit(CardUse.WARFARE_DOUBLE_BUILD, doubleBuild(in, home, firstBuild), homePosition));
         options.add(new Benefit(
-                CardUse.WARFARE_BUILD_THEN_MOVE,
-                buildThenMove(firstBuild, planFromHome, thundersEdge),
-                homePosition));
+                CardUse.WARFARE_BUILD_THEN_MOVE, buildThenMove(firstBuild, planFromHome, thundersEdge), homePosition));
         options.add(farReach(in));
         unblock(in).ifPresent(options::add);
         if (thundersEdge) extraAction(in).ifPresent(options::add);
-        Benefit best = options.stream()
-                .max(Comparator.comparingDouble(Benefit::value))
-                .orElseThrow();
+        Benefit best =
+                options.stream().max(Comparator.comparingDouble(Benefit::value)).orElseThrow();
         if (thundersEdge) return List.of(best);
         return List.of(new Benefit(CardUse.WARFARE_TOKEN, TokenValue.tacticTokens(in, 1)), best);
     }
@@ -115,8 +111,8 @@ class WarfareUses {
                     .max()
                     .orElse(0);
             if (move <= 0) continue;
-            Set<String> near = MovementGraph.reach(game, seat, origin.getPosition(), move)
-                    .keySet();
+            Set<String> near =
+                    MovementGraph.reach(game, seat, origin.getPosition(), move).keySet();
             Map<String, Integer> far = MovementGraph.reach(game, seat, origin.getPosition(), 2 * move);
             for (String position : far.keySet()) {
                 if (near.contains(position)) continue;

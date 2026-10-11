@@ -92,10 +92,14 @@ public class TacticalPlanner {
             UnitType.Warsun);
 
     public static Optional<TacticalPlan> best(Game game, Player seat) {
+        return best(game, seat, List.of());
+    }
+
+    public static Optional<TacticalPlan> best(Game game, Player seat, List<SetupHint> hints) {
         if (seat.getTacticalCC() <= 0) return Optional.empty();
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
         if (seat.getTacticalCC() + seat.getStrategicCC() - 1 < reservedTokens) return Optional.empty();
-        Context context = new Context(game, seat);
+        Context context = new Context(game, seat, Set.of(), hints);
         List<TacticalPlan> plans = candidates(context, tile -> activatable(game, seat, tile));
         if (plans.isEmpty()) return Optional.empty();
         TacticalPlan top = plans.getFirst();
@@ -168,7 +172,8 @@ public class TacticalPlanner {
         produce(context, tile).ifPresent(plans::add);
         position(context, tile).ifPresent(plans::add);
         return plans.stream()
-                .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)))
+                .map(plan -> plan.withScore(PlayAreaNotes.adjustedScore(context.game, context.seat, tile, plan)
+                        + SetupHint.bonusFor(context.hints, plan)))
                 .max(Comparator.comparingDouble(TacticalPlan::score));
     }
 
@@ -1029,6 +1034,7 @@ public class TacticalPlanner {
         private final Game game;
         private final Player seat;
         private final Set<String> freed;
+        private final List<SetupHint> hints;
         private final Map<String, Map<String, Integer>> reachCache = new HashMap<>();
         private final Map<String, Boolean> spaceCannonCache = new HashMap<>();
         private final Map<String, Integer> forwardNeeds = new HashMap<>();
@@ -1043,9 +1049,14 @@ public class TacticalPlanner {
         }
 
         Context(Game game, Player seat, Set<String> freed) {
+            this(game, seat, freed, List.of());
+        }
+
+        Context(Game game, Player seat, Set<String> freed, List<SetupHint> hints) {
             this.game = game;
             this.seat = seat;
             this.freed = freed;
+            this.hints = hints;
         }
 
         double exploreValue(Tile tile, Planet planet, int infantry, int mechs) {
