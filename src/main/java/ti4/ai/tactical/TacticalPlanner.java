@@ -810,6 +810,7 @@ public class TacticalPlanner {
         return Optional.ofNullable(best);
     }
 
+    // TODO: arriving ships are assumed undamaged (the less defensive reading)
     private static Optional<TacticalPlan> defendFrom(
             Context context, Tile tile, Tile origin, Defenders now, double costNow, double buildBonus) {
         Player seat = context.seat;

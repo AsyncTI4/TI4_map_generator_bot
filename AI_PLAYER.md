@@ -218,7 +218,7 @@ to build one by hand:
   | Card | Uses it plans for |
   | --- | --- |
   | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), and acting first in a race for the custodians |
-  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
+  | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
   | Politics | becoming speaker (more when it will want Imperial next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), and looking at the agenda deck once the custodians are taken |
   | Construction | a space dock early, PDS (more under threat), a structure objective it would complete; for the Thunder's Edge card also production at a dock without placing a token, so the units can move out this round |
   | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
@@ -385,13 +385,13 @@ to build one by hand:
 - **Tactical actions.** At the start of its turn, `TacticalPlanner` scores every system it can
   activate and remembers the best plan for the turn:
   - **Expand**: a carrier (or other transport) takes ground forces (infantry first, mechs last, except
-    that mechs go to hazardous planets first) to free planets, keeping one ground force (a mech when there is one) on each home planet and on Mecatol Rex, and avoiding systems
+    that mechs go to hazardous planets first) to free planets, keeping at least one ground force (a mech when there is one) on each home planet, more when the defense model below asks for them, and one on Mecatol Rex, and avoiding systems
     covered by enemy space cannon. In rounds 1-4 every planet taken is worth an extra 0.8, fading to nothing by round
     8, so small planets are worth a token early. It plans to take every free planet in the system: when one transport
     cannot carry a ground force for each planet (and a second for each hazardous one), more transports from the same
     system go along (0.3 per extra ship). Capacity is used: the transports fill up with every spare ground force,
     except what the transports staying behind need for the best system they can reach this round, and then with
-    fighters that escort them (0.15 each; fighters stay home only when an enemy can reach it). Each ground force
+    fighters that escort them (0.15 each; the fighters the defense model wants at home stay). Each ground force
     beyond the planets taken is worth 0.5, up to the free planets within one move of the target, since it moves on
     next round. Every ground force it brings lands: a mech on each hazardous planet it can, then one force on every
     other planet, then a second infantry on each hazardous planet (the cards that remove one become nearly free),
@@ -442,6 +442,36 @@ to build one by hand:
     _Raise a Fleet_, _Achieve Supremacy_ with its flagship or a war sun, and secrets such as _Control the Region_,
     _Cut Supply Lines_ beside an unguarded space dock, and _Foster Cohesion_). It may enter a system where another
     player has planets or structures but no ships.
+  - **Defense** (`DefenseOutlook`). Its home system, a system with its space dock, a Mecatol Rex it holds, a system whose
+    ships or planets carry at least 4 points of objective progress, and a system where an invasion would complete a
+    revealed public objective for the invader are _guarded_. For each guarded system and each other player it works out
+    the biggest force that player could bring there in one tactical action (`IncomingForces`): the ships that reach it
+    by their move values (the seat's ships block them, Gravity Drive adds one ship's move, a ship starting in a gravity
+    rift moves one farther), limited by fleet supply and carrying only the ground forces and fighters their own
+    capacity holds. _Before its next turn_ needs a tactic token and a fleet not under its own token, or an unplayed
+    Thunder's Edge Warfare, and a player who has not passed; _next round_ ignores tokens and passing and counts half,
+    or fully when the enemy holds an unplayed Prophecy of Kings Warfare or the seat will not get another turn. The
+    exact combat odds give the chance the enemy wins the space and then takes a planet (it lands on the planet it
+    likes best, after the seat's space cannon and bombardment). How likely it is to try is its _fear_: the round (0.3
+    in round 1, 0.6 in round 2, full from round 3) times the faction's temperament (`FactionAggression`, plus 0.03 per
+    military technology up to 6 and up to 0.2 for a bigger navy) times the share of its fleet the attack leaves spare
+    times whether it has a reason to score (a revealed public objective the attack completes, and denying the leader or
+    a player near winning; without one fear halves) times how the attack compares with its other options (the planets
+    it would take against the ships it would lose and the cost of the action, set against the best free planets it
+    could reach instead), and a Ceasefire the seat holds cuts it to 30%. The seat asks for no better than even odds,
+    relaxing as fear falls (`target = 0.5 + 0.5 (1 - fear)^2`); the _defense cost_ is the value it expects to lose above
+    that target, over both windows. Only the seat's own cards are read; a neighbour contributes its public board,
+    objectives and technologies. The cost then drives the plans: ships, ground forces and fighters leave a guarded
+    system only while the cost stays within half a point (`holdBack`, `groundToKeep`, with a second pass that keeps
+    more infantry once the ships that leave are known); expansions, attacks and moves are scored net of the cost of
+    leaving; a _defend_ plan brings ships to an exposed system when that lowers the cost by more than the move costs
+    (their spare ground forces land on the weakest planet); retaking a planet in its own home is worth the points
+    that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
+    planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
+    defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:
+    screening (a ship parked on a chokepoint), pre-emptive strikes on a threatening fleet, defending with ships from
+    more than one system in one action, planets an enemy needs in systems the seat does not guard, and Prophecy of
+    Kings Warfare with Fleet Logistics unlocking a second fleet.
   - **Objective value.** Every plan also scores its progress on the revealed public objectives and the seat's own
     secrets (`ObjectiveValue` over a before/after `Footprint` of systems, ships and planets): a point for
     completing one, a share of a point for each step towards it (larger the closer it gets, so it finishes what it
@@ -453,8 +483,8 @@ to build one by hand:
   Plans respect move values (nebulae, rifts, asteroid fields, supernovas, enemy ships), capacity,
   fleet supply and stranded cargo. With Gravity Drive one ship per action may move one system farther: the
   transport of an expansion, the ship of a single-ship move, or one extra ship in an attack (the strongest against
-  enemy ships, otherwise the one with the most capacity) or a group move. A ship leaving home stays as the guard only
-  when the move would otherwise empty the home system. `TacticalRules` then walks the bot's own buttons step by step,
+  enemy ships, otherwise the one with the most capacity) or a group move. Ships leave a guarded system only as far as its
+  defense model allows. `TacticalRules` then walks the bot's own buttons step by step,
   in distance or ring mode, looking for the planned system in every part of a system picker that was split over
   several messages; if it still cannot find it, it activates the best system the picker does offer. Once it has
   taken an action, it only ends its turn. When its units

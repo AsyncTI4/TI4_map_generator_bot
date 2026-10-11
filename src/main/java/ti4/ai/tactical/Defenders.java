@@ -45,6 +45,7 @@ record Defenders(Stack ships, Stack groundInSpace, Map<String, Stack> planets) {
             return units.isEmpty();
         }
 
+        // TODO: departing ships are assumed to be the damaged ones first (the less defensive reading)
         Stack minus(UnitType type, int count) {
             int removed = Math.min(count, count(type));
             if (removed <= 0) return this;
