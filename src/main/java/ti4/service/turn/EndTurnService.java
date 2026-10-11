@@ -85,7 +85,7 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player)) return;
+        UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
         if (NetrunnersBreakthroughHandler.offerDataBreachTechnology(game, player)) return;
         if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
