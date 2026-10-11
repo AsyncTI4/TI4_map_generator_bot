@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.GameHorizon;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
@@ -127,8 +128,6 @@ public class ResearchPolicy {
     private static final String LAWS_OF_PHYSICS = "mlp";
     private static final String ADAPT_NEW_STRATEGIES = "ans";
     private static final int PAIR = 2;
-    private static final int DEFAULT_VICTORY_POINTS = 10;
-    private static final double LEADER_POINTS_PER_ROUND = 2.0;
     private static final double RESEARCHES_PER_ROUND = 1.5;
     private static final String SPACE_DOCK_UPGRADE = "sd2";
     private static final int DOCK_UPGRADE_PRODUCTION = 2;
@@ -227,13 +226,7 @@ public class ResearchPolicy {
     }
 
     static int researchesLeft(Game game) {
-        int goal = game.getVp() > 0 ? game.getVp() : DEFAULT_VICTORY_POINTS;
-        int leader = game.getRealPlayers().stream()
-                .mapToInt(Player::getTotalVictoryPoints)
-                .max()
-                .orElse(0);
-        int roundsLeft = (int) Math.ceil(Math.max(0, goal - leader) / LEADER_POINTS_PER_ROUND);
-        return Math.max(1, (int) Math.floor(roundsLeft * RESEARCHES_PER_ROUND));
+        return Math.max(1, (int) Math.floor(GameHorizon.roundsLeft(game) * RESEARCHES_PER_ROUND));
     }
 
     static boolean withinReach(Game game, Player seat, String objective) {

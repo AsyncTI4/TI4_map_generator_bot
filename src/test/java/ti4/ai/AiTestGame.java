@@ -40,6 +40,7 @@ public final class AiTestGame {
     public final Player sol;
     public final AiMemory memory = new AiMemory();
     private final Map<String, AiMemory> otherMemories = new HashMap<>();
+    private int customObjectives;
 
     public AiTestGame() {
         this(HUMAN_ID);
@@ -96,6 +97,11 @@ public final class AiTestGame {
 
     public void units(Tile tile, String holder, Player player, UnitType type, int count) {
         tile.addUnit(holder, Units.getUnitKey(type, player.getColor()), count);
+    }
+
+    /** Gives {@code player} victory points through a custom public objective, which no seat can score itself. */
+    public void points(Player player, int points) {
+        game.scorePublicObjective(player.getUserID(), game.addCustomPO("Test points " + ++customObjectives, points));
     }
 
     public void aiIsActive(String phase) {

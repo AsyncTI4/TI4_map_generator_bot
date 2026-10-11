@@ -57,4 +57,17 @@ class ResearchPolicyTest extends BaseTi4Test {
                                 + 0.3 * ResearchPolicy.baseValue(Mapper.getTech("hm")),
                         Offset.offset(1e-9));
     }
+
+    // About one and a half researches fit in each of the rounds the leader still needs: seven in a fresh ten point
+    // game (five rounds), four with the leader on 4 (three rounds), and always at least one.
+    @Test
+    void researchesLeftShrinkAsTheLeaderNearsTheGoal() {
+        assertThat(ResearchPolicy.researchesLeft(test.game)).isEqualTo(7);
+
+        test.points(test.nekro, 4);
+        assertThat(ResearchPolicy.researchesLeft(test.game)).isEqualTo(4);
+
+        test.points(test.nekro, 6);
+        assertThat(ResearchPolicy.researchesLeft(test.game)).isEqualTo(1);
+    }
 }
