@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
@@ -34,18 +35,23 @@ class BattleMath {
         return (int) Math.round(expected);
     }
 
-    static int ownCannonHits(Game game, Player seat, Tile tile, Tile origin) {
-        return (int) Math.round(cannonFire(game, tile, seat, BoardView.space(origin)));
+    static int ownCannonHits(Game game, Player seat, Tile tile, Collection<Tile> origins) {
+        List<UnitHolder> leaving = origins.stream().map(BoardView::space).toList();
+        return (int) Math.round(cannonFireLeaving(game, tile, seat, leaving));
     }
 
     static double cannonFire(Game game, Tile tile, Player shooter, @Nullable UnitHolder leaving) {
+        return cannonFireLeaving(game, tile, shooter, leaving == null ? List.of() : List.of(leaving));
+    }
+
+    static double cannonFireLeaving(Game game, Tile tile, Player shooter, Collection<UnitHolder> leaving) {
         double expected = 0;
         for (String position : FoWHelper.getAdjacentTiles(game, tile.getPosition(), shooter, false, true)) {
             Tile nearby = game.getTileByPosition(position);
             if (nearby == null) continue;
             boolean inSystem = nearby == tile;
             for (UnitHolder holder : nearby.getUnitHolders().values()) {
-                if (holder == leaving) continue;
+                if (leaving.contains(holder)) continue;
                 for (UnitKey key : holder.getUnitKeysForPlayer(shooter)) {
                     UnitModel model = shooter.getUnitFromUnitKey(key);
                     if (model == null || (!inSystem && !model.getDeepSpaceCannon(shooter))) continue;
