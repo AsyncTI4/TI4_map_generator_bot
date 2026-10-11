@@ -37,6 +37,10 @@ public class ProductionPlanner {
     private static final int OLD_FIELD_COUNT = 7;
     private static final int WANTED_CARRIERS = 2;
     private static final int WANTED_DREADNOUGHTS = 3;
+    private static final double FRONTLINE_BONUS = 0.5;
+    private static final int FRONTLINE_RANGE = 2;
+    private static final double MAX_HURT_WEIGHT = 1.5;
+    private static final double OUTLYING_SHARE = 0.5;
     private static final int WANTED_UPGRADED_LIGHT_SHIPS = 4;
     private static final int WANTED_CRUISERS = 2;
     private static final int WANTED_MECHS = 2;
@@ -347,15 +351,46 @@ public class ProductionPlanner {
 
     private static void planSurplusShips(Builder builder) {
         Player seat = builder.seat;
-        builder.surplusShipsUpTo(UnitType.Flagship, 1, 1, FlagshipRating.spareResourcesNeeded(seat));
-        builder.surplusShipsUpTo(UnitType.Warsun, 1, 1);
-        builder.surplusShipsUpTo(UnitType.Dreadnought, WANTED_DREADNOUGHTS, 1);
+        double frontline = 1 + FRONTLINE_BONUS * frontlineInterest(builder);
+        builder.surplusShipsUpTo(UnitType.Flagship, 1, frontline, FlagshipRating.spareResourcesNeeded(seat));
+        builder.surplusShipsUpTo(UnitType.Warsun, 1, frontline);
+        builder.surplusShipsUpTo(UnitType.Dreadnought, WANTED_DREADNOUGHTS, frontline);
         for (UnitType light : List.of(UnitType.Cruiser, UnitType.Destroyer)) {
-            if (isUpgraded(seat, light)) builder.surplusShipsUpTo(light, WANTED_UPGRADED_LIGHT_SHIPS, 1);
+            if (isUpgraded(seat, light)) builder.surplusShipsUpTo(light, WANTED_UPGRADED_LIGHT_SHIPS, frontline);
         }
         if (!isUpgraded(seat, UnitType.Cruiser)) {
-            builder.surplusShipsUpTo(UnitType.Cruiser, WANTED_CRUISERS, UNUPGRADED_LIGHT_SHIP_SHARE);
+            builder.surplusShipsUpTo(UnitType.Cruiser, WANTED_CRUISERS, UNUPGRADED_LIGHT_SHIP_SHARE * frontline);
         }
+    }
+
+    private static double frontlineInterest(Builder builder) {
+        Game game = builder.game;
+        Standings standings = builder.defense.standings();
+        double interest = 0;
+        for (String position : MovementGraph.reach(game, builder.seat, builder.tile.getPosition(), FRONTLINE_RANGE)
+                .keySet()) {
+            Tile tile = game.getTileByPosition(position);
+            if (tile == null) continue;
+            for (Player rival : game.getRealPlayers()) {
+                if (rival == builder.seat || !hasPresence(rival, tile)) continue;
+                boolean decisive = tile == rival.getHomeSystemTile() || holdsMecatol(game, tile);
+                double weight = standings.hurtWeight(rival) / MAX_HURT_WEIGHT * (decisive ? 1 : OUTLYING_SHARE)
+                        + standings.winThreat(rival);
+                interest = Math.max(interest, Math.clamp(weight, 0.0, 1.0));
+            }
+        }
+        return interest;
+    }
+
+    private static boolean hasPresence(Player rival, Tile tile) {
+        return tile.containsPlayersUnits(rival)
+                || tile.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> rival.getPlanets().contains(planet.getName()));
+    }
+
+    private static boolean holdsMecatol(Game game, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> game.mecatols().contains(planet.getName()));
     }
 
     private static void fillProduction(Builder builder) {
