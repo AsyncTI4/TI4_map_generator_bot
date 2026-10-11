@@ -177,6 +177,12 @@ public class ReactionCheckService {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "Since multiple unrevealed objectives are available and at least one has been peeked at, the buttons specify the position of the card they will reveal. The speaker gets to pick which one to reveal, per the rules.");
+            Player speaker = game.getSpeaker();
+            if (speaker != null) {
+                MessageHelper.sendMessageToChannel(
+                        speaker.getCorrectChannel(),
+                        speaker.getRepresentation() + " please choose which objective to reveal.");
+            }
         }
     }
 
