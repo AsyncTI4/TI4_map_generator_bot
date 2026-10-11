@@ -14,6 +14,11 @@ public class CombatOdds {
 
     private static final int MAX_ROUNDS = 60;
     private static final double NEGLIGIBLE = 1e-7;
+    private static final int ATTACKER_COST = 0;
+    private static final int DEFENDER_COST = 1;
+    private static final int ATTACKER_COST_IF_WIN = 2;
+    private static final int ATTACKER_UNIT = 3;
+    private static final int DEFENDER_UNIT = 4;
 
     public record Combatant(
             int hitsOn,
@@ -68,14 +73,27 @@ public class CombatOdds {
         return resolve(Force.of(attacker), Force.of(defender));
     }
 
+    public record Detailed(
+            Outcome outcome,
+            double attackerCostLost,
+            double defenderCostLost,
+            double attackerCostLostIfWin,
+            double attackerLosesUnit,
+            double defenderLosesUnit) {}
+
     public static Outcome resolve(Force attacker, Force defender) {
+        return resolveDetailed(attacker, defender).outcome();
+    }
+
+    public static Detailed resolveDetailed(Force attacker, Force defender) {
         Side a = new Side(attacker);
         Side d = new Side(defender);
-        if (a.hitPoints() == 0) return new Outcome(0, 1, 0);
-        if (d.hitPoints() == 0) return new Outcome(1, 0, 0);
+        if (a.hitPoints() == 0) return new Detailed(new Outcome(0, 1, 0), 0, 0, 0, 0, 0);
+        if (d.hitPoints() == 0) return new Detailed(new Outcome(1, 0, 0), 0, 0, 0, 0, 0);
         double attackerWins = 0;
         double defenderWins = 0;
         double bothDestroyed = 0;
+        double[] losses = new double[5];
         Map<Long, Double> states = new HashMap<>();
         states.put(key(0, 0), 1.0);
         for (int round = 0; round < MAX_ROUNDS && !states.isEmpty(); round++) {
@@ -94,10 +112,16 @@ public class CombatOdds {
                         int newD = Math.min(d.hitPoints(), absorbedByD + x * a.hitMultiplier(d.lostAUnit(absorbedByD)));
                         boolean aDead = newA == a.hitPoints();
                         boolean dDead = newD == d.hitPoints();
-                        if (aDead && dDead) bothDestroyed += p;
-                        else if (dDead) attackerWins += p;
-                        else if (aDead) defenderWins += p;
-                        else {
+                        if (aDead && dDead) {
+                            bothDestroyed += p;
+                            addLosses(losses, p, a, newA, d, newD, false);
+                        } else if (dDead) {
+                            attackerWins += p;
+                            addLosses(losses, p, a, newA, d, newD, true);
+                        } else if (aDead) {
+                            defenderWins += p;
+                            addLosses(losses, p, a, newA, d, newD, false);
+                        } else {
                             int repairedA = a.afterRepair(absorbedByA, newA, d.lostAUnit(absorbedByD));
                             int repairedD = d.afterRepair(absorbedByD, newD, a.lostAUnit(absorbedByA));
                             next.merge(key(repairedA, repairedD), p, Double::sum);
@@ -107,9 +131,32 @@ public class CombatOdds {
             }
             states = prune(next);
         }
-        double remaining =
-                states.values().stream().mapToDouble(Double::doubleValue).sum();
-        return new Outcome(attackerWins, defenderWins + remaining, bothDestroyed);
+        double remaining = 0;
+        for (Map.Entry<Long, Double> state : states.entrySet()) {
+            remaining += state.getValue();
+            int absorbedByA = (int) (state.getKey() >> 32);
+            int absorbedByD = (int) (state.getKey() & 0xffffffffL);
+            addLosses(losses, state.getValue(), a, absorbedByA, d, absorbedByD, false);
+        }
+        double costLostIfWin = attackerWins == 0 ? 0 : losses[ATTACKER_COST_IF_WIN] / attackerWins;
+        return new Detailed(
+                new Outcome(attackerWins, defenderWins + remaining, bothDestroyed),
+                losses[ATTACKER_COST],
+                losses[DEFENDER_COST],
+                costLostIfWin,
+                losses[ATTACKER_UNIT],
+                losses[DEFENDER_UNIT]);
+    }
+
+    private static void addLosses(
+            double[] losses, double p, Side a, int absorbedByA, Side d, int absorbedByD, boolean attackerWon) {
+        double attackerCost = a.costLost(absorbedByA);
+        double defenderCost = d.costLost(absorbedByD);
+        losses[ATTACKER_COST] += p * attackerCost;
+        losses[DEFENDER_COST] += p * defenderCost;
+        if (attackerWon) losses[ATTACKER_COST_IF_WIN] += p * attackerCost;
+        if (attackerCost > 0) losses[ATTACKER_UNIT] += p;
+        if (defenderCost > 0) losses[DEFENDER_UNIT] += p;
     }
 
     private static Map<Long, Double> prune(Map<Long, Double> states) {
@@ -127,6 +174,7 @@ public class CombatOdds {
         private final List<Combatant> lossOrder;
         private final List<Combatant> improvedOrder;
         private final int sustains;
+        private final double[] lostCosts;
         private final Map<Integer, double[]> distributions = new HashMap<>();
         private final Map<Integer, double[]> improvedDistributions = new HashMap<>();
 
@@ -142,6 +190,13 @@ public class CombatOdds {
                             ? order.stream().map(improved.units()::get).toList()
                             : lossOrder;
             sustains = (int) force.units().stream().filter(Combatant::sustain).count();
+            lostCosts = new double[lossOrder.size() + 1];
+            for (int i = 0; i < lossOrder.size(); i++)
+                lostCosts[i + 1] = lostCosts[i] + lossOrder.get(i).cost();
+        }
+
+        double costLost(int absorbed) {
+            return lostCosts[Math.min(lossOrder.size(), Math.max(0, absorbed - sustains))];
         }
 
         int hitPoints() {
