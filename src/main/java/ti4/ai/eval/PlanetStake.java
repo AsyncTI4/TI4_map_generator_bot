@@ -17,12 +17,15 @@ public class PlanetStake {
             Map.of(UnitType.Spacedock, SPACE_DOCK, UnitType.Pds, PDS);
 
     public static double of(Game game, Player seat, Planet planet) {
+        return of(game, seat, planet, new ObjectiveValue(game, seat));
+    }
+
+    public static double of(Game game, Player seat, Planet planet, ObjectiveValue objectives) {
         String name = planet.getName();
         double stake = BoardView.planetValue(planet);
         if (!seat.getExhaustedPlanets().contains(name)) {
             stake += Math.max(BoardView.planetResources(game, name), BoardView.planetInfluence(game, name));
         }
-        ObjectiveValue objectives = new ObjectiveValue(game, seat);
         return stake + Math.max(0, -objectives.gain(objectives.before().withoutPlanet(name)));
     }
 

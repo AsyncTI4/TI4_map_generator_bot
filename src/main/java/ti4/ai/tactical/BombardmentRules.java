@@ -165,7 +165,7 @@ public class BombardmentRules {
         return BoardView.groundForces(planet, defender) + BoardView.undamaged(planet, defender, UnitType.Mech);
     }
 
-    private static boolean shielded(Game game, Player seat, Planet planet, Map<UnitType, Integer> ships) {
+    static boolean shielded(Game game, Player seat, Planet planet, Map<UnitType, Integer> ships) {
         boolean shieldsDown = ships.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .map(entry -> seat.getUnitByType(entry.getKey()))
