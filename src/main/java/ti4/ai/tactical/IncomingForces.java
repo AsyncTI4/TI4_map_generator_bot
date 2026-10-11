@@ -76,16 +76,23 @@ final class IncomingForces {
 
     private final Game game;
     private final Exclusion exclusion;
-    private final Map<String, Map<String, Integer>> reaches = new HashMap<>();
+    private final IncomingForces base;
+    private final Map<String, Map<String, Integer>> reaches;
     private final Map<String, IncomingForce> forces = new HashMap<>();
 
     IncomingForces(Game game) {
-        this(game, null);
+        this(game, null, null);
     }
 
     IncomingForces(Game game, @Nullable Exclusion exclusion) {
+        this(game, exclusion, null);
+    }
+
+    IncomingForces(Game game, @Nullable Exclusion exclusion, @Nullable IncomingForces base) {
         this.game = game;
         this.exclusion = exclusion;
+        this.base = base;
+        this.reaches = base == null ? new HashMap<>() : base.reaches;
     }
 
     private boolean isGone(Player enemy, Tile tile) {
@@ -118,6 +125,7 @@ final class IncomingForces {
     }
 
     IncomingForce of(Player enemy, Tile target, Horizon horizon) {
+        if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
         return forces.computeIfAbsent(
                 enemy.getFaction() + "#" + target.getPosition() + "#" + horizon, key -> scan(enemy, target, horizon));
     }

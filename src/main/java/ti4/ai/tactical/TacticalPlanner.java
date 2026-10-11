@@ -830,6 +830,7 @@ public class TacticalPlanner {
                 .anyMatch(planet -> game.mecatols().contains(planet.getName()));
     }
 
+    // TODO: staged groups leave fighters behind and assume their ships are undamaged
     private static List<TacticalPlan> stageFrom(
             Context context, Predicate<Tile> activatable, Tile target, Player opponent, Tile origin) {
         Game game = context.game;

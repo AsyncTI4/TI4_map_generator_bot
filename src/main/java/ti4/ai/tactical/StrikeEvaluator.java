@@ -52,6 +52,7 @@ class StrikeEvaluator {
             double noKill,
             Map<UnitType, Integer> dropped) {}
 
+    // TODO: Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS are not in the odds
     static StrikeEstimate estimate(Game game, Player seat, Strike strike) {
         Tile target = strike.target();
         Player opponent = strike.opponent();

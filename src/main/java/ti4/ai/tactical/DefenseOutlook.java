@@ -94,6 +94,7 @@ public final class DefenseOutlook {
     private final Map<String, Double> fearCeilings = new HashMap<>();
     private final Map<String, Double> fleetCosts = new HashMap<>();
     private final Map<String, Double> costs = new HashMap<>();
+    private final Map<String, Double> threats = new HashMap<>();
 
     public DefenseOutlook(Game game, Player seat) {
         this(game, seat, new IncomingForces(game), null, null);
@@ -126,7 +127,9 @@ public final class DefenseOutlook {
         DefenseOutlook base = root == null ? this : root;
         String key = removed.owner().getFaction() + "#" + removed.tile().getPosition();
         return base.exclusions.computeIfAbsent(
-                key, ignored -> new DefenseOutlook(game, seat, new IncomingForces(game, removed), base, removed));
+                key,
+                ignored -> new DefenseOutlook(
+                        game, seat, new IncomingForces(game, removed, base.incoming), base, removed));
     }
 
     public static double homeCost(Game game, Player seat, boolean immediateOnly) {
@@ -273,6 +276,7 @@ public final class DefenseOutlook {
         return new Chances(space, space * groundMax, groundMax);
     }
 
+    // TODO: the struck player's PDS on planets the strike takes still count against the staying fleet
     double counterstrike(
             Tile tile,
             Defenders after,
@@ -415,6 +419,12 @@ public final class DefenseOutlook {
     }
 
     private double threat(Player enemy, Tile tile, Horizon horizon, Defenders defenders) {
+        if (root != null && enemy != exclusion.owner()) return root.threat(enemy, tile, horizon, defenders);
+        String key = enemy.getFaction() + "|" + tile.getPosition() + "|" + horizon + "|" + defenders.key();
+        return cached(threats, key, () -> computeThreat(enemy, tile, horizon, defenders));
+    }
+
+    private double computeThreat(Player enemy, Tile tile, Horizon horizon, Defenders defenders) {
         IncomingForce force = incoming.of(enemy, tile, horizon);
         if (force.isEmpty() || fearCeiling(enemy, tile, horizon, force) < MIN_FEAR) return 0;
         Chances chances = chances(tile, force, defenders);

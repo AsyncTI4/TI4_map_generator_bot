@@ -545,6 +545,50 @@ class OffenseTest extends BaseTi4Test {
         assertThat(attackOn(target)).isEmpty();
     }
 
+    private StrikeValue naaluThreatensTheDockSystem(int strategyTokens) {
+        board = new DefenseScenario();
+        board.test.units(board.home, "space", nekro(), UnitType.Cruiser, 4);
+        nekro().setFleetCC(6);
+        String target = board.beyondStaging();
+        Tile system = board.test.place("47", target);
+        Player naalu = board.test.addSeat("200000000000000005", "naalu", "yellow");
+        naalu.setStrategicCC(strategyTokens);
+        naalu.setFleetCC(5);
+        board.test.units(system, "space", naalu, UnitType.Carrier, 1);
+        board.test.units(system, "space", naalu, UnitType.Cruiser, 2);
+        board.test.units(system, "space", naalu, UnitType.Infantry, 3);
+        String dockPosition = neighbours(target).stream()
+                .filter(position -> !position.equals(board.stagingPosition) && !AiTestGame.HOME.equals(position))
+                .filter(position -> !neighbours(AiTestGame.HOME).contains(position))
+                .filter(position -> board.test.game.getTileByPosition(position) == null)
+                .toList()
+                .getFirst();
+        Tile dockSystem = board.test.place("26", dockPosition);
+        nekro().addPlanet("lodor");
+        board.test.units(dockSystem, "lodor", nekro(), UnitType.Spacedock, 1);
+        board.test.units(dockSystem, "lodor", nekro(), UnitType.Infantry, 1);
+        board.test.place(
+                "48",
+                neighbours(target).stream()
+                        .filter(position -> board.test.game.getTileByPosition(position) == null)
+                        .toList()
+                        .getLast());
+        return breakdown(target);
+    }
+
+    // Test 12, second half: a stack that slips away is still there afterwards, so destroying it relieves no other
+    // system
+    // of its threat; the same stack that stays and loses does.
+    @Test
+    void anEscapedStackRelievesNothing() {
+        StrikeValue escaping = naaluThreatensTheDockSystem(2);
+        StrikeValue staying = naaluThreatensTheDockSystem(0);
+
+        assertThat(escaping.kills()).isZero();
+        assertThat(escaping.defense()).isZero();
+        assertThat(staying.defense()).isPositive();
+    }
+
     // Test 22: planning attacks only reads what the table can see of the opponent.
     @Test
     void neverLooksAtTheOpponentsHiddenCards() {
