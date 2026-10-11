@@ -24,8 +24,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.turn.EndTurnService;
-import ti4.service.turn.PassService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -36,8 +34,6 @@ public class UydaiUnitHandler {
     private static final String DESTROY_INFANTRY = "uydaiDeathCommandosDestroyInfantry_";
     private static final String DECLINE_DESTROY_INFANTRY = "uydaiDeathCommandosDeclineDestroyInfantry";
     private static final String PLACE_DEATH_COMMANDO = "uydaiDeathCommandosPlace_";
-    private static final String STORED_COMMANDOS = "uydaiDeathCommandos";
-    private static final String PASSING_AFTER_PLACEMENT = "uydaiDeathCommandosPassing";
 
     public static void resolveDeathCommandos(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits) {
@@ -52,7 +48,6 @@ public class UydaiUnitHandler {
             List<DiceHelper.Die> dice = DiceHelper.rollDice(6, destroyedUnit.getTotalRemoved());
             int successes = DiceHelper.countSuccesses(dice);
             if (successes > 0) {
-                addStoredCommandos(game, owner, successes);
                 owner.setStasisInfantry(owner.getStasisInfantry() + successes);
             }
 
@@ -86,7 +81,10 @@ public class UydaiUnitHandler {
     }
 
     public static boolean offerDeathCommandosPlacement(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (getStoredCommandos(game, player) < 1) {
+        if (!player.hasUnit(DEATH_COMMANDOS)) {
+            return false;
+        }
+        if (player.getStasisInfantry() < 1) {
             return false;
         }
         List<Button> buttons = getLegendaryPlanetButtons(game, player);
@@ -95,15 +93,6 @@ public class UydaiUnitHandler {
         }
         sendDeathCommandoPlacementPrompt(player, event, game, buttons);
         return true;
-    }
-
-    public static boolean offerDeathCommandosPlacementBeforePassing(
-            GenericInteractionCreateEvent event, Game game, Player player) {
-        boolean offered = offerDeathCommandosPlacement(event, game, player);
-        if (offered) {
-            game.setStoredValue(PASSING_AFTER_PLACEMENT + player.getFaction(), "true");
-        }
-        return offered;
     }
 
     @ButtonHandler(DESTROY_INFANTRY)
@@ -135,7 +124,7 @@ public class UydaiUnitHandler {
     public static void placeDeathCommando(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String planet = buttonID.substring(PLACE_DEATH_COMMANDO.length());
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
-        if (getStoredCommandos(game, player) < 1
+        if (!player.hasUnit(DEATH_COMMANDOS)
                 || player.getStasisInfantry() < 1
                 || !(unitHolder instanceof Planet planetHolder)
                 || !player.getPlanets().contains(planet)
@@ -143,7 +132,6 @@ public class UydaiUnitHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        addStoredCommandos(game, player, -1);
         player.setStasisInfantry(player.getStasisInfantry() - 1);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 infantry " + planet);
         MessageHelper.sendMessageToChannel(
@@ -151,16 +139,6 @@ public class UydaiUnitHandler {
                 player.getRepresentationNoPing() + " placed 1 **Death Commando** on "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
         ButtonHelper.deleteMessage(event);
-
-        if (offerDeathCommandosPlacement(event, game, player)) {
-            return;
-        }
-        if (!game.getStoredValue(PASSING_AFTER_PLACEMENT + player.getFaction()).isEmpty()) {
-            game.removeStoredValue(PASSING_AFTER_PLACEMENT + player.getFaction());
-            PassService.passPlayerForRound(event, game, player, false);
-        } else {
-            EndTurnService.endTurnAndUpdateMap(event, game, player);
-        }
     }
 
     private static void offerInfantryDestruction(Game game, Player player, Planet planet) {
@@ -201,8 +179,8 @@ public class UydaiUnitHandler {
             Player player, GenericInteractionCreateEvent event, Game game, List<Button> buttons) {
         String message = player.getRepresentationNoPing()
                 + ", place 1 Death Commando from stasis on a legendary planet you control. "
-                + getStoredCommandos(game, player)
-                + " remain in stasis.";
+                + player.getStasisInfantry()
+                + " infantry remain in stasis.";
         String prefix = player.factionButtonChecker() + PLACE_DEATH_COMMANDO;
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), message, NewStuffHelper.buttonPagination(buttons, prefix, 0));
@@ -220,19 +198,5 @@ public class UydaiUnitHandler {
             }
         }
         return buttons;
-    }
-
-    private static int getStoredCommandos(Game game, Player player) {
-        String value = game.getStoredValue(STORED_COMMANDOS + player.getFaction());
-        return value.isEmpty() ? 0 : Integer.parseInt(value);
-    }
-
-    private static void addStoredCommandos(Game game, Player player, int amount) {
-        int total = getStoredCommandos(game, player) + amount;
-        if (total < 1) {
-            game.removeStoredValue(STORED_COMMANDOS + player.getFaction());
-        } else {
-            game.setStoredValue(STORED_COMMANDOS + player.getFaction(), Integer.toString(total));
-        }
     }
 }

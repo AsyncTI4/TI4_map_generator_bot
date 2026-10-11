@@ -2408,7 +2408,7 @@ public class PlayerAreaGenerator {
             Set<PlanetType> types = EnumSet.noneOf(PlanetType.class);
             if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
-            if (types.contains(PlanetType.FAKE)) {
+            if (types.contains(PlanetType.FAKE) || types.contains(PlanetType.SPACESTATION)) {
                 fakePlanets.add(planet);
             } else if (game.getTileFromPlanet(planet) == null) {
                 nonTile.add(planet);
