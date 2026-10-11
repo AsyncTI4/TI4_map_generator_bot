@@ -149,11 +149,11 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // A lone carrier is a coin flip against Sol's destroyer, but the fighters at home can ride along and make the
-    // attack safe. Two of the carrier's four slots still carry infantry to land on Lodor.
+    // attack safe. Two of the carrier's four slots still carry infantry to land on Lodor. Nothing threatens home, so
+    // the carrier needs no guard ship to stay behind (the old rule that kept one ship home is gone).
     @Test
     void bringsFightersToWinASpaceCombat() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
@@ -262,12 +262,12 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // Attacking from home leaves the least useful ship behind as a guard. The infantry taken along must fit in
-    // the ships that actually leave, not in the whole home fleet.
+    // Twelve infantry wait at home, but the infantry taken along must fit in the ships that leave: two carriers carry
+    // eight. (The dreadnought that used to stay behind as the home guard is gone; a threatened home that holds ships
+    // back is covered in the defence tests below.)
     @Test
     void neverPlansMoreInfantryThanTheDepartingShipsCanCarry() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 12);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
@@ -283,7 +283,6 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .filter(move -> move.type() == UnitType.Infantry)
                 .mapToInt(UnitMove::count)
                 .sum();
-        assertThat(plan.moves()).noneMatch(move -> move.type() == UnitType.Dreadnought);
         assertThat(infantry).isPositive().isLessThanOrEqualTo(capacity);
         assertThat(plan.landings().values().stream().mapToInt(Integer::intValue).sum())
                 .isLessThanOrEqualTo(infantry);
@@ -328,7 +327,9 @@ class TacticalPlannerTest extends BaseTi4Test {
 
     // Nekro copies one of the defender's technologies after the first kill. Against Sol's four cruisers, copying
     // Fighter II upgrades its six fighters for the rest of the fight, so the attack scores better when Sol owns
-    // Fighter II than when Sol only owns Antimass Deflectors, which would not change the fight.
+    // Fighter II than when Sol only owns Antimass Deflectors, which would not change the fight. The fleet is two
+    // carriers and the fighters: a dreadnought beside them would make the fight a walkover, and nothing threatens home
+    // enough to keep it back.
     @Test
     void countsACombatTechnologyItWouldCopyMidFight() {
         double withAntimass = attackScoreAgainstFourCruisers("amd");
@@ -341,7 +342,6 @@ class TacticalPlannerTest extends BaseTi4Test {
         AiTestGame fresh = new AiTestGame();
         Tile freshHome = fresh.nekroHome();
         fresh.units(freshHome, "space", fresh.nekro, UnitType.Carrier, 2);
-        fresh.units(freshHome, "space", fresh.nekro, UnitType.Dreadnought, 1);
         fresh.units(freshHome, "space", fresh.nekro, UnitType.Fighter, 6);
         fresh.units(freshHome, "mordaiii", fresh.nekro, UnitType.Infantry, 4);
         fresh.nekro.setFleetCC(8);
@@ -436,12 +436,12 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.map(TacticalPlan::target)).contains(neighbour);
     }
 
-    // The same coin flip as above, but a PDS II at home covers Lodor (Deep Space Cannon): its expected hit removes
-    // the destroyer before the space combat, so the attack is safe without any fighters.
+    // The same coin flip as above (a lone carrier, no guard ship needed), but a PDS II at home covers Lodor (Deep
+    // Space Cannon): its expected hit removes the destroyer before the space combat, so the attack is safe without any
+    // fighters.
     @Test
     void countsItsOwnSpaceCannonWhenAttacking() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
@@ -475,12 +475,13 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // A cruiser stays home as the guard, so a carrier and two cruisers attack Sol's two cruisers: too even a fight.
-    // With Assault Cannon those three ships make Sol destroy a cruiser before the combat, and the attack is on.
+    // A carrier and two cruisers attack Sol's two cruisers: too even a fight. With Assault Cannon those three ships
+    // make Sol destroy a cruiser before the combat, and the attack is on. (Nothing threatens home, so no cruiser is
+    // kept back as a guard.)
     @Test
     void countsAssaultCannonBeforeTheSpaceCombat() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Cruiser, 3);
+        test.units(home, "space", test.nekro, UnitType.Cruiser, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
@@ -493,12 +494,13 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // A dreadnought stays home as the guard, so a carrier and a dreadnought attack Sol's two cruisers: not safe enough.
-    // Non-Euclidean Shielding lets the dreadnought's sustain cancel two hits, and the attack is on.
+    // A carrier and a dreadnought attack Sol's two cruisers: not safe enough. Non-Euclidean Shielding lets the
+    // dreadnought's sustain cancel two hits, and the attack is on. (Nothing threatens home, so no second dreadnought
+    // is kept back as a guard.)
     @Test
     void countsNonEuclideanShieldingInTheOdds() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 2);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
@@ -511,12 +513,12 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // A damaged dreadnought can no longer sustain damage, but it still fights: two of the three dreadnoughts are
-    // damaged, one stays home as the guard, and the other two join the attack instead of waiting for repairs.
+    // A damaged dreadnought can no longer sustain damage, but it still fights: both dreadnoughts are damaged, and they
+    // join the attack instead of waiting for repairs.
     @Test
     void bringsDamagedShipsIntoAnAttack() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 2);
         home.addUnitDamage("space", ti4.helpers.Units.getUnitKey(UnitType.Dreadnought, test.nekro.getColor()), 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         test.nekro.setFleetCC(5);

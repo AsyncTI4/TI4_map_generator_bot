@@ -34,6 +34,7 @@ import ti4.model.UnitModel;
 public class ProductionPlanner {
 
     static final int MIN_UNITS = 4;
+    private static final int OLD_FIELD_COUNT = 7;
     private static final int WANTED_CARRIERS = 2;
     private static final int WANTED_DREADNOUGHTS = 3;
     private static final int WANTED_UPGRADED_LIGHT_SHIPS = 4;
@@ -72,7 +73,14 @@ public class ProductionPlanner {
     private static final List<UnitType> HEAVY_SHIPS = List.of(UnitType.Flagship, UnitType.Warsun);
 
     public record BuildOrder(
-            String unitId, String location, UnitType type, int units, double cost, double value, boolean scoring) {
+            String unitId,
+            String location,
+            UnitType type,
+            int units,
+            double cost,
+            double value,
+            boolean scoring,
+            boolean defense) {
         public String handlerId() {
             return "place_" + unitId + "_" + location;
         }
@@ -93,6 +101,17 @@ public class ProductionPlanner {
 
         public boolean scoring() {
             return orders.stream().anyMatch(BuildOrder::scoring);
+        }
+
+        public boolean defense() {
+            return orders.stream().anyMatch(BuildOrder::defense);
+        }
+
+        public double nonDefenseValue() {
+            return orders.stream()
+                    .filter(order -> !order.defense())
+                    .mapToDouble(BuildOrder::value)
+                    .sum();
         }
 
         public boolean isEmpty() {
@@ -122,7 +141,8 @@ public class ProductionPlanner {
                                     String.valueOf(order.units()),
                                     String.valueOf(order.cost()),
                                     String.valueOf(order.value()),
-                                    String.valueOf(order.scoring())))
+                                    String.valueOf(order.scoring()),
+                                    String.valueOf(order.defense())))
                             .toList());
         }
 
@@ -139,7 +159,8 @@ public class ProductionPlanner {
                             Integer.parseInt(fields[3]),
                             Double.parseDouble(fields[4]),
                             Double.parseDouble(fields[5]),
-                            Boolean.parseBoolean(fields[6])));
+                            Boolean.parseBoolean(fields[6]),
+                            fields.length > OLD_FIELD_COUNT && Boolean.parseBoolean(fields[OLD_FIELD_COUNT])));
                 }
                 return Optional.of(new BuildPlan(orders));
             } catch (RuntimeException e) {
@@ -153,6 +174,10 @@ public class ProductionPlanner {
     }
 
     public static BuildPlan plan(Game game, Player seat, Tile tile, int extraResources) {
+        return plan(game, seat, tile, extraResources, new DefenseOutlook(game, seat));
+    }
+
+    public static BuildPlan plan(Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
         Builder builder = new Builder(
                 game,
@@ -164,7 +189,8 @@ public class ProductionPlanner {
                                 + extraResources
                                 + (seat.hasTech("st") ? 1 : 0)
                                 + aidaDiscount(seat),
-                        seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat)));
+                        seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat)),
+                defense);
         planScoringUnits(builder);
         planCoreUnits(builder);
         planSurplusShips(builder);
@@ -270,7 +296,7 @@ public class ProductionPlanner {
 
     private static void planCoreUnits(Builder builder) {
         builder.shipsUpTo(UnitType.Carrier, WANTED_CARRIERS, CARRIER_VALUE, false);
-        int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile);
+        int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
         builder.infantry(WANTED_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
         int wantedMechs =
                 builder.seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY) ? MECHANIZE_MECHS : WANTED_MECHS;
@@ -386,26 +412,47 @@ public class ProductionPlanner {
         private final Budget budget;
         private final List<BuildOrder> orders = new ArrayList<>();
         private final String groundPlanet;
+        private final DefenseOutlook defense;
 
         Builder(Game game, Player seat, Tile tile, Budget budget) {
-            this(game, seat, tile, budget, null);
+            this(game, seat, tile, budget, null, new DefenseOutlook(game, seat));
+        }
+
+        Builder(Game game, Player seat, Tile tile, Budget budget, DefenseOutlook defense) {
+            this(game, seat, tile, budget, null, defense);
         }
 
         Builder(Game game, Player seat, Tile tile, Budget budget, @Nullable String groundPlanet) {
+            this(game, seat, tile, budget, groundPlanet, new DefenseOutlook(game, seat));
+        }
+
+        Builder(
+                Game game,
+                Player seat,
+                Tile tile,
+                Budget budget,
+                @Nullable String groundPlanet,
+                DefenseOutlook defense) {
             this.game = game;
             this.seat = seat;
             this.tile = tile;
             this.budget = budget;
             this.groundPlanet = groundPlanet;
+            this.defense = defense;
         }
 
         boolean ship(UnitType type, double value, boolean scoring) {
+            return ship(type, value, scoring, false);
+        }
+
+        boolean ship(UnitType type, double value, boolean scoring, boolean forDefense) {
             UnitModel model = seat.getUnitByType(type);
             if (model == null || !underCap(model.getAsyncId(), planned(type) + 1)) return false;
             double cost = model.getCost();
             if (!budget.allows(1, cost, true)) return false;
             budget.spend(1, cost, true);
-            orders.add(new BuildOrder(type.name().toLowerCase(), tile.getPosition(), type, 1, cost, value, scoring));
+            orders.add(new BuildOrder(
+                    type.name().toLowerCase(), tile.getPosition(), type, 1, cost, value, scoring, forDefense));
             return true;
         }
 
@@ -460,6 +507,10 @@ public class ProductionPlanner {
         }
 
         boolean ground(UnitType type, int count, double valueEach) {
+            return ground(type, count, valueEach, false);
+        }
+
+        boolean ground(UnitType type, int count, double valueEach, boolean forDefense) {
             Optional<String> planet = groundPlanet != null ? Optional.of(groundPlanet) : dockPlanet();
             UnitModel model = seat.getUnitByType(type);
             if (count <= 0 || planet.isEmpty() || model == null) return false;
@@ -469,11 +520,15 @@ public class ProductionPlanner {
             if (!budget.allows(count, cost, false)) return false;
             budget.spend(count, cost, false);
             String unitId = count == 2 ? "2" + type.getValue() : type.name().toLowerCase();
-            orders.add(new BuildOrder(unitId, planet.get(), type, count, cost, valueEach * count, false));
+            orders.add(new BuildOrder(unitId, planet.get(), type, count, cost, valueEach * count, false, forDefense));
             return true;
         }
 
         private boolean addFighters(int count, double valueEach) {
+            return addFighters(count, valueEach, false);
+        }
+
+        private boolean addFighters(int count, double valueEach, boolean forDefense) {
             UnitModel model = seat.getUnitByType(UnitType.Fighter);
             if (count <= 0 || model == null || !underCap(model.getAsyncId(), planned(UnitType.Fighter) + count)) {
                 return false;
@@ -483,7 +538,7 @@ public class ProductionPlanner {
             budget.spend(count, cost, false);
             String unitId = count == 2 ? "2" + UnitType.Fighter.getValue() : "fighter";
             orders.add(new BuildOrder(
-                    unitId, tile.getPosition(), UnitType.Fighter, count, cost, valueEach * count, false));
+                    unitId, tile.getPosition(), UnitType.Fighter, count, cost, valueEach * count, false, forDefense));
             return true;
         }
 

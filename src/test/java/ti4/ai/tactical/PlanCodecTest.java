@@ -43,10 +43,34 @@ class PlanCodecTest {
     @Test
     void buildPlanRoundTrips() {
         BuildPlan plan = new BuildPlan(List.of(
-                new BuildOrder("carrier", "301", UnitType.Carrier, 1, 3.0, 2.5, false),
-                new BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 0.4, true)));
+                new BuildOrder("carrier", "301", UnitType.Carrier, 1, 3.0, 2.5, false, false),
+                new BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 0.4, true, false),
+                new BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 3.5, false, true)));
 
         assertThat(BuildPlan.decode(plan.encode())).contains(plan);
+    }
+
+    // Test 19: a build plan remembered before orders carried a defense flag still decodes, as non-defensive.
+    @Test
+    void anOlderBuildPlanWithoutTheDefenseFlagDecodes() {
+        String sevenFields = "carrier~301~Carrier~1~3.0~2.5~false;2gf~mordaiii~Infantry~2~1.0~0.4~true";
+
+        BuildPlan plan = BuildPlan.decode(sevenFields).orElseThrow();
+
+        assertThat(plan.orders()).hasSize(2).noneMatch(BuildOrder::defense);
+        assertThat(plan.defense()).isFalse();
+        assertThat(plan.orders().getLast().scoring()).isTrue();
+    }
+
+    @Test
+    void aDefenseOrderMarksThePlanAndKeepsItsValueOutOfTheOrdinaryTotal() {
+        BuildPlan plan = new BuildPlan(List.of(
+                new BuildOrder("carrier", "301", UnitType.Carrier, 1, 3.0, 2.5, false, false),
+                new BuildOrder("2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 3.5, false, true)));
+
+        assertThat(plan.defense()).isTrue();
+        assertThat(plan.nonDefenseValue()).isEqualTo(2.5);
+        assertThat(plan.value()).isEqualTo(6.0);
     }
 
     @Test

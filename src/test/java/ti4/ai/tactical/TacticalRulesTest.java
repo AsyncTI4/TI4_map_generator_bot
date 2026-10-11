@@ -232,6 +232,32 @@ class TacticalRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_nekro_doneLanding_" + target);
     }
 
+    // A defending plan brings infantry home to a planet that already holds some, so its count is the planet's total:
+    // Mordai II holds two and four are wanted, so two land and no more.
+    @Test
+    void landsOnlyTheMissingInfantryOfADefendingPlan() {
+        test.game.setStoredValue("currentActionSummarynekro", " Activated 301 (Mordai II).");
+        test.game.setActiveSystem(AiTestGame.HOME);
+        TacticalPlan plan = new TacticalPlan(Kind.DEFEND, AiTestGame.HOME, List.of(), Map.of("mordaiii", 4), 2.0);
+        test.memory.put(TacticalRules.PLAN_KEY + test.context().turnKey(), plan.encode());
+        test.units(home, "space", test.nekro, UnitType.Infantry, 3);
+        AiPrompt landing = prompt(
+                "landing",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_landUnits_301_1gf_mordaiii_black",
+                "FFCC_nekro_landUnits_301_2gf_mordaiii_black",
+                "FFCC_nekro_doneLanding_301");
+
+        assertThat(pressedId(TacticalRules.continueAction(test.context(landing)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_landUnits_301_2gf_mordaiii_black");
+
+        home.removeUnit("space", Units.getUnitKey(UnitType.Infantry, "black"), 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        assertThat(pressedId(TacticalRules.continueAction(test.context(landing)).orElseThrow()))
+                .isEqualTo("FFCC_nekro_doneLanding_301");
+    }
+
     // Landing waits while enemy ships are still in the active system.
     @Test
     void waitsForSpaceCombatBeforeLanding() {
@@ -258,7 +284,7 @@ class TacticalRulesTest extends BaseTi4Test {
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
                 new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
-                                "carrier", AiTestGame.HOME, UnitType.Carrier, 1, 3.0, 2.5, false)))
+                                "carrier", AiTestGame.HOME, UnitType.Carrier, 1, 3.0, 2.5, false, false)))
                         .encode());
         AiPrompt production = prompt(
                 "production",
@@ -378,7 +404,7 @@ class TacticalRulesTest extends BaseTi4Test {
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
                 new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
-                                "2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 1.0, false)))
+                                "2gf", "mordaiii", UnitType.Infantry, 2, 1.0, 1.0, false, false)))
                         .encode());
         AiPrompt production = prompt(
                 "production",
@@ -403,7 +429,7 @@ class TacticalRulesTest extends BaseTi4Test {
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
                 new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
-                                "2ff", AiTestGame.HOME, UnitType.Fighter, 2, 1.0, 0.2, false)))
+                                "2ff", AiTestGame.HOME, UnitType.Fighter, 2, 1.0, 0.2, false, false)))
                         .encode());
         AiPrompt production = prompt(
                 "production",
@@ -432,7 +458,7 @@ class TacticalRulesTest extends BaseTi4Test {
         test.memory.put(
                 TacticalRules.BUILD_KEY + test.context().turnKey(),
                 new ProductionPlanner.BuildPlan(List.of(new ProductionPlanner.BuildOrder(
-                                "dreadnought", "301", UnitType.Dreadnought, 1, 4.0, 2.0, true)))
+                                "dreadnought", "301", UnitType.Dreadnought, 1, 4.0, 2.0, true, false)))
                         .encode());
         AiPrompt production = prompt(
                 "production",
