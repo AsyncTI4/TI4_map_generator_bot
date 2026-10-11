@@ -411,19 +411,21 @@ to build one by hand:
     next round. Every ground force it brings lands: a mech on each hazardous planet it can, then one force on every
     other planet, then a second infantry on each hazardous planet (the cards that remove one become nearly free),
     then the rest spread over the planets.
-  - **Attack**: only a single opponent, and only when the exact combat odds (`CombatOdds`, with standing combat
-    modifiers such as Fragile or Unrelenting) give at least 80% in space and on each planet it lands on. It always
-    clears enemy ships out of its own home system. It attacks another player's home system only while it holds
-    _Darken the Skies_ or _Conquer the Weak_ is unscored, taking the expected space cannon losses off its fleet
-    first; other systems covered by enemy space cannon are avoided. The odds also count its own space cannon (PDS in
-    the system, PDS II and other deep space cannon next to it) firing first, Assault Cannon on both sides (the
-    cheapest non-fighter ship lost), anti-fighter barrage on both sides, Non-Euclidean Shielding (a sustained hit
-    cancels two), Duranium Armor repairs, X-89 ΩΩ doubling ground combat and bombardment hits, and the expected
-    bombardment hits on the planet the bot will bombard. Damaged ships join attacks but can no longer
-    sustain damage, and damaged defenders cannot either. An attack can be worth it for objective
-    progress alone. It also weighs the attack with the fighters at the origin riding along in the fleet's capacity
-    (the infantry and mechs to land share what is left) and takes whichever plan scores better; the ground odds use
-    the infantry and mechs actually landed.
+  - **Attack** (the model is described under **Offense** below): a strike moves ships, and the ground forces they carry,
+    from one to three systems into a system holding a single other player's units or planets, and lands on the planets
+    there that are worth it, free ones included. Its exact odds (`CombatOdds`, with standing combat modifiers such as
+    Fragile or Unrelenting) count its own space cannon (PDS in the system, PDS II and other deep space cannon next to
+    it) firing first; the enemy's space cannon offense on the arriving ships (a system covered strongly enough to
+    destroy the fleet is simply a strike that cannot win) and a PDS on the planet shooting at the landing (it sends one
+    ground force more than the hits it expects when nothing defends the planet); Assault Cannon on both sides (the
+    cheapest non-fighter ship lost); anti-fighter barrage on both sides; Non-Euclidean Shielding (a sustained hit
+    cancels two); Duranium Armor repairs; X-89 ΩΩ doubling ground combat and bombardment hits; the expected
+    bombardment hits on the planet the bot will bombard; and Naalu's Foresight (a stack that would lose and has a
+    strategy token and an empty system beside it leaves before the combat, so nothing is killed). Damaged ships join
+    attacks but can no longer sustain damage, and damaged defenders cannot either. It also weighs the attack with the
+    fighters at the origin riding along in the fleet's capacity (the infantry and mechs to land share what is left)
+    and takes whichever plan scores better; the ground odds use the infantry and mechs actually landed, and ground
+    forces that rode in a destroyed ship never land. It always clears enemy ships out of its own home system.
   - **Produce** (`ProductionPlanner`): build at a space dock, scoring first. Activating a system to build is only
     worth it for at least 4 units, unless the build scores or advances an objective. In order:
     1. **Scoring.** A flagship or war sun (the cheaper) while _Engineer a Marvel_ is unscored, one that could reach
@@ -484,9 +486,52 @@ to build one by hand:
     that home holds; and production buys infantry, mechs, fighters or ships at the dock (ground forces on the dock
     planet) until the cost is gone or a unit no longer lowers it by half a point per resource, so a one-planet home is
     defended on the ground and a home with several planets in space, and a hopeless defence buys nothing. Not yet:
-    screening (a ship parked on a chokepoint), pre-emptive strikes on a threatening fleet, defending with ships from
-    more than one system in one action, planets an enemy needs in systems the seat does not guard, and Prophecy of
-    Kings Warfare with Fleet Logistics unlocking a second fleet.
+    screening (a ship parked on a chokepoint), defending with ships from more than one system in one action, planets
+    an enemy needs in systems the seat does not guard, and Prophecy of Kings Warfare with Fleet Logistics unlocking a
+    second fleet.
+  - **Offense** (`StrikeEvaluator`, `OffenseOutlook`, `Standings`). Every attack is a _strike_ whose physics and
+    economics are kept apart, and the value of a strike is judged in the world after it:
+    1. **Physics.** The exact odds above give the chance to win the space combat, both sides' expected losses in
+       resources (a destroyed ship takes its cargo with it, and the surviving ships' capacity is what can land), the
+       chance each side loses a unit, and for every planet the chance to take it. Landing needs a win chance of at least
+       one half (3 in 10 against a player about to win).
+    2. **Standings.** From public information only (scores, objectives revealed and ready, techs, planets, the Imperial
+       card): what each player can still score this round, how close each is to winning (_win threat_, full when the
+       projected total reaches the goal), how much hurting each is worth (more for the sole leader, less for a player
+       behind) and how much denying a point to each is worth (little until the player is close to winning, then more than
+       a point of its own).
+    3. **Value.** In the planner's currency (a victory point is 8): the seat's own objective progress; the planets taken
+       (explored, with the custodians' point for Mecatol Rex); the economy and the public objectives the target loses with
+       them or with its ships (an objective it can no longer pay for counts too); stopping a player from scoring public
+       objectives at all by taking a planet of its home system, unless it is Nomad; the Imperial point, both the seat's own
+       and denying the holder who holds or could land on Mecatol Rex; the opponent's units destroyed; blockading a space
+       dock; Technological Singularity's copy as Nekro; the relief at the seat's other guarded systems when the units
+       that threaten them are gone (and the exposure of the systems the strike leaves); the secrets the combat scores.
+       What a strike can add by hurting a player who is not close to winning is capped below one point of the seat's own, so
+       its own scoring outranks random planets and kills; against a player about to win the cap rises to several points.
+    4. **Costs.** The seat's expected losses; the anger of the opponent (more against a larger navy, an aggressive faction
+       and one that can reach the seat's guarded systems, three times more for a home system or Mecatol Rex, nothing
+       against a player about to win); the counterstrike on the ships and planets left in the system (the struck fleet
+       excluded); a Nullification Field that can cancel the action; feeding a Nekro opponent's Technological Singularity
+       and being captured by Vuil'raith; half a point for each origin beyond the first.
+    5. **Gates.** Win chance and the final score of at least 4 after every cost. Another player's home system is landed on
+       only when its owner is close to winning, or the block it causes is worth about half a point of the seat's own, or
+       the seat's own objective gains as much; otherwise it is a ship-only strike. Planets with enemy structures are
+       taken only in their owner's home system, on Mecatol Rex, with _Conquer the Weak_ or against a player close to winning.
+    The strikes of a system are first ranked by a cheap score (the value and the exposure of the systems they leave), and
+    the two best plus the best held-back and all-in departures get the full economics. Up to three origins join one
+    strike while the combined score keeps improving and the fleet pool allows it. A fleet that cannot yet reach a
+    winning player's home, Mecatol Rex or a planet that stops its objectives can _stage_: it moves to a system from which
+    it can strike next round, worth about a third of the strike it prepares (against the opponent's units and the
+    reinforcements it could bring), less the counterstrike at the staging system, and half as much when the opponent
+    holds an unplayed Diplomacy it could lock a planet with. Docks within two moves of a player worth hurting value their
+    dreadnoughts, cruisers, upgraded destroyers, War Suns and flagships half as much again.
+    Not yet: screening chokepoints; locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
+    without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
+    the kill estimates; building space docks forward; more than three origins; Prophecy of Kings Warfare with Fleet
+    Logistics for a double move; pre-emptive strikes against a fleet that threatens only the system the strike leaves
+    from; staging for a single target (`forTarget`) or for Warfare; action cards, agenda points, alliances, systems with
+    units of two other players, memory of past attacks, and the seat's hidden aggression level.
   - **Objective value.** Every plan also scores its progress on the revealed public objectives and the seat's own
     secrets (`ObjectiveValue` over a before/after `Footprint` of systems, ships and planets): a point for
     completing one, a share of a point for each step towards it (larger the closer it gets, so it finishes what it
@@ -621,7 +666,10 @@ Four small generic changes don't reference `ti4.ai`:
     and private threads.
   - Each report also has a scoreboard (victory points after every round, each revealed objective and who scored
     it, secrets, techs, planets and trade goods per seat) and the AI's decisions counted by reason. A batch ends
-    with the average victory points of the leader and of the whole table, the measure of the AI's strength.
+    with the average victory points of the leader and of the whole table, the measure of the AI's strength, the
+    tactical plans per game by kind (attacks, attacks on another player's home and the ones that landed there, attacks
+    on Mecatol Rex against an Imperial holder, staging moves) and the time `TacticalPlanner.ranked` takes on sampled
+    real boards.
   - By default it plays the first round:
     ```
     mvn -o test -Dtest=AiSelfPlayTest
