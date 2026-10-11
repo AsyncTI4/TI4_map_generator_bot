@@ -15,6 +15,7 @@ import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -54,6 +55,7 @@ public final class DefenseOutlook {
     private static final double MIN_COMMITMENT = 0.85;
     private static final double SPARE_FLEET_FOR_FULL_COMMITMENT = 0.5;
     private static final double CEASEFIRE_FEAR = 0.3;
+    private static final double STRUCK_PLAYER_FEAR = 1.2;
     private static final double UNIT_COST_FLOOR = 0.5;
     private static final double RISK_TIE = 1e-9;
     private static final int NEAR_WIN_GAP = 3;
@@ -63,34 +65,68 @@ public final class DefenseOutlook {
 
     record Chances(double space, double take, double groundMax) {}
 
+    record Blend(DefenseOutlook excluded, double w0) {}
+
     private record Bundle(double gain, double score, int capacity, double cost, List<UnitMove> remaining) {}
 
     private final Game game;
     private final Player seat;
     private final IncomingForces incoming;
+    private final DefenseOutlook root;
+    private final Exclusion exclusion;
+    private final Map<String, DefenseOutlook> exclusions = new HashMap<>();
     private List<Player> enemies;
     private Tile home;
     private boolean homeKnown;
     private ObjectiveValue own;
     private Standings standings;
-    private final Map<String, ObjectiveValue> publicViews = new HashMap<>();
-    private final Map<String, Boolean> guarded = new HashMap<>();
-    private final Map<String, Double> scoringLosses = new HashMap<>();
-    private final Map<String, Double> stakes = new HashMap<>();
-    private final Map<String, Double> ownShipLosses = new HashMap<>();
-    private final Map<String, Double> publicGains = new HashMap<>();
-    private final Map<String, Double> spaceGains = new HashMap<>();
+    private List<Tile> guardedTiles;
+    private final Map<String, ObjectiveValue> publicViews;
+    private final Map<String, Boolean> guarded;
+    private final Map<String, Double> scoringLosses;
+    private final Map<String, Double> stakes;
+    private final Map<String, Double> ownShipLosses;
+    private final Map<String, Double> publicGains;
+    private final Map<String, Double> spaceGains;
+    private final Map<String, Map<String, Double>> alternatives;
+    private final Map<String, Double> spaceChances;
+    private final Map<String, Double> groundChances;
     private final Map<String, Double> fearCeilings = new HashMap<>();
     private final Map<String, Double> fleetCosts = new HashMap<>();
-    private final Map<String, Map<String, Double>> alternatives = new HashMap<>();
-    private final Map<String, Double> spaceChances = new HashMap<>();
-    private final Map<String, Double> groundChances = new HashMap<>();
     private final Map<String, Double> costs = new HashMap<>();
 
     public DefenseOutlook(Game game, Player seat) {
+        this(game, seat, new IncomingForces(game), null, null);
+    }
+
+    private DefenseOutlook(
+            Game game,
+            Player seat,
+            IncomingForces incoming,
+            @Nullable DefenseOutlook root,
+            @Nullable Exclusion exclusion) {
         this.game = game;
         this.seat = seat;
-        this.incoming = new IncomingForces(game);
+        this.incoming = incoming;
+        this.root = root;
+        this.exclusion = exclusion;
+        this.publicViews = root == null ? new HashMap<>() : root.publicViews;
+        this.guarded = root == null ? new HashMap<>() : root.guarded;
+        this.scoringLosses = root == null ? new HashMap<>() : root.scoringLosses;
+        this.stakes = root == null ? new HashMap<>() : root.stakes;
+        this.ownShipLosses = root == null ? new HashMap<>() : root.ownShipLosses;
+        this.publicGains = root == null ? new HashMap<>() : root.publicGains;
+        this.spaceGains = root == null ? new HashMap<>() : root.spaceGains;
+        this.alternatives = root == null ? new HashMap<>() : root.alternatives;
+        this.spaceChances = root == null ? new HashMap<>() : root.spaceChances;
+        this.groundChances = root == null ? new HashMap<>() : root.groundChances;
+    }
+
+    DefenseOutlook excluding(Exclusion removed) {
+        DefenseOutlook base = root == null ? this : root;
+        String key = removed.owner().getFaction() + "#" + removed.tile().getPosition();
+        return base.exclusions.computeIfAbsent(
+                key, ignored -> new DefenseOutlook(game, seat, new IncomingForces(game, removed), base, removed));
     }
 
     public static double homeCost(Game game, Player seat, boolean immediateOnly) {
@@ -100,12 +136,28 @@ public final class DefenseOutlook {
     }
 
     Standings standings() {
+        if (root != null) return root.standings();
         if (standings == null) standings = new Standings(game, incoming);
         return standings;
     }
 
     Defenders defendersAt(Tile tile) {
         return Defenders.of(seat, tile);
+    }
+
+    Defenders defendersAfter(Tile tile, List<UnitMove> moves) {
+        return defendersAt(tile).minus(movesFrom(tile, moves));
+    }
+
+    List<Tile> guardedTiles() {
+        if (root != null) return root.guardedTiles();
+        if (guardedTiles == null) {
+            guardedTiles = game.getTileMap().values().stream()
+                    .filter(tile -> !seatPlanets(tile).isEmpty() || tile.containsPlayersUnits(seat))
+                    .filter(this::isGuarded)
+                    .toList();
+        }
+        return guardedTiles;
     }
 
     double cost(Tile tile) {
@@ -117,6 +169,7 @@ public final class DefenseOutlook {
     }
 
     boolean isGuarded(Tile tile) {
+        if (root != null) return root.isGuarded(tile);
         String key = tile.getPosition();
         Boolean known = guarded.get(key);
         if (known != null) return known;
@@ -138,22 +191,31 @@ public final class DefenseOutlook {
     }
 
     double leaveCost(Tile origin, List<UnitMove> moves) {
+        return leaveCost(origin, moves, null);
+    }
+
+    double leaveCost(Tile origin, List<UnitMove> moves, @Nullable Blend blend) {
         if (!isGuarded(origin)) return 0;
         Defenders current = defendersAt(origin);
         Defenders after = current.minus(movesFrom(origin, moves));
-        return Math.max(0, cost(origin, after) - cost(origin, current));
+        return Math.max(0, blendedCost(origin, after, blend) - blendedCost(origin, current, blend));
     }
 
     List<UnitMove> holdBack(Tile origin, List<UnitMove> leavingRegardless, List<UnitMove> candidates) {
+        return holdBack(origin, leavingRegardless, candidates, null);
+    }
+
+    List<UnitMove> holdBack(
+            Tile origin, List<UnitMove> leavingRegardless, List<UnitMove> candidates, @Nullable Blend blend) {
         if (candidates.isEmpty() || !isGuarded(origin)) return candidates;
         Defenders current = defendersAt(origin);
         Defenders afterRegardless = current.minus(movesFrom(origin, leavingRegardless));
-        double base = cost(origin, current);
+        double base = blendedCost(origin, current, blend);
         List<UnitMove> leaving = new ArrayList<>(candidates);
         while (!leaving.isEmpty()) {
-            double now = cost(origin, afterRegardless.minus(movesFrom(origin, leaving)));
+            double now = blendedCost(origin, afterRegardless.minus(movesFrom(origin, leaving)), blend);
             if (now - base <= GARRISON_TOLERANCE) break;
-            Bundle best = bestKeptBundle(origin, afterRegardless, leaving, now);
+            Bundle best = bestKeptBundle(origin, afterRegardless, leaving, now, blend);
             if (best == null || best.gain() < HOLD_MIN_GAIN) break;
             leaving = new ArrayList<>(best.remaining());
         }
@@ -161,16 +223,28 @@ public final class DefenseOutlook {
     }
 
     int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving) {
+        return groundToKeep(home, planet, shipsLeaving, null);
+    }
+
+    int groundToKeep(Tile home, Planet planet, List<UnitMove> shipsLeaving, @Nullable Blend blend) {
         Defenders current = defendersAt(home);
         int present = current.groundOn(planet.getName());
         if (present <= TacticalPlanner.HOME_GARRISON || !isGuarded(home))
             return Math.min(present, TacticalPlanner.HOME_GARRISON);
         Defenders baseline = current.minus(movesFrom(home, shipsLeaving));
-        double base = cost(home, current);
+        double base = blendedCost(home, current, blend);
         for (int keep = TacticalPlanner.HOME_GARRISON; keep < present; keep++) {
-            if (cost(home, baseline.withGround(planet.getName(), keep)) - base <= GARRISON_TOLERANCE) return keep;
+            if (blendedCost(home, baseline.withGround(planet.getName(), keep), blend) - base <= GARRISON_TOLERANCE) {
+                return keep;
+            }
         }
         return present;
+    }
+
+    private double blendedCost(Tile tile, Defenders defenders, @Nullable Blend blend) {
+        double standing = cost(tile, defenders);
+        if (blend == null) return standing;
+        return blend.w0() * blend.excluded().cost(tile, defenders) + (1 - blend.w0()) * standing;
     }
 
     double fear(Player enemy, Tile tile, Horizon horizon, Defenders defenders) {
@@ -187,6 +261,40 @@ public final class DefenseOutlook {
     Chances chances(Player enemy, Tile tile, Horizon horizon, Defenders defenders) {
         IncomingForce force = incoming.of(enemy, tile, horizon);
         return force.isEmpty() ? new Chances(0, 0, 0) : chances(tile, force, defenders);
+    }
+
+    Chances chancesAgainst(Player enemy, Tile tile, Horizon horizon, Defenders after, List<Planet> planets) {
+        IncomingForce force = incoming.of(enemy, tile, horizon);
+        if (force.isEmpty()) return new Chances(0, 0, 0);
+        double space = spaceChance(tile, force, after);
+        if (!force.carriesGround() || planets.isEmpty()) return new Chances(space, 0, 0);
+        double groundMax = 0;
+        for (Planet planet : planets) groundMax = Math.max(groundMax, groundChance(tile, force, planet, after));
+        return new Chances(space, space * groundMax, groundMax);
+    }
+
+    double counterstrike(
+            Tile tile,
+            Defenders after,
+            List<Planet> planetsAfter,
+            double shipStake,
+            double planetStake,
+            Player struck) {
+        if (isGuarded(tile)) return 0;
+        double worst = 0;
+        for (Player enemy : enemies()) {
+            for (Horizon horizon : Horizon.values()) {
+                IncomingForce force = incoming.of(enemy, tile, horizon);
+                if (force.isEmpty()) continue;
+                double eagerness = enemy == struck ? STRUCK_PLAYER_FEAR : 1.0;
+                double fear = Math.min(1, fearCeiling(enemy, tile, horizon, force, planetsAfter) * eagerness);
+                if (fear <= 0) continue;
+                Chances chances = chancesAgainst(enemy, tile, horizon, after, planetsAfter);
+                double exposed = chances.space() * shipStake + chances.take() * planetStake;
+                worst = Math.max(worst, weight(enemy, horizon) * fear * exposed);
+            }
+        }
+        return worst;
     }
 
     @Nullable
@@ -234,8 +342,17 @@ public final class DefenseOutlook {
                 planets = Math.max(
                         planets, PlanetStake.of(game, seat, planet, own()) + PlanetStake.structures(planet, seat));
             }
-            return planets + (isHome(tile) ? publicScoringLock() : 0);
+            return planets + (isHome(tile) ? publicScoringLock() : 0) + mecatolHandover(tile);
         });
+    }
+
+    private double mecatolHandover(Tile tile) {
+        if (!controlsMecatol(tile)) return 0;
+        return standings()
+                .imperialHolder()
+                .filter(holder -> holder != seat)
+                .map(holder -> standings().denialWeight(holder) * ObjectiveValue.VICTORY_POINT_VALUE)
+                .orElse(0.0);
     }
 
     double scoringLoss(Tile tile) {
@@ -321,14 +438,15 @@ public final class DefenseOutlook {
     }
 
     private double publicGain(Player enemy, Tile tile, IncomingForce force) {
-        String key = force.key() + "|" + tile.getPosition();
+        return publicGain(enemy, tile, force, seatPlanets(tile));
+    }
+
+    private double publicGain(Player enemy, Tile tile, IncomingForce force, List<Planet> planets) {
+        List<String> names = planets.stream().map(Planet::getName).toList();
+        String key = force.key() + "|" + tile.getPosition() + "|" + names;
         return cached(publicGains, key, () -> {
             ObjectiveValue view = publicView(enemy);
-            return view.gain(view.before()
-                    .after(
-                            tile.getPosition(),
-                            force.moves(),
-                            seatPlanets(tile).stream().map(Planet::getName).toList()));
+            return view.gain(view.before().after(tile.getPosition(), force.moves(), names));
         });
     }
 
@@ -339,15 +457,25 @@ public final class DefenseOutlook {
     }
 
     private double fearCeiling(Player enemy, Tile tile, Horizon horizon, IncomingForce force) {
-        String key = force.key() + "|" + tile.getPosition() + "|" + horizon;
-        return cached(fearCeilings, key, () -> fearWith(enemy, tile, horizon, force, 1.0));
+        return fearCeiling(enemy, tile, horizon, force, seatPlanets(tile));
+    }
+
+    private double fearCeiling(Player enemy, Tile tile, Horizon horizon, IncomingForce force, List<Planet> planets) {
+        String key = force.key() + "|" + tile.getPosition() + "|" + horizon + "|"
+                + planets.stream().map(Planet::getName).toList();
+        return cached(fearCeilings, key, () -> fearWith(enemy, tile, horizon, force, 1.0, planets));
     }
 
     private double fearWith(Player enemy, Tile tile, Horizon horizon, IncomingForce force, double appetiteShare) {
+        return fearWith(enemy, tile, horizon, force, appetiteShare, seatPlanets(tile));
+    }
+
+    private double fearWith(
+            Player enemy, Tile tile, Horizon horizon, IncomingForce force, double appetiteShare, List<Planet> planets) {
         double raw = roundFactor(horizon)
                 * aggression(enemy)
                 * commitment(enemy, force)
-                * motiveFactor(enemy, tile, force)
+                * motiveFactor(enemy, tile, force, planets)
                 * appetiteShare
                 * ceasefire(enemy);
         return clamp(raw, 0, 1);
@@ -389,8 +517,8 @@ public final class DefenseOutlook {
         return MIN_COMMITMENT + (1 - MIN_COMMITMENT) * clamp(spare / SPARE_FLEET_FOR_FULL_COMMITMENT, 0, 1);
     }
 
-    private double motiveFactor(Player enemy, Tile tile, IncomingForce force) {
-        double reason = publicGain(enemy, tile, force) + denial(tile);
+    private double motiveFactor(Player enemy, Tile tile, IncomingForce force, List<Planet> planets) {
+        double reason = publicGain(enemy, tile, force, planets) + denial(tile);
         return 0.5 + 0.5 * clamp(reason / SCORING_REASON_SCALE, 0, 1);
     }
 
@@ -590,7 +718,8 @@ public final class DefenseOutlook {
         }
     }
 
-    private Bundle bestKeptBundle(Tile origin, Defenders afterRegardless, List<UnitMove> leaving, double now) {
+    private Bundle bestKeptBundle(
+            Tile origin, Defenders afterRegardless, List<UnitMove> leaving, double now, @Nullable Blend blend) {
         Bundle best = null;
         for (UnitType type : typesOf(leaving)) {
             int available = leaving.stream()
@@ -599,7 +728,7 @@ public final class DefenseOutlook {
                     .sum();
             for (int count : bundleSizes(available)) {
                 List<UnitMove> remaining = without(leaving, type, count);
-                double after = cost(origin, afterRegardless.minus(movesFrom(origin, remaining)));
+                double after = blendedCost(origin, afterRegardless.minus(movesFrom(origin, remaining)), blend);
                 double unitCost = Math.max(UNIT_COST_FLOOR, count * IncomingForces.cost(seat, type));
                 Bundle bundle = new Bundle(
                         now - after, (now - after) / unitCost, BoardView.capacity(seat, type), unitCost, remaining);
@@ -676,6 +805,7 @@ public final class DefenseOutlook {
     }
 
     private ObjectiveValue own() {
+        if (root != null) return root.own();
         if (own == null) own = new ObjectiveValue(game, seat);
         return own;
     }
@@ -689,12 +819,13 @@ public final class DefenseOutlook {
         return view;
     }
 
-    private double fleetCostTotal(Player player) {
+    double fleetCostTotal(Player player) {
         String key = player.getFaction();
         Double known = fleetCosts.get(key);
         if (known != null) return known;
         double total = 0;
         for (Tile tile : game.getTileMap().values()) {
+            if (exclusion != null && exclusion.owner() == player && exclusion.tile() == tile) continue;
             for (Map.Entry<UnitType, Integer> ship :
                     BoardView.ships(BoardView.space(tile), player).entrySet()) {
                 if (ship.getKey() != UnitType.Fighter) {
