@@ -791,15 +791,9 @@ class AutoCompleteProvider {
                     return;
                 }
 
-                List<Command.Choice> options =
-                        GameUndoNameService.getUndoNamesToCommandText(game, 25).entrySet().stream()
-                                .sorted(Map.Entry.comparingByKey(
-                                        Comparator.comparing(GameUndoNameService::getUndoNumberFromFileName)
-                                                .reversed()))
-                                .limit(25)
-                                .map(entry ->
-                                        new Command.Choice(StringUtils.left(entry.getValue(), 100), entry.getKey()))
-                                .toList();
+                List<Command.Choice> options = GameUndoNameService.getLatestUndoSaves(game, 25).stream()
+                        .map(save -> new Command.Choice(StringUtils.left(save.label(), 100), save.selectionValue()))
+                        .toList();
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {

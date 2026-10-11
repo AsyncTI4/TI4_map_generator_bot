@@ -155,9 +155,9 @@ public class GameManager {
     }
 
     @Nullable
-    public static Game undo(Game game, int undoIndex) {
+    public static Game undo(Game game, int undoIndex, @Nullable Long selectedSaveLastModifiedDate) {
         waitFor(gameNamesLoadedLatch);
-        Game undo = GameUndoService.undo(game, undoIndex);
+        Game undo = GameUndoService.undo(game, undoIndex, selectedSaveLastModifiedDate);
         return handleUndo(undo);
     }
 

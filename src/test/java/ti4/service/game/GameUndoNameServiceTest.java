@@ -33,6 +33,23 @@ class GameUndoNameServiceTest {
     }
 
     @Test
+    void selectionValueCarriesTheSaveLastModifiedDate() {
+        String value = new GameUndoNameService.UndoSave("pbd21740_1668.txt", "label", 1765357943476L).selectionValue();
+
+        assertThat(GameUndoNameService.getUndoNumberFromSelection("pbd21740", value))
+                .isEqualTo(1668);
+        assertThat(GameUndoNameService.getLastModifiedDateFromSelection(value)).isEqualTo(1765357943476L);
+    }
+
+    @Test
+    void typedSelectionHasNoLastModifiedDate() {
+        assertThat(GameUndoNameService.getLastModifiedDateFromSelection("pbd21740_1668.txt"))
+                .isNull();
+        assertThat(GameUndoNameService.getLastModifiedDateFromSelection("pbd21740_1668.txt@99999999999999999999"))
+                .isNull();
+    }
+
+    @Test
     void shouldRejectSelectionForAnotherGame() {
         Integer undoNumber = GameUndoNameService.getUndoNumberFromSelection("pbd21740", "pbd21741_1668.txt");
         assertThat(undoNumber).isNull();

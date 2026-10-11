@@ -52,18 +52,18 @@ class Undo extends GameStateSubcommand {
             return;
         }
 
-        Integer targetUndoIndex = GameUndoNameService.getUndoNumberFromSelection(gameName, gameToUndoBackTo);
-        if (targetUndoIndex == null) {
+        Integer selectedUndoIndex = GameUndoNameService.getUndoNumberFromSelection(gameName, gameToUndoBackTo);
+        if (selectedUndoIndex == null) {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
-        targetUndoIndex--;
 
-        if (GameManager.undo(game, targetUndoIndex) == null) {
+        Long selectedSaveLastModifiedDate = GameUndoNameService.getLastModifiedDateFromSelection(gameToUndoBackTo);
+        if (GameManager.undo(game, selectedUndoIndex - 1, selectedSaveLastModifiedDate) == null) {
             MessageHelper.replyToMessage(
                     event,
-                    "Undo failed - `" + gameToUndoBackTo
-                            + "` is no longer available. It may have been removed by another undo; please pick again.");
+                    "Undo failed and nothing was rolled back. Save `" + gameName + "_" + selectedUndoIndex
+                            + "` may have been changed by another undo; please pick again.");
         }
     }
 }
