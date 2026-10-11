@@ -90,12 +90,45 @@ public final class ObjectiveValue {
             if (then >= target.threshold()) {
                 total += points;
             } else {
-                int stillNeeded = target.threshold() - Math.min(now, then);
-                int fewestStillNeeded = target.threshold() - Math.max(now, then);
-                total += points * partialShare(target, fewestStillNeeded) * (then - now) / stillNeeded;
+                total += partialGain(target, now, then);
             }
         }
         return total;
+    }
+
+    private static double partialGain(Target target, int now, int then) {
+        int stillNeeded = target.threshold() - Math.min(now, then);
+        int fewestStillNeeded = target.threshold() - Math.max(now, then);
+        return VICTORY_POINT_VALUE
+                * target.points()
+                * partialShare(target, fewestStillNeeded)
+                * (then - now)
+                / stillNeeded;
+    }
+
+    public Set<String> brokenReady(Footprint after) {
+        Set<String> broken = new HashSet<>();
+        for (Target target : targets) {
+            boolean complete = target.before() >= target.threshold();
+            int then = progress(target.id(), after);
+            if (complete && then != NOT_MODELLED && then < target.threshold()) broken.add(target.id());
+        }
+        return broken;
+    }
+
+    public double progressLoss(Footprint after) {
+        double loss = 0;
+        for (Target target : targets) {
+            int now = target.before();
+            int then = progress(target.id(), after);
+            if (now >= target.threshold() || then == NOT_MODELLED || then >= now) continue;
+            loss -= partialGain(target, now, then);
+        }
+        return loss;
+    }
+
+    public boolean oneStepShort() {
+        return targets.stream().anyMatch(target -> target.before() == target.threshold() - 1);
     }
 
     private static double partialShare(Target target, int fewestStillNeeded) {

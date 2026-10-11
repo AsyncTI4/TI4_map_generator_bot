@@ -72,6 +72,7 @@ public final class DefenseOutlook {
     private Tile home;
     private boolean homeKnown;
     private ObjectiveValue own;
+    private Standings standings;
     private final Map<String, ObjectiveValue> publicViews = new HashMap<>();
     private final Map<String, Boolean> guarded = new HashMap<>();
     private final Map<String, Double> scoringLosses = new HashMap<>();
@@ -96,6 +97,11 @@ public final class DefenseOutlook {
         DefenseOutlook outlook = new DefenseOutlook(game, seat);
         Tile home = outlook.home();
         return home == null ? 0 : outlook.cost(home, outlook.defendersAt(home), immediateOnly);
+    }
+
+    Standings standings() {
+        if (standings == null) standings = new Standings(game, incoming);
+        return standings;
     }
 
     Defenders defendersAt(Tile tile) {
