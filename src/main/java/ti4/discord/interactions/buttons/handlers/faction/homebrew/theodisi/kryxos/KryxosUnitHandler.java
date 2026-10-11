@@ -88,6 +88,15 @@ public class KryxosUnitHandler {
             return;
         }
 
+								if (player.hasTech("x89c4")) {
+												List<Integer> doubledHits = new ArrayList<>();
+            for (int hits : hitsByMech) {
+                doubledHits.add(hits * 2);
+            }
+            hitsByMech = doubledHits;
+        }
+ 
+
         UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
         int undamagedMechs = unitHolder.getUnitCount(mechKey) - unitHolder.getDamagedUnitCount(mechKey);
         if (undamagedMechs <= 0) {
