@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.BoardView;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -72,5 +73,19 @@ final class DefenseScenario {
 
     Defenders defenders() {
         return Defenders.of(test.nekro, home);
+    }
+
+    Defenders afterBuilding(ProductionPlanner.BuildPlan plan) {
+        return afterBuilding(defenders(), plan);
+    }
+
+    static Defenders afterBuilding(Defenders defenders, ProductionPlanner.BuildPlan plan) {
+        Defenders grown = defenders;
+        for (ProductionPlanner.BuildOrder order : plan.orders()) {
+            grown = BoardView.GROUND_FORCES.contains(order.type())
+                    ? grown.plusGround(order.location(), order.type(), order.units())
+                    : grown.plusShips(order.type(), order.units(), 0);
+        }
+        return grown;
     }
 }

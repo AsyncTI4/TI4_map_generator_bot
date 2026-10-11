@@ -68,6 +68,13 @@ public class ProductionPlanner {
     private static final String MAKE_AN_EXAMPLE = "mew";
     private static final String FIGHT_WITH_PRECISION = "fwp";
     private static final String MECHANIZE_THE_MILITARY = "mtm";
+    private static final int MAX_DEFENSE_BUNDLES = 6;
+    private static final int MAX_DEFENSE_BUNDLE_SIZE = 3;
+    private static final int MAX_DEFENSE_MECHS = 2;
+    private static final double DEFENSE_MIN_VALUE_PER_RESOURCE = 0.5;
+    private static final double DEFENSE_FOCUS_BIAS = 1.2;
+    private static final List<UnitType> DEFENSE_SHIPS =
+            List.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
     private static final String AI_DEVELOPMENT = "aida";
     private static final int AIDA_MIN_DISCOUNT = 2;
     private static final List<UnitType> HEAVY_SHIPS = List.of(UnitType.Flagship, UnitType.Warsun);
@@ -192,6 +199,7 @@ public class ProductionPlanner {
                         seat.getFleetCC() - BoardView.nonFighterShips(BoardView.space(tile), seat)),
                 defense);
         planScoringUnits(builder);
+        planDefensiveUnits(builder);
         planCoreUnits(builder);
         planSurplusShips(builder);
         fillProduction(builder);
@@ -291,6 +299,38 @@ public class ProductionPlanner {
         if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
             int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
             builder.shipsUpTo(UnitType.Destroyer, pawns, builder.scoringValue(UnitType.Destroyer), true);
+        }
+    }
+
+    private record DefenseBundle(UnitType type, int count) {
+        boolean ground() {
+            return BoardView.GROUND_FORCES.contains(type);
+        }
+    }
+
+    private static void planDefensiveUnits(Builder builder) {
+        DefenseOutlook defense = builder.defense;
+        Tile tile = builder.tile;
+        if (!defense.isGuarded(tile)) return;
+        for (int added = 0; added < MAX_DEFENSE_BUNDLES; added++) {
+            Defenders planned = builder.plannedDefenders();
+            double now = defense.cost(tile, planned);
+            if (now <= 0) return;
+            DefenseBundle best = null;
+            double bestGain = 0;
+            double bestPerResource = 0;
+            for (DefenseBundle bundle : builder.defenseBundles()) {
+                double gain = now - defense.cost(tile, builder.grown(planned, bundle));
+                double bundleCost = Math.max(CHEAPEST_UNIT_COST, builder.cost(bundle.type()) * bundle.count());
+                double perResource = gain / bundleCost * builder.defenseBias(bundle);
+                if (perResource > bestPerResource) {
+                    best = bundle;
+                    bestGain = gain;
+                    bestPerResource = perResource;
+                }
+            }
+            if (best == null || bestPerResource < DEFENSE_MIN_VALUE_PER_RESOURCE) return;
+            builder.addDefense(best, bestGain);
         }
     }
 
@@ -396,6 +436,10 @@ public class ProductionPlanner {
 
         boolean allows(int unitCount, double cost, boolean usesFleet) {
             return units >= unitCount && resources >= cost && (!usesFleet || fleetRoom > 0);
+        }
+
+        boolean allowsShips(int unitCount, double cost) {
+            return units >= unitCount && resources >= cost && fleetRoom >= unitCount;
         }
 
         void spend(int unitCount, double cost, boolean usesFleet) {
@@ -511,7 +555,7 @@ public class ProductionPlanner {
         }
 
         boolean ground(UnitType type, int count, double valueEach, boolean forDefense) {
-            Optional<String> planet = groundPlanet != null ? Optional.of(groundPlanet) : dockPlanet();
+            Optional<String> planet = groundTarget();
             UnitModel model = seat.getUnitByType(type);
             if (count <= 0 || planet.isEmpty() || model == null) return false;
             if (type == UnitType.Mech && game.isBaseGameMode()) return false;
@@ -556,6 +600,82 @@ public class ProductionPlanner {
             int allowance = dockPlanet().isPresent() ? BoardView.DOCK_FIGHTER_ALLOWANCE : 0;
             int fighters = BoardView.count(space, seat, UnitType.Fighter) + planned(UnitType.Fighter);
             return Math.max(0, allowance + Math.max(0, shipCapacity - keptForGroundForces) - fighters);
+        }
+
+        Defenders plannedDefenders() {
+            Defenders defenders = Defenders.of(seat, tile);
+            for (BuildOrder order : orders) defenders = grown(defenders, order.type(), order.units(), order.location());
+            return defenders;
+        }
+
+        Defenders grown(Defenders defenders, DefenseBundle bundle) {
+            return grown(
+                    defenders, bundle.type(), bundle.count(), groundTarget().orElse(""));
+        }
+
+        private static Defenders grown(Defenders defenders, UnitType type, int count, String planet) {
+            return BoardView.GROUND_FORCES.contains(type)
+                    ? defenders.plusGround(planet, type, count)
+                    : defenders.plusShips(type, count, 0);
+        }
+
+        List<DefenseBundle> defenseBundles() {
+            List<DefenseBundle> bundles = new ArrayList<>();
+            for (int count = 1; count <= MAX_DEFENSE_BUNDLE_SIZE; count++) {
+                addIfAffordable(bundles, UnitType.Infantry, count);
+                if (count <= MAX_DEFENSE_MECHS) addIfAffordable(bundles, UnitType.Mech, count);
+                addIfAffordable(bundles, UnitType.Fighter, count);
+                for (UnitType ship : DEFENSE_SHIPS) addIfAffordable(bundles, ship, count);
+            }
+            return bundles;
+        }
+
+        private void addIfAffordable(List<DefenseBundle> bundles, UnitType type, int count) {
+            if (canAdd(type, count)) bundles.add(new DefenseBundle(type, count));
+        }
+
+        private boolean canAdd(UnitType type, int count) {
+            UnitModel model = seat.getUnitByType(type);
+            if (model == null || !underCap(model.getAsyncId(), planned(type) + count)) return false;
+            double cost = model.getCost() * count;
+            if (BoardView.GROUND_FORCES.contains(type)) {
+                boolean mechAllowed = type != UnitType.Mech || !game.isBaseGameMode();
+                return mechAllowed && groundTarget().isPresent() && budget.allows(count, cost, false);
+            }
+            if (type == UnitType.Fighter) return count <= fighterRoom() && budget.allows(count, cost, false);
+            return budget.allowsShips(count, cost);
+        }
+
+        double defenseBias(DefenseBundle bundle) {
+            long planets = tile.getPlanetUnitHolders().stream()
+                    .filter(planet -> seat.getPlanets().contains(planet.getName()))
+                    .count();
+            boolean focused = bundle.ground() ? planets == 1 : planets >= 2;
+            return focused ? DEFENSE_FOCUS_BIAS : 1.0;
+        }
+
+        void addDefense(DefenseBundle bundle, double gain) {
+            double each = gain / bundle.count();
+            UnitType type = bundle.type();
+            if (bundle.ground()) {
+                addInPairs(bundle.count(), count -> ground(type, count, each, true));
+            } else if (type == UnitType.Fighter) {
+                addInPairs(bundle.count(), count -> addFighters(count, each, true));
+            } else {
+                for (int ship = 0; ship < bundle.count(); ship++) ship(type, each, false, true);
+            }
+        }
+
+        private void addInPairs(int total, IntPredicate add) {
+            for (int left = total; left > 0; ) {
+                int added = pairOrSingle(left, add);
+                if (added == 0) return;
+                left -= added;
+            }
+        }
+
+        private Optional<String> groundTarget() {
+            return groundPlanet != null ? Optional.of(groundPlanet) : dockPlanet();
         }
 
         boolean leavesRoomToFill(double cost) {
