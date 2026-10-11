@@ -308,8 +308,8 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .isEmpty();
     }
 
-    // Four infantry against three on Lodor fall short of the 80% bar. X-89 Bacterial Weapon ΩΩ doubles their ground
-    // combat hits, which makes the same invasion worth it.
+    // Four infantry against four on Lodor are a clear underdog (about 30% to take the planet), below even the relaxed
+    // landing bar. X-89 Bacterial Weapon ΩΩ doubles their ground combat hits, which makes the same invasion worth it.
     @Test
     void x89MakesAnInvasionWorthIt() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -317,7 +317,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 3);
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 4);
 
         assertThat(attackOn(neighbour)).isEmpty();
 
@@ -374,7 +374,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // Copying a technology after a combat is Nekro's Technological Singularity. A seat without that ability must
-    // not count it, so a marginal attack that only the copy made worthwhile is dropped.
+    // not count it, so a marginal attack (two defenders on Lodor) that only the copy made worthwhile is dropped.
     @Test
     void onlyASeatWithTechnologicalSingularityValuesCopyingATechnology() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -382,7 +382,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 1);
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 2);
 
         assertThat(attackOn(neighbour)).isPresent();
 
@@ -455,8 +455,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // Destroyer II's barrage (3 dice on 6 each) is expected to shoot down all three of Sol's fighters before the
-    // combat, leaving a lone carrier. Plain destroyers (2 dice on 9) only get one, and the fight stays even.
+    // Destroyer II's barrage (3 dice on 6 each) is expected to shoot down all five of Sol's fighters before the
+    // combat, leaving a lone carrier. Plain destroyers (2 dice on 9) only get one, and the rest of the swarm wins.
     @Test
     void countsAntiFighterBarrageBeforeTheSpaceCombat() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -465,7 +465,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
         test.units(lodor, "space", test.sol, UnitType.Carrier, 1);
-        test.units(lodor, "space", test.sol, UnitType.Fighter, 3);
+        test.units(lodor, "space", test.sol, UnitType.Fighter, 5);
         test.nekro.setFleetCC(5);
         assertThat(attackOn(neighbour)).isEmpty();
 
@@ -494,17 +494,18 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(attackOn(neighbour)).isPresent();
     }
 
-    // A carrier and a dreadnought attack Sol's two cruisers: not safe enough. Non-Euclidean Shielding lets the
-    // dreadnought's sustain cancel two hits, and the attack is on. (Nothing threatens home, so no second dreadnought
-    // is kept back as a guard.)
+    // A carrier and two dreadnoughts attack Sol's four cruisers: they would win more often than not, but the expected
+    // losses (about five resources) eat the prize. Non-Euclidean Shielding lets each dreadnought's sustain cancel two
+    // hits, which cuts those losses and the attack is on. (Nothing threatens home, so no dreadnought is kept back as
+    // a guard.)
     @Test
     void countsNonEuclideanShieldingInTheOdds() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "space", test.sol, UnitType.Cruiser, 2);
+        test.units(lodor, "space", test.sol, UnitType.Cruiser, 4);
         test.nekro.setFleetCC(5);
         assertThat(attackOn(neighbour)).isEmpty();
 

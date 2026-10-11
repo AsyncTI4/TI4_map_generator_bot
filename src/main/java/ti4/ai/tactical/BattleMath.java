@@ -63,6 +63,17 @@ class BattleMath {
         return expected;
     }
 
+    static double spaceCannonHits(Player owner, UnitHolder holder) {
+        double expected = 0;
+        for (UnitKey key : holder.getUnitKeysForPlayer(owner)) {
+            UnitModel model = owner.getUnitFromUnitKey(key);
+            if (model == null) continue;
+            int dice = model.getSpaceCannonDieCount(owner) * holder.getUnitCount(key);
+            expected += dice * hitChance(model.getSpaceCannonHitsOn(owner));
+        }
+        return expected;
+    }
+
     static Side afterBarrage(Side target, Side shooter) {
         int fighters = target.units().getOrDefault(UnitType.Fighter, 0);
         if (fighters == 0) return target;

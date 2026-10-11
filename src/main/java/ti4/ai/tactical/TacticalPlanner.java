@@ -29,6 +29,8 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.secrets.ActionSecretTiming;
+import ti4.ai.tactical.DefenseOutlook.Blend;
+import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
@@ -37,7 +39,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -47,10 +48,14 @@ import ti4.model.UnitModel;
 public class TacticalPlanner {
 
     public static final double MIN_SCORE = 1.0;
-    static final double ATTACK_MIN_WIN = 0.8;
+    private static final double MIN_WIN = 0.5;
+    private static final double DESPERATE_MIN_WIN = 0.3;
+    private static final double DESPERATE_THREAT = 0.5;
+    private static final double HOME_LANDING_THREAT = 0.25;
+    private static final double HOME_LANDING_SHARE = 0.5;
+    private static final int FINALISTS = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
     private static final double DISTANCE_COST = 0.2;
-    private static final double TECH_STEAL_VALUE = 3.0;
     private static final double PLANET_TEMPO_VALUE = 0.8;
     private static final double FRONTIER_CARD_VALUE = 1.5;
     private static final double FRONTIER_POSITION_VALUE = 1.0;
@@ -405,54 +410,107 @@ public class TacticalPlanner {
     }
 
     private static Optional<TacticalPlan> attack(Context context, Tile tile) {
-        Game game = context.game;
-        Player seat = context.seat;
-        if (isAnotherPlayersHome(game, seat, tile) && !opensHomeSystems(game, seat)) return Optional.empty();
-        Player opponent = singleOpponent(game, seat, tile);
+        return context.attackPlan(tile);
+    }
+
+    private static Optional<TacticalPlan> bestAttack(Context context, Tile tile) {
+        Player opponent = singleOpponent(context.game, context.seat, tile);
         if (opponent == null) return Optional.empty();
-        TacticalPlan best = null;
+        return finalPlan(context, tile, candidatePool(context, tile, opponent));
+    }
+
+    private static List<Candidate> candidatePool(Context context, Tile tile, Player opponent) {
+        List<Candidate> pool = new ArrayList<>();
         for (Tile origin : context.origins()) {
-            if (origin == tile) continue;
-            Optional<TacticalPlan> plan = attackFrom(context, tile, origin, opponent);
-            if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
+            if (origin != tile) pool.addAll(candidatesFrom(context, tile, origin, opponent));
         }
-        if (best == null) return Optional.empty();
-        boolean firesThrough = isAnotherPlayersHome(game, seat, tile) && opensHomeSystems(game, seat);
-        if (context.coveredByEnemySpaceCannon(tile) && !firesThrough) return Optional.empty();
-        return Optional.of(best);
+        return pool;
+    }
+
+    static Optional<StrikeValue> explainAttack(Game game, Player seat, String position) {
+        Tile tile = game.getTileByPosition(position);
+        Player opponent = tile == null ? null : singleOpponent(game, seat, tile);
+        if (opponent == null) return Optional.empty();
+        Context context = new Context(game, seat);
+        return candidatePool(context, tile, opponent).stream()
+                .max(Comparator.comparingDouble(found -> found.quick().score()))
+                .map(found -> context.offense().evaluate(found.strike(), found.estimate(), found.terms(), true));
     }
 
     private record Departure(List<UnitMove> ships, List<UnitMove> cargo, boolean heldBack) {}
 
-    private static Optional<TacticalPlan> attackFrom(Context context, Tile tile, Tile origin, Player opponent) {
-        Optional<TacticalPlan> unescorted = attackWithGarrison(context, tile, origin, opponent, 0);
+    private record Part(Tile origin, Departure departure) {}
+
+    private record Candidate(
+            List<Part> parts,
+            Strike strike,
+            StrikeEstimate estimate,
+            ContextTerms terms,
+            StrikeValue quick,
+            boolean heldBack,
+            @Nullable Blend blend) {
+
+        List<UnitMove> moves() {
+            return strike.moves();
+        }
+    }
+
+    private static List<Candidate> candidatesFrom(Context context, Tile tile, Tile origin, Player opponent) {
+        List<Candidate> pool = new ArrayList<>(withGarrisonPasses(context, tile, origin, opponent, 0));
         int fighters = BoardView.count(BoardView.space(origin), context.seat, UnitType.Fighter);
-        if (fighters == 0 || !BoardView.hasEnemyShips(context.game, context.seat, tile)) return unescorted;
-        return better(unescorted, attackWithGarrison(context, tile, origin, opponent, fighters));
+        if (fighters > 0 && BoardView.hasEnemyShips(context.game, context.seat, tile)) {
+            pool.addAll(withGarrisonPasses(context, tile, origin, opponent, fighters));
+        }
+        return pool;
     }
 
-    private static Optional<TacticalPlan> attackWithGarrison(
+    private static List<Candidate> withGarrisonPasses(
             Context context, Tile tile, Tile origin, Player opponent, int fightersAvailable) {
-        Optional<TacticalPlan> first = attackVariants(context, tile, origin, opponent, fightersAvailable, List.of());
-        return secondPass(
+        List<Candidate> first = variants(context, tile, origin, opponent, fightersAvailable, List.of());
+        Optional<Candidate> top = first.stream()
+                .max(Comparator.comparingDouble(found -> found.quick().score()));
+        DefenseOutlook defense = context.defense();
+        if (top.isEmpty()
+                || !defense.isGuarded(origin)
+                || defense.leaveCost(origin, top.get().moves(), top.get().blend())
+                        <= DefenseOutlook.GARRISON_TOLERANCE) {
+            return first;
+        }
+        List<Candidate> pool = new ArrayList<>(first);
+        pool.addAll(variants(
                 context,
+                tile,
                 origin,
-                first,
-                leaving -> attackVariants(context, tile, origin, opponent, fightersAvailable, leaving));
+                opponent,
+                fightersAvailable,
+                departingShips(top.get().moves())));
+        return pool;
     }
 
-    private static Optional<TacticalPlan> attackVariants(
+    private static List<Candidate> variants(
             Context context,
             Tile tile,
             Tile origin,
             Player opponent,
             int fightersAvailable,
             List<UnitMove> shipsLeaving) {
-        Departure held = departure(context, tile, origin, fightersAvailable, true, shipsLeaving);
-        Optional<TacticalPlan> best = attackFrom(context, tile, origin, opponent, held);
-        if (!held.heldBack()) return best;
-        Departure allIn = departure(context, tile, origin, fightersAvailable, false, shipsLeaving);
-        return better(best, attackFrom(context, tile, origin, opponent, allIn));
+        DefenseOutlook defense = context.defense();
+        Departure allIn = departure(context, tile, origin, fightersAvailable, false, shipsLeaving, null);
+        Optional<Candidate> everyShip =
+                candidate(context, tile, opponent, List.of(new Part(origin, allIn)), false, null);
+        List<Candidate> variants = new ArrayList<>(everyShip.stream().toList());
+        if (!defense.isGuarded(origin)) return variants;
+        double w0 = everyShip
+                .map(found ->
+                        found.estimate().escaped() ? 0.0 : found.estimate().spaceWin())
+                .orElse(0.0);
+        Blend blend = w0 > 0 ? new Blend(defense.excluding(new Exclusion(opponent, tile)), w0) : null;
+        Departure held = departure(context, tile, origin, fightersAvailable, true, shipsLeaving, blend);
+        if (held.heldBack()) {
+            candidate(context, tile, opponent, List.of(new Part(origin, held)), true, blend)
+                    .ifPresent(variants::add);
+        }
+        return variants;
     }
 
     private static Departure departure(
@@ -461,7 +519,8 @@ public class TacticalPlanner {
             Tile origin,
             int fightersAvailable,
             boolean holdBack,
-            List<UnitMove> shipsLeaving) {
+            List<UnitMove> shipsLeaving,
+            @Nullable Blend blend) {
         Game game = context.game;
         Player seat = context.seat;
         UnitHolder originSpace = BoardView.space(origin);
@@ -490,11 +549,12 @@ public class TacticalPlanner {
             candidates.add(new UnitMove(origin.getPosition(), BoardView.SPACE, UnitType.Fighter, escort));
         }
         List<UnitMove> cargo = enemyPlanets(game, seat, tile).isEmpty()
+                        && freePlanetsIn(context, tile).isEmpty()
                 ? List.of()
                 : take(
-                        availableGroundForces(game, seat, origin, context.defense(), shipsLeaving),
+                        availableGroundForces(game, seat, origin, context.defense(), shipsLeaving, blend),
                         capacityOf(seat, ships) - escort);
-        List<UnitMove> leaving = holdBack ? context.defense().holdBack(origin, cargo, candidates) : candidates;
+        List<UnitMove> leaving = holdBack ? context.defense().holdBack(origin, cargo, candidates, blend) : candidates;
         List<UnitMove> leavingShips = shipsIn(leaving);
         int capacity = capacityOf(seat, leavingShips);
         int fighters = Math.min(countOf(leaving, UnitType.Fighter), capacity);
@@ -505,60 +565,155 @@ public class TacticalPlanner {
         return new Departure(departing, take(cargo, capacity - fighters), unitCount(leaving) < unitCount(candidates));
     }
 
-    private static Optional<TacticalPlan> attackFrom(
-            Context context, Tile tile, Tile origin, Player opponent, Departure departure) {
-        if (departure.ships().isEmpty()) return Optional.empty();
+    private static List<Planet> freePlanetsIn(Context context, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .filter(planet -> BoardView.controller(context.game, planet.getName()) == null)
+                .filter(planet -> !BoardView.hasCustodians(planet) || context.canPayCustodians())
+                .toList();
+    }
+
+    private static Optional<Candidate> candidate(
+            Context context, Tile tile, Player opponent, List<Part> parts, boolean heldBack, @Nullable Blend blend) {
+        if (parts.stream().anyMatch(part -> part.departure().ships().isEmpty())) return Optional.empty();
+        Optional<Candidate> first = evaluated(context, tile, opponent, parts, heldBack, blend, true);
+        if (first.isEmpty()) return first;
+        boolean raidsAHome = isAnotherPlayersHome(context.game, context.seat, tile)
+                && !first.get().estimate().landings().isEmpty();
+        if (!raidsAHome || homeLandingJustified(context, opponent, first.get())) return first;
+        return evaluated(context, tile, opponent, parts, heldBack, blend, false);
+    }
+
+    private static boolean homeLandingJustified(Context context, Player opponent, Candidate candidate) {
+        StrikeValue value = candidate.quick();
+        double points = HOME_LANDING_SHARE * ObjectiveValue.VICTORY_POINT_VALUE;
+        return context.defense().standings().winThreat(opponent) >= HOME_LANDING_THREAT
+                || value.homeBlock() >= points
+                || value.ownObjective() >= points;
+    }
+
+    private static Optional<Candidate> evaluated(
+            Context context,
+            Tile tile,
+            Player opponent,
+            List<Part> parts,
+            boolean heldBack,
+            @Nullable Blend blend,
+            boolean homeLandings) {
         Game game = context.game;
         Player seat = context.seat;
-        List<UnitMove> ships = departure.ships();
-        List<UnitMove> cargo = departure.cargo();
-        boolean conquering = tile.isHomeSystem(game) && wantsToConquer(game, seat);
-        StrikeRules rules = new StrikeRules(conquering, ATTACK_MIN_WIN, conquering, false, context.canPayCustodians());
-        List<UnitMove> departing = new ArrayList<>(ships);
-        departing.addAll(cargo);
-        Strike strike = Strike.of(seat, tile, opponent, List.of(origin), departing, rules);
-        StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
-        double spaceWin = estimate.spaceWin();
-        if (spaceWin < ATTACK_MIN_WIN) return Optional.empty();
-        boolean spaceCombat = estimate.spaceCombat();
-        boolean groundCombat = estimate.groundCombat();
-        Map<UnitType, Integer> bombarding =
-                StrikeEvaluator.bombardingShips(seat, BoardView.space(tile), new Side(seat, shipsOf(ships)));
-        Optional<BombardmentRules.Target> bombardment = BombardmentRules.target(game, seat, tile, bombarding);
-        double cannonLosses = isAnotherPlayersHome(game, seat, tile) && context.coveredByEnemySpaceCannon(tile)
-                ? StrikeEvaluator.cannonLoss(game, seat, strike)
-                : 0;
-        double value = 0;
-        double retakeValue =
-                tile == seat.getHomeSystemTile() ? context.defense().publicScoringLock() : 0;
-        for (Map.Entry<String, Integer> landing : estimate.landings().entrySet()) {
-            if (!(tile.getUnitHolders().get(landing.getKey()) instanceof Planet planet)) continue;
-            double groundWin = estimate.groundWins().get(landing.getKey());
-            value += (BoardView.planetValue(planet)
-                            + unexploredValue(context, tile, planet, landing.getValue())
-                            + retakeValue)
-                    * groundWin;
+        List<Tile> origins = parts.stream().map(Part::origin).toList();
+        List<UnitMove> departing = new ArrayList<>();
+        for (Part part : parts) {
+            departing.addAll(part.departure().ships());
+            departing.addAll(part.departure().cargo());
         }
-        if ((spaceCombat || groundCombat) && canStealTech(game, seat, opponent)) value += TECH_STEAL_VALUE;
-        value += actionSecretBonus(game, seat, tile, opponent, ships, spaceCombat, groundCombat);
-        value += makeAnExampleBonus(game, seat, tile, bombarding, bombardment);
-        if (spaceCombat && tile == seat.getHomeSystemTile()) value += HOME_DEFENCE_VALUE;
-        int landed = estimate.landings().values().stream()
+        Strike strike =
+                Strike.of(seat, tile, opponent, origins, departing, rules(context, tile, opponent, homeLandings));
+        StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
+        if (estimate.spaceWin() <= 0) return Optional.empty();
+        Optional<List<UnitMove>> legal = executedMoves(context, parts, tile, estimate);
+        if (legal.isEmpty()) return Optional.empty();
+        Strike executed = strike.withMoves(legal.get());
+        ContextTerms terms = terms(context, tile, executed, estimate);
+        StrikeValue quick = context.offense().evaluate(executed, estimate, terms, false);
+        return Optional.of(new Candidate(parts, executed, estimate, terms, quick, heldBack, blend));
+    }
+
+    private static StrikeRules rules(Context context, Tile tile, Player opponent, boolean homeLandings) {
+        Game game = context.game;
+        double threat = context.defense().standings().winThreat(opponent);
+        boolean conquering = tile.isHomeSystem(game) && wantsToConquer(game, context.seat);
+        double minWin = threat >= DESPERATE_THREAT ? DESPERATE_MIN_WIN : MIN_WIN;
+        boolean structures = conquering || tile == opponent.getHomeSystemTile() || threat >= DESPERATE_THREAT;
+        return new StrikeRules(conquering, minWin, structures, homeLandings, context.canPayCustodians());
+    }
+
+    private static Optional<List<UnitMove>> executedMoves(
+            Context context, List<Part> parts, Tile tile, StrikeEstimate estimate) {
+        Player seat = context.seat;
+        int landed = estimate.groundSent().values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
-        List<UnitMove> moves = new ArrayList<>(ships);
-        moves.addAll(take(cargo, landed));
-        Optional<List<UnitMove>> legal = legalMoves(context, origin, tile, moves);
-        if (legal.isEmpty()) return Optional.empty();
-        value += spaceWin
-                * context.objectiveGain(tile, legal.get(), estimate.landings().keySet());
-        if (value <= 0) return Optional.empty();
-        double score = spaceWin * value
-                - (1 - spaceWin) * fleetCost(seat, legal.get())
-                - cannonLosses
-                - context.defense().leaveCost(origin, legal.get());
-        if (score < ATTACK_MIN_SCORE) return Optional.empty();
-        return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), legal.get(), estimate.landings(), score));
+        List<UnitMove> allCargo = new ArrayList<>();
+        parts.forEach(part -> allCargo.addAll(part.departure().cargo()));
+        List<UnitMove> carried = take(allCargo, landed);
+        int moving = parts.stream()
+                .mapToInt(part -> movedNonFighterShips(part.departure().ships()))
+                .sum();
+        if (BoardView.nonFighterShips(BoardView.space(tile), seat) + moving > seat.getFleetCC()) {
+            return Optional.empty();
+        }
+        List<UnitMove> executed = new ArrayList<>();
+        for (Part part : parts) {
+            List<UnitMove> own = new ArrayList<>(part.departure().ships());
+            carried.stream()
+                    .filter(move -> move.origin().equals(part.origin().getPosition()))
+                    .forEach(own::add);
+            Optional<List<UnitMove>> legal = legalMoves(context, part.origin(), tile, own);
+            if (legal.isEmpty()) return Optional.empty();
+            executed.addAll(legal.get());
+        }
+        return Optional.of(merge(executed));
+    }
+
+    private static ContextTerms terms(Context context, Tile tile, Strike strike, StrikeEstimate estimate) {
+        Game game = context.game;
+        Player seat = context.seat;
+        double objective =
+                context.objectiveGain(tile, strike.moves(), estimate.landings().keySet());
+        Map<String, Double> explore = new HashMap<>();
+        estimate.groundSent().forEach((name, sent) -> {
+            if (tile.getUnitHolders().get(name) instanceof Planet planet) {
+                explore.put(name, unexploredValue(context, tile, planet, sent));
+            }
+        });
+        double[] secrets = secretBonuses(game, seat, tile, strike, estimate);
+        boolean ownHome = tile == seat.getHomeSystemTile();
+        double homeDefence = ownHome && estimate.spaceCombat() ? HOME_DEFENCE_VALUE : 0;
+        double retake = ownHome ? context.defense().publicScoringLock() : 0;
+        Map<UnitType, Integer> bombarding =
+                StrikeEvaluator.bombardingShips(seat, BoardView.space(tile), new Side(seat, strike.ships()));
+        Optional<BombardmentRules.Target> bombardment = BombardmentRules.target(game, seat, tile, bombarding);
+        double example = makeAnExampleBonus(game, seat, tile, bombarding, bombardment);
+        return new ContextTerms(objective, explore, secrets[0], secrets[1], homeDefence, retake, example);
+    }
+
+    private static Optional<TacticalPlan> finalPlan(Context context, Tile tile, List<Candidate> pool) {
+        if (pool.isEmpty()) return Optional.empty();
+        List<Candidate> ranked = pool.stream()
+                .sorted(Comparator.comparingDouble(
+                                (Candidate found) -> found.quick().score())
+                        .reversed())
+                .toList();
+        List<Candidate> finalists = new ArrayList<>(ranked.subList(0, Math.min(FINALISTS, ranked.size())));
+        ranked.stream().filter(Candidate::heldBack).findFirst().ifPresent(found -> addDistinct(finalists, found));
+        ranked.stream()
+                .filter(found -> !found.heldBack())
+                .findFirst()
+                .ifPresent(found -> addDistinct(finalists, found));
+        TacticalPlan best = null;
+        for (Candidate finalist : finalists) {
+            Optional<TacticalPlan> plan = fullPlan(context, tile, finalist);
+            if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
+        }
+        return Optional.ofNullable(best);
+    }
+
+    private static void addDistinct(List<Candidate> finalists, Candidate candidate) {
+        if (finalists.stream().noneMatch(found -> found == candidate)) finalists.add(candidate);
+    }
+
+    private static Optional<TacticalPlan> fullPlan(Context context, Tile tile, Candidate candidate) {
+        StrikeValue value =
+                context.offense().evaluate(candidate.strike(), candidate.estimate(), candidate.terms(), true);
+        if (candidate.estimate().spaceWin() < candidate.strike().rules().landMinWin()) return Optional.empty();
+        if (value.score() < ATTACK_MIN_SCORE) return Optional.empty();
+        return Optional.of(new TacticalPlan(
+                Kind.ATTACK,
+                tile.getPosition(),
+                candidate.moves(),
+                candidate.estimate().landings(),
+                value.score()));
     }
 
     private static double unexploredValue(Context context, Tile tile, Planet planet, int infantry) {
@@ -599,12 +754,8 @@ public class TacticalPlanner {
                         seat, bombarding, planet, bombardment.get().defender());
     }
 
-    private static boolean isAnotherPlayersHome(Game game, Player seat, Tile tile) {
+    static boolean isAnotherPlayersHome(Game game, Player seat, Tile tile) {
         return tile.isHomeSystem(game) && tile != seat.getHomeSystemTile();
-    }
-
-    private static boolean opensHomeSystems(Game game, Player seat) {
-        return seat.getSecretsUnscored().containsKey(DARKEN_THE_SKIES) || wantsToConquer(game, seat);
     }
 
     private static boolean wantsToConquer(Game game, Player seat) {
@@ -620,39 +771,85 @@ public class TacticalPlanner {
             List<UnitMove> ships,
             boolean spaceCombat,
             boolean groundCombat) {
-        if (!spaceCombat && !groundCombat) return 0;
+        Map<UnitType, Integer> moving = new EnumMap<>(UnitType.class);
+        ships.forEach(move -> moving.merge(move.type(), move.count(), Integer::sum));
+        double[] bonuses = secretBonuses(game, seat, tile, opponent, moving, spaceCombat, groundCombat);
+        return bonuses[0] + bonuses[1];
+    }
+
+    private static double[] secretBonuses(Game game, Player seat, Tile tile, Strike strike, StrikeEstimate estimate) {
+        return secretBonuses(
+                game, seat, tile, strike.opponent(), strike.ships(), estimate.spaceCombat(), estimate.groundCombat());
+    }
+
+    private static double[] secretBonuses(
+            Game game,
+            Player seat,
+            Tile tile,
+            Player opponent,
+            Map<UnitType, Integer> ships,
+            boolean space,
+            boolean ground) {
+        if (!space && !ground) return new double[] {0, 0};
         Set<String> held = seat.getSecretsUnscored().keySet();
-        List<String> qualifying = new ArrayList<>();
-        if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) qualifying.add("sar");
-        if (held.contains("btv") && tile.isAnomaly(game, seat)) qualifying.add("btv");
+        List<String> generic = new ArrayList<>();
+        if (held.contains("sar") && opponent.getTotalVictoryPoints() == game.getHighestScore()) generic.add("sar");
+        if (held.contains("btv") && tile.isAnomaly(game, seat)) generic.add("btv");
         if (held.contains(DARKEN_THE_SKIES) && tile.isHomeSystem(game) && tile != seat.getHomeSystemTile()) {
-            qualifying.add(DARKEN_THE_SKIES);
+            generic.add(DARKEN_THE_SKIES);
         }
         if (held.contains("baf")
                 && seat.getPromissoryNotesInPlayArea().stream().anyMatch(note -> game.getPNOwner(note) == opponent)) {
-            qualifying.add("baf");
+            generic.add("baf");
         }
-        if (spaceCombat) {
-            UnitHolder space = BoardView.space(tile);
-            int arriving = movedNonFighterShips(ships) + BoardView.nonFighterShips(space, seat);
-            boolean flagship = ships.stream().anyMatch(move -> move.type() == UnitType.Flagship);
-            if (held.contains("uf") && flagship) qualifying.add("uf");
-            if (held.contains("dyp") && arriving >= DEMONSTRATION_SHIPS) qualifying.add("dyp");
+        List<String> spaceOnly = new ArrayList<>();
+        if (space) {
+            UnitHolder holder = BoardView.space(tile);
+            int arriving = ships.entrySet().stream()
+                            .filter(ship -> BoardView.MOVING_SHIPS.contains(ship.getKey()))
+                            .mapToInt(Map.Entry::getValue)
+                            .sum()
+                    + BoardView.nonFighterShips(holder, seat);
+            if (held.contains("uf") && ships.getOrDefault(UnitType.Flagship, 0) > 0) spaceOnly.add("uf");
+            if (held.contains("dyp") && arriving >= DEMONSTRATION_SHIPS) spaceOnly.add("dyp");
             if (held.contains("dtgs")
-                    && BoardView.count(space, opponent, UnitType.Flagship)
-                                    + BoardView.count(space, opponent, UnitType.Warsun)
+                    && BoardView.count(holder, opponent, UnitType.Flagship)
+                                    + BoardView.count(holder, opponent, UnitType.Warsun)
                             > 0) {
-                qualifying.add("dtgs");
+                spaceOnly.add("dtgs");
             }
         }
-        int combats = (spaceCombat ? 1 : 0) + (groundCombat ? 1 : 0);
-        double points = qualifying.stream()
+        double bestSpaceOnly = secretPoints(game, seat, spaceOnly).stream()
+                .findFirst()
+                .orElse(0.0);
+        List<Double> genericPoints = secretPoints(game, seat, generic);
+        double firstGeneric = genericPoints.isEmpty() ? 0 : genericPoints.get(0);
+        double secondGeneric = genericPoints.size() < 2 ? 0 : genericPoints.get(1);
+        double spacePoints = 0;
+        double groundPoints = 0;
+        if (space && ground) {
+            if (bestSpaceOnly + firstGeneric >= firstGeneric + secondGeneric) {
+                spacePoints = bestSpaceOnly;
+                groundPoints = firstGeneric;
+            } else {
+                spacePoints = firstGeneric;
+                groundPoints = secondGeneric;
+            }
+        } else if (space) {
+            spacePoints = Math.max(bestSpaceOnly, firstGeneric);
+        } else {
+            groundPoints = firstGeneric;
+        }
+        return new double[] {
+            ObjectiveValue.VICTORY_POINT_VALUE * spacePoints, ObjectiveValue.VICTORY_POINT_VALUE * groundPoints
+        };
+    }
+
+    private static List<Double> secretPoints(Game game, Player seat, List<String> secrets) {
+        return secrets.stream()
                 .map(secret -> ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE)
                 .sorted(Comparator.reverseOrder())
-                .limit(combats)
-                .mapToDouble(Double::doubleValue)
-                .sum();
-        return ObjectiveValue.VICTORY_POINT_VALUE * points;
+                .toList();
     }
 
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {
@@ -980,13 +1177,6 @@ public class TacticalPlanner {
                 .toList();
     }
 
-    private static boolean canStealTech(Game game, Player seat, Player opponent) {
-        return seat.hasAbility("technological_singularity")
-                && !ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
-                                seat, opponent, new ArrayList<>(), game)
-                        .isEmpty();
-    }
-
     static int movableGroundForces(Game game, Player seat, Tile origin) {
         return movableGroundForces(game, seat, origin, new DefenseOutlook(game, seat));
     }
@@ -997,6 +1187,16 @@ public class TacticalPlanner {
 
     private static List<UnitMove> availableGroundForces(
             Game game, Player seat, Tile origin, DefenseOutlook defense, List<UnitMove> shipsLeaving) {
+        return availableGroundForces(game, seat, origin, defense, shipsLeaving, null);
+    }
+
+    private static List<UnitMove> availableGroundForces(
+            Game game,
+            Player seat,
+            Tile origin,
+            DefenseOutlook defense,
+            List<UnitMove> shipsLeaving,
+            @Nullable Blend blend) {
         List<UnitMove> infantry = new ArrayList<>();
         List<UnitMove> mechs = new ArrayList<>();
         String position = origin.getPosition();
@@ -1011,7 +1211,7 @@ public class TacticalPlanner {
         for (Planet planet : origin.getPlanetUnitHolders()) {
             if (!seat.getPlanets().contains(planet.getName())) continue;
             int planetMechs = BoardView.count(planet, seat, UnitType.Mech);
-            int garrison = garrison(game, origin, planet, defense, shipsLeaving);
+            int garrison = garrison(game, origin, planet, defense, shipsLeaving, blend);
             int mechsStaying = Math.min(planetMechs, garrison);
             int infantryStaying = garrison - mechsStaying;
             int planetInfantry = BoardView.count(planet, seat, UnitType.Infantry);
@@ -1027,9 +1227,14 @@ public class TacticalPlanner {
     }
 
     private static int garrison(
-            Game game, Tile origin, Planet planet, DefenseOutlook defense, List<UnitMove> shipsLeaving) {
+            Game game,
+            Tile origin,
+            Planet planet,
+            DefenseOutlook defense,
+            List<UnitMove> shipsLeaving,
+            @Nullable Blend blend) {
         if (origin.isHomeSystem(game)) {
-            return Math.max(HOME_GARRISON, defense.groundToKeep(origin, planet, shipsLeaving));
+            return Math.max(HOME_GARRISON, defense.groundToKeep(origin, planet, shipsLeaving, blend));
         }
         return game.mecatols().contains(planet.getName()) ? MECATOL_GARRISON : 0;
     }
@@ -1061,24 +1266,6 @@ public class TacticalPlanner {
         return rest;
     }
 
-    private static Map<UnitType, Integer> shipsOf(List<UnitMove> moves) {
-        return unitsOf(moves.stream()
-                .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()) || move.type() == UnitType.Fighter)
-                .toList());
-    }
-
-    private static Map<UnitType, Integer> unitsOf(List<UnitMove> moves) {
-        Map<UnitType, Integer> units = new EnumMap<>(UnitType.class);
-        for (UnitMove move : moves) units.merge(move.type(), move.count(), Integer::sum);
-        return units;
-    }
-
-    private static Map<UnitType, Integer> groundOn(UnitHolder planet, Player player) {
-        Map<UnitType, Integer> ground = new HashMap<>();
-        for (UnitType type : BoardView.GROUND_FORCES) ground.put(type, BoardView.count(planet, player, type));
-        return ground;
-    }
-
     private static double fleetCost(Player seat, List<UnitMove> moves) {
         return moves.stream()
                 .mapToDouble(move -> BoardView.model(seat, move.type())
@@ -1100,6 +1287,8 @@ public class TacticalPlanner {
         private ObjectiveValue objectives;
         private Boolean canPayCustodians;
         private DefenseOutlook defense;
+        private OffenseOutlook offense;
+        private final Map<String, Optional<TacticalPlan>> attacks = new HashMap<>();
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
 
@@ -1129,6 +1318,19 @@ public class TacticalPlanner {
         DefenseOutlook defense() {
             if (defense == null) defense = new DefenseOutlook(game, seat);
             return defense;
+        }
+
+        OffenseOutlook offense() {
+            if (offense == null) offense = new OffenseOutlook(game, seat, defense());
+            return offense;
+        }
+
+        Optional<TacticalPlan> attackPlan(Tile tile) {
+            Optional<TacticalPlan> known = attacks.get(tile.getPosition());
+            if (known != null) return known;
+            Optional<TacticalPlan> computed = bestAttack(this, tile);
+            attacks.put(tile.getPosition(), computed);
+            return computed;
         }
 
         ObjectiveValue objectives() {

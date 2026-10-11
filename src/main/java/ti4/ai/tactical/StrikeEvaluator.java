@@ -1,5 +1,7 @@
 package ti4.ai.tactical;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,11 +15,14 @@ import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Detailed;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.CombatOdds.Outcome;
+import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.PlanetStake;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 
@@ -25,6 +30,9 @@ import ti4.model.UnitModel;
 class StrikeEvaluator {
 
     private static final Detailed UNDEFENDED = new Detailed(new Outcome(1, 0, 0), 0, 0, 0, 0, 0);
+    private static final String FORESIGHT = "foresight";
+    private static final double FORESIGHT_ESCAPE_WIN = 0.5;
+    private static final double COST_TOLERANCE = 1e-9;
 
     private record Space(
             double win,
@@ -33,6 +41,16 @@ class StrikeEvaluator {
             double theirLoss,
             double killChance,
             double ourLossChance) {}
+
+    private record Ground(
+            Map<String, Integer> landings,
+            Map<String, Double> wins,
+            Map<String, Integer> sent,
+            boolean fought,
+            double ourLoss,
+            double theirLoss,
+            double noKill,
+            Map<UnitType, Integer> dropped) {}
 
     static StrikeEstimate estimate(Game game, Player seat, Strike strike) {
         Tile target = strike.target();
@@ -47,11 +65,32 @@ class StrikeEvaluator {
         List<Combatant> survivingCannon = BattleMath.afterCannonFire(arriving, theirCannon);
         if (theirCannon > 0 && survivingCannon.isEmpty()) return wipedOut(seat, strike, spaceCombat);
         double cannonLoss = costOf(arriving) - costOf(survivingCannon);
+        Space cannonOnly = new Space(1, cannonLoss, cannonLoss, 0, 0, cannonLoss > 0 ? 1 : 0);
         Space fight = spaceCombat
                 ? spaceCombat(game, seat, strike, attacking, new Side(opponent, defenderShips), theirCannon)
-                : new Space(1, cannonLoss, cannonLoss, 0, 0, cannonLoss > 0 ? 1 : 0);
-        if (fight.win() == 0 && spaceCombat) return lost(seat, strike, fight);
-        return withGround(game, seat, strike, fight, spaceCombat, bombardingShips(seat, space, attacking));
+                : cannonOnly;
+        boolean escaped = spaceCombat && escapes(game, strike, fight);
+        if (escaped) fight = cannonOnly;
+        if (fight.win() == 0) return lost(seat, strike, fight);
+        Map<UnitType, Integer> survivors = survivors(seat, strike.ships(), fight.ourLossIfWin());
+        Ground ground = ground(game, seat, strike, fight, survivors, bombardingShips(seat, space, attacking));
+        double cargoLoss =
+                (1 - fight.win()) * shipCost(seat, strike.cargo()) + fight.win() * shipCost(seat, ground.dropped());
+        return new StrikeEstimate(
+                fight.win(),
+                escaped,
+                spaceCombat && !escaped,
+                ground.fought(),
+                ground.landings(),
+                ground.wins(),
+                ground.sent(),
+                fight.ourLoss() + ground.ourLoss() + cargoLoss,
+                fight.ourLossIfWin(),
+                fight.theirLoss() + ground.theirLoss(),
+                fight.killChance(),
+                1 - ground.noKill(),
+                fight.ourLossChance(),
+                survivors);
     }
 
     private static StrikeEstimate wipedOut(Player seat, Strike strike, boolean spaceCombat) {
@@ -77,6 +116,23 @@ class StrikeEvaluator {
                 0,
                 fight.ourLossChance(),
                 Map.of());
+    }
+
+    private static boolean escapes(Game game, Strike strike, Space fight) {
+        Player opponent = strike.opponent();
+        Tile target = strike.target();
+        if (!opponent.hasAbility(FORESIGHT) || opponent.getStrategicCC() <= 0) return false;
+        boolean shipsPresent =
+                !BoardView.ships(BoardView.space(target), opponent).isEmpty();
+        if (!shipsPresent || fight.win() < FORESIGHT_ESCAPE_WIN) return false;
+        for (String position : FoWHelper.getAdjacentTiles(game, target.getPosition(), opponent, false)) {
+            Tile neighbour = game.getTileByPosition(position);
+            if (neighbour == null || neighbour == target || !MovementGraph.canEnter(game, opponent, neighbour)) {
+                continue;
+            }
+            if (!BoardView.hasEnemyShips(game, opponent, neighbour)) return true;
+        }
+        return false;
     }
 
     private static Space spaceCombat(
@@ -123,66 +179,149 @@ class StrikeEvaluator {
                 preOurLoss > 0 ? 1 : detailed.attackerLosesUnit());
     }
 
-    private static StrikeEstimate withGround(
+    private static Map<UnitType, Integer> survivors(Player seat, Map<UnitType, Integer> ships, double lossIfWin) {
+        Map<UnitType, Integer> kept = new EnumMap<>(UnitType.class);
+        kept.putAll(ships);
+        List<UnitType> cheapestFirst = new ArrayList<>(kept.keySet());
+        cheapestFirst.sort(Comparator.comparingDouble(type -> unitCost(seat, type)));
+        double budget = lossIfWin + COST_TOLERANCE;
+        for (UnitType type : cheapestFirst) {
+            double cost = unitCost(seat, type);
+            while (kept.get(type) > 0 && cost <= budget) {
+                kept.merge(type, -1, Integer::sum);
+                budget -= cost;
+            }
+        }
+        kept.values().removeIf(count -> count <= 0);
+        return kept;
+    }
+
+    private static Ground ground(
             Game game,
             Player seat,
             Strike strike,
             Space fight,
-            boolean spaceCombat,
+            Map<UnitType, Integer> survivors,
             Map<UnitType, Integer> bombarding) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
+        StrikeRules rules = strike.rules();
         double spaceWin = fight.win();
         Optional<BombardmentRules.Target> bombardment = BombardmentRules.target(game, seat, target, bombarding);
         Map<UnitType, Integer> remaining = new EnumMap<>(UnitType.class);
         remaining.putAll(strike.cargo());
+        Map<UnitType, Integer> dropped = dropExcessCargo(seat, remaining, survivors);
         Map<String, Integer> landings = new LinkedHashMap<>();
-        Map<String, Double> groundWins = new LinkedHashMap<>();
-        double ourLoss = fight.ourLoss();
-        double theirLoss = fight.theirLoss();
+        Map<String, Double> wins = new LinkedHashMap<>();
+        Map<String, Integer> sentTo = new LinkedHashMap<>();
+        double ourLoss = 0;
+        double theirLoss = 0;
         double noKill = 1;
-        boolean groundCombat = false;
-        for (Planet planet : TacticalPlanner.enemyPlanets(game, seat, target)) {
+        boolean fought = false;
+        List<Planet> planets = new ArrayList<>();
+        if (!TacticalPlanner.isAnotherPlayersHome(game, seat, target) || rules.homeLandings()) {
+            planets.addAll(TacticalPlanner.enemyPlanets(game, seat, target));
+            planets.addAll(freePlanets(game, seat, target, rules, planets));
+        }
+        Map<UnitType, Integer> extraGround = new EnumMap<>(UnitType.class);
+        extraGround.putAll(strike.extraDefenderGround());
+        for (Planet planet : planets) {
             int ground = count(remaining);
-            if (ground == 0
-                    || (BoardView.enemyStructuresOn(game, seat, planet)
-                            && !strike.rules().structuresAllowed())) {
-                continue;
+            if (ground == 0 || structuresForbid(game, seat, planet, rules)) continue;
+            Map<UnitType, Integer> defenderGround = groundOn(planet, opponent);
+            if (BoardView.controller(game, planet.getName()) == opponent || !defenderGround.isEmpty()) {
+                extraGround.forEach((type, count) -> defenderGround.merge(type, count, Integer::sum));
+                extraGround.clear();
             }
-            int defenders = BoardView.groundForces(planet, opponent);
-            int sent = defenders == 0 ? 1 : ground;
-            boolean bombarded = bombardment
-                    .filter(found -> found.planet().equals(planet.getName()))
-                    .isPresent();
-            int bombardmentHits = bombarded ? BombardmentRules.expectedHits(seat, bombarding) : 0;
-            Detailed detailed = defenders == 0
-                    ? UNDEFENDED
-                    : groundDetailed(game, target, planet, seat, opponent, remaining, bombardmentHits);
+            int defenders = count(defenderGround);
+            int hits = (int) Math.round(BattleMath.spaceCannonHits(opponent, planet));
+            int sent = defenders == 0 ? Math.min(ground, hits + 1) : ground;
+            Map<UnitType, Integer> landing = new EnumMap<>(UnitType.class);
+            landing.putAll(remaining);
+            trim(landing, sent);
+            Map<UnitType, Integer> shotDown = removeLanders(landing, hits);
+            if (count(landing) == 0) continue;
+            Detailed detailed = UNDEFENDED;
+            if (defenders > 0) {
+                boolean bombarded = bombardment
+                        .filter(found -> found.planet().equals(planet.getName()))
+                        .isPresent();
+                int bombardmentHits = bombarded ? BombardmentRules.expectedHits(seat, bombarding) : 0;
+                detailed =
+                        groundDetailed(game, target, planet, seat, opponent, landing, defenderGround, bombardmentHits);
+            }
             double groundWin = detailed.outcome().attackerWins();
-            if (groundWin < strike.rules().landMinWin()) continue;
+            if (groundWin < rules.landMinWin()) continue;
             takeUnits(remaining, sent);
-            landings.put(planet.getName(), sent);
-            groundWins.put(planet.getName(), groundWin);
-            groundCombat |= defenders > 0;
-            ourLoss += spaceWin * detailed.attackerCostLost();
-            theirLoss += spaceWin * detailed.defenderCostLost();
+            landings.put(planet.getName(), BoardView.groundForces(planet, seat) + sent);
+            sentTo.put(planet.getName(), sent);
+            wins.put(planet.getName(), groundWin);
+            fought |= defenders > 0;
+            ourLoss += spaceWin * (detailed.attackerCostLost() + shipCost(seat, shotDown));
+            theirLoss += spaceWin * detailed.defenderCostLost()
+                    + spaceWin * groundWin * PlanetStake.structures(planet, opponent);
             noKill *= 1 - spaceWin * detailed.defenderLosesUnit();
         }
-        return new StrikeEstimate(
-                spaceWin,
-                false,
-                spaceCombat,
-                groundCombat,
-                landings,
-                groundWins,
-                landings,
-                ourLoss,
-                fight.ourLossIfWin(),
-                theirLoss,
-                fight.killChance(),
-                1 - noKill,
-                fight.ourLossChance(),
-                strike.ships());
+        return new Ground(landings, wins, sentTo, fought, ourLoss, theirLoss, noKill, dropped);
+    }
+
+    private static boolean structuresForbid(Game game, Player seat, Planet planet, StrikeRules rules) {
+        if (!BoardView.enemyStructuresOn(game, seat, planet)) return false;
+        return !rules.structuresAllowed() && !game.mecatols().contains(planet.getName());
+    }
+
+    private static List<Planet> freePlanets(
+            Game game, Player seat, Tile target, StrikeRules rules, List<Planet> alreadyListed) {
+        return target.getPlanetUnitHolders().stream()
+                .filter(planet -> !alreadyListed.contains(planet))
+                .filter(planet -> !seat.getPlanets().contains(planet.getName()))
+                .filter(planet -> BoardView.controller(game, planet.getName()) == null)
+                .filter(planet -> !BoardView.hasCustodians(planet) || rules.canPayCustodians())
+                .sorted(Comparator.comparingDouble(BoardView::planetValue).reversed())
+                .toList();
+    }
+
+    private static Map<UnitType, Integer> dropExcessCargo(
+            Player seat, Map<UnitType, Integer> cargo, Map<UnitType, Integer> survivors) {
+        int capacity = 0;
+        int fighters = 0;
+        for (Map.Entry<UnitType, Integer> ship : survivors.entrySet()) {
+            capacity += ship.getValue() * BoardView.capacity(seat, ship.getKey());
+            if (ship.getKey() == UnitType.Fighter) fighters += ship.getValue();
+        }
+        int room = Math.max(0, capacity - fighters);
+        Map<UnitType, Integer> dropped = new EnumMap<>(UnitType.class);
+        int excess = count(cargo) - room;
+        for (UnitType type : BoardView.GROUND_FORCES) {
+            int removed = Math.min(Math.max(0, excess), cargo.getOrDefault(type, 0));
+            if (removed <= 0) continue;
+            cargo.merge(type, -removed, Integer::sum);
+            dropped.put(type, removed);
+            excess -= removed;
+        }
+        return dropped;
+    }
+
+    private static void trim(Map<UnitType, Integer> units, int keep) {
+        int left = keep;
+        for (UnitType type : BoardView.GROUND_FORCES) {
+            int kept = Math.min(left, units.getOrDefault(type, 0));
+            units.put(type, kept);
+            left -= kept;
+        }
+    }
+
+    private static Map<UnitType, Integer> removeLanders(Map<UnitType, Integer> landing, int hits) {
+        Map<UnitType, Integer> removed = new EnumMap<>(UnitType.class);
+        int left = hits;
+        for (UnitType type : BoardView.GROUND_FORCES) {
+            int taken = Math.min(left, landing.getOrDefault(type, 0));
+            if (taken <= 0) continue;
+            landing.merge(type, -taken, Integer::sum);
+            removed.put(type, taken);
+            left -= taken;
+        }
+        return removed;
     }
 
     static Map<UnitType, Integer> bombardingShips(Player seat, UnitHolder space, Side attacking) {
@@ -199,9 +338,10 @@ class StrikeEvaluator {
             Player seat,
             Player opponent,
             Map<UnitType, Integer> sent,
+            Map<UnitType, Integer> defenderGround,
             int bombardmentHits) {
         Side attacking = new Side(seat, sent);
-        Side defending = new Side(opponent, groundOn(planet, opponent));
+        Side defending = new Side(opponent, defenderGround);
         Map<UnitType, Integer> defendersDamaged = BattleMath.damagedAmong(planet, opponent, defending.units());
         Force defence = CombatForces.force(
                 opponent,
@@ -223,7 +363,10 @@ class StrikeEvaluator {
 
     private static Map<UnitType, Integer> groundOn(UnitHolder planet, Player player) {
         Map<UnitType, Integer> ground = new EnumMap<>(UnitType.class);
-        for (UnitType type : BoardView.GROUND_FORCES) ground.put(type, BoardView.count(planet, player, type));
+        for (UnitType type : BoardView.GROUND_FORCES) {
+            int count = BoardView.count(planet, player, type);
+            if (count > 0) ground.put(type, count);
+        }
         return ground;
     }
 
@@ -258,25 +401,14 @@ class StrikeEvaluator {
         return combatants.stream().mapToDouble(Combatant::cost).sum();
     }
 
-    static double cannonLoss(Game game, Player seat, Strike strike) {
-        int hits = BattleMath.expectedCannonHits(game, seat, strike.target());
-        List<Combatant> arriving = CombatForces.combatants(
-                game,
-                strike.target(),
-                BoardView.space(strike.target()),
-                new Side(seat, strike.ships()),
-                new Side(strike.opponent(), Map.of()),
-                strike.damaged());
-        return costOf(arriving) - costOf(BattleMath.afterCannonFire(arriving, hits));
+    private static double unitCost(Player player, UnitType type) {
+        return BoardView.model(player, type).map(UnitModel::getCost).orElse(0f);
     }
 
     static double shipCost(Player player, Map<UnitType, Integer> units) {
         double cost = 0;
         for (Map.Entry<UnitType, Integer> unit : units.entrySet()) {
-            cost += unit.getValue()
-                    * BoardView.model(player, unit.getKey())
-                            .map(UnitModel::getCost)
-                            .orElse(0f);
+            cost += unit.getValue() * unitCost(player, unit.getKey());
         }
         return cost;
     }

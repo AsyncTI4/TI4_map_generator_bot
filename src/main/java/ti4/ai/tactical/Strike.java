@@ -21,6 +21,20 @@ record Strike(
         Map<UnitType, Integer> extraDefenderGround,
         StrikeRules rules) {
 
+    Strike withMoves(List<UnitMove> executed) {
+        return new Strike(
+                target,
+                opponent,
+                origins,
+                executed,
+                ships,
+                damaged,
+                cargo,
+                extraDefenderShips,
+                extraDefenderGround,
+                rules);
+    }
+
     static Strike of(
             Player seat, Tile target, Player opponent, List<Tile> origins, List<UnitMove> moves, StrikeRules rules) {
         Map<UnitType, Integer> ships = new EnumMap<>(UnitType.class);

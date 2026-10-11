@@ -1,0 +1,22 @@
+package ti4.ai.tactical;
+
+record StrikeValue(
+        double ownObjective,
+        double planets,
+        double economyDenial,
+        double objectiveDenial,
+        double homeBlock,
+        double imperial,
+        double kills,
+        double blockade,
+        double nekroGain,
+        double defense,
+        double existing,
+        double value,
+        double losses,
+        double anger,
+        double counter,
+        double nekroFeed,
+        double capture,
+        double cancel,
+        double score) {}
