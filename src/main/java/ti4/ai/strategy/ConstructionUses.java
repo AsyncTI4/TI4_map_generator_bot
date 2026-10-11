@@ -8,6 +8,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.strategy.CardPlan.Benefit;
+import ti4.ai.tactical.DefenseOutlook;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
@@ -112,12 +113,19 @@ class ConstructionUses {
 
     private static Optional<String> threatenedSeatTile(PlanInputs in) {
         Game game = in.game();
+        Tile home = in.seat().getHomeSystemTile();
         return in.seat().getPlanets().stream()
                 .map(game::getTileFromPlanet)
                 .filter(Objects::nonNull)
-                .filter(in::isThreatened)
+                .distinct()
+                .filter(tile -> isThreatened(in, tile, home))
                 .map(Tile::getPosition)
                 .findFirst();
+    }
+
+    private static boolean isThreatened(PlanInputs in, Tile tile, Tile home) {
+        if (tile != home) return in.isThreatened(tile);
+        return DefenseOutlook.homeCost(in.game(), in.seat(), false) > 0;
     }
 
     private static double total(List<Benefit> benefits) {

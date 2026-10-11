@@ -12,6 +12,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.strategy.CardPlan.Benefit;
+import ti4.ai.tactical.DefenseOutlook;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -61,7 +62,9 @@ class DiplomacyUses {
                 .mapToDouble(BoardView::planetValue)
                 .sum();
         double value = CardValueScale.PROTECT_SHARE * planets;
-        if (tile == seat.getHomeSystemTile()) value += CardValueScale.HOME_DEFENSE;
+        if (tile == seat.getHomeSystemTile()) {
+            value += Math.max(CardValueScale.HOME_DEFENSE, DefenseOutlook.homeCost(in.game(), seat, true));
+        }
         return in.nearWin() ? value * CardValueScale.NEAR_WIN_MULTIPLIER : value;
     }
 
