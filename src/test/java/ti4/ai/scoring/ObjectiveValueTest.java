@@ -3,6 +3,7 @@ package ti4.ai.scoring;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,36 @@ class ObjectiveValueTest extends BaseTi4Test {
                 .after(elsewhere, List.of(new Footprint.Move(neighbour, UnitType.Destroyer, 1)), List.of());
 
         assertThat(value.gain(after)).isZero();
+    }
+
+    // publicOnly is how the AI weighs another seat's scoring: a secret objective that seat holds is invisible to it,
+    // while the same footprint is worth a full point to the seat itself.
+    @Test
+    void publicOnlyIgnoresTheSeatsSecretObjectives() {
+        test.nekro.setSecret("gamf");
+        Map<UnitType, Integer> fiveDreadnoughts = Map.of(UnitType.Dreadnought, 5);
+        ObjectiveValue full = new ObjectiveValue(test.game, test.nekro);
+        ObjectiveValue publicOnly = ObjectiveValue.publicOnly(test.game, test.nekro);
+
+        assertThat(full.gain(full.before().withBuilt(AiTestGame.HOME, fiveDreadnoughts)))
+                .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(publicOnly.gain(publicOnly.before().withBuilt(AiTestGame.HOME, fiveDreadnoughts)))
+                .isZero();
+    }
+
+    @Test
+    void publicOnlyStillCountsTheRevealedObjectives() {
+        reveal("raise_fleet");
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 4);
+        Tile staging = test.place(EMPTY_SYSTEM, neighbour);
+        test.units(staging, "space", test.nekro, UnitType.Cruiser, 1);
+        ObjectiveValue publicOnly = ObjectiveValue.publicOnly(test.game, test.nekro);
+
+        Footprint joined = publicOnly
+                .before()
+                .after(AiTestGame.HOME, List.of(new Footprint.Move(neighbour, UnitType.Cruiser, 1)), List.of());
+
+        assertThat(publicOnly.gain(joined)).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
     // Reaching the threshold is worth a full victory point.

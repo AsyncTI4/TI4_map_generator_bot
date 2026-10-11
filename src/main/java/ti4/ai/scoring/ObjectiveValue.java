@@ -38,6 +38,10 @@ public final class ObjectiveValue {
     private final Map<String, Set<String>> systemSets = new HashMap<>();
 
     public ObjectiveValue(Game game, Player seat) {
+        this(game, seat, true);
+    }
+
+    private ObjectiveValue(Game game, Player seat, boolean includeSecrets) {
         this.game = game;
         this.seat = seat;
         this.before = Footprint.of(game, seat);
@@ -47,7 +51,13 @@ public final class ObjectiveValue {
                 addTarget(id, Math.max(1, ObjectivePolicy.victoryPoints(id)));
             }
         }
-        for (String id : seat.getSecretsUnscored().keySet()) addTarget(id, 1);
+        if (includeSecrets) {
+            for (String id : seat.getSecretsUnscored().keySet()) addTarget(id, 1);
+        }
+    }
+
+    public static ObjectiveValue publicOnly(Game game, Player player) {
+        return new ObjectiveValue(game, player, false);
     }
 
     private void addTarget(String id, int points) {
