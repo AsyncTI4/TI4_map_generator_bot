@@ -1312,7 +1312,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -1327,7 +1327,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -1392,7 +1392,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -1409,7 +1409,7 @@ public final class FoWHelper {
 
         for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos);
-            UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
+            UnitHolder unitHolder = tile2.getSpaceUnitHolder();
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                 return true;
             }

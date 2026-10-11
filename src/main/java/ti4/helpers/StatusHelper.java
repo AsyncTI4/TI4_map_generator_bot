@@ -101,7 +101,7 @@ public final class StatusHelper {
                 }
             }
             if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 String msg = player.getRepresentation()
                         + ", you may use these buttons to queue a public objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
@@ -122,7 +122,7 @@ public final class StatusHelper {
                 }
             }
             if (!buttons.isEmpty()) {
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 String msg = player.getRepresentation()
                         + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
@@ -154,7 +154,7 @@ public final class StatusHelper {
 
                     List<Button> ralnelHeroButtons = new ArrayList<>();
                     ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
-                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    ralnelHeroButtons.add(Buttons.DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
                 }
@@ -570,7 +570,7 @@ public final class StatusHelper {
                     && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("kyroHeroInitiation", "Play Kyro Hero"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentation()

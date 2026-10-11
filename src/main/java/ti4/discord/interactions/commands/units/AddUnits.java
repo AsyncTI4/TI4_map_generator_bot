@@ -81,7 +81,7 @@ public class AddUnits extends GameStateCommand {
         String color = getPlayer().getColor();
         boolean coexist = event.getOption(Constants.COEXIST, Boolean.FALSE, OptionMapping::getAsBoolean);
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         boolean doesTileHaveFloatingGF = false;
         if (space != null && getPlayer().getColor() != null) {
             doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0

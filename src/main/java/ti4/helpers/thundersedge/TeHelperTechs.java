@@ -572,7 +572,7 @@ public final class TeHelperTechs {
         List<Button> buttons = new ArrayList<>();
 
         game.getTileMap().values().forEach(tile -> {
-            UnitHolder space = tile.getUnitHolders().get("space");
+            UnitHolder space = tile.getSpaceUnitHolder();
             if (space.getTokenList().contains(Constants.TOKEN_INGRESS))
                 buttons.add(Buttons.red(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         });

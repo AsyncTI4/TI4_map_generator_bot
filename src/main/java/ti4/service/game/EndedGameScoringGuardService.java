@@ -30,8 +30,6 @@ public class EndedGameScoringGuardService {
     }
 
     static List<Button> getButtons() {
-        return List.of(
-                Buttons.green(CONTINUE_PLAYING_BUTTON_ID, "Continue Playing"),
-                Buttons.gray("deleteButtons", "Delete These Buttons"));
+        return List.of(Buttons.green(CONTINUE_PLAYING_BUTTON_ID, "Continue Playing"), Buttons.DELETE_BUTTONS);
     }
 }

@@ -74,7 +74,7 @@ public class ResonanceGeneratorService {
         String active = Constants.TOKEN_BREACH_ACTIVE, inactive = Constants.TOKEN_BREACH_INACTIVE;
         String pos = buttonID.replace("flipBreach_", "");
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
 
         // TODO: JAZZ - idk if you can have multiple, but just prefer flipping inactive for now
         String oldState, newState;
@@ -139,7 +139,7 @@ public class ResonanceGeneratorService {
             pos = pos.split("_")[0];
         }
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
 
         // TODO: JAZZ - idk if you can have multiple, so don't double add for now
         boolean placedActive = !space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
@@ -163,7 +163,7 @@ public class ResonanceGeneratorService {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("placeInactiveBreach_", "");
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
 
         // TODO: JAZZ - idk if you can have multiple, so don't double add for now
         if (!space.getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {

@@ -63,7 +63,7 @@ public class ArdentiaAbilityHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

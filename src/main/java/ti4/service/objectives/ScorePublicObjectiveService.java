@@ -157,7 +157,7 @@ public class ScorePublicObjectiveService {
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_RESOLVING);
             String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
@@ -228,7 +228,7 @@ public class ScorePublicObjectiveService {
                 message2 += "\n" + Helper.buildSpentThingsMessage(player, game, "both");
                 buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             }
-            Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }

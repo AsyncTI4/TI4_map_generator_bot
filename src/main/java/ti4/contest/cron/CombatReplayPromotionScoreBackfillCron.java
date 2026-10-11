@@ -21,7 +21,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -147,7 +146,7 @@ public class CombatReplayPromotionScoreBackfillCron {
         Player attacker = snapshotGame.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = snapshotGame.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Tile tile = snapshotGame.getTileByPosition(candidate.getTilePosition());
-        UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile == null ? null : tile.getSpaceUnitHolder();
         if (attacker == null
                 || defender == null
                 || tile == null

@@ -91,7 +91,7 @@ public class LazaxCombatSupport {
     }
 
     public SpaceCombatSnapshot buildSpaceCombatSnapshot(Game game, Player attacker, Player defender, Tile tile) {
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         if (space == null) return null;
 
         FleetStrength attackerStrength = calculateFleetStrength(attacker, defender, tile, space);

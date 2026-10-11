@@ -902,7 +902,7 @@ public final class ButtonHelperTwilightsFall {
                         buttons2.add(Buttons.green(
                                 "drawSingularNewSpliceCard_" + type,
                                 "Draw 1 " + StringUtils.capitalize(type) + " Card"));
-                        buttons2.add(Buttons.gray("deleteButtons", "Decline"));
+                        buttons2.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
@@ -1080,7 +1080,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         if (!buttons.isEmpty()) {
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", please choose a card to reveal.",

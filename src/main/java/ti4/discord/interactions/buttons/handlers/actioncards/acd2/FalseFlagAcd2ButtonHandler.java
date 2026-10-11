@@ -37,7 +37,7 @@ class FalseFlagAcd2ButtonHandler {
                             + ", no other player has a command token on the board for _False Flag_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose whose command token to remove for _False Flag_.",
@@ -67,7 +67,7 @@ class FalseFlagAcd2ButtonHandler {
                     target.getRepresentationNoPing() + " has no command tokens on the board for _False Flag_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which of " + target.getRepresentationNoPing()
@@ -111,7 +111,7 @@ class FalseFlagAcd2ButtonHandler {
                             + ", you have no systems containing your units to place the token in for _False Flag_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose a system containing your units to place "

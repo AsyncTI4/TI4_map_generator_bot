@@ -945,8 +945,7 @@ class GameLoadService {
                 case Constants.AUTO_SABO_PASS_MEDIAN ->
                     player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CAPTURE -> {
-                    UnitHolder unitHolder =
-                            player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+                    UnitHolder unitHolder = player.getNomboxTile().getSpaceUnitHolder();
                     StringTokenizer unitTokens = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (unitTokens.hasMoreTokens()) {
                         StringTokenizer unitInfo = new StringTokenizer(unitTokens.nextToken(), ",");

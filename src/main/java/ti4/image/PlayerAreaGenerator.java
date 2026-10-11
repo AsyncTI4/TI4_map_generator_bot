@@ -984,7 +984,7 @@ public class PlayerAreaGenerator {
         String betaID = Mapper.getTokenID("creussbeta");
         String gammaID = Mapper.getTokenID("creussgamma");
         for (Tile tile : game.getTileMap().values()) {
-            Set<String> tileTokens = tile.getUnitHolders().get("space").getTokenList();
+            Set<String> tileTokens = tile.getSpaceUnitHolder().getTokenList();
             alphaOnMap |= tileTokens.contains(alphaID);
             betaOnMap |= tileTokens.contains(betaID);
             gammaOnMap |= tileTokens.contains(gammaID);

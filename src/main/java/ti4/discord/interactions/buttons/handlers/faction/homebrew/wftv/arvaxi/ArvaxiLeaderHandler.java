@@ -35,7 +35,7 @@ public class ArvaxiLeaderHandler {
                     p.factionButtonChecker() + "arvaxiAgentOffer_" + acIndex + "_" + discarder.getFaction(),
                     "Use Arvaxi Agent on " + acName,
                     CardEmojis.getACEmoji(game)));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     p.getCardsInfoThread(),
                     p.getRepresentationUnfoggedNoPing() + ", " + discarder.getFactionNameOrColor() + " discarded _"
@@ -62,7 +62,7 @@ public class ArvaxiLeaderHandler {
         for (Player target : game.getRealPlayers()) {
             if (target.getFaction().equals(discarderFaction)) continue;
             buttons.add(Buttons.green(
-                    "FFCC_" + player.getFaction() + "_arvaxiAgentPickTarget_" + acIndex + "_" + target.getFaction(),
+                    player.factionButtonChecker() + "arvaxiAgentPickTarget_" + acIndex + "_" + target.getFaction(),
                     target.getFactionNameOrColor(),
                     target.fogSafeEmoji()));
         }
@@ -98,7 +98,7 @@ public class ArvaxiLeaderHandler {
         ActionCardHelper.sendActionCardInfo(game, target);
 
         List<Button> spendButtons = ButtonHelper.getExhaustButtonsWithTG(game, target, "inf");
-        spendButtons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        spendButtons.add(Buttons.DONE_EXHAUSTING_PLANETS);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged()
@@ -118,7 +118,7 @@ public class ArvaxiLeaderHandler {
 
     public static Button getPurgeHeroButton(Player player, String tilePosition) {
         return Buttons.gray(
-                "FFCC_" + player.getFaction() + "_purgeArvaxiHero_" + tilePosition,
+                player.factionButtonChecker() + "purgeArvaxiHero_" + tilePosition,
                 "Purge Arvaxi Hero",
                 FactionEmojis.arvaxi);
     }

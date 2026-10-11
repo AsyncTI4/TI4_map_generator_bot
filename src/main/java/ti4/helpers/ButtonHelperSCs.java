@@ -257,7 +257,7 @@ public final class ButtonHelperSCs {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.",
@@ -757,7 +757,7 @@ public final class ButtonHelperSCs {
                 || (game.getScPlayed().get(11) != null && game.getScPlayed().get(11))) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RESOLVING);
 
         return scButtons;
     }
@@ -891,7 +891,7 @@ public final class ButtonHelperSCs {
                 && (game.getScPlayed().get(11) == null || !game.getScPlayed().get(11))) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RESOLVING);
 
         return scButtons;
     }
@@ -1448,7 +1448,7 @@ public final class ButtonHelperSCs {
                 .sendMessageEmbeds(po.getRepresentationEmbed())
                 .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         buttons.add(Buttons.green("cutTape_" + objID, "Reveal Objective"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose whether to reveal the objective or not.",

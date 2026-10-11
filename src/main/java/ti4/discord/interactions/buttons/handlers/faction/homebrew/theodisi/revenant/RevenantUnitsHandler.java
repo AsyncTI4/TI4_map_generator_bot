@@ -34,7 +34,7 @@ public class RevenantUnitsHandler {
         String message = player.getRepresentation()
                 + ", you may use the DEPLOY ability of Grave Robbers (Revenant mech) to place 1 mech from your reinforcements on a planet you control. Please choose the planet on which you wish to place it.";
         String prefix = player.factionButtonChecker() + PAGE_GRAVE_ROBBERS;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE);
         List<Button> displayedButtons = new ArrayList<>(buttons);
         displayedButtons.addAll(extraButtons);
         if (displayedButtons.size() > 25) {
@@ -55,13 +55,7 @@ public class RevenantUnitsHandler {
                 + ", you may use the DEPLOY ability of Grave Robbers (Revenant mech) to place 1 mech from your reinforcements on a planet you control. Please choose the planet on which you wish to place it.";
         String prefix = player.factionButtonChecker() + PAGE_GRAVE_ROBBERS;
         NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                player.getCorrectChannel(),
-                buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
-                message,
-                prefix,
-                buttonID);
+                event, player.getCorrectChannel(), buttons, List.of(Buttons.DECLINE), message, prefix, buttonID);
     }
 
     @ButtonHandler(PLACE_GRAVE_ROBBERS)

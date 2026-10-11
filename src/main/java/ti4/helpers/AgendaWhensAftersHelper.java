@@ -53,7 +53,7 @@ public final class AgendaWhensAftersHelper {
             List<Button> buttons = new ArrayList<>();
 
             buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -899,7 +899,7 @@ public final class AgendaWhensAftersHelper {
         buttons = new ArrayList<>();
 
         buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -983,7 +983,7 @@ public final class AgendaWhensAftersHelper {
                 }
             }
             buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
         }
 
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
@@ -1001,7 +1001,7 @@ public final class AgendaWhensAftersHelper {
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         Player quasher = Helper.getPlayerFromAbility(game, "quash");
         if (quasher != null && quasher.getStrategicCC() > 0) {
-            String factionChecker = "FFCC_" + quasher.getFaction() + "_";
+            String factionChecker = quasher.factionButtonChecker();
             Button quashButton = Buttons.red(factionChecker + "quash", "Quash Agenda", FactionEmojis.Xxcha);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButton(
@@ -1059,7 +1059,7 @@ public final class AgendaWhensAftersHelper {
 
         if (Helper.getPlayerFromAbility(game, "galactic_threat") != null) {
             Player nekroProbably = Helper.getPlayerFromAbility(game, "galactic_threat");
-            String factionChecker = "FFCC_" + nekroProbably.getFaction() + "_";
+            String factionChecker = nekroProbably.factionButtonChecker();
             afterButtons.add(Buttons.gray(
                     factionChecker + "play_after_Galactic Threat Rider",
                     "Predict Outcome for Galactic Threat",
@@ -1069,14 +1069,14 @@ public final class AgendaWhensAftersHelper {
         // conspirators
         if (Helper.getPlayerFromAbility(game, "conspirators") != null && !game.isFowMode()) {
             Player nekroProbably = Helper.getPlayerFromAbility(game, "conspirators");
-            String factionChecker = "FFCC_" + nekroProbably.getFaction() + "_";
+            String factionChecker = nekroProbably.factionButtonChecker();
             afterButtons.add(Buttons.gray(
                     factionChecker + "play_after_Conspirators", "Use Conspirators", FactionEmojis.zealots));
         }
 
         if (Helper.getPlayerFromUnlockedLeader(game, "keleresheroodlynn") != null) {
             Player keleresX = Helper.getPlayerFromUnlockedLeader(game, "keleresheroodlynn");
-            String factionChecker = "FFCC_" + keleresX.getFaction() + "_";
+            String factionChecker = keleresX.factionButtonChecker();
             afterButtons.add(Buttons.gray(
                     factionChecker + "play_after_Keleres Xxcha Hero",
                     "Play Keleres (Xxcha) Hero",
@@ -1085,7 +1085,7 @@ public final class AgendaWhensAftersHelper {
 
         if (Helper.getPlayerFromAbility(game, "radiance") != null) {
             Player edyn = Helper.getPlayerFromAbility(game, "radiance");
-            String factionChecker = "FFCC_" + edyn.getFaction() + "_";
+            String factionChecker = edyn.factionButtonChecker();
             afterButtons.add(Buttons.gray(
                     factionChecker + "play_after_Edyn Radiance Ability",
                     "Use Edyn Radiance Ability",
@@ -1093,7 +1093,7 @@ public final class AgendaWhensAftersHelper {
         }
 
         for (Player p1 : game.getRealPlayers()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             if (p1.hasTechReady("dsedyng")) {
                 afterButtons.add(Buttons.gray(
                         factionChecker + "play_after_Edyn Unity Algorithm", "Use Unity Algorithm", FactionEmojis.edyn));

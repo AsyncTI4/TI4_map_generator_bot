@@ -267,7 +267,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
         }
 
-        if (!buttons.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        if (!buttons.isEmpty()) buttons.add(Buttons.DELETE_BUTTONS);
         if (!"blank".equalsIgnoreCase(output)) {
             MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
         }

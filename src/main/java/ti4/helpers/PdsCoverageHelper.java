@@ -203,7 +203,7 @@ public final class PdsCoverageHelper {
 
     private static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
         int count = 0;
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         for (Units.UnitKey unit : space.getUnitKeys()) {
             if (!player.unitBelongsToPlayer(unit)) continue;
 

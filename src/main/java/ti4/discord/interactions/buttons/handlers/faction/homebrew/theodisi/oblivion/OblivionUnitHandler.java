@@ -43,7 +43,7 @@ public class OblivionUnitHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

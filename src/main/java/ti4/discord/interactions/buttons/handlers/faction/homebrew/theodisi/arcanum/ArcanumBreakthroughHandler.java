@@ -47,7 +47,7 @@ public class ArcanumBreakthroughHandler {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + FLIP_ON_GAIN, "Flip Power Word: Wish", FactionEmojis.arcanum),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
@@ -313,7 +313,7 @@ public class ArcanumBreakthroughHandler {
 
     public static int getPowerWordWishCapacityBonus(Game game, Player player, Tile tile) {
         if (!player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK) || tile == null) return 0;
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         return getSelectionCountInHolder(game, player, CAPACITY, tile, space, null, Integer.MAX_VALUE);
     }
 

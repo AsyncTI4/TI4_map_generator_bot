@@ -1764,7 +1764,7 @@ public class TransactionHelper {
 
     @ButtonHandler("transact_")
     static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
-        String factionChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = p1.factionButtonChecker();
 
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("transact_", "");
@@ -1979,7 +1979,7 @@ public class TransactionHelper {
 
     private static void resolveSpecificTransButtonPress(
             Game game, Player p1, String buttonID, ButtonInteractionEvent event, boolean oldWay) {
-        String factionChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = p1.factionButtonChecker();
         buttonID = buttonID.replace("send_", "");
         List<Button> goAgainButtons = new ArrayList<>();
 
@@ -2334,7 +2334,7 @@ public class TransactionHelper {
 
     private static List<Button> getPlayersToTransact(Game game, Player p) {
         List<Button> playerButtons = new ArrayList<>();
-        String factionChecker = "FFCC_" + p.getFaction() + "_";
+        String factionChecker = p.factionButtonChecker();
         for (Player player : game.getPlayers().values()) {
             if (player.isRealPlayer()) {
                 if (player.getFaction().equalsIgnoreCase(p.getFaction())) {
@@ -2568,7 +2568,7 @@ public class TransactionHelper {
 
     // TODO: fog leak - legacy flow puts faction ids in custom_ids (transact_*, send_*); new model uses colors.
     private static List<Button> getStuffToTransButtonsOld(Game game, Player p1, Player p2) {
-        String factionChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = p1.factionButtonChecker();
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
             stuffToTransButtons.add(Buttons.green(factionChecker + "transact_TGs_" + p2.getFaction(), "Trade Goods"));

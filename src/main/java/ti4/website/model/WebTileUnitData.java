@@ -71,7 +71,7 @@ public final class WebTileUnitData {
         tileData.isAnomaly = tile.isAnomaly(game, null);
 
         // Extract command tokens from space
-        UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         if (spaceHolder != null) {
             for (String ccID : spaceHolder.getCcList()) {
                 Player player =

@@ -152,13 +152,7 @@ public class ScrapyardUnitHandler {
         String prefix = player.factionButtonChecker() + SELECT_FUEL_CELL_AMOUNT;
         List<Button> amounts = getFuelCellAmountButtons(player, fighters);
         if (NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                event.getMessageChannel(),
-                amounts,
-                List.of(Buttons.gray("deleteButtons", "Decline")),
-                message,
-                prefix,
-                buttonID)) return;
+                event, event.getMessageChannel(), amounts, List.of(Buttons.DECLINE), message, prefix, buttonID)) return;
         int amount;
         try {
             amount = Integer.parseInt(buttonID.substring(SELECT_FUEL_CELL_AMOUNT.length()));
@@ -283,7 +277,7 @@ public class ScrapyardUnitHandler {
                 message,
                 NewStuffHelper.buttonPagination(
                         getFuelCellAmountButtons(player, fighters),
-                        List.of(Buttons.gray("deleteButtons", "Decline")),
+                        List.of(Buttons.DECLINE),
                         player.factionButtonChecker() + SELECT_FUEL_CELL_AMOUNT,
                         25,
                         page,

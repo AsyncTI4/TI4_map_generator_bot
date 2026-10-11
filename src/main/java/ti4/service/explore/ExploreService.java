@@ -515,7 +515,7 @@ public class ExploreService {
                             "exhaustAgent_augersagent_" + player.getFaction(),
                             "Use Ilyxum Agent on " + player.getColor(),
                             FactionEmojis.augers));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE);
                     String msg2 = p2.getRepresentationUnfogged() + " you may use "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Clodho, the Ilyxum" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
@@ -928,7 +928,7 @@ public class ExploreService {
                             "saarMechRes_" + "mirage",
                             "Pay 1 Trade Good for Mech on " + Helper.getPlanetRepresentation("mirage", game),
                             MiscEmojis.tg));
-                    saarButton.add(Buttons.red("deleteButtons", "Decline"));
+                    saarButton.add(Buttons.DECLINE);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + " you may pay 1 trade good to place 1 "
@@ -1026,7 +1026,7 @@ public class ExploreService {
                         Buttons.blue("discardExploreTop_cultural", "Discard Top Cultural", ExploreEmojis.Cultural));
                 discardButtons.add(
                         Buttons.gray("discardExploreTop_frontier", "Discard Top Frontier", ExploreEmojis.Frontier));
-                discardButtons.add(Buttons.red("deleteButtons", "Done Resolving"));
+                discardButtons.add(Buttons.DONE_RESOLVING);
                 message = new StringBuilder(player.getRepresentation()
                         + " you may use the buttons to discard the top of the exploration decks if you choose.");
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1313,7 +1313,7 @@ public class ExploreService {
             case "ancientshipyard" -> {
                 List<String> colors = tile == null
                         ? Collections.emptyList()
-                        : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
+                        : tile.getSpaceUnitHolder().getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
                     MessageHelper.sendMessageToEventChannel(event, "Cruiser added to the system automatically.");
@@ -1379,7 +1379,7 @@ public class ExploreService {
                         "You can use these buttons to redistribute or gain a command token, along with spending 2 influence potentially..",
                         buttons);
                 Button deleteButton =
-                        Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons", "Delete These Buttons");
+                        Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons");
                 String message2 = player.getRepresentation(false, true) + " cc buttons";
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(), message2, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
@@ -1501,7 +1501,7 @@ public class ExploreService {
                 && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
             gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm", MiscEmojis.comm));
-            gainComm.add(Buttons.red("deleteButtons", "Decline"));
+            gainComm.add(Buttons.DECLINE);
             String sb = player.getFactionEmoji() + " may use their **Fortune Seekers** ability\n"
                     + player.getRepresentationUnfogged()
                     + ", after resolving the exploration, you may use this button to get your commodity from your **Fortune Seekers** ability.";
@@ -1537,7 +1537,7 @@ public class ExploreService {
                     player.factionButtonChecker() + "hiddenVaultsProduce_" + planetID,
                     "Produce 1 Infantry on " + Helper.getPlanetRepresentation(planetID, game),
                     UnitEmojis.infantry));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -1558,7 +1558,7 @@ public class ExploreService {
 
     public static void expFront(
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force, String cardID) {
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
         boolean hasGhotiAnchorpointFrontier =
@@ -1586,7 +1586,7 @@ public class ExploreService {
 
     public static void expFrontAlreadyDone(
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, String cardID) {
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
         boolean hasGhotiAnchorpointFrontier =

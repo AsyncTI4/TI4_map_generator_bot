@@ -334,7 +334,7 @@ public class VeiledHeartService {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + " select a veiled "

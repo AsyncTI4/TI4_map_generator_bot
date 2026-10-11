@@ -622,7 +622,7 @@ public class CombatReplayService {
     private static ResolutionState buildResolutionState(Game game, CombatCandidateEntity candidate, Tile tile) {
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         if (attacker == null || defender == null || space == null) {
             return null;
         }
@@ -700,7 +700,7 @@ public class CombatReplayService {
         Tile tile = snapshotGame.getTileByPosition(candidate.getTilePosition());
         Player attacker = snapshotGame.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = snapshotGame.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
-        UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile == null ? null : tile.getSpaceUnitHolder();
         if (tile == null || attacker == null || defender == null || space == null) return null;
 
         LazaxCombatSupport.FleetStrength attackerStrength =
@@ -819,7 +819,7 @@ public class CombatReplayService {
 
     private int countDestroyersInCombat(Tile tile, Player player) {
         if (tile == null || player == null) return 0;
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         if (space == null) return 0;
         int destroyers = 0;
         for (var entry : CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player)

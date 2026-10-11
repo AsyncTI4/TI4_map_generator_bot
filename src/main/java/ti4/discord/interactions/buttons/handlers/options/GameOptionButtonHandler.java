@@ -127,8 +127,7 @@ final class GameOptionButtonHandler {
 
                 Press **Continue Base Game Setup** ___only___ if that is what you want.""",
                 java.util.List.of(
-                        Buttons.red("setupBaseGameMode_confirm", "Continue Base Game Setup"),
-                        Buttons.gray("deleteButtons", "Cancel")));
+                        Buttons.red("setupBaseGameMode_confirm", "Continue Base Game Setup"), Buttons.CANCEL));
     }
 
     @ButtonHandler("setupBaseGameMode_confirm")

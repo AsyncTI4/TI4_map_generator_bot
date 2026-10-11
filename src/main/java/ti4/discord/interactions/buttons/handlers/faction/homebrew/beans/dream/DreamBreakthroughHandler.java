@@ -54,7 +54,7 @@ public class DreamBreakthroughHandler {
                     player.getRepresentation() + ", has no valid destination for _Dream-Space Convergence_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", choose a nexus token to move with _Dream-Space Convergence_.",
@@ -82,7 +82,7 @@ public class DreamBreakthroughHandler {
                 event,
                 player.getCorrectChannel(),
                 destinationButtons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE),
                 message,
                 pagePrefix,
                 buttonID)) {
@@ -120,7 +120,7 @@ public class DreamBreakthroughHandler {
                 event,
                 player.getCorrectChannel(),
                 destinationButtons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE),
                 message,
                 "dream_bt_move_nexus_destination_" + fromPosition + "_",
                 buttonID);
@@ -194,7 +194,7 @@ public class DreamBreakthroughHandler {
     }
 
     private static List<Button> getDreamBtDestinationButtons(List<Button> buttons, String pagePrefix, int page) {
-        List<Button> decline = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> decline = List.of(Buttons.DECLINE);
         if (buttons.size() <= 25 - decline.size()) {
             List<Button> allButtons = new ArrayList<>(buttons);
             allButtons.addAll(decline);

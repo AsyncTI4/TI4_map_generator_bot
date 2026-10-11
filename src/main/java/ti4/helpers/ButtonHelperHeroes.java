@@ -63,7 +63,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green(
                     "argentHeroStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         String msg = player.getRepresentation()
                 + ", please choose the system you wish to move stuff to using Mirik Aun Sissiri, the Argent hero.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -129,7 +129,7 @@ public class ButtonHelperHeroes {
                         tile.getRepresentationForButtons(game, player)));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         return buttons;
     }
 
@@ -696,7 +696,7 @@ public class ButtonHelperHeroes {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.red(
                                     "xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
-                            buttons.add(Buttons.gray("deleteButtons", "Decline"));
+                            buttons.add(Buttons.DECLINE);
                             MessageHelper.sendMessageToChannelWithButtons(
                                     player.getCorrectChannel(),
                                     player.getRepresentation()
@@ -1109,7 +1109,7 @@ public class ButtonHelperHeroes {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -1191,7 +1191,7 @@ public class ButtonHelperHeroes {
         player.setTg(player.getCommodities() + player.getTg());
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-        Button tgButton = Buttons.red("deleteButtons", "Delete Buttons");
+        Button tgButton = Buttons.DELETE_BUTTONS;
         for (UnitHolder uH : tile.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uH.getName())) {
                 String planet = uH.getName();
@@ -1372,8 +1372,7 @@ public class ButtonHelperHeroes {
         var frontierTokenId = Mapper.getTokenID(Constants.FRONTIER);
         return game.getTileMap().values().stream()
                 .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
-                .filter(tile ->
-                        tile.getUnitHolders().get("space").getTokenList().contains(frontierTokenId))
+                .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains(frontierTokenId))
                 .map(tile -> Buttons.blue(
                         factionChecker + "exploreFront_" + tile.getPosition(),
                         "Explore " + tile.getRepresentationForButtons(game, player)))
@@ -1477,7 +1476,7 @@ public class ButtonHelperHeroes {
                     "stealRelic_" + victim.getFaction() + "_" + relic,
                     "Steal " + Mapper.getRelic(relic).getName()));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         String msg = player.getRepresentationUnfogged() + ", please choose the relic you wish to steal.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
@@ -1506,7 +1505,7 @@ public class ButtonHelperHeroes {
 
     public static void resolvDihmohnHero(Game game) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = unitHolder.getUnits();
         for (Player player : game.getRealPlayers()) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -1620,7 +1619,7 @@ public class ButtonHelperHeroes {
         buttons.add(Buttons.green("olradinHeroFlip_people", "People Policy"));
         buttons.add(Buttons.green("olradinHeroFlip_environment", "Environment Policy"));
         buttons.add(Buttons.green("olradinHeroFlip_economy", "Economy Policy"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         String msg = player.getRepresentation() + " you may flip one policy.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
@@ -1718,7 +1717,7 @@ public class ButtonHelperHeroes {
                 buttons.add(Buttons.gray(factionChecker + "jnHeroSwapOut_" + tech, techM.getName()));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         return buttons;
     }
 
@@ -1880,7 +1879,7 @@ public class ButtonHelperHeroes {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("mykoheroSteal_" + hero, "Copy " + hero));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasLeaderUnlocked("mykomentorihero")) {
                 String msg = p2.getRepresentationUnfogged()
@@ -1988,7 +1987,7 @@ public class ButtonHelperHeroes {
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RESOLVING);
 
         return scButtons;
     }
@@ -2013,7 +2012,7 @@ public class ButtonHelperHeroes {
 
         scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
 
-        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.DONE_RESOLVING);
 
         return scButtons;
     }

@@ -200,7 +200,7 @@ public final class ButtonHelperModifyUnits {
     public static void autoAssignAntiFighterBarrageHits(
             Player player, Game game, String pos, int hits, ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
                 + " in the following way:\n");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -652,7 +652,7 @@ public final class ButtonHelperModifyUnits {
             GenericInteractionCreateEvent event,
             boolean justSummarizing,
             boolean spaceCannonOffence) {
-        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         if (!justSummarizing) {
             LostLegaciesRelicHandler.beginNeutralReplacementBatch(game);
         }
@@ -1163,7 +1163,7 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         return buttons;
     }
 
@@ -1240,7 +1240,7 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         return buttons;
     }
 
@@ -2126,7 +2126,7 @@ public final class ButtonHelperModifyUnits {
             CommanderUnlockCheckService.checkPlayer(player, "cabal");
             if (player.hasAbility("industrious") && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                 Button replace = Buttons.green(
-                        "FFCC_" + player.getFaction() + "_rohdhnaIndustrious_"
+                        player.factionButtonChecker() + "rohdhnaIndustrious_"
                                 + tile.getPosition() + "_" + unitID + " "
                                 + planetName,
                         "Replace Space Dock with War Sun");
@@ -2218,7 +2218,7 @@ public final class ButtonHelperModifyUnits {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
                                 Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        shroadedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
@@ -2228,7 +2228,7 @@ public final class ButtonHelperModifyUnits {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
                                 Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        shroadedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
@@ -2238,7 +2238,7 @@ public final class ButtonHelperModifyUnits {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
                                 Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        shroadedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
@@ -2263,7 +2263,7 @@ public final class ButtonHelperModifyUnits {
                         cloakedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile.getPosition() + "_" + unitID,
                                 "Capture 1 " + StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(unitID))));
-                        cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        cloakedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
@@ -2274,7 +2274,7 @@ public final class ButtonHelperModifyUnits {
                         cloakedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile.getPosition() + "_" + unitID,
                                 "Capture 1 " + StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(unitID))));
-                        cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        cloakedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
@@ -2289,7 +2289,7 @@ public final class ButtonHelperModifyUnits {
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition() + "_" + solBtLimit,
                             "Build Up To " + solBtLimit + " Ground Forces and Fighters"));
-                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons2.add(Buttons.DECLINE);
                     String msg = player.getRepresentation()
                             + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value), using _Bellum Gloriosum_. Use buttons to resolve or decline."
                             + "\n-# Note: Finish your normal build first for best results.";
@@ -2666,7 +2666,7 @@ public final class ButtonHelperModifyUnits {
                         shroadedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile2.getPosition() + "_" + unitID,
                                 "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        shroadedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
@@ -2677,7 +2677,7 @@ public final class ButtonHelperModifyUnits {
                         shroadedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile2.getPosition() + "_" + unitID,
                                 "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        shroadedFleets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
                                 "You may place this produced ship on Homesick Phantom, the Rebellion hero.",
@@ -2695,7 +2695,7 @@ public final class ButtonHelperModifyUnits {
                                 + " but does not contain a legendary planet or another player's units. Press button to resolve";
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
-                        buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                        buttons2.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                     }
                     if (!willSkipBuild && player.hasTech("tf-rallythehorde")) {
@@ -2704,7 +2704,7 @@ public final class ButtonHelperModifyUnits {
                                 + " you may place a neutral ship of that type in any system which does not possess any non-neutral ships. Press button to resolve";
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green("startRallyTheHorde", "Rally The Horde"));
-                        buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                        buttons2.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                     }
                 }
@@ -2738,7 +2738,7 @@ public final class ButtonHelperModifyUnits {
         if (!buttonID.contains("deleteButtons")) {
             DoneExhausting = Buttons.red("deleteButtons_" + buttonID, "Done Exhausting Planets");
         } else {
-            DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+            DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS;
         }
         buttons.add(DoneExhausting);
         if (!willSkipBuild) {
@@ -2752,7 +2752,7 @@ public final class ButtonHelperModifyUnits {
                                     + player.getUnitFromUnitKey(unitKey).getCapacityValue(),
                             "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
                                     + " Ground Forces and Fighters"));
-                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons2.add(Buttons.DECLINE);
                     String msg = player.getRepresentation()
                             + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using _Bellum Gloriosum_. Use buttons to resolve or decline."
                             + "\n-# Note: Finish your normal build first for best results.";
@@ -2855,7 +2855,7 @@ public final class ButtonHelperModifyUnits {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
-        UnitHolder uh = tile.getUnitHolders().get("space");
+        UnitHolder uh = tile.getSpaceUnitHolder();
         for (UnitKey unit : uh.getUnitsByStateForPlayer(player).keySet()) {
             UnitModel um = player.getUnitFromUnitKey(unit);
             if (um == null || !um.getIsShip()) continue;
@@ -2963,7 +2963,7 @@ public final class ButtonHelperModifyUnits {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
-        for (UnitKey unit : tile.getUnitHolders().get("space").getUnits().keySet()) {
+        for (UnitKey unit : tile.getSpaceUnitHolder().getUnits().keySet()) {
             if (unit.unitType() == UnitType.Infantry || unit.unitType() == UnitType.Mech) {
                 continue;
             }

@@ -61,7 +61,7 @@ class OtherHeroButtonHandler {
         buttons.add(
                 Buttons.red(player.factionButtonChecker() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
         for (int x = 1;
-                x < player.getNomboxTile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) + 1;
+                x < player.getNomboxTile().getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) + 1;
                 x++) {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "pharadnHeroCommit_" + planet + "_" + x,

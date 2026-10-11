@@ -334,7 +334,7 @@ public class CombatReplaySideBetPayoutService {
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Player player = targetFaction == null ? attacker : game.getPlayerFromColorOrFaction(targetFaction);
         Player opponent = targetFaction == null ? defender : opponentFor(game, candidate, targetFaction);
-        UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile == null ? null : tile.getSpaceUnitHolder();
         if (tile == null
                 || attacker == null
                 || defender == null

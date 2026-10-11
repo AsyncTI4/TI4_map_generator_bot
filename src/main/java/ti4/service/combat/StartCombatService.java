@@ -554,7 +554,7 @@ public class StartCombatService {
         // sigma homebrew
         if (isSpaceCombat) {
             boolean sustain = false;
-            UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+            UnitHolder space = tile.getSpaceUnitHolder();
             for (Units.UnitKey unit : space.getUnits().keySet()) {
                 Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                 UnitModel removedUnit = player.getPriorityUnitByAsyncID(unit.asyncID(), space);
@@ -635,7 +635,7 @@ public class StartCombatService {
             }
             if (isSpaceCombat) {
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player2, tile)) {
-                    UnitHolder space = tile.getUnitHolders().get("space");
+                    UnitHolder space = tile.getSpaceUnitHolder();
                     int dreadCount = space.getUnitCount(UnitType.Dreadnought, player2.getColor());
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
@@ -646,7 +646,7 @@ public class StartCombatService {
                                     + " The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player1, tile)) {
-                    UnitHolder space = tile.getUnitHolders().get("space");
+                    UnitHolder space = tile.getSpaceUnitHolder();
                     int dreadCount = space.getUnitCount(UnitType.Dreadnought, player1.getColor());
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
@@ -1034,8 +1034,7 @@ public class StartCombatService {
             buttons2.add(Buttons.red("get_so_score_buttons", "Score A Secret Objective"));
             if ("space".equalsIgnoreCase(type)
                     && player.getSecretsUnscored().containsKey("uf")
-                    && tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, player.getColor())
-                            > 0) {
+                    && tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Flagship, player.getColor()) > 0) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
@@ -1044,8 +1043,7 @@ public class StartCombatService {
             }
             if ("space".equalsIgnoreCase(type)
                     && player.getSecretsUnscored().containsKey("dtgs")
-                    && (tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, otherPlayer.getColor())
-                                    > 0
+                    && (tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Flagship, otherPlayer.getColor()) > 0
                             || tile.getUnitHolders()
                                             .get("space")
                                             .getUnitCount(Units.UnitType.Warsun, otherPlayer.getColor())
@@ -1103,7 +1101,7 @@ public class StartCombatService {
                                         player.factionButtonChecker() + "useVanguardReinforce",
                                         "Use Reinforce (On Win)",
                                         FactionEmojis.vanguard),
-                                Buttons.red("deleteButtons", "Decline")));
+                                Buttons.DECLINE));
             }
             if (!"space".equalsIgnoreCase(type) && player.hasAbility("enhanced_fundamentals") && player.getTg() >= 2) {
                 VanguardAbilitiesHandler.sendFundamentalsButton(player);
@@ -1711,7 +1709,7 @@ public class StartCombatService {
             Game game, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         boolean isSpaceCombat = "space".equalsIgnoreCase(groundOrSpace);
         CurrentCombat currentCombat = getCurrentCombat(game);
         UnitHolder combatHolder = isSpaceCombat
@@ -1821,7 +1819,7 @@ public class StartCombatService {
         if (!game.isFowMode()) checkAndAddDihmonBreakthroughButton(p2, isSpaceCombat, buttons, tile);
 
         for (Player agentHolder : game.getRealPlayers()) {
-            String factionChecker = "FFCC_" + agentHolder.getFaction() + "_";
+            String factionChecker = agentHolder.factionButtonChecker();
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("thronesagent")) {
                 buttons.add(ThronesLeadersHandler.getThronesAgentButton(agentHolder));
@@ -2080,7 +2078,7 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && isGroundCombat
                 && !p1.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
                     "Use Kortali Agent",
@@ -2089,7 +2087,7 @@ public class StartCombatService {
         if (p1.hasUnexhaustedLeader("kortaliagent")
                 && isGroundCombat
                 && !p2.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
                     "Use Kortali Agent",
@@ -2097,7 +2095,7 @@ public class StartCombatService {
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Buttons.gray(
                         factionChecker + "placeGlory_" + pos,
@@ -2115,7 +2113,7 @@ public class StartCombatService {
             }
         }
         if (p1.hasAbility("glory")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Buttons.gray(
                         factionChecker + "placeGlory_" + pos,
@@ -2133,14 +2131,14 @@ public class StartCombatService {
             }
         }
         if ((p2 == game.getActivePlayer() && p2.hasAbility("pride")) && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "resolvePride_" + p1.getFaction(),
                     "Resolve Pride (Upon Win)",
                     FactionEmojis.toldar));
         }
         if ((p1 == game.getActivePlayer() && p1.hasAbility("pride"))) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "resolvePride_" + p2.getFaction(),
                     "Resolve Pride (Upon Win)",
@@ -2151,7 +2149,7 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && p2.getDebtTokenCount(p1.getColor(), Constants.VADEN_DEBT_POOL) > 0
                 && "space".equalsIgnoreCase(groundOrSpace)) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "collateralizedLoans_" + pos + "_" + p1.getFaction(),
                     "Collateralized Loans",
@@ -2160,7 +2158,7 @@ public class StartCombatService {
         if ((p1.hasAbility("collateralized_loans"))
                 && p1.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0
                 && "space".equalsIgnoreCase(groundOrSpace)) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "collateralizedLoans_" + pos + "_" + p2.getFaction(),
                     "Collateralized Loans",
@@ -2176,24 +2174,24 @@ public class StartCombatService {
                     FactionEmojis.belkosea));
         }
         if (p2.hasAbility("necrophage") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(factionChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
         }
         if (p1.hasAbility("necrophage")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(factionChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
         }
 
         if (p2.getPromissoryNotesInPlayArea().contains("dspntold")
                 && !game.isFowMode()
                 && p2.getTotalVictoryPoints() < p1.getTotalVictoryPoints()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(
                     Buttons.gray(factionChecker + "toldarPN", "Gain 3 Commodities (Upon Win)", FactionEmojis.toldar));
         }
         if (p1.getPromissoryNotesInPlayArea().contains("dspntold")
                 && p1.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(
                     Buttons.gray(factionChecker + "toldarPN", "Gain 3 Commodities (Upon Win)", FactionEmojis.toldar));
         }
@@ -2207,14 +2205,14 @@ public class StartCombatService {
         }
 
         if (p2.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p2) && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
                     FactionEmojis.belkosea));
         }
         if (p1.hasRelicReady("superweaponcaled") && ButtonHelperAbilities.canUseCaled(game, p1)) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
@@ -2233,7 +2231,7 @@ public class StartCombatService {
                 && (space.getUnitCount(Units.UnitType.Destroyer, p2) > 0
                         || space.getUnitCount(Units.UnitType.Cruiser, p2) > 0);
         if (p2.hasAbility("devotion") && !game.isFowMode() && isSpaceCombat && hasDevotionShips) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "startDevotion_" + tile.getPosition(), "Devotion", FactionEmojis.Yin));
         }
@@ -2241,20 +2239,20 @@ public class StartCombatService {
                 && (space.getUnitCount(Units.UnitType.Destroyer, p1) > 0
                         || space.getUnitCount(Units.UnitType.Cruiser, p1) > 0);
         if (p1.hasAbility("devotion") && isSpaceCombat && hasDevotionShips) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "startDevotion_" + tile.getPosition(), "Devotion", FactionEmojis.Yin));
         }
 
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p2, "mykomentoricommander") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "resolveMykoCommander",
                     "Spend For Myko-Mentori Commander",
                     FactionEmojis.mykomentori));
         }
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p1, "mykomentoricommander")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "resolveMykoCommander",
                     "Spend For Myko-Mentori Commander",
@@ -2262,12 +2260,12 @@ public class StartCombatService {
         }
 
         if (isSpaceCombat && p2.hasAbility("munitions") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(
                     Buttons.gray(factionChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
         }
         if (isSpaceCombat && p1.hasAbility("munitions")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(
                     Buttons.gray(factionChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
         }
@@ -2277,39 +2275,39 @@ public class StartCombatService {
         }
         ToldarTechHandler.addVirTrainingButton(buttons, p1);
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "vadenYellowTechUse_" + p1.getColor(),
                     "Produce Additional Hit for 1 Trade Good",
                     FactionEmojis.vaden));
         }
         if (p1.hasTech("dsvadey")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "vadenYellowTechUse_" + p2.getColor(),
                     "Produce Additional Hit for 1 Trade Good",
                     FactionEmojis.vaden));
         }
         if (p2.hasTechReady("dsvadey") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustTech_dsvadey", "Exhaust To Kill Sustaining Unit", FactionEmojis.vaden));
         }
         if (p1.hasTechReady("dsvadey")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustTech_dsvadey", "Exhaust To Kill Sustaining Unit", FactionEmojis.vaden));
         }
 
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "gain_1_comms_stay",
                     "Gain Commodity with Myko-Mentori Flagship",
                     FactionEmojis.mykomentori));
         }
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "gain_1_comms_stay",
                     "Gain Commodity with Myko-Mentori Flagship",
@@ -2319,7 +2317,7 @@ public class StartCombatService {
         if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p2, tile)
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p2, tile))
                 && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             String tp = tile.getPosition();
             buttons.add(Buttons.blue(
                     factionChecker + "placeOneNDone_skipbuild_ff_space" + tp,
@@ -2337,7 +2335,7 @@ public class StartCombatService {
         if ((ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_1", p1, tile)
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_sol_flagship_2", p1, tile))
                 && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             String tp = tile.getPosition();
             buttons.add(Buttons.blue(
                     factionChecker + "placeOneNDone_skipbuild_ff_space" + tp,
@@ -2422,21 +2420,21 @@ public class StartCombatService {
                 && game.playerHasLeaderUnlockedOrAlliance(p2, "gheminacommander")
                 && gheminaCommanderApplicable
                 && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.red(
                     factionChecker + "declareUse_Ghemina Commander", "Use Ghemina Commanders", FactionEmojis.ghemina));
         }
         if (isSpaceCombat
                 && game.playerHasLeaderUnlockedOrAlliance(p1, "gheminacommander")
                 && gheminaCommanderApplicable) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.red(
                     factionChecker + "declareUse_Ghemina Commander", "Use Ghemina Commanders", FactionEmojis.ghemina));
         }
         if (p1.hasLeaderUnlocked("keleresherokuuasi")
                 && isSpaceCombat
                 && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, p1, game)) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeKeleresAHero", "Purge Keleres (Argent) Hero", FactionEmojis.Keleres));
         }
@@ -2444,31 +2442,31 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && isSpaceCombat
                 && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, p2, game)) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeKeleresAHero", "Purge Keleres (Argent) Hero", FactionEmojis.Keleres));
         }
 
         if (p1.hasLeaderUnlocked("dihmohnhero") && isSpaceCombat) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(
                     Buttons.gray(factionChecker + "purgeDihmohnHero", "Purge Dih-Mohn Hero", FactionEmojis.dihmohn));
         }
         if (p2.hasLeaderUnlocked("dihmohnhero") && !game.isFowMode() && isSpaceCombat) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(
                     Buttons.gray(factionChecker + "purgeDihmohnHero", "Purge Dih-Mohn Hero", FactionEmojis.dihmohn));
         }
 
         if (p1.hasLeaderUnlocked("kortalihero")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeKortaliHero_" + p2.getFaction(),
                     "Purge Kortali Hero",
                     FactionEmojis.kortali));
         }
         if (p2.hasLeaderUnlocked("kortalihero") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeKortaliHero_" + p1.getFaction(),
                     "Purge Kortali Hero",
@@ -2476,7 +2474,7 @@ public class StartCombatService {
         }
 
         if ((p1.hasLeaderUnlocked("redcreusshero") || p1.hasLeaderUnlocked("crimsonhero")) && isSpaceCombat) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeRedCreussHero_" + tile.getPosition(),
                     "Purge Rebellion Hero",
@@ -2485,7 +2483,7 @@ public class StartCombatService {
         if ((p2.hasLeaderUnlocked("redcreusshero") || p2.hasLeaderUnlocked("crimsonhero"))
                 && !game.isFowMode()
                 && isSpaceCombat) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeRedCreussHero_" + tile.getPosition(),
                     "Purge Rebellion Hero",
@@ -2498,14 +2496,14 @@ public class StartCombatService {
             buttons.add(ArvaxiLeaderHandler.getPurgeHeroButton(p2, tile.getPosition()));
         }
         if (p1.hasLeaderUnlocked("bastionhero")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeBastionHero_" + tile.getPosition(),
                     "Purge Bastion Hero",
                     FactionEmojis.Bastion));
         }
         if (p2.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "purgeBastionHero_" + tile.getPosition(),
                     "Purge Bastion Hero",
@@ -2574,7 +2572,7 @@ public class StartCombatService {
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander")
                 && isGroundCombat
                 && p1 != game.getActivePlayer()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "cheiranCommanderBlock_hm",
                     "Block with Cheiran Commander",
@@ -2584,7 +2582,7 @@ public class StartCombatService {
                 && game.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander")
                 && isGroundCombat
                 && p2 != game.getActivePlayer()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "cheiranCommanderBlock_hm",
                     "Block with Cheiran Commander",
@@ -2592,24 +2590,24 @@ public class StartCombatService {
         }
 
         if (p1.hasTechReady("absol_x89") && isGroundCombat && p1 != game.getActivePlayer()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.green(
                     factionChecker + "exhaustTech_absol_x89", "X-89 Bacterial Weapon", TechEmojis.BioticTech));
         }
         if (!game.isFowMode() && p2.hasTechReady("absol_x89") && isGroundCombat && p2 != game.getActivePlayer()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.green(
                     factionChecker + "exhaustTech_absol_x89", "X-89 Bacterial Weapon", TechEmojis.BioticTech));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "kortalicommander")) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
+            String factionChecker = p1.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "kortaliCommanderBlock_hm",
                     "Block with Kortali Commander",
                     FactionEmojis.kortali));
         }
         if (!game.isFowMode() && game.playerHasLeaderUnlockedOrAlliance(p2, "kortalicommander")) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
+            String factionChecker = p2.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "kortaliCommanderBlock_hm",
                     "Block with Kortali Commander",

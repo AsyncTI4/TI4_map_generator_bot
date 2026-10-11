@@ -1068,7 +1068,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 player.getRepresentation() + " drew 1 red back tile from this list:\n> " + tileToPullFromUnshuffled);
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
-        UnitHolder space = tileOg.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tileOg.getSpaceUnitHolder();
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         boolean frontier = space.getTokenList().contains(frontierFilename);
         Tile novaTile = new Tile(tileID, tileOg.getPosition(), space);

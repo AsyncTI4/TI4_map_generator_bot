@@ -23,7 +23,7 @@ public class ArvaxiAbilityHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player neighbor : player.getNeighbouringPlayers(true)) {
             buttons.add(Buttons.green(
-                    "FFCC_" + player.getFaction() + "_underhandedManeuverTarget_" + neighbor.getFaction(),
+                    player.factionButtonChecker() + "underhandedManeuverTarget_" + neighbor.getFaction(),
                     neighbor.getFactionNameOrColor(),
                     neighbor.fogSafeEmoji()));
         }
@@ -62,7 +62,7 @@ public class ArvaxiAbilityHandler {
                 player.factionButtonChecker() + "underhandedManeuverPickNeighbor",
                 "Use Underhanded Maneuver",
                 FactionEmojis.arvaxi));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + ", use buttons to resolve _Underhanded Maneuver_.",

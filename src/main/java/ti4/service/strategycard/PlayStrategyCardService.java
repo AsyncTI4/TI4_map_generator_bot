@@ -438,7 +438,7 @@ public class PlayStrategyCardService {
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
                 StoneEmbraceService.serveStoneEmbraceButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
-                Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");
+                Button deleteB = Buttons.DELETE_BUTTONS;
                 empNMahButtons.add(deleteB);
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.addFirst(emelpar);
@@ -560,7 +560,7 @@ public class PlayStrategyCardService {
             List<Button> graceButtons = new ArrayList<>();
             graceButtons.add(
                     Buttons.green(player.factionButtonChecker() + "resolveGrace_" + scToPlay, "Resolve Grace Ability"));
-            graceButtons.add(Buttons.red("deleteButtons", "Decline"));
+            graceButtons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
@@ -592,7 +592,7 @@ public class PlayStrategyCardService {
                                     + " you may use this button to play _Acquiescence_ to perform the secondary without spending a command token from your strategy pool.";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquiescence"));
-                            buttons.add(Buttons.red("deleteButtons", "Decline"));
+                            buttons.add(Buttons.DECLINE);
                             MessageHelper.sendMessageToChannelWithButtons(
                                     player2.getCardsInfoThread(), acqMessage, buttons);
                         }
@@ -605,9 +605,7 @@ public class PlayStrategyCardService {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " may use _Lunar Eclipse_ after performing this strategic action.",
-                    List.of(
-                            AeternaAbilityHandler.getLunarEclipseButton(player),
-                            Buttons.red("deleteButtons", "Decline")));
+                    List.of(AeternaAbilityHandler.getLunarEclipseButton(player), Buttons.DECLINE));
         }
         if (player.hasPlayablePromissoryInHand("thpnverydith")) {
             VerydithPromissoryHandler.usePactRenewed(player);

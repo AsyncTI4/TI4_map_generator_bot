@@ -57,10 +57,10 @@ public class ThurvialiAbilityHandler {
         List<Button> displayedButtons;
         if (buttons.size() <= 24) {
             displayedButtons = new ArrayList<>(buttons);
-            displayedButtons.add(Buttons.red("deleteButtons", "Decline"));
+            displayedButtons.add(Buttons.DECLINE);
         } else {
-            displayedButtons = NewStuffHelper.buttonPagination(
-                    buttons, List.of(Buttons.red("deleteButtons", "Decline")), buttonPrefix, 25, 0, false);
+            displayedButtons =
+                    NewStuffHelper.buttonPagination(buttons, List.of(Buttons.DECLINE), buttonPrefix, 25, 0, false);
         }
         MessageHelper.sendMessageToChannelWithButtons(owner.getCorrectChannel(), message, displayedButtons);
     }
@@ -88,13 +88,7 @@ public class ThurvialiAbilityHandler {
         String buttonPrefix =
                 player.factionButtonChecker() + CELESTIAL_ENVOYS_PLACE + strategyCard + "|" + target.getFaction() + "|";
         if (NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                event.getMessageChannel(),
-                buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
-                message,
-                buttonPrefix,
-                buttonID)) {
+                event, event.getMessageChannel(), buttons, List.of(Buttons.DECLINE), message, buttonPrefix, buttonID)) {
             return;
         }
         Tile tile = game.getTileFromPlanet(payload[2]);

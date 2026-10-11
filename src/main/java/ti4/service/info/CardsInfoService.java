@@ -414,7 +414,7 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
-        if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
+        if (!player.getNomboxTile().getSpaceUnitHolder().getUnits().isEmpty()) {
             FactionEmojis f = FactionEmojis.Cabal;
             if (player.hasAbility("mark_of_pharadn")) {
                 f = FactionEmojis.pharadn;

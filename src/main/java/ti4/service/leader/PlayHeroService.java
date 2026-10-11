@@ -623,7 +623,7 @@ public class PlayHeroService {
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-                buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                buttons.add(Buttons.DONE_RESOLVING);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
@@ -705,7 +705,7 @@ public class PlayHeroService {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
                         Buttons.blue(player.factionButtonChecker() + "yinHeroStart", "Invade A Planet With Yin Hero"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
@@ -752,7 +752,7 @@ public class PlayHeroService {
                         player.factionButtonChecker() + "augersHeroStart_" + 1, "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Buttons.blue(
                         player.factionButtonChecker() + "augersHeroStart_" + 2, "Resolve Ilyxum Hero on Stage 2 Deck"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)

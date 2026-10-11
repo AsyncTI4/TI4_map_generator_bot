@@ -75,7 +75,7 @@ public class LandUnits extends GameStateCommand {
         boolean coexist = event.getOption(Constants.COEXIST, Boolean.FALSE, OptionMapping::getAsBoolean);
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         boolean doesTileHaveFloatingGF = false;
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         if (space != null && getPlayer().getColor() != null) {
             doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
                     || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
@@ -88,7 +88,7 @@ public class LandUnits extends GameStateCommand {
         }
 
         doesTileHaveFloatingGF = false;
-        space = tile.getUnitHolders().get("space");
+        space = tile.getSpaceUnitHolder();
         if (space != null && getPlayer().getColor() != null) {
             doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
                     || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;

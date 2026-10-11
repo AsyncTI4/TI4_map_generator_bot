@@ -45,7 +45,7 @@ public class KryxosPromissoryHandler {
                         player.factionButtonChecker() + USE_EVOEDICT + techM.getAlias(),
                         "Use Evolutionary Edict",
                         FactionEmojis.kryxos),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

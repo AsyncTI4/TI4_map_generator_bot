@@ -3017,7 +3017,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nano-Forge Ability"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
                     getRepresentation()

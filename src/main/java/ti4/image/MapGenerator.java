@@ -2156,7 +2156,7 @@ public class MapGenerator implements AutoCloseable {
             String betaID = Mapper.getTokenID("creussbeta");
             String gammaID = Mapper.getTokenID("creussgamma");
             for (Tile tile2 : game.getTileMap().values()) {
-                Set<String> tileTokens = tile2.getUnitHolders().get("space").getTokenList();
+                Set<String> tileTokens = tile2.getSpaceUnitHolder().getTokenList();
                 alphaOnMap |= tileTokens.contains(alphaID);
                 betaOnMap |= tileTokens.contains(betaID);
                 gammaOnMap |= tileTokens.contains(gammaID);

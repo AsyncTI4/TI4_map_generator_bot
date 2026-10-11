@@ -243,7 +243,7 @@ public class OblivionLeadersHandler {
         }
 
         List<Button> offeredButtons = new ArrayList<>(buttons);
-        offeredButtons.add(Buttons.red("deleteButtons", "Decline"));
+        offeredButtons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()

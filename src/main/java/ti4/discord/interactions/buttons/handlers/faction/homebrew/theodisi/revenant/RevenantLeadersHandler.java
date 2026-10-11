@@ -870,7 +870,7 @@ public class RevenantLeadersHandler {
         String message = componentOwner.getRepresentation() + ", choose the player who will produce 1 unit with "
                 + "Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.";
         String prefix = componentOwner.factionButtonChecker() + SELECT_REVSCRAPYARD_TARGET;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, componentOwner.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
             return;
@@ -950,7 +950,7 @@ public class RevenantLeadersHandler {
         String message = target.getRepresentation()
                 + ", choose a system containing 1 or more of your ships in which to produce 1 unit due to Thrash \"Feral\" Burner, the Revenant of Scrapyard agent.";
         String prefix = target.factionButtonChecker() + PAGE_REVSCRAPYARD_SYSTEMS + target.getFaction() + "_";
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE);
         if (event != null
                 && NewStuffHelper.checkAndHandlePaginationChange(
                         event, target.getCorrectChannel(), buttons, extraButtons, message, prefix, buttonID)) {
@@ -1011,7 +1011,7 @@ public class RevenantLeadersHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -1051,7 +1051,7 @@ public class RevenantLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose where to place the infantry with Melloh Terras.",
@@ -1256,7 +1256,7 @@ public class RevenantLeadersHandler {
                         activePlayer.factionButtonChecker() + USE_REVXYTHERIS + activePlayer.getFaction(),
                         "Use Revenant Xytheris Agent",
                         FactionEmojis.revenant),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 activePlayer.getCorrectChannel(),
                 activePlayer.getRepresentation()
@@ -1431,7 +1431,7 @@ public class RevenantLeadersHandler {
                 event,
                 event.getMessageChannel(),
                 getRevKryxosTechButtons(player, availableTechs, step),
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE),
                 menuMessage,
                 paginationPrefix,
                 buttonID)) {
@@ -1599,7 +1599,7 @@ public class RevenantLeadersHandler {
                 Buttons.green(
                         player.factionButtonChecker() + USE_REVBASE + techM.getID(),
                         "Ready " + technologyRepresentation),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

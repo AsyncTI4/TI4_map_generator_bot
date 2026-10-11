@@ -99,7 +99,7 @@ public class ButtonHelperCommanders {
             }
             buttons.add(Buttons.green("olradinCommanderStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         String msg = player.getRepresentationUnfogged()
                 + " you may exhaust 1 planet to gain trade goods equal to its influence or resources.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -447,7 +447,7 @@ public class ButtonHelperCommanders {
                             + " so you __may__ gain 1 trade good.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
                 }
                 case RANGE_OPT_IN -> {
@@ -456,7 +456,7 @@ public class ButtonHelperCommanders {
                             + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
                 }
                 case AUTO -> {
@@ -679,7 +679,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -693,7 +693,7 @@ public class ButtonHelperCommanders {
                                     + " so you __may__ gain 1 trade good when you " + reason + ".";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
                 }
                 case RANGE_OPT_IN -> {
@@ -703,7 +703,7 @@ public class ButtonHelperCommanders {
                                     + ", but since you are in **Pillage** range, this has not been done automatically.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
                 }
                 case AUTO -> {
@@ -737,7 +737,7 @@ public class ButtonHelperCommanders {
                 buttons.add(Buttons.green(
                         "freeSystemsBT_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmojiOrColor()));
             }
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -748,7 +748,7 @@ public class ButtonHelperCommanders {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve _Peace Accords_.",
@@ -759,7 +759,7 @@ public class ButtonHelperCommanders {
             String msg = "Please choose the system in which you wish to produce a ship using ";
             msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
             List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -793,7 +793,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", please choose a planet to coexist on with "
@@ -819,12 +819,12 @@ public class ButtonHelperCommanders {
             buttons2.add(Buttons.green(
                     "getTech_" + Mapper.getTech(techID).getAlias() + "__noPay",
                     Mapper.getTech(techID).getName()));
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            buttons2.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(obsidian.getCardsInfoThread(), msg, buttons2);
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, obsidian, "res");
             Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(doneExhausting);
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     obsidian.getCardsInfoThread(), "You can use these buttons to pay the 4 resources.", buttons);
         }
@@ -838,7 +838,7 @@ public class ButtonHelperCommanders {
                 List<Button> buttons = new ArrayList<>();
 
                 buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -863,7 +863,7 @@ public class ButtonHelperCommanders {
                         }
                     }
                     if (removeTechButtons.size() > 2) {
-                        removeTechButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                        removeTechButtons.add(Buttons.DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()

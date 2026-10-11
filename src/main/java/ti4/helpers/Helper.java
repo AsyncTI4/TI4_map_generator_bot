@@ -1014,9 +1014,9 @@ public final class Helper {
                 label += " - Exhausted";
             }
             if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
-                button = Buttons.gray("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label, scEmoji);
+                button = Buttons.gray(playerPicker.factionButtonChecker() + "scPick_" + sc, label, scEmoji);
             } else {
-                button = Buttons.gray("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, sc + " " + label, scEmoji);
+                button = Buttons.gray(playerPicker.factionButtonChecker() + "scPick_" + sc, sc + " " + label, scEmoji);
             }
             scButtons.add(button);
         }
@@ -3191,12 +3191,7 @@ public final class Helper {
                 if (("tacticalAction".equalsIgnoreCase(warfareNOtherstuff)
                                 || "warfare".equalsIgnoreCase(warfareNOtherstuff))
                         && getProductionValueOfUnitHolder(player, game, tile, unitHolder) == 0
-                        && getProductionValueOfUnitHolder(
-                                        player,
-                                        game,
-                                        tile,
-                                        tile.getUnitHolders().get("space"))
-                                == 0
+                        && getProductionValueOfUnitHolder(player, game, tile, tile.getSpaceUnitHolder()) == 0
                         && !hasRallyingCryProduction
                         && !canProduceParturitionStructure) {
                     continue;

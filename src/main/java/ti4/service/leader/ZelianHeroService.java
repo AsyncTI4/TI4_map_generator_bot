@@ -51,7 +51,7 @@ public class ZelianHeroService {
         ButtonHelperAgents.resolveArtunoCheck(player, resourcesSum);
 
         // Add the zelian asteroid field to the map and copy over the space unitholder
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         game.removeTile(tile.getPosition());
         Tile asteroidTile = new Tile(AliasHandler.resolveTile("D36"), tile.getPosition(), space);
         game.setTile(asteroidTile);

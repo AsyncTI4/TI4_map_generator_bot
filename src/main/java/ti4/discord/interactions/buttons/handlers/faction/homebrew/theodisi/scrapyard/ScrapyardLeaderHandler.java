@@ -51,7 +51,7 @@ public class ScrapyardLeaderHandler {
                         agentOwner.factionButtonChecker() + DECLARE_RIKKA + target.getFaction(),
                         "Declare Rikka",
                         FactionEmojis.scrapyard),
-                Buttons.red("deleteButtons", "Decline")));
+                Buttons.DECLINE));
         MessageHelper.sendMessageToChannelWithButtons(
                 target == agentOwner ? target.getCorrectChannel() : agentOwner.getCardsInfoThread(),
                 agentOwner.getRepresentation()
@@ -142,7 +142,7 @@ public class ScrapyardLeaderHandler {
             return;
         }
         buttons.sort(Comparator.comparing(Button::getLabel));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose a unit type for Nix \"Stray\" Calder.",

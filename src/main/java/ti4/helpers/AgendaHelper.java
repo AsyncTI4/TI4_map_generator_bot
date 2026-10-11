@@ -127,7 +127,7 @@ public final class AgendaHelper {
                 if (p2.getDebtTokenCount(player.getColor()) >= 3) {
                     buttons.add(Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt3", "Erase 3 Debt"));
                 }
-                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
@@ -207,7 +207,7 @@ public final class AgendaHelper {
                                 p2.getColor()));
                     }
                 }
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
             }
         }
@@ -506,7 +506,7 @@ public final class AgendaHelper {
                 String realIdentity;
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 String pFaction = nextInLine.getFlexibleDisplayName();
-                String factionChecker = "FFCC_" + nextInLine.getFaction() + "_";
+                String factionChecker = nextInLine.factionButtonChecker();
                 Button Vote = Buttons.blue(factionChecker + "vote", pFaction + " Choose To Vote");
                 Button Abstain;
                 if (nextInLine.hasAbility("future_sight")
@@ -843,7 +843,7 @@ public final class AgendaHelper {
             String message = AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n" + realIdentity
                     + " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
-            String factionChecker = "FFCC_" + nextInLine.getFaction() + "_";
+            String factionChecker = nextInLine.factionButtonChecker();
             Button vote = Buttons.blue(factionChecker + "vote", pFaction + " Choose To Vote");
             Button abstain;
             if (nextInLine.hasAbility("future_sight")
@@ -1662,7 +1662,7 @@ public final class AgendaHelper {
                     && IsPlayerElectedService.isPlayerElected(game, player, "committee")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
@@ -3257,7 +3257,7 @@ public final class AgendaHelper {
                 }
             }
             if (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition())) {
-                UnitHolder uH = tile.getUnitHolders().get(Constants.SPACE);
+                UnitHolder uH = tile.getSpaceUnitHolder();
                 for (UnitKey key : uH.getUnitKeys()) {
                     game.getPlayerByUnitKey(key).ifPresent(p -> {
                         if (p.getUnitFromUnitKey(key).getIsShip()) {

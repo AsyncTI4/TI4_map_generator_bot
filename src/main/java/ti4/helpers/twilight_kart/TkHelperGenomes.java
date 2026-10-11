@@ -132,7 +132,7 @@ public class TkHelperGenomes {
                 List<Button> buttons = new ArrayList<>(
                         Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
                 if (!buttons.isEmpty()) {
-                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                    buttons.add(Buttons.DONE_DELETE_BUTTONS);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), text, buttons);
             }

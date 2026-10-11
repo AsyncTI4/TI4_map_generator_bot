@@ -93,7 +93,7 @@ class NekroHeroButtonHandler {
         } else {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_RESOLVING);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Please use these buttons to draw 1 ability.", buttons);
         }

@@ -155,7 +155,7 @@ public final class ButtonHelperTacticalAction {
                                 Buttons.gray("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, game)));
                     }
                 }
-                trapButtons.add(Buttons.red("deleteButtons", "Decline"));
+                trapButtons.add(Buttons.DECLINE);
                 String msg =
                         player.getRepresentationUnfogged() + " you can use the buttons to place a trap on a planet";
                 if (trapButtons.size() > 1) {
@@ -168,7 +168,7 @@ public final class ButtonHelperTacticalAction {
                         "exhaustAgent_celdauriagent_" + player.getFaction(),
                         "Use Celdauri Agent",
                         FactionEmojis.celdauri));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -259,7 +259,7 @@ public final class ButtonHelperTacticalAction {
 
                     if (!excavatorPlanets.isEmpty()
                             && !"yes".equals(game.getStoredValue(player.getFaction() + "usedExcavatorThisAction"))) {
-                        excavatorPlanets.add(Buttons.red("deleteButtons", "Decline"));
+                        excavatorPlanets.add(Buttons.DECLINE);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
@@ -276,7 +276,7 @@ public final class ButtonHelperTacticalAction {
                         + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
                 List<Button> systemButtons2 = new ArrayList<>();
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-                systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
+                systemButtons2.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
             if (game.isWarfareAction()
@@ -428,7 +428,7 @@ public final class ButtonHelperTacticalAction {
         if (unitsWereMoved && tile.getPlanetUnitHolders().isEmpty() && player.hasUnexhaustedLeader("empyreanagent")) {
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(Buttons.gray("exhaustAgent_empyreanagent", "Use Empyrean Agent", FactionEmojis.Empyrean));
-            empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            empyButtons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + ", use button to exhaust "
@@ -1075,7 +1075,7 @@ public final class ButtonHelperTacticalAction {
 
         if (tile.getPlanetUnitHolders().isEmpty()
                 && ButtonHelper.doesPlayerHaveFSHere("mortheus_flagship", player, tile)
-                && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
+                && !tile.getSpaceUnitHolder().getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
             String msg = player.getRepresentationUnfogged()
                     + " automatically added 1 frontier token to the system due to the Particle Sieve (the Mortheus flagship).";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

@@ -45,7 +45,7 @@ public class TkHelperUnits {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
         buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
 
         String msg = player.getRepresentation() + ", use these buttons to resolve the ";
         msg += UnitEmojis.fighter + " " + FactionEmojis.Nekro + " _Maleagant_ ability.";

@@ -175,7 +175,7 @@ public class LostLegaciesRelicHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 killer.getRepresentationNoPing()

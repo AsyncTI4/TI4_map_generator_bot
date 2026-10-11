@@ -475,7 +475,7 @@ public class PlayerTechService {
             case "pi", "absol_pi", "tf-predictivecommand" -> { // Predictive Intelligence
                 deleteTheOneButtonIfButtonEvent(event);
                 Button deleteButton =
-                        Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons", "Delete These Buttons");
+                        Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons");
                 String message = player.getRepresentation(false, true) + " use buttons to redistribute";
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(), message, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));

@@ -39,7 +39,7 @@ class PrisonersOfWarAcd2ButtonHandler {
                     player.getRepresentationUnfogged() + ", there are no opponents to target with _Prisoners of War_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose your opponent for _Prisoners of War_.",
@@ -163,7 +163,7 @@ class PrisonersOfWarAcd2ButtonHandler {
                             + target.getRepresentationNoPing() + "'s command token in for _Prisoners of War_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose a non-home system containing your units to place "

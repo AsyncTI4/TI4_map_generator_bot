@@ -77,7 +77,7 @@ class TestHideAcDiscard extends GameStateSubcommand {
         // Real production custom IDs - these dispatch straight into the real handlers, not a copy.
         buttons.add(Buttons.green("peekDataSkimmer", "Peek Data Skimmer (real handler)"));
         buttons.add(Buttons.green("reengineerTakeDiscard", "Reengineer: Take Last Discard (real handler)"));
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

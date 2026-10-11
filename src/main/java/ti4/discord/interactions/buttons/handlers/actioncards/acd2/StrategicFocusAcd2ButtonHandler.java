@@ -18,7 +18,7 @@ class StrategicFocusAcd2ButtonHandler {
     @ButtonHandler("resolveStrategicFocus")
     public static void resolveStrategicFocus(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = TeHelperActionCards.getReadiedStrategyCardSecondaryButtons(game, player);
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

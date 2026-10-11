@@ -175,7 +175,7 @@ public class Expeditions {
             String msg = getExpeditionMessage(exp.getKey());
             buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey(), player.getGame())));
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         return buttons;
     }
 

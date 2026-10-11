@@ -50,7 +50,7 @@ public class MyrrPromissoryHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", please choose a planet to attach _" + pnModel.getName() + "_ to.",

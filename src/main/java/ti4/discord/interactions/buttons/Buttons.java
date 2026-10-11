@@ -36,6 +36,10 @@ public final class Buttons {
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
     public static final Button CANCEL = gray("deleteButtons", "Cancel");
+    public static final Button DECLINE = red("deleteButtons", "Decline");
+    public static final Button DONE_RESOLVING = red("deleteButtons", "Done Resolving");
+    public static final Button DELETE_BUTTONS = red("deleteButtons", "Delete These Buttons");
+    public static final Button DONE_EXHAUSTING_PLANETS = red("deleteButtons", "Done Exhausting Planets");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
     public static final Button DEAL_2_SO =
             green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);

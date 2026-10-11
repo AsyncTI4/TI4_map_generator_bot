@@ -533,7 +533,7 @@ public class CombatRollService {
 
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
         if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
-            combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
+            combatHoldersForOpponent.add(tile.getSpaceUnitHolder());
         }
         if (opponent == null) {
             opponent = getOpponent(player, combatHoldersForOpponent, game);
@@ -777,7 +777,7 @@ public class CombatRollService {
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
-            Button decline = Buttons.gray("deleteButtons", "Decline");
+            Button decline = Buttons.DECLINE;
             String thalnosMessage =
                     "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -938,7 +938,7 @@ public class CombatRollService {
                             + StringHelper.pluralize(h, "hit") + " in round #" + round2 + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     if (h > 0) {
-                        String factionChecker = "FFCC_" + opponent.getFaction() + "_";
+                        String factionChecker = opponent.factionButtonChecker();
                         if (opponent.isDummy() || opponent.isNpc()) {
                             buttons.add(Buttons.green(
                                     opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
@@ -1092,7 +1092,7 @@ public class CombatRollService {
                     + StringHelper.pluralize(h, "hit") + " from SPACE CANNON against your ships.";
             MessageHelper.sendMessageToChannel(channel, msg);
             List<Button> buttons = new ArrayList<>();
-            String factionChecker = "FFCC_" + opponent.getFaction() + "_";
+            String factionChecker = opponent.factionButtonChecker();
             if (opponent.isDummy() || opponent.isNpc()) {
                 buttons.add(Buttons.green(
                         opponent.dummyPlayerSpoof() + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_"
@@ -1233,7 +1233,7 @@ public class CombatRollService {
                             player.factionButtonChecker() + "meteorSlings_" + planet,
                             "Infantry on " + Helper.getPlanetRepresentation(planet, game)));
 
-                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                    buttons.add(Buttons.DONE_DELETE_BUTTONS);
                     String msg2 = player.getRepresentation() + " you could potentially cancel "
                             + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                             + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
@@ -1305,9 +1305,8 @@ public class CombatRollService {
         String repairId = combatOnHolder instanceof Planet
                 ? AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), 0)
                 : "autoAssignSpaceHits_" + tile.getPosition() + "_0";
-        List<Button> buttons = List.of(
-                Buttons.green(buttonPrefix + repairId, "Repair With Duranium Armor"),
-                Buttons.gray("deleteButtons", "Decline"));
+        List<Button> buttons =
+                List.of(Buttons.green(buttonPrefix + repairId, "Repair With Duranium Armor"), Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 opponent.getRepresentationUnfogged()
@@ -1416,7 +1415,7 @@ public class CombatRollService {
         boolean isThalnosReroll = "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"));
 
         int totalMisses = 0;
-        UnitHolder space = activeSystem.getUnitHolders().get("space");
+        UnitHolder space = activeSystem.getSpaceUnitHolder();
         StringBuilder extra = new StringBuilder();
         boolean usesX89c4 = player.hasTech("x89c4")
                 && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
@@ -2845,7 +2844,7 @@ public class CombatRollService {
     static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInAFB(
             Tile tile, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
-        UnitHolder spaceHolder = tile.getUnitHolders().get("space");
+        UnitHolder spaceHolder = tile.getSpaceUnitHolder();
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         Map<Pair<UnitModel, UnitHolder>, Integer> output = new HashMap<>();
@@ -2936,7 +2935,7 @@ public class CombatRollService {
     public static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInBombardment(
             Tile tile, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
-        UnitHolder spaceHolder = tile.getUnitHolders().get("space");
+        UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             getUnitsOnHolderByAsyncId(colorID, unitsByAsyncId, unitHolder);
@@ -3036,7 +3035,7 @@ public class CombatRollService {
     static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInSpaceCannonOffense(
             Tile tile, Player player, GenericInteractionCreateEvent event, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
-        UnitHolder spaceHolder = tile.getUnitHolders().get("space");
+        UnitHolder spaceHolder = tile.getSpaceUnitHolder();
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnTile = new HashMap<>();

@@ -107,7 +107,7 @@ public class PassService {
         //     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         //     List<Button> buttons = new ArrayList<>();
         //     buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Commodities"));
-        //     buttons.add(Buttons.red("deleteButtons", "Decline"));
+        //     buttons.add(Buttons.DECLINE);
         //     MessageHelper.sendMessageToChannelWithButtons(
         //             player.getCorrectChannel(), "Use buttons to resolve.", buttons);
         // }

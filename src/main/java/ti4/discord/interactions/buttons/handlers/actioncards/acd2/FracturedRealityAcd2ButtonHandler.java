@@ -32,7 +32,7 @@ public class FracturedRealityAcd2ButtonHandler {
             buttons.add(Buttons.red(prefix + rollType.name(), describeCombatRoll(rollType)));
         }
         buttons.add(Buttons.gray(player.factionButtonChecker() + "fracturedRealityRollNow", "Other Die Roll"));
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the roll you are using " + CARD + " on.",

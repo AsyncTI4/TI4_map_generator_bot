@@ -100,7 +100,7 @@ public class ZephyrionLeaderHandler {
                                 + tile.getPosition(),
                         StringUtils.capitalize(unitTypeString) + " in " + tile.getRepresentationForButtons(game, p2)));
             }
-            destroyButtons.add(Buttons.gray("deleteButtons", "Done"));
+            destroyButtons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     game.getMainGameChannel(),
                     p2.getRepresentation() + ", choose which ship to destroy.",
@@ -165,7 +165,7 @@ public class ZephyrionLeaderHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getMainGameChannel(),
                 p2.getRepresentation() + ", remove units that exceed capacity and gain 1 trade good each.",
@@ -219,7 +219,7 @@ public class ZephyrionLeaderHandler {
         if (buttons.isEmpty()) {
             ButtonHelper.deleteMessage(event);
         } else {
-            buttons.add(Buttons.gray("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.editMessageButtons(event, buttons);
         }
     }
@@ -253,7 +253,7 @@ public class ZephyrionLeaderHandler {
                             + " with a bounty token and gained 1 victory point.");
         } else {
             List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(player, game, unitTypeString, "place");
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", use the buttons to place " + StringUtils.capitalize(unitTypeString)

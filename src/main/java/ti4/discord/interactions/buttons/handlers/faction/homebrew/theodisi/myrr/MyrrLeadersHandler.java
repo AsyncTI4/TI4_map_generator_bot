@@ -71,7 +71,7 @@ public class MyrrLeadersHandler {
                                             + "|" + tile.getPosition(),
                                     "Use Myrr Agent",
                                     FactionEmojis.myrr),
-                            Buttons.red("deleteButtons", "Decline")));
+                            Buttons.DECLINE));
         }
     }
 
@@ -127,7 +127,7 @@ public class MyrrLeadersHandler {
         }
 
         ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentation()

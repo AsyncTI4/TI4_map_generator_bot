@@ -36,7 +36,7 @@ class FieldTestAcd2ButtonHandler {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "fieldTestType_" + type.name(), type + " Technology"));
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

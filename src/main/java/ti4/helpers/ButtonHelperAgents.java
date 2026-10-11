@@ -114,7 +114,7 @@ public final class ButtonHelperAgents {
                         + p2.getCommoditiesTotal() + " commodit" + (p2.getCommoditiesTotal() == 1 ? "y" : "ies") + ".";
                 buttons.add(Buttons.green(
                         "exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(), "Use Vuil'raith Agent"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
             if (cabal.hasUnexhaustedLeader("toldaragent")) {
@@ -127,7 +127,7 @@ public final class ButtonHelperAgents {
                         + p2.getCommoditiesTotal() + " commodit" + (p2.getCommoditiesTotal() == 1 ? "y" : "ies") + ".";
                 buttons.add(Buttons.green(
                         "toldarAgent_" + p2.getFaction() + "_" + p2.getCommoditiesTotal(), "Use Toldar Agent"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
         }
@@ -147,7 +147,7 @@ public final class ButtonHelperAgents {
                         + p2.getFactionEmojiOrColor() + " for " + amount + " commodit" + (amount == 1 ? "y" : "ies")
                         + ".";
                 buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + amount, "Use Toldar Agent"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(toldar.getCardsInfoThread(), msg, buttons);
             }
         }
@@ -579,12 +579,12 @@ public final class ButtonHelperAgents {
                 if (player.getPlanetsAllianceMode().contains(planet)) {
                     String pp = unitHolder.getName();
                     Button inf1Button = Buttons.green(
-                            "FFCC_" + player.getFaction() + "_place_infantry_" + pp,
+                            player.factionButtonChecker() + "place_infantry_" + pp,
                             "Produce 1 Infantry on " + Helper.getPlanetRepresentation(pp, game),
                             UnitEmojis.infantry);
                     unitButtons.add(inf1Button);
                     Button mfButton = Buttons.green(
-                            "FFCC_" + player.getFaction() + "_place_mech_" + pp,
+                            player.factionButtonChecker() + "place_mech_" + pp,
                             "Produce Mech on " + Helper.getPlanetRepresentation(pp, game),
                             UnitEmojis.mech);
                     unitButtons.add(mfButton);
@@ -802,7 +802,7 @@ public final class ButtonHelperAgents {
                     + "Echo-Weaver Tzara, the Tyris" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             List<Button> buttons = new ArrayList<>(ButtonHelper.getEchoAvailableSystems(game, player));
-            buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            buttons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -2406,7 +2406,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Could not find the active system");
             return;
         }
-        if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
+        if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             MessageHelper.sendMessageToChannel(
                     bentor.getCorrectChannel(),
                     "Player did not have any infantry in the space area of the active system, no mech placed.");
@@ -2684,8 +2684,8 @@ public final class ButtonHelperAgents {
     public static void moveGlory(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tileAS = game.getTileByPosition(buttonID.split("_")[2]);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        UnitHolder spaceAS = tileAS.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
+        UnitHolder spaceAS = tileAS.getSpaceUnitHolder();
         String tokenToMove = "";
         for (String token : space.getTokenList()) {
             if (token.contains("glory")) {
@@ -2705,7 +2705,7 @@ public final class ButtonHelperAgents {
     @ButtonHandler("placeGlory_")
     public static void placeGlory(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         List<String> gloryTokens = getGloryTokensLeft(game);
         if (gloryTokens.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -2730,7 +2730,7 @@ public final class ButtonHelperAgents {
         for (Tile tile : game.getTileMap().values()) {
             List<String> gloryTokens2 = new ArrayList<>(gloryTokens);
             for (String glory : gloryTokens2) {
-                if (tile.getUnitHolders().get("space").getTokenList().contains(glory)) {
+                if (tile.getSpaceUnitHolder().getTokenList().contains(glory)) {
                     gloryTokens.remove(glory);
                 }
             }
@@ -2741,9 +2741,9 @@ public final class ButtonHelperAgents {
     public static List<Tile> getGloryTokenTiles(Game game) {
         List<Tile> gloryTiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory.png")
-                    || tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory2.png")
-                    || tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory3.png")) {
+            if (tile.getSpaceUnitHolder().getTokenList().contains("token_ds_glory.png")
+                    || tile.getSpaceUnitHolder().getTokenList().contains("token_ds_glory2.png")
+                    || tile.getSpaceUnitHolder().getTokenList().contains("token_ds_glory3.png")) {
                 gloryTiles.add(tile);
             }
         }
@@ -2867,7 +2867,7 @@ public final class ButtonHelperAgents {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green(
                     "exhaustAgent_nomadagentartuno_" + tg, "Exhaust Artuno With " + StringHelper.pluralize(tg, "TG")));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -2909,7 +2909,7 @@ public final class ButtonHelperAgents {
                 }
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

@@ -68,7 +68,7 @@ class CompoundingInterestsAcd2ButtonHandler {
         buttons.add(Buttons.green("compoundingInterestsStep2_gain_" + remaining, "Gain 1 Commodity", MiscEmojis.comm));
         buttons.add(Buttons.blue(
                 "compoundingInterestsStep2_convert_" + remaining, "Convert 1 Commodity to TG", MiscEmojis.tg));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         String remainingText = remaining == 1 ? "1 choice remaining" : remaining + " choices remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

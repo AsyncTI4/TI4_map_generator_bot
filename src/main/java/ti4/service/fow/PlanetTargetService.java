@@ -282,7 +282,7 @@ public class PlanetTargetService {
             ButtonInteractionEvent event, Game game, Player actor, String buttonID, UnitHolderTargetSpec spec) {
         // See handlePlanetPage's javadoc: pageNavPrefix as built can carry an FFCC_<faction>_ gate that
         // never reaches a handler, so matching must use the same stripped form the framework already applied.
-        String ffccGate = "FFCC_" + actor.getFaction() + "_";
+        String ffccGate = actor.factionButtonChecker();
         String effectivePrefix = spec.pageNavPrefix().startsWith(ffccGate)
                 ? spec.pageNavPrefix().substring(ffccGate.length())
                 : spec.pageNavPrefix();
@@ -318,7 +318,7 @@ public class PlanetTargetService {
         if (tile == null) return null;
 
         UnitHolder holder = Constants.SPACE.equalsIgnoreCase(parts[3])
-                ? tile.getUnitHolders().get(Constants.SPACE)
+                ? tile.getSpaceUnitHolder()
                 : tile.getUnitHolderFromPlanet(parts[3]);
         if (holder == null) return null;
 
@@ -549,7 +549,7 @@ public class PlanetTargetService {
      * stripped form, or a nav id from an FFCC_-gated spec would never be recognized as one.
      */
     static Integer pageNumberFor(String buttonID, Player actor, PlanetTargetSpec spec) {
-        String ffccGate = "FFCC_" + actor.getFaction() + "_";
+        String ffccGate = actor.factionButtonChecker();
         String effectivePrefix = spec.pageNavPrefix().startsWith(ffccGate)
                 ? spec.pageNavPrefix().substring(ffccGate.length())
                 : spec.pageNavPrefix();

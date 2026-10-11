@@ -101,7 +101,7 @@ public class MoveUnits extends GameStateCommand {
         List<RemovedUnit> removed =
                 RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeDamaged);
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
-        UnitHolder space = tileTo.getUnitHolders().get("space");
+        UnitHolder space = tileTo.getSpaceUnitHolder();
         boolean doesTileHaveFloatingGF = false;
         if (space != null && getPlayer().getColor() != null) {
             doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0

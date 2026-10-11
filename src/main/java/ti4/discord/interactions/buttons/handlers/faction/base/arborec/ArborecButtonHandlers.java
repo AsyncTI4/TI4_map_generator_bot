@@ -112,7 +112,7 @@ public class ArborecButtonHandlers {
                 poses.add(tile.getPosition());
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

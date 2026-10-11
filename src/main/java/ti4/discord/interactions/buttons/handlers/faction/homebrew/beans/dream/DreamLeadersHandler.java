@@ -90,7 +90,7 @@ public class DreamLeadersHandler {
                         + dreamPlayer.getFaction(),
                 "Use Dream Agent",
                 FactionEmojis.dream));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
                 dreamPlayer.getRepresentation()

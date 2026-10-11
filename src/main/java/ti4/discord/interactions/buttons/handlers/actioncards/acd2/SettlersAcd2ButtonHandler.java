@@ -52,7 +52,7 @@ class SettlersAcd2ButtonHandler {
                     player.factionButtonChecker() + "settlersChoose_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose a non-home planet that contains another player's units"

@@ -28,7 +28,7 @@ public class ForceGiveActionCardService {
         for (var entry : giver.getActionCards().entrySet()) {
             String acName = Mapper.getActionCard(entry.getKey()).getName();
             buttons.add(Buttons.green(
-                    "FFCC_" + giver.getFaction() + "_forceGiveAC_" + entry.getValue() + "_" + receiver.getFaction(),
+                    giver.factionButtonChecker() + "forceGiveAC_" + entry.getValue() + "_" + receiver.getFaction(),
                     acName,
                     CardEmojis.getACEmoji(giver)));
         }

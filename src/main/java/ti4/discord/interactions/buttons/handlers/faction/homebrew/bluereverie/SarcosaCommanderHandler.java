@@ -32,7 +32,7 @@ public class SarcosaCommanderHandler {
             return;
         }
         buttons = new ArrayList<>(buttons);
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -57,7 +57,7 @@ public class SarcosaCommanderHandler {
             return;
         }
         buttons = new ArrayList<>(buttons);
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

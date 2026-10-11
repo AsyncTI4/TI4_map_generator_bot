@@ -222,7 +222,7 @@ public class AutoPingCron {
     private static void offerTemporaryPingDisable(Player player, MessageChannel channel) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
-        buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
+        buttons.add(Buttons.DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
                 player.getRepresentationNoPing() + ", if the game is not waiting on you, you may disable the"

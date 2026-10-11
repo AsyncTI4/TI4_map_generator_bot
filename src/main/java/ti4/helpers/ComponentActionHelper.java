@@ -78,7 +78,7 @@ import ti4.spring.service.gameevent.GameEventType;
 public class ComponentActionHelper {
 
     public static List<Button> getAllPossibleCompButtons(Game game, Player p1, GenericInteractionCreateEvent event) {
-        String factionChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = p1.factionButtonChecker();
         String prefix = "componentActionRes_";
         List<Button> compButtons = new ArrayList<>();
         if (MonumentsButtonHandler.canUseYinMonument(game, p1)) {
@@ -642,7 +642,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
-        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
+        compButtons.add(Buttons.CANCEL);
 
         return compButtons;
     }
@@ -1347,7 +1347,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green(
                             "exhaustTCS_" + relicID + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + relicID));
-                    buttons3.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons3.add(Buttons.DECLINE);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + relicID
                             + " and potentially resolve a transaction.";

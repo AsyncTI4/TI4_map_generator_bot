@@ -64,7 +64,7 @@ class TestPillageTg extends GameStateSubcommand {
         buttons.add(Buttons.gray(PREFIX + "toggleMuaat", "Toggle Magmus Unlocked"));
         buttons.add(Buttons.green(PREFIX + "triggerLetnev", "Trigger Letnev Commander Check (real handler)"));
         buttons.add(Buttons.green(PREFIX + "triggerMuaat", "Trigger Muaat Commander Check (real handler)"));
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

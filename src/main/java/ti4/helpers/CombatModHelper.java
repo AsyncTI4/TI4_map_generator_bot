@@ -934,7 +934,7 @@ public class CombatModHelper {
                 }
                 case "damaged_units_max_2" -> {
                     UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
-                    UnitHolder space = activeSystem.getUnitHolders().get("space");
+                    UnitHolder space = activeSystem.getSpaceUnitHolder();
                     if (origUnit.getIsGroundForce()
                             && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
@@ -948,7 +948,7 @@ public class CombatModHelper {
                 }
                 case "damaged_units" -> {
                     UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
-                    UnitHolder space = activeSystem.getUnitHolders().get("space");
+                    UnitHolder space = activeSystem.getSpaceUnitHolder();
                     if (origUnit.getIsGroundForce()
                             && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {

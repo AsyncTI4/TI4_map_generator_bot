@@ -142,7 +142,7 @@ public class TeHelperActionCards {
                             + ", no other player has a readied strategy card, so there is no legal target for _Extreme Duress_ right now.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", choose the player who will experience _Extreme Duress_.",
@@ -510,7 +510,7 @@ public class TeHelperActionCards {
             msg2 = player.getRepresentation()
                     + ", you have no strategy tokens to deduct, so the bot did not deduct one. You should probably only resolve leadership.";
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_RESOLVING);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);

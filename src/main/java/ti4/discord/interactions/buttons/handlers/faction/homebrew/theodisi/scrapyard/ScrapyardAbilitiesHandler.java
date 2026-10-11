@@ -204,7 +204,7 @@ public class ScrapyardAbilitiesHandler {
                         "Use Repurposed Parts (" + entry.getValue().getName() + ")",
                         entry.getValue().getUnitEmoji()));
             }
-            buttons.add(Buttons.gray("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may use _Repurposed Parts_ to produce 1 unit with a lower "

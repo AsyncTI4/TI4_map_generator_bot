@@ -75,7 +75,7 @@ public class MyrrAbilitiesHandler {
                             player.factionButtonChecker() + FACTORY_LEASE_SYSTEM + tile.getPosition() + "|" + lease,
                             "Produce in " + tile.getRepresentationForButtons(game, player)));
                 }
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
