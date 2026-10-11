@@ -35,6 +35,7 @@ import ti4.ai.secrets.SecretRules;
 import ti4.ai.secrets.SecretValue;
 import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.ChecksAndBalances;
+import ti4.ai.strategy.SecondaryQueue;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
@@ -181,7 +182,9 @@ public class NekroBrain implements FactionBrain {
             this::scorePublicObjective,
             SecretRules::scoreStatusSecret,
             this::startStatusHomework,
-            this::passOnSabotage);
+            this::passOnSabotage,
+            StrategyCardRules::awaitSecondaries,
+            StrategyCardRules::awaitFollowTurn);
 
     @Override
     public String id() {
@@ -396,6 +399,7 @@ public class NekroBrain implements FactionBrain {
         if (TacticalRules.inProgress(context)) return TacticalRules.continueAction(context);
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);
         if (primary.isPresent()) return primary;
+        if (StrategyCardRules.awaitingSecondaries(context)) return Optional.empty();
         List<AiPrompt> thisTurn = promptsThisTurn(context);
         Optional<AiDecision> secondAction =
                 TacticalRules.secondAction(context, thisTurn).or(() -> secondStrategicAction(context, thisTurn));
@@ -509,6 +513,8 @@ public class NekroBrain implements FactionBrain {
                         && !seat.hasFollowedSC(initiative)
                         && !seat.getSCs().contains(initiative)
                         && !StrategyCardRules.waitsToFollow(context, initiative)
+                        && SecondaryQueue.blockerFor(context.game(), seat, initiative, context.now())
+                                .isEmpty()
                         && !context.alreadyPressed(prompt, button);
             });
             if (decline.isPresent()) {

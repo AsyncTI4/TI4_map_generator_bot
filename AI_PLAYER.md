@@ -253,6 +253,15 @@ to build one by hand:
   influence is actually paid. While another payment or token gain is still open, it waits up to 90 seconds before
   deciding on a Leadership, Technology, Warfare or Diplomacy follow, instead of declining it.
 
+  **Secondaries in order** (`SecondaryQueue`): a played card resolves its primary first, then each other player
+  follows or declines in turn, starting after the card's holder and going clockwise (the same order the bot prints for
+  the card). An AI waits for its turn: it does not follow or decline while the holder's primary (an AI holder's, until
+  its last step) is open or an earlier player has not answered yet, or an earlier AI seat is still choosing its
+  technology, paying for it, placing its structure, readying planets or building. An AI holder does not end its turn,
+  play a second card or act again until every other player has followed or declined and the AI followers have
+  finished their steps. It waits for a human as long as it takes; an open step of an AI seat is given up after 10
+  minutes. A human holder's primary cannot be seen, so AI followers only wait for the players ahead of them.
+
   Follows that cost a strategy token are ranked Imperial, Technology, Diplomacy, Warfare, Construction, Politics,
   Trade; while 2 cards would complete its _Form a Spy Network_, Politics moves up to just after Imperial. When several
   cards wait for an answer it takes the best first, and it keeps one strategy token for each better card another
@@ -595,3 +604,12 @@ Four small generic changes don't reference `ti4.ai`:
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |
 | V4 | Extortion and pacts. |
 | V5 | Action cards, leaders, more depth, then faction-specific rules beyond the shared set. |
+
+### Known limitations
+
+- **Secondary ordering, human holder.** A human holder's primary cannot be detected, so AI followers only wait for
+  the players ahead of them, not for the primary to finish.
+- **Secondary ordering, human followers.** A human who is partway through their secondary counts as done once they
+  have pressed follow; the bot does not expose their later steps (technology choice, payment, placement).
+- **Secondary ordering, undo.** Rolling the game back with `/game undo` clears the secondary queue, so the AIs
+  re-derive who has followed from the game state alone.

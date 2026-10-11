@@ -16,6 +16,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.profile.AggressionLevel;
 import ti4.ai.profile.AiProfile;
+import ti4.ai.strategy.SecondaryQueue;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -47,6 +48,7 @@ public final class AiTestGame {
     private AiTestGame(String solUserId) {
         game = new Game();
         game.setName("ai-test-game");
+        SecondaryQueue.forget(game.getName());
         game.setRound(2);
         game.setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
         game.setActiveSystem("");

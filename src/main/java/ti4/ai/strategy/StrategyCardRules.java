@@ -113,6 +113,7 @@ public class StrategyCardRules {
     public static AiDecision play(
             AiTurnContext context, AiPrompt prompt, PromptButton button, int initiative, String reason) {
         context.memory().put(PLAYED_KEY + context.turnKey(), String.valueOf(initiative));
+        if (context.isActivePlayer()) SecondaryQueue.primaryStarted(context.game(), initiative, context.now());
         if (StrategyCard.of(context.game(), initiative) == StrategyCard.TRADE) TradeCardRules.recordPlay(context);
         return AiDecision.press(prompt, button, reason);
     }
@@ -122,10 +123,57 @@ public class StrategyCardRules {
     }
 
     public static Optional<AiDecision> resolvePrimary(AiTurnContext context) {
-        Optional<Integer> initiative = context.memory()
+        Optional<AiDecision> step = resolvePrimaryStep(context);
+        if (step.isEmpty())
+            playedInitiative(context).ifPresent(card -> SecondaryQueue.primaryResolved(context.game(), card));
+        return step;
+    }
+
+    public static boolean awaitingSecondaries(AiTurnContext context) {
+        return unfinishedSecondary(context).isPresent();
+    }
+
+    public static Optional<AiDecision> awaitSecondaries(AiTurnContext context) {
+        if (!context.isActivePlayer()) return Optional.empty();
+        return unfinishedSecondary(context)
+                .map(player -> new AiDecision.Wait(
+                        context.now() + SecondaryQueue.RECHECK_MILLIS, "the secondary of its card from " + player));
+    }
+
+    public static Optional<AiDecision> awaitFollowTurn(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        for (int initiative : game.getPlayedSCs()) {
+            if (seat.getSCs().contains(initiative) || seat.hasFollowedSC(initiative)) continue;
+            Optional<String> blocker = SecondaryQueue.blockerFor(game, seat, initiative, context.now());
+            if (blocker.isPresent()) {
+                return Optional.of(new AiDecision.Wait(
+                        context.now() + SecondaryQueue.RECHECK_MILLIS,
+                        "its turn to follow strategy card " + initiative + " after " + blocker.get()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<String> unfinishedSecondary(AiTurnContext context) {
+        return playedInitiative(context)
+                .flatMap(initiative -> SecondaryQueue.unfinished(context.game(), initiative, context.now()));
+    }
+
+    private static Optional<Integer> playedInitiative(AiTurnContext context) {
+        return context.memory()
                 .get(PLAYED_KEY + context.turnKey())
                 .filter(StringUtils::isNumeric)
                 .map(Integer::parseInt);
+    }
+
+    private static boolean holdsOpenStep(AiTurnContext context) {
+        return pendingSince(context).isPresent()
+                || request(context, WARFARE_BUILD_KEY).isPresent();
+    }
+
+    private static Optional<AiDecision> resolvePrimaryStep(AiTurnContext context) {
+        Optional<Integer> initiative = playedInitiative(context);
         if (initiative.isEmpty()) return Optional.empty();
         Optional<Long> pendingSince = pendingSince(context);
         if (pendingSince.isPresent()) {
@@ -272,8 +320,11 @@ public class StrategyCardRules {
     public static Optional<AiDecision> follow(AiTurnContext context) {
         Game game = context.game();
         Player seat = context.seat();
+        closeFinishedFollows(context);
         List<Integer> unfollowed = game.getPlayedSCs().stream()
                 .filter(initiative -> !seat.getSCs().contains(initiative) && !seat.hasFollowedSC(initiative))
+                .filter(initiative -> SecondaryQueue.blockerFor(game, seat, initiative, context.now())
+                        .isEmpty())
                 .sorted(Comparator.comparingInt(initiative -> followRank(context, StrategyCard.of(game, initiative))))
                 .toList();
         for (int initiative : unfollowed) {
@@ -293,9 +344,23 @@ public class StrategyCardRules {
                             busyPaying(context) ? Optional.empty() : followLeadership(context, card.get());
                         default -> Optional.empty();
                     };
-            if (decision.isPresent()) return decision;
+            if (decision.isPresent()) {
+                if (decision.get() instanceof AiDecision.Press) {
+                    SecondaryQueue.followStarted(game, seat, initiative, context.now());
+                }
+                return decision;
+            }
         }
         return Optional.empty();
+    }
+
+    private static void closeFinishedFollows(AiTurnContext context) {
+        if (holdsOpenStep(context)) return;
+        for (int initiative : context.game().getPlayedSCs()) {
+            if (context.seat().hasFollowedSC(initiative)) {
+                SecondaryQueue.followFinished(context.game(), context.seat(), initiative);
+            }
+        }
     }
 
     public static boolean waitsToFollow(AiTurnContext context, int initiative) {
