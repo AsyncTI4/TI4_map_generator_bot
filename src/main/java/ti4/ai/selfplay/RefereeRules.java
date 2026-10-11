@@ -13,6 +13,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.service.game.EndGameService;
 
 @UtilityClass
 public class RefereeRules {
@@ -46,10 +47,13 @@ public class RefereeRules {
         return game.getPublicObjectives2Peekable().isEmpty();
     }
 
+    public static Predicate<PromptButton> endsGame() {
+        return button -> EndGameService.MOST_POINTS_END_GAME_BUTTON_ID.equals(button.handlerId());
+    }
+
     public static boolean offersGameEnd(List<AiPrompt> publicPrompts) {
         return publicPrompts.stream()
-                .anyMatch(prompt -> prompt.firstEnabled(button -> "gameEnd".equals(button.handlerId()))
-                        .isPresent());
+                .anyMatch(prompt -> prompt.firstEnabled(endsGame()).isPresent());
     }
 
     public static int stateFingerprint(Game game) {

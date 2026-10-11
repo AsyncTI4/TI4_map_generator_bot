@@ -1,21 +1,32 @@
 package ti4.ai.selfplay;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.perception.PromptButton;
 import ti4.ai.selfplay.RefereeRules.RefereePress;
 import ti4.game.Player;
+import ti4.message.MessageHelper;
+import ti4.service.button.ReactionCheckService;
+import ti4.service.game.EndGameService;
 import ti4.testUtils.BaseTi4Test;
 
 // In an all-AI game nobody else presses the game's own housekeeping buttons, so one of the AI seats does, after a
@@ -90,11 +101,29 @@ class RefereeRulesTest extends BaseTi4Test {
     @Test
     void doesNotRevealOnceTheObjectiveTrackIsExhausted() {
         test.game.setSpeakerUserID(test.nekro.getUserID());
-        AiPrompt reveal = prompt("reveal", PromptSource.PUBLIC, SETTLED, "reveal_stage_2", "gameEnd");
+        AiPrompt reveal = prompt(
+                "reveal",
+                PromptSource.PUBLIC,
+                SETTLED,
+                "reveal_stage_2",
+                EndGameService.MOST_POINTS_END_GAME_BUTTON_ID);
 
         assertThat(RefereeRules.trackExhausted(test.game)).isTrue();
         assertThat(next(reveal)).isEmpty();
         assertThat(RefereeRules.offersGameEnd(List.of(reveal))).isTrue();
+    }
+
+    // Once every seat has scored in the last round, the bot posts the reveal button next to its own End Game button.
+    // If the AIs do not read that as the end of the game, nobody presses anything and the game stalls in
+    // statusScoring with every seat passed. Driving the bot's real prompt keeps the AIs in step with its button ids.
+    @Test
+    void recognisesTheEndGameButtonTheBotOffersOnceTheObjectivesRunOut() {
+        test.game.setRound(9);
+        AiPrompt allScored = allHaveScoredPrompt();
+
+        assertThat(RefereeRules.trackExhausted(test.game)).isTrue();
+        assertThat(RefereeRules.offersGameEnd(List.of(allScored))).isTrue();
+        assertThat(next(allScored)).isEmpty();
     }
 
     @Test
@@ -126,7 +155,8 @@ class RefereeRulesTest extends BaseTi4Test {
     // Ending the game or starting a rematch is the humans' call, even in self-play.
     @Test
     void neverEndsTheGameOrStartsARematch() {
-        AiPrompt end = prompt("end", PromptSource.PUBLIC, SETTLED, "gameEnd", "rematch");
+        AiPrompt end =
+                prompt("end", PromptSource.PUBLIC, SETTLED, EndGameService.MOST_POINTS_END_GAME_BUTTON_ID, "rematch");
 
         assertThat(next(end)).isEmpty();
         assertThat(RefereeRules.anyStep().test(end.buttons().getFirst())).isFalse();
@@ -162,6 +192,17 @@ class RefereeRulesTest extends BaseTi4Test {
         Optional<RefereePress> press = RefereeRules.next(test.game, seats, List.of(start, reveal), key -> true, NOW);
 
         assertThat(press.map(found -> found.button().customId())).contains("startOfGameObjReveal");
+    }
+
+    private AiPrompt allHaveScoredPrompt() {
+        ArgumentCaptor<List<Button>> posted = ArgumentCaptor.captor();
+        try (MockedStatic<MessageHelper> messages = Mockito.mockStatic(MessageHelper.class)) {
+            ReactionCheckService.respondAllHaveScored(test.game);
+            messages.verify(() -> MessageHelper.sendMessageToChannelWithButtons(any(), anyString(), posted.capture()));
+        }
+        List<PromptButton> buttons = new ArrayList<>();
+        for (Button button : posted.getValue()) buttons.add(PromptButton.of(buttons.size(), button));
+        return new AiPrompt("main", "all-scored", PromptSource.PUBLIC, "", buttons, SETTLED);
     }
 
     private Optional<RefereePress> next(AiPrompt... prompts) {

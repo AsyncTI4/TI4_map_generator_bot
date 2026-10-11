@@ -113,7 +113,7 @@ class AiTickRunner {
 
         Snapshot snapshot = AiPerception.read(game, seats);
         List<AiPrompt> refereePrompts =
-                snapshot.publicPrompts(RefereeRules.anyStep().or(button -> "gameEnd".equals(button.handlerId())));
+                snapshot.publicPrompts(RefereeRules.anyStep().or(RefereeRules.endsGame()));
         if (selfPlay && RefereeRules.trackExhausted(game) && RefereeRules.offersGameEnd(refereePrompts)) {
             if (lane.markGameOverAnnounced()) announceGameOver(game, true);
             return;
