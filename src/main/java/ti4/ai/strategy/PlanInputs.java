@@ -21,7 +21,8 @@ record PlanInputs(
         List<TacticalPlan> ranked,
         Set<String> threatened,
         int reinforcements,
-        Map<String, List<TacticalPlan>> freeing) {
+        Map<String, List<TacticalPlan>> freeing,
+        Map<Integer, CardPlan> plans) {
 
     private static final int MAX_CACHED = 32;
     private static final Map<String, Cached> CACHE = new LinkedHashMap<>(16, 0.75f, true) {
@@ -51,6 +52,7 @@ record PlanInputs(
                 TacticalPlanner.ranked(game, seat),
                 Threats.reachableByEnemies(game, seat),
                 StrategyCardRules.reinforcements(game, seat),
+                new ConcurrentHashMap<>(),
                 new ConcurrentHashMap<>());
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));

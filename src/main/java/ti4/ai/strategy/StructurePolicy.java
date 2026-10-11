@@ -45,6 +45,10 @@ class StructurePolicy {
     }
 
     static boolean nearsStructureObjective(Game game, Player seat) {
+        return structureShortfall(game, seat) <= STRUCTURES_SHORT;
+    }
+
+    static int structureShortfall(Game game, Player seat) {
         List<String> objectives = new ArrayList<>();
         for (String id : game.getRevealedPublicObjectives().keySet()) {
             if (STRUCTURE_OBJECTIVES.contains(id) && !ObjectivePolicy.hasScored(game, seat, id)) objectives.add(id);
@@ -52,13 +56,14 @@ class StructurePolicy {
         seat.getSecretsUnscored().keySet().stream()
                 .filter(STRUCTURE_OBJECTIVES::contains)
                 .forEach(objectives::add);
+        int shortfall = Integer.MAX_VALUE;
         for (String id : objectives) {
             int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
             if (threshold <= 0) continue;
             int missing = threshold - ListPlayerInfoService.getPlayerProgressOnObjective(id, game, seat);
-            if (missing > 0 && missing <= STRUCTURES_SHORT) return true;
+            if (missing > 0) shortfall = Math.min(shortfall, missing);
         }
-        return false;
+        return shortfall;
     }
 
     static Optional<String> next(Game game, Player seat) {

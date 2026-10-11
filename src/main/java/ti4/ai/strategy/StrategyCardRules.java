@@ -307,7 +307,7 @@ public class StrategyCardRules {
         return !holdsNoActionCards(seat) && SpyNetwork.withinReach(game, seat, POLITICS_DRAW);
     }
 
-    private static boolean holdsNoActionCards(Player seat) {
+    static boolean holdsNoActionCards(Player seat) {
         return seat.getSecretsUnscored().containsKey(HOLD_NO_ACTION_CARDS);
     }
 
