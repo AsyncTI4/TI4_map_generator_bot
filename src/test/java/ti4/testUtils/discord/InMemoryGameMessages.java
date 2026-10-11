@@ -1,6 +1,7 @@
 package ti4.testUtils.discord;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +23,8 @@ import ti4.spring.service.gamemessage.GameMessageService;
 public final class InMemoryGameMessages {
 
     private final Map<String, List<GameMessage>> byGame = new LinkedHashMap<>();
-    private final GameMessageService service = mock(GameMessageService.class, this::answer);
+    private final GameMessageService service =
+            mock(GameMessageService.class, withSettings().stubOnly().defaultAnswer(this::answer));
 
     public GameMessageService service() {
         return service;

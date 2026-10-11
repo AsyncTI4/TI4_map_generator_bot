@@ -14,6 +14,8 @@ import ti4.ai.AiSettings;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.testUtils.BaseTi4Test;
+import ti4.testUtils.discord.DiscordRouter;
+import ti4.testUtils.discord.FakeChannel;
 
 // Six AI seats play against each other in-process: a fake Discord stands in for the server, the AI runtime is
 // ticked on a virtual clock, and every press runs the bot's real button handlers. A run ends at its stop
@@ -33,12 +35,20 @@ class AiSelfPlayTest extends BaseTi4Test {
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
     }
 
-    // Whole games take most of a minute each and dice and decks are random, so they only run when asked for:
-    // -Dai.selfplay.full=true, optionally with -Dai.selfplay.games=N to play several and report every outcome.
+    // Whole games take a minute or two each and dice and decks are random, so they only run when asked for:
+    // -Dai.selfplay.full=true, optionally with -Dai.selfplay.games=N to play several and report every outcome, and
+    // -Dai.selfplay.threads=T to play up to T of them at once, each on its own thread with its own fake Discord
+    // (default:
+    // half the processors, about one game per physical core, where throughput levels off).
     @Test
     @EnabledIfSystemProperty(named = "ai.selfplay.full", matches = "true")
     void sixAiSeatsPlayFullGames() throws Exception {
         int games = Integer.getInteger("ai.selfplay.games", 1);
+        int threads = Math.clamp(
+                Integer.getInteger("ai.selfplay.threads", Runtime.getRuntime().availableProcessors() / 2), 1, games);
+        long batchStart = System.nanoTime();
+        List<SelfPlayGame.Outcome> played = playAll(games, threads);
+        long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
         List<SelfPlayGame.Outcome> unfinished = new ArrayList<>();
         List<String> summary = new ArrayList<>();
         int leaderPoints = 0;
@@ -46,10 +56,9 @@ class AiSelfPlayTest extends BaseTi4Test {
         List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
         int totalPoints = 0;
         for (int i = 0; i < games; i++) {
-            SelfPlayGame.Outcome outcome = play(game -> false, 14 * VIRTUAL_DAY, 100_000);
+            SelfPlayGame.Outcome outcome = played.get(i);
             String line = "Game " + (i + 1) + "/" + games + ": " + outcome.ending() + " in round " + outcome.round()
-                    + ", victory points " + outcome.victoryPoints();
-            System.out.println(line);
+                    + ", victory points " + outcome.victoryPoints() + ", wall time " + outcome.wallSeconds() + "s";
             summary.add(line);
             leaderPoints += outcome.leaderVictoryPoints();
             totalPoints += outcome.totalVictoryPoints();
@@ -63,6 +72,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         System.out.printf(
                 "Average leader victory points %.1f, average total %.1f, average final round %.1f over %d games%n",
                 (double) leaderPoints / games, (double) totalPoints / games, (double) finalRounds / games, games);
+        System.out.printf(
+                "Batch wall time %ds for %d games on %d threads (%.1fs per game); %d Discord calls routed from bot"
+                        + " threads%n",
+                batchSeconds, games, threads, (double) batchSeconds / games, DiscordRouter.unboundCalls());
         System.out.println("Average points scored per round, whole table (games still running that round): "
                 + perRound(outcomes.stream()
                         .map(SelfPlayGame.Outcome::tablePointsPerRound)
@@ -219,15 +232,68 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .toList();
     }
 
+    // Every game gets its own thread, environment and fake Discord. Their virtual clocks start a millisecond apart and
+    // only ever move in whole steps, so no two games can stamp the same message id.
+    private static List<SelfPlayGame.Outcome> playAll(int games, int threads) throws Exception {
+        long clockStart = System.currentTimeMillis();
+        if (threads == 1) {
+            List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
+            for (int i = 0; i < games; i++) outcomes.add(playFullGame(clockStart + i, i, games));
+            return outcomes;
+        }
+        java.util.concurrent.atomic.AtomicInteger names = new java.util.concurrent.atomic.AtomicInteger();
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(
+                threads, task -> new Thread(task, "ai-self-play-" + names.incrementAndGet()));
+        try {
+            List<java.util.concurrent.Future<SelfPlayGame.Outcome>> futures = new ArrayList<>();
+            for (int i = 0; i < games; i++) {
+                int slot = i;
+                futures.add(pool.submit(() -> playFullGame(clockStart + slot, slot, games)));
+            }
+            List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
+            for (java.util.concurrent.Future<SelfPlayGame.Outcome> future : futures) outcomes.add(future.get());
+            return outcomes;
+        } finally {
+            pool.shutdownNow();
+        }
+    }
+
+    // CPU time of the game's own thread next to its wall time shows how much of a game is computing and how much is
+    // waiting, which is what decides how many games are worth running at once.
+    private static SelfPlayGame.Outcome playFullGame(long clockStart, int slot, int games) throws Exception {
+        java.lang.management.ThreadMXBean threads = java.lang.management.ManagementFactory.getThreadMXBean();
+        long cpuStart = threads.getCurrentThreadCpuTime();
+        SelfPlayGame.Outcome outcome = play(game -> false, 14 * VIRTUAL_DAY, 100_000, clockStart);
+        long cpuSeconds = (threads.getCurrentThreadCpuTime() - cpuStart) / 1_000_000_000L;
+        System.out.println("Game " + (slot + 1) + "/" + games + " finished: " + outcome.ending() + " in round "
+                + outcome.round() + ", victory points " + outcome.victoryPoints() + ", wall time "
+                + outcome.wallSeconds() + "s, game thread CPU " + cpuSeconds + "s");
+        return outcome;
+    }
+
     private static SelfPlayGame.Outcome play(Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks)
             throws Exception {
-        try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
+        return play(stopWhen, maxVirtualMillis, maxTicks, System.currentTimeMillis());
+    }
+
+    private static SelfPlayGame.Outcome play(
+            Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks, long clockStart) throws Exception {
+        try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
             SelfPlayGame game = new SelfPlayGame(
                     env, "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
             try {
                 game.setUp(factions());
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
                 System.out.println(outcome.report());
+                // Every channel and thread in this game's fake Discord must be its own; anything else means a call was
+                // routed to the wrong game while several games ran at once.
+                List<String> foreign = env.discord.channels().stream()
+                        .map(FakeChannel::name)
+                        .filter(channel -> !channel.contains(game.name))
+                        .toList();
+                assertThat(foreign)
+                        .as("channels from another game in " + game.name)
+                        .isEmpty();
                 return outcome;
             } finally {
                 AiRuntime.forget(game.name);

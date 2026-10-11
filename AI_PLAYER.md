@@ -598,7 +598,8 @@ Four small generic changes don't reference `ti4.ai`:
       button ids work as on Discord, and every Discord request completes immediately on the test's thread.
     - `SelfPlayEnvironment` provides the Spring beans the button path needs, stores game files in a temporary
       folder, and turns off map rendering, database sync and metadata files.
-  - The AI runtime ticks on a virtual clock, so a game takes about 25 seconds of real time.
+  - The AI runtime ticks on a virtual clock. The first round takes about 30 seconds of real time and a whole game
+    about 2 minutes. A game keeps its thread busy only part of that time, so whole games run several at once (below).
   - A run ends at the victory point goal, when the objectives run out, or when nothing changes for two virtual
     hours (a stall). The outcome's report shows the game state, the AI's recent decisions and presses, what the bot
     logged, Discord calls the fake doesn't support, and the latest messages in the main channel, combat threads
@@ -610,10 +611,17 @@ Four small generic changes don't reference `ti4.ai`:
     ```
     mvn -o test -Dtest=AiSelfPlayTest
     ```
-  - Whole games, here eight in a row:
+  - Whole games, here eight:
     ```
     mvn -o test -Dtest=AiSelfPlayTest -Dai.selfplay.full=true -Dai.selfplay.games=8
     ```
+  - `-Dai.selfplay.threads=T` plays up to T games at once (default: half the processors, about one per physical core).
+    Each game runs on its own thread with its own fake Discord, environment and virtual clock: the test stubs are
+    thread-local, `DiscordRouter` points `JdaService.jda` and `guildPrimary` at the calling thread's fake, and every game
+    checks at the end that its fake holds only its own channels. On an 8-core machine 10 games take about 3 minutes
+    (about 20 seconds per game, against about 2 minutes each one after another), and 16 take under 5. The test mocks
+    are stub-only, so a game does not keep a record of every call it made; that is what lets many games fit in the heap.
+    Under heavy load the bot's real-time "Slow Button Warning" can show up in the reports; it says nothing about the AI.
   - `-Dai.selfplay.factions=sol,jolnar,...` seats other factions (default: the first six supported ones). Every seat
     starts with only its own faction note and the five generic notes; the scoreboard lists the notes each seat holds,
     received and has in its play area.

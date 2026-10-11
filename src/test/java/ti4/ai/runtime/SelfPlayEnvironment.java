@@ -3,6 +3,7 @@ package ti4.ai.runtime;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,8 +21,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.mockito.MockSettings;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import ti4.ai.AiSettings;
 import ti4.ai.actuation.AiActuator;
 import ti4.ai.brain.AiDecision;
@@ -30,7 +33,6 @@ import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
-import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -47,6 +49,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gamemessage.GameMessageService;
 import ti4.spring.service.title.PlayerTitleService;
+import ti4.testUtils.discord.DiscordRouter;
 import ti4.testUtils.discord.FakeDiscord;
 import ti4.testUtils.discord.InMemoryGameMessages;
 
@@ -98,8 +101,6 @@ final class SelfPlayEnvironment implements AutoCloseable {
     private static final String ACCEPT_FAMILY = "acceptOffer";
     private final Map<String, UserSettings> userSettings = new HashMap<>();
     private final List<MockedStatic<?>> mocks = new ArrayList<>();
-    private final Object previousJda = JdaService.jda;
-    private final Object previousGuild = JdaService.guildPrimary;
 
     SelfPlayEnvironment(long startMillis) throws IOException {
         clock = new AtomicLong(startMillis);
@@ -122,22 +123,21 @@ final class SelfPlayEnvironment implements AutoCloseable {
     }
 
     private void install() {
-        JdaService.jda = discord.jda();
-        JdaService.guildPrimary = discord.guild();
+        DiscordRouter.bind(discord);
 
         Map<Class<?>, Object> beans = new HashMap<>();
         beans.put(GameMessageService.class, gameMessages.service());
-        beans.put(CombatContestSettings.class, mock(CombatContestSettings.class));
-        beans.put(CombatReplayService.class, mock(CombatReplayService.class));
-        beans.put(PlayerTitleService.class, mock(PlayerTitleService.class));
-        beans.put(GameEventService.class, mock(GameEventService.class));
-        beans.put(ActiveLeaseService.class, mock(ActiveLeaseService.class, invocation -> {
+        beans.put(CombatContestSettings.class, mock(CombatContestSettings.class, quiet()));
+        beans.put(CombatReplayService.class, mock(CombatReplayService.class, quiet()));
+        beans.put(PlayerTitleService.class, mock(PlayerTitleService.class, quiet()));
+        beans.put(GameEventService.class, mock(GameEventService.class, quiet()));
+        beans.put(ActiveLeaseService.class, mock(ActiveLeaseService.class, quiet(invocation -> {
             Class<?> type = invocation.getMethod().getReturnType();
             if (type == boolean.class)
                 return !invocation.getMethod().getName().toLowerCase().contains("drain");
             return null;
-        }));
-        MockedStatic<SpringContext> spring = open(mockStatic(SpringContext.class));
+        })));
+        MockedStatic<SpringContext> spring = open(mockStatic(SpringContext.class, quiet()));
         spring.when(() -> SpringContext.getBean(org.mockito.ArgumentMatchers.any()))
                 .thenAnswer(invocation -> {
                     Class<?> type = invocation.getArgument(0);
@@ -149,27 +149,38 @@ final class SelfPlayEnvironment implements AutoCloseable {
 
         open(mockStatic(
                 Storage.class,
-                invocation -> "getStoragePath".equals(invocation.getMethod().getName())
-                        ? storage.toString()
-                        : invocation.callRealMethod()));
+                quiet(invocation ->
+                        "getStoragePath".equals(invocation.getMethod().getName())
+                                ? storage.toString()
+                                : invocation.callRealMethod())));
         Storage.init();
 
-        open(mockStatic(MapRenderPipeline.class));
-        open(mockStatic(GameDatabaseSyncPipeline.class));
-        open(mockStatic(AutoPingMetadataManager.class));
-        open(mockStatic(TechSummariesMetadataManager.class));
-        open(mockStatic(UserSettingsManager.class, this::userSettings));
+        open(mockStatic(MapRenderPipeline.class, quiet()));
+        open(mockStatic(GameDatabaseSyncPipeline.class, quiet()));
+        open(mockStatic(AutoPingMetadataManager.class, quiet()));
+        open(mockStatic(TechSummariesMetadataManager.class, quiet()));
+        open(mockStatic(UserSettingsManager.class, quiet(this::userSettings)));
 
-        MockedStatic<AiRuntime> runtime = open(mockStatic(AiRuntime.class, CALLS_REAL_METHODS));
+        MockedStatic<AiRuntime> runtime = open(mockStatic(AiRuntime.class, quiet(CALLS_REAL_METHODS)));
         runtime.when(AiRuntime::mayMutate).thenReturn(true);
         runtime.when(AiRuntime::isProcessReady).thenReturn(true);
-        MockedStatic<AiSettings> settings = open(mockStatic(AiSettings.class, CALLS_REAL_METHODS));
+        MockedStatic<AiSettings> settings = open(mockStatic(AiSettings.class, quiet(CALLS_REAL_METHODS)));
         settings.when(AiSettings::isEnabled).thenReturn(true);
 
-        open(mockStatic(CircuitBreaker.class, this::circuitBreaker));
-        open(mockStatic(BotLogger.class, this::botLogger));
-        open(mockStatic(AiActuator.class, this::actuator));
-        open(mockStatic(FactionBrainRegistry.class, this::brains));
+        open(mockStatic(CircuitBreaker.class, quiet(this::circuitBreaker)));
+        open(mockStatic(BotLogger.class, quiet(this::botLogger)));
+        open(mockStatic(AiActuator.class, quiet(this::actuator)));
+        open(mockStatic(FactionBrainRegistry.class, quiet(this::brains)));
+    }
+
+    // Stub-only: a whole game makes millions of calls through these mocks, and a recording mock would keep every one
+    // of them (with its arguments) until the game ends.
+    private static MockSettings quiet() {
+        return withSettings().stubOnly();
+    }
+
+    private static MockSettings quiet(Answer<?> answer) {
+        return withSettings().stubOnly().defaultAnswer(answer);
     }
 
     private <T> MockedStatic<T> open(MockedStatic<T> mock) {
@@ -474,8 +485,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 // Keep closing the others.
             }
         }
-        JdaService.jda = (net.dv8tion.jda.api.JDA) previousJda;
-        JdaService.guildPrimary = (net.dv8tion.jda.api.entities.Guild) previousGuild;
+        DiscordRouter.unbind(discord);
         deleteQuietly(storage);
     }
 

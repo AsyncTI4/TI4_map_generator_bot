@@ -60,7 +60,8 @@ final class SelfPlayGame {
             List<Map<String, Double>> stateAtRoundStart,
             int seats,
             TradeSummary trade,
-            String report) {
+            String report,
+            long wallSeconds) {
 
         // Per seat, for each round the game reached: how many presses of this kind the AI made.
         List<Double> perSeat(java.util.function.Predicate<String> kinds) {
@@ -146,6 +147,7 @@ final class SelfPlayGame {
     private final List<Map<String, Integer>> pointsAfterRound = new ArrayList<>();
     private final List<Map<String, Double>> stateAtRoundStart = new ArrayList<>();
     private int recordedRound;
+    private long wallStart = System.nanoTime();
 
     SelfPlayGame(SelfPlayEnvironment env, String name) {
         this.env = env;
@@ -416,7 +418,8 @@ final class SelfPlayGame {
                 List.copyOf(stateAtRoundStart),
                 game == null ? 0 : game.getRealPlayers().size(),
                 tradeSummary(ending, game),
-                report(ending, game, ticks));
+                report(ending, game, ticks),
+                (System.nanoTime() - wallStart) / 1_000_000_000L);
     }
 
     private List<SelfPlayEnvironment.TradeRecord> ledger() {
