@@ -33,6 +33,7 @@ public final class AgendaForecast {
 
     private record Frame(
             Game game,
+            Player viewer,
             List<Player> voters,
             List<String> outcomes,
             double[][] base,
@@ -62,9 +63,10 @@ public final class AgendaForecast {
         List<Player> voters = votingOrder(game);
         if (outcomes.isEmpty() || voters.isEmpty()) return NONE;
         String agenda = AgendaPolicy.currentAgenda(game);
-        Placed placed = readPlaced(game, voters, outcomes);
+        Placed placed = readPlaced(game, viewer, voters, outcomes);
         Frame frame = new Frame(
                 game,
+                viewer,
                 voters,
                 outcomes,
                 baseUtilities(game, viewer, voters, outcomes, agenda),
@@ -210,7 +212,7 @@ public final class AgendaForecast {
         return draws;
     }
 
-    private static Placed readPlaced(Game game, List<Player> voters, List<String> outcomes) {
+    private static Placed readPlaced(Game game, Player viewer, List<Player> voters, List<String> outcomes) {
         int[] byOutcome = new int[outcomes.size()];
         int[] byVoter = new int[voters.size()];
         List<Rider> riders = new ArrayList<>();
@@ -227,21 +229,25 @@ public final class AgendaForecast {
                     byVoter[voter] += Integer.parseInt(what);
                     if (outcome >= 0) byOutcome[outcome] += Integer.parseInt(what);
                 } else if (what.contains("Rider") || what.contains("Sanction")) {
-                    riders.add(riderOf(game, voters, voter, what, outcome));
+                    riders.add(riderOf(game, viewer, voters, voter, what, outcome));
                 }
             }
         }
         return new Placed(byOutcome, byVoter, riders);
     }
 
-    private static Rider riderOf(Game game, List<Player> voters, int voter, String title, int outcome) {
+    private static Rider riderOf(Game game, Player viewer, List<Player> voters, int voter, String title, int outcome) {
         Player owner = voters.get(voter);
         return new Rider(
-                voter, title, outcome, RiderPayoff.of(game, owner, title), AgendaUtility.riderStake(game, owner));
+                voter,
+                title,
+                outcome,
+                RiderPayoff.of(game, viewer, owner, title),
+                AgendaUtility.riderStake(game, owner));
     }
 
     private static Rider rider(Frame frame, int voter, String title, int outcome) {
-        return riderOf(frame.game(), frame.voters(), voter, title, outcome);
+        return riderOf(frame.game(), frame.viewer(), frame.voters(), voter, title, outcome);
     }
 
     private static int[] remainingVotes(Game game, Frame frame, Placed placed) {

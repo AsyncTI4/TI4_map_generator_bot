@@ -323,8 +323,8 @@ class AgendaCardRulesTest extends BaseTi4Test {
     // ---- keep values ---------------------------------------------------------------------------------------------
 
     @Test
-    void theThreeRidersAreWorthTheirKeepPriorNotNothing() {
-        for (String alias : new String[] {"imp_rider", "trade_rider", "politic_rider"}) {
+    void theFiveRidersAreWorthTheirKeepPriorNotNothing() {
+        for (String alias : new String[] {"imp_rider", "trade_rider", "politic_rider", "tech_rider", "lead_rider"}) {
             holds(nekro, alias);
 
             assertThat(AiActionCards.usable(alias)).isTrue();

@@ -80,6 +80,8 @@ public class AiActionCards {
             AgendaCards.rider(RiderPayoff.IMPERIAL),
             AgendaCards.rider(RiderPayoff.TRADE),
             AgendaCards.rider(RiderPayoff.POLITICS),
+            AgendaCards.rider(RiderPayoff.TECHNOLOGY),
+            AgendaCards.rider(RiderPayoff.LEADERSHIP),
             ExtraActionCard.masterPlan(),
             ExtraActionCard.counterstroke(),
             new AiCard(

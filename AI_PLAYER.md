@@ -528,14 +528,15 @@ to build one by hand:
     Sabo'd)" button, and when _Coup d'Etat_ is cancelled it plays its strategy card again.
   - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
     (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
-  - **Riders** (`AgendaCardRules`): _Imperial Rider_, _Trade Rider_ and _Politics Rider_, played as "after"s with the
+  - **Riders** (`AgendaCardRules`): _Imperial_, _Trade_, _Politics_, _Technology_ and _Leadership_ Rider, played as "after"s with the
     bot's queue, and worth their keep prior in the hand like any card the AI plays. In the after window, when its after
     slot is empty and it may play cards, it asks the forecast what each rider would bring on each outcome:
     ```
     gain(rider, outcome) = the seat's expected utility with the rider placed on the outcome
                            less its expected utility voting its current ballot
     ```
-    The rider's own payoff (a point, 5 trade goods and what they unlock, 3 action cards and the speaker token), the
+    The rider's own payoff (a point, 5 trade goods and what they unlock, 3 action cards and the speaker token, the best
+    research it could do for free, 3 command tokens as the Leadership plan values them), the
     votes it gives up (none for Nekro or under the Xxcha commander) and the rival stake other voters see in an
     _Imperial Rider_ are all in the two forecasts. It queues the best rider whose gain reaches the card's keep prior
     (`queueAnAfter`, `queueAfter_ac_<card>`, `lockAftersIn`), one per agenda, never over a queued entry such as Galactic
@@ -544,7 +545,11 @@ to build one by hand:
     window closes. It does not pass on "after"s while a played rider is unplaced (and gives up after 5 minutes); it does
     when the rider was cancelled, placed, or refused by the bot (a seat over the hand limit), and when voting has begun it
     drops a still queued rider and still places a played one. The AI never re-decides once it has locked the rider in,
-    and every seat decides on the same table, so several seats may ride one agenda.
+    and every seat decides on the same table, so several seats may ride one agenda. Winning riders pay out through the
+    bot's own buttons: Imperial, Trade and Politics need nothing from the AI; for a _Technology Rider_ it presses "Get a
+    Technology" on the message that names it and picks the technology at no cost (Nekro's turns into 3 command tokens
+    through Propagation); for a _Leadership Rider_ it takes 3 command tokens within its reinforcements
+    (`RiderPayouts`).
   - **Veto**: a "when" card, worth its keep prior in the hand. It is queued (`queueAWhen`, `queueWhen_ac_veto`) when the
     seat's "when" slot is empty (a Political Secret or Political Favor note takes priority and keeps the card) and the
     agenda's expected election costs the seat 5 units or more, the rule Political Favor uses
@@ -923,7 +928,7 @@ Seven small generic changes don't reference `ti4.ai`:
   It is never the second action of _Master Plan_ or _Fleet Logistics_ (a component action card is never the second
   action), though a points play can wait for the turn after. The wait for the Mecatol Rex swipe trusts the highest
   ranked tactical action; if that action is never taken, the card is played at the pass.
-- **Action cards, riders.** Only _Imperial_, _Trade_ and _Politics_ riders are played (Technology and Leadership next); the
+- **Action cards, riders.** Only _Imperial_, _Trade_, _Politics_, _Technology_ and _Leadership_ riders are played; the
   placement riders (Diplomacy, Construction, Warfare), _Sanction_ and the other agenda cards are not. There is no
   rider stacking logic: a seat does not consider that another seat's rider on the same agenda will be queued or placed
   first, so several seats can end up riding the same agenda and the late riders fall to the earlier ones' choices.

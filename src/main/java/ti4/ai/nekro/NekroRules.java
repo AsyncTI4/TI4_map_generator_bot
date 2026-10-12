@@ -25,25 +25,33 @@ public class NekroRules {
     public static Optional<AiDecision> propagationTokens(AiTurnContext context) {
         Player seat = context.seat();
         if (!seat.hasAbility("propagation")) return Optional.empty();
-        Game game = context.game();
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
             if (context.now() - prompt.createdAtMillis() > RECENT_MILLIS) continue;
             Optional<Integer> target = propagationTarget(context, prompt);
             if (target.isEmpty()) continue;
-            Optional<PromptButton> done = prompt.firstEnabled(button -> isOwnOrOpen(button, context.faction())
-                    && "deleteButtons".equals(button.handlerId())
-                    && button.label().startsWith("Done Gaining"));
-            if (done.isEmpty()) continue;
-            if (CommandTokenPolicy.netGainSoFar(game, seat) < target.get()) {
-                Optional<PromptButton> grow = prompt.enabledHandler(CommandTokenPolicy.poolToGrow(game, seat));
-                if (grow.isPresent()) {
-                    return Optional.of(AiDecision.press(prompt, grow.get(), "gain a command token from Propagation"));
-                }
-            }
-            context.memory().remove(PROPAGATION_KEY + prompt.messageId());
-            return Optional.of(AiDecision.press(prompt, done.get(), "finish gaining command tokens from Propagation"));
+            Optional<AiDecision> gain =
+                    gainTokens(context, prompt, target.get(), PROPAGATION_KEY + prompt.messageId(), "Propagation");
+            if (gain.isPresent()) return gain;
         }
         return Optional.empty();
+    }
+
+    public static Optional<AiDecision> gainTokens(
+            AiTurnContext context, AiPrompt prompt, int target, String memoryKey, String source) {
+        Game game = context.game();
+        Player seat = context.seat();
+        Optional<PromptButton> done = prompt.firstEnabled(button -> isOwnOrOpen(button, context.faction())
+                && "deleteButtons".equals(button.handlerId())
+                && button.label().startsWith("Done Gaining"));
+        if (done.isEmpty()) return Optional.empty();
+        if (CommandTokenPolicy.netGainSoFar(game, seat) < target) {
+            Optional<PromptButton> grow = prompt.enabledHandler(CommandTokenPolicy.poolToGrow(game, seat));
+            if (grow.isPresent()) {
+                return Optional.of(AiDecision.press(prompt, grow.get(), "gain a command token from " + source));
+            }
+        }
+        context.memory().remove(memoryKey);
+        return Optional.of(AiDecision.press(prompt, done.get(), "finish gaining command tokens from " + source));
     }
 
     private static Optional<Integer> propagationTarget(AiTurnContext context, AiPrompt prompt) {

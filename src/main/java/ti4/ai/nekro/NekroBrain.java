@@ -17,6 +17,7 @@ import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.GalacticThreatRules;
+import ti4.ai.agenda.RiderPayouts;
 import ti4.ai.agenda.ShenanigansRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -122,6 +123,8 @@ public class NekroBrain implements FactionBrain {
             NekroLeaderRules::payAgentCost,
             RelicActionRules::next,
             NekroRules::propagationTokens,
+            RiderPayouts::technology,
+            RiderPayouts::leadership,
             NekroRules::commanderDraw,
             NekroRules::dacxiveAnimators,
             TechRules::reviveInfantry,

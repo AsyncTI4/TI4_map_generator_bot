@@ -166,6 +166,10 @@ class HiddenInfoGuardTest extends BaseTi4Test {
         AgendaForecast forecast = AgendaForecast.of(table.game, table.nekro);
         forecast.chances();
         forecast.withRider(spy, "Imperial Rider", "sol").chances();
+        forecast.withRider(spy, "Technology Rider", "sol").chances();
+        forecast.withRider(spy, "Leadership Rider", "sol").chances();
+        forecast.withRider(spy, "Politics Rider", "sol").chances();
+        forecast.withRider(spy, "Trade Rider", "sol").chances();
         forecast.withVotes(table.nekro, "sol", 2).expectedUtility(table.nekro);
         forecast.without(spy).mostLikely();
         AgendaPolicy.wouldElectToAPoint(table.game, table.nekro);

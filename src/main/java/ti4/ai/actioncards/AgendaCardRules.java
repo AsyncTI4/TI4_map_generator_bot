@@ -25,7 +25,12 @@ import ti4.game.Player;
 @UtilityClass
 public class AgendaCardRules {
 
-    static final List<String> RIDER_TITLES = List.of(RiderPayoff.IMPERIAL, RiderPayoff.TRADE, RiderPayoff.POLITICS);
+    static final List<String> RIDER_TITLES = List.of(
+            RiderPayoff.IMPERIAL,
+            RiderPayoff.TRADE,
+            RiderPayoff.POLITICS,
+            RiderPayoff.TECHNOLOGY,
+            RiderPayoff.LEADERSHIP);
     private static final String RIDER_KEY = "agendaRider|";
     private static final String PLAYED_KEY = "agendaRiderPlayed|";
     private static final String FIELD = "~";

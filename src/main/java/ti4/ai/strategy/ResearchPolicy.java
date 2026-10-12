@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -153,6 +154,13 @@ public class ResearchPolicy {
         TechnologyModel tech = Mapper.getTech(alias);
         if (tech == null) return 0;
         return value(game, seat, alias) - PrerequisiteSkips.of(game, seat, tech).valueLost();
+    }
+
+    public static double freeResearchWorth(Game game, Player seat) {
+        return bestResearchable(game, seat)
+                .map(tech -> TECH_TEMPO * researchValue(game, seat, tech)
+                        + ScoringStakes.scoreValue(game, seat, publicPointsCompletedBy(game, seat, tech)))
+                .orElse(0.0);
     }
 
     public static Optional<String> bestResearchable(Game game, Player seat) {
