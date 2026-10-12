@@ -101,13 +101,13 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
         String prefix = menuAction + "_" + navId() + "_";
         List<Button> buttons = new ArrayList<>();
         if (settings.isEffectiveDiscordantStarsEnabled()) {
-            buttons.add(Buttons.blue(prefix + "prioritizeDiscordantStars", "Prioritize Discordant Stars"));
+            buttons.add(Buttons.blue(prefix + "prioritizeAllDS", "Prioritize Discordant Stars"));
         }
         if (settings.isEffectiveBlueReverieEnabled()) {
-            buttons.add(Buttons.blue(prefix + "prioritizeBlueReverie", "Prioritize Blue Reverie"));
+            buttons.add(Buttons.blue(prefix + "prioritizeAllBR", "Prioritize Blue Reverie"));
         }
         if (settings.isLostLegaciesEnabled()) {
-            buttons.add(Buttons.blue(prefix + "prioritizeLostLegacies", "Prioritize Lost Legacies"));
+            buttons.add(Buttons.blue(prefix + "prioritizeAllLL", "Prioritize Lost Legacies"));
         }
         return buttons;
     }
@@ -116,9 +116,9 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         ComponentSource source =
                 switch (action) {
-                    case "prioritizeDiscordantStars" -> ComponentSource.ds;
-                    case "prioritizeBlueReverie" -> ComponentSource.blue_reverie;
-                    case "prioritizeLostLegacies" -> ComponentSource.theodisi;
+                    case "prioritizeAllDS" -> ComponentSource.ds;
+                    case "prioritizeAllBR" -> ComponentSource.blue_reverie;
+                    case "prioritizeAllLL" -> ComponentSource.theodisi;
                     default -> null;
                 };
         if (source == null) return null;
