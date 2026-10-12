@@ -95,6 +95,11 @@ public class AgendaPolicy {
     public static Optional<PromptButton> chooseOutcome(Game game, Player speaker, List<PromptButton> outcomes) {
         if (outcomes.isEmpty()) return Optional.empty();
         String agenda = currentAgenda(game);
+        AgendaForecast forecast = AgendaForecast.of(game, speaker);
+        if (forecast.hasRivalImperialRider(speaker)) {
+            return outcomes.stream()
+                    .max(Comparator.comparingDouble(button -> forecast.utility(speaker, outcomeOf(button))));
+        }
         return outcomes.stream()
                 .max(Comparator.comparingDouble(button -> score(game, speaker, agenda, outcomeOf(button))));
     }

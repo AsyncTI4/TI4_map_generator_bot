@@ -112,6 +112,50 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
     }
 
+    private static final String ARMS_REDUCTION = "Directive_For/Against_7_arms_reduction";
+
+    // A rival one point from winning, and an agenda the seat has no view on: Sol has votes and the rival has a rider,
+    // so it casts no votes of its own.
+    private void rivalRacesOnForWith(String rider) {
+        Player rival = test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setVp(10);
+        test.game.scorePublicObjective(rival.getUserID(), test.game.addCustomPO("Test points", 9));
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":0,\"black\":0}");
+        test.game.setCurrentAgendaVote("for", "red_" + rider);
+    }
+
+    // A rival's Imperial Rider on "for" would win the rival the game; the AI, which has no view on the directive, votes
+    // it down with everything it has.
+    @Test
+    void votesDownARivalsImperialRiderWithAllItsVotes() {
+        rivalRacesOnForWith("Imperial Rider");
+
+        int everything = ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(sol, test.game, "jord");
+        assertThat(everything).isPositive();
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("against", "", everything));
+    }
+
+    @Test
+    void leavesTheVoteAloneWithoutARivalsImperialRider() {
+        rivalRacesOnForWith("Trade Rider");
+
+        assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
+
+        test.game.setCurrentAgendaVote("for", "blue_Imperial Rider");
+        assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
+    }
+
+    // Mutiny keeps its own rule, "for" when it would carry.
+    @Test
+    void mutinyKeepsItsRuleWhateverTheRiders() {
+        rivalRacesOnForWith("Imperial Rider");
+        test.game.setCurrentAgendaInfo("Law_For/Against_7_mutiny");
+
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
+                .contains("for");
+    }
+
     // The speaker's tie-break buttons share the confirm prefix; a ballot left in memory must not press them.
     @Test
     void neverConfirmsVotesOnATieBreakButton() {

@@ -100,6 +100,13 @@ public final class AgendaForecast {
                 .sum();
     }
 
+    public boolean hasRivalImperialRider(Player seat) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(seat);
+        return riders.stream()
+                .anyMatch(rider ->
+                        rider.owner() != voter && RiderPayoff.isImperial(rider.title()) && rider.outcome() >= 0);
+    }
+
     public Optional<String> riderOutcome(Player owner, String title) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(owner);
         return riders.stream()

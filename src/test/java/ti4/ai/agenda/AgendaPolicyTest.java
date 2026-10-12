@@ -11,6 +11,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
+import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
 class AgendaPolicyTest extends BaseTi4Test {
@@ -77,6 +78,32 @@ class AgendaPolicyTest extends BaseTi4Test {
 
         assertThat(AgendaPolicy.predictedElectionScore(test.game, test.nekro, test.sol))
                 .isGreaterThan(AgendaPolicy.predictedElectionScore(test.game, test.nekro, null));
+    }
+
+    // The speaker breaking a tie keeps a rival's Imperial Rider from winning the rival the game.
+    @Test
+    void breaksATieAgainstARivalsImperialRider() {
+        Player rival = test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setVp(10);
+        givePoints(rival.getUserID(), 9);
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Directive_For/Against_7_arms_reduction");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":3,\"red\":0,\"black\":0}");
+        AiPrompt tie = prompt(
+                "tie",
+                PromptSource.PUBLIC,
+                NOW,
+                "resolveAgendaVote_outcomeTie*_for",
+                "resolveAgendaVote_outcomeTie*_against");
+
+        assertThat(AgendaPolicy.chooseOutcome(test.game, test.nekro, tie.enabledButtons())
+                        .map(PromptButton::customId))
+                .contains("resolveAgendaVote_outcomeTie*_for");
+
+        test.game.setCurrentAgendaVote("for", "red_Imperial Rider");
+        assertThat(AgendaPolicy.chooseOutcome(test.game, test.nekro, tie.enabledButtons())
+                        .map(PromptButton::customId))
+                .contains("resolveAgendaVote_outcomeTie*_against");
     }
 
     // With nobody voting, the speaker decides: an agenda that hands the elected player a victory point goes to

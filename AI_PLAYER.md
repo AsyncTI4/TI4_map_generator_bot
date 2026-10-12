@@ -286,6 +286,11 @@ to build one by hand:
     Planet of Ixth_, the _Research Teams_, _Core Mining_, ...) only go on planets with that trait. It votes
     everything when a point is at stake, half otherwise, and abstains on agendas it has no stake in. It only
     answers the outcome prompts its own vote opened.
+  - **A rival's _Imperial Rider_.** When another seat's _Imperial Rider_ sits on an outcome of the agenda, the seat
+    votes all of its votes for the outcome that leaves it best off in the forecast with those votes counted (the rider
+    costs the seat what a point is worth to the rival, in full when it wins them the game), whatever it thought of the
+    agenda, and as speaker breaking a tie it picks the tied outcome that does the same. _Mutiny_ keeps its own rule,
+    and agendas without such a rider are voted as above.
   - **Nekro** cannot vote (Galactic Threat): it never plans a ballot unless the Xxcha commander lets it. Once per
     agenda phase it queues Galactic Threat as an "after" when
     another player has a technology it could gain, predicts the outcome most likely to win (the election of the

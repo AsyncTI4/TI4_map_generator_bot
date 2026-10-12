@@ -195,6 +195,10 @@ public class AgendaVoting {
                 .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
                 .sum();
         if (available <= 0) return Optional.empty();
+        if (!MUTINY.equals(agenda)) {
+            Optional<String> stopsRider = outcomeThatStopsARivalRider(game, seat, available);
+            if (stopsRider.isPresent()) return ballotFor(game, stopsRider.get(), available);
+        }
         List<String> outcomes = AgendaOutcomes.of(game);
         Optional<String> best = outcomes.stream()
                 .filter(outcome -> score(game, seat, agenda, outcome, available) > 0)
@@ -202,14 +206,26 @@ public class AgendaVoting {
         if (best.isEmpty()) return Optional.empty();
         double score = score(game, seat, agenda, best.get(), available);
         int votes = score >= ALL_IN_SCORE ? available : (available + 1) / 2;
+        return ballotFor(game, best.get(), votes);
+    }
+
+    private static Optional<String> outcomeThatStopsARivalRider(Game game, Player seat, int votes) {
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
+        if (!forecast.hasRivalImperialRider(seat)) return Optional.empty();
+        return AgendaOutcomes.of(game).stream()
+                .max(Comparator.comparingDouble(
+                        outcome -> forecast.withVotes(seat, outcome, votes).expectedUtility(seat)));
+    }
+
+    private static Optional<Ballot> ballotFor(Game game, String outcome, int votes) {
         String owner = "";
-        Planet planet = game.getPlanetsInfo().get(best.get());
+        Planet planet = game.getPlanetsInfo().get(outcome);
         if (planet != null) {
-            Player planetOwner = BoardView.controller(game, best.get());
+            Player planetOwner = BoardView.controller(game, outcome);
             if (planetOwner == null) return Optional.empty();
             owner = planetOwner.getFaction();
         }
-        return Optional.of(new Ballot(best.get(), owner, votes));
+        return Optional.of(new Ballot(outcome, owner, votes));
     }
 
     private static double score(Game game, Player seat, String agenda, String outcome, int available) {
