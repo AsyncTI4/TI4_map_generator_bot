@@ -188,7 +188,66 @@ public class UnitModelValueInjectionService {
             String ability = copiedAbilityText.isBlank() ? baseAbility : baseAbility + "\n\n" + copiedAbilityText;
             injectedUnit.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
         }
+        if (player.hasRelic("lightrailordnance_br") && unit.getUnitType() == UnitType.Spacedock) {
+            UnitModel pds = player.getUnitFromAsyncID(UnitType.Pds.getValue());
+            if (pds != null) {
+                injectedUnit = addLightrailOrdnanceAttributes(injectedUnit, pds);
+            }
+        }
         return injectedUnit;
+    }
+
+    private UnitModel addLightrailOrdnanceAttributes(UnitModel spaceDock, UnitModel pds) {
+        UnitModel enhancedSpaceDock = copyUnit(spaceDock);
+        enhancedSpaceDock.setMoveValue(Math.max(spaceDock.getMoveValue(), pds.getMoveValue()));
+        enhancedSpaceDock.setProductionValue(Math.max(spaceDock.getProductionValue(), pds.getProductionValue()));
+        enhancedSpaceDock.setCapacityValue(Math.max(spaceDock.getCapacityValue(), pds.getCapacityValue()));
+        enhancedSpaceDock.setFleetSupplyBonus(Math.max(spaceDock.getFleetSupplyBonus(), pds.getFleetSupplyBonus()));
+        enhancedSpaceDock.setCapacityUsed(Math.max(spaceDock.getCapacityUsed(), pds.getCapacityUsed()));
+        enhancedSpaceDock.setCost(Math.max(spaceDock.getCost(), pds.getCost()));
+        enhancedSpaceDock.setCombatDieCount(Math.max(spaceDock.getCombatDieCount(), pds.getCombatDieCount()));
+        enhancedSpaceDock.setCombatHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getCombatDieCount,
+                UnitModel::getCombatHitsOn,
+                spaceDock.getCombatHitsOn()));
+        enhancedSpaceDock.setAfbDieCount(Math.max(spaceDock.getAfbDieCount(), pds.getAfbDieCount()));
+        enhancedSpaceDock.setAfbHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds), UnitModel::getAfbDieCount, UnitModel::getAfbHitsOn, spaceDock.getAfbHitsOn()));
+        enhancedSpaceDock.setBombardDieCount(Math.max(spaceDock.getBombardDieCount(), pds.getBombardDieCount()));
+        enhancedSpaceDock.setBombardHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getBombardDieCount,
+                UnitModel::getBombardHitsOn,
+                spaceDock.getBombardHitsOn()));
+        enhancedSpaceDock.setSpaceCannonDieCount(
+                Math.max(spaceDock.getSpaceCannonDieCount(), pds.getSpaceCannonDieCount()));
+        enhancedSpaceDock.setSpaceCannonHitsOn(getBestHitsOn(
+                List.of(spaceDock, pds),
+                UnitModel::getSpaceCannonDieCount,
+                UnitModel::getSpaceCannonHitsOn,
+                spaceDock.getSpaceCannonHitsOn()));
+        enhancedSpaceDock.setDeepSpaceCannon(spaceDock.getDeepSpaceCannon() || pds.getDeepSpaceCannon());
+        enhancedSpaceDock.setPlanetaryShield(spaceDock.getPlanetaryShield() || pds.getPlanetaryShield());
+        enhancedSpaceDock.setSustainDamage(spaceDock.getSustainDamage() || pds.getSustainDamage());
+        enhancedSpaceDock.setDisablesPlanetaryShield(
+                spaceDock.getDisablesPlanetaryShield() || pds.getDisablesPlanetaryShield());
+        enhancedSpaceDock.setCanBeDirectHit(spaceDock.getCanBeDirectHit() || pds.getCanBeDirectHit());
+        enhancedSpaceDock.setIsStructure(spaceDock.getIsStructure() || pds.getIsStructure());
+        enhancedSpaceDock.setIsMonument(spaceDock.getIsMonument() || pds.getIsMonument());
+        enhancedSpaceDock.setIsGroundForce(spaceDock.getIsGroundForce() || pds.getIsGroundForce());
+        enhancedSpaceDock.setIsShip(spaceDock.getIsShip() || pds.getIsShip());
+        enhancedSpaceDock.setIsSpaceOnly(spaceDock.getIsSpaceOnly() || pds.getIsSpaceOnly());
+        enhancedSpaceDock.setIsPlanetOnly(spaceDock.getIsPlanetOnly() || pds.getIsPlanetOnly());
+        String pdsAbility = pds.getAbility().orElse("");
+        if (!pdsAbility.isBlank()) {
+            String spaceDockAbility = spaceDock.getAbility().orElse("");
+            String ability = spaceDockAbility.isBlank()
+                    ? "**" + pds.getName() + "**: " + pdsAbility
+                    : spaceDockAbility + "\n\n**" + pds.getName() + "**: " + pdsAbility;
+            enhancedSpaceDock.setAbility(ability.length() <= 1024 ? ability : ability.substring(0, 1021) + "...");
+        }
+        return enhancedSpaceDock;
     }
 
     private UnitModel combineDuplicateUnits(UnitModel representative, List<UnitModel> units) {

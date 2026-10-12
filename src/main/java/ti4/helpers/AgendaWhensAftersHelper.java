@@ -313,7 +313,8 @@ public final class AgendaWhensAftersHelper {
 
     public static List<String> getPossibleAfterNames(Player player) {
         List<String> names = new ArrayList<>();
-        List<String> abilities = new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators"));
+        List<String> abilities =
+                new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators", "radiance_br"));
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
@@ -374,7 +375,8 @@ public final class AgendaWhensAftersHelper {
 
     private static List<Button> getPossibleAferButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        List<String> abilities = new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators"));
+        List<String> abilities =
+                new ArrayList<>(Arrays.asList("radiance", "galactic_threat", "conspirators", "radiance_br"));
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
@@ -1085,6 +1087,15 @@ public final class AgendaWhensAftersHelper {
 
         if (Helper.getPlayerFromAbility(game, "radiance") != null) {
             Player edyn = Helper.getPlayerFromAbility(game, "radiance");
+            String factionChecker = "FFCC_" + edyn.getFaction() + "_";
+            afterButtons.add(Buttons.gray(
+                    factionChecker + "play_after_Edyn Radiance Ability",
+                    "Use Edyn Radiance Ability",
+                    FactionEmojis.edyn));
+        }
+
+        if (Helper.getPlayerFromAbility(game, "radiance_br") != null) {
+            Player edyn = Helper.getPlayerFromAbility(game, "radiance_br");
             String factionChecker = "FFCC_" + edyn.getFaction() + "_";
             afterButtons.add(Buttons.gray(
                     factionChecker + "play_after_Edyn Radiance Ability",

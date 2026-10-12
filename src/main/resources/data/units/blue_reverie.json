@@ -589,5 +589,22 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "During combat, you may have this ship become damaged to produce 1 hit against another player's non-fighter ships in this system."
+    },
+    {
+        "id": "tnelis_mech_br",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Daedalon",
+        "source": "blue_reverie",
+        "faction": "tnelis",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: After you move 1 or more destroyers into a non-home system, you may place 1 mech from your reinforcements into coexistence on a planet in that system.",
+        "notes": "You may use this ability once after movement.",
+        "homebrewReplacesID": "tnelis_mech"
     }
 ]

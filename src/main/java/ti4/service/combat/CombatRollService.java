@@ -101,6 +101,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -129,6 +130,86 @@ import tools.jackson.databind.ObjectMapper;
 public class CombatRollService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Pattern TOTAL_HITS_LINE_PATTERN = Pattern.compile("\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n");
+
+    public void sendSpaceCannonOffenceHitAssignment(
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            int hits,
+            MessageChannel channel,
+            GenericInteractionCreateEvent event) {
+        String message = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered "
+                + StringHelper.pluralize(hits, "hit") + " from SPACE CANNON against your ships.";
+        MessageHelper.sendMessageToChannel(channel, message);
+        List<Button> buttons = new ArrayList<>();
+        String factionChecker = "FFCC_" + opponent.getFaction() + "_";
+        if (opponent.isDummy() || opponent.isNpc()) {
+            buttons.add(Buttons.green(
+                    opponent.dummyPlayerSpoof() + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + hits,
+                    "Auto-assign Hit" + (hits == 1 ? "" : "s For Dummy")));
+        } else {
+            buttons.add(Buttons.green(
+                    factionChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + hits,
+                    "Auto-assign Hit" + (hits == 1 ? "" : "s")));
+        }
+        buttons.add(Buttons.red(
+                "getDamageButtons_" + tile.getPosition() + "deleteThis_pds",
+                "Manually Assign Hit" + (hits == 1 ? "" : "s")));
+        buttons.add(Buttons.gray(
+                factionChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + hits, "Cancel a Hit"));
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                buttons, game, opponent, tile, "pds", hits);
+        List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
+                game, player, tile, CombatRollType.SpaceCannonOffence, opponent, hits);
+        buttons.addAll(stingOfTheHiveButtons);
+        String assignmentMessage = opponent.getRepresentationNoPing() + ", you may automatically assign "
+                + (hits == 1 ? "the hit" : "hits") + "."
+                + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, hits, event, true, true);
+        if (!stingOfTheHiveButtons.isEmpty()) {
+            assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
+                    + " to decide whether to cancel hits and place mine tokens before assigning hits.";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(channel, assignmentMessage, buttons);
+    }
+
+    public void sendGroundCombatHitAssignment(
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            Planet combatPlanet,
+            int hits,
+            GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(
+                opponent.factionButtonChecker() + AutoAssignGroundHitsButtonIds.format(combatPlanet.getName(), hits),
+                "Auto-assign Hit" + (hits == 1 ? "" : "s")));
+        buttons.add(Buttons.red(
+                "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
+                "Manually Assign Hit" + (hits == 1 ? "" : "s")));
+        MonumentsBRButtonHandler.addSacredPoolsGroundCombatButton(
+                buttons, game, opponent, tile, combatPlanet.getName());
+        buttons.add(Buttons.gray(
+                opponent.factionButtonChecker()
+                        + CancelGroundHitsButtonId.of(tile.getPosition(), hits, combatPlanet.getName()),
+                "Cancel a Hit"));
+        TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
+                buttons, game, opponent, tile, "ground", hits);
+        AshenPromissoryHandler.addFromTheAshesButton(buttons, game, opponent, player, tile, combatPlanet, hits);
+        StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+        if (combat != null && combat.round() == 1 && opponent.hasTech("threvenantr")) {
+            RevenantTechHandler.addEternalAegisButton(buttons, game, opponent, player, tile, combatPlanet, hits);
+        }
+        ToldarTechHandler.addExhaustVirTrainingButton(buttons, opponent, player, tile, combatPlanet, hits);
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(),
+                opponent.getRepresentationUnfogged()
+                        + ", please assign "
+                        + (hits == 1 ? "the hit" : "the hits")
+                        + " produced by _Self-Assembly Routines_.",
+                buttons);
+    }
 
     public boolean checkIfUnitsOfType(
             Player player,
@@ -1088,41 +1169,10 @@ public class CombatRollService {
                 && (opponent != player || targetPlayer != null)) {
             MessageChannel channel =
                     isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
-            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered "
-                    + StringHelper.pluralize(h, "hit") + " from SPACE CANNON against your ships.";
-            MessageHelper.sendMessageToChannel(channel, msg);
-            List<Button> buttons = new ArrayList<>();
-            String factionChecker = "FFCC_" + opponent.getFaction() + "_";
-            if (opponent.isDummy() || opponent.isNpc()) {
-                buttons.add(Buttons.green(
-                        opponent.dummyPlayerSpoof() + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_"
-                                + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
-            } else {
-                buttons.add(Buttons.green(
-                        factionChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+            if (!BlueReverieTechHelper.offerGravitonLaserSystemAfterSpaceCannon(
+                    game, player, opponent, tile, h, event)) {
+                sendSpaceCannonOffenceHitAssignment(game, player, opponent, tile, h, channel, event);
             }
-            buttons.add(Buttons.red(
-                    "getDamageButtons_" + tile.getPosition() + "deleteThis_pds",
-                    "Manually Assign Hit" + (h == 1 ? "" : "s")));
-            buttons.add(Buttons.gray(
-                    factionChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-            TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
-                    buttons, game, opponent, tile, "pds", h);
-            List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
-                    game, player, tile, CombatRollType.SpaceCannonOffence, opponent, h);
-            if (!stingOfTheHiveButtons.isEmpty()) {
-                buttons.addAll(stingOfTheHiveButtons);
-            }
-            String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
-                    + (h == 1 ? "the hit" : "hits") + "."
-                    + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
-            if (!stingOfTheHiveButtons.isEmpty()) {
-                msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
-                        + " to decide whether to cancel hits and place mine tokens before assigning hits.";
-            }
-            MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {

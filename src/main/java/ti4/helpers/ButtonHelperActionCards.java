@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -352,6 +353,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
+        EscapeClauseActionCardHandler.offerPreset(game, player);
         checkForPlayingSpliceCards(game, player);
         checkForPreassigningRelitigate(game, player);
         if (player.getPlayableActionCards().contains("puppetsonastring")) {

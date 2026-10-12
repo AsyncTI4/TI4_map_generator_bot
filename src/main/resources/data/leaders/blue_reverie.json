@@ -307,5 +307,57 @@
         "abilityText": "Attach this card to a revealed objective. A player with the fewest victory points may score this objective without fulfilling its requirements; after a player scores this objective, the Toldar player may draw 1 secret objective.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "blue_reverie"
+    },
+    {
+        "id": "edynagent_br",
+        "faction": "edyn",
+        "type": "agent",
+        "name": "Allant",
+        "title": "Elder Voice",
+        "abilityWindow": "When a player commits units to a planet:",
+        "abilityText": "You may exhaust this card to allow that player to place those units into coexistence instead.",
+        "unlockCondition": "Always Unlocked",
+        "homebrewReplacesID": "edynagent",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "gheminacommander_br",
+        "faction": "ghemina",
+        "type": "commander",
+        "name": "Jarl Vel & Jarl Jotrun",
+        "title": "Dual Raid Leaders",
+        "abilityWindow": "While you are the active player:",
+        "abilityText": "Players that have two or fewer command tokens on the game board cannot cancel hits your units or abilities produce.",
+        "unlockCondition": "Have 2 flagships on the game board.",
+        "homebrewReplacesID": "gheminacommander",
+        "source": "blue_reverie",
+        "shortName": "Jarls Vel & Jotrun"
+    },
+    {
+        "id": "yinhero_br",
+        "faction": "yin",
+        "type": "hero",
+        "name": "Dannel of the Tenth",
+        "tfName": "Blessing of the Yin",
+        "title": "High Priest of Yin",
+        "abilityName": "Quantum Dissemination: Blessing of the Yin",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home, non-legendary planets and resolve invasions on those planets; players cannot use SPACE CANNON against those units. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "homebrewReplacesID": "yinhero",
+         "source": "blue_reverie"
+    },
+    {
+        "id": "yssarilagent_br",
+        "faction": "yssaril",
+        "type": "agent",
+        "name": "Ssruu",
+        "tfName": "Clever Genome",
+        "title": "Clever, Clever Ssruu",
+        "abilityWindow": "At any time:",
+        "abilityText": "This card has the text ability of each other player's agent that is exhausted. ",
+        "unlockCondition": "Always Unlocked",
+        "homebrewReplacesID": "yssarilagent",
+        "source": "blue_reverie"
     }
 ]

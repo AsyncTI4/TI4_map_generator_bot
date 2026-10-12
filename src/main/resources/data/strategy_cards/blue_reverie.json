@@ -1,0 +1,19 @@
+[
+    {
+        "id": "br5trade",
+        "initiative": 5,
+        "name": "Trade",
+        "primaryTexts": [
+            "Place or move a trade station token into any non-home system that contains no stations.",
+            "Gain 3 trade goods and replenish commodities.",
+            "Gain 1 commodity when a player uses the secondary ability of this strategy card."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to replenish commodities and gain 2 trade goods."
+        ],
+        "imageFileName": "br_5",
+        "colourHexCode": "#00a99d",
+        "botSCAutomationID": "pok5trade",
+        "source": "blue_reverie"
+    }
+]

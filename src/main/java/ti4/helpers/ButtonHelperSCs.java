@@ -397,15 +397,17 @@ public final class ButtonHelperSCs {
         }
         OnyxxaAbilityHandler.checkSilentAccord(game, player, event, scNum);
 
+        boolean firstFollow = !player.getFollowedSCs().contains(scNum);
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Trade**");
         }
         String message = deductCC(game, player, scNum);
-        if (!player.getFollowedSCs().contains(scNum)) {
+        if (firstFollow) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
         }
         player.addFollowedSC(scNum, event);
         ButtonHelperStats.replenishComms(event, game, player, true);
+        resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
 
         ReactionService.addReaction(event, game, player, message);
         ReactionService.addReaction(event, game, player, " has replenished commodities.");
@@ -502,12 +504,10 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_refresh")
     public static void refresh(Game game, Player player, ButtonInteractionEvent event) {
-        boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
-        if (used) {
-            return;
-        }
-        int initComm = player.getCommodities();
-        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+        resolveRefresh(game, player, event);
+    }
+
+    private static boolean resolveRefresh(Game game, Player player, ButtonInteractionEvent event) {
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             StrategyCardModel model =
@@ -527,29 +527,45 @@ public final class ButtonHelperSCs {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
-            return;
+            return false;
         }
+        if (!payForBrTradeFollow(game, player, event, scModel)) {
+            return false;
+        }
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
+        if (used) {
+            return false;
+        }
+        int initComm = player.getCommodities();
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         int tradeInitiative = scModel.getInitiative();
-        if (!player.getFollowedSCs().contains(tradeInitiative)) {
+        boolean firstFollow = !player.getFollowedSCs().contains(tradeInitiative);
+        if (firstFollow) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         player.addFollowedSC(tradeInitiative, event);
+        resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
         ReactionService.addReaction(event, game, player, "has replenished commodities.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
         ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
+        return true;
     }
 
     @ButtonHandler("sc_refresh_and_wash")
     public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
+        resolveRefreshAndWash(game, player, event);
+    }
+
+    private static boolean resolveRefreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
         String messageID = event.getMessageId();
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
-            return;
+            return false;
         }
 
         if (player.getSCs().contains(5) && !game.isHomebrewSCMode()) {
@@ -557,7 +573,7 @@ public final class ButtonHelperSCs {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " since you have the **Trade** strategy card, and the primary is done automatically when you play **Trade**, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong.");
-            return;
+            return false;
         }
 
         if (!game.isTwilightsFallMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
@@ -566,12 +582,36 @@ public final class ButtonHelperSCs {
                     player.getRepresentationUnfogged()
                             + " since you do not currently hold your _Trade Agreement_, washing here seems likely an error and will mess with the _Trade Agreement_ resolution."
                             + " Nothing has been processed as a result. Try a different route of washing your commodities if this correction is wrong.");
-            return;
+            return false;
         }
 
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            StrategyCardModel model =
+                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            if (model != null && model.usesAutomationForSCID("pok5trade")) {
+                scModel = model;
+                break;
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
+        }
+        if (scModel == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
+            return false;
+        }
+        if (!payForBrTradeFollow(game, player, event, scModel)) {
+            return false;
+        }
         boolean used = addUsedSCPlayer(messageID, game, player);
         if (used) {
-            return;
+            return false;
         }
         int commoditiesTotal = player.getCommoditiesTotal();
         int washedCommsPower = commoditiesTotal + player.getTg();
@@ -581,30 +621,9 @@ public final class ButtonHelperSCs {
         if (!game.isAgeOfCommerceMode()) {
             player.setCommodities(0);
         }
-
-        StrategyCardModel scModel = null;
-        for (int scNum : player.getUnfollowedSCs()) {
-            StrategyCardModel model =
-                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
-            if (model != null && model.usesAutomationForSCID("pok5trade")) {
-                scModel = model;
-                break;
-            }
-        }
-        if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
-        }
-        if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
-        }
-        if (scModel == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
-            return;
-        }
         int tradeInitiative = scModel.getInitiative();
-        if (!player.getFollowedSCs().contains(tradeInitiative)) {
+        boolean firstFollow = !player.getFollowedSCs().contains(tradeInitiative);
+        if (firstFollow) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         player.addFollowedSC(tradeInitiative, event);
@@ -664,6 +683,52 @@ public final class ButtonHelperSCs {
         if (commoditiesTotal > 0) {
             ButtonHelperStats.offerBountyBrokerageAfterTradeWash(game, player);
         }
+        resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
+        return true;
+    }
+
+    private static boolean payForBrTradeFollow(
+            Game game, Player player, ButtonInteractionEvent event, StrategyCardModel scModel) {
+        int tradeInitiative = scModel.getInitiative();
+        if (!"br5trade".equals(scModel.getId()) || player.getFollowedSCs().contains(tradeInitiative)) {
+            return true;
+        }
+
+        if (player.getStrategicCC() > 0) {
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Trade**");
+        }
+
+        String message = deductCC(game, player, tradeInitiative);
+        ReactionService.addReaction(event, game, player, message);
+        return !message.contains("**can't follow.**");
+    }
+
+    private static void resolveBrTradeFollowBenefits(
+            Game game, Player player, StrategyCardModel scModel, boolean firstFollow) {
+        if (!firstFollow || !"br5trade".equals(scModel.getId())) {
+            return;
+        }
+        Player tradeOwner = game.getPlayerFromSC(scModel.getInitiative());
+        if (tradeOwner == null || tradeOwner == player) {
+            return;
+        }
+        String tradeGoodChange = player.gainTG(2, true);
+        ButtonHelperAgents.resolveArtunoCheck(player, 2);
+        ButtonHelperAbilities.pillageCheck(player, game);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " gained 2 trade goods " + tradeGoodChange
+                        + " from the Trade secondary.");
+
+        int oldCommodities = tradeOwner.getCommodities();
+        tradeOwner.gainCommodities(1);
+        int commoditiesGained = tradeOwner.getCommodities() - oldCommodities;
+        ButtonHelperStats.afterGainCommsChecks(game, tradeOwner, commoditiesGained);
+        MessageHelper.sendMessageToChannel(
+                tradeOwner.getCorrectChannel(),
+                tradeOwner.getRepresentationNoPing() + " gained " + commoditiesGained + " "
+                        + (commoditiesGained == 1 ? "commodity" : "commodities") + " due to "
+                        + player.getRepresentationNoPing() + " following the Trade secondary.");
     }
 
     @ButtonHandler("anarchy7Build_")

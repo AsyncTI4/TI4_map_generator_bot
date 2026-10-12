@@ -1606,6 +1606,14 @@ public final class AgendaHelper {
             orderList.remove(edynPlayer.orElse(null));
             orderList.add(edynPlayer.get());
         }
+
+        Player blueReverieExecutiveOrderPlayer =
+                game.getPlayerFromColorOrFaction(game.getStoredValue("executiveOrderBr"));
+        if (blueReverieExecutiveOrderPlayer != null) {
+            orderList.remove(blueReverieExecutiveOrderPlayer);
+            orderList.addFirst(blueReverieExecutiveOrderPlayer);
+        }
+
         return orderList;
     }
 
@@ -1845,7 +1853,8 @@ public final class AgendaHelper {
             voteAmount = 1;
         }
 
-        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"));
+        boolean executive = player.getFaction().equals(game.getStoredValue("executiveOrder"))
+                && game.getStoredValue("executiveOrderBr").isEmpty();
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
             voteAmount = Math.max(p.getResources(), p.getInfluence());
         }
@@ -1930,7 +1939,9 @@ public final class AgendaHelper {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg", "Spend Trade Goods for 2 Votes Each", FactionEmojis.Hacan));
             }
-            if (player.isSpeaker() && !game.getStoredValue("executiveOrder").isEmpty()) {
+            if (player.isSpeaker()
+                    && !game.getStoredValue("executiveOrder").isEmpty()
+                    && game.getStoredValue("executiveOrderBr").isEmpty()) {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg",
                         "Spend Trade Goods for 1 Vote Each",

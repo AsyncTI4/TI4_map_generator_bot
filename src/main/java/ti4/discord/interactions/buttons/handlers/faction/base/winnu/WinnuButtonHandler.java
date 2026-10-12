@@ -8,6 +8,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -37,6 +38,24 @@ class WinnuButtonHandler {
     public static void resolveWinnuHeroSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int sc = Integer.parseInt(buttonID.split("_")[1]);
         boolean isOverrule = buttonID.contains("overrule");
+        boolean isBlueReverieOverrule = buttonID.contains("overrule_br");
+        if (isBlueReverieOverrule
+                && ((game.getScPlayed().get(sc) != null && game.getScPlayed().get(sc))
+                        || player.getStrategicCC() < 1)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", that strategy card is no longer eligible for _Overrule_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (isBlueReverieOverrule) {
+            player.setStrategicCC(player.getStrategicCC() - 1);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "resolved _Overrule_");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " spent 1 command token from their strategy pool to resolve _Overrule_.");
+        }
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
         if (isOverrule) {
             OverruleStatsService.get().recordChoice(game.getName(), Helper.getSCName(sc, game));

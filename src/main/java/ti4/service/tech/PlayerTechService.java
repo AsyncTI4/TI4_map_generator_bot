@@ -55,6 +55,7 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
@@ -537,7 +538,7 @@ public class PlayerTechService {
                         "Purging a relic fragment or spending a command token (and exhausting technology) is not automated at this time.");
                 ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
-            case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
+            case "executiveorder", "executiveorder_br" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
             case "nekroc4r", "nanomachines", "tf-nanomachines" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
                 String message = player.getRepresentation() + ", please choose one of the options for this technology:";
@@ -693,6 +694,14 @@ public class PlayerTechService {
                 ArcanumPrimordialTechHandler.resolvePowerWordPlaneShift(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "gd_br" -> {
+                BlueReverieTechHelper.exhaustGravityDrive(game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "is_br" -> {
+                BlueReverieTechHelper.offerInheritanceSystemsBr(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
@@ -831,6 +840,12 @@ public class PlayerTechService {
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
             VyserixLeaderHandler.resolveCommanderOnResearch(game, player, techM);
+        }
+        if (player.hasTech("dxa_br") && !player.hasTechReady("dxa_br")) {
+            player.refreshTech("dxa_br");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " gained a technology, and so has readied _Daxcive Animators_.");
         }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
@@ -1136,6 +1151,11 @@ public class PlayerTechService {
         }
         if (player.hasTechReady("is")) {
             Button inheritanceSystemsButton = Buttons.gray("exhaustTech_is", "Exhaust Inheritance Systems");
+            buttons.add(inheritanceSystemsButton);
+        }
+        if (player.hasTechReady("is_br")) {
+            Button inheritanceSystemsButton =
+                    Buttons.gray("exhaustTech_is_br", "Exhaust Inheritance Systems", FactionEmojis.L1Z1X);
             buttons.add(inheritanceSystemsButton);
         }
         if (player.hasRelicReady("prophetstears")) {

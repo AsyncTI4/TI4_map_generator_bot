@@ -2273,6 +2273,9 @@ public final class Helper {
                         && player.hasAbility("synthesis")) {
                     productionValue++;
                 }
+                if (productionValue > 0 && player.hasTech("pm_br")) {
+                    productionValue += 2;
+                }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
             } else {
@@ -2676,6 +2679,9 @@ public final class Helper {
                         if (cosmicSuper) {
                             productionValue++;
                         }
+                        if (productionValue > 0 && player.hasTech("pm_br")) {
+                            productionValue += 2;
+                        }
                         if (productionValue > highestProd) {
                             highestProd = productionValue;
                         }
@@ -2724,6 +2730,9 @@ public final class Helper {
                             }
                             if (cosmicSuper) {
                                 productionValue++;
+                            }
+                            if (productionValue > 0 && player.hasTech("pm_br")) {
+                                productionValue += 2;
                             }
                             if (productionValue > highestProd) {
                                 highestProd = productionValue;
@@ -3103,7 +3112,8 @@ public final class Helper {
         }
         boolean greenMechd = false;
         boolean ironMechSpaceAdded = false;
-        if (player.hasTech("tf-desperados") && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
+        if ((player.hasTech("tf-desperados") || player.hasAbility("desperados_br"))
+                && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "desperadoDestroyer_" + tile.getPosition(),
                     "Place Desperado Destroyer",
@@ -3129,6 +3139,12 @@ public final class Helper {
                 unitButtons.add(Buttons.blue(
                         "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
                         "Use Self-Assembly Routines",
+                        TechEmojis.WarfareTech));
+            }
+            if (player.hasTech("sar_br")) {
+                unitButtons.add(Buttons.blue(
+                        player.factionButtonChecker() + "sarBR_" + tile.getPosition() + "_" + warfareNOtherstuff,
+                        "Use Self Assembly Routines",
                         TechEmojis.WarfareTech));
             }
 
