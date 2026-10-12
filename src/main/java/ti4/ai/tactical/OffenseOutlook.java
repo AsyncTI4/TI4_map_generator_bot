@@ -69,6 +69,10 @@ final class OffenseOutlook {
     }
 
     StrikeValue evaluate(Strike strike, StrikeEstimate estimate, ContextTerms terms, boolean full) {
+        return evaluate(strike, estimate, terms, full, Double.NEGATIVE_INFINITY);
+    }
+
+    StrikeValue evaluate(Strike strike, StrikeEstimate estimate, ContextTerms terms, boolean full, double floor) {
         Player opponent = strike.opponent();
         Tile target = strike.target();
         double w = estimate.spaceWin();
@@ -107,7 +111,8 @@ final class OffenseOutlook {
         double nekroFeed = 0;
         double capture = 0;
         double cancel = 0;
-        if (full) {
+        double extraOrigins = EXTRA_ORIGIN_COST * Math.max(0, strike.origins().size() - 1);
+        if (full && value - losses - extraOrigins >= floor) {
             double harm = estimate.theirExpectedLoss() + heldPlanetValue + denial.harmPoints();
             anger = anger(strike, harm);
             counter = w * counterstrike(strike, estimate, after, planetsAfter, landed);
@@ -115,7 +120,6 @@ final class OffenseOutlook {
             capture = VUIL_RAITH.equals(opponent.getFaction()) ? CAPTURE_VALUE * estimate.ourLossChance() * hurt : 0;
             cancel = cancel(strike);
         }
-        double extraOrigins = EXTRA_ORIGIN_COST * Math.max(0, strike.origins().size() - 1);
         double score = (1 - cancel) * (value - losses - anger - counter - nekroFeed - capture)
                 - cancel * NULLIFICATION_COST
                 - extraOrigins;

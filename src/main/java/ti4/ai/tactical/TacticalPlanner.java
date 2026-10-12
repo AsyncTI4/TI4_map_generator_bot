@@ -765,9 +765,9 @@ public class TacticalPlanner {
     }
 
     private static Optional<TacticalPlan> fullPlan(Context context, Tile tile, Candidate candidate) {
-        StrikeValue value =
-                context.offense().evaluate(candidate.strike(), candidate.estimate(), candidate.terms(), true);
         if (candidate.estimate().spaceWin() < candidate.strike().rules().landMinWin()) return Optional.empty();
+        StrikeValue value = context.offense()
+                .evaluate(candidate.strike(), candidate.estimate(), candidate.terms(), true, ATTACK_MIN_SCORE);
         if (value.score() < ATTACK_MIN_SCORE) return Optional.empty();
         return Optional.of(new TacticalPlan(
                 Kind.ATTACK,
@@ -863,6 +863,10 @@ public class TacticalPlanner {
             if (BoardView.hasEnemyShips(game, seat, staging) || context.coveredByEnemySpaceCannon(staging)) continue;
             if (group.stream().anyMatch(move -> !context.reaches(origin, staging, move.type()))) continue;
             if (!context.reach(staging, slowest).containsKey(target.getPosition())) continue;
+            if (futureScore(context, target, opponent, staging, group, cargo)
+                    < ATTACK_MIN_SCORE + STAGE_FUTURE_MARGIN) {
+                continue;
+            }
             options.add(new Staging(staging, counterAt(context, staging, opponent, group, groupCost)));
         }
         options.sort(Comparator.comparingDouble(Staging::counter));
@@ -919,7 +923,8 @@ public class TacticalPlanner {
 
     private static double futureScore(
             Context context, Tile target, Player opponent, Tile staging, List<UnitMove> group, List<UnitMove> cargo) {
-        String key = target.getPosition() + "#" + staging.getPosition() + "#" + group + "#" + cargo;
+        String key = target.getPosition() + "#" + BoardView.ships(BoardView.space(staging), context.seat) + "#" + group
+                + "#" + cargo;
         Double known = context.futureScores.get(key);
         if (known != null) return known;
         double score = computeFuture(context, target, opponent, staging, group, cargo);
@@ -950,7 +955,8 @@ public class TacticalPlanner {
                     target, opponent, List.of(), List.of(), ships, Map.of(), ground, extraShips, extraGround, rules);
             StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
             if (estimate.spaceWin() < rules.landMinWin()) return 0;
-            StrikeValue value = context.offense().evaluate(strike, estimate, ContextTerms.none(), true);
+            StrikeValue value = context.offense()
+                    .evaluate(strike, estimate, ContextTerms.none(), true, ATTACK_MIN_SCORE + STAGE_FUTURE_MARGIN);
             boolean raidsAHome = isAnotherPlayersHome(game, seat, target)
                     && !estimate.landings().isEmpty();
             score = value.score();
