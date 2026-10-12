@@ -83,7 +83,9 @@ public class AnonymousCommsService {
     private static final String MESSAGE_INPUT = "message";
     private static final String HOURS_INPUT = "hours";
     private static final String PARTNER_SEPARATOR = "-";
-    private static final Pattern THREAD_NAME = Pattern.compile("^\\w+-comms-(\\w+)-private$", Pattern.CASE_INSENSITIVE);
+    private static final String COMMS_SUFFIX = "-comms-private";
+    private static final Pattern THREAD_NAME =
+            Pattern.compile("^(?:\\w+-comms-(\\w+)|(?:\\S+\\s+)?(\\w+)-comms)-private$", Pattern.CASE_INSENSITIVE);
     private static final Pattern TO_PREFIX =
             Pattern.compile("^to(\\w+)[^\\w\\s]*\\s+(.+)$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern USER_MENTION = Pattern.compile("<@!?\\d+>");
@@ -98,6 +100,7 @@ public class AnonymousCommsService {
     // Discord's 24h auto-archive until the next relay; persisting activity needs startup registration in JdaService.
     private static final Map<String, ThreadActivity> LAST_ACTIVITY = new ConcurrentHashMap<>();
     private static final AtomicBoolean CRON_REGISTERED = new AtomicBoolean();
+    private static final Set<String> RENAME_ATTEMPTED = ConcurrentHashMap.newKeySet();
 
     record ThreadActivity(String gameName, Instant lastMessage) {}
 
@@ -116,7 +119,17 @@ public class AnonymousCommsService {
     @Nullable
     static String threadTarget(String threadName) {
         Matcher matcher = THREAD_NAME.matcher(threadName);
-        return matcher.matches() ? matcher.group(1).toLowerCase() : null;
+        if (!matcher.matches()) return null;
+        String target = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+        return target.toLowerCase();
+    }
+
+    static String partnerThreadName(String color) {
+        return CommsColorMarker.of(color) + " " + StringUtils.capitalize(color) + COMMS_SUFFIX;
+    }
+
+    static String inboxThreadName() {
+        return INBOX_MARKER + StringUtils.capitalize(INBOX) + COMMS_SUFFIX;
     }
 
     public static boolean handleMessage(Game game, @Nullable Player sender, Message message) {
@@ -472,14 +485,13 @@ public class AnonymousCommsService {
 
     @Nullable
     public static ThreadChannel inbox(Game game, Player owner) {
-        String name = game.getName() + "-comms-" + INBOX + "-private";
         return findOrCreateThread(
-                game, owner, inboxKey(owner), name, AutoArchiveDuration.TIME_1_WEEK, inboxIntro(game));
+                game, owner, inboxKey(owner), inboxThreadName(), AutoArchiveDuration.TIME_1_WEEK, inboxIntro(game));
     }
 
     @Nullable
     public static ThreadChannel partnerThread(Game game, Player owner, Player partner) {
-        String name = game.getName() + "-comms-" + partner.getColor() + "-private";
+        String name = partnerThreadName(partner.getColor());
         String intro = "## Comms with " + colorName(partner) + "\nType here to talk to " + colorName(partner)
                 + ". Your messages are relayed by the bot, so neither of you sees who is behind the other color.";
         return findOrCreateThread(
@@ -503,13 +515,14 @@ public class AnonymousCommsService {
     @Nullable
     private static ThreadChannel findOrCreateThread(
             Game game, Player owner, String key, String name, AutoArchiveDuration duration, String intro) {
+        String fittedName = DiscordThreadUtility.fitThreadName(name);
         ThreadChannel existing = findThread(owner, game.getStoredValue(key));
-        if (existing != null) return existing;
+        if (existing != null) return renamedIfOutdated(existing, fittedName);
         TextChannel privateChannel = owner.getPrivateChannel();
         if (privateChannel == null) return null;
         try {
             ThreadChannel created = privateChannel
-                    .createThreadChannel(DiscordThreadUtility.fitThreadName(name))
+                    .createThreadChannel(fittedName)
                     .setAutoArchiveDuration(duration)
                     .complete();
             game.setStoredValue(key, created.getId());
@@ -519,6 +532,12 @@ public class AnonymousCommsService {
             BotLogger.error("Could not create anonymous comms thread " + name, e);
             return null;
         }
+    }
+
+    private static ThreadChannel renamedIfOutdated(ThreadChannel thread, String name) {
+        if (name.equals(thread.getName()) || !RENAME_ATTEMPTED.add(thread.getId())) return thread;
+        thread.getManager().setArchived(false).setName(name).queue(Consumers.nop(), BotLogger::catchRestError);
+        return thread;
     }
 
     private static String withMemberTags(Game game, Player owner, String intro) {

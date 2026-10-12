@@ -22,6 +22,7 @@ class TestBedCombatThreadsTest {
         assertTrue(TestBedCombatThreads.isCombatThread(game, "pbd7-round-2-system-305-turn-3-red-vs-blue-private"));
         assertFalse(TestBedCombatThreads.isCombatThread(game, "pbd70-round-1-system-101-turn-1-letnev-vs-nekro"));
         assertFalse(TestBedCombatThreads.isCombatThread(game, "pbd7-comms-blue-private"));
+        assertFalse(TestBedCombatThreads.isCombatThread(game, "🔵 Blue-comms-private"));
         assertFalse(TestBedCombatThreads.isCombatThread(game, "pbd7-cards-info-someone-private"));
     }
 
