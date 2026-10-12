@@ -35,7 +35,13 @@ class Involvement {
             "Fire Team",
             "Fighter Prototype",
             "Emergency Repairs",
-            "Reveal Prototype");
+            "Reveal Prototype",
+            "Courageous to the End",
+            "Maneuvering Jets",
+            "In The Silence Of Space",
+            "Solar Flare",
+            "Salvage",
+            "Crash Landing");
 
     static double level(AiTurnContext context, String title, Player cardPlayer) {
         if (aimedAtSeat(context, title, cardPlayer)) return AIMED_AT_SEAT;
