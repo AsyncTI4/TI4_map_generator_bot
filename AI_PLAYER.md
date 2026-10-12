@@ -675,9 +675,10 @@ Six small generic changes don't reference `ti4.ai`:
   private thread, where the report's @mentions of the victims could add them to the thread.
 - The bombardment hit prompt offers every defender an "Auto-assign Hits" button (dummy players already had one), so
   humans and AI seats alike can assign bombardment hits automatically.
-- The Sabotage button (`ActionCardButtonHandler`) refuses a press on a window that is already canceled or closed: it
-  spends no Sabotage and marks no play as canceled. Before, a second press on the same window spent another Sabotage
-  and canceled an earlier play of the same card.
+- The Sabotage button (`ActionCardButtonHandler`) refuses a second press on a window that a Sabotage already canceled
+  (the canceled windows' message ids are kept in the game's stored value `canceledActionCardWindows`): it spends no
+  Sabotage and marks no play as canceled. Before, that press spent another Sabotage and canceled an earlier play of the
+  same card. Any other press behaves as before.
 - A canceled _War Machine_ or _Flank Speed_ takes its effect back (the card player's spent `warmachine`, the
   `flankspeedBoost` of the active tactical action) instead of leaving it for the player to undo by hand. It acts on the
   card's player, not on the player who pressed the button.

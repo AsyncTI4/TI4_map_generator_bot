@@ -69,12 +69,11 @@ class ActionCardButtonHandler {
             return;
         }
 
-        if ("ac".equalsIgnoreCase(type) && !SabotageService.isWindowOpen(game, event.getMessageId())) {
+        if ("ac".equalsIgnoreCase(type) && SabotageService.wasWindowCanceled(game, event.getMessageId())) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", _" + acName
-                            + "_ can no longer be canceled: its window has closed or it was already canceled."
-                            + " Your _Sabotage_ was not played.");
+                            + "_ has already been canceled. Your _Sabotage_ was not played.");
             return;
         }
 
@@ -143,6 +142,7 @@ class ActionCardButtonHandler {
             }
             if (hasSabo) {
                 ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
+                SabotageService.rememberCanceledWindow(game, event.getMessageId());
             } else {
                 message = "Tried to play a _Sabotage_ but found none in hand.";
                 sendReact = false;

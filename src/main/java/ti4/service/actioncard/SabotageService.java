@@ -29,6 +29,8 @@ public class SabotageService {
     private static final String WAR_MACHINE_SPENT = "warmachine";
     private static final String FLANK_SPEED_TITLE = "Flank Speed";
     private static final String FLANK_SPEED_BOOST = "flankspeedBoost";
+    private static final String CANCELED_WINDOWS = "canceledActionCardWindows";
+    private static final String CANCELED_WINDOW_SEPARATOR = "_";
     private static final Set<String> ALL_SABOTAGE_CARD_ALIASES = Set.of(
             "sabo1",
             "sabo2",
@@ -162,8 +164,15 @@ public class SabotageService {
         return null;
     }
 
-    public static boolean isWindowOpen(Game game, String messageId) {
-        return GameMessageManager.getOne(game.getName(), messageId).isPresent();
+    public static boolean wasWindowCanceled(Game game, String messageId) {
+        return Set.of(game.getStoredValue(CANCELED_WINDOWS).split(CANCELED_WINDOW_SEPARATOR))
+                .contains(messageId);
+    }
+
+    public static void rememberCanceledWindow(Game game, String messageId) {
+        String canceled = game.getStoredValue(CANCELED_WINDOWS);
+        game.setStoredValue(
+                CANCELED_WINDOWS, canceled.isEmpty() ? messageId : canceled + CANCELED_WINDOW_SEPARATOR + messageId);
     }
 
     public static void undoEffectsOfCanceledCard(Game game, @Nullable Player cardPlayer, String title) {

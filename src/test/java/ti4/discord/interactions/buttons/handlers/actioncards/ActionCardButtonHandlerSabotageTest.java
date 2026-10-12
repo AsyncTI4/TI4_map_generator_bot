@@ -5,10 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.AfterEach;
@@ -18,9 +17,7 @@ import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
-import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -61,15 +58,6 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
         messages.close();
     }
 
-    private void windowIs(boolean open) {
-        messages.when(() -> GameMessageManager.getOne(anyString(), anyString()))
-                .thenReturn(
-                        open
-                                ? Optional.of(new GameMessage(
-                                        WINDOW_MESSAGE, GameMessageType.ACTION_CARD, new LinkedHashSet<>(), 0L))
-                                : Optional.empty());
-    }
-
     private void sabotage(String title) {
         ActionCardButtonHandler.sabotage(event, nekro, "sabotage_ac_" + title + "_sol", game);
     }
@@ -81,7 +69,6 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
     @Test
     void cancelsACardWhoseWindowIsOpen() {
         game.getGameStats().recordAcPlay("Mining Initiative", sol);
-        windowIs(true);
 
         sabotage("Mining Initiative");
 
@@ -90,33 +77,32 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
         assertThat(playWasCanceled(0)).isTrue();
     }
 
-    // The first Sabotage removes the window, so a second press (from a player who answered before it landed) spends
+    // A player who answered before the first Sabotage landed can still press the button. That second press spends
     // nothing and cancels nothing, in particular not an earlier play of the same card.
     @Test
     void refusesASecondSabotageOnAWindowThatIsAlreadyCanceled() {
         game.getGameStats().recordAcPlay("Mining Initiative", sol);
         game.getGameStats().recordAcPlay("Mining Initiative", sol);
-        game.getGameStats().markLatestPlayCanceled("Mining Initiative");
-        windowIs(false);
+        sabotage("Mining Initiative");
 
         sabotage("Mining Initiative");
 
-        cards.verify(() -> ActionCardHelper.playAC(any(), any(), any(), anyString(), any()), never());
-        messages.verify(() -> GameMessageManager.remove(anyString(), anyString()), never());
+        cards.verify(() -> ActionCardHelper.playAC(any(), any(), any(), anyString(), any()), times(1));
         assertThat(playWasCanceled(0)).isFalse();
         assertThat(playWasCanceled(1)).isTrue();
-        assertThat(nekro.getActionCards()).containsKey("sabo1");
     }
 
+    // Only a window that was canceled refuses a press. One the bot stopped tracking for another reason (everyone
+    // answered, it went stale) still cancels the card, as it did before.
     @Test
-    void refusesASabotageOnAWindowThatHasClosed() {
+    void stillCancelsACardWhoseWindowWasNotCanceled() {
         game.getGameStats().recordAcPlay("Mining Initiative", sol);
-        windowIs(false);
+        messages.when(() -> GameMessageManager.getOne(anyString(), anyString())).thenReturn(Optional.empty());
 
         sabotage("Mining Initiative");
 
-        cards.verify(() -> ActionCardHelper.playAC(any(), any(), any(), anyString(), any()), never());
-        assertThat(playWasCanceled(0)).isFalse();
+        cards.verify(() -> ActionCardHelper.playAC(any(), any(), any(), anyString(), any()));
+        assertThat(playWasCanceled(0)).isTrue();
     }
 
     // The card's effect is applied when it is played, before anyone can cancel it; cancelling it takes the effect
@@ -126,7 +112,6 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
         game.getGameStats().recordAcPlay("War Machine", sol);
         sol.addSpentThing("warmachine");
         nekro.addSpentThing("warmachine");
-        windowIs(true);
 
         sabotage("War Machine");
 
@@ -138,7 +123,6 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
     void takesFlankSpeedBack() {
         game.getGameStats().recordAcPlay("Flank Speed", sol);
         game.setStoredValue("flankspeedBoost", "1");
-        windowIs(true);
 
         sabotage("Flank Speed");
 
@@ -150,7 +134,6 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
         game.getGameStats().recordAcPlay("Mining Initiative", sol);
         game.setStoredValue("flankspeedBoost", "1");
         sol.addSpentThing("warmachine");
-        windowIs(true);
 
         sabotage("Mining Initiative");
 
