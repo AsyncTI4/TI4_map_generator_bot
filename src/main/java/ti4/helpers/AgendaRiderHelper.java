@@ -38,6 +38,7 @@ public class AgendaRiderHelper {
         String choice = buttonID.substring(buttonID.indexOf('_') + 1);
         String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
 
+        // TODO: removes this rider for every faction, not only the cancelled player's (matters with two copies in play)
         rewriteVotes(game, piece -> !piece.contains(choice), null);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), voteMessage);

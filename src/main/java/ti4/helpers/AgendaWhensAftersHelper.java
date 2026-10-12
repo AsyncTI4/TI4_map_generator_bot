@@ -525,6 +525,8 @@ public final class AgendaWhensAftersHelper {
                             }
                             case "ac" -> {
                                 ActionCardHelper.playAC(event, game, player, when, game.getMainGameChannel());
+                                // TODO: the halt for Veto does not hold: any later declineToQueueAWhen press resumes
+                                // the queue
                                 if (!when.contains("veto")) {
                                     resolveWhenQueue(event, game);
                                     offerEveryoneWhensQueue(game);
