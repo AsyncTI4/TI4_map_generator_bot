@@ -43,7 +43,9 @@ the tech-steal bonus when choosing attacks) switch on for Nekro only.
 
 **When an AI is confused**, it posts the choice in the main game channel and **any player**
 may pick for it. Choices involving hidden information (its hand, its secret objectives) are
-never shown: the AI picks a safe option and says so.
+never shown: the AI picks a safe option and says so. A safe option is one that declines or passes; it is never a
+button that cancels a hit (`cancelSpaceHits_`, `cancelPdsOffenseHits_`, `cancelGroundHits_`, `cancelAFBHits_`), which
+would throw a hit away for free.
 
 **Trading:** they trade through the bot's own transaction buttons and never read chat. They start deals on their
 own turn, in the agenda phase, as Trade holder with the players who followed, and ask for debt payments at any time;
@@ -581,7 +583,33 @@ to build one by hand:
     played a Veto would otherwise wait on one another, and the stall detector does not call it stuck. It gives up after
     five minutes if the bot never posted the buttons. A cancelled Veto resumes the queue through the bot (see
     Segregation).
-  - Not yet: combat cards, _War Machine_, _Rally_, _Parley_,
+  - **Combat cards** (`CombatCardRules`, `CombatCards`): _Morale Boost_ (every copy), _Fighter Prototype_ and
+    _Emergency Repairs_. The bot has no card window in a combat: the start of a round is the gap before someone presses
+    the unowned combat roll, and a one-round modifier is moved in by the seat's next roll of any kind (anti-fighter
+    barrage, space cannon and bombardment included) and dropped by it. So the card is played at the one moment the
+    seat would roll its combat round, through a hook `CombatRules` calls just before it presses that roll, after its
+    own space cannon, anti-fighter barrage, assault cannon and bombardment have been dealt with. The hook is only called
+    when both sides have rolled the same number of rounds (once the opponent has rolled, its dice are known), no hits
+    are pending, the combat is in the active system and, for a ground combat, no ground combat automation is still on
+    offer (an automated combat has no window). The seat is idle at that moment whatever it holds, so the timing says
+    nothing about its hand, and no other player's hand is read. A card is played when its swing reaches its keep prior:
+    ```
+    swing = (chance to win with the card - chance to win without it) x stake
+    stake = unit cost of both sides + score value of the objective points riding on the system
+    ```
+    _Morale Boost_ and _Fighter Prototype_ are valued on a first round that carries the bonus (+1 to all dice, or +2 to
+    fighters, in round 1 of a space combat only) before the ordinary chain (`CombatOdds.resolveFirstRound`);
+    _Emergency Repairs_ on the fight with every damaged unit of the combat repaired, and only with damaged units. Both
+    are read through the `CombatForecast` facade. A play is remembered per round (`acPlay|combat:<position>@<holder>#<round>:start`)
+    and goes through the usual Sabotage window; while it is in play a hold rule ahead of `CombatRules` keeps the seat
+    from rolling or assigning, and after a modifier card resolves the roll also waits (20 seconds at most) until the
+    modifier shows in the seat's pending modifiers. A play whose combat is over is dropped, and one lost with the memory
+    is rebuilt from its still visible resolve button. `-Dai.combatcards=false` switches the cards off (they are not
+    played in fog of war either). The cost: a Sabotage window left open holds the combat. In human games the other
+    AI seats pass after 10 to 40 minutes, a human can hold the window to the 24 hour ceiling, and the opponent AI waits
+    too since the card is aimed at it, so a combat card can freeze a combat for that long. The combat cards used to be
+    worth nothing in the hand and the first to be discarded at the hand limit; they are now kept at their prior.
+  - Not yet: the other combat cards (see the known limitations), _War Machine_, _Rally_, _Parley_,
     _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
     remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
     unusable while it could stall; a test over the deck keeps it that way.
@@ -1006,7 +1034,7 @@ Seven small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, an agenda outcome forecast with riders, Veto and the shenanigans courtesy. Still to do: combat action cards and the rest of the agenda ones, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows, an agenda outcome forecast with riders, Veto and the shenanigans courtesy. Still to do: the rest of the combat action cards and the agenda ones, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |
@@ -1045,6 +1073,26 @@ Seven small generic changes don't reference `ti4.ai`:
     want" cannot emerge until For/Against agendas are valued.
   - _Deadly Plot_ and _Bribery_ (the bot has no automation for them), the placement riders (Diplomacy, Construction,
     Warfare), _Sanction_ and the D-tier agenda cards.
+- **Action cards, combat.**
+  - Played: _Morale Boost_, _Fighter Prototype_ and _Emergency Repairs_, at the start of a round. Not yet: _Shields
+    Holding_ and _Maneuvering Jets_ (they post nothing: the player presses "Cancel a Hit" on the hit message, and the
+    second cancel button is unowned, so the AI needs perception and a two-step play first), and _Fire Team_ (its extra
+    hits are posted as text only, with no hit-assignment buttons, so the AI could neither take them nor assign them).
+  - No ground combat card is played in a combat that may still be automated, which includes any combat where the
+    "Automate Combat" button is still on offer. Ground cards are therefore only played where no one offered automation.
+  - The play comes at the seat's roll moment: when the opponent rolls first, the seat plays nothing that round (an AI
+    defender never plays a start-of-round card in round 1 against an AI attacker, which rolls first). _Emergency
+    Repairs_ is only played at the start of a round, never at its end.
+  - _Wild Wild Galaxy_'s +2 _Morale Boost_ is valued as +1.
+  - Left to humans: _Direct Hit_ (the bot asks for the ship in chat), _Skilled Retreat_, _Rout_, _Intercept_,
+    _Parley_ and _Ghost Squad_ (retreat and invasion windows), _Courageous to the End_ (the AI cannot answer its
+    `assignHits_` prompts), _Blitz_ and _Experimental Battlestation_ (they roll in the main channel),
+    _Reflective Shielding_, _Scramble Frequency_, _Waylay_, _Solar Flare_, _In The Silence Of Space_, _Salvage_ and
+    _Crash Landing_.
+  - _Bunker_ is a bot bug, not an AI one: its -4 to bombardment is stored in the defender's new combat modifiers, which
+    only move in when the defender rolls, so the attacker's bombardment probably never sees it (a To-Do in
+    `CombatRollService`).
+  - A combat card's Sabotage window can freeze its combat for as long as it stays open (see the combat cards above).
 - **Action cards, Strategize.** Never Technology (the bot's button grants the technology without collecting its 4
   resources, so the AI could not pay honestly) or Leadership (the strategy token taken up front has to be regained by
   hand).
