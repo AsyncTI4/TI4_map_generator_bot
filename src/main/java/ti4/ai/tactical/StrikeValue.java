@@ -3,6 +3,7 @@ package ti4.ai.tactical;
 record StrikeValue(
         double ownObjective,
         double planets,
+        double territory,
         double economyDenial,
         double objectiveDenial,
         double homeBlock,

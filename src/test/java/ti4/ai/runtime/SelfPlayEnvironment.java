@@ -32,6 +32,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.Territory;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
@@ -429,6 +430,9 @@ final class SelfPlayEnvironment implements AutoCloseable {
         if (plan.isEmpty()) return;
         List<String> kinds = new ArrayList<>();
         kinds.add(PLAN_PREFIX + plan.get().kind().name().toLowerCase());
+        if (plan.get().kind() == TacticalPlan.Kind.EXPAND) {
+            kinds.add(PLAN_PREFIX + expansionZone(context, plan.get()));
+        }
         if (plan.get().kind() == TacticalPlan.Kind.ATTACK) {
             Game game = context.game();
             Tile target = game.getTileByPosition(plan.get().target());
@@ -452,6 +456,37 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     actionsByRound.computeIfAbsent(context.game().getRound(), ignored -> new java.util.TreeMap<>());
             kinds.forEach(kind -> round.merge(kind, 1, Integer::sum));
         }
+    }
+
+    // Where an expansion goes, by the territory zone of its target and the round band, for the zone split in the batch
+    // summary.
+    private static String expansionZone(AiTurnContext context, TacticalPlan plan) {
+        Game game = context.game();
+        Tile target = game.getTileByPosition(plan.target());
+        Territory.Zone zone = target == null
+                ? Territory.Zone.NEUTRAL
+                : Territory.of(game, context.seat()).zone(target);
+        String area =
+                switch (zone) {
+                    case HOME, LANE, SLICE -> EXPAND_OWN_AREA;
+                    case BORDER -> EXPAND_BORDER;
+                    case FOREIGN, OTHER_HOME -> EXPAND_ANOTHERS_AREA;
+                    case MECATOL -> EXPAND_MECATOL;
+                    case NEUTRAL -> EXPAND_ELSEWHERE;
+                };
+        return area + " " + roundBand(game.getRound());
+    }
+
+    static final String EXPAND_OWN_AREA = "expand in own area";
+    static final String EXPAND_BORDER = "expand on a border";
+    static final String EXPAND_ANOTHERS_AREA = "expand in another's area";
+    static final String EXPAND_MECATOL = "expand on Mecatol";
+    static final String EXPAND_ELSEWHERE = "expand elsewhere";
+    static final List<String> ROUND_BANDS = List.of("r1-2", "r3-4", "r5+");
+
+    static String roundBand(int round) {
+        if (round <= 2) return ROUND_BANDS.get(0);
+        return round <= 4 ? ROUND_BANDS.get(1) : ROUND_BANDS.get(2);
     }
 
     // Every eighth tactical action, the planner ranks the same board again and the time it takes is kept, to compare

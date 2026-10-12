@@ -588,10 +588,12 @@ class TacticalRulesTest extends BaseTi4Test {
     }
 
     // A free planet next door is not urgent: it can wait for the next turn, so the seat plays slowly and ends its
-    // turn instead of spending Fleet Logistics' second action.
+    // turn instead of spending Fleet Logistics' second action. Sol's home is placed so that the planet lies on the
+    // border, where the territory bonus is small.
     @Test
     void playsSlowlyWithoutAnUrgentSecondAction() {
         test.nekro.addTech("fl");
+        test.solHomeBeside(target);
         test.game.setActiveSystem("105");
         test.game.setStoredValue("currentActionSummarynekro", " Activated 105.");
         test.game.setStoredValue("gameEventTacticalLogged", "yes");

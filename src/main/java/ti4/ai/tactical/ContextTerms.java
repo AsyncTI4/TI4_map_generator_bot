@@ -9,9 +9,10 @@ record ContextTerms(
         double groundSecretBonus,
         double homeDefence,
         double retakeValue,
-        double makeAnExample) {
+        double makeAnExample,
+        Map<String, Double> territoryValues) {
 
     static ContextTerms none() {
-        return new ContextTerms(0, Map.of(), 0, 0, 0, 0, 0);
+        return new ContextTerms(0, Map.of(), 0, 0, 0, 0, 0, Map.of());
     }
 }

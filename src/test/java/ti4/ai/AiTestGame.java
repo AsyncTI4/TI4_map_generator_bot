@@ -89,6 +89,25 @@ public final class AiTestGame {
                 .orElseThrow();
     }
 
+    /**
+     * Sol's home system (tile 01, Jord, held by Sol) beside {@code position} and two steps from {@link #HOME}, so that
+     * {@code position} lies on the border between the two homes and gets neither a slice bonus nor a foreign penalty
+     * from the territory zones.
+     */
+    public Tile solHomeBeside(String position) {
+        List<String> nearHome = PositionMapper.getAdjacentTilePositions(HOME);
+        String spot = PositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate -> !"x".equals(candidate)
+                        && !HOME.equals(candidate)
+                        && !nearHome.contains(candidate)
+                        && game.getTileByPosition(candidate) == null)
+                .findFirst()
+                .orElseThrow();
+        Tile tile = place("01", spot);
+        sol.addPlanet("jord");
+        return tile;
+    }
+
     public Tile place(String tileId, String position) {
         Tile tile = new Tile(tileId, position);
         game.setTile(tile);

@@ -104,6 +104,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         printSecrets(outcomes);
         printPlanKinds(outcomes);
         printMecatol(outcomes);
+        printExpansionZones(outcomes);
         System.out.println("Tactical actions per seat each round: "
                 + perRoundDecimal(
                         outcomes.stream()
@@ -223,6 +224,35 @@ class AiSelfPlayTest extends BaseTi4Test {
                         / games,
                 SelfPlayEnvironment.RANKED_WITH_STAGE.sum(),
                 samples);
+    }
+
+    // Where expansions went, by the territory zone of the target, as a share of the expansions in each round band and
+    // as a count per game.
+    private static void printExpansionZones(List<SelfPlayGame.Outcome> outcomes) {
+        int games = Math.max(1, outcomes.size());
+        List<String> areas = List.of(
+                SelfPlayEnvironment.EXPAND_OWN_AREA,
+                SelfPlayEnvironment.EXPAND_BORDER,
+                SelfPlayEnvironment.EXPAND_ANOTHERS_AREA,
+                SelfPlayEnvironment.EXPAND_MECATOL,
+                SelfPlayEnvironment.EXPAND_ELSEWHERE);
+        for (String band : SelfPlayEnvironment.ROUND_BANDS) {
+            List<Integer> counts = areas.stream()
+                    .map(area -> outcomes.stream()
+                            .mapToInt(outcome -> outcome.total(SelfPlayEnvironment.PLAN_PREFIX + area + " " + band))
+                            .sum())
+                    .toList();
+            int all = counts.stream().mapToInt(Integer::intValue).sum();
+            List<String> parts = new ArrayList<>();
+            for (int i = 0; i < areas.size(); i++) {
+                parts.add(String.format(
+                        "%s %.2f per game (%.0f%%)",
+                        areas.get(i).substring("expand ".length()),
+                        (double) counts.get(i) / games,
+                        all == 0 ? 0 : 100.0 * counts.get(i) / all));
+            }
+            System.out.println("Expansion targets " + band + ": " + String.join(", ", parts));
+        }
     }
 
     // The custodians race over the batch: the round the token went, who took it and whether they went first, the

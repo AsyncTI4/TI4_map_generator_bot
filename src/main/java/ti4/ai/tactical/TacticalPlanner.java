@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.Territory;
 import ti4.ai.explore.ExploreDeck;
 import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
@@ -66,6 +67,10 @@ public class TacticalPlanner {
     static final double ATTACK_MIN_SCORE = 4.0;
     private static final double DISTANCE_COST = 0.2;
     private static final double PLANET_TEMPO_VALUE = 0.8;
+    private static final double LANE_PLANET_BONUS = 1.5;
+    private static final double SLICE_PLANET_BONUS = 1.0;
+    private static final double BORDER_PLANET_BONUS = 0.3;
+    private static final double FOREIGN_PLANET_PENALTY = 1.0;
     private static final double FRONTIER_CARD_VALUE = 1.5;
     private static final double FRONTIER_POSITION_VALUE = 1.0;
     private static final String DARK_ENERGY_TAP = "det";
@@ -287,6 +292,7 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            value += context.expansionZoneBonus(tile);
         }
         int spareForces = unitCount(cargo) - landed;
         value += context.offense()
@@ -736,7 +742,32 @@ public class TacticalPlanner {
                 StrikeEvaluator.bombardingShips(seat, BoardView.space(tile), new Side(seat, strike.ships()));
         Optional<BombardmentRules.Target> bombardment = BombardmentRules.target(game, seat, tile, bombarding);
         double example = makeAnExampleBonus(game, seat, tile, bombarding, bombardment);
-        return new ContextTerms(objective, explore, secrets[0], secrets[1], homeDefence, retake, example);
+        return new ContextTerms(
+                objective,
+                explore,
+                secrets[0],
+                secrets[1],
+                homeDefence,
+                retake,
+                example,
+                territoryValues(context, tile));
+    }
+
+    private static Map<String, Double> territoryValues(Context context, Tile tile) {
+        double bonus = ownAreaBonus(context.territory().zone(tile));
+        if (bonus == 0) return Map.of();
+        Map<String, Double> values = new HashMap<>();
+        tile.getPlanetUnitHolders().forEach(planet -> values.put(planet.getName(), bonus));
+        return values;
+    }
+
+    private static double ownAreaBonus(Territory.Zone zone) {
+        return switch (zone) {
+            case LANE -> LANE_PLANET_BONUS;
+            case SLICE -> SLICE_PLANET_BONUS;
+            case BORDER -> BORDER_PLANET_BONUS;
+            default -> 0;
+        };
     }
 
     private static Optional<TacticalPlan> finalPlan(Context context, Tile tile, List<Candidate> pool) {
@@ -1550,6 +1581,7 @@ public class TacticalPlanner {
         private final Map<String, Double> futureScores = new HashMap<>();
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
+        private Territory territory;
 
         Context(Game game, Player seat) {
             this(game, seat, Set.of());
@@ -1572,6 +1604,17 @@ public class TacticalPlanner {
                     planet.getName() + "#" + infantry + "#" + mechs,
                     key -> ExploreDeck.expectedValueOfPlanet(
                             ExploreSite.landing(game, seat, tile, planet, infantry, mechs, exploreOutlook)));
+        }
+
+        Territory territory() {
+            if (territory == null) territory = Territory.of(game, seat);
+            return territory;
+        }
+
+        double expansionZoneBonus(Tile tile) {
+            Territory.Zone zone = territory().zone(tile);
+            if (zone == Territory.Zone.FOREIGN) return -FOREIGN_PLANET_PENALTY * earlyGameWeight(game);
+            return ownAreaBonus(zone);
         }
 
         DefenseOutlook defense() {

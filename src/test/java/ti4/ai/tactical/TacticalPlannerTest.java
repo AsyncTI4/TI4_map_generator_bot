@@ -374,7 +374,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // Copying a technology after a combat is Nekro's Technological Singularity. A seat without that ability must
-    // not count it, so a marginal attack (two defenders on Lodor) that only the copy made worthwhile is dropped.
+    // not count it, so a marginal attack (three defenders on Lodor, on the border with Sol's area so that the territory
+    // bonus is small) that only the copy made worthwhile is dropped.
     @Test
     void onlyASeatWithTechnologicalSingularityValuesCopyingATechnology() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
@@ -382,7 +383,8 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");
-        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 2);
+        test.units(lodor, "lodor", test.sol, UnitType.Infantry, 3);
+        test.solHomeBeside(neighbour);
 
         assertThat(attackOn(neighbour)).isPresent();
 
@@ -394,7 +396,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     // Xanhact (0/1) is the only free planet left once Cealdri is held. Early in the game any free planet is worth a
     // tactical action, so the expansion clears the bar (0.6 + 0.8 tempo - 0.2 distance); by round 8 the tempo has
     // faded and the same planet (0.4) is no longer worth a token on its own. The explore decks are empty, so that
-    // exploring the planet adds nothing to the numbers.
+    // exploring the planet adds nothing to the numbers. Sol's home is placed so that the planet lies on the border,
+    // where the territory bonus is only 0.3 a planet.
     @Test
     void takesALoneSmallPlanetEarlyButNotLate() {
         test.game.setExploreDeck(new ArrayList<>());
@@ -403,6 +406,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
         test.place("73", neighbour);
         test.nekro.addPlanet("cealdri");
+        test.solHomeBeside(neighbour);
 
         test.game.setRound(2);
         TacticalPlan early = expansionTo(neighbour).orElseThrow();

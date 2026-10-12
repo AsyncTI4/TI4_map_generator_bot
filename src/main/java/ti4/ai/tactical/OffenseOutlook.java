@@ -80,6 +80,7 @@ final class OffenseOutlook {
         double meanGround = landed.isEmpty() ? 1 : meanGroundWin(landed, estimate);
         double ownObjective = w * terms.ownObjectiveGain() * meanGround;
         double planets = 0;
+        double territory = 0;
         double heldPlanetValue = 0;
         for (Planet planet : landed) {
             double g = estimate.groundWins().get(planet.getName());
@@ -87,6 +88,7 @@ final class OffenseOutlook {
             double explore = terms.exploreValues().getOrDefault(planet.getName(), 0.0);
             double custodians = BoardView.hasCustodians(planet) ? VP : 0;
             planets += w * g * (base + explore + custodians);
+            territory += w * g * terms.territoryValues().getOrDefault(planet.getName(), 0.0);
             if (BoardView.controller(game, planet.getName()) == opponent) heldPlanetValue += w * g * base;
         }
         double hurt = standings.hurtWeight(opponent);
@@ -103,8 +105,14 @@ final class OffenseOutlook {
         double harmTerms = heldPlanetValue + economyDenial + denial.objective() + denial.homeBlock() + kills + blockade;
         double cappedHarm = Math.min(harmTerms, harmCap);
         double imperial = imperial(strike, estimate, landed, after, planetsAfter);
-        double value =
-                ownObjective + (planets - heldPlanetValue) + cappedHarm + imperial + nekroGain + defenseTerm + existing;
+        double value = ownObjective
+                + (planets - heldPlanetValue)
+                + territory
+                + cappedHarm
+                + imperial
+                + nekroGain
+                + defenseTerm
+                + existing;
         double losses = estimate.ourExpectedLoss();
         double anger = 0;
         double counter = 0;
@@ -126,6 +134,7 @@ final class OffenseOutlook {
         return new StrikeValue(
                 ownObjective,
                 planets,
+                territory,
                 economyDenial,
                 denial.objective(),
                 denial.homeBlock(),
