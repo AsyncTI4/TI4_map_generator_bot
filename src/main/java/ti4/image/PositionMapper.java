@@ -122,9 +122,21 @@ public final class PositionMapper {
         return Math.max(mainRings, boardRings);
     }
 
+    static int boardLayoutRingCount(Game game) {
+        return boardLayoutRingCount(layoutRingCount(game));
+    }
+
+    private static int boardLayoutRingCount(int layoutRings) {
+        return Math.clamp(layoutRings, RING_MIN_COUNT, BoardPosition.MAX_RING);
+    }
+
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
-        int ringCount = layoutRingCount(game);
-        ringCount = Math.clamp(ringCount, RING_MIN_COUNT, RING_MAX_COUNT);
+        int layoutRings = layoutRingCount(game);
+        int ringCount = Math.clamp(layoutRings, RING_MIN_COUNT, RING_MAX_COUNT);
+        Optional<BoardPosition> board = BoardPosition.parse(position);
+        if (board.isPresent()) {
+            x -= BoardPosition.ringCompression(board.get().index(), boardLayoutRingCount(layoutRings));
+        }
         if (ringCount == RING_MIN_COUNT) {
             x += HORIZONTAL_TILE_SPACING;
         }
@@ -154,10 +166,6 @@ public final class PositionMapper {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 y -= lower * SPACE_FOR_TILE_HEIGHT;
                 y += fractureYbump;
-                Optional<BoardPosition> board = BoardPosition.parse(position);
-                if (board.isPresent()) {
-                    x -= BoardPosition.ringCompression(board.get().index(), ringCount);
-                }
             }
             return new Point(x, y);
         }
