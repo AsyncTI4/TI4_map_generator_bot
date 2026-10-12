@@ -253,6 +253,8 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, split[INFANTRY], split[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (context.game.mecatols().contains(planet.getName())) value += MecatolStake.holdValue(context.game, seat);
+            value += context.expansionZoneBonus(tile);
         }
         value += context.objectiveGain(tile, List.of(), landings.keySet());
         return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), List.of(), landings, value));
@@ -1288,9 +1290,8 @@ public class TacticalPlanner {
                 spaceOnly.add("dtgs");
             }
         }
-        double bestSpaceOnly = secretPoints(game, seat, spaceOnly).stream()
-                .findFirst()
-                .orElse(0.0);
+        double bestSpaceOnly =
+                secretPoints(game, seat, spaceOnly).stream().findFirst().orElse(0.0);
         List<Double> genericPoints = secretPoints(game, seat, generic);
         double firstGeneric = genericPoints.isEmpty() ? 0 : genericPoints.get(0);
         double secondGeneric = genericPoints.size() < 2 ? 0 : genericPoints.get(1);
