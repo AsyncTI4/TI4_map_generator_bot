@@ -367,7 +367,9 @@ to build one by hand:
     resolve button and the target buttons. Most target buttons are not tied to a player, so it presses one only in a
     message that addresses it and was posted after the play. If the target it picked is no longer on offer it takes the
     best one that is. It remembers the resolve button in case the channel moves on, and after an undo or a restart it
-    picks a play up again from the board: the resolve button, or a target message addressed to it. Plays outside its
+    picks a play up again from the board: the resolve button, or a target message addressed to it, but only for a card
+    it played and that was not cancelled, and a target button must match the card's own id (a Technology strategy card
+    button is not a research card's). Plays outside its
     own turn (_Forward Supply Base_) are tracked by the activation that triggered them, one play per activation.
   - **Honest play.** It never plays while censured, over the hand limit, or passed against Transparasteel, and keeps
     5 cards while it holds _Form a Spy Network_.
@@ -724,8 +726,8 @@ Six small generic changes don't reference `ti4.ai`:
   - The batch summary counts the action cards: plays per seat per game, plays a Sabotage cancelled (per game and as a
     share of all plays), Sabotage plays per game, and each card's plays per seat per game next to the rate at which
     human players play it when they draw it. `-Dai.actioncards.ab=true` plays half of the seats, a different half in
-    each game, with the action card rules from before the statistics, and the summary compares the final victory
-    points of the two groups with their seat counts.
+    each game, with the action card rules from before the statistics, and the summary compares the two groups: average
+    final victory points, action cards played per seat per game and top finishes, with their seat counts.
 - In a dev guild:
   1. `/testbed apply` a preset that starts in `setup`, or create a game for self-play.
   2. `/ai add` once per AI seat.

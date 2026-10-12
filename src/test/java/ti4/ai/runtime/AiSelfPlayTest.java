@@ -232,28 +232,45 @@ class AiSelfPlayTest extends BaseTi4Test {
     }
 
     private static void printActionCardAb(List<SelfPlayGame.Outcome> outcomes) {
-        int newSeats = 0;
-        int legacySeats = 0;
-        int newPoints = 0;
-        int legacyPoints = 0;
+        AbGroup added = new AbGroup();
+        AbGroup legacy = new AbGroup();
         for (SelfPlayGame.Outcome outcome : outcomes) {
+            int best = outcome.victoryPoints().values().stream()
+                    .mapToInt(Integer::intValue)
+                    .max()
+                    .orElse(0);
             for (Map.Entry<String, Integer> seat : outcome.victoryPoints().entrySet()) {
-                if (outcome.actionCards().legacySeats().contains(seat.getKey())) {
-                    legacySeats++;
-                    legacyPoints += seat.getValue();
-                } else {
-                    newSeats++;
-                    newPoints += seat.getValue();
-                }
+                boolean isLegacy = outcome.actionCards().legacySeats().contains(seat.getKey());
+                AbGroup group = isLegacy ? legacy : added;
+                long plays = outcome.actionCards().plays().stream()
+                        .filter(play -> seat.getKey().equals(play.faction()))
+                        .count();
+                group.add(seat.getValue(), plays, seat.getValue() == best);
             }
         }
-        System.out.printf(
-                "Action card A/B: new seats average %.2f final victory points over %d seats, legacy seats %.2f over %d"
-                        + " seats%n",
-                newSeats == 0 ? 0 : (double) newPoints / newSeats,
-                newSeats,
-                legacySeats == 0 ? 0 : (double) legacyPoints / legacySeats,
-                legacySeats);
+        System.out.println("Action card A/B: new seats " + added.describe() + ", legacy seats " + legacy.describe());
+    }
+
+    // Points, plays and finishing at the top of the table (ties count for every seat that tied) for one side of an A/B.
+    private static final class AbGroup {
+        private int seats;
+        private int points;
+        private long plays;
+        private int tops;
+
+        void add(int seatPoints, long seatPlays, boolean top) {
+            seats++;
+            points += seatPoints;
+            plays += seatPlays;
+            if (top) tops++;
+        }
+
+        String describe() {
+            return String.format(
+                    "average %.2f final victory points, %.2f action cards played per game, %d top finishes, over %d"
+                            + " seats",
+                    seats == 0 ? 0 : (double) points / seats, seats == 0 ? 0 : (double) plays / seats, tops, seats);
+        }
     }
 
     private static String perRoundDecimal(List<List<Double>> perGame, int firstRound) {
