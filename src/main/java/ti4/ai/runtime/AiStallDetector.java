@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
+import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.CombatRules;
@@ -69,7 +70,8 @@ class AiStallDetector {
         }
         Predicate<AiPrompt> agendaQueue = prompt -> prompt.isHidden()
                 && (prompt.hasHandlerPrefix("declineToQueueAWhen") || prompt.hasHandlerPrefix("declineToQueueAnAfter"));
-        if (prompts.stream().anyMatch(agendaQueue))
+        boolean waitingInTheQueue = AgendaQueue.holdsQueuedWhen(game, seat) || AgendaQueue.holdsQueuedAfter(game, seat);
+        if (!waitingInTheQueue && prompts.stream().anyMatch(agendaQueue))
             reasons.add(new WaitReason("a \"when\"/\"after\" decision", agendaQueue));
         return reasons;
     }

@@ -83,6 +83,29 @@ class AiStallDetectorTest extends BaseTi4Test {
                 .containsExactly("a combat");
     }
 
+    // The "Pass On" button stays on the confirmation of a queued entry until the queue plays it, which can take as long
+    // as the other players do. A seat whose entry waits in the queue is waiting for the queue, not stuck on a decision.
+    @Test
+    void aSeatWhoseEntryWaitsInTheQueueIsNotWaitingOnADecision() {
+        game.setPhaseOfGame("agendawaiting");
+        AiPrompt passOnWhens = prompt("whens", PromptSource.AI_THREAD, NOW, "declineToQueueAWhen");
+        AiPrompt passOnAfters = prompt("afters", PromptSource.AI_THREAD, NOW, "declineToQueueAnAfter");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens, passOnAfters)))
+                .extracting(WaitReason::description)
+                .containsExactly("a \"when\"/\"after\" decision");
+
+        game.setStoredValue("queuedWhens", "nekro_");
+        game.setStoredValue("queuedWhensFornekro", "ac_veto");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens)))
+                .isEmpty();
+
+        game.removeStoredValue("queuedWhens");
+        game.setStoredValue("queuedAfters", "nekro_");
+        game.setStoredValue("queuedAftersFornekro", "ac_imp_rider");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnAfters)))
+                .isEmpty();
+    }
+
     private static List<String> relatedTo(List<WaitReason> reasons, AiPrompt... prompts) {
         List<String> related = new ArrayList<>();
         for (AiPrompt prompt : prompts) {
