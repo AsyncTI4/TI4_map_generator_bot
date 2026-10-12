@@ -42,10 +42,14 @@ public class OverruleChoice {
         return ImperialUses.takesMecatolFirst(PlanInputs.of(game, seat, PlanMoment.ACTION));
     }
 
-    public static boolean overrulesOwnImperialFirst(Game game, Player seat) {
+    public static boolean canOverrule(Game game, Player seat) {
         return !game.isFowMode()
                 && seat.getActionCards().containsKey(OVERRULE)
-                && ActionCardRules.mayPlayNow(game, seat)
+                && ActionCardRules.mayPlayNow(game, seat);
+    }
+
+    public static boolean overrulesOwnImperialFirst(Game game, Player seat) {
+        return canOverrule(game, seat)
                 && ScoringStakes.holdsUnplayedImperial(game, seat)
                 && ScoringStakes.overrulePoints(game, seat) >= ONE_POINT;
     }

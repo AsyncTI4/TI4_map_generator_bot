@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.strategy.MecatolCash;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Tile;
@@ -786,6 +789,86 @@ class TacticalPlannerTest extends BaseTi4Test {
 
     private Optional<TacticalPlan> expansionTo(String position) {
         return TacticalPlanner.forTarget(test.game, test.nekro, position).filter(found -> found.kind() == Kind.EXPAND);
+    }
+
+    private static final int IMPERIAL = 8;
+    private static final double EXACT = 1e-9;
+
+    private void imperialIsInTheGame() {
+        for (int card = 1; card <= IMPERIAL; card++) test.game.setScTradeGood(card, 0);
+    }
+
+    private void carrierWithInfantryNextTo(String position, int infantry) {
+        Tile staging = test.place("26", AiTestGame.neighbourOf(position));
+        test.units(staging, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(staging, "space", test.nekro, UnitType.Infantry, infantry);
+    }
+
+    // Taking Mecatol Rex lets the Imperial point be cashed: the point Imperial gives for holding it, once with its own
+    // unplayed Imperial and once more through Overrule, which performs Imperial's primary again.
+    @Test
+    void takingMecatolRexIsWorthTheImperialPointsItCanCash() {
+        imperialIsInTheGame();
+        test.place("18", "000");
+        carrierWithInfantryNextTo("000", 2);
+        double plain = expansionTo("000").orElseThrow().score();
+        double point = ScoringStakes.scoreValue(test.game, test.nekro, 1);
+
+        test.nekro.setActionCard("overrule", 1);
+        double withOverrule = expansionTo("000").orElseThrow().score();
+        assertThat(withOverrule - plain).isCloseTo(0.75 * point, within(EXACT));
+
+        test.nekro.addSC(IMPERIAL);
+        double withBoth = expansionTo("000").orElseThrow().score();
+        assertThat(withBoth - plain)
+                .isCloseTo(0.75 * ScoringStakes.scoreValue(test.game, test.nekro, 2), within(EXACT));
+
+        test.nekro.getActionCards().clear();
+        double withImperial = expansionTo("000").orElseThrow().score();
+        assertThat(withImperial - plain).isCloseTo(0.75 * point, within(EXACT));
+    }
+
+    @Test
+    void anOverruleItCannotPlayIsNotWorthTakingMecatolRexFor() {
+        imperialIsInTheGame();
+        test.place("18", "000");
+        carrierWithInfantryNextTo("000", 2);
+        double plain = expansionTo("000").orElseThrow().score();
+
+        test.nekro.setActionCard("overrule", 1);
+        test.game.setSCPlayed(IMPERIAL, true);
+
+        assertThat(expansionTo("000").orElseThrow().score()).isCloseTo(plain, within(EXACT));
+    }
+
+    @Test
+    void takingMecatolRexFromAnotherPlayerIsWorthTheSameImperialPoints() {
+        imperialIsInTheGame();
+        Tile rex = test.place("18", "000");
+        test.sol.addPlanet("mr");
+        test.units(rex, "mr", test.sol, UnitType.Infantry, 1);
+        Tile staging = test.place("26", AiTestGame.neighbourOf("000"));
+        test.units(staging, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(staging, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(staging, "space", test.nekro, UnitType.Infantry, 4);
+        double plain = attackOn("000").orElseThrow().score();
+
+        test.nekro.addSC(IMPERIAL);
+
+        assertThat(attackOn("000").orElseThrow().score()).isGreaterThan(plain);
+    }
+
+    @Test
+    void holdingMecatolRexAlreadyIsNotTakenAgain() {
+        imperialIsInTheGame();
+        test.nekro.addSC(IMPERIAL);
+
+        assertThat(MecatolCash.points(test.game, test.nekro)).isEqualTo(1);
+
+        test.place("18", "000");
+        test.nekro.addPlanet("mr");
+
+        assertThat(MecatolCash.points(test.game, test.nekro)).isZero();
     }
 
     private double productionScoreAtHome() {

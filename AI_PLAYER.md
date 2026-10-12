@@ -172,7 +172,12 @@ to build one by hand:
     influence while its ships can reach Mecatol Rex, and the influence-leaning planets a Leadership secondary (or its
     own primary) would spend on command tokens while that card is still to come this round.
   - **Mecatol Rex.** It lands on Mecatol Rex when it can pay the custodians' 6 influence (on top of the reserve),
-    pays it honestly, and scores the Imperial point whenever it plays Imperial while holding Mecatol Rex.
+    pays it honestly, and scores the Imperial point whenever it plays Imperial while holding Mecatol Rex. The tactical
+    planner values gaining it (an expansion or an attack) at three quarters of the points it could then cash, valued
+    as points: one for its own unplayed Imperial and one for an _Overrule_ it may play while Imperial is still to be
+    played (two with both). That makes the swipe, taking Mecatol Rex before Imperial, worth planning for, and it pushes
+    those plans over the score at which a second tactical action is taken (Fleet Logistics, _Master Plan_) and above
+    the component actions they are compared with.
   - **Secret objectives** (`ti4.ai.secrets`), within the scoring limits:
     - **Status phase:** one per status phase, choosing among those it qualifies for the one it could lose first
       (board presence) and the ones with a cost last. It pays those costs honestly: 5 action cards for

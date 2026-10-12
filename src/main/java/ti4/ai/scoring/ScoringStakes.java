@@ -105,7 +105,7 @@ public class ScoringStakes {
         return descending.stream().limit(count).mapToInt(Integer::intValue).sum();
     }
 
-    private static boolean imperialIsUnplayed(Game game) {
+    public static boolean imperialIsUnplayed(Game game) {
         return game.getSCList().stream()
                 .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.IMPERIAL
                         && !game.getPlayedSCs().contains(card));

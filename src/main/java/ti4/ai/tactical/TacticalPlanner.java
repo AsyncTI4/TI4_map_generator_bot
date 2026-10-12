@@ -31,7 +31,9 @@ import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
+import ti4.ai.strategy.MecatolCash;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
@@ -64,6 +66,7 @@ public class TacticalPlanner {
     private static final int LAST_EARLY_ROUND = 4;
     private static final double EARLY_GAME_FADE_PER_ROUND = 0.25;
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
+    private static final double MECATOL_CASH_SHARE = 0.75;
     private static final String DARKEN_THE_SKIES = "dts";
     private static final String CONQUER_THE_WEAK = "conquer";
     private static final String MAKE_AN_EXAMPLE = "mew";
@@ -236,6 +239,7 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, split[INFANTRY], split[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (isMecatol(context.game, planet)) value += context.mecatolCash();
         }
         value += context.objectiveGain(tile, List.of(), landings.keySet());
         return Optional.of(new TacticalPlan(Kind.EXPAND, tile.getPosition(), List.of(), landings, value));
@@ -281,6 +285,7 @@ public class TacticalPlanner {
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
             if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (isMecatol(context.game, planet)) value += context.mecatolCash();
         }
         int spareForces = unitCount(cargo) - landed;
         value += FORWARD_GROUND_FORCE_VALUE * Math.min(spareForces, forward);
@@ -588,7 +593,10 @@ public class TacticalPlanner {
             if (groundWin < ATTACK_MIN_WIN) continue;
             landings.put(planet.getName(), sent);
             assigned += sent;
-            value += (BoardView.planetValue(planet) + unexploredValue(context, tile, planet, sent) + retakeValue)
+            value += (BoardView.planetValue(planet)
+                            + unexploredValue(context, tile, planet, sent)
+                            + retakeValue
+                            + mecatolCashOn(context, planet))
                     * groundWin;
             groundCombat |= defenders > 0;
         }
@@ -609,6 +617,14 @@ public class TacticalPlanner {
                 - context.defense().leaveCost(origin, legal.get());
         if (score < ATTACK_MIN_SCORE) return Optional.empty();
         return Optional.of(new TacticalPlan(Kind.ATTACK, tile.getPosition(), legal.get(), landings, score));
+    }
+
+    private static boolean isMecatol(Game game, Planet planet) {
+        return game.mecatols().contains(planet.getName());
+    }
+
+    private static double mecatolCashOn(Context context, Planet planet) {
+        return isMecatol(context.game, planet) ? context.mecatolCash() : 0;
     }
 
     private static double unexploredValue(Context context, Tile tile, Planet planet, int infantry) {
@@ -1172,6 +1188,7 @@ public class TacticalPlanner {
         private List<Tile> origins;
         private ObjectiveValue objectives;
         private Boolean canPayCustodians;
+        private Double mecatolCash;
         private DefenseOutlook defense;
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
@@ -1231,6 +1248,13 @@ public class TacticalPlanner {
                         .isPresent();
             }
             return canPayCustodians;
+        }
+
+        double mecatolCash() {
+            if (mecatolCash == null) {
+                mecatolCash = MECATOL_CASH_SHARE * ScoringStakes.scoreValue(game, seat, MecatolCash.points(game, seat));
+            }
+            return mecatolCash;
         }
 
         List<Tile> origins() {
