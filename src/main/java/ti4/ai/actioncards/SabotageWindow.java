@@ -99,7 +99,10 @@ class SabotageWindow {
     }
 
     static boolean canceled(Game game, Player seat, String alias, int playsBefore) {
-        String title = title(alias);
+        return canceledPlay(game, seat, title(alias), playsBefore);
+    }
+
+    static boolean canceledPlay(Game game, Player seat, String title, int playsBefore) {
         String playerId = GameStats.getTrackedPlayerId(seat);
         List<GameStats.ActionCardPlay> plays = game.getGameStats().getActionCardPlays();
         for (int index = plays.size() - 1; index >= Math.max(0, playsBefore); index--) {

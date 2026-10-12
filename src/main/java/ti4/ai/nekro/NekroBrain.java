@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import ti4.ai.actioncards.ActionCardResponses;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.actioncards.ActionCardValue;
+import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.actioncards.SabotageRules;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
@@ -161,6 +162,7 @@ public class NekroBrain implements FactionBrain {
             PromissoryRules::queueAgendaNote,
             this::declineWhens,
             GalacticThreatRules::next,
+            AgendaCardRules::riders,
             this::declineAfters,
             AgendaVoting::next,
             this::abstainFromAgenda,
@@ -297,6 +299,9 @@ public class NekroBrain implements FactionBrain {
     private Optional<AiDecision> declineAfters(AiTurnContext context) {
         if (context.game().getStoredValue("declinedAfters").contains(context.faction() + "_")) return Optional.empty();
         if (AgendaQueue.holdsQueuedAfter(context.game(), context.seat())) return Optional.empty();
+        if (AgendaCardRules.holdsUnplacedRider(context)) return Optional.empty();
+        Optional<AiDecision> rider = AgendaCardRules.queueRider(context);
+        if (rider.isPresent()) return rider;
         return firstHandler(context, "declineToQueueAnAfter", "pass on playing an \"after\"");
     }
 

@@ -58,7 +58,9 @@ record AiCard(
         AFTER_ACTIVATION,
         PRE_PLAY,
         AFTER_ACTION,
-        REACTION
+        REACTION,
+        AGENDA_WHEN,
+        AGENDA_AFTER
     }
 
     boolean hasTarget() {

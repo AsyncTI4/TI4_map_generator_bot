@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AiCard.KeepFloor;
 import ti4.ai.actioncards.AiCard.Window;
+import ti4.ai.agenda.RiderPayoff;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.tactical.Stall;
@@ -75,6 +76,9 @@ public class AiActionCards {
             SecretCards.impersonation(),
             StrategizeCard.strategize(),
             OverruleCard.overrule(),
+            AgendaCards.rider(RiderPayoff.IMPERIAL),
+            AgendaCards.rider(RiderPayoff.TRADE),
+            AgendaCards.rider(RiderPayoff.POLITICS),
             ExtraActionCard.masterPlan(),
             ExtraActionCard.counterstroke(),
             new AiCard(

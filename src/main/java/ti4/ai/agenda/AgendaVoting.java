@@ -186,6 +186,14 @@ public class AgendaVoting {
         return Optional.of(finish.get().press("finish casting its votes"));
     }
 
+    public static AgendaForecast forecastWithItsBallot(Game game, Player seat) {
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
+        if (forecast.isEmpty()) return forecast;
+        return plan(game, seat)
+                .map(ballot -> forecast.withVotes(seat, ballot.outcome(), ballot.votes()))
+                .orElseGet(() -> forecast.without(seat));
+    }
+
     static Optional<Ballot> plan(Game game, Player seat) {
         if (cannotVote(game, seat)) return Optional.empty();
         String agenda = AgendaPolicy.currentAgenda(game);

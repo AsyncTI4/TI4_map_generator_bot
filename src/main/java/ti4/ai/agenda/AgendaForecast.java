@@ -84,6 +84,10 @@ public final class AgendaForecast {
         return chances;
     }
 
+    public java.util.Set<String> outcomes() {
+        return chances().keySet();
+    }
+
     public double chance(String outcome) {
         return chances().getOrDefault(outcome, 0.0);
     }

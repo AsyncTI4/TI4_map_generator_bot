@@ -521,7 +521,24 @@ to build one by hand:
     Sabo'd)" button, and when _Coup d'Etat_ is cancelled it plays its strategy card again.
   - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
     (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
-  - Not yet: combat and agenda cards, _War Machine_, _Rally_, _Parley_,
+  - **Riders** (`AgendaCardRules`): _Imperial Rider_, _Trade Rider_ and _Politics Rider_, played as "after"s with the
+    bot's queue, and worth their keep prior in the hand like any card the AI plays. In the after window, when its after
+    slot is empty and it may play cards, it asks the forecast what each rider would bring on each outcome:
+    ```
+    gain(rider, outcome) = the seat's expected utility with the rider placed on the outcome
+                           less its expected utility voting its current ballot
+    ```
+    The rider's own payoff (a point, 5 trade goods and what they unlock, 3 action cards and the speaker token), the
+    votes it gives up (none for Nekro or under the Xxcha commander) and the rival stake other voters see in an
+    _Imperial Rider_ are all in the two forecasts. It queues the best rider whose gain reaches the card's keep prior
+    (`queueAnAfter`, `queueAfter_ac_<card>`, `lockAftersIn`), one per agenda, never over a queued entry such as Galactic
+    Threat and never for an agenda the forecast cannot enumerate. When the queue plays the card the bot posts the
+    outcome buttons; the AI re-runs the choice on the current forecast and places the rider at once, before the Sabotage
+    window closes. It does not pass on "after"s while a played rider is unplaced (and gives up after 5 minutes); it does
+    when the rider was cancelled, placed, or refused by the bot (a seat over the hand limit), and when voting has begun it
+    drops a still queued rider and still places a played one. The AI never re-decides once it has locked the rider in,
+    and every seat decides on the same table, so several seats may ride one agenda.
+  - Not yet: combat cards, _War Machine_, _Rally_, _Parley_,
     _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
     remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
     unusable while it could stall; a test over the deck keeps it that way.
@@ -883,6 +900,11 @@ Six small generic changes don't reference `ti4.ai`:
   It is never the second action of _Master Plan_ or _Fleet Logistics_ (a component action card is never the second
   action), though a points play can wait for the turn after. The wait for the Mecatol Rex swipe trusts the highest
   ranked tactical action; if that action is never taken, the card is played at the pass.
+- **Action cards, riders.** Only _Imperial_, _Trade_ and _Politics_ riders are played (Technology and Leadership next); the
+  placement riders (Diplomacy, Construction, Warfare), _Sanction_ and the other agenda cards are not. There is no
+  rider stacking logic: a seat does not consider that another seat's rider on the same agenda will be queued or placed
+  first, so several seats can end up riding the same agenda and the late riders fall to the earlier ones' choices.
+  The softmax temperature of the forecast (4 trade goods) leaves a clear favourite about a quarter short of certain.
 - **Action cards, Strategize.** Never Technology (the bot's button grants the technology without collecting its 4
   resources, so the AI could not pay honestly) or Leadership (the strategy token taken up front has to be regained by
   hand).

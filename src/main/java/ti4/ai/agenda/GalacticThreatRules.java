@@ -28,8 +28,6 @@ public class GalacticThreatRules {
     private static final String RIDER_SUFFIX = "Galactic Threat Rider";
     private static final String RIDER_PREFIX = "rider_";
     private static final String PLANET_RIDER_PREFIX = "planetRider_";
-    private static final String AGENDA_SEEN_KEY = "agendaSeen|";
-    private static final long CLOCK_SKEW_MILLIS = 5_000L;
     private static final String TECH_PREFIX = "getTech_";
     private static final String NO_PAY_SUFFIX = "__noPay";
     private static final String QUEUE_ABILITY = "queueAfter_ability_galactic_threat";
@@ -49,11 +47,11 @@ public class GalacticThreatRules {
         if (!seat.hasAbility(ABILITY) || !game.getPhaseOfGame().toLowerCase().startsWith("agenda")) {
             return Optional.empty();
         }
-        long agendaSeen = agendaSeenAt(context);
+        AgendaClock.seenAt(context);
         Optional<AiDecision> payout = chooseTechnology(context);
         if (payout.isPresent()) return payout;
         if (silencedByPoliticalSecret(game, seat)) return Optional.empty();
-        Optional<AiDecision> prediction = predict(context, agendaSeen);
+        Optional<AiDecision> prediction = predict(context);
         if (prediction.isPresent()) return prediction;
         if (!game.getStoredValue("galacticThreatUsed").isEmpty()) return Optional.empty();
         if (holdsQueuedPrediction(game, seat) && QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -91,19 +89,11 @@ public class GalacticThreatRules {
         return false;
     }
 
-    private static long agendaSeenAt(AiTurnContext context) {
-        String key = AGENDA_SEEN_KEY + context.game().getCurrentAgendaInfo();
-        Optional<String> seen = context.memory().get(key).filter(StringUtils::isNumeric);
-        if (seen.isPresent()) return Long.parseLong(seen.get());
-        context.memory().put(key, String.valueOf(context.now()));
-        return context.now();
-    }
-
-    private static Optional<AiDecision> predict(AiTurnContext context, long agendaSeen) {
+    private static Optional<AiDecision> predict(AiTurnContext context) {
         String faction = context.faction();
         Game game = context.game();
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
-            if (prompt.isHidden() || prompt.createdAtMillis() < agendaSeen - CLOCK_SKEW_MILLIS) continue;
+            if (prompt.isHidden() || !AgendaClock.isInThisAgenda(context, prompt)) continue;
             List<PromptButton> riders = prompt.enabledButtons().stream()
                     .filter(button ->
                             button.isOwnedBy(faction) && button.handlerId().endsWith(RIDER_SUFFIX))
