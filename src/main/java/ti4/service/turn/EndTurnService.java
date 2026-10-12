@@ -270,7 +270,8 @@ public class EndTurnService {
             }
         }
 
-        if (game.getRealPlayers().stream().allMatch(Player::isPassed)) {
+        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
+        if (nextPlayer == null) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
@@ -285,7 +286,6 @@ public class EndTurnService {
 
             return;
         }
-        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()
