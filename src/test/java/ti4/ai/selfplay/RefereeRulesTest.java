@@ -194,6 +194,41 @@ class RefereeRulesTest extends BaseTi4Test {
         assertThat(press.map(found -> found.button().customId())).contains("startOfGameObjReveal");
     }
 
+    private static AiPrompt resolution(String id, long created, String... labels) {
+        return prompt(
+                id,
+                PromptSource.PUBLIC,
+                created,
+                java.util.stream.IntStream.range(0, labels.length)
+                        .mapToObj(index -> index == 0 ? "agendaResolution_for" : "autoresolve_manual")
+                        .toList(),
+                List.of(labels));
+    }
+
+    // The players need a minute with the shenanigans before the winner is confirmed, and only the plain "Resolve with
+    // Current Winner" button is the AI's to press, not the manual resolution next to it.
+    @Test
+    void confirmsTheAgendaWinnerOnlyAMinuteAfterItWasAnnounced() {
+        AiPrompt fresh = resolution("fresh", NOW - 59_000L, "Resolve with Current Winner", "Resolve it Manually");
+        assertThat(next(fresh)).isEmpty();
+
+        AiPrompt settled = resolution("settled", NOW - 60_000L, "Resolve with Current Winner", "Resolve it Manually");
+        assertThat(next(settled).map(press -> press.button().customId())).contains("agendaResolution_for");
+    }
+
+    @Test
+    void neverPressesAResolutionOtherThanTheCurrentWinner() {
+        AiPrompt other = resolution("other", NOW - 120_000L, "Resolve Sol", "Resolve it Manually");
+
+        assertThat(next(other)).isEmpty();
+        assertThat(RefereeRules.anyStep().test(other.buttons().getFirst())).isFalse();
+        assertThat(RefereeRules.anyStep()
+                        .test(resolution("current", NOW, "Resolve with Current Winner")
+                                .buttons()
+                                .getFirst()))
+                .isTrue();
+    }
+
     private AiPrompt allHaveScoredPrompt() {
         ArgumentCaptor<List<Button>> posted = ArgumentCaptor.captor();
         try (MockedStatic<MessageHelper> messages = Mockito.mockStatic(MessageHelper.class)) {

@@ -20,7 +20,16 @@ public class RefereeRules {
 
     public record RefereePress(Player seat, AiPrompt prompt, PromptButton button, String reason) {}
 
-    private record Step(Predicate<String> handler, String reason) {
+    private record Step(Predicate<String> handler, String reason, String label, long minAgeMillis) {
+
+        Step(Predicate<String> handler, String reason) {
+            this(handler, reason, "", 0L);
+        }
+
+        boolean accepts(PromptButton button) {
+            return handler.test(button.handlerId()) && (label.isEmpty() || label.equals(button.label()));
+        }
+
         boolean reveals() {
             return handler.test("reveal_stage_1")
                     || handler.test("reveal_stage_2")
@@ -29,6 +38,8 @@ public class RefereeRules {
         }
     }
 
+    private static final String CURRENT_WINNER_LABEL = "Resolve with Current Winner";
+    private static final long AGENDA_RESOLUTION_MIN_AGE_MILLIS = 60_000L;
     private static final List<Step> STEPS = List.of(
             new Step("deal2SOToAll"::equals, "deal the starting secret objectives"),
             new Step("startOfGameObjReveal"::equals, "reveal the first objectives"),
@@ -38,7 +49,11 @@ public class RefereeRules {
             new Step("reveal_stage_2"::equals, "reveal a stage 2 objective"),
             new Step("startStrategyPhase"::equals, "start the strategy phase"),
             new Step("flip_agenda"::equals, "flip the agenda"),
-            new Step(id -> id.startsWith("agendaResolution_"), "resolve the agenda"),
+            new Step(
+                    id -> id.startsWith("agendaResolution_"),
+                    "resolve the agenda",
+                    CURRENT_WINNER_LABEL,
+                    AGENDA_RESOLUTION_MIN_AGE_MILLIS),
             new Step(id -> id.startsWith("resolveAgendaVote_outcomeTie"), "break the agenda tie"),
             new Step("proceed_to_strategy"::equals, "move on to the strategy phase"));
 
@@ -68,22 +83,22 @@ public class RefereeRules {
     }
 
     public static Predicate<PromptButton> anyStep() {
-        return button -> STEPS.stream().anyMatch(step -> step.handler().test(button.handlerId()));
+        return button -> STEPS.stream().anyMatch(step -> step.accepts(button));
     }
 
     public static Optional<RefereePress> next(
             Game game, List<Player> seats, List<AiPrompt> publicPrompts, Predicate<String> mayPress, long now) {
         if (seats.isEmpty() || !AiSeats.isSelfPlay(game)) return Optional.empty();
-        long settledBefore = now - AiSettings.refereeDelay(game).toMillis();
+        long refereeDelay = AiSettings.refereeDelay(game).toMillis();
         boolean everySeatFilled = game.getRealPlayers().size() >= game.getPlayerCountForMap();
         for (Step step : STEPS) {
             if (step == STEPS.getFirst() && !everySeatFilled) continue;
             if (step.reveals() && trackExhausted(game)) continue;
+            long settledBefore = now - Math.max(refereeDelay, step.minAgeMillis());
             for (AiPrompt prompt : publicPrompts) {
                 if (prompt.createdAtMillis() > settledBefore) continue;
-                Optional<PromptButton> button =
-                        prompt.firstEnabled(candidate -> step.handler().test(candidate.handlerId())
-                                && mayPress.test(AiTurnContext.pressKey(prompt, candidate)));
+                Optional<PromptButton> button = prompt.firstEnabled(candidate ->
+                        step.accepts(candidate) && mayPress.test(AiTurnContext.pressKey(prompt, candidate)));
                 if (button.isEmpty()) continue;
                 Optional<Player> presser = presser(game, seats, button.get());
                 if (presser.isPresent()) {

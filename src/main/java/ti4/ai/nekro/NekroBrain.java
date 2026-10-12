@@ -17,6 +17,7 @@ import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.GalacticThreatRules;
+import ti4.ai.agenda.ShenanigansRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
@@ -102,7 +103,9 @@ public class NekroBrain implements FactionBrain {
             "convert_2_comms",
             "addIonStorm_",
             "crownofemphidiaexplore",
-            "acquireATech");
+            "acquireATech",
+            "generic_button_id_",
+            "genericReact4");
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -167,6 +170,7 @@ public class NekroBrain implements FactionBrain {
             AgendaVoting::next,
             this::abstainFromAgenda,
             this::breakAgendaTie,
+            ShenanigansRules::react,
             TradeRules::payDebtInAgenda,
             this::pickStrategyCard,
             NekroLeaderRules::startAgent,

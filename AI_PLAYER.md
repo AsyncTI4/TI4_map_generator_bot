@@ -65,7 +65,9 @@ to build one by hand:
    - **Referee.** After every seat has been idle for 20 seconds, the speaker AI presses the
      buttons any player may press to move the game on: dealing the starting secret objectives
      (once every seat is filled), revealing objectives, starting the strategy phase, flipping and
-     resolving agendas, breaking ties and moving on to the next round. It never ends the game.
+     resolving agendas, breaking ties and moving on to the next round. It never ends the game. It confirms an agenda's
+     winner (the "Resolve with Current Winner" button, never a manual resolution) only once the announcement is a
+     minute old, so the AI seats have answered the shenanigans prompts first.
    - **No one to delegate to.** Instead of posting a choice for the table, an unsure AI picks a
      declining option (or else the first option that doesn't open a form) and says so.
    - **Game end.** Once a player reaches the victory point goal, or every objective has been revealed,
@@ -315,6 +317,11 @@ to build one by hand:
     and "elected to a point" tests take expectations over it, which makes them a little less sure than the single
     expected winner they used to assume: a 9 vote leader now wins about three times in four, so the leader has to be
     7 points ahead, not 6, before Political Favor is worth discarding the agenda.
+  - **Shenanigans courtesy** (`ShenanigansRules`). When the winner is announced the bot asks every player to confirm they
+    play no _Deadly Plot_, _Bribery_, _Confounding Legal Text_ or _Confusing Legal Text_ (generic buttons that add a
+    reaction). Each AI seat presses each of those buttons once, 5 to 25 seconds after the message, a delay seeded by the
+    message and never by the hand: the bot pre-reacts for seats holding no action cards, so whether a seat has to answer
+    is public. It never plays those cards (the bot has no automation for them), so confirming is its true answer.
   - **Queued entries.** A seat whose "when" or "after" slot holds an entry (a Political Secret or Political Favor
     note, Galactic Threat) never presses the "Pass On" button the bot posts for it, which would unqueue it, and never
     holds its turn while the entry waits (`AgendaQueue`). It used to wait quietly, which meant it never answered the
@@ -921,6 +928,15 @@ Seven small generic changes don't reference `ti4.ai`:
   rider stacking logic: a seat does not consider that another seat's rider on the same agenda will be queued or placed
   first, so several seats can end up riding the same agenda and the late riders fall to the earlier ones' choices.
   The softmax temperature of the forecast (4 trade goods) leaves a clear favourite about a quarter short of certain.
+- **Agenda cards, deferred.**
+  - _Confounding Legal Text_: a human's "Resolve with Current Winner" plus the AI's own resolution of the same agenda
+    resolve it twice, because the bot only guards a second press of the same winner. The self-play referee picks the
+    newest resolution button. It needs a bot-side guard first.
+  - _Diplomatic Pressure_: the note it needs comes from a hidden hand, and there is no valuation of a note to aim it by.
+  - The poison pill: `AgendaPolicy` values nearly every For/Against agenda at 0, so "predict the outcome you do not
+    want" cannot emerge until For/Against agendas are valued.
+  - _Deadly Plot_ and _Bribery_ (the bot has no automation for them), the placement riders (Diplomacy, Construction,
+    Warfare), _Sanction_ and the D-tier agenda cards.
 - **Action cards, Strategize.** Never Technology (the bot's button grants the technology without collecting its 4
   resources, so the AI could not pay honestly) or Leadership (the strategy token taken up front has to be regained by
   hand).
