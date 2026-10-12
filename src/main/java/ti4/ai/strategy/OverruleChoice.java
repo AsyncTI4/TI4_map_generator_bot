@@ -50,6 +50,7 @@ public class OverruleChoice {
 
     public static boolean overrulesOwnImperialFirst(Game game, Player seat) {
         return canOverrule(game, seat)
+                && ScoringStakes.lateGame(game)
                 && ScoringStakes.holdsUnplayedImperial(game, seat)
                 && ScoringStakes.overrulePoints(game, seat) >= ONE_POINT;
     }

@@ -794,6 +794,11 @@ class TacticalPlannerTest extends BaseTi4Test {
     private static final int IMPERIAL = 8;
     private static final double EXACT = 1e-9;
 
+    // Sol at 6 of 10: the late game, when a held Overrule is played for points.
+    private void lateGame() {
+        test.game.scorePublicObjective(test.sol.getUserID(), test.game.addCustomPO("Test points", 6));
+    }
+
     private void imperialIsInTheGame() {
         for (int card = 1; card <= IMPERIAL; card++) test.game.setScTradeGood(card, 0);
     }
@@ -808,6 +813,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     // unplayed Imperial and once more through Overrule, which performs Imperial's primary again.
     @Test
     void takingMecatolRexIsWorthTheImperialPointsItCanCash() {
+        lateGame();
         imperialIsInTheGame();
         test.place("18", "000");
         carrierWithInfantryNextTo("000", 2);
@@ -826,6 +832,19 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.nekro.getActionCards().clear();
         double withImperial = expansionTo("000").orElseThrow().score();
         assertThat(withImperial - plain).isCloseTo(0.75 * point, within(EXACT));
+    }
+
+    // Early in the game the Overrule is being saved, so it cashes no point yet.
+    @Test
+    void anOverruleSavedForTheLateGameIsNotWorthTakingMecatolRexForEarly() {
+        imperialIsInTheGame();
+        test.place("18", "000");
+        carrierWithInfantryNextTo("000", 2);
+        double plain = expansionTo("000").orElseThrow().score();
+
+        test.nekro.setActionCard("overrule", 1);
+
+        assertThat(expansionTo("000").orElseThrow().score()).isCloseTo(plain, within(EXACT));
     }
 
     @Test

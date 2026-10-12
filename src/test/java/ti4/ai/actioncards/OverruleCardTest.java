@@ -84,10 +84,12 @@ class OverruleCardTest extends BaseTi4Test {
         }
     }
 
-    // Overrule is held for the late points it can win. Here Nekro qualifies for two public objectives, which Imperial
-    // scores one more of than the status phase could, so the card is played on Imperial while it is still to be played.
+    // Overrule is held for the late points it can win. In the late game Nekro qualifies for two public objectives,
+    // which Imperial scores one more of than the status phase could, so the card is played on Imperial while it is
+    // still to be played.
     @Test
     void overruleIsPlayedOnImperialWhileItIsStillToBePlayed() {
+        lateGame();
         qualifyForTwoPublics();
         Plan plan = plan().orElseThrow();
 
@@ -279,6 +281,12 @@ class OverruleCardTest extends BaseTi4Test {
         return decision.map(AiTestGame::pressedId).orElse("");
     }
 
+    // Sol at 6 of 10: the late game, when points start to decide the game, but not yet the final round.
+    private void lateGame() {
+        table.points(table.sol, 6);
+        changed();
+    }
+
     private void holdsOverrule() {
         table.nekro.setActionCard("overrule", HAND_INDEX);
     }
@@ -354,6 +362,7 @@ class OverruleCardTest extends BaseTi4Test {
 
     @Test
     void anExtraPublicObjectiveThroughImperialIsWorthPlayingFor() {
+        lateGame();
         qualifyForTwoPublics();
         holdsOverrule();
         double point = ScoringStakes.scoreValue(table.game, table.nekro, 1);
@@ -373,6 +382,7 @@ class OverruleCardTest extends BaseTi4Test {
 
     @Test
     void aPointsPlayDoesNotLowerTheKeepFloor() {
+        lateGame();
         qualifyForTwoPublics();
         holdsOverrule();
 
@@ -380,10 +390,43 @@ class OverruleCardTest extends BaseTi4Test {
                 .isEqualTo(OverruleReserve.VALUE);
     }
 
+    // Players save Overrule for the late game: early on even an extra public objective and a secret are not worth it,
+    // so the card is held and kept.
+    @Test
+    void earlyInTheGameEvenAnExtraPublicIsHeldForTheLateGame() {
+        qualifyForTwoPublics();
+        holdsOverrule();
+
+        assertThat(OverruleChoice.option(table.game, table.nekro, imperial())
+                        .orElseThrow()
+                        .pointsPlay())
+                .isTrue();
+        assertThat(plan()).isEmpty();
+        assertThat(ActionCardValue.bestNewComponentPlay(table.game, table.nekro))
+                .isEmpty();
+        assertThat(ActionCardValue.keepValue(table.game, table.nekro, "overrule"))
+                .isEqualTo(OverruleReserve.VALUE);
+    }
+
+    // Early on its own Imperial is not held back for an Overrule the seat is saving.
+    @Test
+    void earlyInTheGameItsOwnImperialIsPlayedAsBefore() {
+        table.nekro.addSC(imperial());
+        qualifyForThreePublics();
+        holdsOverrule();
+        AiPrompt turn = turnStart();
+
+        assertThat(OverruleChoice.overrulesOwnImperialFirst(table.game, table.nekro))
+                .isFalse();
+        assertThat(pressed(StrategyCardTurn.playIfDue(table.test.context(turn), List.of(turn))))
+                .isEqualTo("FFCC_nekro_strategicAction_" + imperial());
+    }
+
     // The Imperial holder may play it before the seat gets another turn, and a tactical action that completes an
     // objective routinely scores more than one point: Overrule goes first anyway.
     @Test
     void mecatolRexWithImperialStillToPlayIsPlayedAtOnceOverATacticalAction() {
+        lateGame();
         holdMecatol();
         table.sol.addSC(imperial());
         holdsOverrule();
@@ -458,6 +501,7 @@ class OverruleCardTest extends BaseTi4Test {
     // Its own unplayed Imperial already scores one of two publics, so Overrule needs a third to add a point.
     @Test
     void anImperialOfItsOwnMakesTwoPublicsNotEnough() {
+        lateGame();
         table.nekro.addSC(imperial());
         qualifyForTwoPublics();
         holdsOverrule();
@@ -473,6 +517,7 @@ class OverruleCardTest extends BaseTi4Test {
 
     @Test
     void aThirdPublicMakesOverruleGoBeforeItsOwnImperial() {
+        lateGame();
         table.nekro.addSC(imperial());
         qualifyForThreePublics();
         holdsOverrule();
@@ -503,6 +548,7 @@ class OverruleCardTest extends BaseTi4Test {
 
     @Test
     void mecatolRexAlsoMakesOverruleGoBeforeItsOwnImperial() {
+        lateGame();
         table.nekro.addSC(imperial());
         holdMecatol();
         holdsOverrule();
@@ -519,6 +565,7 @@ class OverruleCardTest extends BaseTi4Test {
     // play.
     @Test
     void overruleDoesNotGoFirstWhenTheSeatMayNotPlayActionCards() {
+        lateGame();
         table.nekro.addSC(imperial());
         qualifyForThreePublics();
         table.cards(table.nekro, "overrule", "sabo1", "sabo2", "sabo3", "sabo4", "rout", "mb1", "mjets1");
@@ -531,6 +578,7 @@ class OverruleCardTest extends BaseTi4Test {
     // The swipe: take Mecatol Rex, then overrule Imperial for its point. The tactical action comes first.
     @Test
     void overruleWaitsForTheTacticalActionThatTakesMecatolRex() {
+        lateGame();
         qualifyForTwoPublics();
         stageForMecatol();
         holdsOverrule();
@@ -569,6 +617,7 @@ class OverruleCardTest extends BaseTi4Test {
     // About to pass, the seat has no tactical action left to wait for.
     @Test
     void theSwipeDoesNotHoldOverruleOnceTheSeatIsAboutToPass() {
+        lateGame();
         qualifyForTwoPublics();
         stageForMecatol();
         holdsOverrule();
@@ -601,6 +650,7 @@ class OverruleCardTest extends BaseTi4Test {
     // it is not even a candidate.
     @Test
     void aBetterTechnologyDoesNotBeatAnImperialPointsPlayWhileTheReserveHolds() {
+        lateGame();
         qualifyForTwoPublics();
         table.nekro.setTg(4);
         fullOfSecrets();

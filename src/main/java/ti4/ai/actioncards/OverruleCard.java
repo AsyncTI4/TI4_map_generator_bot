@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.actioncards.CardChains.Source;
 import ti4.ai.brain.AiDecision;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.strategy.OverruleChoice;
 import ti4.ai.strategy.OverruleChoice.Option;
 import ti4.ai.strategy.StrategyCardRules;
@@ -74,6 +75,9 @@ class OverruleCard {
             return options.stream().filter(Option::wins).toList();
         }
         boolean reserved = OverruleReserve.active(game, seat, moment);
+        if (reserved && !ScoringStakes.lateGame(game)) {
+            return options.stream().filter(Option::wins).toList();
+        }
         return options.stream()
                 .filter(option -> option.pointsPlay() || !reserved || option.value() >= OverruleReserve.VALUE)
                 .toList();

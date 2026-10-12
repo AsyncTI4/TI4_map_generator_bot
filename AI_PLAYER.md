@@ -177,7 +177,7 @@ to build one by hand:
     pays it honestly, and scores the Imperial point whenever it plays Imperial while holding Mecatol Rex. The tactical
     planner values gaining it (an expansion or an attack) at three quarters of the points it could then cash, valued
     as points: one for its own unplayed Imperial and one for an _Overrule_ it may play while Imperial is still to be
-    played (two with both). That makes the swipe, taking Mecatol Rex before Imperial, worth planning for, and it pushes
+    played, from the late game on (two with both). That makes the swipe, taking Mecatol Rex before Imperial, worth planning for, and it pushes
     those plans over the score at which a second tactical action is taken (Fleet Logistics, _Master Plan_) and above
     the component actions they are compared with.
   - **Secret objectives** (`ti4.ai.secrets`), within the scoring limits:
@@ -469,7 +469,9 @@ to build one by hand:
     Logistics too it plays Master Plan first. Once the Sabotage window has closed on it, the seat presses the bot's
     button for the extra action and takes it the way Fleet Logistics does; a Sabotaged Master Plan gives nothing.
   - **Overrule is held for points.** Human players keep it for a late play that scores: taking Mecatol Rex and then
-    overruling Imperial for its point, an extra public objective through Imperial, or both. So the seat keeps it
+    overruling Imperial for its point, an extra public objective through Imperial, or both. Before the late game (no
+    player within 4 points of the goal, where a point starts to be worth more) it is held for anything short of a win,
+    even an extra public objective and a secret, and its own Imperial is played as usual. From then on the seat keeps it
     at a reserve of 10.8 (0.9 of a late victory point, worth 12) and plays it only on a points play, which the reserve
     never holds back, or on a use worth that much. A fresh secret and a free technology are not, so the card stays in
     the hand, above the rest of it (above a Sabotage kept against a contender) at the hand limit, until a points play

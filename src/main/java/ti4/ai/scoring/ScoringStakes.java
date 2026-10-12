@@ -49,6 +49,13 @@ public class ScoringStakes {
                 .anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp() - CONTENDER_FROM_GOAL);
     }
 
+    public static boolean lateGame(Game game) {
+        return game.getVp() > 0
+                && game.getRealPlayers().stream()
+                        .filter(player -> !player.isEliminated())
+                        .anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp() - RISES_FROM_GOAL);
+    }
+
     public static double pointsInReach(Game game, Player viewer, Player player) {
         double points = publicPoints(game, player);
         if (holdsUnplayedImperial(game, player) && player.controlsMecatol(true)) points += MECATOL_POINTS;
