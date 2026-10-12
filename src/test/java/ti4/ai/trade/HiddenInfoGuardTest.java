@@ -13,7 +13,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
+import ti4.ai.actioncards.CardScoring;
+import ti4.ai.actioncards.SabotagePolicy;
 import ti4.ai.perception.AiPrompt;
+import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.secrets.SecretOdds;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -100,6 +105,45 @@ class HiddenInfoGuardTest extends BaseTi4Test {
         TradeTerms.exclusionReason(table.game, table.nekro, spy, TRUST);
         Desperation.vpWorth(table.game, spy);
         Desperation.tradeGoodsShort(table.game, spy);
+
+        neverPeeked();
+    }
+
+    // Estimating how close Sol is to winning, what its action cards could score and whether to cancel one of them uses
+    // its points, planets, technologies, board and the number of secret objectives it holds (card counting against the
+    // secrets nobody has scored), never the contents of its hand.
+    @Test
+    void estimatingSolsScoringNeverPeeks() {
+        table.nekro.setActionCard("sabo1", 9);
+        List<String> titles = List.of(
+                "Overrule",
+                "Imperial Rider",
+                "Political Stability",
+                "Puppets on a String",
+                "Mining Initiative",
+                "Industrial Initiative",
+                "Economic Initiative",
+                "Uprising",
+                "Focused Research",
+                "Parley",
+                "Coup d'Etat");
+
+        ScoringStakes.pointsInReach(table.game, table.nekro, spy);
+        ScoringStakes.contender(table.game, table.nekro, spy);
+        ScoringStakes.anyOpponentIsContender(table.game, table.nekro);
+        SecretOdds.chanceReady(table.game, table.nekro, spy);
+        SecretOdds.unseenPool(table.game, table.nekro);
+        for (String title : titles) {
+            CardScoring.pointsFor(title, table.game, spy);
+            AiPrompt window = AiTestGame.prompt(
+                    "window-" + title,
+                    PromptSource.PUBLIC,
+                    AiTestGame.NOW,
+                    "no_sabotage",
+                    "sabotage_ac_" + title + "_sol");
+            SabotagePolicy.cancelWith(table.test.contextFor(table.nekro, Set.of(), AiTestGame.NOW, window), window);
+            SabotagePolicy.aimedAtSeat(table.test.contextFor(table.nekro, Set.of(), AiTestGame.NOW, window), window);
+        }
 
         neverPeeked();
     }

@@ -1,8 +1,6 @@
 package ti4.ai.nekro;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -10,12 +8,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.dv8tion.jda.api.utils.TimeUtil;
-import org.apache.commons.lang3.StringUtils;
-import ti4.ai.AiSeats;
 import ti4.ai.actioncards.ActionCardResponses;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.actioncards.ActionCardValue;
+import ti4.ai.actioncards.SabotageRules;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.GalacticThreatRules;
@@ -54,9 +50,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.message.GameMessage;
-import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 
 public class NekroBrain implements FactionBrain {
 
@@ -110,12 +103,7 @@ public class NekroBrain implements FactionBrain {
     private static final Set<String> WINDOW_PREFIXES = Stream.concat(
                     PUBLIC_WINDOW_PREFIXES.stream(), ActionCardRules.targetPrefixes().stream())
             .collect(Collectors.toUnmodifiableSet());
-    private static final String NO_SABOTAGE = "no_sabotage";
-    private static final long MIN_SELF_PLAY_PASS_DELAY_SECONDS = 5;
-    private static final int SELF_PLAY_PASS_DELAY_SPREAD_SECONDS = 10;
     private static final long SAME_TURN_TOLERANCE_MILLIS = TimeUnit.SECONDS.toMillis(5);
-    private static final long MIN_SABOTAGE_PASS_DELAY_MINUTES = 10;
-    private static final long SABOTAGE_PASS_DELAY_SPREAD_MINUTES = 30;
 
     private final List<Function<AiTurnContext, Optional<AiDecision>>> rules = List.of(
             ActionSecretRules::observe,
@@ -159,6 +147,8 @@ public class NekroBrain implements FactionBrain {
             TradeRules::rescindStale,
             TradeRules::answerOffers,
             ActionCardResponses::respond,
+            SabotageRules::answerWindowsAimedAtSeat,
+            SabotageRules::followUp,
             PromissoryRules::answerOffers,
             PromissoryRules::playCeasefire,
             PromissoryRules::playCombatNotes,
@@ -188,7 +178,7 @@ public class NekroBrain implements FactionBrain {
             this::scorePublicObjective,
             SecretRules::scoreStatusSecret,
             this::startStatusHomework,
-            this::passOnSabotage,
+            SabotageRules::answerWindows,
             StrategyCardRules::awaitSecondaries,
             StrategyCardRules::awaitFollowTurn);
 
@@ -568,63 +558,6 @@ public class NekroBrain implements FactionBrain {
             }
         }
         return Optional.empty();
-    }
-
-    private Optional<AiDecision> passOnSabotage(AiTurnContext context) {
-        List<AiPrompt> windows = new ArrayList<>();
-        Set<String> visible = new HashSet<>();
-        for (AiPrompt prompt : newestFirst(context.prompts())) {
-            if (prompt.isHidden()) continue;
-            visible.add(prompt.messageId());
-            if (prompt.enabledHandler(NO_SABOTAGE).isPresent()) windows.add(prompt);
-        }
-        windows.addAll(scrolledOutSabotageWindows(context, visible));
-        for (AiPrompt prompt : windows) {
-            Optional<PromptButton> pass = prompt.enabledHandler(NO_SABOTAGE);
-            if (pass.isEmpty() || context.alreadyPressed(prompt, pass.get()) || windowClosedFor(context, prompt)) {
-                continue;
-            }
-            long readyAt = prompt.createdAtMillis() + sabotagePassDelayMillis(context, prompt);
-            if (context.now() < readyAt) return Optional.of(new AiDecision.Wait(readyAt, "sabotage window"));
-            return Optional.of(AiDecision.press(prompt, pass.get(), "no sabotage"));
-        }
-        return Optional.empty();
-    }
-
-    private static List<AiPrompt> scrolledOutSabotageWindows(AiTurnContext context, Set<String> visible) {
-        Game game = context.game();
-        String channelId = game.getMainChannelID();
-        if (channelId == null) return List.of();
-        List<AiPrompt> windows = new ArrayList<>();
-        for (GameMessage window : GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD)) {
-            if (visible.contains(window.messageId()) || !StringUtils.isNumeric(window.messageId())) continue;
-            if (window.factionsThatReacted().contains(context.faction())) continue;
-            long created = TimeUtil.getTimeCreated(Long.parseLong(window.messageId()))
-                    .toInstant()
-                    .toEpochMilli();
-            PromptButton pass = new PromptButton(0, NO_SABOTAGE, NO_SABOTAGE, null, "No Sabotage", false);
-            windows.add(new AiPrompt(
-                    channelId, window.messageId(), AiPrompt.PromptSource.PUBLIC, "", List.of(pass), created));
-        }
-        return windows;
-    }
-
-    private static long sabotagePassDelayMillis(AiTurnContext context, AiPrompt prompt) {
-        int seed = prompt.messageId().hashCode() ^ (int) context.profile().seed();
-        if (AiSeats.isSelfPlay(context.game())) {
-            return TimeUnit.SECONDS.toMillis(
-                    MIN_SELF_PLAY_PASS_DELAY_SECONDS + Math.floorMod(seed, SELF_PLAY_PASS_DELAY_SPREAD_SECONDS));
-        }
-        long spread = Math.floorMod(
-                prompt.messageId().hashCode() ^ context.profile().seed(), SABOTAGE_PASS_DELAY_SPREAD_MINUTES);
-        return TimeUnit.MINUTES.toMillis(MIN_SABOTAGE_PASS_DELAY_MINUTES + spread);
-    }
-
-    private static boolean windowClosedFor(AiTurnContext context, AiPrompt prompt) {
-        return GameMessageManager.getOne(context.game().getName(), prompt.messageId())
-                .map(GameMessage::factionsThatReacted)
-                .map(factions -> factions.contains(context.faction()))
-                .orElse(true);
     }
 
     private Optional<AiDecision> firstHandler(AiTurnContext context, String handler, String reason) {

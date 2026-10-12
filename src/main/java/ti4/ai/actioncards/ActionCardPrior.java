@@ -1,11 +1,14 @@
 package ti4.ai.actioncards;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardStats.CardStats;
+import ti4.game.Game;
 import ti4.helpers.ActionCardHelper;
 import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
+import ti4.model.DeckModel;
 
 @UtilityClass
 public class ActionCardPrior {
@@ -25,6 +28,14 @@ public class ActionCardPrior {
     public static String nameOf(String alias) {
         ActionCardModel model = Mapper.getActionCard(alias);
         return model == null ? alias : model.getName();
+    }
+
+    public static Optional<String> aliasOfTitle(Game game, String title) {
+        DeckModel deck = Mapper.getDeck(game.getAcDeckID());
+        Stream<String> deckCards = deck == null ? Stream.empty() : deck.getCardIDs().stream();
+        return Stream.concat(deckCards, Mapper.getActionCards().keySet().stream())
+                .filter(alias -> title.equals(nameOf(alias)))
+                .findFirst();
     }
 
     public static double strength(String alias) {

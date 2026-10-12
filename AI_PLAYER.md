@@ -152,7 +152,8 @@ to build one by hand:
   - declining whens/afters; **agenda votes**, Nekro's **Galactic Threat** and agenda ties as speaker (below);
   - **scoring** (below), status-phase command tokens, the opening secret objective discard, discarding down to the
     action card limit, and queueing _Prove Endurance_ when it holds it and everyone else has passed;
-  - "No Sabotage" after the same seeded delay in every window, so the timing never reveals its hand;
+  - Sabotage or "No Sabotage" after the same seeded delay in every window, so the timing never reveals its hand
+    (below);
   - Nekro: Propagation's command tokens from any source, the commander's card draw, Dacxive Animators' infantry,
     and its agent and hero (below);
   - paying for a Nekro agent that names it (any AI seat);
@@ -370,8 +371,37 @@ to build one by hand:
     own turn (_Forward Supply Base_) are tracked by the activation that triggered them, one play per activation.
   - **Honest play.** It never plays while censured, over the hand limit, or passed against Transparasteel, and keeps
     5 cards while it holds _Form a Spy Network_.
-  - **Answering others.** Every AI seat answers each Sabotage window after the same seeded delay, including windows
-    that have scrolled out of the messages it reads.
+  - **Sabotage** (`SabotagePolicy`, `SabotageRules`). Every AI seat answers each window after the same seeded delay
+    (5 to 14 seconds when only AIs play, 10 to 39 minutes otherwise), whichever button it presses, including windows
+    that have scrolled out of the messages it reads (it remembers each window's Sabotage button when it first sees
+    it). It presses "Cancel Action Card With Sabotage" instead of "No Sabotage" when it holds a Sabotage and may play
+    action cards (not censured, not over the limit, not passed against Transparasteel), the card is not its own, can
+    be cancelled and is not protected by Shameix's Bane, the game is not fog of war, the window is still open right
+    before the press, and the cancel value reaches the value of the Sabotage it would spend:
+    ```
+    cancel value = baseline + rival stake + denial stake
+    baseline     = 1.2 × cancel appetite × involvement × standing
+    rival stake  = what the points the card can give its player are worth to them
+                   (in full when they reach the goal, otherwise a quarter)
+    denial stake = what the points a card aimed at the seat would stop it scoring are worth to it
+                   (30 when that is the win)
+    ```
+    Involvement is 1 for a card aimed at the seat (_Coup d'Etat_, _Extreme Duress_ and _Crisis_ on its turn, _Public
+    Disgrace_ while it picks, a combat card played by its opponent in the system it fights in), 0.6 in the agenda
+    phase and 0.35 otherwise; standing is as above (3 for a contender). The points a card can give its player
+    (`CardScoring`) are: for _Overrule_, Imperial's extra public and the Mecatol Rex point while Imperial is still to be
+    played; 0.6 for an _Imperial Rider_; 0.5 for _Political Stability_, _Puppets on a String_ and _Master Plan_ while
+    the player holds Imperial; the spend objective an economy card or _Uprising_ unlocks; and a technology objective
+    that is one technology short for a research card. The points a card aimed at the seat would stop it scoring are
+    what its planned strategy card scores (_Public Disgrace_, _Coup d'Etat_, _Crisis_), its reserved trade goods
+    (_Extreme Duress_), the victory points riding on the system it fights in (combat cards) and the point an
+    election would give it (agenda cards). The Sabotage it would spend is worth its keep prior, a second one 0.6 of
+    that, and the last one at least 4 while any opponent is a contender. With a quiet table that makes an uninvolved
+    seat spend its only Sabotage on _Overrule_, _Lie in Wait_, _Rout_, _Confounding Legal Text_, _Political Stability_,
+    _Parley_ and _Imperial Rider_, and on anything that could win the game for a contender.
+    A window aimed at the seat is answered before it continues a combat or its turn, and it keeps its turn while such
+    a window is open for the others. When _Crisis_ is cancelled it presses the bot's "Delete These (If Crisis Was
+    Sabo'd)" button, and when _Coup d'Etat_ is cancelled it plays its strategy card again.
   - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
     (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
   - Not yet: combat and agenda cards, _Overrule_, _Strategize_, _War Machine_, _Rally_, _Counterstroke_, _Parley_ and the
@@ -635,7 +665,7 @@ list. Today the seams are:
 | `SlashCommandManager` registers `AiCommand` | the `/ai` command |
 | `TestBedService.findNonDeveloper` skips AI seats | test-bed games with an AI can still be reset and scripted |
 
-Four small generic changes don't reference `ti4.ai`:
+Six small generic changes don't reference `ti4.ai`:
 - `GlobalSettings.ImplementedSettings.AI_PLAYERS_ENABLED`, the kill switch.
 - A public `TestBedPress.standInEvent` with a configurable repost header.
 - The Nekro hero's casualty and trade-good report goes to the player's game channel (`getCorrectChannel`) rather
@@ -643,6 +673,12 @@ Four small generic changes don't reference `ti4.ai`:
   private thread, where the report's @mentions of the victims could add them to the thread.
 - The bombardment hit prompt offers every defender an "Auto-assign Hits" button (dummy players already had one), so
   humans and AI seats alike can assign bombardment hits automatically.
+- The Sabotage button (`ActionCardButtonHandler`) refuses a press on a window that is already canceled or closed: it
+  spends no Sabotage and marks no play as canceled. Before, a second press on the same window spent another Sabotage
+  and canceled an earlier play of the same card.
+- A canceled _War Machine_ or _Flank Speed_ takes its effect back (the card player's spent `warmachine`, the
+  `flankspeedBoost` of the active tactical action) instead of leaving it for the player to undo by hand. It acts on the
+  card's player, not on the player who pressed the button.
 
 ## Testing
 
@@ -683,6 +719,7 @@ Four small generic changes don't reference `ti4.ai`:
     starts with only its own faction note and the five generic notes; the scoreboard lists the notes each seat holds,
     received and has in its play area.
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
+  - `SabotageSelfPlayTest` plays a contender's _Overrule_ in a six-seat game and checks that an AI seat cancels it with the bot's real buttons.
   - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
   - The batch summary counts the action cards: plays per seat per game, plays a Sabotage cancelled (per game and as a
     share of all plays), Sabotage plays per game, and each card's plays per seat per game next to the rate at which
@@ -699,7 +736,7 @@ Four small generic changes don't reference `ti4.ai`:
 | Version | Scope |
 | --- | --- |
 | V0 | Seat, runtime, actuation, fallback, `/ai` commands; simple phase decisions. |
-| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest) and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
+| **V1 (in progress)** | Full turn play. Done: tactical actions, combat (including bombardment), Technological Singularity, several AI seats and self-play, scoring (spend objectives, custodians, Imperial), strategy card primaries and secondaries including Warfare's, research, status, action and agenda-phase secrets, agenda voting and Galactic Threat, Nekro's agent and hero, component action cards (economy, Spy, Uprising, research and the rest), Sabotage and action card values from human play statistics and scoring stakes, promissory notes, trading (offers, counter-offers, Trade card terms, debt), Diplomacy and Politics follows. Still to do: combat and agenda action cards, the mech secrets (Mechanize the Military, Occupy the Fringe), Strengthen Bonds. |
 | V1.1 | Draft participation (factions reserved for AI seats, other picks made by the table). |
 | V2 | Hidden aggression levels with drift and lock; attacks gated by aggression. |
 | V3 | Deeper deals: votes for trade goods, multi-party pacts. |

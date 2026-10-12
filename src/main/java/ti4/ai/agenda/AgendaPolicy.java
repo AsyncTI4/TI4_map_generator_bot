@@ -65,6 +65,7 @@ public class AgendaPolicy {
     private static final Set<String> BAD_FOR_PLANET_OWNER =
             Set.of("core_mining", "demilitarized_zone", "disarmament", "redistribution");
     private static final String ELECT_PLAYER = "elect player";
+    private static final Set<String> POINT_ELECTIONS = Set.of("censure", "shard_of_the_throne", "crown_of_emphidia");
 
     public static boolean favoursElectedPlayer(String agenda) {
         return GOOD_FOR_ELECTED_PLAYER.contains(agenda);
@@ -107,6 +108,13 @@ public class AgendaPolicy {
                     .max(Comparator.comparingInt(button -> victoryPoints(ownerOf(game, button))));
         }
         return owners.stream().max(Comparator.comparingInt(button -> planetCount(ownerOf(game, button))));
+    }
+
+    public static boolean wouldElectToAPoint(Game game, Player seat) {
+        String agenda = currentAgenda(game);
+        return POINT_ELECTIONS.contains(agenda)
+                && electsPlayer(agenda)
+                && mostVotes(game, null).filter(seat::equals).isPresent();
     }
 
     public static double predictedElectionScore(Game game, Player seat, @Nullable Player silenced) {
