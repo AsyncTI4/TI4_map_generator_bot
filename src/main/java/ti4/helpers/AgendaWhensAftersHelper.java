@@ -468,6 +468,15 @@ public final class AgendaWhensAftersHelper {
         }
     }
 
+    public static void resumeWhenQueueAfterCanceledVeto(ButtonInteractionEvent event, Game game, Player vetoPlayer) {
+        boolean waiting = "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame());
+        boolean whensOpen = game.getStoredValue("whensResolved").isEmpty();
+        boolean vetoHeldTheQueue = vetoPlayer.getFaction().equals(game.getStoredValue("lastPlayerToPlayAWhen"));
+        if (!waiting || !whensOpen || !vetoHeldTheQueue) return;
+        resolveWhenQueue(event, game);
+        offerEveryoneWhensQueue(game);
+    }
+
     private static void resolveWhenQueue(ButtonInteractionEvent event, Game game) {
         String alreadyResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty()) {

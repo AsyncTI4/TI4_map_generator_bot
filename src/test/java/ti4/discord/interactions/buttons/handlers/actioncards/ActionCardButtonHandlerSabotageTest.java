@@ -3,16 +3,20 @@ package ti4.discord.interactions.buttons.handlers.actioncards;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -127,6 +131,59 @@ class ActionCardButtonHandlerSabotageTest extends BaseTi4Test {
         sabotage("Flank Speed");
 
         assertThat(game.getStoredValue("flankspeedBoost")).isEmpty();
+    }
+
+    // A rider is erased because its card was cancelled, not because someone pressed the button: a player with no
+    // Sabotage in hand cancels nothing, and the rider stays.
+    @Test
+    void keepsTheRiderWhenTheSabotageFailsForWantOfASabotageInHand() {
+        nekro.getActionCards().clear();
+        game.getGameStats().recordAcPlay("Imperial Rider", sol);
+        game.setCurrentAgendaVote("for", "sol_Imperial Rider");
+
+        sabotage("Imperial Rider");
+
+        assertThat(game.getCurrentAgendaVotes().get("for")).isEqualTo("sol_Imperial Rider");
+        assertThat(playWasCanceled(0)).isFalse();
+    }
+
+    @Test
+    void erasesTheRiderWhenTheSabotageCancelsIt() {
+        game.getGameStats().recordAcPlay("Imperial Rider", sol);
+        game.setCurrentAgendaVote("for", "sol_Imperial Rider");
+
+        sabotage("Imperial Rider");
+
+        assertThat(game.getCurrentAgendaVotes().get("for")).isEmpty();
+        assertThat(playWasCanceled(0)).isTrue();
+    }
+
+    // The when queue stops at a Veto until it is resolved; if the Veto is cancelled nothing else would start it again.
+    @Test
+    void resumesTheWhenQueueWhenTheVetoThatHeldItIsCancelled() {
+        game.setSpeakerUserID(nekro.getUserID());
+        game.setPhaseOfGame("agendawaiting");
+        game.setStoredValue("lastPlayerToPlayAWhen", "sol");
+        game.getGameStats().recordAcPlay("Veto", sol);
+
+        sabotage("Veto");
+
+        helper.verify(
+                () -> MessageHelper.sendMessageToChannel(ArgumentMatchers.<MessageChannel>any(), contains("nudge")));
+    }
+
+    @Test
+    void doesNotTouchTheWhenQueueForACardThatIsNotAVeto() {
+        game.setSpeakerUserID(nekro.getUserID());
+        game.setPhaseOfGame("agendawaiting");
+        game.setStoredValue("lastPlayerToPlayAWhen", "sol");
+        game.getGameStats().recordAcPlay("Diplomatic Pressure", sol);
+
+        sabotage("Diplomatic Pressure");
+
+        helper.verify(
+                () -> MessageHelper.sendMessageToChannel(ArgumentMatchers.<MessageChannel>any(), contains("nudge")),
+                never());
     }
 
     @Test

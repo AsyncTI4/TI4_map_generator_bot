@@ -8,6 +8,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -153,12 +154,15 @@ class ActionCardButtonHandler {
             }
         }
 
-        if (acName.contains("Rider") || acName.contains("Sanction")) {
-            AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
-        }
         if (sendReact) {
             if (game.getGameStats().markLatestPlayCanceled(acName)) {
                 SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
+                if (acName.contains("Rider") || acName.contains("Sanction")) {
+                    AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
+                }
+                if ("Veto".equals(acName) && targetPlayer != null) {
+                    AgendaWhensAftersHelper.resumeWhenQueueAfterCanceledVeto(event, game, targetPlayer);
+                }
             }
             if ("Relitigate".equals(acName) && targetPlayer != null) {
                 RelitigateLLButtonHandler.onRelitigateSabotaged(game, targetPlayer);
