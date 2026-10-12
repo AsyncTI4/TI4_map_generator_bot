@@ -9,6 +9,10 @@ import ti4.game.Player;
 @UtilityClass
 public class CardFacade {
 
+    public static double strategyToken() {
+        return CardValueScale.STRATEGY_TOKEN;
+    }
+
     public static double dockValue(Game game) {
         return game.getRound() <= CardValueScale.LAST_EARLY_DOCK_ROUND
                 ? CardValueScale.DOCK_EARLY

@@ -25,6 +25,7 @@ import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.ScoringRules;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SpyNetwork;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
@@ -86,6 +87,8 @@ public class StrategyCardRules {
     private static final String TRADE_TOKEN_BUTTON = "sc_trade_follow";
     private static final String TRADE_GRANT = "tradeGrant";
     private static final String POLITICS_DRAW_BUTTON = "sc_ac_draw";
+    private static final String STRATEGIZE_POLITICS_BUTTON = "draw2 AC";
+    private static final String STRATEGIZE_SECRET_BUTTON = "non_sc_draw_so";
     private static final String HOLD_NO_ACTION_CARDS = "dont_fsn";
     private static final int POLITICS_DRAW = 2;
     private static final int EXTRA_TOKENS = 2;
@@ -374,8 +377,11 @@ public class StrategyCardRules {
     }
 
     private static int followRank(AiTurnContext context, StrategyCard card) {
-        List<StrategyCard> priority =
-                chasesSpyNetwork(context.game(), context.seat()) ? SPY_NETWORK_PRIORITY : FOLLOW_PRIORITY;
+        return followRank(context.game(), context.seat(), card);
+    }
+
+    private static int followRank(Game game, Player seat, StrategyCard card) {
+        List<StrategyCard> priority = chasesSpyNetwork(game, seat) ? SPY_NETWORK_PRIORITY : FOLLOW_PRIORITY;
         int rank = priority.indexOf(card);
         return rank < 0 ? priority.size() : rank;
     }
@@ -389,8 +395,10 @@ public class StrategyCardRules {
     }
 
     private static boolean wantsToFollow(AiTurnContext context, StrategyCard card) {
-        Game game = context.game();
-        Player seat = context.seat();
+        return wantsToFollow(context.game(), context.seat(), card);
+    }
+
+    private static boolean wantsToFollow(Game game, Player seat, StrategyCard card) {
         return switch (card) {
             case IMPERIAL -> hasRoomForSecret(seat);
             case TECHNOLOGY ->
@@ -398,7 +406,12 @@ public class StrategyCardRules {
                         ? propagationWorthFollowing(game, seat)
                                 && ScoringReserve.planAfterReserve(game, seat, SpendCost.resources(FOLLOW_TECH_COST))
                                         .isPresent()
-                        : worthPayingForResearch(context, FOLLOW_TECH_COST, ResearchPolicy.WORTH_FOLLOWING_FOR);
+                        : worthPayingForResearch(
+                                game,
+                                seat,
+                                FOLLOW_TECH_COST,
+                                ResearchPolicy.WORTH_FOLLOWING_FOR,
+                                Wallet.of(game, seat));
             case DIPLOMACY -> DiplomacyUse.worthFollowing(game, seat);
             case WARFARE -> homeBuild(game, seat).isPresent();
             case CONSTRUCTION -> StructurePolicy.nearsStructureObjective(game, seat);
@@ -1063,6 +1076,87 @@ public class StrategyCardRules {
 
     private static boolean hasRoomForSecret(Player seat) {
         return seat.getSoScored() + seat.getSecretsUnscored().size() < seat.getMaxSOCount();
+    }
+
+    public static boolean hasSpareStrategyToken(Game game, Player seat, StrategyCard card) {
+        int rank = followRank(game, seat, card);
+        int saved = 0;
+        for (Player other : game.getRealPlayers()) {
+            if (other == seat) continue;
+            for (int initiative : other.getSCs()) {
+                if (game.getPlayedSCs().contains(initiative)) continue;
+                StrategyCard better = StrategyCard.of(game, initiative);
+                if (followRank(game, seat, better) < rank && wantsToFollow(game, seat, better)) saved++;
+            }
+        }
+        int reservedTokens = ScoringReserve.of(game, seat).tokens();
+        return seat.getStrategicCC() - saved >= 1
+                && seat.getStrategicCC() + seat.getTacticalCC() - 1 - saved >= reservedTokens;
+    }
+
+    public static Optional<Double> secondaryValue(Game game, Player seat, StrategyCard card) {
+        return switch (card) {
+            case IMPERIAL -> hasRoomForSecret(seat) ? Optional.of(SecretDrawValue.of(game, seat)) : Optional.empty();
+            case DIPLOMACY ->
+                DiplomacyUse.bestToFollow(game, seat)
+                        .filter(choice -> DiplomacyUse.worthFollowing(game, seat))
+                        .map(choice -> choice.unlocksScore()
+                                ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
+                                : CardValueScale.READY_SHARE * choice.use());
+            case CONSTRUCTION ->
+                StructurePolicy.nearsStructureObjective(game, seat)
+                        ? Optional.of(CardValueScale.STRUCTURE_OBJECTIVE_SHARE * CardValueScale.VICTORY_POINT)
+                        : Optional.empty();
+            case WARFARE -> homeBuild(game, seat).map(plan -> CardValueScale.PRODUCTION_SHARE * plan.value());
+            case POLITICS -> politicsValue(game, seat);
+            case TRADE ->
+                seat.getCommoditiesTotal() > seat.getCommodities()
+                        ? Optional.of(CardValueScale.COMMODITY * (seat.getCommoditiesTotal() - seat.getCommodities()))
+                        : Optional.empty();
+            default -> Optional.empty();
+        };
+    }
+
+    private static Optional<Double> politicsValue(Game game, Player seat) {
+        int room = ButtonHelper.getACLimit(game, seat) - seat.getAcCount();
+        if (holdsNoActionCards(seat) || room < 1) return Optional.empty();
+        return Optional.of(CardValueScale.ACTION_CARD * Math.min(POLITICS_DRAW, room));
+    }
+
+    public static Optional<AiDecision> startSecondary(AiTurnContext context, AiPrompt prompt, StrategyCard card) {
+        Game game = context.game();
+        Player seat = context.seat();
+        String reason = "perform the secondary of " + card.name().toLowerCase() + " with Strategize";
+        return switch (card) {
+            case IMPERIAL ->
+                hasRoomForSecret(seat)
+                        ? CardMessages.pressOnce(context, prompt, STRATEGIZE_SECRET_BUTTON, reason)
+                        : Optional.empty();
+            case DIPLOMACY -> {
+                Optional<AiDecision> press = CardMessages.pressOnce(context, prompt, DIPLOMACY_READY_BUTTON, reason);
+                press.ifPresent(decision -> requestReadying(context, DiplomacyUse.bestToFollow(game, seat)));
+                yield press;
+            }
+            case CONSTRUCTION ->
+                StructurePolicy.next(game, seat).flatMap(unit -> requestStructure(context, prompt, unit, reason));
+            case WARFARE -> startWarfareBuild(context, prompt, reason);
+            case POLITICS -> CardMessages.pressOnce(context, prompt, STRATEGIZE_POLITICS_BUTTON, reason);
+            case TRADE -> CardMessages.pressOnce(context, prompt, TRADE_REFRESH_BUTTON, reason);
+            default -> Optional.empty();
+        };
+    }
+
+    private static Optional<AiDecision> startWarfareBuild(AiTurnContext context, AiPrompt prompt, String reason) {
+        Optional<BuildPlan> plan = homeBuild(context.game(), context.seat());
+        if (plan.isEmpty()) return Optional.empty();
+        Optional<PromptButton> button = WARFARE_BUILD_BUTTONS.stream()
+                .map(prompt::enabledHandler)
+                .flatMap(Optional::stream)
+                .findFirst();
+        if (button.isEmpty() || context.alreadyPressed(prompt, button.get())) return Optional.empty();
+        context.memory().put(requestKey(context, WARFARE_BUILD_KEY), context.now() + "|0");
+        context.memory().put(requestKey(context, WARFARE_PLAN_KEY), plan.get().encode());
+        return Optional.of(AiDecision.press(prompt, button.get(), reason));
     }
 
     private static boolean hasSpareStrategyToken(AiTurnContext context, StrategyCard card) {

@@ -71,6 +71,7 @@ public class AiActionCards {
             TableCards.repealLaw(),
             TableCards.brilliance(),
             SecretCards.impersonation(),
+            StrategizeCard.strategize(),
             new AiCard(
                     SABOTAGE,
                     ActionCardHelper::isSabotageOrShatter,
