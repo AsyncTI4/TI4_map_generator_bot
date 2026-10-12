@@ -119,6 +119,13 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
   (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
   new code and when touching existing call sites.
+- **Keep new features fog safe.** Fog of War games must not leak factions, identities or hidden state
+  to other players. Before writing new messages or buttons, make some effort to use the fog-safe
+  helpers in [FoWHelper.java](src/main/java/ti4/helpers/FoWHelper.java) (`actorOrAnon`,
+  `fogSafeTargetButton`, `identityOrColorIfCanSeeStats`, `notifyPlayerAndAffectedInFog`, â€¦) and
+  `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
+  fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
+  isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
 - **Component-specific rules live in [COMPONENT_RULES.md](COMPONENT_RULES.md).** Open it only
   when your change touches a component listed below; otherwise skip it.
   - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
