@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.eval.BoardView;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -131,5 +134,113 @@ class StagingTest extends BaseTi4Test {
         board.sardakk.setFleetCC(6);
 
         assertThat(stagePlan()).isEmpty();
+    }
+
+    private String secondLaunchPosition() {
+        return neighbours(stagingPosition).stream()
+                .filter(position -> free(position)
+                        && !TARGET.equals(position)
+                        && !neighbours(TARGET).contains(position)
+                        && !launchPosition.equals(position))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private String secondLaunch(int dreadnoughts) {
+        String position = secondLaunchPosition();
+        Tile launch = board.test.place("49", position);
+        board.test.units(launch, "space", board.test.nekro, UnitType.Carrier, 1);
+        board.test.units(launch, "space", board.test.nekro, UnitType.Dreadnought, dreadnoughts);
+        board.test.units(launch, "space", board.test.nekro, UnitType.Infantry, 4);
+        return position;
+    }
+
+    private void defendTheTargetWith(int dreadnoughts, int cruisers) {
+        Tile sardakkHome = board.test.game.getTileByPosition(TARGET);
+        board.test.units(sardakkHome, "space", board.sardakk, UnitType.Dreadnought, dreadnoughts);
+        board.test.units(sardakkHome, "space", board.sardakk, UnitType.Cruiser, cruisers);
+    }
+
+    private static Set<String> originsOf(TacticalPlan plan) {
+        return plan.moves().stream().map(TacticalPlan.UnitMove::origin).collect(Collectors.toSet());
+    }
+
+    private static int shipsMoved(TacticalPlan plan) {
+        return plan.moves().stream()
+                .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))
+                .mapToInt(TacticalPlan.UnitMove::count)
+                .sum();
+    }
+
+    private List<TacticalPlan> stagePlans() {
+        return TacticalPlanner.ranked(board.test.game, board.test.nekro).stream()
+                .filter(plan -> plan.kind() == Kind.STAGE)
+                .toList();
+    }
+
+    // The home is defended by a dreadnought and a cruiser, which one fleet (a carrier and a dreadnought) cannot beat
+    // next round. A second fleet behind the same staging system makes the strike strong enough, so both move there.
+    @Test
+    void gathersTwoFleetsThatAreEachTooWeakAlone() {
+        defendTheTargetWith(1, 1);
+        assertThat(stagePlan()).isEmpty();
+        String second = secondLaunch(1);
+
+        TacticalPlan plan = stagePlan().orElseThrow();
+
+        assertThat(plan.target()).isEqualTo(stagingPosition);
+        assertThat(originsOf(plan)).containsExactlyInAnyOrder(launchPosition, second);
+    }
+
+    // A fortress (four dreadnoughts and two PDS) is out of reach of the fleet however long it waits, so the neighbour's
+    // home is not worth staging for. A weak system of the same neighbour, a destroyer over a planet the seat wants,
+    // is: the fleet moves to a system beside it, one step from where it now stands.
+    @Test
+    void stagesTowardsAWeakSystemRatherThanAFortress() {
+        defendTheTargetWith(4, 0);
+        Tile fortress = board.test.game.getTileByPosition(TARGET);
+        board.test.units(fortress, "quinarra", board.sardakk, UnitType.Pds, 2);
+        String beside = neighbours(launchPosition).stream()
+                .filter(position -> free(position)
+                        && !stagingPosition.equals(position)
+                        && !"000".equals(position)
+                        && !TARGET.equals(position)
+                        && !neighbours(TARGET).contains(position))
+                .findFirst()
+                .orElseThrow();
+        board.test.place("50", beside);
+        String weak = neighbours(beside).stream()
+                .filter(position -> free(position)
+                        && !neighbours(launchPosition).contains(position)
+                        && !neighbours(stagingPosition).contains(position)
+                        && !TARGET.equals(position)
+                        && !neighbours(TARGET).contains(position))
+                .findFirst()
+                .orElseThrow();
+        Tile lodor = board.test.place("26", weak);
+        board.sardakk.addPlanet("lodor");
+        board.test.units(lodor, "space", board.sardakk, UnitType.Destroyer, 1);
+
+        List<TacticalPlan> plans = stagePlans();
+
+        assertThat(plans).isNotEmpty();
+        assertThat(plans).noneMatch(plan -> plan.target().equals(stagingPosition));
+        assertThat(plans).allMatch(plan -> neighbours(weak).contains(plan.target()));
+        assertThat(plans).allMatch(plan -> originsOf(plan).equals(Set.of(launchPosition)));
+    }
+
+    // Two fleets that could each stage alone would together put four ships into the staging system, one more than the
+    // seat's fleet supply of three allows: the smaller contribution stays behind.
+    @Test
+    void gatheringNeverExceedsFleetSupply() {
+        secondLaunch(1);
+        board.test.nekro.setFleetCC(5);
+        assertThat(shipsMoved(stagePlan().orElseThrow())).isEqualTo(4);
+
+        board.test.nekro.setFleetCC(3);
+
+        List<TacticalPlan> plans = stagePlans();
+        assertThat(plans).isNotEmpty();
+        assertThat(plans).allMatch(plan -> shipsMoved(plan) <= 3);
     }
 }

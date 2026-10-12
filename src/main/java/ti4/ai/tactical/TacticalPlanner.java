@@ -60,10 +60,11 @@ public class TacticalPlanner {
     private static final boolean STAGE_ENABLED = true;
     private static final double STAGE_SHARE = 0.35;
     private static final double STAGE_MIN_DENIAL = 0.5;
-    private static final double STAGE_FUTURE_MARGIN = 1.0;
+    private static final double STAGE_MIN_FEASIBILITY = 0.5;
     private static final double DIPLOMACY_DISCOUNT = 0.5;
     private static final double STAGE_SHIP_STAKE = 0.5;
     private static final int STAGE_TARGETS = 3;
+    private static final int STAGING_CANDIDATES = 4;
     private static final int STAGING_TILES_PER_TARGET = 2;
     static final double ATTACK_MIN_SCORE = 4.0;
     private static final double DISTANCE_COST = 0.2;
@@ -815,30 +816,29 @@ public class TacticalPlanner {
         Map<String, TacticalPlan> best = new LinkedHashMap<>();
         for (Tile target : stageTargets(context)) {
             Player opponent = singleOpponent(context.game, context.seat, target);
-            for (Tile origin : context.origins()) {
-                if (origin == target) continue;
-                for (TacticalPlan plan : stageFrom(context, activatable, target, opponent, origin)) {
-                    TacticalPlan known = best.get(plan.target());
-                    if (known == null || plan.score() > known.score()) best.put(plan.target(), plan);
-                }
+            for (TacticalPlan plan : stageAgainst(context, activatable, target, opponent)) {
+                TacticalPlan known = best.get(plan.target());
+                if (known == null || plan.score() > known.score()) best.put(plan.target(), plan);
             }
         }
         return new ArrayList<>(best.values());
     }
 
+    private record RankedTarget(Tile tile, double worth) {}
+
     private static List<Tile> stageTargets(Context context) {
         Game game = context.game;
         Player seat = context.seat;
-        List<Tile> targets = new ArrayList<>();
+        List<RankedTarget> ranked = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             Player opponent = singleOpponent(game, seat, tile);
             if (opponent == null || !worthStagingFor(context, tile, opponent)) continue;
-            if (context.attackPlan(tile).isPresent()) continue;
-            targets.add(tile);
+            double feasibility = stageFeasibility(context, tile, opponent);
+            if (feasibility < STAGE_MIN_FEASIBILITY || context.attackPlan(tile).isPresent()) continue;
+            ranked.add(new RankedTarget(tile, stagePrize(context, tile, opponent) * feasibility));
         }
-        targets.sort(Comparator.comparingDouble((Tile tile) -> prizeEstimate(context, tile))
-                .reversed());
-        return targets.subList(0, Math.min(STAGE_TARGETS, targets.size()));
+        ranked.sort(Comparator.comparingDouble(RankedTarget::worth).reversed());
+        return ranked.stream().limit(STAGE_TARGETS).map(RankedTarget::tile).toList();
     }
 
     private static boolean worthStagingFor(Context context, Tile tile, Player opponent) {
@@ -849,13 +849,51 @@ public class TacticalPlanner {
                 .anyMatch(planet -> context.offense().deniesObjectives(opponent, planet));
     }
 
-    private static double prizeEstimate(Context context, Tile tile) {
-        double planets = tile.getPlanetUnitHolders().stream()
-                .filter(planet -> !context.seat.getPlanets().contains(planet.getName()))
+    private static double stagePrize(Context context, Tile tile, Player opponent) {
+        Game game = context.game;
+        Player seat = context.seat;
+        double prize = tile.getPlanetUnitHolders().stream()
+                .filter(planet -> !seat.getPlanets().contains(planet.getName()))
                 .mapToDouble(BoardView::planetValue)
                 .sum();
-        boolean decisive = tile.isHomeSystem(context.game) || holdsMecatol(context.game, tile);
-        return planets + (decisive ? ObjectiveValue.VICTORY_POINT_VALUE : 0);
+        if (tile == opponent.getHomeSystemTile()) {
+            prize += ObjectiveValue.VICTORY_POINT_VALUE
+                    * context.defense().standings().denialWeight(opponent);
+        }
+        boolean opponentHoldsMecatol = tile.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> game.mecatols().contains(planet.getName())
+                        && BoardView.controller(game, planet.getName()) == opponent);
+        if (opponentHoldsMecatol) {
+            prize += MecatolStake.holdValue(game, seat)
+                    + context.defense().standings().denialWeight(opponent) * MecatolStake.holdValue(game, opponent);
+        }
+        return prize;
+    }
+
+    private static double stageFeasibility(Context context, Tile target, Player opponent) {
+        Player seat = context.seat;
+        double ours = 0;
+        for (Tile origin : context.origins()) {
+            for (UnitMove ships : context.stageGroup(origin)) {
+                int move = BoardView.moveValueWithGravityDrive(seat, ships.type());
+                if (context.reach(origin, 2 * move).containsKey(target.getPosition())) {
+                    ours += ships.count() * cost(seat, ships.type());
+                }
+            }
+        }
+        double theirs = Math.max(
+                        1,
+                        context.defense()
+                                .force(opponent, target, IncomingForces.Horizon.NEXT_ROUND)
+                                .fleetCost())
+                + pdsOn(target, opponent);
+        return Math.min(1, ours / theirs);
+    }
+
+    private static int pdsOn(Tile target, Player opponent) {
+        return target.getPlanetUnitHolders().stream()
+                .mapToInt(planet -> BoardView.count(planet, opponent, UnitType.Pds))
+                .sum();
     }
 
     private static boolean holdsMecatol(Game game, Tile tile) {
@@ -863,93 +901,137 @@ public class TacticalPlanner {
                 .anyMatch(planet -> game.mecatols().contains(planet.getName()));
     }
 
+    private record Contribution(Tile origin, List<UnitMove> ships, List<UnitMove> cargo, List<UnitMove> moves) {
+
+        double shipCost(Player seat) {
+            return fleetCost(seat, ships);
+        }
+    }
+
+    private record Gathering(Tile staging, List<Contribution> contributions, double cost, double counter) {
+
+        List<UnitMove> ships() {
+            return contributions.stream()
+                    .flatMap(found -> found.ships().stream())
+                    .toList();
+        }
+
+        List<UnitMove> cargo() {
+            return contributions.stream()
+                    .flatMap(found -> found.cargo().stream())
+                    .toList();
+        }
+
+        Gathering withCounter(double newCounter) {
+            return new Gathering(staging, contributions, cost, newCounter);
+        }
+    }
+
     // TODO: staged groups leave fighters behind and assume their ships are undamaged
-    private static List<TacticalPlan> stageFrom(
-            Context context, Predicate<Tile> activatable, Tile target, Player opponent, Tile origin) {
+    private static List<TacticalPlan> stageAgainst(
+            Context context, Predicate<Tile> activatable, Tile target, Player opponent) {
         Game game = context.game;
         Player seat = context.seat;
-        UnitHolder originSpace = BoardView.space(origin);
-        List<UnitMove> ships = new ArrayList<>();
-        for (UnitType type : BoardView.MOVING_SHIPS) {
-            int count = BoardView.count(originSpace, seat, type);
-            if (count > 0) ships.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, count));
-        }
-        List<UnitMove> group = context.defense().holdBack(origin, List.of(), ships);
-        if (group.isEmpty()) return List.of();
-        boolean planetsToTake = !enemyPlanets(game, seat, target).isEmpty()
-                || !freePlanetsIn(context, target).isEmpty();
-        List<UnitMove> cargo = planetsToTake
-                ? take(availableGroundForces(game, seat, origin, context.defense(), group), capacityOf(seat, group))
-                : List.of();
-        int slowest = group.stream()
-                .mapToInt(move -> BoardView.moveValue(seat, move.type()))
-                .min()
-                .orElse(0);
-        if (slowest <= 0 || context.reach(origin, slowest).containsKey(target.getPosition())) return List.of();
-        List<UnitMove> departing = new ArrayList<>(group);
-        departing.addAll(cargo);
-        double groupCost = fleetCost(seat, group);
-        List<Staging> options = new ArrayList<>();
+        List<Gathering> gatherings = new ArrayList<>();
         for (Tile staging : game.getTileMap().values()) {
-            if (staging == origin || staging == target || !activatable.test(staging)) continue;
+            if (staging == target || staging == seat.getHomeSystemTile() || !activatable.test(staging)) continue;
             if (!MovementGraph.canEnter(game, seat, staging)) continue;
             if (BoardView.hasEnemyShips(game, seat, staging) || context.coveredByEnemySpaceCannon(staging)) continue;
-            if (group.stream().anyMatch(move -> !context.reaches(origin, staging, move.type()))) continue;
-            if (!context.reach(staging, slowest).containsKey(target.getPosition())) continue;
-            if (futureScore(context, target, opponent, staging, group, cargo)
-                    < ATTACK_MIN_SCORE + STAGE_FUTURE_MARGIN) {
-                continue;
-            }
-            options.add(new Staging(staging, counterAt(context, staging, opponent, group, groupCost)));
+            gather(context, target, staging).ifPresent(gatherings::add);
         }
-        options.sort(Comparator.comparingDouble(Staging::counter));
+        gatherings.sort(Comparator.comparingDouble(Gathering::cost).reversed());
+        List<Gathering> candidates = new ArrayList<>();
+        for (Gathering gathering : gatherings.subList(0, Math.min(STAGING_CANDIDATES, gatherings.size()))) {
+            candidates.add(gathering.withCounter(counterAt(context, gathering, opponent)));
+        }
+        candidates.sort(Comparator.comparingDouble(Gathering::counter));
         List<TacticalPlan> plans = new ArrayList<>();
-        for (Staging option : options.subList(0, Math.min(STAGING_TILES_PER_TARGET, options.size()))) {
-            stagePlan(context, target, opponent, origin, option, departing, group, cargo, groupCost)
-                    .ifPresent(plans::add);
+        for (Gathering gathering : candidates.subList(0, Math.min(STAGING_TILES_PER_TARGET, candidates.size()))) {
+            stagePlan(context, target, opponent, gathering).ifPresent(plans::add);
         }
         return plans;
     }
 
-    private record Staging(Tile tile, double counter) {}
+    private static Optional<Gathering> gather(Context context, Tile target, Tile staging) {
+        Player seat = context.seat;
+        List<Contribution> contributions = new ArrayList<>();
+        for (Tile origin : context.origins()) {
+            if (origin == staging || origin == target) continue;
+            contribution(context, target, staging, origin).ifPresent(contributions::add);
+        }
+        contributions.sort(Comparator.comparingDouble((Contribution found) -> found.shipCost(seat))
+                .reversed());
+        List<Contribution> kept =
+                new ArrayList<>(contributions.subList(0, Math.min(MAX_ORIGINS, contributions.size())));
+        while (!kept.isEmpty() && exceedsFleetSupply(seat, staging, kept)) kept.removeLast();
+        if (kept.isEmpty()) return Optional.empty();
+        double cost = kept.stream().mapToDouble(found -> found.shipCost(seat)).sum();
+        return Optional.of(new Gathering(staging, kept, cost, 0));
+    }
 
-    private static double counterAt(
-            Context context, Tile staging, Player opponent, List<UnitMove> group, double groupCost) {
-        Defenders after = context.defense().defendersAt(staging);
-        for (UnitMove move : group) after = after.plusShips(move.type(), move.count(), 0);
-        return context.defense().counterstrike(staging, after, List.of(), STAGE_SHIP_STAKE * groupCost, 0, opponent);
+    private static boolean exceedsFleetSupply(Player seat, Tile staging, List<Contribution> contributions) {
+        int moving = contributions.stream()
+                .mapToInt(found -> movedNonFighterShips(found.ships()))
+                .sum();
+        return BoardView.nonFighterShips(BoardView.space(staging), seat) + moving > seat.getFleetCC();
+    }
+
+    private static Optional<Contribution> contribution(Context context, Tile target, Tile staging, Tile origin) {
+        Game game = context.game;
+        Player seat = context.seat;
+        List<UnitMove> ships = context.stageGroup(origin).stream()
+                .filter(move -> context.reaches(origin, staging, move.type()))
+                .filter(move -> context.reach(staging, BoardView.moveValue(seat, move.type()))
+                        .containsKey(target.getPosition()))
+                .filter(move -> !context.reaches(origin, target, move.type()))
+                .toList();
+        if (ships.isEmpty()) return Optional.empty();
+        boolean planetsToTake = !enemyPlanets(game, seat, target).isEmpty()
+                || !freePlanetsIn(context, target).isEmpty();
+        List<UnitMove> cargo = planetsToTake
+                ? take(availableGroundForces(game, seat, origin, context.defense(), ships), capacityOf(seat, ships))
+                : List.of();
+        List<UnitMove> departing = new ArrayList<>(ships);
+        departing.addAll(cargo);
+        return legalMoves(context, origin, staging, departing)
+                .map(moves -> new Contribution(origin, ships, cargo, moves));
+    }
+
+    private static double counterAt(Context context, Gathering gathering, Player opponent) {
+        Defenders after = context.defense().defendersAt(gathering.staging());
+        for (UnitMove move : gathering.ships()) after = after.plusShips(move.type(), move.count(), 0);
+        return context.defense()
+                .counterstrike(gathering.staging(), after, List.of(), STAGE_SHIP_STAKE * gathering.cost(), 0, opponent);
     }
 
     private static Optional<TacticalPlan> stagePlan(
-            Context context,
-            Tile target,
-            Player opponent,
-            Tile origin,
-            Staging option,
-            List<UnitMove> departing,
-            List<UnitMove> group,
-            List<UnitMove> cargo,
-            double groupCost) {
+            Context context, Tile target, Player opponent, Gathering gathering) {
         Player seat = context.seat;
-        Tile staging = option.tile();
-        Optional<List<UnitMove>> legal = legalMoves(context, origin, staging, departing);
-        if (legal.isEmpty()) return Optional.empty();
-        double future = futureScore(context, target, opponent, staging, group, cargo);
-        if (future < ATTACK_MIN_SCORE + STAGE_FUTURE_MARGIN) return Optional.empty();
+        Tile staging = gathering.staging();
+        double future = futureScore(context, target, opponent, staging, gathering.ships(), gathering.cargo());
+        if (future < ATTACK_MIN_SCORE) return Optional.empty();
         boolean diplomacy = context.defense().standings().holdsUnplayedDiplomacy(opponent)
                 && target.getPlanetUnitHolders().stream()
                         .anyMatch(planet -> BoardView.controller(context.game, planet.getName()) == opponent
                                 && !context.game.mecatols().contains(planet.getName()));
-        int farthest = group.stream()
-                .mapToInt(move -> context.distance(origin, staging, move.type()))
+        List<UnitMove> moves = merge(gathering.contributions().stream()
+                .flatMap(found -> found.moves().stream())
+                .toList());
+        int farthest = gathering.contributions().stream()
+                .flatMap(found ->
+                        found.ships().stream().map(move -> context.distance(found.origin(), staging, move.type())))
+                .mapToInt(Integer::intValue)
                 .max()
                 .orElse(0);
+        double leaving = gathering.contributions().stream()
+                .mapToDouble(found -> context.defense().leaveCost(found.origin(), found.moves()))
+                .sum();
         double score = STAGE_SHARE * future * (diplomacy ? DIPLOMACY_DISCOUNT : 1)
-                - option.counter()
-                - context.defense().leaveCost(origin, legal.get())
+                - gathering.counter()
+                - leaving
                 - DISTANCE_COST * farthest
-                - GROUP_MOVE_COST * (movedNonFighterShips(legal.get()) - 1);
-        TacticalPlan plan = new TacticalPlan(Kind.STAGE, staging.getPosition(), legal.get(), Map.of(), score);
+                - GROUP_MOVE_COST * (movedNonFighterShips(moves) - 1);
+        TacticalPlan plan = new TacticalPlan(Kind.STAGE, staging.getPosition(), moves, Map.of(), score);
         return Optional.of(plan.withScore(PlayAreaNotes.adjustedScore(context.game, seat, staging, plan)
                 + SetupHint.bonusFor(context.hints, plan)));
     }
@@ -988,8 +1070,8 @@ public class TacticalPlanner {
                     target, opponent, List.of(), List.of(), ships, Map.of(), ground, extraShips, extraGround, rules);
             StrikeEstimate estimate = StrikeEvaluator.estimate(game, seat, strike);
             if (estimate.spaceWin() < rules.landMinWin()) return 0;
-            StrikeValue value = context.offense()
-                    .evaluate(strike, estimate, ContextTerms.none(), true, ATTACK_MIN_SCORE + STAGE_FUTURE_MARGIN);
+            StrikeValue value =
+                    context.offense().evaluate(strike, estimate, ContextTerms.none(), true, ATTACK_MIN_SCORE);
             boolean raidsAHome = isAnotherPlayersHome(game, seat, target)
                     && !estimate.landings().isEmpty();
             score = value.score();
@@ -1584,6 +1666,7 @@ public class TacticalPlanner {
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
         private Territory territory;
+        private final Map<String, List<UnitMove>> stageGroups = new HashMap<>();
 
         Context(Game game, Player seat) {
             this(game, seat, Set.of());
@@ -1606,6 +1689,18 @@ public class TacticalPlanner {
                     planet.getName() + "#" + infantry + "#" + mechs,
                     key -> ExploreDeck.expectedValueOfPlanet(
                             ExploreSite.landing(game, seat, tile, planet, infantry, mechs, exploreOutlook)));
+        }
+
+        List<UnitMove> stageGroup(Tile origin) {
+            return stageGroups.computeIfAbsent(origin.getPosition(), position -> {
+                UnitHolder space = BoardView.space(origin);
+                List<UnitMove> ships = new ArrayList<>();
+                for (UnitType type : BoardView.MOVING_SHIPS) {
+                    int count = BoardView.count(space, seat, type);
+                    if (count > 0) ships.add(new UnitMove(position, BoardView.SPACE, type, count));
+                }
+                return defense().holdBack(origin, List.of(), ships);
+            });
         }
 
         Territory territory() {
