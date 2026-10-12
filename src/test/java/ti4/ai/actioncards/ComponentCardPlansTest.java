@@ -8,7 +8,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.perception.AiPrompt;
+import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.strategy.ReadyingValue;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
@@ -161,6 +164,47 @@ class ComponentCardPlansTest extends BaseTi4Test {
         assertThat(plan("uprising").orElseThrow().target()).isEqualTo("sol_abyz");
     }
 
+    private double insubordinationAgainstSol(int tokens) {
+        table.sol.setTacticalCC(tokens);
+        return plan("insub").orElseThrow().value();
+    }
+
+    // Taking a player's last tactic token while they hold 4 unspent resources and a dock costs them a build too.
+    @Test
+    void insubordinationIsWorthMoreWhenItTakesALastTokenFromAPlayerWhoCouldBuild() {
+        Tile home = table.solHomeWithADock();
+        assertThat(home).isNotNull();
+        double notTheLast = insubordinationAgainstSol(2);
+
+        assertThat(insubordinationAgainstSol(1) - notTheLast)
+                .isCloseTo(4 * PlayerTargetCards.LOST_BUILD_PER_RESOURCE, within(1e-9));
+    }
+
+    @Test
+    void insubordinationSeesNoBuildToLoseWithoutUnspentResources() {
+        table.solHomeWithADock();
+        table.sol.exhaustPlanet("jord");
+
+        assertThat(insubordinationAgainstSol(1)).isCloseTo(insubordinationAgainstSol(2), within(1e-9));
+    }
+
+    @Test
+    void insubordinationSeesNoBuildToLoseWithoutADock() {
+        table.solHome();
+
+        assertThat(insubordinationAgainstSol(1)).isCloseTo(insubordinationAgainstSol(2), within(1e-9));
+    }
+
+    @Test
+    void insubordinationPrefersThePlayerItCostsABuildWhenNobodyIsAContender() {
+        Player hacan = table.third("hacan", "yellow");
+        hacan.setTacticalCC(1);
+        table.solHomeWithADock();
+        table.sol.setTacticalCC(1);
+
+        assertThat(plan("insub").orElseThrow().target()).isEqualTo("sol");
+    }
+
     // ---- Fighter Conscription ----------------------------------------------------------------
 
     // A fighter fits in a system with a space dock (3 fighters) or with a ship that has capacity left.
@@ -221,6 +265,46 @@ class ComponentCardPlansTest extends BaseTi4Test {
         assertThat(alone).isCloseTo(1.0 + table.stall(), within(1e-9));
         assertThat(plan("ghost_ship").orElseThrow().value()).isCloseTo(2.0 + table.stall(), within(1e-9));
         assertThat(alpha).isNotNull();
+    }
+
+    // Behind the Gate needs a ship in an alpha and a beta wormhole system: the destroyer that completes the pair is
+    // worth half the point.
+    @Test
+    void ghostShipGoesWhereItCompletesAnObjective() {
+        table.reveal("btgk");
+        table.system("39", "202");
+        table.system("40", "203");
+        table.ships(table.nekro, table.game.getTileByPosition("202"), UnitType.Cruiser, 1);
+
+        Plan plan = plan("ghost_ship").orElseThrow();
+
+        assertThat(plan.target()).isEqualTo("203");
+        assertThat(plan.value()).isGreaterThan(1.0 + 0.5 * 8 + table.stall() - 1e-9);
+    }
+
+    @Test
+    void ghostShipValuesAWormholeSystemItCouldReachMalliceFrom() {
+        table.system("39", "202");
+        double withoutNexus = plan("ghost_ship").orElseThrow().value();
+
+        table.system("82a", "310");
+        double withNexus = plan("ghost_ship").orElseThrow().value();
+
+        assertThat(withNexus).isCloseTo(withoutNexus + 1.0, within(1e-9));
+    }
+
+    // A ship already sitting in a wormhole system connects the seat to Mallice, so another destroyer adds nothing
+    // there.
+    @Test
+    void ghostShipSeesNoGainInMalliceWhenTheSeatAlreadyHasAShipInAWormholeSystem() {
+        table.system("39", "202");
+        table.system("40", "203");
+        table.ships(table.nekro, table.game.getTileByPosition("203"), UnitType.Cruiser, 1);
+        double withoutNexus = plan("ghost_ship").orElseThrow().value();
+
+        table.system("82a", "310");
+
+        assertThat(plan("ghost_ship").orElseThrow().value()).isCloseTo(withoutNexus, within(1e-9));
     }
 
     // ---- Exploration Probe -------------------------------------------------------------------
@@ -301,6 +385,65 @@ class ComponentCardPlansTest extends BaseTi4Test {
     @Test
     void refitTroopsNeedsInfantry() {
         assertThat(plan("refit")).isEmpty();
+    }
+
+    // ---- Economic Initiative -----------------------------------------------------------------
+
+    // Lodor (3 resources, cultural) was spent paying for something; the dock at home can still build with it.
+    private void spentCulturalPlanetWithProductionToCome() {
+        table.system("26", "202");
+        table.nekro.addPlanet("lodor");
+        table.nekro.exhaustPlanet("lodor");
+        table.nekro.setTacticalCC(3);
+        table.nekro.setFleetCC(3);
+    }
+
+    @Test
+    void economicInitiativeIsWorthWhatReadyingASpentPlanetBuysPlusTheStall() {
+        spentCulturalPlanetWithProductionToCome();
+        double readying = ReadyingValue.of(table.game, table.nekro, List.of("lodor"));
+
+        assertThat(readying).isPositive();
+        assertThat(plan("economic_initiative").orElseThrow().value()).isCloseTo(readying + table.stall(), within(1e-9));
+    }
+
+    @Test
+    void economicInitiativeIsPlayedWhenASpentCulturalPlanetCanProduceAgain() {
+        spentCulturalPlanetWithProductionToCome();
+        table.nekro.setActionCard("economic_initiative", 9);
+        AiPrompt hand = AiTestGame.prompt("hand", PromptSource.AI_THREAD, AiTestGame.NOW, "ac_play_from_hand_9");
+
+        assertThat(AiTestGame.pressedId(ActionCardRules.playBeforePassing(table.test.context(hand))
+                        .orElseThrow()))
+                .isEqualTo("ac_play_from_hand_9");
+    }
+
+    @Test
+    void economicInitiativeIsHeldWhenEveryCulturalPlanetIsReady() {
+        table.system("26", "202");
+        table.nekro.addPlanet("lodor");
+
+        assertThat(plan("economic_initiative").map(Plan::value).orElse(0.0)).isZero();
+    }
+
+    // A seat that has passed takes no more actions, so readying a planet buys nothing: no stall either.
+    @Test
+    void economicInitiativeIsWorthNothingToASeatThatHasPassedWithoutASpendObjective() {
+        spentCulturalPlanetWithProductionToCome();
+        table.nekro.setPassed(true);
+
+        assertThat(plan("economic_initiative").map(Plan::value).orElse(0.0)).isZero();
+    }
+
+    // Only the cultural planets are readied; a spent hazardous planet changes nothing.
+    @Test
+    void economicInitiativeIgnoresPlanetsThatAreNotCultural() {
+        table.system("38", "202");
+        table.nekro.addPlanet("abyz");
+        table.nekro.exhaustPlanet("abyz");
+        table.nekro.setTacticalCC(3);
+
+        assertThat(plan("economic_initiative").map(Plan::value).orElse(0.0)).isZero();
     }
 
     // ---- Forward Supply Base -----------------------------------------------------------------

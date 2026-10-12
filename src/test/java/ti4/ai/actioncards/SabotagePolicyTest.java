@@ -86,17 +86,33 @@ class SabotagePolicyTest extends BaseTi4Test {
 
     // ---- the baseline ------------------------------------------------------------------------
 
-    // With nothing at stake on the board, and a player who is neither a contender nor behind, the seat spends its
-    // only Sabotage on a card only when human players cancel it often and it matters to the table.
-    @Test
-    void anUninvolvedSeatSpendsItsSabotageOnTheCardsHumansCancelMost() {
+    private void overruleIsPlayed() {
+        table.game.getGameStats().recordAcPlay("Overrule", table.sol);
+    }
+
+    private TreeSet<String> cancelledTitles() {
         table.test.isActive(table.sol, "action");
         TreeSet<String> cancelled = new TreeSet<>();
         for (String title : cancellableTitles()) {
             if (cancels(title)) cancelled.add(title);
         }
+        return cancelled;
+    }
 
-        assertThat(cancelled)
+    // "Save your Sabotage for Overrule": while it has not shown up, the seat's only Sabotage is worth 3, which
+    // nothing an uninvolved seat sees at standing 1 reaches except Overrule itself.
+    @Test
+    void anUninvolvedSeatSavesItsOnlySabotageForOverruleWhileOverruleIsUnseen() {
+        assertThat(cancelledTitles()).containsExactly("Overrule");
+    }
+
+    // With nothing at stake on the board, and a player who is neither a contender nor behind, the seat spends its
+    // only Sabotage on a card only when human players cancel it often and it matters to the table.
+    @Test
+    void anUninvolvedSeatSpendsItsSabotageOnTheCardsHumansCancelMostOnceOverruleIsPlayed() {
+        overruleIsPlayed();
+
+        assertThat(cancelledTitles())
                 .containsExactly(
                         "Confounding Legal Text",
                         "Imperial Rider",
@@ -154,6 +170,7 @@ class SabotagePolicyTest extends BaseTi4Test {
 
     @Test
     void passesOnEveryOrdinaryCardFromAPlayerWhoTrailsTheSeat() {
+        overruleIsPlayed();
         table.test.isActive(table.sol, "action");
         assertThat(cancels("Political Stability")).isTrue();
 
@@ -207,9 +224,72 @@ class SabotagePolicyTest extends BaseTi4Test {
     }
 
     @Test
-    void theReserveOnlyAppliesWhileSomeoneCouldWin() {
+    void theContenderReserveOnlyAppliesWhileSomeoneCouldWin() {
+        overruleIsPlayed();
+
         assertThat(SabotagePolicy.marginalKeep(table.game, table.nekro))
                 .isCloseTo(ActionCardPrior.keepPrior("sabo1"), within(EXACT));
+    }
+
+    @Test
+    void theLastSabotageIsWorthTheOverruleReserveWhileOverruleIsUnseen() {
+        assertThat(SabotagePolicy.marginalKeep(table.game, table.nekro, "Mining Initiative"))
+                .isCloseTo(SabotagePolicy.OVERRULE_RESERVE, within(EXACT));
+    }
+
+    // Cancelling Overrule is what the reserve is for, so it is held to the Sabotage's ordinary worth.
+    @Test
+    void cancellingOverruleItselfIsExemptFromTheReserve() {
+        assertThat(SabotagePolicy.marginalKeep(table.game, table.nekro, "Overrule"))
+                .isCloseTo(ActionCardPrior.keepPrior("sabo1"), within(EXACT));
+    }
+
+    @Test
+    void aContenderReserveStillOutweighsTheOverruleReserve() {
+        table.points(table.sol, 8);
+
+        assertThat(SabotagePolicy.marginalKeep(table.game, table.nekro, "Mining Initiative"))
+                .isCloseTo(SabotagePolicy.CONTENDER_RESERVE, within(EXACT));
+    }
+
+    @Test
+    void aSpareSabotageIsNotHeldBackForOverrule() {
+        table.nekro.setActionCard("sabo2", 2);
+
+        assertThat(SabotagePolicy.marginalKeep(table.game, table.nekro, "Mining Initiative"))
+                .isCloseTo(0.6 * ActionCardPrior.keepPrior("sabo1"), within(EXACT));
+    }
+
+    @Test
+    void overruleIsSeenOncePlayedDiscardedPurgedOrHeldByTheSeat() {
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isTrue();
+
+        table.nekro.setActionCard("overrule", 5);
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isFalse();
+        table.nekro.getActionCards().remove("overrule");
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isTrue();
+
+        table.game.setStoredValue("removeOverrule", "true");
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isFalse();
+        table.game.removeStoredValue("removeOverrule");
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isTrue();
+
+        table.game.getDiscardActionCards().put("overrule", 7);
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isFalse();
+        table.game.getDiscardActionCards().remove("overrule");
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isTrue();
+
+        overruleIsPlayed();
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isFalse();
+    }
+
+    // A card aimed at the seat is worth 1.2 x its appetite whatever the reserve, so Public Disgrace clears 3.
+    @Test
+    void aCardAimedAtTheSeatStillClearsTheOverruleReserve() {
+        table.test.isActive(table.nekro, "strategy");
+
+        assertThat(SabotagePolicy.overruleUnseen(table.game, table.nekro)).isTrue();
+        assertThat(cancels("Public Disgrace")).isTrue();
     }
 
     // ---- the points the seat would lose --------------------------------------------------------

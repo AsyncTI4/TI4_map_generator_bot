@@ -30,6 +30,9 @@ class SystemTargetCards {
     private static final String PROBE_PREFIX = "probeStep2_";
     private static final double DESTROYER_VALUE = 1.0;
     private static final double POSITION_VALUE = 1.0;
+    private static final double OBJECTIVE_SHARE = 0.5;
+    private static final double MALLICE_ACCESS_VALUE = 1.0;
+    private static final String NEXUS_PREFIX = "82";
 
     static AiCard ghostShip() {
         return AiActionCards.component(
@@ -71,8 +74,21 @@ class SystemTargetCards {
 
     private static double ghostShipValue(Game game, Player seat, Tile tile, ObjectiveValue objectives) {
         Footprint after = objectives.before().withBuilt(tile.getPosition(), Map.of(UnitType.Destroyer, 1));
-        boolean positioned = nextToOwnFleet(game, seat, tile) || objectives.gain(after) > 0;
-        return DESTROYER_VALUE + (positioned ? POSITION_VALUE : 0);
+        double fleet = nextToOwnFleet(game, seat, tile) ? POSITION_VALUE : 0;
+        double objective = OBJECTIVE_SHARE * Math.max(0, objectives.gain(after));
+        return DESTROYER_VALUE + fleet + objective + malliceAccess(game, seat, tile);
+    }
+
+    private static double malliceAccess(Game game, Player seat, Tile tile) {
+        if (!FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition())) return 0;
+        Optional<Tile> nexus = game.getTileMap().values().stream()
+                .filter(candidate -> candidate.getTileID().startsWith(NEXUS_PREFIX))
+                .findFirst();
+        if (nexus.isEmpty() || BoardView.hasOwnShips(seat, nexus.get())) return 0;
+        boolean alreadyConnected = game.getTileMap().values().stream()
+                .filter(other -> BoardView.hasOwnShips(seat, other))
+                .anyMatch(other -> FoWHelper.doesTileHaveAlphaOrBeta(game, other.getPosition()));
+        return alreadyConnected ? 0 : MALLICE_ACCESS_VALUE;
     }
 
     private static boolean nextToOwnFleet(Game game, Player seat, Tile tile) {

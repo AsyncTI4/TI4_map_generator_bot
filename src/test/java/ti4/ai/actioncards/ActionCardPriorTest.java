@@ -46,25 +46,47 @@ class ActionCardPriorTest extends BaseTi4Test {
                 .isGreaterThan(ActionCardPrior.keepPrior("mjets1"));
     }
 
+    // Cards the experts have not ranked (Parley, Uprising, Sabotage) keep the strength the statistics give them.
     @Test
-    void keepPriorsFollowTheImpactScore() {
-        assertThat(ActionCardPrior.keepPrior("overrule")).isCloseTo(1.80, within(0.005));
-        assertThat(ActionCardPrior.keepPrior("lieinwait")).isCloseTo(1.61, within(0.005));
+    void keepPriorsOfUnrankedCardsFollowTheImpactScore() {
         assertThat(ActionCardPrior.keepPrior("parley")).isCloseTo(1.57, within(0.005));
         assertThat(ActionCardPrior.keepPrior("uprising")).isCloseTo(1.52, within(0.005));
         assertThat(ActionCardPrior.keepPrior("sabo1")).isCloseTo(1.41, within(0.005));
-        assertThat(ActionCardPrior.keepPrior("mining_initiative")).isCloseTo(1.31, within(0.005));
-        assertThat(ActionCardPrior.keepPrior("mb1")).isCloseTo(1.10, within(0.005));
-        assertThat(ActionCardPrior.keepPrior("mjets1")).isCloseTo(0.90, within(0.005));
+    }
+
+    // Impact 33.6 gives Lie in Wait a statistics strength of 1.68; the experts put it third of six in A (1.7 to 1.4).
+    @Test
+    void aRankedCardIsWorthTheMeanOfWhatTheStatisticsAndTheExpertsSay() {
+        double expert = 1.7 - 0.4 * 0.3;
+
+        assertThat(ActionCardPrior.strength("lieinwait")).isCloseTo((1.683 + expert) / 2, within(0.005));
+        assertThat(ActionCardPrior.keepPrior("lieinwait"))
+                .isCloseTo(1.2 * (0.5 + 0.5 * (1.683 + expert) / 2), within(0.005));
+    }
+
+    // The statistics rate Impersonation, Leadership Rider and Morale Boost differently from the experts.
+    @Test
+    void theExpertsMoveCardsTheStatisticsMisjudged() {
+        assertThat(ActionCardPrior.keepPrior("mb1")).isLessThan(1.10);
+        assertThat(ActionCardPrior.strength("mb1")).isLessThan(0.9);
+        assertThat(ActionCardPrior.keepPrior("mining_initiative")).isCloseTo(1.32, within(0.005));
+        assertThat(ActionCardPrior.keepPrior("mjets1")).isCloseTo(0.9, within(0.02));
+    }
+
+    @Test
+    void theBlendStaysWithinTheStrengthBounds() {
+        for (String alias : Mapper.getDeck(DEFAULT_DECK).getCardIDs()) {
+            assertThat(ActionCardPrior.strength(alias)).as(alias).isBetween(0.5, 2.0);
+        }
     }
 
     // A card with few recorded plays has a less certain impact, so it is pulled halfway towards an average card.
     @Test
     void aThinCardIsPulledTowardsTheAverage() {
-        double impactStrength = 27.6 / 30;
+        double impactStrength = 17.9 / 30;
         double pulled = impactStrength + 0.5 * (1 - impactStrength);
 
-        assertThat(ActionCardPrior.strength("ghost_squad")).isCloseTo(pulled, within(0.001));
+        assertThat(ActionCardPrior.strength("salvage")).isCloseTo(pulled, within(0.001));
     }
 
     @Test

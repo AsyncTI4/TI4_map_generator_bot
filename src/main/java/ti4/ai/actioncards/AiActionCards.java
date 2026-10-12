@@ -137,7 +137,7 @@ public class AiActionCards {
     }
 
     private static double economyValue(Game game, Player seat, String alias) {
-        double value = ActionCardValue.playValue(game, seat, alias);
+        double value = ActionCardValue.newRulesPlayValue(game, seat, alias);
         return value > 0 ? value + Stall.actionValue(game, seat) : 0;
     }
 

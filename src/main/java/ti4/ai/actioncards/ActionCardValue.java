@@ -13,6 +13,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.strategy.ReadyingValue;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -105,6 +106,12 @@ public class ActionCardValue {
             case WAR_EFFORT -> canPlaceCruiser(game, seat) ? WAR_EFFORT_VALUE : 0;
             default -> 0;
         };
+    }
+
+    static double newRulesPlayValue(Game game, Player seat, String alias) {
+        double value = playValue(game, seat, alias);
+        if (!ECONOMIC.equals(alias)) return value;
+        return value + ReadyingValue.of(game, seat, exhaustedCulturalPlanets(game, seat));
     }
 
     public static double keepValue(Game game, Player seat, String alias) {

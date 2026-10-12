@@ -14,12 +14,16 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
+import ti4.model.DeckModel;
 import ti4.service.actioncard.SabotageService;
 
 @UtilityClass
 public class SabotagePolicy {
 
     static final double CONTENDER_RESERVE = 4.0;
+    static final double OVERRULE_RESERVE = 3.0;
+    static final String OVERRULE = "overrule";
+    private static final String OVERRULE_TITLE = "Overrule";
     static final String SABOTAGE_PREFIX = "sabotage_ac_";
     private static final String SEPARATOR = "_";
 
@@ -62,7 +66,20 @@ public class SabotagePolicy {
         return baseline + rival + denied;
     }
 
+    static boolean overruleUnseen(Game game, Player seat) {
+        if (game.isOverrulePurged() || seat.getActionCards().containsKey(OVERRULE)) return false;
+        DeckModel deck = Mapper.getDeck(game.getAcDeckID());
+        if (deck == null || !deck.getCardIDs().contains(OVERRULE)) return false;
+        return !game.getDiscardActionCards().containsKey(OVERRULE)
+                && game.getGameStats().getActionCardPlays().stream()
+                        .noneMatch(play -> OVERRULE_TITLE.equals(play.getActionCard()));
+    }
+
     static double marginalKeep(Game game, Player seat) {
+        return marginalKeep(game, seat, "");
+    }
+
+    static double marginalKeep(Game game, Player seat, String title) {
         List<String> held = seat.getActionCards().keySet().stream()
                 .filter(AiActionCards::isSabotage)
                 .sorted()
@@ -70,12 +87,14 @@ public class SabotagePolicy {
         if (held.isEmpty()) return Double.MAX_VALUE;
         double prior = ActionCardPrior.keepPrior(held.getFirst());
         if (held.size() > 1) return ActionCardValue.EXTRA_SABOTAGE_SHARE * prior;
-        return ScoringStakes.anyOpponentIsContender(game, seat) ? Math.max(prior, CONTENDER_RESERVE) : prior;
+        double reserve = ScoringStakes.anyOpponentIsContender(game, seat) ? CONTENDER_RESERVE : 0;
+        if (!OVERRULE_TITLE.equals(title) && overruleUnseen(game, seat)) reserve = Math.max(reserve, OVERRULE_RESERVE);
+        return Math.max(prior, reserve);
     }
 
     private static boolean worthCancelling(AiTurnContext context, Cancellation cancellation) {
         double value = cancelValue(context, cancellation.title(), cancellation.cardPlayer());
-        return value >= marginalKeep(context.game(), context.seat());
+        return value >= marginalKeep(context.game(), context.seat(), cancellation.title());
     }
 
     private static Optional<Cancellation> cancellation(AiTurnContext context, AiPrompt window) {

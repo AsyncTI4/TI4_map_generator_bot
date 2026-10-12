@@ -62,6 +62,13 @@ final class CardTable {
         sol.addPlanet("jord");
     }
 
+    Tile solHomeWithADock() {
+        solHome();
+        Tile home = game.getTileByPosition(SOL_SPOT);
+        test.units(home, "jord", sol, UnitType.Spacedock, 1);
+        return home;
+    }
+
     Tile system(String tileId, String position) {
         return test.place(tileId, position);
     }

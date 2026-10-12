@@ -64,6 +64,16 @@ class DiplomacyUse {
         return best(game, seat, candidates, PLANETS_TO_READY);
     }
 
+    static Choice readying(Game game, Player seat, Collection<String> planets) {
+        List<String> readied = planets.stream()
+                .distinct()
+                .sorted(Comparator.comparingInt((String planet) -> -higherValue(game, planet))
+                        .thenComparing(Comparator.naturalOrder()))
+                .limit(PAIR_CANDIDATES)
+                .toList();
+        return new Choice(readied, new Demand(game, seat, 0).use(readied), SpendUnlock.unlocks(game, seat, readied, 0));
+    }
+
     static Optional<Choice> best(Game game, Player seat, Collection<String> candidates, int count) {
         return best(game, seat, candidates, count, 0);
     }

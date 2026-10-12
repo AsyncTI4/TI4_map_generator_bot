@@ -39,7 +39,11 @@ public class ActionCardPrior {
     }
 
     public static double strength(String alias) {
-        return stats(alias).map(ActionCardPrior::strength).orElse(NEUTRAL_STRENGTH);
+        Optional<Double> expert = ExpertTiers.strengthOfName(nameOf(alias));
+        Optional<Double> human = stats(alias).map(ActionCardPrior::strength);
+        if (expert.isEmpty()) return human.orElse(NEUTRAL_STRENGTH);
+        double blended = human.map(strength -> (strength + expert.get()) / 2).orElse(expert.get());
+        return Math.clamp(blended, MIN_STRENGTH, MAX_STRENGTH);
     }
 
     public static double keepPrior(String alias) {

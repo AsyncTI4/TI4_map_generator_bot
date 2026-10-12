@@ -11,8 +11,11 @@ import ti4.ai.actioncards.CardPrompts.Offer;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 class PlayerTargetCards {
@@ -21,6 +24,9 @@ class PlayerTargetCards {
     static final String INSUBORDINATION = "insub";
     static final String FORWARD_SUPPLY_BASE = "fsb";
     private static final double TACTIC_TOKEN_VALUE = 0.75;
+    static final int LOST_BUILD_MIN_RESOURCES = 3;
+    static final int LOST_BUILD_CAP = 6;
+    static final double LOST_BUILD_PER_RESOURCE = 0.3;
     private static final double CONTENDER_WEIGHT = 100_000.0;
     private static final double FORWARD_SUPPLY_BASE_TRADE_GOODS = 3.0;
     private static final String SPY_PREFIX = "spyStep2_";
@@ -73,13 +79,31 @@ class PlayerTargetCards {
         return others(game, seat).stream()
                 .filter(other -> other.getTacticalCC() > 0 && !other.isPassed())
                 .max(Comparator.comparing((Player other) -> ScoringStakes.contender(game, seat, other))
+                        .thenComparingDouble(other -> insubordinationValue(game, seat, other))
                         .thenComparingInt(Player::getTotalVictoryPoints)
                         .thenComparingInt(Player::getTacticalCC)
                         .thenComparing(Player::getFaction, Comparator.reverseOrder()))
                 .map(target -> Plan.aimedAt(
-                        TACTIC_TOKEN_VALUE * TableStanding.of(game, seat, target),
+                        insubordinationValue(game, seat, target),
                         target.getFaction(),
                         "against " + target.getRepresentationNoPing() + "'s tactic pool."));
+    }
+
+    static double insubordinationValue(Game game, Player seat, Player target) {
+        double token = TACTIC_TOKEN_VALUE + lostBuild(game, target);
+        return token * TableStanding.of(game, seat, target);
+    }
+
+    private static double lostBuild(Game game, Player target) {
+        if (target.getTacticalCC() != 1 || target.isPassed() || !hasProduction(game, target)) return 0;
+        Wallet wallet = Wallet.of(game, target);
+        int unspent = wallet.resources() + wallet.tradeGoods();
+        return unspent >= LOST_BUILD_MIN_RESOURCES ? Math.min(unspent, LOST_BUILD_CAP) * LOST_BUILD_PER_RESOURCE : 0;
+    }
+
+    private static boolean hasProduction(Game game, Player target) {
+        return !ButtonHelper.getTilesOfPlayersSpecificUnits(game, target, UnitType.Spacedock)
+                .isEmpty();
     }
 
     static Optional<Plan> forwardSupplyBasePlan(Game game, Player seat) {
@@ -105,8 +129,10 @@ class PlayerTargetCards {
     }
 
     private static ToDoubleFunction<Player> insubordinationWeight(Game game, Player seat) {
-        return other ->
-                contenderWeight(game, seat, other) + other.getTotalVictoryPoints() * 100.0 + other.getTacticalCC();
+        return other -> contenderWeight(game, seat, other)
+                + insubordinationValue(game, seat, other) * 10_000.0
+                + other.getTotalVictoryPoints() * 100.0
+                + other.getTacticalCC();
     }
 
     private static ToDoubleFunction<Player> forwardSupplyBaseWeight(Game game, Player seat) {

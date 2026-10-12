@@ -320,11 +320,18 @@ to build one by hand:
     factions play far more cards than the rest. From it each card gets (one action card is worth 1.2, a trade good 1):
     | Figure | Formula | Use |
     | --- | --- | --- |
-    | strength | Impact Score over the average of 30, kept between 0.5 and 2; a card with few recorded plays is pulled halfway to 1 | how good the card is |
+    | strength | the mean of the Impact Score over the average of 30 (a card with few recorded plays is pulled halfway to 1) and, for the 62 cards the experts ranked, the expert strength; kept between 0.5 and 2 | how good the card is |
     | keep prior | 1.2 × (0.5 + 0.5 × strength), so 0.9 for _Maneuvering Jets_ up to 1.8 for _Overrule_ | what holding the card is worth before looking at the board |
-    | cancel appetite | the card's cancel rate, shrunk towards the average with 50 plays, over the average cancel rate of 4.4%, at most 4; 0 for a card that cannot be cancelled | how much human players want the card cancelled |
+    | cancel appetite | (human statistics only) the card's cancel rate, shrunk towards the average with 50 plays, over the average cancel rate of 4.4%, at most 4; 0 for a card that cannot be cancelled | how much human players want the card cancelled |
     | first-play rate | single copy cards: first plays over the 1072 games a copy is drawn in; four-of cards: the play rate | what the self-play report compares each card's rate with (never a decision input) |
     | retrieval | single copy cards: replays per first play (0.065 on average) | choosing a card from the discard pile, later |
+  - **Expert tiers** (`ExpertTiers`, `data/ai/action_card_expert_tiers.json`). A podcast tier list by three experienced players
+    ranks every card from _Ancient Burial Sites_ to _Overrule_ (S, A, B, C, D, best first within a tier). The Impact
+    Score misjudges some cards (_Impersonation_ and _Leadership Rider_ rate lower than the experts put them, _Morale
+    Boost_ higher), so each tier is a range of strengths, spread evenly from its best card to its worst: S 2.2 to 1.8,
+    A 1.7 to 1.4, B 1.35 to 1.05, C 1.0 to 0.8, D 0.75 to 0.45. A ranked card's strength is the mean of the two
+    sources; a card the experts have not reached keeps the statistics alone. Cancel appetite stays with the human
+    statistics.
   - **Keeping and discarding** (`AiActionCards`). A card is *usable* when a rule of the AI plays it: the economy
     cards, _Summit_, _Sabotage_ and the cards in the table below. A card no rule plays is worth 0 and goes first;
     between such cards the lower keep prior goes first. A usable card is worth the larger of its keep prior and what
@@ -337,7 +344,9 @@ to build one by hand:
     figure relics, _Enigmatic Device_ and the _Sling Relay_ use) as long as at least one other player has not passed.
     That is added to what every component action card does now, but only when the card does something at all. The
     economy cards are _Mining Initiative_ (trade goods equal to its best planet's resources), _Industrial Initiative_
-    (its industrial planets), _Economic Initiative_ (readying its cultural planets), _Rise of a Messiah_ (3 or more
+    (its industrial planets), _Economic Initiative_ (readying its spent cultural planets, valued as Diplomacy's ready
+    is: the resources and influence that would be spent this round on production, research, tokens, the custodians
+    or a spend objective, plus the points a spend objective would score), _Rise of a Messiah_ (3 or more
     planets), _Frontline Deployment_ (on a planet a dock or carrier can pick the infantry up from, or next to enemy
     ships) and _War Effort_ (a cruiser where the fleet pool and cruiser limit allow it). A card that unlocks a spend
     objective is worth the points it scores (30 if they win the game). Economy cards and the cards below are played
@@ -349,9 +358,9 @@ to build one by hand:
     | --- | --- | --- |
     | Fighter Conscription | 0.5 per fighter that fits the capacity of a system with its dock or capacity units and no other player's ships | none |
     | Uprising | the resources it gains (plus the score they unlock), plus a quarter of the planet's resources and influence while its owner has not passed, times the owner's standing, plus the points exhausting the planet would take from the owner's spend objective | a readied planet outside a home system, the best by that value |
-    | Insubordination | a tactic token (0.75) times the owner's standing | a contender first, else the strongest player with a tactic token who has not passed |
+    | Insubordination | a tactic token (0.75), plus 0.3 per unspent resource (3 to 6) when it takes the last token of a player who has a dock and has not passed, times the owner's standing | a contender first, else the strongest player with a tactic token who has not passed |
     | Spy | an action card (1.2) times the owner's standing | a contender first, else the player with the most action cards |
-    | Ghost Ship | a destroyer (1), and 1 more next to its own ships or where it advances an objective | a wormhole system outside the home systems without other players' ships |
+    | Ghost Ship | a destroyer (1), 1 more next to its own ships, half of what an objective gains from the extra ship (wormhole, anomaly, edge and presence objectives), and 1 for a way into Mallice from an alpha or beta system when it has no ship in a wormhole system yet | a wormhole system outside the home systems without other players' ships |
     | Exploration Probe | a frontier exploration (1.5) | a frontier token in or next to a system with its ships |
     | Archaeological Expedition | three draws from the deck of a planet trait it holds, times the value of the relic fragments in it | the best deck |
     | Refit Troops | 1.3 per infantry replaced by a mech (1 or 2), while it has mechs in reinforcements | its planets with infantry, spread out |
@@ -410,9 +419,12 @@ to build one by hand:
     what its planned strategy card scores (_Public Disgrace_, _Coup d'Etat_, _Crisis_), its reserved trade goods
     (_Extreme Duress_), the victory points riding on the system it fights in (combat cards) and the point an
     election would give it (agenda cards). The Sabotage it would spend is worth its keep prior, a second one 0.6 of
-    that, and the last one at least 4 while any opponent is a contender. With a quiet table that makes an uninvolved
-    seat spend its only Sabotage on _Overrule_, _Lie in Wait_, _Rout_, _Confounding Legal Text_, _Political Stability_,
-    _Parley_ and _Imperial Rider_, and on anything that could win the game for a contender.
+    that, and the last one at least 4 while any opponent is a contender. "Save your Sabotage for Overrule": while
+    _Overrule_ has not been seen (not played this game, not in the discard pile, not purged by the game setting and not
+    in the seat's own hand) the last Sabotage is also worth at least 3, except against _Overrule_ itself. With a quiet
+    table that makes an uninvolved seat spend its only Sabotage on _Overrule_ alone while it is unseen, and afterwards
+    on _Overrule_, _Lie in Wait_, _Rout_, _Confounding Legal Text_, _Political Stability_, _Parley_ and _Imperial
+    Rider_; a card aimed at the seat, or anything that could win the game for a contender, clears the bar either way.
     A window aimed at the seat is answered before it continues a combat or its turn, and it keeps its turn while such
     a window is open for the others. When _Crisis_ is cancelled it presses the bot's "Delete These (If Crisis Was
     Sabo'd)" button, and when _Coup d'Etat_ is cancelled it plays its strategy card again.
