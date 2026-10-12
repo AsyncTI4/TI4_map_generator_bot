@@ -2,6 +2,7 @@ package ti4.ai.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,16 +74,20 @@ class StrategyCardPlannerTest extends BaseTi4Test {
         changed();
     }
 
-    // Imperial picked with nothing to score and no Mecatol Rex was once a reported mistake, when a secret was worth a
-    // strategy token. The experts rank a fresh secret among the best things a card can give, so the secret is now
-    // valued as what it will probably score (SecretDrawValue), and it is all Imperial is worth here.
+    // The reported mistake: Imperial picked with nothing to score and no Mecatol Rex. A fresh secret is worth a lot
+    // (SecretDrawValue), but the same secret is available to anyone following Imperial for a strategy token, so picking
+    // Imperial for it saves only that token, and Imperial falls below every card with a real use.
     @Test
-    void valuesImperialAsAFreshSecretWhenItCanScoreNothing() {
+    void valuesImperialOnlyAsASecretWhenItCanScoreNothing() {
         test.game.setRound(3);
         changed();
 
+        assertThat(SecretDrawValue.of(test.game, test.nekro)).isGreaterThan(CardValueScale.STRATEGY_TOKEN);
         assertThat(plan(IMPERIAL).benefits()).extracting(Benefit::use).containsExactly(CardUse.IMPERIAL_SECRET);
-        assertThat(plan(IMPERIAL).benefits().getFirst().value()).isEqualTo(SecretDrawValue.of(test.game, test.nekro));
+        assertThat(plan(IMPERIAL).benefits().getFirst().value()).isEqualTo(CardValueScale.STRATEGY_TOKEN);
+        for (int card : List.of(LEADERSHIP, POLITICS, CONSTRUCTION, TRADE)) {
+            assertThat(value(IMPERIAL)).as("Imperial against card " + card).isLessThan(value(card));
+        }
     }
 
     @Test

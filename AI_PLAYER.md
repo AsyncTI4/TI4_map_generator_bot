@@ -226,7 +226,7 @@ to build one by hand:
   | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
   | Warfare | PoK: a command token plus one reactivation; Thunder's Edge: a free tactical action. Reactivations are a second build at home, building at home and then moving out, moving twice to reach a far system, or activating a system that holds its token |
   | Technology | the best technology it can research (and a second worth 6 resources); for Nekro, Propagation's tokens |
-  | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (what a fresh secret is worth, see _A fresh secret_); plus denying the card to a Mecatol Rex holder still to pick |
+  | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret (only the strategy token a follow would cost, since following Imperial draws the same secret); plus denying the card to a Mecatol Rex holder still to pick |
 
   The pick adds the trade goods on a card and a small nudge (at most an eighth of a point) from how often human Nekro
   players take that card in that round (`PickPrior`), and remembers the plan. During the action phase it re-plans
@@ -330,7 +330,7 @@ to build one by hand:
     pool of `SecretOdds`, judged against the seat's own public board) raised towards 1 by a quarter for each round the
     game is expected to last (the leader's points to go over 2), times what a point is worth to the seat. Only one
     secret scores in each status phase, so secrets already in the hand take rounds away, and a full hand makes a draw
-    worth the swap, 0.3, at most. _Imperial_'s secret, an exploration's secret and _Impersonation_ use it.
+    worth the swap, 0.3, at most. Following _Imperial_, an exploration's secret, _Impersonation_ and _Strategize_ use it. Picking _Imperial_ only for its secret still counts just the strategy token it saves over following.
   - **Expert tiers** (`ExpertTiers`, `data/ai/action_card_expert_tiers.json`). A podcast tier list by three experienced players
     ranks every card from _Ancient Burial Sites_ to _Overrule_ (S, A, B, C, D, best first within a tier). The Impact
     Score misjudges some cards (_Impersonation_ and _Leadership Rider_ rate lower than the experts put them, _Morale
@@ -381,7 +381,7 @@ to build one by hand:
     | Impersonation | the value of a fresh secret less the 3 influence, paid with the planets it can best spare | none: the secret is drawn at once |
     | Counterstroke (2 copies) | the tactic token it gets back (at least 0.75) plus what its ships in that system could do once the token no longer holds them; played after another player activates a system holding its token | none: it takes the token back in the system |
     | Overrule | what the strategy card plan values the primary of the card at (Imperial or Technology, the two the bot can run for a card nobody played), plus a little for how often human players overrule that card (Imperial 0.45, Technology 0.25) | an unplayed card of those two; the card stays unplayed for its holder |
-    | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the readied or unchosen ones, never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
+    | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the unchosen ones and its own unplayed cards (a card another player will play this round can simply be followed), never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
     | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
     | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), else a pure stall | a legal system that is not next to its own planets or units |
     | Pirate Fleet | 2 × a contender's standing for blocking its approach, less the 3 resources, paid honestly | a legal system next to a contender and away from its own ships |

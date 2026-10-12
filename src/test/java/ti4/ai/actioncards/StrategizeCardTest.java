@@ -88,6 +88,24 @@ class StrategizeCardTest extends BaseTi4Test {
                 .isCloseTo(SecretDrawValue.of(table.game, table.nekro) - 1.0 + table.stall(), within(EXACT));
     }
 
+    // Another player will play their Imperial this round, and following it draws the same secret for the same token,
+    // so Strategize is kept for a secondary the seat could not get otherwise.
+    @Test
+    void strategizeSkipsACardAnotherPlayerWillPlay() {
+        table.sol.addSC(initiativeOf(StrategyCard.IMPERIAL));
+
+        Optional<Plan> plan = plan();
+
+        assertThat(plan.map(Plan::target)).isNotEqualTo(Optional.of("IMPERIAL"));
+    }
+
+    @Test
+    void strategizeCanUseItsOwnCardBeforePlayingIt() {
+        table.nekro.addSC(initiativeOf(StrategyCard.IMPERIAL));
+
+        assertThat(plan().map(Plan::target)).contains("IMPERIAL");
+    }
+
     @Test
     void strategizeCannotUseACardThatHasBeenPlayed() {
         table.game.setSCPlayed(initiativeOf(StrategyCard.IMPERIAL), true);

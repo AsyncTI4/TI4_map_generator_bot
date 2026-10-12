@@ -33,7 +33,11 @@ class ImperialUses {
                 new Benefit(CardUse.IMPERIAL_MECATOL, mecatolValue(in), mecatolPosition(game)),
                 new Benefit(
                         CardUse.IMPERIAL_SECRET,
-                        !holdsMecatol && hasRoomForSecret(seat) ? SecretDrawValue.of(game, seat) : 0));
+                        !holdsMecatol && hasRoomForSecret(seat) ? secretOverFollowing(game, seat) : 0));
+    }
+
+    private static double secretOverFollowing(Game game, Player seat) {
+        return Math.min(SecretDrawValue.of(game, seat), CardValueScale.STRATEGY_TOKEN);
     }
 
     static boolean holdsThreatenedMecatol(PlanInputs in) {

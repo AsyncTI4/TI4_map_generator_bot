@@ -74,6 +74,8 @@ class OverruleCardTest extends BaseTi4Test {
         }
     }
 
+    // Picking Imperial only for its secret saves just a strategy token over following it, but Overrule's secret comes
+    // on top of following Imperial later, so here the secret counts in full.
     @Test
     void overruleIsPlayedOnImperialWhileItIsStillToBePlayed() {
         Plan plan = plan().orElseThrow();

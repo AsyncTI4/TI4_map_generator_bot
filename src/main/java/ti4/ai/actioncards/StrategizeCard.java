@@ -59,6 +59,7 @@ class StrategizeCard {
         List<Secondary> secondaries = new ArrayList<>();
         for (int initiative : game.getSCList()) {
             if (initiative <= 0 || game.getPlayedSCs().contains(initiative)) continue;
+            if (heldByAnother(game, seat, initiative)) continue;
             StrategyCard card = StrategyCard.of(game, initiative);
             boolean known = secondaries.stream().anyMatch(secondary -> secondary.card() == card);
             if (known) continue;
@@ -69,6 +70,11 @@ class StrategizeCard {
                 .reversed()
                 .thenComparing(secondary -> secondary.card().name()));
         return secondaries;
+    }
+
+    private static boolean heldByAnother(Game game, Player seat, int initiative) {
+        return game.getRealPlayers().stream()
+                .anyMatch(player -> player != seat && player.getSCs().contains(initiative));
     }
 
     private static Optional<AiDecision> step(AiTurnContext context, String key, CardPlay play) {

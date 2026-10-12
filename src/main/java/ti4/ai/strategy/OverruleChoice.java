@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -25,6 +26,15 @@ public class OverruleChoice {
         if (!canPlay(game, initiative)) return Optional.empty();
         StrategyCard card = StrategyCard.of(game, initiative);
         CardPlan plan = StrategyCardPlanner.plan(PlanInputs.of(game, seat, PlanMoment.ACTION), initiative);
-        return Optional.of(plan.value() + CardValueScale.PRIOR_WEIGHT * HUMAN_SHARE.getOrDefault(card, 0.0));
+        return Optional.of(plan.value()
+                + extraSecret(game, seat, plan)
+                + CardValueScale.PRIOR_WEIGHT * HUMAN_SHARE.getOrDefault(card, 0.0));
+    }
+
+    private static double extraSecret(Game game, Player seat, CardPlan plan) {
+        return plan.benefit(CardUse.IMPERIAL_SECRET)
+                .filter(benefit -> benefit.value() > 0)
+                .map(benefit -> SecretDrawValue.of(game, seat) - benefit.value())
+                .orElse(0.0);
     }
 }
