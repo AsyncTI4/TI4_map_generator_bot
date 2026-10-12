@@ -189,6 +189,63 @@ class ComponentCardFlowTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // Cards whose only choice is one button after the resolve button: the player, system or tactic pool to aim at.
+    private void oneChoiceCard(String alias, String title, String resolveHandler, String chosen, String... offered) {
+        play(alias);
+        cardLeavesHand(alias, title);
+        ActionCardRules.continuePlay(table.test.context(announcement(title)));
+
+        assertThat(resolveCard(title, resolveHandler)).isEqualTo("FFCC_nekro_" + resolveHandler);
+        assertThat(pressed(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, targets(offered)))))
+                .isEqualTo(chosen);
+        assertThat(play().map(CardPlay::stage)).contains(Stage.DONE);
+    }
+
+    @Test
+    void insubordinationPicksAPlayerWithATacticToken() {
+        threePlayers();
+        table.sol.setTacticalCC(3);
+        table.points(table.sol, 8);
+
+        oneChoiceCard(
+                "insub",
+                "Insubordination",
+                "resolveInsubStep1",
+                "insubStep2_sol",
+                "insubStep2_hacan",
+                "insubStep2_sol");
+    }
+
+    @Test
+    void ghostShipPicksTheSystemItDeclared() {
+        String near = AiTestGame.neighbourOf(AiTestGame.HOME);
+        Tile alpha = table.system("39", near);
+        table.ships(table.nekro, table.game.getTileByPosition(AiTestGame.HOME), UnitType.Cruiser, 1);
+
+        oneChoiceCard(
+                "ghost_ship",
+                "Ghost Ship",
+                "resolveGhostShipStep1",
+                "ghostShipStep2_" + alpha.getPosition(),
+                "ghostShipStep2_" + AiTestGame.HOME,
+                "ghostShipStep2_" + alpha.getPosition());
+    }
+
+    @Test
+    void explorationProbePicksTheFrontierSystemItDeclared() {
+        String near = AiTestGame.neighbourOf(AiTestGame.HOME);
+        Tile frontier = table.system("41", near);
+        frontier.addToken(ti4.image.Mapper.getTokenID(ti4.helpers.Constants.FRONTIER), "space");
+        table.ships(table.nekro, table.game.getTileByPosition(AiTestGame.HOME), UnitType.Cruiser, 1);
+
+        oneChoiceCard(
+                "probe",
+                "Exploration Probe",
+                "resolveProbeStep1",
+                "probeStep2_" + frontier.getPosition(),
+                "probeStep2_" + frontier.getPosition());
+    }
+
     // Uprising has two steps: the planet's owner, then the planet.
     @Test
     void uprisingPicksTheOwnerThenThePlanet() {
@@ -473,10 +530,29 @@ class ComponentCardFlowTest extends BaseTi4Test {
     void picksUpATargetStepAfterLosingItsMemory() {
         threePlayers();
         table.cards(table.sol, "intercept");
+        table.game.getGameStats().recordAcPlay("Spy", table.nekro);
 
         assertThat(pressed(ActionCardRules.continuePlay(
                         table.test.contextAt(SETTLED, targets("spyStep2_sol", "spyStep2_hacan")))))
                 .startsWith("spyStep2_");
+    }
+
+    // The Technology card posts a button that begins with the same letters as Focused Research's: it is not a play of
+    // that card, and a button for a card the seat never played is nobody's to press.
+    @Test
+    void doesNotMistakeAnotherCardsButtonsForAPlayInProgress() {
+        threePlayers();
+        AiPrompt research = addressedTo("research", "acquireATechWithSC_first");
+        AiPrompt spyTargets = addressedTo("spy", "spyStep2_sol", "spyStep2_hacan");
+
+        assertThat(ActionCardRules.continuePlay(table.test.contextAt(SETTLED, research, spyTargets)))
+                .isEmpty();
+    }
+
+    private AiPrompt addressedTo(String id, String... customIds) {
+        return AiTestGame.withContent(
+                prompt(id, PromptSource.PUBLIC, SETTLED, customIds),
+                table.nekro.getRepresentationUnfogged() + ", please choose.");
     }
 
     @Test

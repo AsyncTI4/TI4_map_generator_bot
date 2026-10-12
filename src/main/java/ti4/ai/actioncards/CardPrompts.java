@@ -42,7 +42,7 @@ class CardPrompts {
             if (prompt.isHidden() || prompt.createdAtMillis() < since) continue;
             for (PromptButton button : prompt.enabledButtons()) {
                 if (button.isOwnedBy(context.faction())
-                        && button.handlerId().startsWith(prefix)
+                        && matches(button.handlerId(), prefix)
                         && !context.alreadyPressed(prompt, button)) {
                     offers.add(offer(prompt, button, prefix));
                 }
@@ -66,13 +66,18 @@ class CardPrompts {
             if (mentioned && !Prompts.mentions(prompt, context.seat())) continue;
             for (PromptButton button : prompt.enabledButtons()) {
                 if (button.isUnowned()
-                        && button.handlerId().startsWith(prefix)
+                        && matches(button.handlerId(), prefix)
                         && !context.alreadyPressed(prompt, button)) {
                     offers.add(offer(prompt, button, prefix));
                 }
             }
         }
         return offers;
+    }
+
+    static boolean matches(String handlerId, String prefix) {
+        boolean prefixed = prefix.endsWith("_") || prefix.endsWith("@");
+        return prefixed ? handlerId.startsWith(prefix) : handlerId.equals(prefix);
     }
 
     static Optional<Offer> choose(List<Offer> offers, String planned, ToDoubleFunction<String> value) {

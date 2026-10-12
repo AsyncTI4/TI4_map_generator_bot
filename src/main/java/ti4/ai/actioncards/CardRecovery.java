@@ -61,12 +61,13 @@ class CardRecovery {
     }
 
     private static boolean targetPending(AiTurnContext context, String key, AiCard card) {
-        if (!card.hasTarget() || context.seat().getActionCards().containsKey(card.key())) return false;
+        if (!card.hasTarget() || !playedUncanceled(context, card)) return false;
         long since = Prompts.turnStart(context);
         for (String prefix : card.targetPrefixes()) {
             Optional<AiPrompt> prompt = Prompts.newestFirst(context.prompts()).stream()
                     .filter(candidate -> !candidate.isHidden() && candidate.createdAtMillis() >= since)
-                    .filter(candidate -> candidate.hasHandlerPrefix(prefix))
+                    .filter(candidate -> candidate.buttons().stream()
+                            .anyMatch(button -> CardPrompts.matches(button.handlerId(), prefix)))
                     .filter(candidate -> offeredToSeat(context, candidate))
                     .findFirst();
             if (prompt.isEmpty()) continue;
@@ -86,6 +87,13 @@ class CardRecovery {
             return true;
         }
         return false;
+    }
+
+    private static boolean playedUncanceled(AiTurnContext context, AiCard card) {
+        if (context.seat().getActionCards().containsKey(card.key())) return false;
+        return SabotageWindow.latestPlayBy(context.game(), context.seat(), card.key())
+                .filter(play -> !play.isCanceled())
+                .isPresent();
     }
 
     private static boolean offeredToSeat(AiTurnContext context, AiPrompt prompt) {

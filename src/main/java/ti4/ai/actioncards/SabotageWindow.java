@@ -2,6 +2,7 @@ package ti4.ai.actioncards;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -73,7 +74,17 @@ class SabotageWindow {
         return false;
     }
 
+    static Optional<GameStats.ActionCardPlay> latestPlayBy(Game game, Player seat, String alias) {
+        return latestPlayIndex(game, seat, alias).stream()
+                .mapToObj(game.getGameStats().getActionCardPlays()::get)
+                .findFirst();
+    }
+
     static int lastPlayIndex(Game game, Player seat, String alias) {
+        return latestPlayIndex(game, seat, alias).orElse(0);
+    }
+
+    private static OptionalInt latestPlayIndex(Game game, Player seat, String alias) {
         String title = title(alias);
         String playerId = GameStats.getTrackedPlayerId(seat);
         List<GameStats.ActionCardPlay> plays = game.getGameStats().getActionCardPlays();
@@ -81,10 +92,10 @@ class SabotageWindow {
             if (title.equals(plays.get(index).getActionCard())
                     && playerId != null
                     && playerId.equals(plays.get(index).getPlayerId())) {
-                return index;
+                return OptionalInt.of(index);
             }
         }
-        return 0;
+        return OptionalInt.empty();
     }
 
     static boolean canceled(Game game, Player seat, String alias, int playsBefore) {

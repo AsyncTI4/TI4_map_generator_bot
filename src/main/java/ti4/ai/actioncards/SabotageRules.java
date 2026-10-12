@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
+import ti4.ai.AiSettings;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -64,7 +65,7 @@ public class SabotageRules {
     }
 
     public static Optional<AiDecision> followUp(AiTurnContext context) {
-        if (!context.isActivePlayer()) return Optional.empty();
+        if (!context.isActivePlayer() || AiSettings.usesLegacyActionCards(context.seat())) return Optional.empty();
         return crisisSabotaged(context).or(() -> couped(context));
     }
 
