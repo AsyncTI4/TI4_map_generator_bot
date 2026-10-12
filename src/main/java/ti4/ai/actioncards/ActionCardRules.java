@@ -53,7 +53,8 @@ public class ActionCardRules {
         Player seat = context.seat();
         String key = PlayMemory.turnKey(context);
         if (context.memory().has(key) || !mayPlay(game, seat) || keepsSpyNetworkCards(seat)) return Optional.empty();
-        return ActionCardValue.bestComponentPlay(game, seat).flatMap(best -> startPlay(context, key, best.alias()));
+        return ActionCardValue.bestComponentPlay(game, seat, PlayMoment.BEFORE_PASSING)
+                .flatMap(best -> startPlay(context, key, best.alias(), PlayMoment.BEFORE_PASSING));
     }
 
     public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context) {
@@ -62,8 +63,12 @@ public class ActionCardRules {
         String key = PlayMemory.turnKey(context);
         if (context.memory().has(key) || !mayPlay(game, seat) || keepsSpyNetworkCards(seat)) return Optional.empty();
         Optional<ActionCardValue.Candidate> best = ActionCardValue.bestNewComponentPlay(game, seat);
-        if (best.isEmpty() || tacticalActionBeats(context, best.get().value())) return Optional.empty();
-        return startPlay(context, key, best.get().alias());
+        if (best.isEmpty()
+                || (!best.get().urgent()
+                        && tacticalActionBeats(context, best.get().value()))) {
+            return Optional.empty();
+        }
+        return startPlay(context, key, best.get().alias(), PlayMoment.IN_TURN);
     }
 
     private static boolean tacticalActionBeats(AiTurnContext context, double actionValue) {
@@ -89,7 +94,7 @@ public class ActionCardRules {
         if (!mayPlay(game, seat) || keepsSpyNetworkCards(seat)) return Optional.empty();
         Optional<ActionCardValue.Candidate> best =
                 ActionCardValue.bestReactionPlay(game, seat, Window.AFTER_ACTIVATION);
-        return best.flatMap(card -> startPlay(context, key, card.alias()));
+        return best.flatMap(card -> startPlay(context, key, card.alias(), PlayMoment.IN_TURN));
     }
 
     public static Optional<AiDecision> masterPlan(AiTurnContext context, boolean secondActionIsWorthIt) {
@@ -109,7 +114,7 @@ public class ActionCardRules {
                         .isPresent())
                 .sorted()
                 .findFirst()
-                .flatMap(alias -> startPlay(context, key, alias));
+                .flatMap(alias -> startPlay(context, key, alias, PlayMoment.IN_TURN));
     }
 
     public static Optional<AiDecision> holdOwnTurn(AiTurnContext context) {
@@ -179,6 +184,10 @@ public class ActionCardRules {
         return Optional.empty();
     }
 
+    public static boolean mayPlayNow(Game game, Player seat) {
+        return !AiSettings.usesLegacyActionCards(seat) && mayPlay(game, seat) && !keepsSpyNetworkCards(seat);
+    }
+
     static boolean mayPlay(Game game, Player seat) {
         if (censured(game, seat) || ButtonHelper.isPlayerOverLimit(game, seat)) return false;
         Player active = game.getActivePlayer();
@@ -193,11 +202,11 @@ public class ActionCardRules {
         return SpyNetwork.holds(seat) && seat.getAcCount() <= SpyNetwork.CARDS;
     }
 
-    private static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias) {
+    private static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias, PlayMoment moment) {
         Integer index = context.seat().getActionCards().get(alias);
         Optional<AiCard> card = AiActionCards.of(alias);
         if (index == null || card.isEmpty()) return Optional.empty();
-        Plan plan = card.get().planFor(context.game(), context.seat()).orElse(Plan.of(0));
+        Plan plan = card.get().planFor(context.game(), context.seat(), moment).orElse(Plan.of(0));
         String title = SabotageWindow.title(alias);
         Optional<Match> play = ActionCardHand.playButton(
                 context, index, card.get().playSuffix().apply(context.game()), Long.MIN_VALUE);

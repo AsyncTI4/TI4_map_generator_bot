@@ -235,7 +235,9 @@ to build one by hand:
   Leadership or Propagation with no tactic token left, Diplomacy to lock a threatened system or once planets are
   worth readying, Construction to produce or to place PDS under threat or a dock in the first 3 rounds, PoK Warfare
   once taking back a token unlocks a much better action, Thunder's Edge Warfare to reactivate a system or with no
-  tactic token, and Imperial while it can score two objectives or before an enemy fleet takes Mecatol Rex. Otherwise
+  tactic token, and Imperial while it can score two objectives or before an enemy fleet takes Mecatol Rex, except that
+  Imperial waits while the best tactical action takes Mecatol Rex (the point is then scored with the card; unless
+  playing it now wins the game) and while the seat's own _Overrule_ is due first. Otherwise
   it plays the card once no tactical action is left. While it holds Warfare for a second build or to build and then
   move out, the tactical planner favours producing at home first (`SetupHint`). After playing a card it resolves the
   primary before ending its turn, paying every cost the bot leaves to the player:
@@ -380,7 +382,7 @@ to build one by hand:
     | Plagiarize | the tech tempo times a non-faction technology a neighbour owns (and the objective it completes) less the 5 influence, paid with the planets it can best spare | the best such technology |
     | Impersonation | the value of a fresh secret less the 3 influence, paid with the planets it can best spare | none: the secret is drawn at once |
     | Counterstroke (2 copies) | the tactic token it gets back (at least 0.75) plus what its ships in that system could do once the token no longer holds them; played after another player activates a system holding its token | none: it takes the token back in the system |
-    | Overrule | what the strategy card plan values the primary of the card at (Imperial or Technology, the two the bot can run for a card nobody played), plus a little for how often human players overrule that card (Imperial 0.45, Technology 0.25) | an unplayed card of those two; the card stays unplayed for its holder |
+    | Overrule | on Imperial, the points its primary scores beyond what the status phase would (one more public objective than the seat has scoring chances for, 2 for a stage II objective, and 1 for Mecatol Rex), valued as points, or 30 when they reach the goal, plus a fresh secret when it holds no Mecatol Rex; on Technology, what the strategy card plan values the primary at; plus a little for how often human players overrule that card (Imperial 0.5, Technology 0.16). It is held for a *points play* (Imperial with at least a point to score) or a use worth the reserve, see below | an unplayed Imperial or Technology, among the uses the reserve lets through; the card stays unplayed for its holder |
     | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the unchosen ones and its own unplayed cards (a card another player will play this round can simply be followed), never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
     | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
     | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), else a pure stall | a legal system that is not next to its own planets or units |
@@ -427,7 +429,22 @@ to build one by hand:
     uses, a tactical action that attacks or is worth most of a point, or an Imperial that scores right away. With Fleet
     Logistics too it plays Master Plan first. Once the Sabotage window has closed on it, the seat presses the bot's
     button for the extra action and takes it the way Fleet Logistics does; a Sabotaged Master Plan gives nothing.
-  - **Overrule.** The bot plays the primary of the chosen card as if it were played, but nothing is marked played, nobody can
+  - **Overrule is held for points.** Human players keep it for a late play that scores: taking Mecatol Rex and then
+    overruling Imperial for its point, an extra public objective through Imperial, or both. So the seat keeps it
+    at a reserve of 10.8 (0.9 of a late victory point, worth 12) and plays it only on a points play, which the reserve
+    never holds back, or on a use worth that much. A fresh secret and a free technology are not, so the card stays in
+    the hand, above the rest of it (above a Sabotage kept against a contender) at the hand limit, until a points play
+    appears. A points play is not compared with a tactical action, since Imperial may be played by its holder first.
+    The reserve is lifted in the final round (someone within 2 points of the goal) for a seat that cannot win with the
+    card (not a contender, and its points, those in reach and the card's own point fall short of the goal), and for any seat that is
+    about to pass, which then plays the card on its best use rather than pass with it. Two waits come before a play:
+    while the seat does not hold Mecatol Rex and its best tactical action takes it, the card waits for that action
+    (unless the play wins the game), and a seat with its own unplayed Imperial and a points play for Overrule on it (a
+    third public objective, or Mecatol Rex) overrules Imperial first and plays Imperial afterwards, two primaries in a
+    round. The seat's own Imperial is held back for the card in that case, in the turn, the second strategic action
+    and the final fallback. Once the card is played, the choice of card is made again from the same rules, but a played
+    card is never wasted: if the reserve would hold every use back it takes the best.
+  - **Overrule, playing.** The bot plays the primary of the chosen card as if it were played, but nothing is marked played, nobody can
     follow, and its message names the card as overruled with the seat's own buttons. The AI therefore starts the primary
     itself (it remembers the card as played this turn, finds the message by the word overruled and the card's name), never
     waits for secondaries, and never touches the card's follow queue. Warfare, Leadership, Politics and the rest are left
@@ -452,8 +469,9 @@ to build one by hand:
     Involvement is 1 for a card aimed at the seat (_Coup d'Etat_, _Extreme Duress_ and _Crisis_ on its turn, _Public
     Disgrace_ while it picks, a combat card played by its opponent in the system it fights in), 0.6 in the agenda
     phase and 0.35 otherwise; standing is as above (3 for a contender). The points a card can give its player
-    (`CardScoring`) are: for _Overrule_, Imperial's extra public and the Mecatol Rex point while Imperial is still to be
-    played; 0.6 for an _Imperial Rider_; 0.5 for _Political Stability_, _Puppets on a String_ and _Master Plan_ while
+    (`CardScoring`) are: for _Overrule_, what its seat's Imperial primary would score (`ScoringStakes.overrulePlay`:
+    one more public objective, 2 for a stage II, and the Mecatol Rex point) while Imperial is still to be played, and
+    the whole game when that reaches the goal; 0.6 for an _Imperial Rider_; 0.5 for _Political Stability_, _Puppets on a String_ and _Master Plan_ while
     the player holds Imperial; the spend objective an economy card or _Uprising_ unlocks; and a technology objective
     that is one technology short for a research card. The points a card aimed at the seat would stop it scoring are
     what its planned strategy card scores (_Public Disgrace_, _Coup d'Etat_, _Crisis_), its reserved trade goods
@@ -828,7 +846,10 @@ Six small generic changes don't reference `ti4.ai`:
   over keeping it" rule are not yet checked against human play rates in a large self-play batch.
 - **Action cards, Overrule.** It only performs Imperial and Technology. The bot cannot yet run the other primaries
   from an overruled card, though human players also overrule Warfare (10% of plays), Construction (9%) and
-  Leadership (6%).
+  Leadership (6%). Overruling the seat's own readied Imperial and then playing it assumes the table accepts that.
+  It is never the second action of _Master Plan_ or _Fleet Logistics_ (a component action card is never the second
+  action), though a points play can wait for the turn after. The wait for the Mecatol Rex swipe trusts the highest
+  ranked tactical action; if that action is never taken, the card is played at the pass.
 - **Action cards, Strategize.** Never Technology (the bot's button grants the technology without collecting its 4
   resources, so the AI could not pay honestly) or Leadership (the strategy token taken up front has to be regained by
   hand).

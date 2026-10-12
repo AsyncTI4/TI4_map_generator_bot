@@ -48,7 +48,11 @@ public class ActionCardValue {
     private static final double SPARE_BELOW = 2.0;
     private static final double NEAR_LIMIT_PRIOR_SHARE = 0.5;
 
-    record Candidate(String alias, double value) {
+    record Candidate(String alias, double value, boolean urgent) {
+
+        Candidate(String alias, double value) {
+            this(alias, value, false);
+        }
 
         double margin() {
             return value - ActionCardPrior.keepPrior(alias);
@@ -56,7 +60,11 @@ public class ActionCardValue {
     }
 
     public static Optional<Candidate> bestComponentPlay(Game game, Player seat) {
-        if (!AiSettings.usesLegacyActionCards(seat)) return bestNewComponentPlay(game, seat);
+        return bestComponentPlay(game, seat, PlayMoment.IN_TURN);
+    }
+
+    static Optional<Candidate> bestComponentPlay(Game game, Player seat, PlayMoment moment) {
+        if (!AiSettings.usesLegacyActionCards(seat)) return bestNewComponentPlay(game, seat, moment);
         boolean nearLimit = seat.getAcCount() >= ButtonHelper.getACLimit(game, seat) - 1;
         double threshold = nearLimit ? NEAR_LIMIT_THRESHOLD : PLAY_THRESHOLD;
         return COMPONENT_CARDS.stream()
@@ -67,18 +75,22 @@ public class ActionCardValue {
     }
 
     static Optional<Candidate> bestNewComponentPlay(Game game, Player seat) {
-        return bestPlay(game, seat, Window.ECONOMY, Window.COMPONENT_ACTION);
+        return bestNewComponentPlay(game, seat, PlayMoment.IN_TURN);
+    }
+
+    static Optional<Candidate> bestNewComponentPlay(Game game, Player seat, PlayMoment moment) {
+        return bestPlay(game, seat, moment, Window.ECONOMY, Window.COMPONENT_ACTION);
     }
 
     static Optional<Candidate> bestReactionPlay(Game game, Player seat, Window window) {
-        return bestPlay(game, seat, window);
+        return bestPlay(game, seat, PlayMoment.IN_TURN, window);
     }
 
-    private static Optional<Candidate> bestPlay(Game game, Player seat, Window... windows) {
+    private static Optional<Candidate> bestPlay(Game game, Player seat, PlayMoment moment, Window... windows) {
         if (AiSettings.usesLegacyActionCards(seat)) return Optional.empty();
         double share = seat.getAcCount() >= ButtonHelper.getACLimit(game, seat) - 1 ? NEAR_LIMIT_PRIOR_SHARE : 1.0;
         return seat.getActionCards().keySet().stream()
-                .map(alias -> candidate(game, seat, alias, List.of(windows)))
+                .map(alias -> candidate(game, seat, alias, List.of(windows), moment))
                 .flatMap(Optional::stream)
                 .filter(candidate -> candidate.value() >= share * ActionCardPrior.keepPrior(candidate.alias()))
                 .max(Comparator.comparingDouble(Candidate::margin)
@@ -86,11 +98,12 @@ public class ActionCardValue {
                         .thenComparing(Candidate::alias, Comparator.reverseOrder()));
     }
 
-    private static Optional<Candidate> candidate(Game game, Player seat, String alias, List<Window> windows) {
+    private static Optional<Candidate> candidate(
+            Game game, Player seat, String alias, List<Window> windows, PlayMoment moment) {
         return AiActionCards.of(alias)
                 .filter(card -> windows.contains(card.window()))
-                .flatMap(card -> card.planFor(game, seat))
-                .map(plan -> new Candidate(alias, plan.value()));
+                .flatMap(card -> card.planFor(game, seat, moment))
+                .map(plan -> new Candidate(alias, plan.value(), plan.urgent()));
     }
 
     static double playValue(Game game, Player seat, String alias) {
@@ -140,7 +153,7 @@ public class ActionCardValue {
         if (card.isEmpty()) return NOT_USABLE;
         double prior = ActionCardPrior.keepPrior(alias);
         if (card.get().isSabotage()) return sabotageKeep(game, seat, alias, prior);
-        double held = prior * card.get().availabilityFor(game, seat);
+        double held = card.get().keepFloorFor(game, seat, alias);
         double now = Math.min(card.get().playValueFor(game, seat), ECONOMY_CAP);
         return Math.max(held, now);
     }
@@ -154,13 +167,21 @@ public class ActionCardValue {
         return Math.max(prior, SabotagePolicy.reserve(game, seat, ""));
     }
 
+    private record DiscardKey(String alias, double keep, double prior, double play) {}
+
     public static List<String> discardOrder(Game game, Player seat) {
-        List<String> aliases = new ArrayList<>(seat.getActionCards().keySet());
-        aliases.sort(Comparator.comparingDouble((String alias) -> keepValue(game, seat, alias))
-                .thenComparingDouble(ActionCardPrior::keepPrior)
-                .thenComparingDouble(alias -> playValue(game, seat, alias))
-                .thenComparing(Comparator.naturalOrder()));
-        return aliases;
+        return seat.getActionCards().keySet().stream()
+                .map(alias -> new DiscardKey(
+                        alias,
+                        keepValue(game, seat, alias),
+                        ActionCardPrior.keepPrior(alias),
+                        playValue(game, seat, alias)))
+                .sorted(Comparator.comparingDouble(DiscardKey::keep)
+                        .thenComparingDouble(DiscardKey::prior)
+                        .thenComparingDouble(DiscardKey::play)
+                        .thenComparing(DiscardKey::alias))
+                .map(DiscardKey::alias)
+                .toList();
     }
 
     public static boolean hasSpareCard(Game game, Player seat) {

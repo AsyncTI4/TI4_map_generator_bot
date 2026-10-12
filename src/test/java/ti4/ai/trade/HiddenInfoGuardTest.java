@@ -130,6 +130,8 @@ class HiddenInfoGuardTest extends BaseTi4Test {
                 "Coup d'Etat");
 
         ScoringStakes.pointsInReach(table.game, table.nekro, spy);
+        ScoringStakes.overrulePlay(table.game, spy);
+        ScoringStakes.overrulePoints(table.game, spy);
         ScoringStakes.contender(table.game, table.nekro, spy);
         ScoringStakes.anyOpponentIsContender(table.game, table.nekro);
         SecretOdds.chanceReady(table.game, table.nekro, spy);

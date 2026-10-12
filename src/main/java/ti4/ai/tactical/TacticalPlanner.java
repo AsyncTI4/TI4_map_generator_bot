@@ -93,10 +93,19 @@ public class TacticalPlanner {
         return best(game, seat, List.of());
     }
 
+    public static boolean hasTokensForAnAction(Game game, Player seat) {
+        return seat.getTacticalCC() > 0
+                && coversReserve(seat, ScoringReserve.of(game, seat).tokens());
+    }
+
+    private static boolean coversReserve(Player seat, int reservedTokens) {
+        return seat.getTacticalCC() + seat.getStrategicCC() - 1 >= reservedTokens;
+    }
+
     public static Optional<TacticalPlan> best(Game game, Player seat, List<SetupHint> hints) {
         if (seat.getTacticalCC() <= 0) return Optional.empty();
         int reservedTokens = ScoringReserve.of(game, seat).tokens();
-        if (seat.getTacticalCC() + seat.getStrategicCC() - 1 < reservedTokens) return Optional.empty();
+        if (!coversReserve(seat, reservedTokens)) return Optional.empty();
         Context context = new Context(game, seat, Set.of(), hints);
         List<TacticalPlan> plans = candidates(context, tile -> activatable(game, seat, tile));
         if (plans.isEmpty()) return Optional.empty();

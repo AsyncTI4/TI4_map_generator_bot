@@ -1,5 +1,6 @@
 package ti4.ai.scoring;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -20,6 +21,11 @@ public class ScoringStakes {
     private static final int RISES_FROM_GOAL = 4;
     private static final double RIVAL_POINT_SHARE = 0.25;
     private static final int MECATOL_POINTS = 1;
+
+    public record OverrulePlay(int points, boolean wins) {
+
+        static final OverrulePlay NOTHING = new OverrulePlay(0, false);
+    }
 
     public static double vpWorth(Game game, Player player) {
         int beyond = Math.max(0, player.getTotalVictoryPoints() - (game.getVp() - RISES_FROM_GOAL));
@@ -60,6 +66,49 @@ public class ScoringStakes {
         return game.getRealPlayers().stream()
                 .filter(other -> other != seat && !other.isEliminated())
                 .anyMatch(other -> contender(game, seat, other));
+    }
+
+    public static int overrulePoints(Game game, Player player) {
+        return overrulePlay(game, player).points();
+    }
+
+    public static OverrulePlay overrulePlay(Game game, Player player) {
+        if (!imperialIsUnplayed(game)) return OverrulePlay.NOTHING;
+        List<Integer> publics = qualifyingPublicsWithOneSpend(game, player);
+        int chances = ScoringReserve.scoringChances(game, player);
+        int extraPublic = sum(publics, chances + 1) - sum(publics, chances);
+        int mecatol = player.controlsMecatol(true) ? MECATOL_POINTS : 0;
+        int points = extraPublic + mecatol;
+        int bestPublic = publics.isEmpty() ? 0 : publics.getFirst();
+        int immediate = bestPublic + mecatol;
+        boolean wins = immediate > 0 && game.getVp() > 0 && player.getTotalVictoryPoints() + immediate >= game.getVp();
+        if (!wins) return new OverrulePlay(points, false);
+        return new OverrulePlay(Math.max(points, game.getVp() - player.getTotalVictoryPoints()), true);
+    }
+
+    private static List<Integer> qualifyingPublicsWithOneSpend(Game game, Player player) {
+        List<String> scorable = ObjectivePolicy.scorablePublics(game, player);
+        List<Integer> points = new ArrayList<>(scorable.stream()
+                .filter(id -> !ObjectiveCatalog.isSpend(id))
+                .map(ObjectivePolicy::victoryPoints)
+                .toList());
+        scorable.stream()
+                .filter(ObjectiveCatalog::isSpend)
+                .map(ObjectivePolicy::victoryPoints)
+                .max(Comparator.naturalOrder())
+                .ifPresent(points::add);
+        points.sort(Comparator.reverseOrder());
+        return points;
+    }
+
+    private static int sum(List<Integer> descending, int count) {
+        return descending.stream().limit(count).mapToInt(Integer::intValue).sum();
+    }
+
+    private static boolean imperialIsUnplayed(Game game) {
+        return game.getSCList().stream()
+                .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.IMPERIAL
+                        && !game.getPlayedSCs().contains(card));
     }
 
     private static int publicPoints(Game game, Player player) {

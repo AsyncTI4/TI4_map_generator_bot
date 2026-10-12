@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.actioncards.CardChains.Source;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.strategy.OverruleChoice;
+import ti4.ai.strategy.OverruleChoice.Option;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -21,39 +22,71 @@ class OverruleCard {
     private static final String SUFFIX = "_overrule";
 
     static AiCard overrule() {
-        TargetStep pick = CardChains.chain(CardChains.last(
-                PICK_PREFIX,
-                Source.ANYONE,
-                (context, suffix) -> value(context.game(), context.seat(), initiativeOf(suffix))
-                        .orElse(Double.NEGATIVE_INFINITY),
-                "overrule"));
         return AiActionCards.component(
-                OVERRULE, OverruleCard::plan, "overruleStart", List.of(PICK_PREFIX), (context, key, play) -> {
-                    Optional<AiDecision> decision = pick.next(context, key, play);
-                    decision.filter(AiDecision.Press.class::isInstance)
-                            .map(AiDecision.Press.class::cast)
-                            .map(press -> initiativeOf(
-                                    StringUtils.removeStart(press.button().handlerId(), PICK_PREFIX)))
-                            .filter(initiative -> initiative > 0)
-                            .ifPresent(initiative -> StrategyCardRules.beginOverruledPrimary(context, initiative));
-                    return decision;
-                });
+                        OVERRULE,
+                        Evaluator.atMoment(OverruleCard::plan),
+                        "overruleStart",
+                        List.of(PICK_PREFIX),
+                        (context, key, play) -> {
+                            Optional<AiDecision> decision =
+                                    pick(initiativeOf(play.extra())).next(context, key, play);
+                            decision.filter(AiDecision.Press.class::isInstance)
+                                    .map(AiDecision.Press.class::cast)
+                                    .map(press -> initiativeOf(StringUtils.removeStart(
+                                            press.button().handlerId(), PICK_PREFIX)))
+                                    .filter(initiative -> initiative > 0)
+                                    .ifPresent(
+                                            initiative -> StrategyCardRules.beginOverruledPrimary(context, initiative));
+                            return decision;
+                        })
+                .withKeepFloor(OverruleReserve::keepFloor);
     }
 
-    static Optional<Plan> plan(Game game, Player seat) {
+    private static TargetStep pick(int planned) {
+        return CardChains.chain(CardChains.last(
+                PICK_PREFIX,
+                Source.ANYONE,
+                (context, suffix) -> pickValue(context.game(), context.seat(), initiativeOf(suffix), planned),
+                "overrule"));
+    }
+
+    static Optional<Plan> plan(Game game, Player seat, PlayMoment moment) {
         if (game.isFowMode()) return Optional.empty();
-        return game.getSCList().stream()
-                .filter(initiative -> OverruleChoice.canPlay(game, initiative))
-                .map(initiative -> Plan.aimedAt(
-                        value(game, seat, initiative).orElse(Double.NEGATIVE_INFINITY),
-                        initiative + SUFFIX,
-                        "on " + Helper.getSCName(initiative, game) + "."))
-                .filter(plan -> plan.value() > Double.NEGATIVE_INFINITY)
+        return keptOptions(game, seat, moment).stream()
+                .map(option -> planOf(game, option))
                 .max(Comparator.comparingDouble(Plan::value).thenComparing(Plan::target));
     }
 
-    private static Optional<Double> value(Game game, Player seat, int initiative) {
-        return OverruleChoice.value(game, seat, initiative);
+    private static Plan planOf(Game game, Option option) {
+        Plan plan = Plan.aimedAt(
+                option.value(),
+                option.initiative() + SUFFIX,
+                "on " + Helper.getSCName(option.initiative(), game) + ".");
+        return option.pointsPlay() ? plan.urgently() : plan;
+    }
+
+    private static List<Option> keptOptions(Game game, Player seat, PlayMoment moment) {
+        List<Option> options = game.getSCList().stream()
+                .map(initiative -> OverruleChoice.option(game, seat, initiative))
+                .flatMap(Optional::stream)
+                .toList();
+        if (moment == PlayMoment.IN_TURN && OverruleChoice.takesMecatolFirst(game, seat)) {
+            return options.stream().filter(Option::wins).toList();
+        }
+        boolean reserved = OverruleReserve.active(game, seat, moment);
+        return options.stream()
+                .filter(option -> option.pointsPlay() || !reserved || option.value() >= OverruleReserve.VALUE)
+                .toList();
+    }
+
+    private static double pickValue(Game game, Player seat, int initiative, int planned) {
+        Optional<Option> option = OverruleChoice.option(game, seat, initiative);
+        if (option.isEmpty()) return Double.NEGATIVE_INFINITY;
+        List<Option> kept = keptOptions(game, seat, PlayMoment.IN_TURN);
+        boolean allowed = initiative == planned
+                || kept.isEmpty()
+                || kept.stream().anyMatch(other -> other.initiative() == initiative);
+        return allowed ? option.get().value() : Double.NEGATIVE_INFINITY;
     }
 
     private static int initiativeOf(String suffix) {

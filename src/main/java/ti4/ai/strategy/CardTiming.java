@@ -26,6 +26,7 @@ class CardTiming {
 
     static Timing of(PlanInputs in, CardPlan plan) {
         if (plan.card() == StrategyCard.WARFARE) return warfare(in, plan);
+        if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
         Optional<Benefit> main = plan.main();
         if (main.isEmpty()) return Timing.FALLBACK;
         return dueNow(in, main.get()) ? Timing.NOW : Timing.FALLBACK;
@@ -42,10 +43,18 @@ class CardTiming {
             case CONSTRUCTION_PDS -> main.hasTarget() && in.round() >= FIRST_ROUND_FOR_EARLY_PDS;
             case CONSTRUCTION_DOCK -> in.round() <= CardValueScale.LAST_EARLY_DOCK_ROUND;
             case IMPERIAL_MECATOL -> ImperialUses.holdsThreatenedMecatol(in);
-            case IMPERIAL_SCORE ->
-                ObjectivePolicy.scorablePublics(in.game(), seat).size() >= PUBLICS_FOR_IMPERIAL_NOW;
+            case IMPERIAL_SCORE -> imperialScoresNow(in);
             default -> false;
         };
+    }
+
+    private static boolean yieldsToOverrule(PlanInputs in) {
+        return OverruleChoice.overrulesOwnImperialFirst(in.game(), in.seat());
+    }
+
+    private static boolean imperialScoresNow(PlanInputs in) {
+        if (ImperialUses.takesMecatolFirst(in) && !ImperialUses.winsByScoring(in)) return false;
+        return ObjectivePolicy.scorablePublics(in.game(), in.seat()).size() >= PUBLICS_FOR_IMPERIAL_NOW;
     }
 
     private static Timing warfare(PlanInputs in, CardPlan plan) {

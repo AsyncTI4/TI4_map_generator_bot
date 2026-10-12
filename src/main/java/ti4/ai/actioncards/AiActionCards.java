@@ -6,10 +6,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
+import ti4.ai.actioncards.AiCard.KeepFloor;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.nekro.CommandTokenPolicy;
@@ -23,7 +23,7 @@ import ti4.helpers.ActionCardHelper;
 public class AiActionCards {
 
     static final String SABOTAGE = "sabotage";
-    private static final ToDoubleBiFunction<Game, Player> ALWAYS = (game, seat) -> 1.0;
+    private static final KeepFloor PRIOR = (game, seat, alias) -> ActionCardPrior.keepPrior(alias);
     private static final Evaluator NEVER = (game, seat) -> Optional.empty();
     private static final double SUMMIT_TOKEN_VALUE = 2.0;
 
@@ -41,7 +41,7 @@ public class AiActionCards {
                     ActionCardValue.SUMMIT::equals,
                     Window.PRE_PLAY,
                     (game, seat) -> Optional.of(Plan.of(summitValue(game, seat))),
-                    ALWAYS,
+                    PRIOR,
                     "resolveSummit",
                     List.of(),
                     EconomyTargets::summitTokens),
@@ -82,7 +82,7 @@ public class AiActionCards {
                     ActionCardHelper::isSabotageOrShatter,
                     Window.REACTION,
                     NEVER,
-                    ALWAYS,
+                    PRIOR,
                     null,
                     List.of(),
                     null));
@@ -137,7 +137,7 @@ public class AiActionCards {
                 key::equals,
                 Window.COMPONENT_ACTION,
                 withStall(evaluator),
-                ALWAYS,
+                PRIOR,
                 resolveHandler,
                 targetPrefixes,
                 target,
@@ -145,7 +145,7 @@ public class AiActionCards {
     }
 
     static AiCard afterAction(String key, Predicate<String> matches, TargetStep target) {
-        return new AiCard(key, matches, Window.AFTER_ACTION, NEVER, ALWAYS, null, List.of(), target);
+        return new AiCard(key, matches, Window.AFTER_ACTION, NEVER, PRIOR, null, List.of(), target);
     }
 
     static AiCard componentOfCopies(
@@ -160,7 +160,7 @@ public class AiActionCards {
                 matches,
                 Window.COMPONENT_ACTION,
                 withStall(evaluator),
-                ALWAYS,
+                PRIOR,
                 resolveHandler,
                 targetPrefixes,
                 target);
@@ -190,7 +190,7 @@ public class AiActionCards {
                 matches,
                 Window.AFTER_ACTIVATION,
                 whenActivated(condition, evaluator),
-                ALWAYS,
+                PRIOR,
                 null,
                 targetPrefixes,
                 target,
@@ -213,7 +213,7 @@ public class AiActionCards {
             String resolveHandler,
             List<String> targetPrefixes,
             TargetStep target) {
-        return new AiCard(key, key::equals, window, evaluator, ALWAYS, resolveHandler, targetPrefixes, target);
+        return new AiCard(key, key::equals, window, evaluator, PRIOR, resolveHandler, targetPrefixes, target);
     }
 
     private static AiCard economy(String alias, String resolveHandler, TargetStep target) {
@@ -223,14 +223,15 @@ public class AiActionCards {
                 matches,
                 Window.ECONOMY,
                 (game, seat) -> ActionCardValue.economyPlan(game, seat, alias),
-                ALWAYS,
+                PRIOR,
                 resolveHandler,
                 List.of(),
                 target);
     }
 
     private static Evaluator withStall(Evaluator evaluator) {
-        return (game, seat) -> evaluator.plan(game, seat).map(plan -> plan.plus(Stall.actionValue(game, seat)));
+        return Evaluator.atMoment((game, seat, moment) ->
+                evaluator.plan(game, seat, moment).map(plan -> plan.plus(Stall.actionValue(game, seat))));
     }
 
     private static double summitValue(Game game, Player seat) {

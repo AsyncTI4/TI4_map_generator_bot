@@ -9,6 +9,7 @@ import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.strategy.CardPlan.Benefit;
 import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -54,14 +55,31 @@ class ImperialUses {
         return takesMecatolThisRound(in) ? CardValueScale.MECATOL_TAKE_SHARE * CardValueScale.VICTORY_POINT : 0;
     }
 
+    static boolean takesMecatolFirst(PlanInputs in) {
+        Player seat = in.seat();
+        if (seat.controlsMecatol(true) || in.ranked().isEmpty()) return false;
+        if (!TacticalPlanner.hasTokensForAnAction(in.game(), seat)) return false;
+        return takesMecatol(in.ranked().getFirst(), mecatolPosition(in.game()));
+    }
+
+    static boolean winsByScoring(PlanInputs in) {
+        int best = ObjectivePolicy.scorablePublics(in.game(), in.seat()).stream()
+                .mapToInt(ObjectivePolicy::victoryPoints)
+                .max()
+                .orElse(0);
+        return best > 0 && in.seat().getTotalVictoryPoints() + best >= in.game().getVp();
+    }
+
     private static boolean takesMecatolThisRound(PlanInputs in) {
         String mecatol = mecatolPosition(in.game());
         if (mecatol.isEmpty()) return false;
         return takesCustodiansThisRound(in.game(), in.seat())
-                || in.ranked().stream()
-                        .filter(plan ->
-                                plan.kind() == TacticalPlan.Kind.EXPAND || plan.kind() == TacticalPlan.Kind.ATTACK)
-                        .anyMatch(plan -> plan.target().equals(mecatol));
+                || in.ranked().stream().anyMatch(plan -> takesMecatol(plan, mecatol));
+    }
+
+    private static boolean takesMecatol(TacticalPlan plan, String mecatol) {
+        boolean takes = plan.kind() == TacticalPlan.Kind.EXPAND || plan.kind() == TacticalPlan.Kind.ATTACK;
+        return takes && !mecatol.isEmpty() && plan.target().equals(mecatol);
     }
 
     private static String mecatolPosition(Game game) {

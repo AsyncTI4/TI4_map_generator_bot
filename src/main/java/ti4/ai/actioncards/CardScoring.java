@@ -9,7 +9,6 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
-import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.ResearchPolicy;
@@ -31,7 +30,7 @@ public class CardScoring {
 
     public static double pointsFor(String title, Game game, Player player) {
         return switch (title) {
-            case "Overrule" -> overrule(game, player);
+            case "Overrule" -> ScoringStakes.overrulePoints(game, player);
             case "Imperial Rider" -> IMPERIAL_RIDER_CHANCE;
             case "Political Stability", "Puppets on a String", "Master Plan" ->
                 ScoringStakes.holdsUnplayedImperial(game, player) ? IMPERIAL_HOLDER_CHANCE : 0;
@@ -57,19 +56,6 @@ public class CardScoring {
                 AgendaPolicy.wouldElectToAPoint(game, seat) ? ONE_POINT : 0;
             default -> 0;
         };
-    }
-
-    private static double overrule(Game game, Player player) {
-        if (!imperialAvailable(game)) return 0;
-        boolean anotherPublic =
-                ObjectivePolicy.scorablePublics(game, player).size() > ScoringReserve.scoringChances(game, player);
-        return (anotherPublic ? ONE_POINT : 0) + mecatolPoint(player);
-    }
-
-    private static boolean imperialAvailable(Game game) {
-        return game.getSCList().stream()
-                .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.IMPERIAL
-                        && !game.getPlayedSCs().contains(card));
     }
 
     private static int mecatolPoint(Player player) {

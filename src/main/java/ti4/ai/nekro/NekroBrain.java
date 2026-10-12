@@ -33,6 +33,7 @@ import ti4.ai.secrets.SecretRules;
 import ti4.ai.secrets.SecretValue;
 import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.ChecksAndBalances;
+import ti4.ai.strategy.OverruleChoice;
 import ti4.ai.strategy.SecondaryQueue;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
@@ -425,7 +426,8 @@ public class NekroBrain implements FactionBrain {
         for (AiPrompt prompt : thisTurn) {
             Optional<PromptButton> play = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
                     && button.handlerId().startsWith("strategicAction_")
-                    && unplayed(context.game(), StrategyCardRanking.initiative(button)));
+                    && unplayed(context.game(), StrategyCardRanking.initiative(button))
+                    && !yieldsToOverrule(context, StrategyCardRanking.initiative(button)));
             if (play.isPresent()) {
                 return Optional.of(StrategyCardRules.play(
                         context, prompt, play.get(), StrategyCardRanking.initiative(play.get())));
@@ -483,7 +485,13 @@ public class NekroBrain implements FactionBrain {
         return Optional.empty();
     }
 
+    private static boolean yieldsToOverrule(AiTurnContext context, int initiative) {
+        return StrategyCard.of(context.game(), initiative) == StrategyCard.IMPERIAL
+                && OverruleChoice.overrulesOwnImperialFirst(context.game(), context.seat());
+    }
+
     private static boolean worthPlayingNow(AiTurnContext context, int initiative) {
+        if (yieldsToOverrule(context, initiative)) return false;
         if (StrategyCardTurn.dueNow(context, initiative)) return true;
         return StrategyCard.of(context.game(), initiative) == StrategyCard.IMPERIAL
                 && StrategyCardRanking.imperialScoresNow(context.game(), context.seat());

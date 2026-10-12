@@ -28,6 +28,7 @@ class ScoringStakesTest extends BaseTi4Test {
         test.aiIsActive("action");
         test.nekroHome();
         test.game.addCustomPO("Custodians", 0);
+        for (int card = 1; card <= IMPERIAL; card++) test.game.setScTradeGood(card, 0);
     }
 
     private void points(Player player, int points) {
@@ -88,6 +89,51 @@ class ScoringStakesTest extends BaseTi4Test {
         test.game.setSCPlayed(IMPERIAL, true);
         assertThat(ScoringStakes.pointsInReach(test.game, test.nekro, test.nekro))
                 .isZero();
+    }
+
+    // Overrule performs Imperial's primary: one more public than the status phase scores, and a point for Mecatol Rex.
+    @Test
+    void overruleIsWorthTheMecatolPointOnlyWhileImperialIsStillToBePlayed() {
+        test.place("18", "000");
+        test.nekro.addPlanet("mr");
+
+        assertThat(ScoringStakes.overrulePoints(test.game, test.nekro)).isEqualTo(1);
+        assertThat(ScoringStakes.overrulePoints(test.game, test.sol)).isZero();
+
+        test.game.setSCPlayed(IMPERIAL, true);
+        assertThat(ScoringStakes.overrulePoints(test.game, test.nekro)).isZero();
+    }
+
+    // Both spend objectives can be paid for on their own, but only one can be paid for with the same ten trade goods,
+    // so Imperial's primary has a single public to score and Overrule adds nothing to the status phase.
+    @Test
+    void onlyOneSpendObjectiveCountsTowardsOverrule() {
+        reveal("trade_routes");
+        reveal("centralize_trade");
+        test.nekro.setTg(10);
+
+        assertThat(ObjectivePolicy.scorablePublics(test.game, test.nekro))
+                .containsExactlyInAnyOrder("trade_routes", "centralize_trade");
+        assertThat(ScoringStakes.overrulePoints(test.game, test.nekro)).isZero();
+    }
+
+    // At 9 of 10 the one public Nekro qualifies for would be scored in the status phase anyway, but through Overrule
+    // it is scored now, which ends the game; two points short it does not.
+    @Test
+    void anOverruleScoreThatReachesTheGoalIsAWinningPlay() {
+        reveal("trade_routes");
+        test.nekro.setTg(5);
+        points(test.nekro, 8);
+
+        assertThat(ScoringStakes.overrulePlay(test.game, test.nekro).wins()).isFalse();
+
+        points(test.nekro, 1);
+
+        ScoringStakes.OverrulePlay play = ScoringStakes.overrulePlay(test.game, test.nekro);
+        assertThat(play.wins()).isTrue();
+        assertThat(play.points()).isEqualTo(1);
+        assertThat(ScoringStakes.scoreValue(test.game, test.nekro, play.points()))
+                .isCloseTo(ScoringStakes.WIN_VALUE, within(EXACT));
     }
 
     // The number of secret objectives in hand is public; the chance one is ready comes from card counting.
