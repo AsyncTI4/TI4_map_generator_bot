@@ -328,41 +328,28 @@ class PromissoryRulesTest extends BaseTi4Test {
         assertThat(PromissoryRules.queueAgendaNote(test.context(whenOffer()))).isEmpty();
     }
 
-    // While the note waits in the queue, the "Pass On Whens" button the bot posts would take it back out.
+    // A note already waiting in the queue is not queued a second time, and the rule does not hold the seat: a queued
+    // seat that waited here would never answer a Sabotage window (see NekroBrainTest).
     @Test
-    void holdsAQueuedNoteUntilItResolves() {
+    void neitherQueuesAgainNorHoldsWhileANoteIsQueued() {
         electionRevealed(6);
+        aiHolds(test.sol, "blue_ps");
         test.game.setStoredValue("queuedWhens", "nekro_");
         test.game.setStoredValue("queuedWhensFornekro", "pn_blue_ps");
 
-        assertThat(PromissoryRules.queueAgendaNote(test.context(hidden("queued", "declineToQueueAWhen"))))
-                .containsInstanceOf(AiDecision.Wait.class);
-    }
-
-    // Once the table moves on to voting (someone pressed "Skip Waiting"), the "when" window is over: holding the note
-    // there would keep the seat from ever voting.
-    @Test
-    void stopsHoldingTheQueuedNoteOnceVotingStarts() {
-        electionRevealed(6);
-        test.game.setStoredValue("queuedWhens", "nekro_");
-        test.game.setStoredValue("queuedWhensFornekro", "pn_blue_ps");
-        test.game.setPhaseOfGame("agendaVoting");
-
-        assertThat(PromissoryRules.queueAgendaNote(test.context(hidden("queued", "declineToQueueAWhen"))))
+        assertThat(PromissoryRules.queueAgendaNote(test.context(whenOffer(), hidden("queued", "declineToQueueAWhen"))))
                 .isEmpty();
     }
 
-    // A "when" queue stuck behind someone else never holds the seat for more than ten minutes.
+    // Once the note has played, its slot is no longer in the queue, so a new note could be queued again.
     @Test
-    void stopsHoldingTheQueuedNoteAfterTenMinutes() {
+    void queuesAgainOnceTheEarlierNoteHasPlayed() {
         electionRevealed(6);
-        test.game.setStoredValue("queuedWhens", "nekro_");
+        aiHolds(test.sol, "blue_ps");
         test.game.setStoredValue("queuedWhensFornekro", "pn_blue_ps");
-        AiPrompt queued = hidden("queued", "declineToQueueAWhen");
-        assertThat(PromissoryRules.queueAgendaNote(test.context(queued))).containsInstanceOf(AiDecision.Wait.class);
 
-        assertThat(PromissoryRules.queueAgendaNote(test.contextAt(NOW + 11 * 60_000L, queued)))
-                .isEmpty();
+        assertThat(pressed(PromissoryRules.queueAgendaNote(test.context(whenOffer()))))
+                .isEqualTo("queueAWhen");
     }
 
     // An election that hands the leader a point is discarded with Political Favor while Xxcha has a strategy token.

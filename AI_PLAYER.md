@@ -287,11 +287,15 @@ to build one by hand:
     everything when a point is at stake, half otherwise, and abstains on agendas it has no stake in. It only
     answers the outcome prompts its own vote opened.
   - **Nekro** cannot vote (Galactic Threat): it never plans a ballot unless the Xxcha commander lets it. Once per
-    agenda phase it queues Galactic Threat as an "after" (and waits quietly while it is queued) when
+    agenda phase it queues Galactic Threat as an "after" when
     another player has a technology it could gain, predicts the outcome most likely to win (the election of the
     player with the most votes), and on a correct prediction takes the best technology (`CopiedTechPolicy`, which
     also caps copied faction technologies at its two Valefar Assimilators). It never researches: every research is
     replaced by Propagation's command tokens, all of them, within its reinforcements.
+  - **Queued entries.** A seat whose "when" or "after" slot holds an entry (a Political Secret or Political Favor
+    note, Galactic Threat) never presses the "Pass On" button the bot posts for it, which would unqueue it, and never
+    holds its turn while the entry waits (`AgendaQueue`). It used to wait quietly, which meant it never answered the
+    Sabotage window of another player's _Veto_ and the agenda stalled until the 24 hour ceiling.
   - As speaker breaking a tie it applies the same preferences. It only breaks real ties while it is the active
     speaker, never an agenda a player is resolving by hand.
 - **Nekro's leaders** (`NekroLeaderRules`).

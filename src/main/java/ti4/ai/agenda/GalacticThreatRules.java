@@ -30,7 +30,6 @@ public class GalacticThreatRules {
     private static final String PLANET_RIDER_PREFIX = "planetRider_";
     private static final String AGENDA_SEEN_KEY = "agendaSeen|";
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
-    private static final long QUEUED_POLL_MILLIS = 30_000L;
     private static final String TECH_PREFIX = "getTech_";
     private static final String NO_PAY_SUFFIX = "__noPay";
     private static final String QUEUE_ABILITY = "queueAfter_ability_galactic_threat";
@@ -58,9 +57,7 @@ public class GalacticThreatRules {
         if (prediction.isPresent()) return prediction;
         if (!game.getStoredValue("galacticThreatUsed").isEmpty()) return Optional.empty();
         if (holdsQueuedPrediction(game, seat) && QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
-            return pressHidden(context, "lockAftersIn", "keep its prediction queued")
-                    .or(() -> Optional.of(
-                            new AiDecision.Wait(context.now() + QUEUED_POLL_MILLIS, "its queued Galactic Threat")));
+            return pressHidden(context, "lockAftersIn", "keep its prediction queued");
         }
         if (!worthPredicting(game, seat)) return Optional.empty();
         return pressHidden(context, QUEUE_ABILITY, "queue Galactic Threat")

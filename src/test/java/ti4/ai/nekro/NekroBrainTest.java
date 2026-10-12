@@ -642,6 +642,80 @@ class NekroBrainTest extends BaseTi4Test {
                 "FFCC_sol_resolveAgendaVote_outcomeTie* against");
     }
 
+    // ---- queued agenda entries --------------------------------------------------------------
+
+    private static final String QUEUED_BY_NEKRO = "nekro_";
+
+    private static AiTestGame agendaTable() {
+        AiTestGame table = new AiTestGame();
+        table.game.setPhaseOfGame("agendawaiting");
+        return table;
+    }
+
+    private AiDecision decideWithOpenSabotageWindow(AiTestGame table, AiPrompt... prompts) {
+        try (MockedStatic<GameMessageManager> messages = Mockito.mockStatic(GameMessageManager.class)) {
+            messages.when(() -> GameMessageManager.getOne(anyString(), anyString()))
+                    .thenAnswer(
+                            call -> Optional.of(new GameMessage(call.getArgument(1), GameMessageType.ACTION_CARD, 0L)));
+            List<AiPrompt> all = new ArrayList<>(List.of(prompts));
+            all.add(publicPrompt("window", NOW - 3_600_000L, "no_sabotage"));
+            return brain.decide(table.contextFor(table.nekro, Set.of(), NOW, all.toArray(AiPrompt[]::new)));
+        }
+    }
+
+    // The "Pass On Whens" button the bot posts for a queued entry would take it back out of the queue, so the seat
+    // leaves it alone; but it must never wait on the entry either, or it could not answer the Sabotage window of a
+    // Veto.
+    @Test
+    void aQueuedWhenIsNotPassedOnAndTheSeatStillAnswersASabotageWindow() {
+        AiTestGame table = agendaTable();
+        table.game.setStoredValue("queuedWhens", QUEUED_BY_NEKRO);
+        table.game.setStoredValue("queuedWhensFornekro", "pn_blue_ps");
+        AiPrompt queued = hiddenPrompt("queued", NOW, "declineToQueueAWhen");
+
+        assertThat(brain.decide(table.contextFor(table.nekro, Set.of(), NOW, queued)))
+                .isInstanceOf(AiDecision.Idle.class);
+        assertPressed(decideWithOpenSabotageWindow(table, queued), "no_sabotage");
+    }
+
+    @Test
+    void aQueuedGalacticThreatIsNotPassedOnAndTheSeatStillAnswersASabotageWindow() {
+        AiTestGame table = agendaTable();
+        table.game.setStoredValue("queuedAfters", QUEUED_BY_NEKRO);
+        table.game.setStoredValue("queuedAftersFornekro", "ability_galactic_threat");
+        AiPrompt queued = hiddenPrompt("queued", NOW, "declineToQueueAnAfter");
+
+        assertThat(brain.decide(table.contextFor(table.nekro, Set.of(), NOW, queued)))
+                .isInstanceOf(AiDecision.Idle.class);
+        assertPressed(decideWithOpenSabotageWindow(table, queued), "no_sabotage");
+    }
+
+    @Test
+    void aQueuedGalacticThreatIsLockedInOnce() {
+        AiTestGame table = agendaTable();
+        table.game.setStoredValue("queuedAfters", QUEUED_BY_NEKRO);
+        table.game.setStoredValue("queuedAftersFornekro", "ability_galactic_threat");
+        AiPrompt lock = hiddenPrompt("lock", NOW, "lockAftersIn");
+
+        assertPressed(brain.decide(table.contextFor(table.nekro, Set.of(), NOW, lock)), "lockAftersIn");
+        assertThat(brain.decide(table.contextFor(
+                        table.nekro,
+                        Set.of(AiTurnContext.pressKey(lock, lock.buttons().getFirst())),
+                        NOW,
+                        lock)))
+                .isInstanceOf(AiDecision.Idle.class);
+    }
+
+    // Once the entry has played it is out of the queue, and the seat passes on the rest as before.
+    @Test
+    void passesOnAftersAgainOnceTheQueuedEntryHasPlayed() {
+        AiTestGame table = agendaTable();
+        table.game.setStoredValue("queuedAftersFornekro", "ability_galactic_threat");
+        AiPrompt queued = hiddenPrompt("queued", NOW, "declineToQueueAnAfter");
+
+        assertPressed(brain.decide(table.contextFor(table.nekro, Set.of(), NOW, queued)), "declineToQueueAnAfter");
+    }
+
     // ---- one action per turn ----------------------------------------------------------------
 
     // Once the AI has pressed its tactical action this turn, the turn buttons stay up; it must not also play its

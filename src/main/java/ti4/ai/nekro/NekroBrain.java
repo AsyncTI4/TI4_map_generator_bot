@@ -13,6 +13,7 @@ import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.actioncards.SabotageRules;
 import ti4.ai.agenda.AgendaPolicy;
+import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.GalacticThreatRules;
 import ti4.ai.brain.AiDecision;
@@ -289,12 +290,13 @@ public class NekroBrain implements FactionBrain {
 
     private Optional<AiDecision> declineWhens(AiTurnContext context) {
         if (context.game().getStoredValue("declinedWhens").contains(context.faction() + "_")) return Optional.empty();
+        if (AgendaQueue.holdsQueuedWhen(context.game(), context.seat())) return Optional.empty();
         return firstHandler(context, "declineToQueueAWhen", "pass on playing a \"when\"");
     }
 
     private Optional<AiDecision> declineAfters(AiTurnContext context) {
         if (context.game().getStoredValue("declinedAfters").contains(context.faction() + "_")) return Optional.empty();
-        if (GalacticThreatRules.holdsQueuedPrediction(context.game(), context.seat())) return Optional.empty();
+        if (AgendaQueue.holdsQueuedAfter(context.game(), context.seat())) return Optional.empty();
         return firstHandler(context, "declineToQueueAnAfter", "pass on playing an \"after\"");
     }
 
