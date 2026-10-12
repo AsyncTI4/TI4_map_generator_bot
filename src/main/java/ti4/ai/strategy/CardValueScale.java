@@ -37,7 +37,9 @@ class CardValueScale {
     static final double ONE_STEP_SHORT_CHANCE = 0.25;
     static final double MECATOL_THREATENED_SHARE = 0.75;
     static final double MECATOL_TAKE_SHARE = 0.5;
-    static final double CUSTODIANS_RACE_TEMPO = 1.5;
+    static final double SPEAKER_RACE_SHARE = 0.2;
+    static final double SPEAKER_RACE_RIVAL_NOW = 0.2;
+    static final double LEADERSHIP_RACE_CAP = 0.5;
     static final double DENIAL_SHARE = 0.5;
     static final int DENIAL_CLOSE_GAP = 2;
     static final double DISTANT_DENIAL_SHARE = 0.5;

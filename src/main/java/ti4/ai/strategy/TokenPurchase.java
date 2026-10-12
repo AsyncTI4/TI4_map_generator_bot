@@ -4,15 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
-import ti4.ai.eval.BoardView;
-import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 public class TokenPurchase {
@@ -73,19 +70,6 @@ public class TokenPurchase {
     }
 
     static boolean custodiansWithinReach(Game game, Player seat) {
-        Optional<Tile> mecatol = game.getTileMap().values().stream()
-                .filter(tile -> tile.isMecatol(game))
-                .filter(tile -> BoardView.planets(tile).stream().anyMatch(BoardView::hasCustodians))
-                .findFirst();
-        if (mecatol.isEmpty()) return false;
-        int move = BoardView.moveValueWithGravityDrive(seat, UnitType.Carrier);
-        for (Tile tile : game.getTileMap().values()) {
-            if (!BoardView.hasOwnShips(seat, tile)) continue;
-            if (MovementGraph.reach(game, seat, tile.getPosition(), move)
-                    .containsKey(mecatol.get().getPosition())) {
-                return true;
-            }
-        }
-        return false;
+        return CustodiansRace.open(game) && CustodiansRace.of(game, seat).canLandThisRound(seat);
     }
 }

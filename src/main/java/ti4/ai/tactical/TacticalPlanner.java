@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -18,6 +19,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Territory;
@@ -69,6 +71,8 @@ public class TacticalPlanner {
     static final double ATTACK_MIN_SCORE = 4.0;
     private static final double DISTANCE_COST = 0.2;
     private static final double PLANET_TEMPO_VALUE = 0.8;
+    private static final double APPROACH_SHARE = 0.5;
+    private static final int APPROACH_GROUND_FORCES = 2;
     private static final double LANE_PLANET_BONUS = 1.5;
     private static final double SLICE_PLANET_BONUS = 1.0;
     private static final double BORDER_PLANET_BONUS = 0.3;
@@ -187,7 +191,7 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> bestFor(Context context, Tile tile) {
         if (!MovementGraph.canEnter(context.game, context.seat, tile)) return Optional.empty();
         List<TacticalPlan> plans = new ArrayList<>();
-        expand(context, tile).ifPresent(plans::add);
+        context.expansionPlan(tile).ifPresent(plans::add);
         attack(context, tile).ifPresent(plans::add);
         produce(context, tile).ifPresent(plans::add);
         position(context, tile).ifPresent(plans::add);
@@ -274,6 +278,8 @@ public class TacticalPlanner {
         int reserved = context.reservedForOtherTransports(origin, tile, transports);
         int landed = Math.min(Math.min(capacity, available), free.size());
         int loadable = Math.max(landed, Math.min(capacity, available - reserved));
+        boolean approaching = context.approaches(tile);
+        if (approaching) loadable = Math.max(loadable, Math.min(landed + 1, Math.min(capacity, available)));
         List<Planet> targets = free.subList(0, landed);
         List<UnitMove> ordered = mechsFirstForHazardousPlanets(groundForces, targets);
         List<UnitMove> cargo = take(ordered, loadable);
@@ -298,6 +304,9 @@ public class TacticalPlanner {
             value += context.expansionZoneBonus(tile);
         }
         int spareForces = unitCount(cargo) - landed;
+        double approach = approaching && spareForces > 0 ? APPROACH_SHARE * context.approachGain(tile) : 0;
+        if (approach > 0) spareForces--;
+        value += approach;
         value += context.offense()
                 .expansionImperial(tile, targets, defendersAfterExpanding(context, tile, transports, forces));
         value += FORWARD_GROUND_FORCE_VALUE * Math.min(spareForces, forward);
@@ -821,7 +830,94 @@ public class TacticalPlanner {
                 if (known == null || plan.score() > known.score()) best.put(plan.target(), plan);
             }
         }
+        for (TacticalPlan plan : approachPlans(context, activatable)) {
+            TacticalPlan known = best.get(plan.target());
+            if (known == null || plan.score() > known.score()) best.put(plan.target(), plan);
+        }
         return new ArrayList<>(best.values());
+    }
+
+    private static List<TacticalPlan> approachPlans(Context context, Predicate<Tile> activatable) {
+        Tile mecatol = context.game.getMecatolTile();
+        if (mecatol == null
+                || !context.race().isOpen()
+                || context.expansionPlan(mecatol).isPresent()) {
+            return List.of();
+        }
+        List<TacticalPlan> plans = new ArrayList<>();
+        for (Tile origin : context.origins())
+            approachFrom(context, activatable, origin).ifPresent(plans::add);
+        return plans;
+    }
+
+    private static Optional<TacticalPlan> approachFrom(Context context, Predicate<Tile> activatable, Tile origin) {
+        Game game = context.game;
+        Player seat = context.seat;
+        OptionalInt hopsHere = context.race().hopsToMecatol(seat, origin);
+        Optional<UnitMove> transport = cheapestTransport(context, origin);
+        if (hopsHere.isEmpty() || transport.isEmpty()) return Optional.empty();
+        List<UnitMove> ground = availableGroundForces(game, seat, origin, context.defense(), List.of(transport.get()));
+        if (ground.isEmpty()) return Optional.empty();
+        int capacity = BoardView.capacity(seat, transport.get().type());
+        List<UnitMove> group = new ArrayList<>(List.of(transport.get()));
+        group.addAll(take(ground, Math.min(APPROACH_GROUND_FORCES, capacity)));
+        TacticalPlan best = null;
+        for (Tile destination : game.getTileMap().values()) {
+            Optional<TacticalPlan> plan =
+                    approachTo(context, activatable, origin, destination, group, hopsHere.getAsInt());
+            if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
+        }
+        return Optional.ofNullable(best);
+    }
+
+    private static Optional<TacticalPlan> approachTo(
+            Context context,
+            Predicate<Tile> activatable,
+            Tile origin,
+            Tile destination,
+            List<UnitMove> group,
+            int hopsHere) {
+        Game game = context.game;
+        Player seat = context.seat;
+        UnitMove transport = group.getFirst();
+        if (destination == origin || destination.isMecatol(game) || !activatable.test(destination)) {
+            return Optional.empty();
+        }
+        if (!MovementGraph.canEnter(game, seat, destination)
+                || BoardView.hasEnemyShips(game, seat, destination)
+                || context.coveredByEnemySpaceCannon(destination)
+                || !context.reachesWithGravityDrive(origin, destination, transport.type())) {
+            return Optional.empty();
+        }
+        OptionalInt hopsThere = context.race().hopsToMecatol(seat, destination);
+        if (hopsThere.isEmpty() || hopsThere.getAsInt() >= hopsHere) return Optional.empty();
+        double gain = context.approachGain(destination);
+        if (gain <= 0) return Optional.empty();
+        Optional<List<UnitMove>> legal = legalMoves(context, origin, destination, group);
+        if (legal.isEmpty()) return Optional.empty();
+        Defenders after = context.defense().defendersAt(destination).plusShips(transport.type(), transport.count(), 0);
+        double stake = STAGE_SHIP_STAKE * fleetCost(seat, List.of(transport));
+        double counter = context.defense().counterstrike(destination, after, List.of(), stake, 0, seat);
+        double score = APPROACH_SHARE * gain
+                - counter
+                - context.defense().leaveCost(origin, legal.get())
+                - DISTANCE_COST * context.distance(origin, destination, transport.type());
+        TacticalPlan plan = new TacticalPlan(Kind.STAGE, destination.getPosition(), legal.get(), Map.of(), score);
+        return Optional.of(plan.withScore(
+                PlayAreaNotes.adjustedScore(game, seat, destination, plan) + SetupHint.bonusFor(context.hints, plan)));
+    }
+
+    private static Optional<UnitMove> cheapestTransport(Context context, Tile origin) {
+        Player seat = context.seat;
+        UnitType cheapest = null;
+        for (UnitType type : TRANSPORT_PREFERENCE) {
+            if (BoardView.capacity(seat, type) <= 0 || BoardView.undamaged(BoardView.space(origin), seat, type) == 0) {
+                continue;
+            }
+            if (cheapest == null || cost(seat, type) < cost(seat, cheapest)) cheapest = type;
+        }
+        if (cheapest == null) return Optional.empty();
+        return Optional.of(new UnitMove(origin.getPosition(), BoardView.SPACE, cheapest, 1));
     }
 
     private record RankedTarget(Tile tile, double worth) {}
@@ -1666,6 +1762,9 @@ public class TacticalPlanner {
         private ExploreOutlook exploreOutlook;
         private final Map<String, Double> exploreValues = new HashMap<>();
         private Territory territory;
+        private CustodiansRace.Snapshot race;
+        private final Map<String, Optional<TacticalPlan>> expansions = new HashMap<>();
+        private final Map<String, Double> approachGains = new HashMap<>();
         private final Map<String, List<UnitMove>> stageGroups = new HashMap<>();
 
         Context(Game game, Player seat) {
@@ -1701,6 +1800,38 @@ public class TacticalPlanner {
                 }
                 return defense().holdBack(origin, List.of(), ships);
             });
+        }
+
+        CustodiansRace.Snapshot race() {
+            if (race == null) race = CustodiansRace.of(game, seat);
+            return race;
+        }
+
+        boolean approaches(Tile tile) {
+            return !tile.isMecatol(game) && race().isOpen();
+        }
+
+        double approachGain(Tile destination) {
+            return approachGains.computeIfAbsent(destination.getPosition(), position -> {
+                OptionalInt idle = race().idleArrival(seat);
+                OptionalInt moved = race().arrivalFrom(seat, destination);
+                OptionalInt best = idle.isEmpty() ? moved : earlier(idle, moved);
+                return race().raceValue(seat, best, CustodiansRace.Order.UNKNOWN)
+                        - race().raceValue(seat, idle, CustodiansRace.Order.UNKNOWN);
+            });
+        }
+
+        private static OptionalInt earlier(OptionalInt first, OptionalInt second) {
+            if (second.isEmpty()) return first;
+            return OptionalInt.of(Math.min(first.getAsInt(), second.getAsInt()));
+        }
+
+        Optional<TacticalPlan> expansionPlan(Tile tile) {
+            Optional<TacticalPlan> known = expansions.get(tile.getPosition());
+            if (known != null) return known;
+            Optional<TacticalPlan> computed = expand(this, tile);
+            expansions.put(tile.getPosition(), computed);
+            return computed;
         }
 
         Territory territory() {

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.Threats;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
@@ -22,7 +23,8 @@ record PlanInputs(
         Set<String> threatened,
         int reinforcements,
         Map<String, List<TacticalPlan>> freeing,
-        Map<Integer, CardPlan> plans) {
+        Map<Integer, CardPlan> plans,
+        CustodiansRace.Snapshot race) {
 
     private static final int MAX_CACHED = 32;
     private static final Map<String, Cached> CACHE = new LinkedHashMap<>(16, 0.75f, true) {
@@ -53,7 +55,8 @@ record PlanInputs(
                 Threats.reachableByEnemies(game, seat),
                 StrategyCardRules.reinforcements(game, seat),
                 new ConcurrentHashMap<>(),
-                new ConcurrentHashMap<>());
+                new ConcurrentHashMap<>(),
+                CustodiansRace.of(game, seat));
         synchronized (CACHE) {
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }

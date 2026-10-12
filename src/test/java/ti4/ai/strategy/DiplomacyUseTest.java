@@ -135,7 +135,8 @@ class DiplomacyUseTest extends BaseTi4Test {
         });
     }
 
-    // Its carrier is one system from Mecatol Rex, but the custodians cost 6 influence it does not have; Rarron and
+    // Its loaded carrier is one system from Mecatol Rex, but the custodians cost 6 influence it does not have; Rarron
+    // and
     // Meer cover it.
     @Test
     void readiesInfluencePlanetsToPayTheCustodians() {
@@ -145,6 +146,7 @@ class DiplomacyUseTest extends BaseTi4Test {
         rex.addToken(Constants.CUSTODIAN_TOKEN_PNG, "mr");
         Tile next = test.place("26", AiTestGame.neighbourOf("000"));
         test.units(next, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(next, "space", test.nekro, UnitType.Infantry, 1);
 
         assertThat(worthFollowing()).isTrue();
         assertThat(best()).hasValueSatisfying(choice -> {
@@ -163,6 +165,7 @@ class DiplomacyUseTest extends BaseTi4Test {
         rex.addToken(Constants.CUSTODIAN_TOKEN_PNG, "mr");
         Tile next = test.place("26", AiTestGame.neighbourOf("000"));
         test.units(next, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(next, "space", test.nekro, UnitType.Infantry, 1);
         test.nekro.setTacticalCC(0);
 
         assertThat(worthFollowing()).isFalse();

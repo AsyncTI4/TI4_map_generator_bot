@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
@@ -124,6 +125,8 @@ public class ResearchPolicy {
             Map.entry("x89", 1.0));
     private static final Set<String> UNIT_UPGRADE_OBJECTIVES = Set.of("develop", "revolutionize");
     private static final Set<String> COLOUR_PAIR_OBJECTIVES = Set.of("diversify", "master_science");
+    private static final String GRAVITY_DRIVE = "gd";
+    private static final double GRAVITY_DRIVE_RACE_SHARE = 0.5;
     private static final String PRODUCE_EN_MASSE = "pem";
     private static final String LAWS_OF_PHYSICS = "mlp";
     private static final String ADAPT_NEW_STRATEGIES = "ans";
@@ -167,7 +170,18 @@ public class ResearchPolicy {
         if (tech == null || seat.hasTech(alias)) return 0;
         return baseValue(tech)
                 + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
-                + steppingStoneValue(game, seat, tech);
+                + steppingStoneValue(game, seat, tech)
+                + custodiansRaceValue(game, seat, alias);
+    }
+
+    private static double custodiansRaceValue(Game game, Player seat, String alias) {
+        if (!GRAVITY_DRIVE.equals(alias) || !CustodiansRace.open(game)) return 0;
+        CustodiansRace.Snapshot race = CustodiansRace.of(game, seat);
+        double withDrive =
+                race.raceValue(seat, race.arrivalWith(seat, CustodiansRace.Drive.LIKELY), CustodiansRace.Order.UNKNOWN);
+        double without =
+                race.raceValue(seat, race.arrivalWith(seat, CustodiansRace.Drive.OWNED), CustodiansRace.Order.UNKNOWN);
+        return GRAVITY_DRIVE_RACE_SHARE * Math.max(0, withDrive - without);
     }
 
     static double baseValue(TechnologyModel tech) {
