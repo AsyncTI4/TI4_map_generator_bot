@@ -452,6 +452,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
     // when anyone else will do.
     @Test
     void forwardSupplyBaseGivesTheOtherTradeGoodToTheFewestPoints() {
+        table.game.setActiveSystem(AiTestGame.HOME);
         Player hacan = table.third("hacan", "yellow");
         table.points(table.sol, 3);
         table.points(hacan, 1);
@@ -465,6 +466,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
 
     @Test
     void forwardSupplyBaseAvoidsTheActivePlayerWhenItCan() {
+        table.game.setActiveSystem(AiTestGame.HOME);
         Player hacan = table.third("hacan", "yellow");
         table.points(table.sol, 3);
         table.points(hacan, 5);
@@ -475,6 +477,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
 
     @Test
     void forwardSupplyBaseGivesTheActivePlayerTheTradeGoodWhenNobodyElseIsLeft() {
+        table.game.setActiveSystem(AiTestGame.HOME);
         table.test.isActive(table.sol, "action");
 
         assertThat(plan("fsb").orElseThrow().target()).isEqualTo("sol");

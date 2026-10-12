@@ -20,7 +20,11 @@ class ActionCardHand {
     private static final long REFRESH_POLL_MILLIS = 3_000L;
 
     static Optional<Match> playButton(AiTurnContext context, int index, long since) {
-        String id = Constants.AC_PLAY_FROM_HAND + index;
+        return playButton(context, index, "", since);
+    }
+
+    static Optional<Match> playButton(AiTurnContext context, int index, String suffix, long since) {
+        String id = Constants.AC_PLAY_FROM_HAND + index + suffix;
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
             if (!prompt.isHidden() || prompt.createdAtMillis() < since) continue;
             Optional<PromptButton> button =

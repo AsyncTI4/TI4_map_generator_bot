@@ -3,6 +3,7 @@ package ti4.ai.actioncards;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 import ti4.ai.brain.AiTurnContext;
@@ -18,7 +19,31 @@ record AiCard(
         String resolveHandler,
         List<String> targetPrefixes,
         TargetStep target,
-        Consumer<AiTurnContext> onResolve) {
+        Consumer<AiTurnContext> onResolve,
+        Function<Game, String> playSuffix) {
+
+    AiCard(
+            String key,
+            Predicate<String> matches,
+            Window window,
+            Evaluator evaluator,
+            ToDoubleBiFunction<Game, Player> availability,
+            String resolveHandler,
+            List<String> targetPrefixes,
+            TargetStep target,
+            Consumer<AiTurnContext> onResolve) {
+        this(
+                key,
+                matches,
+                window,
+                evaluator,
+                availability,
+                resolveHandler,
+                targetPrefixes,
+                target,
+                onResolve,
+                game -> "");
+    }
 
     AiCard(
             String key,

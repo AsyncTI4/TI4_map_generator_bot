@@ -15,6 +15,7 @@ import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 
 @UtilityClass
@@ -55,6 +56,7 @@ class PlayerTargetCards {
         return AiActionCards.reaction(
                 FORWARD_SUPPLY_BASE,
                 Window.AFTER_ACTIVATION,
+                (game, seat, activated) -> FoWHelper.playerHasUnitsInSystem(seat, activated),
                 PlayerTargetCards::forwardSupplyBasePlan,
                 "forwardSupplyBase",
                 FORWARD_SUPPLY_BASE_PREFIX,

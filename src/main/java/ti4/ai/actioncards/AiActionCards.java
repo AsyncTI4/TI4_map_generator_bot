@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.tactical.Stall;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 
 @UtilityClass
@@ -74,6 +76,7 @@ public class AiActionCards {
             StrategizeCard.strategize(),
             OverruleCard.overrule(),
             ExtraActionCard.masterPlan(),
+            ExtraActionCard.counterstroke(),
             new AiCard(
                     SABOTAGE,
                     ActionCardHelper::isSabotageOrShatter,
@@ -166,11 +169,41 @@ public class AiActionCards {
     static AiCard reaction(
             String key,
             Window window,
+            ActivationTest condition,
             Evaluator evaluator,
             String resolveHandler,
             String targetPrefix,
             TargetStep target) {
-        return card(key, window, evaluator, resolveHandler, List.of(targetPrefix), target);
+        return card(key, window, whenActivated(condition, evaluator), resolveHandler, List.of(targetPrefix), target);
+    }
+
+    static AiCard reactionWithPlayButton(
+            String key,
+            Predicate<String> matches,
+            ActivationTest condition,
+            Evaluator evaluator,
+            List<String> targetPrefixes,
+            TargetStep target,
+            Function<Game, String> playSuffix) {
+        return new AiCard(
+                key,
+                matches,
+                Window.AFTER_ACTIVATION,
+                whenActivated(condition, evaluator),
+                ALWAYS,
+                null,
+                targetPrefixes,
+                target,
+                context -> {},
+                playSuffix);
+    }
+
+    private static Evaluator whenActivated(ActivationTest condition, Evaluator evaluator) {
+        return (game, seat) -> {
+            Tile activated = game.getTileByPosition(game.getActiveSystem());
+            if (activated == null || !condition.holds(game, seat, activated)) return Optional.empty();
+            return evaluator.plan(game, seat);
+        };
     }
 
     private static AiCard card(

@@ -379,6 +379,7 @@ to build one by hand:
     | Divert Funding | the tech tempo times what the technology it gains is worth more than the one it returns (never a unit upgrade or faction technology), plus the objective it completes | the least valuable technology it can return; it never researches that one again |
     | Plagiarize | the tech tempo times a non-faction technology a neighbour owns (and the objective it completes) less the 5 influence, paid with the planets it can best spare | the best such technology |
     | Impersonation | the value of a fresh secret less the 3 influence, paid with the planets it can best spare | none: the secret is drawn at once |
+    | Counterstroke (2 copies) | the tactic token it gets back (at least 0.75) plus what its ships in that system could do once the token no longer holds them; played after another player activates a system holding its token | none: it takes the token back in the system |
     | Overrule | what the strategy card plan values the primary of the card at (Imperial or Technology, the two the bot can run for a card nobody played), plus a little for how often human players overrule that card (Imperial 0.45, Technology 0.25) | an unplayed card of those two; the card stays unplayed for its holder |
     | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the readied or unchosen ones, never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
     | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
@@ -469,7 +470,7 @@ to build one by hand:
     Sabo'd)" button, and when _Coup d'Etat_ is cancelled it plays its strategy card again.
   - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
     (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
-  - Not yet: combat and agenda cards, _War Machine_, _Rally_, _Counterstroke_, _Parley_,
+  - Not yet: combat and agenda cards, _War Machine_, _Rally_, _Parley_,
     _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
     remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
     unusable while it could stall; a test over the deck keeps it that way.

@@ -24,7 +24,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 
@@ -86,11 +85,7 @@ public class ActionCardRules {
         }
         Tile activated = game.getTileByPosition(game.getActiveSystem());
         String key = PlayMemory.reactionKey(context);
-        if (activated == null
-                || !FoWHelper.playerHasUnitsInSystem(seat, activated)
-                || context.memory().has(key)) {
-            return Optional.empty();
-        }
+        if (activated == null || context.memory().has(key)) return Optional.empty();
         if (!mayPlay(game, seat) || keepsSpyNetworkCards(seat)) return Optional.empty();
         Optional<ActionCardValue.Candidate> best =
                 ActionCardValue.bestReactionPlay(game, seat, Window.AFTER_ACTIVATION);
@@ -204,7 +199,8 @@ public class ActionCardRules {
         if (index == null || card.isEmpty()) return Optional.empty();
         Plan plan = card.get().planFor(context.game(), context.seat()).orElse(Plan.of(0));
         String title = SabotageWindow.title(alias);
-        Optional<Match> play = ActionCardHand.playButton(context, index, Long.MIN_VALUE);
+        Optional<Match> play = ActionCardHand.playButton(
+                context, index, card.get().playSuffix().apply(context.game()), Long.MIN_VALUE);
         if (play.isPresent()) {
             PlayMemory.store(context, key, played(context, alias, plan.target()));
             PlayMemory.rememberAnnouncement(context, key, announcementOf(context, title, plan));
