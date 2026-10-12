@@ -342,7 +342,9 @@ to build one by hand:
     the turn ends once it is resolved. A component action also stalls: it takes the turn without committing
     anything while the other players keep acting, which is worth 1.5 trade goods (`Stall.ACTION_VALUE`, the same
     figure relics, _Enigmatic Device_ and the _Sling Relay_ use) as long as at least one other player has not passed.
-    That is added to what every component action card does now, but only when the card does something at all. The
+    That is added to what every component action card does now, even a card whose effect gives nothing (_Industrial
+    Initiative_ with no industrial planet is a pure stall). A card that cannot legally be played (no legal target, _War
+    Effort_ with no room for the cruiser) has no value. The
     economy cards are _Mining Initiative_ (trade goods equal to its best planet's resources), _Industrial Initiative_
     (its industrial planets), _Economic Initiative_ (readying its spent cultural planets, valued as Diplomacy's ready
     is: the resources and influence that would be spent this round on production, research, tokens, the custodians
@@ -351,7 +353,9 @@ to build one by hand:
     ships) and _War Effort_ (a cruiser where the fleet pool and cruiser limit allow it). A card that unlocks a spend
     objective is worth the points it scores (30 if they win the game). Economy cards and the cards below are played
     when what they do now, with the stall, is worth at least their keep prior (half of it near the hand limit), either
-    instead of a tactical action that scores less, or when it is about to pass. Seats on the earlier rules (the A/B
+    instead of a tactical action that scores less, or when it is about to pass. Among the cards it may play it spends the
+    one with the largest margin (what it does now less its keep prior), so a card that is worth little in the hand goes as a
+    pure stall before a good one is wasted as one. Seats on the earlier rules (the A/B
     flag) play the economy cards only when about to pass and worth 2 (1 near the limit) without the stall.
     _Summit_ is pre-played as soon as it is drawn.
     | Card | Worth | Target |
@@ -368,6 +372,21 @@ to build one by hand:
     | Focused Research | the best technology it could research at the tech tempo (and the objective it completes) less the 4 trade goods, when the scoring reserve can spare them | the technology the Technology card would pick |
     | Divert Funding | the tech tempo times what the technology it gains is worth more than the one it returns (never a unit upgrade or faction technology), plus the objective it completes | the least valuable technology it can return; it never researches that one again |
     | Plagiarize | the tech tempo times a non-faction technology a neighbour owns (and the objective it completes) less the 5 influence, paid with the planets it can best spare | the best such technology |
+    | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
+    | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), else a pure stall | a legal system that is not next to its own planets or units |
+    | Pirate Fleet | 2 × a contender's standing for blocking its approach, less the 3 resources, paid honestly | a legal system next to a contender and away from its own ships |
+    | Mercenary Contract | the points a contender loses with the planet (and a third of the planet's value) less the 2 trade goods | an empty non-home planet a contender controls, among the first 22 the bot lists |
+    | Signal Jamming | what the player would have wanted from the system: a third of the planets it could still take, a point for Mecatol Rex, times its standing | the player and the system next to or with its ships; a pure stall elsewhere |
+    | Cripple Defenses | a PDS (1) per PDS on the planet times the owner's standing | a rival planet without its own PDS on it; a pure stall when there is no PDS |
+    | Plague | half the infantry on the planet × 0.5 × the owner's standing | the rival planet with the most infantry, never one it has ground forces on |
+    | Unstable Planet | half the planet's value if readied, plus up to 3 infantry (0.5 each), times the owner's standing | a rival's hazardous planet, never one it has ground forces on |
+    | Reactor Meltdown | a space dock (4 early, 2 later) times the owner's standing | a rival's dock outside the home systems |
+    | Tactical Bombardment | half the value of each readied rival planet in a system with its BOMBARDMENT units | played only when a readied rival planet is there |
+    | Lucky Shot | the cost of the ship times the owner's standing | a rival dreadnought, cruiser or destroyer in a system with a planet it holds |
+    | Scuttle | a fifth of the ship's cost plus the points the trade goods unlock | one ship in a system without enemies, with no planet of its own and no objective riding on it; it then finishes |
+    | Seize Artifact | a fragment, a half more against a contender | a neighbour's fragment of the kind it wants most |
+    | Repeal Law | the harm of a law that hurts it (an election that punishes the elected, one that punishes its planet) or the point a rival gets from a point law | a law that hurts the seat; never one that helps it |
+    | Brilliance | the readying value of a spent planet with a technology specialty, else 2 for its own breakthrough | the best ready, else a breakthrough for the weakest player who is not a contender |
 
     Every row of this table, and the economy cards, also adds the stall. The *tech tempo* converts a technology's value to
     trade goods: technology comes from few sources, so the Technology follow pays 4 resources and a strategy token
@@ -430,8 +449,10 @@ to build one by hand:
     Sabo'd)" button, and when _Coup d'Etat_ is cancelled it plays its strategy card again.
   - **When targeted** (once the card's Sabotage window has closed). It hands a card to a _Spy_ (if it has one), gives the least harmful promissory note to _Diplomatic Pressure_
     (keeping Support for the Throne), and under _Extreme Duress_ plays its strategy card rather than lose its hand.
-  - Not yet: combat and agenda cards, _Overrule_, _Strategize_, _War Machine_, _Rally_, _Counterstroke_, _Parley_ and the
-    remaining component action cards.
+  - Not yet: combat and agenda cards, _Overrule_, _Strategize_, _War Machine_, _Rally_, _Counterstroke_, _Parley_,
+    _Exchange Program_ (its agreement needs a negotiation, and the other way costs both players a fleet token) and the
+    remaining component action cards. Every other card of the deck's Action window is played, so none is discarded as
+    unusable while it could stall; a test over the deck keeps it that way.
 - **Promissory notes** (`ti4.ai.promissory`). It plays the notes other players gave it, only through the bot's own
   buttons and only in the note's timing window:
   - _Trade Agreement_ when its owner replenishes (if they have commodities), _Research Agreement_ for a technology

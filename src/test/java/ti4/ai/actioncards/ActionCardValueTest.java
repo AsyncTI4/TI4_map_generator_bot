@@ -35,8 +35,17 @@ class ActionCardValueTest extends BaseTi4Test {
 
     @Test
     void aCardARulePlaysIsWorthItsPriorBeforeTheBoardAsksForIt() {
+        test.sol.setPassed(true);
+
         assertThat(keep("industrial_initiative")).isEqualTo(ActionCardPrior.keepPrior("industrial_initiative"));
-        assertThat(keep("sabo1")).isEqualTo(ActionCardPrior.keepPrior("sabo1"));
+        assertThat(keep("sabo1"))
+                .isEqualTo(Math.max(ActionCardPrior.keepPrior("sabo1"), SabotagePolicy.OVERRULE_RESERVE));
+    }
+
+    // A component action card that can be played is at least a stall while another player still acts.
+    @Test
+    void aPlayableComponentCardIsWorthAtLeastTheStall() {
+        assertThat(keep("industrial_initiative")).isEqualTo(Stall.ACTION_VALUE);
     }
 
     @Test
@@ -75,12 +84,61 @@ class ActionCardValueTest extends BaseTi4Test {
     }
 
     @Test
-    void anEconomyCardThatGainsNothingIsNotWorthTheStall() {
-        test.nekro.getPlanets().clear();
-
+    void anEconomyCardThatGainsNothingIsStillAStall() {
         assertThat(ActionCardValue.playValue(test.game, test.nekro, "industrial_initiative"))
                 .isZero();
+        assertThat(economyPlanValue("industrial_initiative")).isEqualTo(Stall.ACTION_VALUE);
+        assertThat(economyPlanValue("economic_initiative")).isEqualTo(Stall.ACTION_VALUE);
+    }
+
+    @Test
+    void aPureStallIsWorthNothingOnceEveryOtherPlayerHasPassed() {
+        test.sol.setPassed(true);
+
         assertThat(economyPlanValue("industrial_initiative")).isZero();
+    }
+
+    // Rise of a Messiah needs a planet to put an infantry on, Frontline Deployment and Mining a planet to use, and
+    // War Effort a system to put the cruiser in: without one the card cannot be played at all.
+    @Test
+    void anEconomyCardWithNothingToUseItOnCannotBePlayed() {
+        test.nekro.getPlanets().clear();
+
+        assertThat(AiActionCards.of("messiah").orElseThrow().planFor(test.game, test.nekro))
+                .isEmpty();
+        assertThat(AiActionCards.of("f_deployment").orElseThrow().planFor(test.game, test.nekro))
+                .isEmpty();
+        assertThat(AiActionCards.of("mining_initiative").orElseThrow().planFor(test.game, test.nekro))
+                .isEmpty();
+        assertThat(AiActionCards.of("industrial_initiative").orElseThrow().planFor(test.game, test.nekro))
+                .isPresent();
+    }
+
+    // Both gain nothing, so both are the same 1.5 stall; the one worth less in the hand is the one to spend.
+    @Test
+    void theCardWorthLeastInHandIsSpentAsAPureStallFirst() {
+        test.place("37", "202");
+        test.nekro.getPlanets().clear();
+        test.nekro.addPlanet("meer");
+        test.nekro.setActionCard("mining_initiative", 1);
+        test.nekro.setActionCard("industrial_initiative", 2);
+
+        assertThat(economyPlanValue("mining_initiative")).isEqualTo(Stall.ACTION_VALUE);
+        assertThat(ActionCardPrior.keepPrior("industrial_initiative"))
+                .isLessThan(ActionCardPrior.keepPrior("mining_initiative"));
+        assertThat(ActionCardValue.bestComponentPlay(test.game, test.nekro))
+                .hasValueSatisfying(best -> assertThat(best.alias()).isEqualTo("industrial_initiative"));
+    }
+
+    // A card that gains a lot is the better play even though it is also the better card to keep: the margin is
+    // what it gains over holding it.
+    @Test
+    void aCardThatGainsMoreHasTheLargerMarginEvenIfItIsWorthMoreInHand() {
+        test.nekro.setActionCard("mining_initiative", 1);
+        test.nekro.setActionCard("industrial_initiative", 2);
+
+        assertThat(ActionCardValue.bestComponentPlay(test.game, test.nekro))
+                .hasValueSatisfying(best -> assertThat(best.alias()).isEqualTo("mining_initiative"));
     }
 
     @Test
@@ -103,10 +161,18 @@ class ActionCardValueTest extends BaseTi4Test {
     }
 
     @Test
-    void aLoneSabotageIsWorthTheFullPrior() {
+    void aLoneSabotageIsWorthTheFullPriorOnceOverruleHasBeenSeen() {
         test.nekro.setActionCard("sabo3", 3);
+        test.game.getGameStats().recordAcPlay("Overrule", test.sol);
 
         assertThat(keep("sabo3")).isEqualTo(ActionCardPrior.keepPrior("sabo3"));
+    }
+
+    @Test
+    void aLoneSabotageIsWorthTheReserveWhileOverruleIsUnseen() {
+        test.nekro.setActionCard("sabo3", 3);
+
+        assertThat(keep("sabo3")).isEqualTo(SabotagePolicy.OVERRULE_RESERVE);
     }
 
     @Test
@@ -116,7 +182,7 @@ class ActionCardValueTest extends BaseTi4Test {
         test.nekro.setActionCard("sabo1", 3);
 
         assertThat(ActionCardValue.discardOrder(test.game, test.nekro))
-                .containsExactly("overrule", "industrial_initiative", "sabo1");
+                .containsExactly("overrule", "sabo1", "industrial_initiative");
     }
 
     // Among cards that are worth nothing the weaker one goes first.

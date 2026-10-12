@@ -23,6 +23,8 @@ public class AiActionCards {
     private static final Evaluator NEVER = (game, seat) -> Optional.empty();
     private static final double SUMMIT_TOKEN_VALUE = 2.0;
 
+    // TODO Exchange Program is not played: its agreement needs a negotiation and the other way costs both players a
+    // fleet token.
     private static final List<AiCard> CARDS = List.of(
             economy(ActionCardValue.MINING, "miningInitiative", null),
             economy(ActionCardValue.INDUSTRIAL, "industrialInitiative", null),
@@ -51,6 +53,21 @@ public class AiActionCards {
             ResearchCards.focusedResearch(),
             ResearchCards.divertFunding(),
             ResearchCards.plagiarize(),
+            TokenCards.unexpectedAction(),
+            TokenCards.signalJamming(),
+            NeutralUnitCards.pirateContract(),
+            NeutralUnitCards.pirateFleet(),
+            NeutralUnitCards.mercenaryContract(),
+            StrikeCards.crippleDefenses(),
+            StrikeCards.plague(),
+            StrikeCards.unstablePlanet(),
+            StrikeCards.reactorMeltdown(),
+            StrikeCards.tacticalBombardment(),
+            StrikeCards.luckyShot(),
+            ShipCards.scuttle(),
+            TableCards.seizeArtifact(),
+            TableCards.repealLaw(),
+            TableCards.brilliance(),
             new AiCard(
                     SABOTAGE,
                     ActionCardHelper::isSabotageOrShatter,
@@ -99,6 +116,24 @@ public class AiActionCards {
         return card(key, Window.COMPONENT_ACTION, withStall(evaluator), resolveHandler, targetPrefixes, target);
     }
 
+    static AiCard componentOfCopies(
+            String key,
+            Predicate<String> matches,
+            Evaluator evaluator,
+            String resolveHandler,
+            List<String> targetPrefixes,
+            TargetStep target) {
+        return new AiCard(
+                key,
+                matches,
+                Window.COMPONENT_ACTION,
+                withStall(evaluator),
+                ALWAYS,
+                resolveHandler,
+                targetPrefixes,
+                target);
+    }
+
     static AiCard reaction(
             String key,
             Window window,
@@ -125,20 +160,19 @@ public class AiActionCards {
                 alias,
                 matches,
                 Window.ECONOMY,
-                (game, seat) -> Optional.of(Plan.of(economyValue(game, seat, alias))),
+                (game, seat) -> ActionCardValue.economyPlan(game, seat, alias),
                 ALWAYS,
                 resolveHandler,
                 List.of(),
                 target);
     }
 
-    private static Evaluator withStall(Evaluator evaluator) {
-        return (game, seat) -> evaluator.plan(game, seat).map(plan -> plan.plus(Stall.actionValue(game, seat)));
+    static Evaluator stalling(Evaluator evaluator) {
+        return withStall(evaluator);
     }
 
-    private static double economyValue(Game game, Player seat, String alias) {
-        double value = ActionCardValue.newRulesPlayValue(game, seat, alias);
-        return value > 0 ? value + Stall.actionValue(game, seat) : 0;
+    private static Evaluator withStall(Evaluator evaluator) {
+        return (game, seat) -> evaluator.plan(game, seat).map(plan -> plan.plus(Stall.actionValue(game, seat)));
     }
 
     private static double summitValue(Game game, Player seat) {

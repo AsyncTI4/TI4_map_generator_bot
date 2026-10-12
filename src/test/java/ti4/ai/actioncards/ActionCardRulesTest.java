@@ -153,10 +153,21 @@ class ActionCardRulesTest extends BaseTi4Test {
                 .contains(Stage.CANCELED);
     }
 
+    // Industrial Initiative gains nothing with no industrial planet, but it is still a turn that commits nothing
+    // while the others act, and it is a card worth less than that.
+    @Test
+    void playsACardThatGainsNothingAsAPureStallWhileOthersStillAct() {
+        test.nekro.setActionCard("industrial_initiative", 9);
+
+        assertThat(pressed(ActionCardRules.playBeforePassing(test.context(hand("ac_play_from_hand_9")))))
+                .isEqualTo("ac_play_from_hand_9");
+    }
+
     // A card whose value is small is kept rather than spent on nothing.
     @Test
-    void keepsACardThatIsNotWorthPlaying() {
+    void keepsACardThatIsNotWorthPlayingOnceEveryOtherPlayerHasPassed() {
         test.nekro.setActionCard("industrial_initiative", 9);
+        test.sol.setPassed(true);
 
         assertThat(ActionCardRules.playBeforePassing(test.context(hand("ac_play_from_hand_9"))))
                 .isEmpty();

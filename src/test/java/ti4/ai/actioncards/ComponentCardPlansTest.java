@@ -419,20 +419,20 @@ class ComponentCardPlansTest extends BaseTi4Test {
     }
 
     @Test
-    void economicInitiativeIsHeldWhenEveryCulturalPlanetIsReady() {
+    void economicInitiativeIsOnlyAStallWhenEveryCulturalPlanetIsReady() {
         table.system("26", "202");
         table.nekro.addPlanet("lodor");
 
-        assertThat(plan("economic_initiative").map(Plan::value).orElse(0.0)).isZero();
+        assertThat(plan("economic_initiative").orElseThrow().value()).isCloseTo(table.stall(), within(1e-9));
     }
 
-    // A seat that has passed takes no more actions, so readying a planet buys nothing: no stall either.
+    // A seat that has passed takes no more actions, so readying a planet buys it nothing.
     @Test
-    void economicInitiativeIsWorthNothingToASeatThatHasPassedWithoutASpendObjective() {
+    void economicInitiativeReadiesNothingOfValueForASeatThatHasPassedWithoutASpendObjective() {
         spentCulturalPlanetWithProductionToCome();
         table.nekro.setPassed(true);
 
-        assertThat(plan("economic_initiative").map(Plan::value).orElse(0.0)).isZero();
+        assertThat(ReadyingValue.of(table.game, table.nekro, List.of("lodor"))).isZero();
     }
 
     // Only the cultural planets are readied; a spent hazardous planet changes nothing.
@@ -443,7 +443,7 @@ class ComponentCardPlansTest extends BaseTi4Test {
         table.nekro.exhaustPlanet("abyz");
         table.nekro.setTacticalCC(3);
 
-        assertThat(plan("economic_initiative").map(Plan::value).orElse(0.0)).isZero();
+        assertThat(plan("economic_initiative").orElseThrow().value()).isCloseTo(table.stall(), within(1e-9));
     }
 
     // ---- Forward Supply Base -----------------------------------------------------------------

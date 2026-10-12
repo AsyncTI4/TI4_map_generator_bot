@@ -87,9 +87,13 @@ public class SabotagePolicy {
         if (held.isEmpty()) return Double.MAX_VALUE;
         double prior = ActionCardPrior.keepPrior(held.getFirst());
         if (held.size() > 1) return ActionCardValue.EXTRA_SABOTAGE_SHARE * prior;
+        return Math.max(prior, reserve(game, seat, title));
+    }
+
+    static double reserve(Game game, Player seat, String title) {
         double reserve = ScoringStakes.anyOpponentIsContender(game, seat) ? CONTENDER_RESERVE : 0;
         if (!OVERRULE_TITLE.equals(title) && overruleUnseen(game, seat)) reserve = Math.max(reserve, OVERRULE_RESERVE);
-        return Math.max(prior, reserve);
+        return reserve;
     }
 
     private static boolean worthCancelling(AiTurnContext context, Cancellation cancellation) {

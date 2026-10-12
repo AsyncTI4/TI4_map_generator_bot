@@ -14,6 +14,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.ReadyingValue;
+import ti4.ai.tactical.Stall;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -47,7 +48,12 @@ public class ActionCardValue {
     private static final double SPARE_BELOW = 2.0;
     private static final double NEAR_LIMIT_PRIOR_SHARE = 0.5;
 
-    record Candidate(String alias, double value) {}
+    record Candidate(String alias, double value) {
+
+        double margin() {
+            return value - ActionCardPrior.keepPrior(alias);
+        }
+    }
 
     public static Optional<Candidate> bestComponentPlay(Game game, Player seat) {
         if (!AiSettings.usesLegacyActionCards(seat)) return bestNewComponentPlay(game, seat);
@@ -75,7 +81,9 @@ public class ActionCardValue {
                 .map(alias -> candidate(game, seat, alias, List.of(windows)))
                 .flatMap(Optional::stream)
                 .filter(candidate -> candidate.value() >= share * ActionCardPrior.keepPrior(candidate.alias()))
-                .max(Comparator.comparingDouble(Candidate::value));
+                .max(Comparator.comparingDouble(Candidate::margin)
+                        .thenComparingDouble(Candidate::value)
+                        .thenComparing(Candidate::alias, Comparator.reverseOrder()));
     }
 
     private static Optional<Candidate> candidate(Game game, Player seat, String alias, List<Window> windows) {
@@ -108,10 +116,22 @@ public class ActionCardValue {
         };
     }
 
-    static double newRulesPlayValue(Game game, Player seat, String alias) {
+    static Optional<Plan> economyPlan(Game game, Player seat, String alias) {
+        if (!isPlayable(game, seat, alias)) return Optional.empty();
         double value = playValue(game, seat, alias);
-        if (!ECONOMIC.equals(alias)) return value;
-        return value + ReadyingValue.of(game, seat, exhaustedCulturalPlanets(game, seat));
+        if (ECONOMIC.equals(alias)) {
+            value += ReadyingValue.of(game, seat, exhaustedCulturalPlanets(game, seat));
+        }
+        return Optional.of(Plan.of(value + Stall.actionValue(game, seat)));
+    }
+
+    private static boolean isPlayable(Game game, Player seat, String alias) {
+        return switch (alias) {
+            case MINING, FRONTLINE -> !seat.getPlanets().isEmpty();
+            case MESSIAH -> messiahPlanets(game, seat) > 0;
+            case WAR_EFFORT -> canPlaceCruiser(game, seat);
+            default -> true;
+        };
     }
 
     public static double keepValue(Game game, Player seat, String alias) {
@@ -119,18 +139,19 @@ public class ActionCardValue {
         Optional<AiCard> card = AiActionCards.of(alias);
         if (card.isEmpty()) return NOT_USABLE;
         double prior = ActionCardPrior.keepPrior(alias);
-        if (card.get().isSabotage()) return prior * sabotageCopyShare(seat, alias);
+        if (card.get().isSabotage()) return sabotageKeep(game, seat, alias, prior);
         double held = prior * card.get().availabilityFor(game, seat);
         double now = Math.min(card.get().playValueFor(game, seat), ECONOMY_CAP);
         return Math.max(held, now);
     }
 
-    private static double sabotageCopyShare(Player seat, String alias) {
+    private static double sabotageKeep(Game game, Player seat, String alias, double prior) {
         long earlierCopies = seat.getActionCards().keySet().stream()
                 .filter(AiActionCards::isSabotage)
                 .filter(other -> other.compareTo(alias) < 0)
                 .count();
-        return earlierCopies == 0 ? 1.0 : EXTRA_SABOTAGE_SHARE;
+        if (earlierCopies > 0) return prior * EXTRA_SABOTAGE_SHARE;
+        return Math.max(prior, SabotagePolicy.reserve(game, seat, ""));
     }
 
     public static List<String> discardOrder(Game game, Player seat) {

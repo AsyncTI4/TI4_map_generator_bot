@@ -67,6 +67,10 @@ public class AgendaPolicy {
     private static final String ELECT_PLAYER = "elect player";
     private static final Set<String> POINT_ELECTIONS = Set.of("censure", "shard_of_the_throne", "crown_of_emphidia");
 
+    public static boolean givesElectedPlayerAPoint(String agenda) {
+        return POINT_ELECTIONS.contains(agenda);
+    }
+
     public static boolean favoursElectedPlayer(String agenda) {
         return GOOD_FOR_ELECTED_PLAYER.contains(agenda);
     }

@@ -321,6 +321,7 @@ public class ActionCardRules {
             return expired(context, play, PROMPT_MILLIS) ? stop(context, key, play, Stage.DONE) : Optional.empty();
         }
         context.memory().remove(REF_KEY + key);
+        card.get().onResolve().accept(context);
         PlayMemory.moveTo(context, key, play, after);
         return Optional.of(button.get().press("resolve " + SabotageWindow.title(play.alias())));
     }
