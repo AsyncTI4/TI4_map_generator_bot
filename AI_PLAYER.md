@@ -170,7 +170,8 @@ to build one by hand:
     influence while its ships can reach Mecatol Rex, and the influence-leaning planets a Leadership secondary (or its
     own primary) would spend on command tokens while that card is still to come this round.
   - **Mecatol Rex.** It lands on Mecatol Rex when it can pay the custodians' 6 influence (on top of the reserve),
-    pays it honestly, and scores the Imperial point whenever it plays Imperial while holding Mecatol Rex.
+    pays it honestly, and scores the Imperial point whenever it plays Imperial while holding Mecatol Rex. Before then
+    it races for the custodians (below).
   - **Secret objectives** (`ti4.ai.secrets`), within the scoring limits:
     - **Status phase:** one per status phase, choosing among those it qualifies for the one it could lose first
       (board presence) and the ones with a cost last. It pays those costs honestly: 5 action cards for
@@ -234,11 +235,11 @@ to build one by hand:
   | --- | --- |
   | Leadership | the tactical actions its 3 tokens unlock (the plans it could not otherwise afford), and acting first in a race for the custodians |
   | Diplomacy | locking a system with its planets that an enemy fleet can reach (home most, by what an attack on it before the seat's next turn would cost it; more when close to winning), and readying its best 2 planets (more with a spend objective revealed). Base-game Diplomacy has no buttons to resolve, so it is worth only its trade goods |
-  | Politics | becoming speaker (more when it will want Imperial next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), and looking at the agenda deck once the custodians are taken |
+  | Politics | becoming speaker (more when it will want Imperial next round or is racing a rival for the custodians next round; a loss when it is already speaker, since the card hands the token away), 2 action cards (a point when they complete _Form a Spy Network_), and looking at the agenda deck once the custodians are taken |
   | Construction | a space dock early, PDS (more under threat), a structure objective it would complete; for the Thunder's Edge card also production at a dock without placing a token, so the units can move out this round |
   | Trade | 3 trade goods, its commodities, a spend objective they make payable, and leverage for deals |
   | Warfare | PoK: a command token plus one reactivation; Thunder's Edge: a free tactical action. Reactivations are a second build at home, building at home and then moving out, moving twice to reach a far system, or activating a system that holds its token |
-  | Technology | the best technology it can research (and a second worth 6 resources); for Nekro, Propagation's tokens |
+  | Technology | the best technology it can research (and a second worth 6 resources; Gravity Drive is worth more while the custodians are still to be taken and it saves the seat a round); for Nekro, Propagation's tokens |
   | Imperial | an extra public objective this round, the Mecatol Rex point (less while an enemy fleet can reach it, half when it can take Mecatol this round), or a secret; plus denying the card to a Mecatol Rex holder still to pick |
 
   The pick adds the trade goods on a card and a small nudge (at most an eighth of a point) from how often human Nekro
@@ -411,6 +412,31 @@ to build one by hand:
     next round. Every ground force it brings lands: a mech on each hazardous planet it can, then one force on every
     other planet, then a second infantry on each hazardous planet (the cards that remove one become nearly free),
     then the rest spread over the planets.
+  - **Territory** (`Territory`). Every system belongs to somebody, by hex distance alone (anomalies, ships and hyperlanes
+    ignored): the seat's home, the _lanes_ (the shortest paths from its home to Mecatol Rex, up to the point where a
+    rival is closer), its _slice_ (closer to its home than to any other), the _border_ (as close to a rival as to
+    its home), a rival's area, and the rivals' homes and Mecatol Rex themselves. Every planet an expansion takes is worth
+    1.5 more on a lane, 1.0 more in the slice and 0.3 more on the border, and costs 1.0 in a rival's area while the game
+    is young (fading to nothing after round 4). An attack that lands on a planet of the lane, slice or border gets the
+    same bonus, but no penalty elsewhere: attacking into a rival's area is the offensive planner's job.
+  - **Holding Mecatol Rex.** What holding Mecatol Rex is worth beyond its planet is the Imperial point of the rounds ahead
+    (`MecatolStake`): a quarter of a victory point for each of at most two later rounds, nothing in the last one. It
+    counts for the seat in an attack or expansion that takes Mecatol Rex, as denial against the holder it is taken
+    from, in what a Mecatol Rex the seat holds is worth defending, and in what a counterstrike on it would cost. Taking
+    Mecatol Rex angers its holder half as much as raiding a home system.
+  - **The race for the custodians** (`CustodiansRace`, public information only). For every seat it works out when a
+    loaded transport (a ship with capacity and a ground force in its system) could land on Mecatol Rex. A transport hops
+    once a round, as far as its move allows (Gravity Drive adds one; a seat with a propulsion technology is assumed to
+    research it), and not at all from a system holding its own command token or once the seat has passed. The arrival is
+    pushed back a round when the seat could not pay the 6 influence, or, for a later arrival, when its planets, trade
+    goods and free planets in reach would not make 6, and is empty under another player's space cannon. A seat that arrives
+    in the same round as a rival wins it by the order of play (the Naalu 0 token first, otherwise the initiative when it is
+    known, a coin flip when it is not), and a rival that arrives sooner usually wins. Mecatol Rex is worth the
+    custodians' point, its hold value and its planet. This drives: **approach moves** (a loaded transport that cannot
+    land this action moves one system closer, worth half of the race it wins, and an expansion that brings a spare
+    ground force gets the same bonus); Leadership (acting first in a same-round race); Politics (the speaker token, when
+    the seat and a rival both arrive next round); the research of Gravity Drive; and the influence it keeps for the
+    custodians while a loaded transport could land.
   - **Attack** (the model is described under **Offense** below): a strike moves ships, and the ground forces they carry,
     from one to three systems into a system holding a single other player's units or planets, and lands on the planets
     there that are worth it, free ones included. Its exact odds (`CombatOdds`, with standing combat modifiers such as
@@ -520,11 +546,14 @@ to build one by hand:
        taken only in their owner's home system, on Mecatol Rex, with _Conquer the Weak_ or against a player close to winning.
     The strikes of a system are first ranked by a cheap score (the value and the exposure of the systems they leave), and
     the two best plus the best held-back and all-in departures get the full economics. Up to three origins join one
-    strike while the combined score keeps improving and the fleet pool allows it. A fleet that cannot yet reach a
-    winning player's home, Mecatol Rex or a planet that stops its objectives can _stage_: it moves to a system from which
-    it can strike next round, worth about a third of the strike it prepares (against the opponent's units and the
+    strike while the combined score keeps improving and the fleet pool allows it. Fleets that cannot yet reach a
+    winning player's home, Mecatol Rex or a planet that stops its objectives can _stage_: they move to a system from which
+    they can strike next round, worth about a third of the strike they prepare (against the opponent's units and the
     reinforcements it could bring), less the counterstrike at the staging system, and half as much when the opponent
-    holds an unplayed Diplomacy it could lock a planet with. Docks within two moves of a player worth hurting value their
+    holds an unplayed Diplomacy it could lock a planet with. Targets are ranked by their prize times how much of the
+    force the opponent can have there next round the seat's ships can reach within two moves (below half, they are not
+    worth staging for), and a staging system gathers the ships of up to three origins that reach it this action and the
+    target next round, within fleet supply; the two safest staging systems per target get the future strike checked. Docks within two moves of a player worth hurting value their
     dreadnoughts, cruisers, upgraded destroyers, War Suns and flagships half as much again.
     Not yet: screening chokepoints; locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
     without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
@@ -668,8 +697,11 @@ Four small generic changes don't reference `ti4.ai`:
     it, secrets, techs, planets and trade goods per seat) and the AI's decisions counted by reason. A batch ends
     with the average victory points of the leader and of the whole table, the measure of the AI's strength, the
     tactical plans per game by kind (attacks, attacks on another player's home and the ones that landed there, attacks
-    on Mecatol Rex against an Imperial holder, staging moves) and the time `TacticalPlanner.ranked` takes on sampled
-    real boards.
+    on Mecatol Rex, the ones that landed and the ones against an Imperial holder, staging moves, and how many sampled
+    rankings held a stage plan), where expansions went by territory zone and round band, the round the custodians were
+    taken with who took them (their initiative, speaker token and first action, and the Politics, speaker and
+    Leadership chain around round 1 and 2), how often Mecatol Rex changed hands afterwards, and the time
+    `TacticalPlanner.ranked` takes on sampled real boards.
   - By default it plays the first round:
     ```
     mvn -o test -Dtest=AiSelfPlayTest
